@@ -158,4 +158,8 @@ export class UserService {
       return info.isBlogAdmin() || info.isBlogPostEditor();
     });
   }
+
+  isLoggedIn(): boolean {
+    return this.userInfo !== null && this.userInfo.isLoggedIn();
+  }
 }

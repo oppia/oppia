@@ -372,7 +372,7 @@
     <li [ngClass]="{'show' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         #profileDropdown="ngbDropdown"
-        *ngIf="userIsLoggedIn && !pageIsIframed"
+        *ngIf="authStatusResolved && userIsLoggedIn && !pageIsIframed"
         class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown pfl">
       <a [attr.aria-expanded]="profileDropdown.isOpen() ? 'true' : 'false'"
          (click)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
@@ -541,7 +541,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="!userIsLoggedIn && username !== '' && !pageIsIframed"
+        *ngIf="authStatusResolved && !userIsLoggedIn && username !== '' && !pageIsIframed"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
@@ -569,7 +569,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="username === '' && !pageIsIframed"
+        *ngIf="authStatusResolved && username === '' && !pageIsIframed"
         class="oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container oppia-navbar-button-container-extra-info">
       </div>
