@@ -46,6 +46,7 @@
 
 # Angular Migration team
 /core/templates/pages/base-root.component.ts @oppia/lace-frontend-reviewers
+/core/controllers/reproduce_collection_error_test.py @oppia/lace-backend-reviewers
 /core/controllers/oppia_root*.py @oppia/lace-frontend-reviewers
 /core/templates/components/shared-component.module.ts @oppia/lace-frontend-reviewers
 /core/templates/services/loader.service*.ts @oppia/lace-frontend-reviewers
