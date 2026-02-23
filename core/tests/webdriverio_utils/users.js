@@ -63,7 +63,7 @@ var login = async function (email, useManualNavigation = true) {
   }
 
   var loginPage = $('.e2e-test-login-page');
-  await waitFor.presenceOf(loginPage, 'Login page did not load');
+  await waitFor.visibilityOf(loginPage, 'Login page did not load');
 
   var emailInput = $('.e2e-test-sign-in-email-input');
   await action.setValue('Email input', emailInput, email);
