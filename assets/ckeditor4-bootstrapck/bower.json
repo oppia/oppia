@@ -1,0 +1,27 @@
+{
+  "name": "bootstrapck4-skin",
+  "version": "1.0.0",
+  "homepage": "http://kunstmaan.github.io/BootstrapCK4-Skin/",
+  "authors": [
+    "Kunstmaan Team <labs@kunstmaan.be>"
+  ],
+  "description": "A Bootstrap inspired skin for CKeditor4",
+  "main": "ckeditor.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "ckeditor",
+    "wysiwyg",
+    "bootstrap",
+    "theme"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
