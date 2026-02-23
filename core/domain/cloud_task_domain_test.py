@@ -108,8 +108,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         self.assertEqual(cloud_task_run.to_dict(), cloud_task_run_dict)
 
 
-class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
-    """Unit tests for VoiceoverRegenerationTaskMapping domain object."""
+class VoiceoverRegenerationJobTests(test_utils.GenericTestBase):
+    """Unit tests for VoiceoverRegenerationJob domain object."""
 
     def test_should_create_domain_object_correctly(self) -> None:
         exploration_id = 'exp_id'
@@ -122,7 +122,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         }
 
         voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            cloud_task_domain.VoiceoverRegenerationJob(
                 exploration_id,
                 task_run_id,
                 language_accent_to_content_status_map,
@@ -151,7 +151,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         }
 
         voiceover_regeneration_task_mapping_dict: (
-            cloud_task_domain.VoiceoverRegenerationTaskMappingDict
+            cloud_task_domain.VoiceoverRegenerationJobDict
         ) = {
             'exploration_id': exploration_id,
             'task_run_id': task_run_id,
@@ -161,7 +161,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         }
 
         voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping.from_dict(
+            cloud_task_domain.VoiceoverRegenerationJob.from_dict(
                 voiceover_regeneration_task_mapping_dict
             )
         )
@@ -175,8 +175,10 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         exploration_id = 'exp_id'
         task_run_id = 'task_run_id'
 
-        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping.create_default_voiceover_regeneration_task_mapping(
-            exploration_id, task_run_id
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationJob.create_default(
+                exploration_id, task_run_id
+            )
         )
 
         self.assertEqual(
@@ -205,7 +207,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         }
 
         voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            cloud_task_domain.VoiceoverRegenerationJob(
                 exploration_id,
                 task_run_id,
                 language_accent_to_content_status_map,
@@ -227,7 +229,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             voiceover_regeneration_task_mapping.are_all_voiceovers_generated()
         )
 
-    def test_should_update_final_content_status_for_cloud_task_run(
+    def test_should_update_final_content_status_successfully(
         self,
     ) -> None:
         exploration_id = 'exp_id'
@@ -241,14 +243,14 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         }
 
         voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            cloud_task_domain.VoiceoverRegenerationJob(
                 exploration_id,
                 task_run_id,
                 language_accent_to_content_status_map,
             )
         )
 
-        voiceover_regeneration_task_mapping.update_final_content_status_for_cloud_task_run(
+        voiceover_regeneration_task_mapping.update_final_content_status(
             'en-US', ['content_1']
         )
 
@@ -271,7 +273,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         language_accent_to_content_status_map: Dict[str, Dict[str, str]] = {}
 
         voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            cloud_task_domain.VoiceoverRegenerationJob(
                 exploration_id,
                 task_run_id,
                 language_accent_to_content_status_map,

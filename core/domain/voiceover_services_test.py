@@ -1683,7 +1683,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             cloud_task_run_model_id,
         )
         voiceover_regeneration_task_mapping_model = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+            cloud_task_models.VoiceoverRegenerationJobModel.get(
                 voiceover_regeneration_task_mapping_model_id, strict=False
             )
         )
@@ -1717,7 +1717,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(len(entity_voiceovers_list), 3)
 
         voiceover_regeneration_task_mapping_model = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+            cloud_task_models.VoiceoverRegenerationJobModel.get(
                 voiceover_regeneration_task_mapping_model_id, strict=False
             )
         )

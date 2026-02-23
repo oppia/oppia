@@ -314,10 +314,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(
                 ],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
-                exploration_title,
-                exploration_version,
-                feconf.SYSTEM_COMMITTER_ID,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)
 
@@ -475,12 +471,10 @@ class RegenerateVoiceoversForExplorationHandler(
         ):
             taskqueue_services.defer(
                 feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
                 ],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
                 language_accent_code,
-                self.user_id,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)

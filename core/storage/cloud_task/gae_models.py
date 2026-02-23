@@ -293,7 +293,7 @@ class CloudTaskRunModel(base_models.BaseModel):
         )
 
 
-class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
+class VoiceoverRegenerationJobModel(base_models.BaseModel):
     """The model maps an exploration's voiceover regeneration request to its
     Cloud Task run.
 
@@ -345,9 +345,9 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_voiceover_regeneration_tasks_by_exploration_id(
+    def get_all_by_exp_id(
         cls, exploration_id: str
-    ) -> List[VoiceoverRegenerationTaskMappingModel]:
+    ) -> List[VoiceoverRegenerationJobModel]:
         """The method fetches all voiceover regeneration task requests for the
         given exploration ID.
 
@@ -355,12 +355,12 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
             exploration_id: str. The ID of the exploration.
 
         Returns:
-            list(VoiceoverRegenerationTaskMappingModel). A list of
-            VoiceoverRegenerationTaskMappingModel instances matching the given
+            list(VoiceoverRegenerationJobModel). A list of
+            VoiceoverRegenerationJobModel instances matching the given
             exploration ID.
         """
         return list(
-            VoiceoverRegenerationTaskMappingModel.query(
+            VoiceoverRegenerationJobModel.query(
                 datastore_services.all_of(
                     cls.exploration_id == exploration_id,
                     cls.deleted  # pylint: disable=singleton-comparison
@@ -370,7 +370,7 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
         )
 
 
-class VoiceoverRegenerationTaskBatchModel(base_models.BaseModel):
+class VoiceoverRegenerationBatchExecutionModel(base_models.BaseModel):
     """Voiceover regeneration for a large number of contents within a single
     Cloud Task run (deferred request) significantly increases the workload and
     may lead to timeout failures due to Gunicorn limitations.
@@ -413,7 +413,7 @@ class VoiceoverRegenerationTaskBatchModel(base_models.BaseModel):
 
     # A dictionary mapping content IDs to their corresponding content string of
     # the exploration.
-    content_id_to_contents_map = datastore_services.JsonProperty(
+    content_ids_to_contents_map = datastore_services.JsonProperty(
         required=True, indexed=False
     )
 
@@ -448,16 +448,16 @@ class VoiceoverRegenerationTaskBatchModel(base_models.BaseModel):
                 'language_accent_code': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'content_id_to_contents_map': (
+                'content_ids_to_contents_map': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
             },
         )
 
     @classmethod
-    def get_child_tasks_by_parent_id(
+    def get_models_by_parent_id(
         cls, parent_cloud_task_run_id: str
-    ) -> List[VoiceoverRegenerationTaskBatchModel]:
+    ) -> List[VoiceoverRegenerationBatchExecutionModel]:
         """The method fetches all model instances corresponding to the given
         parent Cloud Task run ID.
 
@@ -465,12 +465,12 @@ class VoiceoverRegenerationTaskBatchModel(base_models.BaseModel):
             parent_cloud_task_run_id: str. The ID of the parent Cloud Task run.
 
         Returns:
-            list(VoiceoverRegenerationTaskBatchModel). A list of
-            VoiceoverRegenerationTaskBatchModel instances matching the given
+            list(VoiceoverRegenerationBatchExecutionModel). A list of
+            VoiceoverRegenerationBatchExecutionModel instances matching the given
             parent Cloud Task run ID.
         """
         return list(
-            VoiceoverRegenerationTaskBatchModel.query(
+            VoiceoverRegenerationBatchExecutionModel.query(
                 datastore_services.all_of(
                     cls.parent_cloud_task_run_id == parent_cloud_task_run_id,
                     cls.deleted  # pylint: disable=singleton-comparison
@@ -480,16 +480,16 @@ class VoiceoverRegenerationTaskBatchModel(base_models.BaseModel):
         )
 
     @classmethod
-    def create_voiceover_regeneration_task_batch_model(
+    def create_and_save_model(
         cls,
         parent_cloud_task_run_id: str,
         child_cloud_task_run_id: str,
         exploration_id: str,
         exploration_version: int,
         language_accent_code: str,
-        content_id_to_contents_map: Dict[str, Dict[str, str]],
-    ) -> VoiceoverRegenerationTaskBatchModel:
-        """Creates a new instance of VoiceoverRegenerationTaskBatchModel.
+        content_ids_to_contents_map: Dict[str, Dict[str, str]],
+    ) -> VoiceoverRegenerationBatchExecutionModel:
+        """Creates a new instance of VoiceoverRegenerationBatchExecutionModel.
 
         Args:
             parent_cloud_task_run_id: str. The ID of the parent Cloud Task run.
@@ -501,13 +501,13 @@ class VoiceoverRegenerationTaskBatchModel(base_models.BaseModel):
                 the regeneration is being done.
             language_accent_code: str. The language accent code for which the
                 regeneration is being done.
-            content_id_to_contents_map: dict(str, dict(str, str)). A dictionary
+            content_ids_to_contents_map: dict(str, dict(str, str)). A dictionary
                 mapping content IDs to their corresponding content details
                 associated with the regeneration process.
 
         Returns:
-            VoiceoverRegenerationTaskBatchModel. The newly created instance of
-            VoiceoverRegenerationTaskBatchModel.
+            VoiceoverRegenerationBatchExecutionModel. The newly created instance of
+            VoiceoverRegenerationBatchExecutionModel.
         """
         model_id = '%s:%s' % (parent_cloud_task_run_id, child_cloud_task_run_id)
         model_instance = cls(
@@ -517,7 +517,7 @@ class VoiceoverRegenerationTaskBatchModel(base_models.BaseModel):
             exploration_id=exploration_id,
             exploration_version=exploration_version,
             language_accent_code=language_accent_code,
-            content_id_to_contents_map=content_id_to_contents_map,
+            content_ids_to_contents_map=content_ids_to_contents_map,
         )
 
         model_instance.update_timestamps()

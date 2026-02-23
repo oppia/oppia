@@ -497,14 +497,14 @@ class AutomaticVoiceoverRegenerationStatusHandlerTests(
             'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}
         }
         voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            cloud_task_domain.VoiceoverRegenerationJob(
                 exploration_id,
                 task_run_id,
                 language_accent_to_content_status_map,
             )
         )
 
-        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+        voiceover_cloud_task_services.save_voiceover_regeneration_job(
             voiceover_regeneration_task_mapping
         )
         exploration = exp_domain.Exploration.create_default_exploration(

@@ -123,15 +123,15 @@ class CloudTaskRun:
         )
 
 
-class VoiceoverRegenerationTaskMappingDict(TypedDict):
-    """Dictionary representing the VoiceoverRegenerationTaskMapping object."""
+class VoiceoverRegenerationJobDict(TypedDict):
+    """Dictionary representing the VoiceoverRegenerationJob object."""
 
     exploration_id: str
     task_run_id: str
     language_accent_to_content_status_map: Dict[str, Dict[str, str]]
 
 
-class VoiceoverRegenerationTaskMapping:
+class VoiceoverRegenerationJob:
     """Domain object class that models the voiceover regeneration request for an
     exploration, associated with a specific cloud task run.
     """
@@ -142,7 +142,7 @@ class VoiceoverRegenerationTaskMapping:
         task_run_id: str,
         language_accent_to_content_status_map: Dict[str, Dict[str, str]],
     ) -> None:
-        """Initializes a VoiceoverRegenerationTaskMapping domain object.
+        """Initializes a VoiceoverRegenerationJob domain object.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -156,12 +156,12 @@ class VoiceoverRegenerationTaskMapping:
             language_accent_to_content_status_map
         )
 
-    def to_dict(self) -> VoiceoverRegenerationTaskMappingDict:
+    def to_dict(self) -> VoiceoverRegenerationJobDict:
         """Returns a dictionary representation of this domain object.
 
         Returns:
             dict. A dictionary representation of the
-            VoiceoverRegenerationTaskMapping object, with keys matching the
+            VoiceoverRegenerationJob object, with keys matching the
             attributes of the object.
         """
 
@@ -176,17 +176,17 @@ class VoiceoverRegenerationTaskMapping:
     @classmethod
     def from_dict(
         cls,
-        voiceover_regeneration_task_mapping_dict: VoiceoverRegenerationTaskMappingDict,
-    ) -> VoiceoverRegenerationTaskMapping:
-        """Returns an instance of VoiceoverRegenerationTaskMapping from the
+        voiceover_regeneration_task_mapping_dict: VoiceoverRegenerationJobDict,
+    ) -> VoiceoverRegenerationJob:
+        """Returns an instance of VoiceoverRegenerationJob from the
         given dictionary.
 
         Args:
             voiceover_regeneration_task_mapping_dict: dict. A dictionary
-                representation of the VoiceoverRegenerationTaskMapping object.
+                representation of the VoiceoverRegenerationJob object.
 
         Returns:
-            VoiceoverRegenerationTaskMapping. A VoiceoverRegenerationTaskMapping
+            VoiceoverRegenerationJob. A VoiceoverRegenerationJob
             domain object created from the given dict representation.
         """
         return cls(
@@ -202,18 +202,18 @@ class VoiceoverRegenerationTaskMapping:
         )
 
     @classmethod
-    def create_default_voiceover_regeneration_task_mapping(
+    def create_default(
         cls, exploration_id: str, task_run_id: str
-    ) -> VoiceoverRegenerationTaskMapping:
-        """Creates a default voiceover regeneration task mapping.
+    ) -> VoiceoverRegenerationJob:
+        """Creates a default voiceover regeneration job instance.
 
         Args:
             exploration_id: str. The ID of the exploration.
             task_run_id: str. The ID of the cloud task run.
 
         Returns:
-            VoiceoverRegenerationTaskMapping. The created voiceover
-            regeneration task mapping.
+            VoiceoverRegenerationJob. The created voiceover regeneration job
+            instance with an empty language accent to content status map.
         """
         return cls(
             exploration_id=exploration_id,
@@ -243,7 +243,7 @@ class VoiceoverRegenerationTaskMapping:
 
     def are_all_voiceovers_attempted(self) -> bool:
         """Checks if all the contents for the voiceover regeneration request
-        have been attempted i.e., either succeeded or failed none
+        have been attempted i.e., either succeeded or failed, none
         of them are still generating.
 
         Returns:
@@ -262,7 +262,7 @@ class VoiceoverRegenerationTaskMapping:
                     return False
         return True
 
-    def update_final_content_status_for_cloud_task_run(
+    def update_final_content_status(
         self, language_accent_code: str, failed_content_ids: List[str]
     ) -> None:
         """Updates the content-status map for a given language-accent code by
@@ -320,7 +320,7 @@ class VoiceoverRegenerationTaskBatch:
     Cloud Task runs.
 
     This class is the domain class representation for
-    VoiceoverRegenerationTaskBatchModel.
+    VoiceoverRegenerationBatchExecutionModel.
     """
 
     def __init__(
@@ -330,14 +330,14 @@ class VoiceoverRegenerationTaskBatch:
         exploration_id: str,
         exploration_version: int,
         language_accent_code: str,
-        content_id_to_contents_map: Dict[str, str],
+        content_ids_to_contents_map: Dict[str, str],
     ) -> None:
         self.parent_cloud_task_run_id = parent_cloud_task_run_id
         self.child_cloud_task_run_id = child_cloud_task_run_id
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
         self.language_accent_code = language_accent_code
-        self.content_id_to_contents_map = content_id_to_contents_map
+        self.content_ids_to_contents_map = content_ids_to_contents_map
 
     def to_dict(self) -> Dict[str, str | List[str] | int | Dict[str, str]]:
         """Returns a dictionary representation of this domain object.
@@ -353,7 +353,7 @@ class VoiceoverRegenerationTaskBatch:
             'exploration_id': self.exploration_id,
             'exploration_version': self.exploration_version,
             'language_accent_code': self.language_accent_code,
-            'content_id_to_contents_map': self.content_id_to_contents_map,
+            'content_ids_to_contents_map': self.content_ids_to_contents_map,
         }
 
     @classmethod
@@ -390,7 +390,7 @@ class VoiceoverRegenerationTaskBatch:
             language_accent_code=voiceover_regeneration_task_batch_dict[
                 'language_accent_code'
             ],
-            content_id_to_contents_map=voiceover_regeneration_task_batch_dict[
-                'content_id_to_contents_map'
+            content_ids_to_contents_map=voiceover_regeneration_task_batch_dict[
+                'content_ids_to_contents_map'
             ],
         )

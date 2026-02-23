@@ -1797,7 +1797,10 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
     'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': (
         'regenerate_voiceovers_on_exploration_added_to_topic'
     ),
-    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT': (
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT': (
         'regenerate_voiceovers_of_exploration_for_given_language_accent'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS': (
+        'regenerate_voiceovers_for_batch_contents'
     ),
 }
