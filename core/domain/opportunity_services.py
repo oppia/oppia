@@ -647,6 +647,16 @@ def get_translation_opportunities(
                 opportunity_summary_exp_ids, language_code
             )
         )
+
+    explorations = exp_fetchers.get_multiple_explorations_by_id(
+        opportunity_summary_exp_ids, strict=False
+    )
+    exp_id_to_data_format_list_count = {
+        exp.id: exp.get_data_format_list_count()
+        for exp in explorations.values()
+        if exp is not None
+    }
+
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         opportunity_summary = get_exploration_opportunity_summary_from_model(
             exp_opportunity_summary_model
@@ -660,6 +670,11 @@ def get_translation_opportunities(
             opportunity_summary.translation_in_review_counts = {
                 language_code: exp_id_to_in_review_count[opportunity_summary.id]
             }
+
+        opportunity_summary.data_format_list_count = (
+            exp_id_to_data_format_list_count.get(opportunity_summary.id, 0)
+        )
+
         opportunity_summaries.append(opportunity_summary)
     return opportunity_summaries, cursor, more
 
