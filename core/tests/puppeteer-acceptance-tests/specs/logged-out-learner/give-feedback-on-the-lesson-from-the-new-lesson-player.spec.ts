@@ -105,7 +105,7 @@ describe('Logged-Out Learner', function () {
     1000000
   );
 
-  it('should be able to give feedback from the navbar', async function () {
+  it('should be able to give feedback from the sidebar', async function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
 

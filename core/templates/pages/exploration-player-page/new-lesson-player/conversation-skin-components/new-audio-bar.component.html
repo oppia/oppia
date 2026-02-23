@@ -13,7 +13,7 @@
 
     <div class="audio-new-header-control-icons">
       <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()" [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''" placement="right">
-        <i class="fas" tabindex="0" aria-label="Press enter to Listen to the Lesson"
+        <i class="fas voiceover-play-pause-button" tabindex="0" aria-label="Press enter to Listen to the Lesson"
             [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying()}">
         </i>
       </a>

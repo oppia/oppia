@@ -20,6 +20,7 @@ import puppeteer, {Page} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import AppConstants from '../../../../../assets/constants';
 
 const aboutUrl = testConstants.URLs.About;
 const androidUrl = testConstants.URLs.Android;
@@ -603,6 +604,12 @@ const generateLessonAttributionSelector = '.lesson-attribution-text';
 const attributionTextSelector = '.cc-attribution-input';
 const ccButtonSelector = '.copy-cc-btn';
 const copiedMessageSelector = '.success-message';
+const mobileLanguageSelector = '.mobile-view-language-code';
+const desktopLanguageSelector = '.desktop-view-language-code';
+const newAudioControlButton = '.oppia-new-audio-header-control-buttons';
+const voiceoverPlayPauseButton = '.voiceover-play-pause-button';
+const continueButtonSelector = '.oppia-learner-confirm-button';
+const voiceoverAudioSliderSelector = 'oppia-audio-slider mat-slider';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -4138,10 +4145,12 @@ export class LoggedOutUser extends BaseUser {
    * Selects and opens a chapter within a story to learn.
    * @param {string} storyName - The name of the story containing the chapter.
    * @param {string} chapterName - The name of the chapter to select and open.
+   * @param {boolean} isNewLessonPlayer - Whether it will be used for new lesson player.
    */
   async selectChapterWithinStoryToLearn(
     storyName: string,
-    chapterName: string
+    chapterName: string,
+    isNewLessonPlayer: boolean = false
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
@@ -4181,9 +4190,10 @@ export class LoggedOutUser extends BaseUser {
                 chapter.click(),
               ]);
 
-              await this.expectPageURLToContain(
-                testConstants.URLs.ExplorationPlayer
-              );
+              const urlPrefix = isNewLessonPlayer
+                ? testConstants.URLs.LessonPlayer
+                : testConstants.URLs.ExplorationPlayer;
+              await this.expectPageURLToContain(urlPrefix);
               showMessage(`Chapter ${chapterName} is opened successfully.`);
               return;
             }
@@ -6180,6 +6190,273 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Function to get the language from language code.
+   */
+  async getLanguageFromLanguageCode(languageCode: string): Promise<string> {
+    const languageData = AppConstants.SUPPORTED_CONTENT_LANGUAGES.find(
+      lang => lang.code === languageCode
+    );
+
+    if (!languageData) {
+      throw new Error(
+        `Language code "${languageCode}" not found in SUPPORTED_CONTENT_LANGUAGES`
+      );
+    }
+
+    // Get the full description (e.g., "हिन्दी (Hindi)").
+    const fullDescription = languageData.description;
+
+    // Split by space and return the first part
+    // result: "हिन्दी (Hindi)" -> ["हिन्दी", "(Hindi)"] -> "हिन्दी".
+    return fullDescription.split(' ')[0];
+  }
+
+  /**
+   * Changes the language of the lesson.
+   * @param {string} languageCode - The language code to change.
+   */
+  async changeLessonLang(languageCode: string): Promise<void> {
+    await this.page.waitForSelector(languageDropdown, {visible: true});
+    await this.page.click(languageDropdown);
+    const languageItemSelector = `.e2e-test-i18n-language-${languageCode}`;
+    await this.page.waitForSelector(languageItemSelector, {visible: true});
+    await this.page.click(languageItemSelector);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+
+    // Post check: check if value has changed to new language.
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    // In mobile view port language code is shown.
+    if (isMobileViewport) {
+      const selectedLanguageCode = await this.page.$eval(
+        mobileLanguageSelector,
+        el => el.textContent?.trim() || ''
+      );
+      if (selectedLanguageCode !== languageCode) {
+        throw new Error(
+          `Expected language to be ${languageCode}, but found ${selectedLanguageCode}`
+        );
+      }
+      showMessage('Language changed successfully.');
+      return;
+    }
+
+    // In desktop view port only language is shown.
+    const selectedLanguage = await this.page.$eval(
+      desktopLanguageSelector,
+      el => el.textContent?.trim() || ''
+    );
+    const expectedLanguage =
+      await this.getLanguageFromLanguageCode(languageCode);
+
+    if (selectedLanguage !== expectedLanguage) {
+      throw new Error(
+        `Expected language to be ${expectedLanguage}, but found ${selectedLanguage}`
+      );
+    }
+  }
+
+  /**
+   * Function to click continue button to go next card.
+   */
+  async clickOnContinueButton(): Promise<void> {
+    await this.page.waitForSelector(continueButtonSelector, {
+      visible: true,
+    });
+    await this.page.click(continueButtonSelector);
+    await this.expectElementToBeVisible(continueButtonSelector, false);
+    await this.page.waitForNetworkIdle();
+  }
+
+  /**
+   * Checks if new audio control button is visible in  new lesson player.
+   */
+  async expectNewAudioControlButtonVisible(): Promise<void> {
+    await this.expectElementToBeVisible(newAudioControlButton);
+    showMessage('Audio Expand button is visible in lesson player.');
+  }
+
+  /**
+   * Function to play/pause Voiceover.
+   */
+  async playPauseVoiceover(): Promise<void> {
+    await this.waitForElementToBeClickable(voiceoverPlayPauseButton);
+    await this.page.click(voiceoverDropdown);
+  }
+
+  /**
+   * Get voiceover slider value.
+   */
+  async getVoiceoverSliderValue(): Promise<number> {
+    const getSliderVal = await this.page.$eval(
+      voiceoverAudioSliderSelector,
+      el => parseFloat(el.getAttribute('aria-valuenow') || '0')
+    );
+
+    return getSliderVal;
+  }
+
+  /**
+   * Checks if voiceover is playable.
+   * @param playable - If voiceover should be playable or not.
+   */
+  async expectVoiceoverPlayable(playable: boolean = true): Promise<void> {
+    const initialSliderValue = await this.getVoiceoverSliderValue();
+    // Starts voiceover.
+    await this.playPauseVoiceover();
+
+    try {
+      await this.page.waitForFunction(
+        (selector: string, prevValue: number) => {
+          const el = document.querySelector(selector);
+          return (
+            parseFloat(el?.getAttribute('aria-valuenow') || '0') > prevValue
+          );
+        },
+        {timeout: 5000},
+        voiceoverAudioSliderSelector,
+        initialSliderValue
+      );
+      if (!playable) {
+        throw new Error(
+          'Voiceover is playable, but was expected to be static.'
+        );
+      }
+      showMessage('Voiceover is playable.');
+    } catch (e) {
+      if (playable) {
+        throw new Error('Voiceover failed to progress within 5 seconds.');
+      }
+    } finally {
+      // Stop the audio.
+      await this.playPauseVoiceover();
+    }
+  }
+
+  /**
+   * Function to check whether voiceover is in pause state.
+   */
+  async expectVoiceoverPauseState(): Promise<void> {
+    // Get current slider value.
+    const initialSliderValue = await this.getVoiceoverSliderValue();
+
+    // Wait for a short duration to verify it doesn't change.
+    await this.page.waitForTimeout(2000);
+    const laterSliderValue = await this.getVoiceoverSliderValue();
+
+    // If slider moved, voiceover is playing.
+    if (laterSliderValue > initialSliderValue) {
+      throw new Error('Voiceover expected to be paused, but is playing');
+    }
+
+    showMessage('Voiceover is in paused state.');
+  }
+
+  /**
+   * Function to check voiceover audio is skippable.
+   */
+  async expectVoiceoverAudioIsSkippable(): Promise<void> {
+    const initialSliderValue = await this.getVoiceoverSliderValue();
+    const slider = await this.page.$(voiceoverAudioSliderSelector);
+    const sliderBox = await slider?.boundingBox();
+    if (!sliderBox) {
+      throw new Error('Could not determine bounding box for audio slider');
+    }
+
+    const targetPercent = 0.75;
+    const targetX = sliderBox.x + sliderBox.width * targetPercent;
+    const centerY = sliderBox.y + sliderBox.height / 2;
+
+    await this.page.mouse.move(targetX, centerY);
+    await this.page.mouse.down();
+    await this.page.mouse.up();
+
+    const newSliderValue = await this.getVoiceoverSliderValue();
+
+    if (newSliderValue <= initialSliderValue) {
+      throw new Error('Slider did not skip forward. Start: $');
+    }
+    showMessage('Voiceover is successfully skippable');
+  }
+  /**
+   * Verifies if the voiceover is playing.
+   * @param {boolean} shouldBePlaying - If the voiceover should be playing or not.
+   */
+  async expectVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
+    try {
+      await this.page.waitForSelector(voiceoverAudioSliderSelector);
+      const currentSliderValue = await this.getVoiceoverSliderValue();
+
+      // Wait until value of audio slider is greater than to currentSliderValue.
+      await this.page.waitForFunction(
+        (selector: string, value: number) => {
+          const element = document.querySelector(selector);
+          const current = parseFloat(
+            element?.getAttribute('aria-valuenow') || '0'
+          );
+          return current > value;
+        },
+        {},
+        voiceoverAudioSliderSelector,
+        currentSliderValue
+      );
+
+      if (shouldBePlaying) {
+        showMessage('Voiceover is playing, as expected.');
+      } else {
+        throw new Error('Voiceover is playing, expected to be paused.');
+      }
+    } catch (error) {
+      if (shouldBePlaying) {
+        error.message =
+          'Voiceover is not playing, expected to be playing.\n' + error.message;
+        throw error;
+      } else {
+        showMessage('Voiceover is not playing, as expected.');
+      }
+    }
+  }
+  /**
+   * Function to play audio till end.
+   * @param {number} timeout - The timeout for playing audio.
+   */
+  async playAudioTillEnd(
+    selector: string = 'oppia-audio-slider',
+    timeout: number = 20000
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        if (!element) {
+          return false;
+        }
+        const currentValue = parseFloat(
+          element.getAttribute('aria-valuenow') || '0'
+        );
+        const maxValue = parseFloat(
+          element.getAttribute('aria-valuemax') || '0'
+        );
+
+        // Return true only when the current progress matches or exceeds the max duration.
+        return maxValue > 0 && currentValue >= maxValue;
+      },
+      {timeout},
+      selector
+    );
+
+    // While mouse is over pause button, the pause button doesn't change its state.
+    await this.page.mouse.move(10, 10);
+  }
+  /**
+   * Verify a given text is visible to the user on the page.
+   * @param {string} text - The text to check.
+   */
+  async expectTextPresentOnPage(text: string): Promise<boolean> {
+    // Use evaluate to get the visible text of the body.
+    const bodyText = await this.page.evaluate(() => document.body.innerText);
+    return bodyText.includes(text);
+  }
   /**
    * TODO(#22716): Update naming to be more descriptive and start with expect.
    * Verifies that the feedback submission was successful by checking for the presence of the feedback popup.
