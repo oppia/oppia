@@ -48,6 +48,7 @@ export class TranslationOpportunitiesComponent {
   userIsLoggedIn = false;
   opportunityType = 'translation';
   languageSelected = false;
+  userIsReviewer = false;
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
@@ -80,21 +81,34 @@ export class TranslationOpportunitiesComponent {
       const heading = opportunity.getOpportunityHeading();
       const languageCode =
         this.translationLanguageService.getActiveLanguageCode();
-      const progressPercentage =
-        opportunity.getTranslationProgressPercentage(languageCode);
+      const dataFormatListCount = opportunity.getDataFormatListCount();
+      let totalCount = opportunity.getContentCount();
+      let translationsCount = opportunity.getTranslationsCount(languageCode);
+      const inReviewCount =
+        opportunity.getTranslationsInReviewCount(languageCode);
+
+      if (!this.userIsReviewer) {
+        totalCount -= dataFormatListCount;
+      }
+
+      let progressPercentage = 0;
+      if (totalCount > 0) {
+        progressPercentage = (translationsCount / totalCount) * 100;
+      }
+
       const opportunityDict: TranslationOpportunity = {
         id: opportunity.getExplorationId(),
         heading: heading,
         subheading: subheading,
         progressPercentage: progressPercentage.toFixed(2),
         actionButtonTitle: 'Translate',
-        inReviewCount: opportunity.getTranslationsInReviewCount(languageCode),
-        totalCount: opportunity.getContentCount(),
-        translationsCount: opportunity.getTranslationsCount(languageCode),
+        inReviewCount: inReviewCount,
+        totalCount: totalCount,
+        translationsCount: translationsCount,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
-        opportunityDict.translationsCount + opportunityDict.inReviewCount ===
+        opportunityDict.translationsCount + opportunityDict.inReviewCount >=
         opportunityDict.totalCount
       ) {
         untranslatableOpportunitiesDicts.push(opportunityDict);
@@ -133,11 +147,29 @@ export class TranslationOpportunitiesComponent {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
-    this.translationLanguageService.onActiveLanguageChanged.subscribe(
-      () => (this.languageSelected = true)
-    );
+
+    const updateReviewerStatus = async () => {
+      const activeLanguageCode =
+        this.translationLanguageService.getActiveLanguageCode();
+      if (activeLanguageCode) {
+        const rights =
+          await this.userService.getUserContributionRightsDataAsync();
+        if (rights) {
+          this.userIsReviewer =
+            rights.can_review_translation_for_language_codes.includes(
+              activeLanguageCode
+            );
+        }
+      }
+    };
+
+    this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
+      this.languageSelected = true;
+      updateReviewerStatus();
+    });
     if (this.translationLanguageService.getActiveLanguageCode()) {
       this.languageSelected = true;
+      updateReviewerStatus();
     } else {
       this.OPPIA_AVATAR_IMAGE_URL =
         this.urlInterpolationService.getStaticCopyrightedImageUrl(
@@ -150,9 +182,18 @@ export class TranslationOpportunitiesComponent {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
+    const activeLanguageCode =
+      this.translationLanguageService.getActiveLanguageCode();
+    const rights = await this.userService.getUserContributionRightsDataAsync();
+    if (rights) {
+      this.userIsReviewer =
+        rights.can_review_translation_for_language_codes.includes(
+          activeLanguageCode
+        );
+    }
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
-        this.translationLanguageService.getActiveLanguageCode(),
+        activeLanguageCode,
         this.translationTopicService.getActiveTopicName()
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
@@ -162,9 +203,18 @@ export class TranslationOpportunitiesComponent {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
+    const activeLanguageCode =
+      this.translationLanguageService.getActiveLanguageCode();
+    const rights = await this.userService.getUserContributionRightsDataAsync();
+    if (rights) {
+      this.userIsReviewer =
+        rights.can_review_translation_for_language_codes.includes(
+          activeLanguageCode
+        );
+    }
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
-        this.translationLanguageService.getActiveLanguageCode(),
+        activeLanguageCode,
         this.translationTopicService.getActiveTopicName()
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
