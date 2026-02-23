@@ -42,8 +42,16 @@ export class AlertsService {
    *   - content: a string containing the warning or message.
    */
 
-  public warnings: Warning[] = [];
-  public messages: Message[] = [];
+  private _warnings: Warning[] = [];
+  private _messages: Message[] = [];
+
+  get warnings(): Warning[] {
+    return this._warnings;
+  }
+
+  get messages(): Message[] {
+    return this._messages;
+  }
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
@@ -55,10 +63,10 @@ export class AlertsService {
    */
   addWarning(warning: string): void {
     this.log.error(warning);
-    if (this.warnings.length >= this.MAX_TOTAL_WARNINGS) {
+    if (this._warnings.length >= this.MAX_TOTAL_WARNINGS) {
       return;
     }
-    this.warnings.push({
+    this._warnings.push({
       type: 'warning',
       content: warning,
     });
@@ -79,17 +87,17 @@ export class AlertsService {
    * @param {Object} warningToDelete - The warning message to be deleted.
    */
   deleteWarning(warningToDelete: Warning): void {
-    const filteredWarnings = this.warnings.filter(
+    const filteredWarnings = this._warnings.filter(
       w => w.content !== warningToDelete.content
     );
-    this.warnings.splice(0, this.warnings.length, ...filteredWarnings);
+    this._warnings.splice(0, this._warnings.length, ...filteredWarnings);
   }
 
   /**
    * Clears all warnings.
    */
   clearWarnings(): void {
-    this.warnings.splice(0, this.warnings.length);
+    this._warnings.splice(0, this._warnings.length);
   }
 
   /**
@@ -99,10 +107,10 @@ export class AlertsService {
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
   addMessage(type: string, message: string, timeoutMilliseconds: number): void {
-    if (this.messages.length >= this.MAX_TOTAL_MESSAGES) {
+    if (this._messages.length >= this.MAX_TOTAL_MESSAGES) {
       return;
     }
-    this.messages.push({
+    this._messages.push({
       type: type,
       content: message,
       timeout: timeoutMilliseconds,
@@ -115,8 +123,8 @@ export class AlertsService {
   deleteMessage(messageToDelete: Message): void {
     const isMessageToKeep = (m: Message): boolean =>
       m.type !== messageToDelete.type || m.content !== messageToDelete.content;
-    const filteredMessages = this.messages.filter(isMessageToKeep);
-    this.messages.splice(0, this.messages.length, ...filteredMessages);
+    const filteredMessages = this._messages.filter(isMessageToKeep);
+    this._messages.splice(0, this._messages.length, ...filteredMessages);
   }
 
   /**
@@ -147,6 +155,6 @@ export class AlertsService {
    * Clears all messages.
    */
   clearMessages(): void {
-    this.messages.splice(0, this.messages.length);
+    this._messages.splice(0, this._messages.length);
   }
 }
