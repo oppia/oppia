@@ -206,8 +206,9 @@ describe('Contributor Certificate Download Modal Component', () => {
     const today = new Date();
     const fromDate = new Date();
     const toDate = new Date();
-    fromDate.setDate(today.getDate() - 2);
+    fromDate.setDate(today.getDate() - 1);
     toDate.setDate(today.getDate() - 1);
+
     component.fromDate = fromDate.toDateString();
     component.toDate = toDate.toDateString();
 
@@ -235,7 +236,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     flushMicrotasks();
 
     expect(component.errorsFound).toBe(true);
-    expect(component.certificateDownloading).toBe(false);
+    expect(component.isDownloading).toBe(false);
     expect(component.errorMessage).toBe('Error message');
   }));
 
