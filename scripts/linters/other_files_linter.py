@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
@@ -121,9 +122,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         error_messages: List[str] = []
         skip_files_section_found = False
 
-        for line_num, line in enumerate(
-            self.file_cache.readlines(APP_YAML_FILEPATH)
-        ):
+        for line_num, line in enumerate(self.file_cache.readlines(APP_YAML_FILEPATH)):
             stripped_line = line.strip()
 
             if '# Third party files:' in stripped_line:
@@ -156,9 +155,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 failed = True
                 break
 
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages
-        )
+        return concurrent_task_utils.TaskResult(name, failed, error_messages, error_messages)
 
     def check_third_party_libs_type_defs(
         self,

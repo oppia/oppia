@@ -1,9 +1,0 @@
-﻿CKEDITOR.plugins.setLang('mathjax', 'de-ch', {
-  title: 'Mathematik in TeX',
-  button: 'Rechnung',
-  dialogInput: 'Schreiben Sie hier in TeX',
-  docUrl: 'http://en.wikibooks.org/wiki/LaTeX/Mathematics',
-  docLabel: 'TeX-Dokumentation',
-  loading: 'Ladevorgang...',
-  pathName: 'rechnen',
-});
