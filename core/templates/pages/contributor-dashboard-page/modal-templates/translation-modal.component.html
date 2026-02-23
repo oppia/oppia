@@ -31,7 +31,8 @@
     </div>
   </div>
   <div *ngIf="!textToTranslate && !loadingData">
-    <strong>Sorry! All available translations are in review currently.</strong>
+    <strong *ngIf="isActiveLanguageReviewer">Sorry! All available translations are in review currently.</strong>
+    <strong *ngIf="!isActiveLanguageReviewer">There are no more cards available for translation. The remaining cards require reviewer privileges to translate.</strong>
   </div>
   <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
