@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import textwrap
 
@@ -132,28 +133,50 @@ def send_mail(
     )
     assert isinstance(admin_email_address, str)
     bcc = [admin_email_address] if bcc_admin else None
-    response = email_services.send_email_to_recipients(
-        sender_email,
-        [recipient_email],
-        subject,
-        plaintext_body,
-        html_body,
-        cc_emails,
-        bcc,
-        '',
-        None,
-        attachments,
+
+    logging.info(
+        convert_email_to_loggable_string(
+            sender_email,
+            [recipient_email],
+            subject,
+            plaintext_body,
+            html_body,
+            cc_emails,
+            bcc,
+            '',
+            None,
+            attachments,
+        )
     )
 
-    if not response:
-        raise Exception(
-            (
-                'Email to %s failed to send. Please try again later or '
-                'contact us to report a bug at '
-                'https://www.oppia.org/contact.'
-            )
-            % recipient_email
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
+    )
+    if server_can_send_emails:
+        response = email_services.send_email_to_recipients(
+            sender_email,
+            [recipient_email],
+            subject,
+            plaintext_body,
+            html_body,
+            cc_emails,
+            bcc,
+            '',
+            None,
+            attachments,
+        )
+
+        if not response:
+            raise Exception(
+                (
+                    'Email to %s failed to send. Please try again later or '
+                    'contact us to report a bug at '
+                    'https://www.oppia.org/contact.'
+                )
+                % recipient_email
+            )
 
 
 def send_bulk_mail(
@@ -193,14 +216,6 @@ def send_bulk_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        raise Exception('This app cannot send emails to users.')
-
     for recipient_email in recipient_emails:
         if not _is_email_valid(recipient_email):
             raise ValueError(
@@ -210,20 +225,38 @@ def send_bulk_mail(
     if not _is_sender_email_valid(sender_email):
         raise ValueError('Malformed sender email address: %s' % sender_email)
 
-    response = email_services.send_email_to_recipients(
-        sender_email,
-        recipient_emails,
-        subject,
-        plaintext_body,
-        html_body,
-        attachments=attachments,
+    logging.info(
+        convert_email_to_loggable_string(
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            attachments=attachments,
+        )
     )
 
-    if not response:
-        raise Exception(
-            'Bulk email failed to send. Please try again later or contact us '
-            'to report a bug at https://www.oppia.org/contact.'
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
+    )
+
+    if server_can_send_emails:
+        response = email_services.send_email_to_recipients(
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            attachments=attachments,
+        )
+
+        if not response:
+            raise Exception(
+                'Bulk email failed to send. Please try again later or contact us '
+                'to report a bug at https://www.oppia.org/contact.'
+            )
 
 
 def convert_email_to_loggable_string(
