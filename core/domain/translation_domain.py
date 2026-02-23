@@ -441,6 +441,25 @@ class BaseTranslatableObject:
         """
         return len(self.get_all_contents_which_need_translations())
 
+    def get_data_format_list_count(self) -> int:
+        """Returns the total number of distinct content fields available in the
+        exploration that have a data format of list.
+
+        Returns:
+            int. The number of such content fields.
+        """
+        count = 0
+        content_id_to_translatable_content = (
+            self.get_translatable_contents_collection().content_id_to_translatable_content
+        )
+        for (
+            _,
+            translatable_content,
+        ) in content_id_to_translatable_content.items():
+            if translatable_content.is_data_format_list():
+                count += 1
+        return count
+
     def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in the object.
 
