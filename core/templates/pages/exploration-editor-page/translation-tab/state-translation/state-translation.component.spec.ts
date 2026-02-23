@@ -57,6 +57,7 @@ import {RouterService} from 'pages/exploration-editor-page/services/router.servi
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
