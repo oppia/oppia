@@ -2,7 +2,9 @@ name: Oppiabot
 
 on:
   merge_group:
-    types: [checks_requested]
+    types:
+      - checks_requested
+      - destroyed
   issues:
     types:
       - labeled
@@ -12,15 +14,22 @@ on:
       - release-*
 permissions: read-all
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{
+         github.event.pull_request.number || github.event.merge_group.head_ref
+         || github.ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   oppiabot:
     name: Verify CLA
     runs-on: ubuntu-22.04
+    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
     permissions:
-      issues: write          
-      pull-requests: write   
-      checks: write 
-      statuses: write        
+      issues: write
+      pull-requests: write
+      checks: write
+      statuses: write
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
