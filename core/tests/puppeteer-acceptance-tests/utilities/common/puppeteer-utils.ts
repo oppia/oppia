@@ -489,10 +489,17 @@ export class BaseUser {
     showMessage(`Checking if element ${elementDesc} is clickable...`);
     const element =
       typeof selector === 'string'
-        ? await this.page.waitForSelector(selector, {timeout, visible: true})
+        ? await this.page.waitForSelector(selector, {
+            timeout: timeout,
+            visible: true,
+          })
         : selector;
     try {
-      await this.page.waitForFunction(isElementClickable, {timeout}, element);
+      await this.page.waitForFunction(
+        isElementClickable,
+        {timeout: timeout},
+        element
+      );
     } catch (error) {
       if (error instanceof Error) {
         await this.page.evaluate(isElementClickable, element, true, true);

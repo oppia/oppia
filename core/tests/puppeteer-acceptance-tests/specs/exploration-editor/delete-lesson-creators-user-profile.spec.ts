@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,22 +15,23 @@
 /**
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/
+ *
  * LC.9: Delete lesson creator's user profile.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-
 describe('Lesson Creator Profile Deletion', function () {
   let expEditor1!: ExplorationEditor & LoggedInUser;
   let expEditor2!: ExplorationEditor & LoggedInUser;
+  let positiveNumbersExpId!: string;
+  let negativeNumbersExpId!: string;
+  let wholeNumbersExpId!: string;
 
   beforeAll(async function () {
     expEditor1 = await UserFactory.createNewUser(
@@ -41,14 +42,10 @@ describe('Lesson Creator Profile Deletion', function () {
       'expEditor2',
       'expEditor2@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should handle exploration ownership correctly after account deletion', async function () {
-    // 1. Setup Exploration A: Published + Shared with expEditor2.
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
-    const positiveNumbersExpId = await expEditor1.getExplorationId();
-
+    positiveNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Introduction to positive numbers');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();
@@ -58,20 +55,17 @@ describe('Lesson Creator Profile Deletion', function () {
       'Mathematics'
     );
 
-    // 2. Roles Assignment. Ensure Settings is open and Roles form is visible.
+    await expEditor1.navigateToSettingsTab();
     await expEditor1.expectRolesFormToBeOpen();
-
     await expEditor1.assignUserToManagerRoleAfterFormOpen('expEditor2');
 
-    // 3. Setup Exploration B (Published) and Exploration C (Draft).
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
-    const negativeNumbersExpId = await expEditor1.getExplorationId();
+    negativeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Negative Numbers Intro');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();
-    // Allow page to fully settle before publishing second exploration.
-    await expEditor1.page.waitForTimeout(1000);
+    await expEditor1.waitForPageToFullyLoad();
     await expEditor1.publishExplorationWithMetadata(
       'Negative Numbers',
       'This exploration teaches students about negative numbers and their applications.',
@@ -80,20 +74,25 @@ describe('Lesson Creator Profile Deletion', function () {
 
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
-    const wholeNumbersExpId = await expEditor1.getExplorationId();
+    wholeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Draft that will be deleted.');
     await expEditor1.saveExplorationDraft();
+  }, 600000);
 
-    // 4. Account Deletion.
+  it('should handle exploration ownership correctly after account deletion', async function () {
+    // 1. Account Deletion.
     await expEditor1.navigateToPreferencesPage();
     await expEditor1.deleteAccount();
     await expEditor1.confirmAccountDeletion('expEditor1');
 
-    // 5. Verify ownership and access permissions as expEditor2.
+    // 2. Verify ownership and access permissions as expEditor2.
     await expEditor2.navigateToExplorationEditor(wholeNumbersExpId);
     await expEditor2.expectErrorPage(404);
     await expEditor2.navigateToExplorationEditor(negativeNumbersExpId);
-    await expEditor2.expectExplorationToBeCommunityOwned();
+    await expEditor2.navigateToSettingsTab();
+    await expEditor2.expectExplorationToBeCommunityOwned(
+      'This exploration is public and community-editable. It is available in the Oppia library.'
+    );
     await expEditor2.navigateToExplorationEditor(positiveNumbersExpId);
     await expEditor2.expectUserToBeExplorationManager('expEditor2');
   }, 600000);

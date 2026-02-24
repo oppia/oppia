@@ -59,6 +59,7 @@ const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 const editRoleButton = '.e2e-test-edit-roles';
 const addUsernameInputBox = '#newMemberUsername';
 const addRoleDropdown = 'mat-select.e2e-test-role-select';
+const managerRoleOption = 'Manager (can edit permissions)';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
@@ -200,6 +201,9 @@ const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
 const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
 const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
+const permissionSettingsContentSelector =
+  '.e2e-test-permission-settings-content';
+const feedbackSettingsContentSelector = '.e2e-test-feedback-settings-content';
 const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
@@ -268,6 +272,7 @@ const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
 const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
 const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 const feedbackAuthorSelector = '.e2e-test-exploration-feedback-author';
+const ownersListSelector = '.e2e-test-owner-role-names';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
@@ -2509,9 +2514,6 @@ export class ExplorationEditor extends BaseUser {
     // Ensure the editor is fully loaded before attempting to navigate.
     await this.waitForPageToFullyLoad();
 
-    // Ensure the welcome modal is not blocking the navbar or options button.
-    await this.dismissWelcomeModal();
-
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2536,20 +2538,8 @@ export class ExplorationEditor extends BaseUser {
       await this.expandSettingsTabSection('Advanced Features');
       await this.expandSettingsTabSection('Roles');
       await this.expandSettingsTabSection('Voice Artists');
-      // Note: Permissions and Feedback don't have expandSettingsTabSection support yet,
-      // so we handle them directly with toggle check.
-      const isPermissionExpanded = await this.isElementVisible(
-        '.e2e-test-permission-settings-content'
-      );
-      if (!isPermissionExpanded) {
-        await this.clickOnElementWithSelector(permissionSettingsDropdown);
-      }
-      const isFeedbackExpanded = await this.isElementVisible(
-        '.e2e-test-feedback-settings-content'
-      );
-      if (!isFeedbackExpanded) {
-        await this.clickOnElementWithSelector(feedbackSettingsDropdown);
-      }
+      await this.expandSettingsTabSection('Permissions');
+      await this.expandSettingsTabSection('Feedback');
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
@@ -2565,7 +2555,8 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Expands the specified settings tab section.
-   * Currently it only expands Basic Settings, Advanced Features, Roles, and Voice Artists.
+   * Supports Basic Settings, Advanced Features, Roles, Voice Artists,
+   * Permissions, Feedback, and Controls sections.
    * @param section - The name of the section to expand.
    */
   async expandSettingsTabSection(
@@ -2574,11 +2565,13 @@ export class ExplorationEditor extends BaseUser {
       | 'Advanced Features'
       | 'Roles'
       | 'Voice Artists'
+      | 'Permissions'
+      | 'Feedback'
       | 'Controls'
   ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       showMessage(
-        `Skipped: Expanding ${section} section on desktop.\n` +
+        `Skipped: Expanding ${section} section.\n` +
           'Reason: Sections are already expanded on desktop.'
       );
       return;
@@ -2586,30 +2579,29 @@ export class ExplorationEditor extends BaseUser {
 
     // Generate the selectors for the section header and content.
     const identifier = section.replace(' ', '-').toLowerCase();
-    const sectionContentSelector = `.e2e-test-${identifier}-content`;
-    const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
+    let sectionContentSelector = `.e2e-test-${identifier}-content`;
+    let sectionHeaderSelector = `.e2e-test-${identifier}-header`;
 
-    const sectionHeader = await this.page.$(sectionHeaderSelector);
-    if (!sectionHeader) {
-      showMessage(
-        `Skipped: Expanding ${section} section on mobile.\n` +
-          'Reason: Section header not found.'
-      );
-      return;
+    if (section === 'Permissions') {
+      sectionContentSelector = permissionSettingsContentSelector;
+      sectionHeaderSelector = permissionSettingsDropdown;
+    } else if (section === 'Feedback') {
+      sectionContentSelector = feedbackSettingsContentSelector;
+      sectionHeaderSelector = feedbackSettingsDropdown;
     }
 
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
-        `Skipped: Expanding ${section} section on desktop.\n` +
-          'Reason: Section is already expanded on desktop.'
+        `Skipped: Expanding ${section} section.\n` +
+          'Reason: Section is already expanded.'
       );
       return;
     }
 
     // Expand the section.
     await this.expectElementToBeVisible(sectionHeaderSelector);
-    await this.page.click(sectionHeaderSelector);
+    await this.clickOnElementWithSelector(sectionHeaderSelector);
     await this.expectElementToBeVisible(sectionContentSelector);
   }
 
@@ -3436,27 +3428,21 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Ensures the Roles form is open in the Settings tab.
+   * Ensures the Roles form is open.
    * This does not modify any prebuilt functions; it uses existing helpers
    * and adds resilient fallbacks for mobile/constrained viewports.
    */
   async expectRolesFormToBeOpen(): Promise<void> {
-    // Ensure Settings tab is visible and Roles section is expanded (on mobile).
-    await this.navigateToSettingsTab();
-    // Give the Settings tab time to render before proceeding.
-    await this.page.waitForTimeout(500);
+    // This check is intended to run after navigating to the Settings tab.
     if (this.isViewportAtMobileWidth()) {
       await this.expandSettingsTabSection('Roles');
     }
 
-    await this.page.waitForSelector(rolesHeaderSelector, {
-      visible: true,
-      timeout: 5000,
-    });
+    await this.expectElementToBeVisible(rolesHeaderSelector);
 
     // The edit button opens the roles form via Angular handler. Try a normal
     // click first, then fallback to dispatching low-level mouse events if the
-    // username input does not appear.
+    // add-user input does not appear.
     await this.page.waitForSelector(editRolesButtonSelector, {
       visible: true,
       timeout: 5000,
@@ -3464,7 +3450,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(editRoleButton);
 
     try {
-      await this.page.waitForSelector(usernameSelector, {
+      await this.page.waitForSelector(addUsernameInputBox, {
         visible: true,
         timeout: 3000,
       });
@@ -3489,38 +3475,33 @@ export class ExplorationEditor extends BaseUser {
           });
         }
       });
-      await this.page.waitForSelector(usernameSelector, {
+      await this.page.waitForSelector(addUsernameInputBox, {
         visible: true,
         timeout: 5000,
       });
     }
 
-    // Verify the roles form is open by checking the username input field is visible and interactive.
-    await this.expectElementToBeVisible(usernameSelector);
+    // Verify the roles form is open by checking the add-user input is visible.
+    await this.expectElementToBeVisible(addUsernameInputBox);
   }
 
   /**
    * Expects the exploration to be community owned in the Settings tab.
-   * Verifies the message "This exploration is public and community-editable.
-   * It is available in the Oppia library."
+   * @param expectedCommunityOwnedMessage The expected community-owned text.
    */
-  async expectExplorationToBeCommunityOwned(): Promise<void> {
-    await this.navigateToSettingsTab();
+  async expectExplorationToBeCommunityOwned(
+    expectedCommunityOwnedMessage: string
+  ): Promise<void> {
     await this.expectElementToBeVisible(communityOwnedMessageSelector);
 
-    // Verify the exact text from the CUJ expectations.
     const messageText = await this.page.$eval(
       communityOwnedMessageSelector,
       el => el.textContent?.trim() || ''
     );
 
-    if (
-      !messageText.includes('public') ||
-      !messageText.includes('community-editable') ||
-      !messageText.includes('available')
-    ) {
+    if (!messageText.includes(expectedCommunityOwnedMessage)) {
       throw new Error(
-        `Expected community-owned message but got: "${messageText}"`
+        `Expected community-owned message to contain "${expectedCommunityOwnedMessage}", but got: "${messageText}"`
       );
     }
   }
@@ -3536,15 +3517,10 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    const [managerOption] = await this.page.$x(
-      "//mat-option[contains(., 'Manager (can edit permissions)')]"
-    );
-    await managerOption.click();
-    await this.page.waitForSelector(tagFilterDropdownSelector, {
-      hidden: true,
-    });
+    await this.clickOnElementWithText(managerRoleOption);
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as manager role.`);
   }
 
@@ -3560,13 +3536,10 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    const [managerOption] = await this.page.$x(
-      "//mat-option[contains(., 'Manager (can edit permissions)')]"
-    );
-    await managerOption.click();
+    await this.clickOnElementWithText(managerRoleOption);
     await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(
       `${username} has been added as manager role (after form open).`
     );
@@ -3586,7 +3559,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithText(collaboratorRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as collaboratorRole.`);
   }
 
@@ -3606,7 +3579,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addRoleDropdown);
     await this.clickOnElementWithText(playtesterRoleOption);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as playtester.`);
   }
 
@@ -5043,7 +5016,6 @@ export class ExplorationEditor extends BaseUser {
     await this.navigateToSettingsTab();
 
     // Verify the username is listed in the Managers section (the definitive check per CUJ).
-    const ownersListSelector = '.e2e-test-owner-role-names';
     await this.expectElementToBeVisible('.e2e-test-roles-content');
     const owners = await this.page.$$(ownersListSelector);
     if (owners.length === 0) {
@@ -7080,7 +7052,6 @@ export class ExplorationEditor extends BaseUser {
     }
     const editorUrl = `${baseUrl}/create/${explorationId}#/`;
     await this.goto(editorUrl);
-    await this.waitForPageToFullyLoad();
 
     showMessage('Navigation to exploration editor is successful.');
   }
