@@ -10,8 +10,8 @@ button:focus {
 
 
 @media (max-width: 570px) {
-  .blog-post-page-breadcrumb .oppia-blog-post-page-back-button {
-    margin-left: -10px;
+  .blog-post-page-breadcrumb .oppia-blog-post-back-button {
+    margin-inline-start: -10px;
   }
 }
 
@@ -29,7 +29,7 @@ button:focus {
 .blog-post-page-breadcrumb .oppia-navbar-breadcrumb {
   display: -webkit-inline-box;
   flex-flow: column;
-  margin-left: -10px;
+  margin-inline-start: -10px;
   overflow-wrap: break-word;
   padding-top: 3px;
 }
