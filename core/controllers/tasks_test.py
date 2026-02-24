@@ -29,11 +29,13 @@ from core.domain import (
     stats_services,
     taskqueue_services,
     user_services,
+    voiceover_regeneration_services,
+    voiceover_services,
 )
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final, List
+from typing import Dict, Final, List, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -572,7 +574,7 @@ class TasksTests(test_utils.EmailTestBase):
         payload = {
             'fn_identifier': function_id,
             'cloud_task_model_id': new_model_id,
-            'args': [exploration_id, '2025-12-13 21:08:46', 'author_id'],
+            'args': [exploration_id, '2025-12-13 21:08:46', self.owner_id],
             'kwargs': {},
         }
 
@@ -594,6 +596,85 @@ class TasksTests(test_utils.EmailTestBase):
         )
         assert cloud_task_run_model_obj is not None
         self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
+
+    def test_should_handle_failure_case_for_voiceover_deferred_tasks(
+        self,
+    ) -> None:
+        exploration_id = 'exploration_id'
+        self.save_new_valid_exploration(exploration_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-NG': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
+
+        url = feconf.TASK_URL_DEFERRED
+        csrf_token = self.get_new_csrf_token()
+        headers = {
+            'X-Appengine-QueueName': 'queue',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1',
+        }
+        new_model_id = 'cloud_task_model_id'
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            project_id,
+            location_id,
+            queue_name,
+            task_id,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_added_to_topic'
+
+        payload = {
+            'fn_identifier': function_id,
+            'cloud_task_model_id': new_model_id,
+            'args': [exploration_id, '2025-12-13 21:08:46', self.owner_id],
+            'kwargs': {},
+        }
+
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
+        self.assertEqual(cloud_task_run_model.latest_job_state, 'PENDING')
+
+        def mock_regenerate_voiceovers_of_exploration(
+            _exploration_id: str,
+            _exploration_version: int,
+            _content_id_to_content_html: Dict[str, str],
+            _language_accent_code: str,
+        ) -> List[Tuple[str, str]]:
+            errors_while_voiceover_regeneration = [
+                ('content5', 'Error 1 occurred'),
+            ]
+            return errors_while_voiceover_regeneration
+
+        with self.swap(
+            voiceover_regeneration_services,
+            'regenerate_voiceovers_of_exploration',
+            mock_regenerate_voiceovers_of_exploration,
+        ):
+            self.post_task(
+                url,
+                payload,
+                expect_errors=False,
+                expected_status_int=200,
+                csrf_token=csrf_token,
+                headers=headers,
+            )
+
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        )
+        assert cloud_task_run_model_obj is not None
+        self.assertEqual(
+            cloud_task_run_model_obj.latest_job_state, 'PERMANENTLY_FAILED'
+        )
 
     def test_should_raise_error_for_missing_cloud_task_model_id(self) -> None:
         url = feconf.TASK_URL_DEFERRED

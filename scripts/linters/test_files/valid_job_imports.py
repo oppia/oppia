@@ -35,6 +35,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     firebase_validation_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
+    number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
     skill_inspection_jobs,
