@@ -27,6 +27,7 @@ import {
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveSkillreview} from './oppia-noninteractive-skillreview.component';
+import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from './oppia-noninteractive-skillreview-concept-card-modal.component';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {PageContextService} from 'services/page-context.service';
 import {SimpleChanges} from '@angular/core';
@@ -126,6 +127,14 @@ describe('NoninteractiveSkillreview', () => {
     component.openConceptCard(e);
 
     expect(modalSpy).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalledWith(
+      OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+      {
+        backdrop: true,
+        backdropClass: 'forced-modal-backdrop-stack-over',
+        windowClass: 'forced-modal-stack-over',
+      }
+    );
     expect(pageContextService.removeCustomEntityContext).not.toHaveBeenCalled();
   });
 
@@ -260,4 +269,42 @@ describe('NoninteractiveSkillreview', () => {
 
     expect(component.linkText).toBe('new text');
   });
+
+  it(
+    'should restore entity context after concept card modal is' +
+      ' successfully closed',
+    fakeAsync(() => {
+      spyOn(pageContextService, 'setCustomEntityContext');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('entityId');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('entityType');
+      spyOn(pageContextService, 'removeCustomEntityContext');
+
+      let e = {
+        currentTarget: {
+          offsetParent: {
+            dataset: {
+              ckeWidgetId: false,
+            },
+          },
+        },
+      } as unknown as MouseEvent;
+
+      ckEditorCopyContentService.copyModeActive = false;
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
+
+      component.openConceptCard(e);
+      tick();
+
+      expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
+      expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
+        'entityType',
+        'entityId'
+      );
+    })
+  );
 });

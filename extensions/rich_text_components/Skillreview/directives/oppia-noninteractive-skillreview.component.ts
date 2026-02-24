@@ -40,12 +40,12 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {AppConstants} from 'app.constants';
-import {PageContextService} from 'services/page-context.service';
-import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import {HtmlEscaperService} from 'services/html-escaper.service';
-import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from './oppia-noninteractive-skillreview-concept-card-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { PageContextService } from 'services/page-context.service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia-noninteractive-skillreview-concept-card-modal.component';
 
 @Component({
   selector: 'oppia-noninteractive-skillreview',
@@ -67,7 +67,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     private pageContextService: PageContextService,
     private htmlEscaperService: HtmlEscaperService,
     private ngbModal: NgbModal
-  ) {}
+  ) { }
 
   private _updateViewOnNewSkillSelected(): void {
     if (!this.skillIdWithValue || !this.textWithValue) {
@@ -118,11 +118,23 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
 
     const modalRef = this.ngbModal.open(
       OppiaNoninteractiveSkillreviewConceptCardModalComponent,
-      {backdrop: true}
+      {
+        backdrop: true,
+        backdropClass: 'forced-modal-backdrop-stack-over',
+        windowClass: 'forced-modal-stack-over',
+      }
     );
     modalRef.componentInstance.skillId = this.skillId;
     modalRef.result.then(
-      () => {},
+      () => {
+        this.pageContextService.removeCustomEntityContext();
+        if (this.entityId && this.entityType) {
+          this.pageContextService.setCustomEntityContext(
+            this.entityType,
+            this.entityId
+          );
+        }
+      },
       res => {
         this.pageContextService.removeCustomEntityContext();
         // Restore the entity context to that of the state before the concept card
