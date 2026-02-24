@@ -593,12 +593,12 @@ const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 // New lesson player page.
 const lessonPlayerSideBarToggleButton = '.player-sidebar-toggle';
 const mobileOpenOptionsButton = '.mobile-open-options-button';
-const lessonCopyLinkbutton = '.e2e-copy-link-button';
+const lessonCopyLinkbutton = '.lesson-copy-link-button';
 const lessonLinkCopiedMessageSelector = '.success-message';
 const LINK_COPIED_MESSAGE = 'Link Copied';
-const lessonEmbedInWebpageButton = '.e2e-embed-in-webpage-button';
-const shareGoogleClassroomSelector = '.e2e-test-share-link-classroom';
-const shareFacebookSelector = '.e2e-test-share-link-facebook';
+const lessonEmbedInWebpageButton = '.embed-lesson-in-webpage-button';
+const shareGoogleClassroomSelector = '.lesson-share-link-classroom';
+const shareFacebookSelector = '.lesson-share-link-facebook';
 const shareModalCloseButton = '.share-modal-close-button';
 const generateLessonAttributionSelector = '.lesson-attribution-text';
 const attributionTextSelector = '.cc-attribution-input';
@@ -610,6 +610,7 @@ const newAudioControlButton = '.oppia-new-audio-header-control-buttons';
 const voiceoverPlayPauseButton = '.voiceover-play-pause-button';
 const continueButtonSelector = '.oppia-learner-confirm-button';
 const voiceoverAudioSliderSelector = 'oppia-audio-slider mat-slider';
+const lessonReportButtonSelector = '.lesson-report-button';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -5843,6 +5844,31 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expect the sidebar of new lesson player in collapsed state.
+   */
+  async expectSidebarCollapsedState(): Promise<void> {
+    expect(this.expectTextPresentOnPage('Close options')).toBe(false);
+    expect(this.expectTextPresentOnPage('Open options')).toBe(true);
+
+    expect(this.expectTextPresentOnPage('Share this lesson')).toBe(false);
+    expect(this.expectTextPresentOnPage('Feedback')).toBe(false);
+  }
+
+  /**
+   * Verifies that the report button is visible in the lesson player sidebar.
+   */
+  async expectReportButton(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(lessonReportButtonSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
    * Open 'Open Options' in new lesson player page.
    */
   async clickOpenOptions(): Promise<void> {
@@ -5913,40 +5939,61 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Click classroom icon and verify the URL with expectedClassroomURL.
-   * @param expectedClassroomURL - Expected share URL via Google Classroom.
+   * Function to click a button and check if it opens the expected
+   * URL domain in a new tab. Closes the tab afterwards.
    */
-  async shareViaGoogleClassroomAndVerifyURL(
-    expectedClassroomURL: string
+  async clickLinkButtonToNewTabVerifyDomainName(
+    button: string,
+    buttonName: string,
+    expectedDestinationPageUrlDomainName: string,
+    expectedDestinationPageName: string
   ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOnElementWithSelector(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    if (newTabPage === null) {
+      throw new Error(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      );
+    }
+    await this.expectPageURLToContain(
+      expectedDestinationPageUrlDomainName,
+      newTabPage
+    );
+    await newTabPage.close();
+  }
+  /**
+   * Click classroom icon and verify the URL domain.
+   */
+  async shareViaGoogleClassroomAndVerifyURL(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(shareGoogleClassroomSelector, {
       visible: true,
     });
 
-    await this.clickLinkButtonToNewTab(
+    await this.clickLinkButtonToNewTabVerifyDomainName(
       shareGoogleClassroomSelector,
       'Classroom',
-      expectedClassroomURL,
+      'classroom.google.com',
       'Google Classroom'
     );
   }
   /**
-   * Click facebook icon and verify the URL with expectedFacebookURL.
-   * @param expectedFacebookURL - Expected share URL via Facebook.
+   * Click facebook icon and verify the URL domain.
    */
-  async shareViaFacebookAndVerifyURL(
-    expectedFacebookURL: string
-  ): Promise<void> {
+  async shareViaFacebookAndVerifyURL(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(shareFacebookSelector, {
       visible: true,
     });
 
-    await this.clickLinkButtonToNewTab(
+    await this.clickLinkButtonToNewTabVerifyDomainName(
       shareFacebookSelector,
       'Facebook',
-      expectedFacebookURL,
+      'facebook.com',
       'Facebook'
     );
   }

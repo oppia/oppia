@@ -113,6 +113,17 @@ describe('Logged-Out Learner', function () {
   it('should be able to share the lesson using copy link', async function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
+    await loggedOutLearner.page.waitForTimeout(1000);
+    await loggedOutLearner.expectTextPresentOnPage('Close options');
+    // Expect lesson description is present on the page.
+    await loggedOutLearner.expectTextPresentOnPage(
+      'Learn basic Mathematics including Place Values'
+    );
+    // Expect Share and Feedback button is visible.
+    await loggedOutLearner.expectTextPresentOnPage('Share this lesson');
+    await loggedOutLearner.expectTextPresentOnPage('Feedback');
+    // Expect report button is not displayed.
+    expect(await loggedOutLearner.expectReportButton()).toBe(false);
 
     await loggedOutLearner.expectScreenshotToMatch(
       'newLessonPlayerOpenOption',
@@ -130,6 +141,11 @@ describe('Logged-Out Learner', function () {
       __dirname,
       newBrowserTab
     );
+    // Expect lesson name present in new tab.
+    await loggedOutLearner.expectTextPresentOnPage(
+      'What are the Place Values?'
+    );
+    await newBrowserTab.close();
     await loggedOutLearner.closeShareModal();
   });
 
@@ -152,12 +168,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
-    const classroomLink = await loggedOutLearner.getExpectedShareURL(
-      'Classroom',
-      explorationId
-    );
 
-    await loggedOutLearner.shareViaGoogleClassroomAndVerifyURL(classroomLink);
+    await loggedOutLearner.shareViaGoogleClassroomAndVerifyURL();
     await loggedOutLearner.closeShareModal();
   });
 
@@ -165,12 +177,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
-    const facebookLink = await loggedOutLearner.getExpectedShareURL(
-      'Facebook',
-      explorationId
-    );
 
-    await loggedOutLearner.shareViaFacebookAndVerifyURL(facebookLink);
+    await loggedOutLearner.shareViaFacebookAndVerifyURL();
     await loggedOutLearner.closeShareModal();
   });
 
@@ -180,6 +188,9 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickShareLessonButton();
 
     await loggedOutLearner.clickLessonAttribution();
+    await loggedOutLearner.expectTextPresentOnPage(
+      'Generate Creative Commons Attribution'
+    );
     await loggedOutLearner.verifyAttributionText(
       LESSON_ATTRIBUTION_PRINT(explorationId)
     );

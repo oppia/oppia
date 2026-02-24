@@ -118,6 +118,8 @@ describe('Logged-Out Learner', function () {
     // Navigate to lesson, verify URL, and match screenshot.
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.expectToBeOnPage('/lesson/');
+    await loggedOutLearner.expectSidebarCollapsedState();
+    await loggedOutLearner.expectTextPresentOnPage('Open options');
 
     await loggedOutLearner.expectScreenshotToMatch(
       'lessonPlayerPage',
