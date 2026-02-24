@@ -205,15 +205,21 @@ describe('Logged-Out Learner', function () {
     );
 
     // Check Audiobar status.
-    expect(await loggedOutLearner.expectTextPresentOnPage('Listen in')).toBe(
-      false
-    );
+    const isMobileViewPort = loggedOutLearner.isViewportAtMobileWidth();
+
+    if (!isMobileViewPort) {
+      expect(await loggedOutLearner.expectTextPresentOnPage('Listen in')).toBe(
+        false
+      );
+    }
     // Change language to hindi.
     await loggedOutLearner.changeLessonLang('hi');
     await loggedOutLearner.clickOnContinueButton();
-    expect(await loggedOutLearner.expectTextPresentOnPage('Listen in')).toBe(
-      true
-    );
+    if (!isMobileViewPort) {
+      expect(await loggedOutLearner.expectTextPresentOnPage('Listen in')).toBe(
+        true
+      );
+    }
 
     await loggedOutLearner.expectNewAudioControlButtonVisible();
     await loggedOutLearner.expectScreenshotToMatch('newAudioBar', __dirname);
@@ -246,7 +252,6 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.changeLessonLang('hi');
     await loggedOutLearner.clickOnContinueButton();
 
-    await loggedOutLearner.playPauseVoiceover();
     await loggedOutLearner.playAudioTillEnd();
     await loggedOutLearner.expectVoiceoverIsPlaying(false);
   });

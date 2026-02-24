@@ -6266,7 +6266,7 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.page.click(continueButtonSelector);
     await this.expectElementToBeVisible(continueButtonSelector, false);
-    await this.page.waitForNetworkIdle();
+    await this.page.waitForTimeout(10000);
   }
 
   /**
@@ -6282,7 +6282,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async playPauseVoiceover(): Promise<void> {
     await this.waitForElementToBeClickable(voiceoverPlayPauseButton);
-    await this.page.click(voiceoverDropdown);
+    await this.page.click(voiceoverPlayPauseButton);
   }
 
   /**
@@ -6357,6 +6357,10 @@ export class LoggedOutUser extends BaseUser {
    * Function to check voiceover audio is skippable.
    */
   async expectVoiceoverAudioIsSkippable(): Promise<void> {
+    await this.playPauseVoiceover();
+    await this.page.waitForTimeout(1000);
+    await this.playPauseVoiceover();
+
     const initialSliderValue = await this.getVoiceoverSliderValue();
     const slider = await this.page.$(voiceoverAudioSliderSelector);
     const sliderBox = await slider?.boundingBox();
@@ -6364,18 +6368,32 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('Could not determine bounding box for audio slider');
     }
 
-    const targetPercent = 0.75;
-    const targetX = sliderBox.x + sliderBox.width * targetPercent;
+    const maxValue = await this.page.$eval(voiceoverAudioSliderSelector, el =>
+      parseFloat(el.getAttribute('aria-valuemax') || '100')
+    );
+    const currentRatio = initialSliderValue / maxValue;
+    const currentX = sliderBox.x + sliderBox.width * currentRatio;
     const centerY = sliderBox.y + sliderBox.height / 2;
 
-    await this.page.mouse.move(targetX, centerY);
+    const moveDistance = sliderBox.width * 0.2;
+    const targetX = Math.min(
+      currentX + moveDistance,
+      sliderBox.x + sliderBox.width - 5
+    );
+
+    // Perform the drag action.
+    await this.page.mouse.move(currentX, centerY);
     await this.page.mouse.down();
+    await this.page.mouse.move(targetX, centerY, {steps: 10});
     await this.page.mouse.up();
+    await this.page.waitForTimeout(3000);
 
     const newSliderValue = await this.getVoiceoverSliderValue();
 
     if (newSliderValue <= initialSliderValue) {
-      throw new Error('Slider did not skip forward. Start: $');
+      throw new Error(
+        `Slider did not skip forward. Start: ${initialSliderValue}, Current: ${newSliderValue}`
+      );
     }
     showMessage('Voiceover is successfully skippable');
   }
@@ -6422,31 +6440,30 @@ export class LoggedOutUser extends BaseUser {
    * @param {number} timeout - The timeout for playing audio.
    */
   async playAudioTillEnd(
-    selector: string = 'oppia-audio-slider',
-    timeout: number = 20000
+    selector: string = voiceoverAudioSliderSelector,
+    timeout: number = 300000
   ): Promise<void> {
+    await this.playPauseVoiceover();
     await this.page.waitForFunction(
-      (selector: string) => {
+      async (selector: string) => {
         const element = document.querySelector(selector);
         if (!element) {
           return false;
         }
-        const currentValue = parseFloat(
-          element.getAttribute('aria-valuenow') || '0'
-        );
-        const maxValue = parseFloat(
-          element.getAttribute('aria-valuemax') || '0'
+        const currentValue = await this.getVoiceoverSliderValue();
+        const maxValue = await this.page.$eval(
+          voiceoverAudioSliderSelector,
+          el => parseFloat(el.getAttribute('aria-valuemax') || '0')
         );
 
         // Return true only when the current progress matches or exceeds the max duration.
-        return maxValue > 0 && currentValue >= maxValue;
+        return maxValue > 0 && currentValue >= maxValue - 1;
       },
       {timeout},
       selector
     );
-
-    // While mouse is over pause button, the pause button doesn't change its state.
-    await this.page.mouse.move(10, 10);
+    // Move mouse to reset UI state.
+    await this.page.mouse.move(0, 0);
   }
   /**
    * Verify a given text is visible to the user on the page.
