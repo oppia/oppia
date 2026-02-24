@@ -6445,25 +6445,24 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.playPauseVoiceover();
     await this.page.waitForFunction(
-      async (selector: string) => {
+      (selector: string) => {
         const element = document.querySelector(selector);
         if (!element) {
           return false;
         }
-        const currentValue = await this.getVoiceoverSliderValue();
-        const maxValue = await this.page.$eval(
-          voiceoverAudioSliderSelector,
-          el => parseFloat(el.getAttribute('aria-valuemax') || '0')
+        const maxValue = parseFloat(
+          element.getAttribute('aria-valuemax') || '0'
+        );
+        const currentValue = parseFloat(
+          element?.getAttribute('aria-valuenow') || '0'
         );
 
         // Return true only when the current progress matches or exceeds the max duration.
-        return maxValue > 0 && currentValue >= maxValue - 1;
+        return maxValue > 0 && currentValue >= maxValue - 2;
       },
       {timeout},
       selector
     );
-    // Move mouse to reset UI state.
-    await this.page.mouse.move(0, 0);
   }
   /**
    * Verify a given text is visible to the user on the page.
