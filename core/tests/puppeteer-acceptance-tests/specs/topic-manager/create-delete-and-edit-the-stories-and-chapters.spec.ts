@@ -147,9 +147,55 @@ describe('Topic Manager', function () {
     );
     await topicManager.addChapter('Simple Exploration', simpleExplorationId);
     await topicManager.saveStoryDraft();
+
+    // Try to add a chapter with an existing exploration ID and expect warning.
+    await topicManager.addChapterWithoutSaving(
+      'Duplicate Exploration Chapter',
+      simpleExplorationId,
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.clickOnElementWithText('Create Chapter');
+    await topicManager.expectExplorationIdAlreadyExistWarning();
+    await topicManager.clickOnElementWithText('Cancel');
+
     await topicManager.openChapterEditor('Simple Exploration');
     await topicManager.previewChapterCard();
     await topicManager.expectPreviewCardToBeVisible('Simple Exploration');
+
+    // Add another chapter to test reordering.
+    const anotherExplorationId =
+      await topicManager.createAndPublishAMinimalExplorationWithTitle(
+        'Another Exploration',
+        'Algebra'
+      );
+    await topicManager.openStoryEditor(
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.addChapter('Another Exploration', anotherExplorationId);
+    await topicManager.saveStoryDraft();
+
+    // Verify initial order.
+    await topicManager.expectChaptersOrderToBe([
+      'Solving problems',
+      'Simple Exploration',
+      'Another Exploration',
+    ]);
+
+    // Reorder chapters.
+    await topicManager.reorderChapters(
+      'Another Exploration',
+      'Solving problems'
+    );
+    await topicManager.saveStoryDraft();
+
+    // Verify new order.
+    await topicManager.expectChaptersOrderToBe([
+      'Another Exploration',
+      'Solving problems',
+      'Simple Exploration',
+    ]);
 
     // Add unsupported chaper.
     await topicManager.openStoryEditor(
@@ -185,7 +231,7 @@ describe('Topic Manager', function () {
     await topicManager.editChapterDetails(
       'New Title',
       'New Description',
-      'New Meta Tag',
+      'New Chapter Outline',
       testConstants.data.curriculumAdminThumbnailImage
     );
     await topicManager.saveStoryDraft();
@@ -202,6 +248,56 @@ describe('Topic Manager', function () {
     // Add aquired skill.
     await topicManager.addAcquiredSkill('Subtraction');
     await topicManager.expectAquiredSkillToBeVisible('Subtraction');
+
+    // Add a prerequisite skill that is already an acquired skill and expect warning.
+    await topicManager.addPrerequisiteSkill('Subtraction');
+    await topicManager.expectWarningInIndicator(
+      new RegExp(
+        'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
+          'prerequisite skill id ' +
+          'list in .*'
+      )
+    );
+    await topicManager.discardStoryChanges();
+
+    // Re-open chapter editor after discarding changes.
+    await topicManager.openChapterEditor(
+      'Simple Exploration',
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+
+    // Add a prerequisite skill that is already a prerequisite skill and expect warning.
+    await topicManager.addPrerequisiteSkill('Addition');
+    // Note: If the UI shows a warning on the page for duplicate prerequisite,
+    // we should check it.
+    await topicManager.expectWarningInIndicator(
+      'The given skill id is already a prerequisite skill.'
+    );
+    await topicManager.discardStoryChanges();
+
+    // Re-open chapter editor.
+    await topicManager.openChapterEditor(
+      'Solving problems',
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+
+    // Delete prerequisite and acquired skills.
+    await topicManager.removeAcquiredSkill('Addition');
+    await topicManager.saveStoryDraft();
+    await topicManager.expectAquiredSkillToBeVisible('Addition', false);
+
+    await topicManager.openChapterEditor(
+      'Simple Exploration',
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.removePrerequisiteSkillFromChapter('Addition');
+    await topicManager.removeAcquiredSkill('Subtraction');
+    await topicManager.saveStoryDraft();
+    await topicManager.expectPrerequisiteSkillToBeVisible('Addition', false);
+    await topicManager.expectAquiredSkillToBeVisible('Subtraction', false);
   });
 
   afterAll(async function () {

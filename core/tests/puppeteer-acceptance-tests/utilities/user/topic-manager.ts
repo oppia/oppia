@@ -70,8 +70,6 @@ const mobileSaveStoryChangesButton =
 // Chapter Creation Modal.
 const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = '.e2e-test-chapter-title-field';
-const chapterExplorationIdField = '.e2e-test-exploration-id-input';
-
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
 ('input.e2e-test-url-fragment-field');
@@ -219,10 +217,12 @@ const editOptionsSelector = '.e2e-test-edit-options';
 const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
 const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
-const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
 const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
 const addPrerequisiteSkillMobileButtonSelector =
   '.e2e-test-mobile-add-prerequisite-skill';
+const removePrerequisiteSkillButtonSelector =
+  '.e2e-test-remove-prerequisite-skill';
+const removeAcquiredSkillButtonSelector = '.e2e-test-remove-acquired-skill';
 const addPrerequisiteSkillInSkillEditorButton =
   '.e2e-test-add-prerequisite-skill-in-skill-editor-button';
 const togglePrerequisiteSkillsDropdown =
@@ -327,6 +327,8 @@ const storyDescriptionInStoryEditorSelector =
 const storyMetaTagContentInStoryEditorSelector =
   '.e2e-test-story-meta-tag-content-field';
 const storyUrlFragmentInStoryEditorSelector = '.e2e-test-url-fragment-field';
+const showDiscardOptionButtonSelector = '.e2e-test-show-discard-option';
+const discardStoryChangesButtonSelector = '.e2e-test-discard-story-changes';
 
 // Chapter Editor.
 const prerequisiteSkillSelector =
@@ -3091,6 +3093,16 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Discards the changes made in the story editor.
+   */
+  async discardStoryChanges(): Promise<void> {
+    await this.clickOnElementWithSelector(showDiscardOptionButtonSelector);
+    await this.clickOnElementWithSelector(discardStoryChangesButtonSelector);
+    await this.waitForPageToFullyLoad();
+    showMessage('Story changes discarded successfully.');
+  }
+
+  /**
    * Opens the story editor for a given story and topic.
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
@@ -3416,16 +3428,27 @@ export class TopicManager extends BaseUser {
   async editChapterDetails(
     chapterName: string,
     description: string,
-    explorationId: string,
+    outline: string,
     thumbnailImage: string
   ): Promise<void> {
     await this.clearAllTextFrom(chapterTitleField);
     await this.typeInInputField(chapterTitleField, chapterName);
     await this.typeInInputField(chapterDescriptionField, description);
 
-    await this.clearAllTextFrom(chapterExplorationIdField);
-    await this.typeInInputField(chapterExplorationIdField, explorationId);
-    await this.clickOnElementWithSelector(saveExplorationIDButton);
+    // Update outline.
+    await this.page.waitForSelector(
+      '.e2e-test-chapter-outline-editor-container'
+    );
+    const outlineEditor = await this.page.$(
+      '.e2e-test-chapter-outline-editor-container .e2e-test-rte'
+    );
+    if (outlineEditor) {
+      await outlineEditor.click();
+      await outlineEditor.type(outline);
+      await this.clickOnElementWithSelector(
+        '.e2e-test-node-outline-save-button'
+      );
+    }
 
     await this.clickOnElementWithSelector(chapterPhotoBoxButton);
     await this.clickOnElementWithSelector(resetChapterThumbnailButton);
@@ -3521,6 +3544,209 @@ export class TopicManager extends BaseUser {
       await elements[0].click();
     }
     await this.filterAndSelectSkillInSkillSelector(skillName);
+  }
+
+  /**
+   * Removes an acquired skill from the chapter.
+   * @param {string} skillName - The name of the skill to remove.
+   */
+  async removeAcquiredSkill(skillName: string): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? aquiredSkillSkillMobileSelector
+      : aquiredSkillSkillSelector;
+    await this.page.waitForSelector(cardSelector);
+    const skillCards = await this.page.$$(cardSelector);
+
+    for (const skillCard of skillCards) {
+      const skillText = await this.page.evaluate(
+        el => el.querySelector('a')?.textContent?.trim(),
+        skillCard
+      );
+
+      if (skillText === skillName) {
+        const removeButton = await skillCard.$(
+          removeAcquiredSkillButtonSelector
+        );
+        if (removeButton) {
+          await removeButton.click();
+          await this.waitForPageToFullyLoad();
+          showMessage(`Removed acquired skill: ${skillName}`);
+          return;
+        }
+      }
+    }
+    throw new Error(`The acquired skill ${skillName} was not found.`);
+  }
+
+  /**
+   * Removes a prerequisite skill from the chapter.
+   * @param {string} skillName - The name of the skill to remove.
+   */
+  async removePrerequisiteSkillFromChapter(skillName: string): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? prerequisiteSkillMobileSelector
+      : prerequisiteSkillSelector;
+    await this.page.waitForSelector(cardSelector);
+    const skillCards = await this.page.$$(cardSelector);
+
+    for (const skillCard of skillCards) {
+      const skillText = await this.page.evaluate(
+        el => el.querySelector('a')?.textContent?.trim(),
+        skillCard
+      );
+
+      if (skillText === skillName) {
+        const removeButton = await skillCard.$(
+          removePrerequisiteSkillButtonSelector
+        );
+        if (removeButton) {
+          await removeButton.click();
+          await this.waitForPageToFullyLoad();
+          showMessage(`Removed prerequisite skill: ${skillName}`);
+          return;
+        }
+      }
+    }
+    throw new Error(`The prerequisite skill ${skillName} was not found.`);
+  }
+
+  /**
+   * Reorders chapters by dragging one chapter before another.
+   * @param {string} chapterName - The name of the chapter to drag.
+   * @param {string} targetChapterName - The name of the target chapter.
+   */
+  async reorderChapters(
+    chapterName: string,
+    targetChapterName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(chapterTitleSelector);
+    const chapterTitles = await this.page.$$(chapterTitleSelector);
+
+    let fromElement: ElementHandle<Element> | null = null;
+    let toElement: ElementHandle<Element> | null = null;
+
+    for (const chapterTitle of chapterTitles) {
+      const text = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        chapterTitle
+      );
+      if (text === chapterName) {
+        fromElement = (await chapterTitle.evaluateHandle(el =>
+          el.closest('[cdkDrag]')
+        )) as ElementHandle<Element>;
+      }
+      if (text === targetChapterName) {
+        toElement = (await chapterTitle.evaluateHandle(el =>
+          el.closest('[cdkDrag]')
+        )) as ElementHandle<Element>;
+      }
+    }
+
+    if (!fromElement || !toElement) {
+      throw new Error('Chapter(s) not found for reordering.');
+    }
+
+    const fromBox = await fromElement.boundingBox();
+    const toBox = await toElement.boundingBox();
+
+    if (!fromBox || !toBox) {
+      throw new Error('Could not get bounding box for chapter(s).');
+    }
+
+    await this.page.mouse.move(
+      fromBox.x + fromBox.width / 2,
+      fromBox.y + fromBox.height / 2
+    );
+    await this.page.mouse.down();
+    await this.page.mouse.move(
+      toBox.x + toBox.width / 2,
+      toBox.y + toBox.height / 2,
+      {steps: 10}
+    );
+    await this.page.mouse.up();
+
+    await this.waitForPageToFullyLoad();
+    showMessage(`Reordered chapters: ${chapterName} to ${targetChapterName}`);
+  }
+
+  /**
+   * Expects a warning message to appear in the chapter editor.
+   * @param {string|RegExp} expectedWarning - The expected warning message or regex.
+   */
+  async expectWarningInIndicator(
+    expectedWarning: string | RegExp
+  ): Promise<void> {
+    const warningIndicatorSelector = '.e2e-test-warning-indicator';
+    const warningTextSelector = '.e2e-test-warnings-text';
+
+    await this.page.waitForSelector(warningIndicatorSelector);
+    await this.page.hover(warningIndicatorSelector);
+    await this.page.waitForSelector(warningTextSelector);
+
+    const actualWarning = await this.page.$eval(warningTextSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (typeof expectedWarning === 'string') {
+      if (actualWarning !== expectedWarning) {
+        throw new Error(
+          `Expected warning: "${expectedWarning}", but got: "${actualWarning}"`
+        );
+      }
+    } else {
+      if (!expectedWarning.test(actualWarning || '')) {
+        throw new Error(
+          `Expected warning to match: ${expectedWarning}, but got: "${actualWarning}"`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects an exploration already present warning.
+   */
+  async expectExplorationIdAlreadyExistWarning(): Promise<void> {
+    const explorationAlreadyPresentMsgSelector = '.e2e-test-invalid-exp-id';
+    await this.expectElementToBeVisible(explorationAlreadyPresentMsgSelector);
+    const actualWarning = await this.page.$eval(
+      explorationAlreadyPresentMsgSelector,
+      el => el.textContent?.trim()
+    );
+
+    const expectedWarning =
+      'The given exploration already exists in the story.';
+    if (actualWarning !== expectedWarning) {
+      throw new Error(
+        `Expected warning: "${expectedWarning}", but got: "${actualWarning}"`
+      );
+    }
+  }
+
+  /**
+   * Verifies the order of chapters in the story editor.
+   * @param {string[]} expectedOrder - The expected order of chapter titles.
+   */
+  async expectChaptersOrderToBe(expectedOrder: string[]): Promise<void> {
+    await this.page.waitForSelector(chapterTitleSelector);
+    const chapterTitles = await this.page.$$(chapterTitleSelector);
+
+    if (chapterTitles.length !== expectedOrder.length) {
+      throw new Error(
+        `Expected ${expectedOrder.length} chapters, but found ${chapterTitles.length}`
+      );
+    }
+
+    for (let i = 0; i < chapterTitles.length; i++) {
+      const actualTitle = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        chapterTitles[i]
+      );
+      if (actualTitle !== expectedOrder[i]) {
+        throw new Error(
+          `Expected chapter at index ${i} to be "${expectedOrder[i]}", but got "${actualTitle}"`
+        );
+      }
+    }
   }
 
   /**
@@ -4154,15 +4380,20 @@ export class TopicManager extends BaseUser {
   /**
    * Checks if the prerequisite skill is visible.
    * @param {string} skillName - The name of the prerequisite skill.
-   * @returns {Promise<ElementHandle<Element>>} The prerequisite skill element.
+   * @param {boolean} visible - Whether the skill should be visible.
+   * @returns {Promise<ElementHandle<Element>|null>} The prerequisite skill element.
    */
   async expectPrerequisiteSkillToBeVisible(
-    skillName: string
-  ): Promise<ElementHandle<Element>> {
+    skillName: string,
+    visible: boolean = true
+  ): Promise<ElementHandle<Element> | null> {
     const selector = this.isViewportAtMobileWidth()
       ? prerequisiteSkillMobileSelector
       : prerequisiteSkillSelector;
-    await this.expectElementToBeVisible(selector);
+
+    if (visible) {
+      await this.expectElementToBeVisible(selector);
+    }
     const prerequisiteSkillElements = await this.page.$$(selector);
 
     let prerequisiteSkillElement: ElementHandle<Element> | null = null;
@@ -4176,26 +4407,39 @@ export class TopicManager extends BaseUser {
       }
     }
 
-    if (!prerequisiteSkillElement) {
+    if (visible && !prerequisiteSkillElement) {
       throw new Error(`Prerequisite skill ${skillName} not found.`);
     }
 
-    showMessage(`Prerequisite skill ${skillName} is visible.`);
+    if (!visible && prerequisiteSkillElement) {
+      throw new Error(
+        `Prerequisite skill ${skillName} found but should not be.`
+      );
+    }
+
+    showMessage(
+      `Prerequisite skill ${skillName} is ${visible ? 'visible' : 'not visible'} as expected.`
+    );
     return prerequisiteSkillElement;
   }
 
   /**
    * Checks if the aquired skill is visible.
    * @param {string} skillName - The name of the aquired skill.
-   * @returns {Promise<ElementHandle<Element>>} The aquired skill element.
+   * @param {boolean} visible - Whether the skill should be visible.
+   * @returns {Promise<ElementHandle<Element>|null>} The aquired skill element.
    */
   async expectAquiredSkillToBeVisible(
-    skillName: string
-  ): Promise<ElementHandle<Element>> {
+    skillName: string,
+    visible: boolean = true
+  ): Promise<ElementHandle<Element> | null> {
     const selector = this.isViewportAtMobileWidth()
       ? aquiredSkillSkillMobileSelector
       : aquiredSkillSkillSelector;
-    await this.expectElementToBeVisible(selector);
+
+    if (visible) {
+      await this.expectElementToBeVisible(selector);
+    }
     const aquiredSkillElements = await this.page.$$(selector);
 
     let aquiredSkillElement: ElementHandle<Element> | null = null;
@@ -4209,11 +4453,17 @@ export class TopicManager extends BaseUser {
       }
     }
 
-    if (!aquiredSkillElement) {
+    if (visible && !aquiredSkillElement) {
       throw new Error(`Aquired skill ${skillName} not found.`);
     }
 
-    showMessage(`Aquired skill ${skillName} is visible.`);
+    if (!visible && aquiredSkillElement) {
+      throw new Error(`Aquired skill ${skillName} found but should not be.`);
+    }
+
+    showMessage(
+      `Aquired skill ${skillName} is ${visible ? 'visible' : 'not visible'} as expected.`
+    );
     return aquiredSkillElement;
   }
 
