@@ -419,21 +419,16 @@ def get_total_number_of_matching_blog_posts(
     valid_blog_post_ids: List[str] = []
     search_offset: Optional[int] = None
 
-    # Keep fetching until there are no more results
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = (
-            1000  # Fetch in chunks of 1000 to avoid memory issues
-        )
+        remaining_to_fetch = 1000
 
         batch_ids, search_offset = get_blog_post_ids_matching_query(
             query_string, tags, size=remaining_to_fetch, offset=search_offset
         )
-
         valid_blog_post_ids.extend(batch_ids)
 
-        if search_offset is None:  # No more results to fetch
+        if search_offset is None:
             break
-
     return len(valid_blog_post_ids)
 
 

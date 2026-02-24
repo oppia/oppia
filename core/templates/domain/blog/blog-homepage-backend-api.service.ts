@@ -172,7 +172,7 @@ export class BlogHomePageBackendApiService {
                   return BlogPostSummary.createFromBackendDict(blogPostSummary);
                 }
               ),
-              totalMatchingBlogPosts: response.total_matching_blog_posts,
+              totalMatchingBlogPosts: response.total_matching_blog_posts ?? 0,
             });
           },
           errorResponse => {

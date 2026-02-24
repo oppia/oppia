@@ -225,88 +225,79 @@ describe('Blog home page component', () => {
 
   it('should handle search query change with language param in URL with empty search query and tag list', () => {
     spyOn(component, 'loadInitialBlogHomePageData');
-    spyOn(windowRef.nativeWindow.history, 'pushState');
-    windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/search/find?lang=en'
-    );
-
-    component.onSearchQueryChangeExec();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
+    let pushStateSpy = spyOn(
+      windowRef.nativeWindow.history,
+      'pushState'
+    ).and.callThrough();
 
     windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/not/search/find?lang=en'
+      'http://localhost/blog/not/search/find?query=&page=1'
     );
-    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
-    component.onSearchQueryChangeExec();
+
     component.searchQuery = '';
     component.selectedTags = [];
 
+    component.onSearchQueryChangeExec();
+
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
-      {},
-      '',
-      '/blog'
+
+    expect(windowRef.nativeWindow.location.href).toEqual(
+      'http://localhost/blog'
     );
+
+    expect(pushStateSpy).not.toHaveBeenCalled();
+
+    expect(component.loadInitialBlogHomePageData).not.toHaveBeenCalled();
   });
 
   it('should handle search query change with language param in URL with non empty search query', () => {
-    component.searchQuery = 'search_query';
-    component.selectedTags = [];
+    spyOn(component, 'loadInitialBlogHomePageData').and.callFake(() => {});
     spyOn(searchService, 'executeSearchQuery').and.callFake(
-      (searchQuery: string, tags: object, callb: () => void) => {
-        callb();
+      (query: string, tags: string[], successCallback: () => void) => {
+        successCallback();
       }
     );
-    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
-      'search_query'
-    );
-    spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
+
     windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/search/find?lang=en'
+      'http://localhost/blog/search/find?q=&page=1'
     );
 
+    component.searchQuery = 'search_query';
+    component.selectedTags = [];
+
     component.onSearchQueryChangeExec();
+
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
-    windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/not/search/find?lang=en'
-    );
-    component.onSearchQueryChangeExec();
-    expect(windowRef.nativeWindow.location.href).toEqual(
-      'http://localhost/blog/search/find?q=search_query&lang=en'
+
+    expect(component.loadInitialBlogHomePageData).not.toHaveBeenCalled();
+
+    expect(pushStateSpy).toHaveBeenCalledWith(
+      {},
+      '',
+      jasmine.stringMatching('blog/search/find\\?q=search_query&page=1')
     );
   });
 
   it('should handle search query change without language param in URL with empty search query and tag list', () => {
     spyOn(component, 'loadInitialBlogHomePageData');
-    spyOn(windowRef.nativeWindow.history, 'pushState');
-    windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/search/find'
-    );
-
-    component.onSearchQueryChangeExec();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
+    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
 
     windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/not/search/find'
+      'http://localhost/blog/search/find?query=&page=1'
     );
-    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
-    component.onSearchQueryChangeExec();
+
     component.searchQuery = '';
     component.selectedTags = [];
 
+    component.onSearchQueryChangeExec();
+
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
-      {},
-      '',
-      '/blog'
-    );
+
+    expect(windowRef.nativeWindow.location.href).toBe('http://localhost/blog');
+
+    expect(pushStateSpy).not.toHaveBeenCalled();
   });
 
   it('should handle search query change without language param in URL with non empty search query', () => {
@@ -318,24 +309,24 @@ describe('Blog home page component', () => {
     spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
       'search_query'
     );
-    spyOn(windowRef.nativeWindow.history, 'pushState');
+    const pushStateSpy = spyOn(
+      windowRef.nativeWindow.history,
+      'pushState'
+    ).and.callThrough();
+
     windowRef.nativeWindow.location = new URL(
       'http://localhost/blog/search/find'
     );
 
-    component.onSearchQueryChangeExec();
     component.searchQuery = 'search_query';
     component.selectedTags = [];
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
-    windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/not/search/find'
-    );
-
     component.onSearchQueryChangeExec();
 
-    expect(windowRef.nativeWindow.location.href).toEqual(
-      'http://localhost/blog/search/find?q=search_query'
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(pushStateSpy).toHaveBeenCalledWith(
+      {},
+      '',
+      'http://localhost/blog/search/find?q=search_query&page=1'
     );
   });
 
@@ -427,7 +418,7 @@ describe('Blog home page component', () => {
 
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
     expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
-    expect(component.searchPageIsActive).toBeFalse();
+    expect(component.searchPageIsActive).toBe(false);
     expect(component.updateSearchFieldsBasedOnUrlQuery).not.toHaveBeenCalled();
   });
 
@@ -448,6 +439,7 @@ describe('Blog home page component', () => {
         searchOffset: null,
         blogPostSummariesList: [],
         listOfDefaultTags: ['learners', 'news'],
+        totalMatchingBlogPosts: 0,
       };
     });
 
@@ -468,7 +460,7 @@ describe('Blog home page component', () => {
       );
       expect(component.loadInitialBlogHomePageData).not.toHaveBeenCalled();
       expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
-      expect(component.searchPageIsActive).toBeTrue();
+      expect(component.searchPageIsActive).toBe(true);
       expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
       expect(searchService.onSearchBarLoaded.emit).toHaveBeenCalled();
       expect(
@@ -484,110 +476,99 @@ describe('Blog home page component', () => {
         spyOn(component, 'loadSearchResultsPageData');
         component.ngOnInit();
 
-        expect(component.searchPageIsActive).toBeTrue();
+        expect(component.searchPageIsActive).toBe(true);
         expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
         expect(component.noResultsFound).toBeUndefined();
 
         mockOnInitialSearchResultsLoaded.emit(searchResponseData);
         tick();
 
-        expect(component.noResultsFound).toBeTrue();
+        expect(component.noResultsFound).toBe(true);
         expect(component.loadSearchResultsPageData).not.toHaveBeenCalled();
-        expect(component.searchPageIsActive).toBeTrue();
+        expect(component.searchPageIsActive).toBe(true);
       })
     );
 
-    it(
-      'should load data after initial search is performed' +
-        ' with one matching result and no offset',
-      fakeAsync(() => {
-        searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
+    it('should load data after initial search is performed with one matching result and no offset', fakeAsync(() => {
+      searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
+      searchResponseData.totalMatchingBlogPosts = 1;
+      searchResponseData.searchOffset = null;
 
-        component.ngOnInit();
+      component.ngOnInit();
 
-        expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-        expect(component.searchPageIsActive).toBeTrue();
-        expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
-        expect(component.noResultsFound).toBeUndefined();
-        expect(component.blogPostSummaries.length).toBe(0);
+      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+      expect(component.searchPageIsActive).toBe(true);
+      expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
+      expect(component.noResultsFound).toBeUndefined();
+      expect(component.blogPostSummaries.length).toBe(0);
 
-        mockOnInitialSearchResultsLoaded.emit(searchResponseData);
-        tick();
+      mockOnInitialSearchResultsLoaded.emit(searchResponseData);
+      tick();
 
-        expect(component.noResultsFound).toBeFalse();
-        expect(component.searchPageIsActive).toBeTrue();
-        expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
-        expect(component.searchOffset).toEqual(null);
-        expect(component.totalBlogPosts).toBe(1);
-        expect(component.lastPostOnPageNum).toBe(1);
-        expect(component.blogPostSummariesToShow).toEqual([
-          blogPostSummaryObject,
-        ]);
-        expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-      })
-    );
+      expect(component.noResultsFound).toBe(false);
+      expect(component.searchPageIsActive).toBe(true);
+      expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
+      expect(component.searchOffset).toEqual(null);
+      expect(component.totalBlogPosts).toBe(1);
+      expect(component.lastPostOnPageNum).toBe(1);
+      expect(component.blogPostSummariesToShow).toEqual([
+        blogPostSummaryObject,
+      ]);
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    }));
 
-    it(
-      'should load data after initial search is performed' +
-        ' with one matching result and with search offset',
-      fakeAsync(() => {
-        searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
-        searchResponseData.searchOffset = 1;
-        component.ngOnInit();
-
-        expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-        expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
-        expect(component.noResultsFound).toBeUndefined();
-        expect(component.blogPostSummaries.length).toBe(0);
-
-        mockOnInitialSearchResultsLoaded.emit(searchResponseData);
-        tick();
-
-        expect(component.noResultsFound).toBeFalse();
-        expect(component.listOfDefaultTags).toEqual(
-          searchResponseData.listOfDefaultTags
-        );
-        expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
-        expect(component.searchOffset).toEqual(1);
-        // As search offset is not null, there are more search result pages to
-        // load. Therefore for pagination to show that more results are available,
-        // total number of blog post is one more than the number of blog posts
-        // loaded as number of pages is automatically calculated using total
-        // collection size and number of blog posts to show on a page.
-        expect(component.totalBlogPosts).toBe(2);
-        expect(component.blogPostSummariesToShow).toEqual([
-          blogPostSummaryObject,
-        ]);
-        expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-      })
-    );
-
-    it('should succesfully load multiple search results pages data', fakeAsync(() => {
+    it('should load data after initial search is performed with one matching result and with search offset', fakeAsync(() => {
+      searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
       searchResponseData.searchOffset = 1;
+      searchResponseData.totalMatchingBlogPosts = 2;
+
+      component.ngOnInit();
+
+      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+      expect(component.blogPostSummaries).toEqual([]);
+      expect(component.noResultsFound).toBeUndefined();
+
+      mockOnInitialSearchResultsLoaded.emit(searchResponseData);
+      tick();
+
+      expect(component.noResultsFound).toBe(false);
+      expect(component.listOfDefaultTags).toEqual(
+        searchResponseData.listOfDefaultTags
+      );
+      expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
+      expect(component.blogPostSummariesToShow).toEqual([
+        blogPostSummaryObject,
+      ]);
+      expect(component.searchOffset).toEqual(1);
+      expect(component.totalBlogPosts).toBe(2);
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    }));
+
+    it('should successfully load multiple search results pages data', fakeAsync(() => {
+      searchResponseData.searchOffset = 1;
+      searchResponseData.totalMatchingBlogPosts = 4;
       searchResponseData.blogPostSummariesList = [
         blogPostSummaryObject,
         blogPostSummaryObject,
       ];
+
       spyOn(alertsService, 'addWarning');
       spyOn(searchService, 'loadMoreData').and.callFake(
-        (callb: (SearchResponseData: SearchResponseData) => void) => {
-          callb(searchResponseData);
+        (callback: (response: SearchResponseData) => void) => {
+          callback(searchResponseData);
         }
       );
+
       component.ngOnInit();
       component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH = 2;
 
-      // Loading page 1.
       mockOnInitialSearchResultsLoaded.emit(searchResponseData);
       tick();
 
       expect(component.blogPostSummaries.length).toBe(2);
-      expect(component.searchOffset).toEqual(1);
-      expect(component.blogPostSummariesToShow).toEqual([
-        blogPostSummaryObject,
-        blogPostSummaryObject,
-      ]);
+      expect(component.totalBlogPosts).toBe(4);
       expect(component.blogPostSummariesToShow.length).toBe(2);
+      expect(component.firstPostOnPageNum).toBe(1);
       expect(component.lastPostOnPageNum).toBe(2);
 
       // Changing to page 2.
@@ -595,18 +576,19 @@ describe('Blog home page component', () => {
       component.onPageChange();
       tick();
 
-      expect(component.firstPostOnPageNum).toBe(3);
-      expect(component.blogPostSummaries.length).toBe(4);
+      expect(component.blogPostSummaries.length).toBe(2);
       expect(component.blogPostSummariesToShow.length).toBe(2);
+      expect(component.firstPostOnPageNum).toBe(3);
       expect(component.lastPostOnPageNum).toBe(4);
 
       // Changing back to page 1.
       component.page = 1;
       component.onPageChange();
+      tick();
 
-      expect(component.firstPostOnPageNum).toBe(1);
-      expect(component.blogPostSummaries.length).toBe(4);
+      expect(component.blogPostSummaries.length).toBe(2);
       expect(component.blogPostSummariesToShow.length).toBe(2);
+      expect(component.firstPostOnPageNum).toBe(1);
       expect(component.lastPostOnPageNum).toBe(2);
 
       expect(alertsService.addWarning).not.toHaveBeenCalled();
@@ -718,7 +700,7 @@ describe('Blog home page component', () => {
       ).toHaveBeenCalledWith('0');
 
       tick();
-      expect(component.noResultsFound).toBeTrue();
+      expect(component.noResultsFound).toBe(true);
 
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
@@ -739,7 +721,7 @@ describe('Blog home page component', () => {
 
       tick();
       expect(component.totalBlogPosts).toBe(1);
-      expect(component.noResultsFound).toBeFalse();
+      expect(component.noResultsFound).toBe(false);
       expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
       expect(component.blogPostSummariesToShow).toEqual([
         blogPostSummaryObject,
@@ -770,97 +752,117 @@ describe('Blog home page component', () => {
     it('should succesfully load multiple blog home pages data', fakeAsync(() => {
       component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 1;
       blogHomePageDataObject.numOfPublishedBlogPosts = 3;
-      blogHomePageDataObject.blogPostSummaryDicts = [blogPostSummaryObject];
+
+      const blogPostSummary2 = {...blogPostSummaryObject, _id: 'sampleBlogId2'};
+      const blogPostSummary3 = {...blogPostSummaryObject, _id: 'sampleBlogId3'};
+
+      blogHomePageDataObject.blogPostSummaryDicts = [
+        blogPostSummaryObject,
+        blogPostSummary2,
+        blogPostSummary3,
+      ];
+
       spyOn(alertsService, 'addWarning');
       spyOn(
         blogHomePageBackendApiService,
         'fetchBlogHomePageDataAsync'
-      ).and.returnValue(Promise.resolve(blogHomePageDataObject));
+      ).and.callFake((offset: string) => {
+        const index = parseInt(offset);
+        return Promise.resolve({
+          numOfPublishedBlogPosts: 3,
+          blogPostSummaryDicts: [
+            blogHomePageDataObject.blogPostSummaryDicts[index],
+          ],
+          listOfDefaultTags: ['learners', 'news'],
+        });
+      });
 
       component.loadInitialBlogHomePageData();
       tick();
+      component.selectBlogPostSummariesToShow();
 
-      expect(component.totalBlogPosts).toBe(3);
-      expect(component.noResultsFound).toBeFalse();
-      expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
       expect(component.blogPostSummariesToShow).toEqual([
         blogPostSummaryObject,
       ]);
+      expect(component.totalBlogPosts).toBe(3);
       expect(component.lastPostOnPageNum).toBe(1);
 
       component.page = 2;
-      component.loadMoreBlogPostSummaries(1);
+      component.loadBlogPostsForPage(1);
       tick();
+      component.selectBlogPostSummariesToShow();
 
-      expect(
-        blogHomePageBackendApiService.fetchBlogHomePageDataAsync
-      ).toHaveBeenCalledWith('1');
-      expect(component.totalBlogPosts).toBe(3);
-      expect(component.blogPostSummaries).toEqual([
-        blogPostSummaryObject,
-        blogPostSummaryObject,
-      ]);
-      expect(component.blogPostSummariesToShow).toEqual([
-        blogPostSummaryObject,
-      ]);
-      expect(component.lastPostOnPageNum).toBe(2);
+      expect(component.blogPostSummariesToShow).toEqual([blogPostSummary2]);
+      expect(component.lastPostOnPageNum).toBe(1);
+
+      component.page = 3;
+      component.loadBlogPostsForPage(2);
+      tick();
+      component.selectBlogPostSummariesToShow();
+
+      expect(component.blogPostSummariesToShow).toEqual([blogPostSummary3]);
 
       expect(alertsService.addWarning).not.toHaveBeenCalled();
     }));
 
     it('should load data for page on changing page', () => {
-      spyOn(component, 'loadMoreBlogPostSummaries');
-      component.totalBlogPosts = 5;
+      if (!urlService.getUrlParams.calls) {
+        spyOn(urlService, 'getUrlParams').and.returnValue({});
+      }
+
+      const constantsRef = BlogHomePageConstants as {
+        MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE: number;
+      };
+
+      const originalPageSize =
+        constantsRef.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
+
+      constantsRef.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 2;
+
+      spyOn(component, 'loadPage').and.callFake(() => {
+        const page = component.page;
+
+        if (page === 2) {
+          component.blogPostSummaries = [
+            blogPostSummaryObject,
+            blogPostSummaryObject,
+          ];
+        } else if (page === 3) {
+          component.blogPostSummaries = [blogPostSummaryObject];
+        }
+
+        component.showBlogPostCardsLoadingScreen = false;
+        component.selectBlogPostSummariesToShow();
+      });
+
       component.blogPostSummaries = [
         blogPostSummaryObject,
         blogPostSummaryObject,
       ];
+      component.totalBlogPosts = 5;
+
       component.ngOnInit();
-      component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 2;
 
-      expect(component.page).toBe(1);
+      (component.loadPage as jasmine.Spy).calls.reset();
+
       expect(component.firstPostOnPageNum).toBe(1);
-      expect(component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE).toBe(2);
-      expect(component.showBlogPostCardsLoadingScreen).toBeFalse();
+      expect(component.lastPostOnPageNum).toBe(2);
 
-      // Changing to page number 2.
       component.page = 2;
       component.onPageChange();
-      expect(component.firstPostOnPageNum).toBe(3);
-      expect(component.showBlogPostCardsLoadingScreen).toBeTrue();
-      expect(component.loadMoreBlogPostSummaries).toHaveBeenCalledWith(2);
-      expect(component.lastPostOnPageNum).toBe(4);
-      // Adding blog post summaries for page 2.
-      component.blogPostSummaries = component.blogPostSummaries.concat([
-        blogPostSummaryObject,
-        blogPostSummaryObject,
-      ]);
-      component.showBlogPostCardsLoadingScreen = false;
 
-      // Changing to page number 3.
+      expect(component.firstPostOnPageNum).toBe(3);
+      expect(component.loadPage).toHaveBeenCalledTimes(1);
+      expect(component.lastPostOnPageNum).toBe(4);
+
       component.page = 3;
       component.onPageChange();
-      expect(component.firstPostOnPageNum).toBe(5);
-      expect(component.showBlogPostCardsLoadingScreen).toBeTrue();
-      expect(component.loadMoreBlogPostSummaries).toHaveBeenCalledWith(4);
-      expect(component.loadMoreBlogPostSummaries).toHaveBeenCalledTimes(2);
-      expect(component.lastPostOnPageNum).toBe(5);
-      // Adding blog post summaries for page 3.
-      component.blogPostSummaries = component.blogPostSummaries.concat([
-        blogPostSummaryObject,
-      ]);
-      component.showBlogPostCardsLoadingScreen = false;
 
-      // Changing back to page number 2.
-      component.page = 2;
-      component.onPageChange();
-      expect(component.firstPostOnPageNum).toBe(3);
-      expect(component.showBlogPostCardsLoadingScreen).toBeFalse();
-      // Function loadMoreBlogPostSummaries should not be called again.
-      expect(component.loadMoreBlogPostSummaries).toHaveBeenCalledTimes(2);
-      expect(component.lastPostOnPageNum).toBe(4);
-      expect(component.blogPostSummaries.length).toBe(5);
-      expect(component.blogPostSummariesToShow.length).toBe(2);
+      expect(component.firstPostOnPageNum).toBe(5);
+      expect(component.loadPage).toHaveBeenCalledTimes(2);
+      expect(component.lastPostOnPageNum).toBe(5);
+
+      constantsRef.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = originalPageSize;
     });
 
     it('should use reject handler if fetching blog home page data fails', fakeAsync(() => {
@@ -903,7 +905,9 @@ describe('Blog home page component', () => {
           })
         );
 
-        component.loadMoreBlogPostSummaries(1);
+        component.firstPostOnPageNum = 2;
+        component.blogPostSummaries = [];
+        component.loadPage();
 
         expect(
           blogHomePageBackendApiService.fetchBlogHomePageDataAsync
@@ -920,7 +924,7 @@ describe('Blog home page component', () => {
 
   it('should tell searching status', () => {
     spyOn(searchService, 'isSearchInProgress').and.returnValue(false);
-    expect(component.isSearchInProgress()).toBeFalse();
+    expect(component.isSearchInProgress()).toBe(false);
   });
 
   it('should get static asset image url', () => {
