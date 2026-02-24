@@ -1029,17 +1029,11 @@ textarea {
 }
 
 .oppia-navbar-breadcrumb-separator {
-  margin-right: 8px;
+  display: inline-block;
+  margin-inline: 8px;
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
-}
-
-.oppia-navbar-breadcrumb-rtl-separator {
-  margin-left: 8px;
-}
-.oppia-navbar-breadcrumb-rtl-separator:after {
-  content: "<";
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile a:hover {
@@ -2544,6 +2538,10 @@ div#ng-curtain {
   color: white;
   font-size: 20px;
   padding: 6px;
+  -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
 
 .oppia-navbar-tabs {
