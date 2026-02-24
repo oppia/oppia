@@ -24,7 +24,6 @@ import html
 import io
 import json
 import logging
-import time
 import uuid
 
 from core import feconf, utils
@@ -52,8 +51,6 @@ if MYPY:  # pragma: no cover
 (voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 
 speech_synthesis_services = models.Registry.import_speech_synthesis_services()
-
-WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
 def _extract_text_from_link_tag(element: bs4.Tag) -> str:
@@ -600,9 +597,6 @@ def regenerate_voiceovers_of_exploration(
         voiceover_filename = generate_new_voiceover_filename(
             content_id, language_accent_code
         )
-
-        # Pause for 3 seconds to prevent sudden spikes in workload.
-        time.sleep(WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS)
 
         try:
             # Generates a voiceover for the provided HTML content in the
