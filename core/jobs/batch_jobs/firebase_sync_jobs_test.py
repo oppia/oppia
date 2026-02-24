@@ -124,6 +124,116 @@ class FirebaseSyncRecordsJobTests(
                 ],
             )
 
+    def test_run_with_matching_records_reports_ok_count(self) -> None:
+        self.firebase_sdk_stub.create_user(
+            uid='fb_a', email='a@a.com', disabled=False
+        )
+
+        self.put_multi(
+            [
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_a',
+                    firebase_auth_id='fb_a',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_a',
+                    email='a@a.com',
+                ),
+            ]
+        )
+
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='OK: 1')],
+        )
+
+        # Verify the Firebase record was left untouched.
+        user = self.firebase_sdk_stub.get_user('fb_a')
+        self.assertEqual(user.uid, 'fb_a')
+        self.assertEqual(user.email, 'a@a.com')
+        self.assertFalse(user.disabled)
+
+    def test_run_with_same_email_different_auth_id_reimports(self) -> None:
+        self.firebase_sdk_stub.create_user(
+            uid='fb_old', email='a@a.com', disabled=False
+        )
+
+        self.put_multi(
+            [
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_a',
+                    firebase_auth_id='fb_new',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_a',
+                    email='a@a.com',
+                ),
+            ]
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='delete_users success: 1'),
+                job_run_result.JobRunResult(stdout='import_users success: 1'),
+            ],
+        )
+
+        with self.assertRaisesRegex(
+            firebase_auth.UserNotFoundError, 'not found'
+        ):
+            self.firebase_sdk_stub.get_user('fb_old')
+
+        new_user = self.firebase_sdk_stub.get_user('fb_new')
+        self.assertEqual(new_user.uid, 'fb_new')
+        self.assertEqual(new_user.email, 'a@a.com')
+        self.assertFalse(new_user.disabled)
+
+    def test_run_with_mixed_records(self) -> None:
+        # Firebase has matching_fb (match) and stale_fb (delete-only).
+        self.firebase_sdk_stub.create_user(
+            uid='matching_fb', email='match@test.com', disabled=False
+        )
+        self.firebase_sdk_stub.create_user(
+            uid='stale_fb', email='stale@test.com', disabled=False
+        )
+
+        # Oppia has matching user (match) and fresh user (import-only).
+        self.put_multi(
+            [
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_match',
+                    firebase_auth_id='matching_fb',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_match',
+                    email='match@test.com',
+                ),
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_fresh',
+                    firebase_auth_id='fresh_fb',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_fresh',
+                    email='fresh@test.com',
+                ),
+            ]
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='OK: 1'),
+                job_run_result.JobRunResult(stdout='delete_users success: 1'),
+                job_run_result.JobRunResult(stdout='import_users success: 1'),
+            ],
+        )
+
     def test_run_with_profile_users_skips_import(self) -> None:
         self.put_multi(
             [
