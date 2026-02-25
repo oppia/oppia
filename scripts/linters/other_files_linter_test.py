@@ -123,6 +123,71 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('App dev file', error_messages.name)
         self.assertTrue(error_messages.failed)
 
+    def test_skip_files_section_stops_when_other_yaml_starts(self) -> None:
+        """Ensures linter stops reading once we exit Third party section."""
+
+        def mock_readlines(unused_self: str, unused_filepath: str):
+            return (
+                '# Third party files:',
+                '- third_party/static/bootstrap-5.3.3/',
+                'runtime: python3',  # ← this should trigger the break
+                '- third_party/static/should_not_be_checked/',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+        self.assertFalse(result.failed)
+
+    def test_no_third_party_section_is_valid(self) -> None:
+        """If no '# Third party files:' section exists, lint should pass."""
+
+        def mock_readlines(unused_self: str, unused_filepath: str):
+            return (
+                'runtime: python3',
+                'handlers:',
+                '- url: /',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+        self.assertFalse(result.failed)
+
+    def test_multiple_valid_third_party_entries(self) -> None:
+        """Ensure multiple valid entries are accepted."""
+
+        def mock_readlines(unused_self: str, unused_filepath: str):
+            return (
+                '# Third party files:',
+                '- third_party/static/bootstrap-5.3.3/',
+                '- third_party/static/ckeditor-4.22.1/',
+                '',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            result = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+        self.assertFalse(result.failed)
+
     def test_check_valid_pattern(self) -> None:
         def mock_readlines(
             unused_self: str, unused_filepath: str
