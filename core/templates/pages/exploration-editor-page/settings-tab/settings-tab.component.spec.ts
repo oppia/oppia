@@ -1243,6 +1243,21 @@ describe('Settings Tab Component', () => {
     );
   });
 
+  it('should disable save button and show error when exploration has no title', () => {
+    component.newMemberUsername = 'newUser';
+    component.newMemberRole = {name: 'owner', value: 'owner'};
+    component.rolesSaveButtonEnabled = true;
+    explorationTitleService.init('');
+    component.saveExplorationTitle();
+
+    component.onRolesFormUsernameBlur();
+
+    expect(component.rolesSaveButtonEnabled).toBe(false);
+    expect(component.errorMessage).toBe(
+      'Please add a title to this exploration before sharing it with other users.'
+    );
+  });
+
   it('should enable save button when tile and username are valid', () => {
     component.newMemberUsername = 'newUser';
     component.newMemberRole = {name: 'owner', value: 'owner'};

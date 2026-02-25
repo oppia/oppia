@@ -63,26 +63,26 @@ def _require_valid_version(
 
     if version_from_payload != exploration_version:
         raise base.BaseHandler.InvalidInputException(
-            'Trying to update version %s of exploration from version %s, '
-            'which is too old. Please reload the page and try again.'
+            "Trying to update version %s of exploration from version %s, "
+            "which is too old. Please reload the page and try again."
             % (exploration_version, version_from_payload)
         )
 
 
 # Common schemas used in this file.
 SCHEMA_FOR_EXPLORATION_ID = {
-    'type': 'basestring',
-    'validators': [
-        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
+    "type": "basestring",
+    "validators": [
+        {"id": "is_regex_matched", "regex_pattern": constants.ENTITY_ID_REGEX}
     ],
 }
 SCHEMA_FOR_VERSION = {
-    'type': 'int',
-    'validators': [
+    "type": "int",
+    "validators": [
         {
-            'id': 'is_at_least',
+            "id": "is_at_least",
             # Version must be greater than zero.
-            'min_value': 1,
+            "min_value": 1,
         }
     ],
 }
@@ -117,38 +117,38 @@ class ExplorationHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'v': {'schema': SCHEMA_FOR_VERSION, 'default_value': None},
-            'apply_draft': {'schema': {'type': 'bool'}, 'default_value': False},
+        "GET": {
+            "v": {"schema": SCHEMA_FOR_VERSION, "default_value": None},
+            "apply_draft": {"schema": {"type": "bool"}, "default_value": False},
         },
-        'PUT': {
-            'version': {'schema': SCHEMA_FOR_VERSION},
-            'commit_message': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [
+        "PUT": {
+            "version": {"schema": SCHEMA_FOR_VERSION},
+            "commit_message": {
+                "schema": {
+                    "type": "basestring",
+                    "validators": [
                         {
-                            'id': 'has_length_at_most',
-                            'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH,
+                            "id": "has_length_at_most",
+                            "max_value": constants.MAX_COMMIT_MESSAGE_LENGTH,
                         }
                     ],
                 },
-                'default_value': None,
+                "default_value": None,
             },
-            'change_list': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'object_dict',
-                        'object_class': exp_domain.ExplorationChange,
+            "change_list": {
+                "schema": {
+                    "type": "list",
+                    "items": {
+                        "type": "object_dict",
+                        "object_class": exp_domain.ExplorationChange,
                     },
                 }
             },
         },
-        'DELETE': {},
+        "DELETE": {},
     }
 
     @acl_decorators.can_play_exploration
@@ -166,8 +166,8 @@ class ExplorationHandler(
         # are not used by that tab.
         assert self.user_id is not None
         assert self.normalized_request is not None
-        version = self.normalized_request.get('v')
-        apply_draft = self.normalized_request['apply_draft']
+        version = self.normalized_request.get("v")
+        apply_draft = self.normalized_request["apply_draft"]
 
         user_settings = (
             user_services.get_user_settings(self.user_id, strict=False)
@@ -189,16 +189,16 @@ class ExplorationHandler(
                 apply_draft=apply_draft,
                 version=version,
             )
-            exploration_data['show_state_editor_tutorial_on_load'] = bool(
+            exploration_data["show_state_editor_tutorial_on_load"] = bool(
                 self.user_id and not has_seen_editor_tutorial
             )
-            exploration_data['show_state_translation_tutorial_on_load'] = bool(
+            exploration_data["show_state_translation_tutorial_on_load"] = bool(
                 self.user_id and not has_seen_translation_tutorial
             )
             # Here we use MyPy ignore because here we are defining a new
             # 'exploration_is_linked_to_story' key on a well defined TypedDict
             # dictionary.
-            exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[typeddict-item]
+            exploration_data["exploration_is_linked_to_story"] = (  # type: ignore[typeddict-item]
                 exp_services.get_story_id_linked_to_exploration(exploration_id)
                 is not None
             )
@@ -224,21 +224,21 @@ class ExplorationHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        version = self.normalized_payload['version']
+        version = self.normalized_payload["version"]
 
         if version > exploration.version:
             raise base.BaseHandler.InvalidInputException(
-                'Trying to update version %s of exploration from version %s, '
-                'which is not possible. Please reload the page and try again.'
+                "Trying to update version %s of exploration from version %s, "
+                "which is not possible. Please reload the page and try again."
                 % (exploration.version, version)
             )
         if not exploration.edits_allowed:
             raise base.BaseHandler.InvalidInputException(
-                'This exploration cannot be edited. Please contact the admin.'
+                "This exploration cannot be edited. Please contact the admin."
             )
 
-        commit_message = self.normalized_payload.get('commit_message')
-        change_list = self.normalized_payload['change_list']
+        commit_message = self.normalized_payload.get("commit_message")
+        change_list = self.normalized_payload["change_list"]
 
         # Validate commit message for public explorations.
         exploration_rights = rights_manager.get_exploration_rights(
@@ -247,8 +247,8 @@ class ExplorationHandler(
         if exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC:
             if not commit_message:
                 raise self.InvalidInputException(
-                    'Exploration is public so expected a commit '
-                    'message but received none.'
+                    "Exploration is public so expected a commit "
+                    "message but received none."
                 )
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
@@ -283,7 +283,7 @@ class ExplorationHandler(
         # Here we use MyPy ignore because here we are defining a new
         # 'exploration_is_linked_to_story' key on a well defined TypedDict
         # dictionary.
-        exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[typeddict-item]
+        exploration_data["exploration_is_linked_to_story"] = (  # type: ignore[typeddict-item]
             exp_services.get_story_id_linked_to_exploration(exploration_id)
             is not None
         )
@@ -300,7 +300,7 @@ class ExplorationHandler(
         """
 
         assert self.user_id is not None
-        log_debug_string = '(%s) %s tried to delete exploration %s' % (
+        log_debug_string = "(%s) %s tried to delete exploration %s" % (
             self.roles,
             self.user_id,
             exploration_id,
@@ -314,7 +314,7 @@ class ExplorationHandler(
             self.user_id, exploration_id, force_deletion=is_exploration_cloned
         )
 
-        log_info_string = '(%s) %s deleted exploration %s' % (
+        log_info_string = "(%s) %s deleted exploration %s" % (
             self.roles,
             self.user_id,
             exploration_id,
@@ -330,40 +330,40 @@ class EntityTranslationsBulkHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'entity_type': {
-            'schema': {
-                'type': 'basestring',
-                'choices': [
+        "entity_type": {
+            "schema": {
+                "type": "basestring",
+                "choices": [
                     feconf.ENTITY_TYPE_EXPLORATION,
                     feconf.ENTITY_TYPE_QUESTION,
                 ],
             }
         },
-        'entity_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [
+        "entity_id": {
+            "schema": {
+                "type": "basestring",
+                "validators": [
                     {
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        "id": "is_regex_matched",
+                        "regex_pattern": constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
         },
-        'entity_version': {
-            'schema': {
-                'type': 'int',
-                'validators': [
+        "entity_version": {
+            "schema": {
+                "type": "int",
+                "validators": [
                     {
-                        'id': 'is_at_least',
+                        "id": "is_at_least",
                         # Version must be greater than zero.
-                        'min_value': 1,
+                        "min_value": 1,
                     }
                 ],
             }
         },
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.open_access
     def get(
@@ -402,9 +402,9 @@ class UserExplorationPermissionsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
@@ -418,34 +418,34 @@ class UserExplorationPermissionsHandler(
         )
         self.values.update(
             {
-                'can_delete': rights_manager.check_can_delete_activity(
+                "can_delete": rights_manager.check_can_delete_activity(
                     self.user, exploration_rights
                 ),
-                'can_edit': rights_manager.check_can_edit_activity(
+                "can_edit": rights_manager.check_can_edit_activity(
                     self.user, exploration_rights
                 ),
-                'can_modify_roles': (
+                "can_modify_roles": (
                     rights_manager.check_can_modify_core_activity_roles(
                         self.user, exploration_rights
                     )
                 ),
-                'can_publish': rights_manager.check_can_publish_activity(
+                "can_publish": rights_manager.check_can_publish_activity(
                     self.user, exploration_rights
                 ),
-                'can_release_ownership': (
+                "can_release_ownership": (
                     rights_manager.check_can_release_ownership(
                         self.user, exploration_rights
                     )
                 ),
-                'can_voiceover': (
+                "can_voiceover": (
                     rights_manager.check_can_voiceover_activity(
                         self.user, exploration_rights
                     )
                 ),
-                'can_unpublish': rights_manager.check_can_unpublish_activity(
+                "can_unpublish": rights_manager.check_can_unpublish_activity(
                     self.user, exploration_rights
                 ),
-                'can_manage_voice_artist': rights_manager.check_can_manage_voice_artist_in_activity(
+                "can_manage_voice_artist": rights_manager.check_can_manage_voice_artist_in_activity(
                     self.user, exploration_rights
                 ),
             }
@@ -482,32 +482,32 @@ class ExplorationRightsHandler(
     """Handles management of exploration editing rights."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'version': {'schema': SCHEMA_FOR_VERSION},
-            'make_community_owned': {
-                'schema': {'type': 'bool'},
-                'default_value': False,
+        "PUT": {
+            "version": {"schema": SCHEMA_FOR_VERSION},
+            "make_community_owned": {
+                "schema": {"type": "bool"},
+                "default_value": False,
             },
-            'new_member_username': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
+            "new_member_username": {
+                "schema": {"type": "basestring"},
+                "default_value": None,
             },
-            'new_member_role': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': feconf.ALLOWED_ACTIVITY_ROLES,
+            "new_member_role": {
+                "schema": {
+                    "type": "basestring",
+                    "choices": feconf.ALLOWED_ACTIVITY_ROLES,
                 },
-                'default_value': None,
+                "default_value": None,
             },
-            'viewable_if_private': {
-                'schema': {'type': 'bool'},
-                'default_value': None,
+            "viewable_if_private": {
+                "schema": {"type": "bool"},
+                "default_value": None,
             },
         },
-        'DELETE': {'username': {'schema': {'type': 'basestring'}}},
+        "DELETE": {"username": {"schema": {"type": "basestring"}}},
     }
 
     @acl_decorators.can_modify_exploration_roles
@@ -529,13 +529,13 @@ class ExplorationRightsHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        version = self.normalized_payload['version']
+        version = self.normalized_payload["version"]
         _require_valid_version(version, exploration.version)
 
-        make_community_owned = self.normalized_payload['make_community_owned']
-        new_member_username = self.normalized_payload.get('new_member_username')
-        new_member_role = self.normalized_payload.get('new_member_role')
-        viewable_if_private = self.normalized_payload.get('viewable_if_private')
+        make_community_owned = self.normalized_payload["make_community_owned"]
+        new_member_username = self.normalized_payload.get("new_member_username")
+        new_member_role = self.normalized_payload.get("new_member_role")
+        viewable_if_private = self.normalized_payload.get("viewable_if_private")
 
         if new_member_username:
             new_member_id = user_services.get_user_id_from_username(
@@ -543,17 +543,20 @@ class ExplorationRightsHandler(
             )
             if new_member_id is None:
                 raise self.InvalidInputException(
-                    'Sorry, we could not find the specified user.'
+                    "Sorry, we could not find the specified user."
                 )
             if new_member_role is None:
                 raise self.InvalidInputException(
-                    'Please provide a role for the new member of the '
-                    'exploration.'
+                    "Please provide a role for the new member of the exploration."
                 )
             if new_member_id == self.user_id:
                 raise self.InvalidInputException(
-                    'Users are not allowed to assign other roles to '
-                    'themselves.'
+                    "Users are not allowed to assign other roles to themselves."
+                )
+            if not exploration.title:
+                raise self.InvalidInputException(
+                    "Please add a title to this exploration before sharing "
+                    "it with other users."
                 )
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role
@@ -584,12 +587,12 @@ class ExplorationRightsHandler(
 
         else:
             raise self.InvalidInputException(
-                'No change was made to this exploration.'
+                "No change was made to this exploration."
             )
 
         self.render_json(
             {
-                'rights': rights_manager.get_exploration_rights(
+                "rights": rights_manager.get_exploration_rights(
                     exploration_id
                 ).to_dict()
             }
@@ -609,15 +612,15 @@ class ExplorationRightsHandler(
                 roles.
         """
         assert self.normalized_request is not None
-        username = self.normalized_request['username']
+        username = self.normalized_request["username"]
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
-                'Sorry, we could not find the specified user.'
+                "Sorry, we could not find the specified user."
             )
         if self.user.user_id == user_id:
             raise self.InvalidInputException(
-                'Sorry, users cannot remove their own roles.'
+                "Sorry, users cannot remove their own roles."
             )
 
         rights_manager.deassign_role_for_exploration(
@@ -625,7 +628,7 @@ class ExplorationRightsHandler(
         )
         self.render_json(
             {
-                'rights': rights_manager.get_exploration_rights(
+                "rights": rights_manager.get_exploration_rights(
                     exploration_id
                 ).to_dict()
             }
@@ -648,11 +651,11 @@ class ExplorationStatusHandler(
     """Handles publishing of an exploration."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'make_public': {'schema': {'type': 'bool'}, 'default_value': False}
+        "PUT": {
+            "make_public": {"schema": {"type": "bool"}, "default_value": False}
         }
     }
 
@@ -684,14 +687,14 @@ class ExplorationStatusHandler(
             exploration_id: str. The exploration ID.
         """
         assert self.normalized_payload is not None
-        make_public = self.normalized_payload['make_public']
+        make_public = self.normalized_payload["make_public"]
 
         if make_public:
             self._publish_exploration(exploration_id)
 
         self.render_json(
             {
-                'rights': rights_manager.get_exploration_rights(
+                "rights": rights_manager.get_exploration_rights(
                     exploration_id
                 ).to_dict()
             }
@@ -715,12 +718,12 @@ class ExplorationModeratorRightsHandler(
     """Handles management of exploration rights by moderators."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'email_body': {'schema': {'type': 'basestring'}},
-            'version': {'schema': SCHEMA_FOR_VERSION},
+        "PUT": {
+            "email_body": {"schema": {"type": "basestring"}},
+            "version": {"schema": SCHEMA_FOR_VERSION},
         }
     }
 
@@ -739,14 +742,14 @@ class ExplorationModeratorRightsHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        email_body = self.normalized_payload['email_body']
-        version = self.normalized_payload['version']
+        email_body = self.normalized_payload["email_body"]
+        version = self.normalized_payload["version"]
         _require_valid_version(version, exploration.version)
 
         # Check that all the prerequisites are satisfied, otherwise do nothing.
         if not email_body:
             raise self.InvalidInputException(
-                'Moderator actions should include an email to the recipient.'
+                "Moderator actions should include an email to the recipient."
             )
         email_manager.require_moderator_email_prereqs_are_satisfied()
 
@@ -761,14 +764,14 @@ class ExplorationModeratorRightsHandler(
             email_manager.send_moderator_action_email(
                 self.user_id,
                 owner_id,
-                'unpublish_exploration',
+                "unpublish_exploration",
                 exploration.title,
                 email_body,
             )
 
         self.render_json(
             {
-                'rights': exp_rights.to_dict(),
+                "rights": exp_rights.to_dict(),
             }
         )
 
@@ -792,15 +795,15 @@ class UserExplorationEmailsHandler(
     """
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'mute': {'schema': {'type': 'bool'}, 'default_value': None},
-            'message_type': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
+        "PUT": {
+            "mute": {"schema": {"type": "bool"}, "default_value": None},
+            "message_type": {
+                "schema": {
+                    "type": "basestring",
+                    "choices": [
                         feconf.MESSAGE_TYPE_FEEDBACK,
                         feconf.MESSAGE_TYPE_SUGGESTION,
                     ],
@@ -821,8 +824,8 @@ class UserExplorationEmailsHandler(
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        mute = self.normalized_payload.get('mute')
-        message_type = self.normalized_payload['message_type']
+        mute = self.normalized_payload.get("mute")
+        message_type = self.normalized_payload["message_type"]
 
         if message_type == feconf.MESSAGE_TYPE_FEEDBACK:
             user_services.set_email_preferences_for_exploration(
@@ -839,7 +842,7 @@ class UserExplorationEmailsHandler(
             )
         )
         self.render_json(
-            {'email_preferences': exploration_email_preferences.to_dict()}
+            {"email_preferences": exploration_email_preferences.to_dict()}
         )
 
 
@@ -863,20 +866,20 @@ class ExplorationFileDownloader(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'v': {'schema': SCHEMA_FOR_VERSION, 'default_value': None},
-            'output_format': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
+        "GET": {
+            "v": {"schema": SCHEMA_FOR_VERSION, "default_value": None},
+            "output_format": {
+                "schema": {
+                    "type": "basestring",
+                    "choices": [
                         feconf.OUTPUT_FORMAT_ZIP,
                         feconf.OUTPUT_FORMAT_JSON,
                     ],
                 },
-                'default_value': feconf.OUTPUT_FORMAT_ZIP,
+                "default_value": feconf.OUTPUT_FORMAT_ZIP,
             },
         }
     }
@@ -890,18 +893,18 @@ class ExplorationFileDownloader(
         """
         assert self.normalized_request is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        version = self.normalized_request.get('v')
-        output_format = self.normalized_request['output_format']
+        version = self.normalized_request.get("v")
+        output_format = self.normalized_request["output_format"]
 
         if version is None:
             version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         if not exploration.title:
-            init_filename = 'oppia-unpublished_exploration-v%s.zip' % version
+            init_filename = "oppia-unpublished_exploration-v%s.zip" % version
         else:
-            init_filename = 'oppia-%s-v%s.zip' % (
-                exploration.title.replace(' ', ''),
+            init_filename = "oppia-%s-v%s.zip" % (
+                exploration.title.replace(" ", ""),
                 version,
             )
         filename = utils.to_ascii(init_filename)
@@ -912,7 +915,7 @@ class ExplorationFileDownloader(
                     exploration_id, version=version
                 ),
                 filename,
-                'text/plain',
+                "text/plain",
             )
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(
@@ -941,24 +944,24 @@ class StateYamlHandler(
     """
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'state_dict': {
-                'schema': {
-                    'type': 'object_dict',
-                    'validation_method': objects_validator.validate_state_dict,
+        "POST": {
+            "state_dict": {
+                "schema": {
+                    "type": "object_dict",
+                    "validation_method": objects_validator.validate_state_dict,
                 }
             },
-            'width': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [
+            "width": {
+                "schema": {
+                    "type": "int",
+                    "validators": [
                         {
-                            'id': 'is_at_least',
+                            "id": "is_at_least",
                             # Width must be greater than zero.
-                            'min_value': 1,
+                            "min_value": 1,
                         }
                     ],
                 }
@@ -974,12 +977,12 @@ class StateYamlHandler(
             unused_exploration_id: str. The unused exploration ID.
         """
         assert self.normalized_payload is not None
-        state_dict = self.normalized_payload['state_dict']
-        width = self.normalized_payload['width']
+        state_dict = self.normalized_payload["state_dict"]
+        width = self.normalized_payload["width"]
 
         self.render_json(
             {
-                'yaml': state_domain.State.convert_state_dict_to_yaml(
+                "yaml": state_domain.State.convert_state_dict_to_yaml(
                     state_dict, width
                 ),
             }
@@ -993,9 +996,9 @@ class ExplorationSnapshotsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
@@ -1010,17 +1013,17 @@ class ExplorationSnapshotsHandler(
 
         # Patch `snapshots` to use the editor's display name.
         snapshots_committer_ids = [
-            snapshot['committer_id'] for snapshot in snapshots
+            snapshot["committer_id"] for snapshot in snapshots
         ]
         committer_usernames = user_services.get_usernames(
             snapshots_committer_ids, strict=True
         )
         for index, snapshot in enumerate(snapshots):
-            snapshot['committer_id'] = committer_usernames[index]
+            snapshot["committer_id"] = committer_usernames[index]
 
         self.render_json(
             {
-                'snapshots': snapshots,
+                "snapshots": snapshots,
             }
         )
 
@@ -1032,10 +1035,10 @@ class ExplorationCheckRevertValidHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID},
-        'version': {'schema': SCHEMA_FOR_VERSION},
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID},
+        "version": {"schema": SCHEMA_FOR_VERSION},
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str, version: int) -> None:
@@ -1048,7 +1051,7 @@ class ExplorationCheckRevertValidHandler(
         info = exp_services.get_exploration_validation_error(
             exploration_id, version
         )
-        self.render_json({'valid': not info, 'details': info})
+        self.render_json({"valid": not info, "details": info})
 
 
 class ExplorationRevertHandlerNormalizedPayloadDict(TypedDict):
@@ -1068,12 +1071,12 @@ class ExplorationRevertHandler(
     """Reverts an exploration to an older version."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'current_version': {'schema': SCHEMA_FOR_VERSION},
-            'revert_to_version': {'schema': SCHEMA_FOR_VERSION},
+        "POST": {
+            "current_version": {"schema": SCHEMA_FOR_VERSION},
+            "revert_to_version": {"schema": SCHEMA_FOR_VERSION},
         }
     }
 
@@ -1086,12 +1089,12 @@ class ExplorationRevertHandler(
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        current_version = self.normalized_payload['current_version']
-        revert_to_version = self.normalized_payload['revert_to_version']
+        current_version = self.normalized_payload["current_version"]
+        revert_to_version = self.normalized_payload["revert_to_version"]
 
         if revert_to_version >= current_version:
             raise self.InvalidInputException(
-                'Cannot revert to version %s from version %s.'
+                "Cannot revert to version %s from version %s."
                 % (revert_to_version, current_version)
             )
 
@@ -1111,9 +1114,9 @@ class ExplorationStatisticsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id: str) -> None:
@@ -1138,10 +1141,10 @@ class StateInteractionStatsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID},
-        'state_name': {'schema': {'type': 'basestring'}},
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID},
+        "state_name": {"schema": {"type": "basestring"}},
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id: str, state_name: str) -> None:
@@ -1157,15 +1160,15 @@ class StateInteractionStatsHandler(
         current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
         if state_name not in current_exploration.states:
-            logging.exception('Could not find state: %s' % state_name)
+            logging.exception("Could not find state: %s" % state_name)
             logging.exception(
-                'Available states: %s'
+                "Available states: %s"
                 % (list(current_exploration.states.keys()))
             )
             raise self.NotFoundException
 
         # TODO(#11475): Return visualizations info based on Apache Beam job.
-        self.render_json({'visualizations_info': []})
+        self.render_json({"visualizations_info": []})
 
 
 class FetchIssuesHandlerNormalizedRequestDict(TypedDict):
@@ -1186,10 +1189,10 @@ class FetchIssuesHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {'exp_version': {'schema': SCHEMA_FOR_VERSION}}
+        "GET": {"exp_version": {"schema": SCHEMA_FOR_VERSION}}
     }
 
     @acl_decorators.can_view_exploration_stats
@@ -1203,13 +1206,13 @@ class FetchIssuesHandler(
             NotFoundException. Invalid version for exploration ID.
         """
         assert self.normalized_request is not None
-        exp_version = self.normalized_request['exp_version']
+        exp_version = self.normalized_request["exp_version"]
         exp_issues = stats_services.get_exp_issues(
             exp_id, exp_version, strict=False
         )
         if exp_issues is None:
             raise self.NotFoundException(
-                'Invalid version %s for exploration ID %s'
+                "Invalid version %s for exploration ID %s"
                 % (exp_version, exp_id)
             )
         unresolved_issues = []
@@ -1226,10 +1229,10 @@ class FetchPlaythroughHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID},
-        'playthrough_id': {'schema': {'type': 'basestring'}},
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID},
+        "playthrough_id": {"schema": {"type": "basestring"}},
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_view_exploration_stats
     def get(self, unused_exploration_id: str, playthrough_id: str) -> None:
@@ -1245,7 +1248,7 @@ class FetchPlaythroughHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
             raise self.NotFoundException(
-                'Invalid playthrough ID %s' % (playthrough_id)
+                "Invalid playthrough ID %s" % (playthrough_id)
             )
         self.render_json(playthrough.to_dict())
 
@@ -1269,19 +1272,19 @@ class ResolveIssueHandler(
     """
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'exp_issue_dict': {
-                'schema': {
-                    'type': 'object_dict',
-                    'object_class': stats_domain.ExplorationIssue,
-                    'new_key_for_argument': 'exp_issue_object',
+        "POST": {
+            "exp_issue_dict": {
+                "schema": {
+                    "type": "object_dict",
+                    "object_class": stats_domain.ExplorationIssue,
+                    "new_key_for_argument": "exp_issue_object",
                 },
-                'default_value': None,
+                "default_value": None,
             },
-            'exp_version': {'schema': SCHEMA_FOR_VERSION},
+            "exp_version": {"schema": SCHEMA_FOR_VERSION},
         }
     }
 
@@ -1298,14 +1301,14 @@ class ResolveIssueHandler(
                 list of issues for the exploration.
         """
         assert self.normalized_payload is not None
-        exp_issue_object = self.normalized_payload.get('exp_issue_object')
-        exp_version = self.normalized_payload['exp_version']
+        exp_issue_object = self.normalized_payload.get("exp_issue_object")
+        exp_version = self.normalized_payload["exp_version"]
 
         exp_issues = stats_services.get_exp_issues(
             exp_id, exp_version, strict=False
         )
         if exp_issues is None:
-            raise self.NotFoundException('Invalid exploration ID %s' % (exp_id))
+            raise self.NotFoundException("Invalid exploration ID %s" % (exp_id))
 
         # Check that the passed in issue actually exists in the exploration
         # issues instance.
@@ -1317,8 +1320,8 @@ class ResolveIssueHandler(
 
         if not issue_to_remove:
             raise self.NotFoundException(
-                'Exploration issue does not exist in the list of issues for '
-                'the exploration with ID %s' % exp_id
+                "Exploration issue does not exist in the list of issues for "
+                "the exploration with ID %s" % exp_id
             )
 
         # Remove the issue from the unresolved issues list.
@@ -1361,31 +1364,31 @@ class ImageUploadHandler(
 
     _decorator = None
     URL_PATH_ARGS_SCHEMAS = {
-        'entity_type': {'schema': {'type': 'basestring'}},
-        'entity_id': {'schema': {'type': 'basestring'}},
+        "entity_type": {"schema": {"type": "basestring"}},
+        "entity_id": {"schema": {"type": "basestring"}},
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'image': {'schema': {'type': 'basestring'}},
-            'filename': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [
+        "POST": {
+            "image": {"schema": {"type": "basestring"}},
+            "filename": {
+                "schema": {
+                    "type": "basestring",
+                    "validators": [
                         {
-                            'id': 'is_regex_matched',
-                            'regex_pattern': (
+                            "id": "is_regex_matched",
+                            "regex_pattern": (
                                 utils.get_image_filename_regex_pattern()
                             ),
                         }
                     ],
                 }
             },
-            'filename_prefix': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': ['thumbnail', 'image'],
+            "filename_prefix": {
+                "schema": {
+                    "type": "basestring",
+                    "choices": ["thumbnail", "image"],
                 },
-                'default_value': constants.ASSET_TYPE_IMAGE,
+                "default_value": constants.ASSET_TYPE_IMAGE,
             },
         }
     }
@@ -1405,9 +1408,9 @@ class ImageUploadHandler(
 
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
-        raw = self.normalized_request['image']
-        filename = self.normalized_payload['filename']
-        filename_prefix = self.normalized_payload['filename_prefix']
+        raw = self.normalized_request["image"]
+        filename = self.normalized_payload["filename"]
+        filename_prefix = self.normalized_payload["filename_prefix"]
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
@@ -1417,12 +1420,12 @@ class ImageUploadHandler(
             raise self.InvalidInputException(e)
 
         fs = fs_services.GcsFileSystem(entity_type, entity_id)
-        filepath = '%s/%s' % (filename_prefix, filename)
+        filepath = "%s/%s" % (filename_prefix, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(
-                'A file with the name %s already exists. Please choose a '
-                'different name.' % filename
+                "A file with the name %s already exists. Please choose a "
+                "different name." % filename
             )
         image_is_compressible = file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
         fs_services.save_original_and_compressed_versions_of_image(
@@ -1434,7 +1437,7 @@ class ImageUploadHandler(
             image_is_compressible,
         )
 
-        self.render_json({'filename': filename})
+        self.render_json({"filename": filename})
 
 
 class StartedTutorialEventHandler(
@@ -1443,9 +1446,9 @@ class StartedTutorialEventHandler(
     """Records that this user has started the state editor tutorial."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"POST": {}}
 
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id: str) -> None:
@@ -1459,29 +1462,29 @@ class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'version': {'schema': SCHEMA_FOR_VERSION},
-            'change_list': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'object_dict',
-                        'object_class': exp_domain.ExplorationChange,
+        "PUT": {
+            "version": {"schema": SCHEMA_FOR_VERSION},
+            "change_list": {
+                "schema": {
+                    "type": "list",
+                    "items": {
+                        "type": "object_dict",
+                        "object_class": exp_domain.ExplorationChange,
                     },
                 }
             },
         },
-        'POST': {},
+        "POST": {},
         # Below two methods are not defined in handler class but they must be
         # present in schema since these two are inherited from its parent class.
-        'GET': {
-            'v': {'schema': SCHEMA_FOR_VERSION, 'default_value': None},
-            'apply_draft': {'schema': {'type': 'bool'}, 'default_value': False},
+        "GET": {
+            "v": {"schema": SCHEMA_FOR_VERSION, "default_value": None},
+            "apply_draft": {"schema": {"type": "bool"}, "default_value": False},
         },
-        'DELETE': {},
+        "DELETE": {},
     }
 
     @acl_decorators.can_save_exploration
@@ -1499,8 +1502,8 @@ class EditorAutosaveHandler(ExplorationHandler):
         # validation.
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        change_list = self.normalized_payload['change_list']
-        version = self.normalized_payload['version']
+        change_list = self.normalized_payload["change_list"]
+        version = self.normalized_payload["version"]
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id
         )
@@ -1541,11 +1544,11 @@ class EditorAutosaveHandler(ExplorationHandler):
         # not mergeable, so that it is available for recovery later.
         self.render_json(
             {
-                'draft_change_list_id': exp_user_data['draft_change_list_id'],
-                'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
+                "draft_change_list_id": exp_user_data["draft_change_list_id"],
+                "is_version_of_draft_valid": exp_services.is_version_of_draft_valid(
                     exploration_id, version
                 ),
-                'changes_are_mergeable': exp_services.are_changes_mergeable(
+                "changes_are_mergeable": exp_services.are_changes_mergeable(
                     exploration_id, version, change_list
                 ),
             }
@@ -1570,9 +1573,9 @@ class StateAnswerStatisticsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_view_exploration_stats
     def get(self, unused_exploration_id: str) -> None:
@@ -1582,7 +1585,7 @@ class StateAnswerStatisticsHandler(
             unused_exploration_id: str. The unused exploration ID.
         """
         # TODO(#11475): Return visualizations info based on Apache Beam job.
-        self.render_json({'answers': {}, 'interaction_ids': {}})
+        self.render_json({"answers": {}, "interaction_ids": {}})
 
 
 class TopUnresolvedAnswersHandler(
@@ -1592,9 +1595,9 @@ class TopUnresolvedAnswersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {"GET": {}}
 
     @acl_decorators.can_edit_exploration
     def get(self, unused_exploration_id: str) -> None:
@@ -1604,7 +1607,7 @@ class TopUnresolvedAnswersHandler(
             unused_exploration_id: str. The unused exploration ID.
         """
         # TODO(#11475): Return visualizations info based on Apache Beam job.
-        self.render_json({'unresolved_answers': []})
+        self.render_json({"unresolved_answers": []})
 
 
 class ExplorationEditsAllowedHandlerNormalizedPayloadDict(TypedDict):
@@ -1624,13 +1627,13 @@ class ExplorationEditsAllowedHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+        "exploration_id": {"schema": SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'edits_are_allowed': {
-                'schema': {
-                    'type': 'bool',
+        "PUT": {
+            "edits_are_allowed": {
+                "schema": {
+                    "type": "bool",
                 }
             }
         }
@@ -1645,7 +1648,7 @@ class ExplorationEditsAllowedHandler(
         """
         assert self.normalized_payload is not None
         exp_services.set_exploration_edits_allowed(
-            exploration_id, self.normalized_payload['edits_are_allowed']
+            exploration_id, self.normalized_payload["edits_are_allowed"]
         )
         self.render_json({})
 
@@ -1668,25 +1671,25 @@ class LearnerAnswerInfoHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'entity_type': {
-            'schema': {
-                'type': 'basestring',
-                'choices': [
+        "entity_type": {
+            "schema": {
+                "type": "basestring",
+                "choices": [
                     feconf.ENTITY_TYPE_EXPLORATION,
                     feconf.ENTITY_TYPE_QUESTION,
                 ],
             }
         },
-        'entity_id': {'schema': SCHEMA_FOR_EXPLORATION_ID},
+        "entity_id": {"schema": SCHEMA_FOR_EXPLORATION_ID},
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'DELETE': {
-            'state_name': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
+        "GET": {},
+        "DELETE": {
+            "state_name": {
+                "schema": {"type": "basestring"},
+                "default_value": None,
             },
-            'learner_answer_info_id': {'schema': {'type': 'basestring'}},
+            "learner_answer_info_id": {"schema": {"type": "basestring"}},
         },
     }
 
@@ -1724,12 +1727,12 @@ class LearnerAnswerInfoHandler(
                 if learner_answer_details is not None:
                     learner_answer_info_data.append(
                         {
-                            'state_name': state_name,
-                            'interaction_id': learner_answer_details.interaction_id,
-                            'customization_args': exp.states[
+                            "state_name": state_name,
+                            "interaction_id": learner_answer_details.interaction_id,
+                            "customization_args": exp.states[
                                 state_name
-                            ].interaction.to_dict()['customization_args'],
-                            'learner_answer_info_dicts': [
+                            ].interaction.to_dict()["customization_args"],
+                            "learner_answer_info_dicts": [
                                 learner_answer_info.to_dict()
                                 for learner_answer_info in learner_answer_details.learner_answer_info_list
                             ],
@@ -1749,18 +1752,18 @@ class LearnerAnswerInfoHandler(
                     for learner_answer_info in learner_answer_details.learner_answer_info_list
                 ]
                 learner_answer_info_data_dict = {
-                    'interaction_id': learner_answer_details.interaction_id,
-                    'customization_args': (
+                    "interaction_id": learner_answer_details.interaction_id,
+                    "customization_args": (
                         question.question_state_data.interaction.to_dict()[
-                            'customization_args'
+                            "customization_args"
                         ]
                     ),
-                    'learner_answer_info_dicts': learner_answer_info_dicts,
+                    "learner_answer_info_dicts": learner_answer_info_dicts,
                 }
 
         self.render_json(
             {
-                'learner_answer_info_data': (
+                "learner_answer_info_data": (
                     learner_answer_info_data_dict
                     if entity_type == feconf.ENTITY_TYPE_QUESTION
                     else learner_answer_info_data
@@ -1785,7 +1788,7 @@ class LearnerAnswerInfoHandler(
             raise self.NotFoundException
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            state_name = self.normalized_request.get('state_name')
+            state_name = self.normalized_request.get("state_name")
             if not state_name:
                 raise self.InvalidInputException
             state_reference = (
@@ -1798,7 +1801,7 @@ class LearnerAnswerInfoHandler(
                 entity_id
             )
         learner_answer_info_id = self.normalized_request[
-            'learner_answer_info_id'
+            "learner_answer_info_id"
         ]
 
         stats_services.delete_learner_answer_info(

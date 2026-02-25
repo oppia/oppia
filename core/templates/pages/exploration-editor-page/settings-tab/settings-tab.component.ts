@@ -758,6 +758,13 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.rolesSaveButtonEnabled = true;
     this.errorMessage = '';
 
+    if (!this.isTitlePresent()) {
+      this.rolesSaveButtonEnabled = false;
+      this.errorMessage =
+        'Please add a title to this exploration before sharing it with other users.';
+      return;
+    }
+
     if (this.newMemberUsername === this.loggedInUser) {
       this.rolesSaveButtonEnabled = false;
       this.errorMessage =
