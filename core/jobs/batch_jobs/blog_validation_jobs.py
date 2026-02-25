@@ -20,9 +20,11 @@ from __future__ import annotations
 
 import datetime
 
-from core.jobs import base_jobs, job_utils
+from core.jobs import base_jobs
+from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.types import blog_validation_errors
+from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
@@ -34,6 +36,10 @@ if MYPY:  # pragma: no cover
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
+
+# ---------------------------------------------------------------------------
+# Existing duplicate-checking jobs (unchanged)
+# ---------------------------------------------------------------------------
 
 class FindDuplicateBlogPostTitlesJob(base_jobs.JobBase):
     """Validates that all the Blog Posts have unique title."""
@@ -191,7 +197,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
     def get_property_value(
         self, model: blog_models.BlogPostModel
     ) -> Union[str, bool, datetime.datetime]:
-        """Returns value of the given property of model
+        """Returns value of the given property of model.
 
         Args:
             model: datastore_services.Model. Entity to validate.
@@ -206,3 +212,121 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
         # types of a BlogPostModel's property.
         assert isinstance(property_value, (str, bool, datetime.datetime))
         return property_value
+
+
+# ---------------------------------------------------------------------------
+# NEW: Base model field validation jobs (fixes issue #21869)
+# ---------------------------------------------------------------------------
+
+class ValidateBlogPostModelJob(base_jobs.JobBase):
+    """Validates that BlogPostModel fields inherited from BaseModel are valid."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        return (
+            self.pipeline
+            | 'Get every BlogPostModel'
+            >> ndb_io.GetModels(blog_models.BlogPostModel.query())
+            | 'Validate BlogPostModel base fields'
+            >> beam.ParDo(ValidateBaseModelFieldsDoFn())
+        )
+
+
+class ValidateBlogPostSummaryModelJob(base_jobs.JobBase):
+    """Validates that BlogPostSummaryModel fields inherited from BaseModel
+    are valid.
+    """
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        return (
+            self.pipeline
+            | 'Get every BlogPostSummaryModel'
+            >> ndb_io.GetModels(blog_models.BlogPostSummaryModel.query())
+            | 'Validate BlogPostSummaryModel base fields'
+            >> beam.ParDo(ValidateBaseModelFieldsDoFn())
+        )
+
+
+class ValidateBlogAuthorDetailsModelJob(base_jobs.JobBase):
+    """Validates that BlogAuthorDetailsModel fields inherited from BaseModel
+    are valid.
+    """
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        return (
+            self.pipeline
+            | 'Get every BlogAuthorDetailsModel'
+            >> ndb_io.GetModels(blog_models.BlogAuthorDetailsModel.query())
+            | 'Validate BlogAuthorDetailsModel base fields'
+            >> beam.ParDo(ValidateBaseModelFieldsDoFn())
+        )
+
+
+class ValidateBaseModelFieldsDoFn(beam.DoFn):
+    """DoFn that validates fields every model inherits from BaseModel.
+
+    Checks performed:
+      1. model.id is not None or empty string.
+      2. model.created_on is a datetime.datetime instance.
+      3. model.last_updated is a datetime.datetime instance.
+      4. model.last_updated >= model.created_on.
+      5. model.deleted is a bool.
+    """
+
+    def process(
+        self,
+        model: Union[
+            blog_models.BlogPostModel,
+            blog_models.BlogPostSummaryModel,
+            blog_models.BlogAuthorDetailsModel,
+        ],
+    ):
+        """Validates base model fields and yields error results.
+
+        Args:
+            model: datastore_services.Model. The blog model to validate.
+
+        Yields:
+            job_run_result.JobRunResult. An error result for each violation
+            found.
+        """
+        model_name = type(model).__name__
+
+        # Check 1: id must be a non-empty string.
+        if not model.id:
+            yield job_run_result.JobRunResult.as_stderr(
+                '%s with id %r has an empty or None id.'
+                % (model_name, model.id)
+            )
+
+        # Check 2: created_on must be a datetime.
+        if not isinstance(model.created_on, datetime.datetime):
+            yield job_run_result.JobRunResult.as_stderr(
+                '%s with id %r has an invalid created_on value: %r'
+                % (model_name, model.id, model.created_on)
+            )
+
+        # Check 3: last_updated must be a datetime.
+        if not isinstance(model.last_updated, datetime.datetime):
+            yield job_run_result.JobRunResult.as_stderr(
+                '%s with id %r has an invalid last_updated value: %r'
+                % (model_name, model.id, model.last_updated)
+            )
+
+        # Check 4: last_updated must not be earlier than created_on.
+        if (
+            isinstance(model.created_on, datetime.datetime)
+            and isinstance(model.last_updated, datetime.datetime)
+            and model.last_updated < model.created_on
+        ):
+            yield job_run_result.JobRunResult.as_stderr(
+                '%s with id %r has last_updated (%r) earlier than '
+                'created_on (%r).'
+                % (model_name, model.id, model.last_updated, model.created_on)
+            )
+
+        # Check 5: deleted must be a boolean.
+        if not isinstance(model.deleted, bool):
+            yield job_run_result.JobRunResult.as_stderr(
+                '%s with id %r has a non-boolean deleted field: %r'
+                % (model_name, model.id, model.deleted)
+            )
