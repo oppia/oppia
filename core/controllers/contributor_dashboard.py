@@ -415,7 +415,7 @@ class ReviewableOpportunitiesHandler(
             if item is not None:
                 ordered_exp_opp_summaries[item.id] = item
 
-        # Inject data_format_list_count into each summary
+        # Inject data_format_list_count into each summary.
         explorations = exp_fetchers.get_multiple_explorations_by_id(
             list(ordered_exp_opp_summaries.keys()), strict=False
         )

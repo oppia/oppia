@@ -387,7 +387,7 @@ describe('Translation opportunities component', () => {
 
       // For non-reviewers, totalCount should be 10 - 4 = 6.
       expect(opportunitiesDicts[0].totalCount).toEqual(6);
-      // progressPercentage = (3 / 6) * 100 = 50.00.
+      // ProgressPercentage = (3 / 6) * 100 = 50.00.
       expect(opportunitiesDicts[0].progressPercentage).toEqual('50.00');
     }
   );
@@ -429,7 +429,7 @@ describe('Translation opportunities component', () => {
 
       // For reviewers, totalCount should remain 10 (no subtraction).
       expect(opportunitiesDicts[0].totalCount).toEqual(10);
-      // progressPercentage = (3 / 10) * 100 = 30.00.
+      // ProgressPercentage = (3 / 10) * 100 = 30.00.
       expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
     }
   );

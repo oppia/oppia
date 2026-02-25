@@ -57,6 +57,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                         'language_codes_needing_voice_artists': ['en'],
                         'language_codes_with_assigned_voice_artists': ['hi'],
                         'translation_in_review_counts': {},
+                        'data_format_list_count': 0,
                         'is_pinned': False,
                     }
                 )
