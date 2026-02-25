@@ -1416,28 +1416,64 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
 
 
 def vendor_ckeditor_from_npm() -> None:
-    """Vendors CKEditor4 and bootstrapck skin from npm into third_party/static."""
+    """Copy CKEditor4 + BootstrapCK from node_modules into
+    third_party/static using versioned directories + stable aliases.
 
-    print('Vendoring CKEditor4 + bootstrapck from node_modules...')
+    This reads package.json from each npm package to create a
+    versioned directory (e.g. third_party/static/ckeditor-4.16.1) and
+    also writes stable aliases (third_party/static/ckeditor).
+    """
+
+    def _get_package_version(package_path: str) -> str:
+        package_json_path = os.path.join(package_path, 'package.json')
+        with open(package_json_path, 'r', encoding='utf-8') as f:
+            return json.load(f)['version']
+
+    print('Vendoring CKEditor4 from npm...')
 
     ckeditor_src = os.path.join('node_modules', 'ckeditor4')
     bootstrap_src = os.path.join('node_modules', 'ckeditor4-bootstrapck')
 
-    ckeditor_dst = os.path.join('third_party', 'static', 'ckeditor')
-    bootstrap_dst = os.path.join(
-        'third_party', 'static', 'ckeditor-bootstrapck'
+    if not os.path.isdir(ckeditor_src):
+        raise Exception('ckeditor4 not installed. Run npm install.')
+
+    if not os.path.isdir(bootstrap_src):
+        raise Exception('ckeditor4-bootstrapck not installed.')
+
+    ckeditor_version = _get_package_version(ckeditor_src)
+    bootstrap_version = _get_package_version(bootstrap_src)
+
+    ckeditor_versioned = os.path.join(
+        THIRD_PARTY_STATIC_DIR, f'ckeditor-{ckeditor_version}'
+    )
+    bootstrap_versioned = os.path.join(
+        THIRD_PARTY_STATIC_DIR, f'ckeditor-bootstrapck-{bootstrap_version}'
     )
 
-    # Clean existing copies.
-    if os.path.exists(ckeditor_dst):
-        shutil.rmtree(ckeditor_dst)
-    if os.path.exists(bootstrap_dst):
-        shutil.rmtree(bootstrap_dst)
+    ckeditor_alias = os.path.join(THIRD_PARTY_STATIC_DIR, 'ckeditor')
+    bootstrap_alias = os.path.join(
+        THIRD_PARTY_STATIC_DIR, 'ckeditor-bootstrapck'
+    )
 
-    shutil.copytree(ckeditor_src, ckeditor_dst)
-    shutil.copytree(bootstrap_src, bootstrap_dst)
+    # Remove old copies
+    for path in [
+        ckeditor_versioned,
+        bootstrap_versioned,
+        ckeditor_alias,
+        bootstrap_alias,
+    ]:
+        if os.path.exists(path):
+            shutil.rmtree(path)
 
-    print('CKEditor4 vendored successfully.')
+    # Copy versioned
+    shutil.copytree(ckeditor_src, ckeditor_versioned)
+    shutil.copytree(bootstrap_src, bootstrap_versioned)
+
+    # Create stable runtime aliases
+    shutil.copytree(ckeditor_versioned, ckeditor_alias)
+    shutil.copytree(bootstrap_versioned, bootstrap_alias)
+
+    print('CKEditor vendored successfully.')
 
 
 def generate_python_package() -> None:
