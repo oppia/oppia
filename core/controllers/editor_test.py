@@ -87,8 +87,12 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
-        self.voiceover_admin_id = self.get_user_id_from_email("voiceoveradmin@app.com")
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL
+        )
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            "voiceoveradmin@app.com"
+        )
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -105,26 +109,34 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         """Returns True if the current user can edit the exploration
         editable.
         """
-        response = self.get_json("%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id)
+        )
         self.assertEqual(response["can_edit"], True)
 
     def assert_cannot_edit(self, exp_id: str) -> None:
         """Returns True if the current user can not edit the exploration
         not editable.
         """
-        response = self.get_json("%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id)
+        )
         self.assertEqual(response["can_edit"], False)
 
     def assert_can_voiceover(self, exp_id: str) -> None:
         """Returns True if the current user can voiceover the exploration."""
-        response = self.get_json("%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id)
+        )
         self.assertEqual(response["can_voiceover"], True)
 
     def assert_cannot_voiceover(self, exp_id: str) -> None:
         """Returns True if the current user can not voiceover the
         exploration.
         """
-        response = self.get_json("%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id)
+        )
         self.assertEqual(response["can_voiceover"], False)
 
 
@@ -142,9 +154,9 @@ class EditorTests(BaseEditorControllerTests):
         self.login(self.EDITOR_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
-        exp_id = self.post_json(feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token)[
-            creator_dashboard.EXPLORATION_ID_KEY
-        ]
+        exp_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
+        )[creator_dashboard.EXPLORATION_ID_KEY]
 
         csrf_token = self.get_new_csrf_token()
         publish_url = "%s/%s" % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
@@ -174,7 +186,9 @@ class EditorTests(BaseEditorControllerTests):
             new_state_name: str, version: Optional[int] = None
         ) -> Dict[str, Union[str, List[Dict[str, Union[str, int]]], int]]:
             """Gets the payload in the dict format."""
-            result: Dict[str, Union[str, List[Dict[str, Union[str, int]]], int]] = {
+            result: Dict[
+                str, Union[str, List[Dict[str, Union[str, int]]], int]
+            ] = {
                 "change_list": [
                     {
                         "cmd": "add_state",
@@ -203,7 +217,9 @@ class EditorTests(BaseEditorControllerTests):
             return result
 
         def _put_and_expect_400_error(
-            payload: Dict[str, Union[str, List[Dict[str, Union[str, int]]], int]],
+            payload: Dict[
+                str, Union[str, List[Dict[str, Union[str, int]]], int]
+            ],
         ) -> Dict[str, str]:
             """Puts a request with no version number and hence, expects 400
             error.
@@ -217,7 +233,9 @@ class EditorTests(BaseEditorControllerTests):
 
         # A request with no version number is invalid.
         response_dict = _put_and_expect_400_error(_get_payload("New state"))
-        self.assertIn("Missing key in handler args: version.", response_dict["error"])
+        self.assertIn(
+            "Missing key in handler args: version.", response_dict["error"]
+        )
 
         # A request with the wrong version number is invalid.
         response_dict = _put_and_expect_400_error(
@@ -280,9 +298,9 @@ class EditorTests(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         publish_url = "%s/%s" % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
 
-        exploration_rights = self.put_json(publish_url, {}, csrf_token=csrf_token)[
-            "rights"
-        ]
+        exploration_rights = self.put_json(
+            publish_url, {}, csrf_token=csrf_token
+        )["rights"]
 
         self.assertEqual(exploration_rights["status"], "private")
 
@@ -853,8 +871,12 @@ solicit_answer_details: false
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
         # Compare saved with golden file.
         self.assertEqual(
-            zf_saved.open("The title for ZIP download handler test.yaml").read(),
-            zf_gold.open("The title for ZIP download handler test!.yaml").read(),
+            zf_saved.open(
+                "The title for ZIP download handler test.yaml"
+            ).read(),
+            zf_gold.open(
+                "The title for ZIP download handler test!.yaml"
+            ).read(),
         )
 
         # Check download to JSON.
@@ -1012,7 +1034,9 @@ solicit_answer_details: false
     ) -> None:
         self.login(self.OWNER_EMAIL)
 
-        self.get_json("/createhandler/download/invalid_id", expected_status_int=404)
+        self.get_json(
+            "/createhandler/download/invalid_id", expected_status_int=404
+        )
 
         self.logout()
 
@@ -1030,7 +1054,8 @@ solicit_answer_details: false
         self.save_new_valid_exploration(exp_id, owner_id)
 
         response = self.get_json(
-            "/createhandler/download/%s?output_format=invalid_output_format" % (exp_id),
+            "/createhandler/download/%s?output_format=invalid_output_format"
+            % (exp_id),
             expected_status_int=400,
         )
 
@@ -1054,7 +1079,9 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
     def test_get_with_invalid_exploration_id_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
 
-        self.get_json("/createhandler/snapshots/invalid_id", expected_status_int=404)
+        self.get_json(
+            "/createhandler/snapshots/invalid_id", expected_status_int=404
+        )
 
         self.logout()
 
@@ -1130,13 +1157,17 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
     def test_get_with_invalid_exploration_id_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
 
-        self.get_json("/createhandler/statistics/invalid_id", expected_status_int=404)
+        self.get_json(
+            "/createhandler/statistics/invalid_id", expected_status_int=404
+        )
 
         self.logout()
 
     def test_guest_cannot_access_exploration_statistics_handler(self) -> None:
         self.save_new_valid_exploration("exp_id", "owner_id")
-        self.get_json("/createhandler/statistics/exp_id", expected_status_int=404)
+        self.get_json(
+            "/createhandler/statistics/exp_id", expected_status_int=404
+        )
 
     def test_get_exploration_statistics(self) -> None:
         self.login(self.OWNER_EMAIL)
@@ -1147,7 +1178,9 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        exp_stats = stats_services.get_exploration_stats(exp_id, exploration.version)
+        exp_stats = stats_services.get_exploration_stats(
+            exp_id, exploration.version
+        )
 
         response = self.get_json("/createhandler/statistics/%s" % (exp_id))
 
@@ -1186,7 +1219,9 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
         )
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exp_stats = stats_services.get_exploration_stats(exp_id, exploration.version)
+        exp_stats = stats_services.get_exploration_stats(
+            exp_id, exploration.version
+        )
 
         response = self.get_json("/createhandler/statistics/%s" % (exp_id))
 
@@ -1233,7 +1268,9 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.exp_id = "exp_id"
-        self.exploration = self.save_new_valid_exploration(self.exp_id, self.owner_id)
+        self.exploration = self.save_new_valid_exploration(
+            self.exp_id, self.owner_id
+        )
 
     def test_cannot_get_unresolved_answers_with_no_state_name(self) -> None:
         self.login(self.OWNER_EMAIL)
@@ -1269,7 +1306,9 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(msg: str, *args: str, **unused_kwargs: str) -> None:
+        def _mock_logging_function(
+            msg: str, *args: str, **unused_kwargs: str
+        ) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
@@ -1426,7 +1465,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             # Unpublished exploration id.
             exp_id = "unpub_eid"
-            exploration = exp_domain.Exploration.create_default_exploration(exp_id)
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id
+            )
             exp_services.save_new_exploration(self.owner_id, exploration)
 
             self.login(self.OWNER_EMAIL)
@@ -1452,7 +1493,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             observed_log_messages = []
             # Unpublished exploration id.
             exp_id = "unpub_eid3"
-            exploration = exp_domain.Exploration.create_default_exploration(exp_id)
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id
+            )
             exp_services.save_new_exploration(self.moderator_id, exploration)
 
             self.login(self.MODERATOR_EMAIL)
@@ -1492,7 +1535,9 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
         super().setUp()
 
         exp_services.load_demo(self.EXP_ID)
-        rights_manager.release_ownership_of_exploration(self.system_user, self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            self.system_user, self.EXP_ID
+        )
 
         self.login(self.EDITOR_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1555,7 +1600,9 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 "%s/%s" % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID)
             )
             init_state_name = reader_dict["exploration"]["init_state_name"]
-            init_state_data = reader_dict["exploration"]["states"][init_state_name]
+            init_state_data = reader_dict["exploration"]["states"][
+                init_state_name
+            ]
             init_content = init_state_data["content"]["html"]
             self.assertIn("ABC", init_content)
             self.assertNotIn("Hi, welcome to Oppia!", init_content)
@@ -1658,7 +1705,9 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
 
         exp_id = "0"
         exp_services.load_demo(exp_id)
-        rights_manager.release_ownership_of_exploration(self.system_user, exp_id)
+        rights_manager.release_ownership_of_exploration(
+            self.system_user, exp_id
+        )
 
         # Sign-up new editors Joe and Sandra.
         self.signup("joe@example.com", "joe")
@@ -1759,7 +1808,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.logout()
 
         self.login(self.OWNER_EMAIL)
-        self.delete_json(rights_url, params={"username": self.COLLABORATOR_USERNAME})
+        self.delete_json(
+            rights_url, params={"username": self.COLLABORATOR_USERNAME}
+        )
         self.logout()
 
         self.login(self.COLLABORATOR_EMAIL)
@@ -2009,7 +2060,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assert_can_voiceover(exp_id)
         csrf_token = self.get_new_csrf_token()
 
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn("State B", reader_dict["states"])
 
         response = self.put_json(
@@ -2083,7 +2136,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = "%s/%s" % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME, reader_dict["rights"]["editor_names"]
         )
@@ -2098,9 +2153,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=401,
         )
-        error_msg = "You do not have credentials to change rights for this exploration."
+        error_msg = (
+            "You do not have credentials to change rights for this exploration."
+        )
         self.assertEqual(response["error"], error_msg)
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME, reader_dict["rights"]["editor_names"]
         )
@@ -2144,7 +2203,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assert_cannot_voiceover(exp_id)
         csrf_token = self.get_new_csrf_token()
 
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn("State B", reader_dict["states"])
 
         response = self.put_json(
@@ -2179,7 +2240,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         error_msg = "You do not have permissions to save this exploration."
         self.assertEqual(response["error"], error_msg)
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn("State B", reader_dict["states"])
         self.logout()
 
@@ -2221,7 +2284,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = "%s/%s" % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME, reader_dict["rights"]["editor_names"]
         )
@@ -2237,9 +2302,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=401,
         )
-        error_msg = "You do not have credentials to change rights for this exploration."
+        error_msg = (
+            "You do not have credentials to change rights for this exploration."
+        )
         self.assertEqual(response["error"], error_msg)
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME, reader_dict["rights"]["editor_names"]
         )
@@ -2282,7 +2351,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assert_can_voiceover(exp_id)
         csrf_token = self.get_new_csrf_token()
 
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn("State B", reader_dict["states"])
 
         self.put_json(
@@ -2315,7 +2386,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=400,
         )
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn("State B", reader_dict["states"])
         self.logout()
 
@@ -2355,7 +2428,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = "%s/%s" % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
 
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME, reader_dict["rights"]["editor_names"]
         )
@@ -2370,9 +2445,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=401,
         )
-        error_msg = "You do not have credentials to change rights for this exploration."
+        error_msg = (
+            "You do not have credentials to change rights for this exploration."
+        )
         self.assertEqual(response["error"], error_msg)
-        reader_dict = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        reader_dict = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertNotIn(
             self.COLLABORATOR2_USERNAME, reader_dict["rights"]["editor_names"]
         )
@@ -2673,7 +2752,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=400,
         )
 
-        self.assertEqual(response["error"], "No change was made to this exploration.")
+        self.assertEqual(
+            response["error"], "No change was made to this exploration."
+        )
 
     def test_can_not_assign_roles_with_invalid_payload_version(self) -> None:
         # Create collaborator user.
@@ -2766,8 +2847,10 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         )
 
         csrf_token = self.get_new_csrf_token()
-        exp_email_preferences = user_services.get_email_preferences_for_exploration(
-            self.owner_id, exp_id
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id
+            )
         )
         self.assertFalse(exp_email_preferences.mute_feedback_notifications)
         self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
@@ -2780,8 +2863,10 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token,
         )
 
-        exp_email_preferences = user_services.get_email_preferences_for_exploration(
-            self.owner_id, exp_id
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id
+            )
         )
         self.assertTrue(exp_email_preferences.mute_feedback_notifications)
         self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
@@ -2797,8 +2882,10 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token,
         )
 
-        exp_email_preferences = user_services.get_email_preferences_for_exploration(
-            self.owner_id, exp_id
+        exp_email_preferences = (
+            user_services.get_email_preferences_for_exploration(
+                self.owner_id, exp_id
+            )
         )
         self.assertFalse(exp_email_preferences.mute_feedback_notifications)
         self.assertTrue(exp_email_preferences.mute_suggestion_notifications)
@@ -2923,7 +3010,9 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             expected_status_int=400,
         )
 
-        error_msg = "Moderator actions should include an email to the recipient."
+        error_msg = (
+            "Moderator actions should include an email to the recipient."
+        )
         self.assertIn(error_msg, response_dict["error"])
 
         # Log out.
@@ -3202,7 +3291,8 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
 
     def test_cannot_fetch_playthrough_with_invalid_playthrough_id(self) -> None:
         self.get_json(
-            "/playthroughdatahandler/%s/%s" % (self.EXP_ID, "invalid_playthrough_id"),
+            "/playthroughdatahandler/%s/%s"
+            % (self.EXP_ID, "invalid_playthrough_id"),
             expected_status_int=404,
         )
 
@@ -3219,7 +3309,9 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             "/issuesdatahandler/%s" % self.EXP_ID, params={"exp_version": 1}
         )
         self.assertEqual(len(response["unresolved_issues"]), 2)
-        self.assertEqual(response["unresolved_issues"][0]["issue_type"], "EarlyQuit")
+        self.assertEqual(
+            response["unresolved_issues"][0]["issue_type"], "EarlyQuit"
+        )
         self.assertEqual(
             response["unresolved_issues"][1]["issue_type"],
             "MultipleIncorrectSubmissions",
@@ -3227,7 +3319,9 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
 
     def test_invalid_issues_are_not_retrieved(self) -> None:
         """Test that invalid issues are not retrieved."""
-        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(self.EXP_ID, 1)
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID, 1
+        )
         assert exp_issues_model is not None
         exp_issues_model.unresolved_issues[1]["is_valid"] = False
         exp_issues_model.update_timestamps()
@@ -3237,12 +3331,15 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             "/issuesdatahandler/%s" % self.EXP_ID, params={"exp_version": 1}
         )
         self.assertEqual(len(response["unresolved_issues"]), 1)
-        self.assertEqual(response["unresolved_issues"][0]["issue_type"], "EarlyQuit")
+        self.assertEqual(
+            response["unresolved_issues"][0]["issue_type"], "EarlyQuit"
+        )
 
     def test_fetch_playthrough_handler(self) -> None:
         """Test that the playthrough gets fetched correctly."""
         response = self.get_json(
-            "/playthroughdatahandler/%s/%s" % (self.EXP_ID, self.playthrough_id1)
+            "/playthroughdatahandler/%s/%s"
+            % (self.EXP_ID, self.playthrough_id1)
         )
         self.assertEqual(response["exp_id"], self.EXP_ID)
         self.assertEqual(response["exp_version"], 1)
@@ -3679,7 +3776,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             "%s.%s" % (self.owner_id, self.EXP_ID2)
         )
-        self.assertNotEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertNotEqual(
+            exp_user_data.draft_change_list, self.NEW_CHANGELIST
+        )
         self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
 
@@ -3699,7 +3798,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
                 "%s.%s" % (self.owner_id, self.EXP_ID2)
             )
-            self.assertNotEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+            self.assertNotEqual(
+                exp_user_data.draft_change_list, self.NEW_CHANGELIST
+            )
             self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
             self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
 
@@ -3750,12 +3851,16 @@ class HasSeenTutorialTests(BaseEditorControllerTests):
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exp_id, self.owner_id)
 
-        response = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertTrue(response["show_state_editor_tutorial_on_load"])
 
         user_services.record_user_started_state_editor_tutorial(self.owner_id)
 
-        response = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertFalse(response["show_state_editor_tutorial_on_load"])
 
         self.logout()
@@ -3766,12 +3871,18 @@ class HasSeenTutorialTests(BaseEditorControllerTests):
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exp_id, self.owner_id)
 
-        response = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertTrue(response["show_state_translation_tutorial_on_load"])
 
-        user_services.record_user_started_state_translation_tutorial(self.owner_id)
+        user_services.record_user_started_state_translation_tutorial(
+            self.owner_id
+        )
 
-        response = self.get_json("%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
+        )
         self.assertFalse(response["show_state_translation_tutorial_on_load"])
 
         self.logout()
@@ -3782,7 +3893,8 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
         with self.login_context(self.OWNER_EMAIL):
             illegal_id = "@#$%^&*"
             self.get_json(
-                "%s/%s" % (feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, illegal_id),
+                "%s/%s"
+                % (feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, illegal_id),
                 expected_status_int=400,
             )
 
@@ -3790,7 +3902,8 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
         with self.login_context(self.OWNER_EMAIL):
             missing_id = "0"
             self.get_json(
-                "%s/%s" % (feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, missing_id),
+                "%s/%s"
+                % (feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, missing_id),
                 expected_status_int=404,
             )
 
@@ -3845,8 +3958,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         ].interaction.to_dict()["customization_args"]
         self.answer = "This is an answer"
         self.answer_details = "These are the answer details"
-        self.state_reference = stats_services.get_state_reference_for_exploration(
-            self.exp_id, self.state_name
+        self.state_reference = (
+            stats_services.get_state_reference_for_exploration(
+                self.exp_id, self.state_name
+            )
         )
         stats_services.record_learner_answer_info(
             self.entity_type,
@@ -3858,7 +3973,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_get_learner_answer_details_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", False):
+        with self.swap(
+            constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", False
+        ):
             response = self.get_json(
                 "%s/%s/%s"
                 % (
@@ -3868,7 +3985,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 ),
                 expected_status_int=404,
             )
-        with self.swap(constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True):
+        with self.swap(
+            constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True
+        ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference
             )
@@ -3914,7 +4033,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         customization_args = question.question_state_data.interaction.to_dict()[
             "customization_args"
         ]
-        state_reference = stats_services.get_state_reference_for_question(question_id)
+        state_reference = stats_services.get_state_reference_for_question(
+            question_id
+        )
         self.assertEqual(state_reference, question_id)
         stats_services.record_learner_answer_info(
             feconf.ENTITY_TYPE_QUESTION,
@@ -3923,7 +4044,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer,
             self.answer_details,
         )
-        with self.swap(constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True):
+        with self.swap(
+            constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True
+        ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference
             )
@@ -3952,7 +4075,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_delete_learner_answer_info_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", False):
+        with self.swap(
+            constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", False
+        ):
             self.delete_json(
                 "%s/%s/%s?state_name=%s&learner_answer_info_id=%s"
                 % (
@@ -3964,15 +4089,19 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 ),
                 expected_status_int=404,
             )
-        with self.swap(constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True):
+        with self.swap(
+            constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True
+        ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference
             )
             assert learner_answer_details is not None
-            self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
-            learner_answer_info_id = learner_answer_details.learner_answer_info_list[
-                0
-            ].id
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1
+            )
+            learner_answer_info_id = (
+                learner_answer_details.learner_answer_info_list[0].id
+            )
             self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 "%s/%s/%s?state_name=%s&learner_answer_info_id=%s"
@@ -3984,8 +4113,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     learner_answer_info_id,
                 )
             )
-            updated_learner_answer_details = stats_services.get_learner_answer_details(
-                self.entity_type, self.state_reference
+            updated_learner_answer_details = (
+                stats_services.get_learner_answer_details(
+                    self.entity_type, self.state_reference
+                )
             )
             assert updated_learner_answer_details is not None
             self.assertEqual(
@@ -4025,7 +4156,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             content_id_generator.next_content_id_index,
         )
         self.assertIsNotNone(question)
-        state_reference = stats_services.get_state_reference_for_question(question_id)
+        state_reference = stats_services.get_state_reference_for_question(
+            question_id
+        )
         self.assertEqual(state_reference, question_id)
         stats_services.record_learner_answer_info(
             feconf.ENTITY_TYPE_QUESTION,
@@ -4034,15 +4167,19 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer,
             self.answer_details,
         )
-        with self.swap(constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True):
+        with self.swap(
+            constants, "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE", True
+        ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference
             )
             assert learner_answer_details is not None
-            self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
-            learner_answer_info_id = learner_answer_details.learner_answer_info_list[
-                0
-            ].id
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1
+            )
+            learner_answer_info_id = (
+                learner_answer_details.learner_answer_info_list[0].id
+            )
             self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 "%s/%s/%s?learner_answer_info_id=%s"
@@ -4053,8 +4190,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     learner_answer_info_id,
                 )
             )
-            updated_learner_answer_details = stats_services.get_learner_answer_details(
-                feconf.ENTITY_TYPE_QUESTION, state_reference
+            updated_learner_answer_details = (
+                stats_services.get_learner_answer_details(
+                    feconf.ENTITY_TYPE_QUESTION, state_reference
+                )
             )
             assert updated_learner_answer_details is not None
             self.assertEqual(
@@ -4074,7 +4213,9 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exp_id, self.editor_id)
 
-        response = self.get_json("%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
+        response = self.get_json(
+            "%s/%s" % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id)
+        )
 
         self.assertTrue(response["can_delete"])
         self.assertTrue(response["can_edit"])
@@ -4302,9 +4443,13 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
                 upload_files=[("image", "unused_filename", raw_image)],
             )
 
-            self.assertIn("Schema validation for 'filename' failed", response["error"])
+            self.assertIn(
+                "Schema validation for 'filename' failed", response["error"]
+            )
 
-            fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+            fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id
+            )
             filepath = "%s/%s" % (filename_prefix, filename)
             self.assertFalse(fs.isfile(filepath))
 
@@ -4358,7 +4503,9 @@ class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
     """Test fetching all translations of a given entity in bulk."""
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS]
+        [
+            feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS
+        ]
     )
     def test_fetching_entity_translations_in_bulk(self) -> None:
         """Test fetching all available translations with the
