@@ -48,37 +48,50 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
 
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
+        # Second value in each tuple is the average time per test case,
+        # i.e. test_time / test_count. Examples:
+        #   test_one:   1.8s total / 9 tests  = 0.200s avg
+        #   test_two:   1.4s total / 7 tests  = 0.200s avg
+        #   test_three: 1.7s total / 1 test   = 1.700s avg
+        #   test_four:  2.3s total / 1 test   = 2.300s avg
         with open(backend_test_time_report_one, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
                     {
-                        'test_one': (1.8, 4.0),
-                        'test_two': (1.4, 4.0),
-                        'test_three': (1.7, 160.0),
-                        'test_four': (2.3, 4.0),
+                        'test_one': (1.8, 0.200),
+                        'test_two': (1.4, 0.200),
+                        'test_three': (1.7, 1.700),
+                        'test_four': (2.3, 2.300),
                     }
                 )
             )
 
+        # test_five:  1.2s total / 6 tests  = 0.200s avg
+        # test_six:   1.1s total / 5 tests  = 0.220s avg
+        # test_seven: 1.3s total / 5 tests  = 0.260s avg
         with open(backend_test_time_report_two, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
                     {
-                        'test_five': (1.2, 5.0),
-                        'test_six': (1.1, 5.0),
-                        'test_seven': (1.3, 5.0),
+                        'test_five': (1.2, 0.200),
+                        'test_six': (1.1, 0.220),
+                        'test_seven': (1.3, 0.260),
                     }
                 )
             )
 
+        # test_eight:  1.5s total / 6 tests   = 0.250s avg
+        # test_nine:  33.0s total / 3 tests   = 11.000s avg  (> 10s threshold)
+        # test_ten:    1.4s total / 7 tests   = 0.200s avg
+        # test_eleven: 164.4s total / 12 tests = 13.700s avg (> 10s threshold, > 150s total)
         with open(backend_test_time_report_three, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
                     {
-                        'test_eight': (1.5, 6.0),
-                        'test_nine': (1.6, 170.0),
-                        'test_ten': (1.4, 6.0),
-                        'test_eleven': (164.4, 200.0),
+                        'test_eight': (1.5, 0.250),
+                        'test_nine': (33.0, 11.000),
+                        'test_ten': (1.4, 0.200),
+                        'test_eleven': (164.4, 13.700),
                     }
                 )
             )
@@ -92,114 +105,114 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             {
                 'test_name': 'test_six',
                 'test_time': 1.1,
-                'test_time_by_average_test_case': 5.0,
+                'test_time_by_average_test_case': 0.220,
             },
             {
                 'test_name': 'test_five',
                 'test_time': 1.2,
-                'test_time_by_average_test_case': 5.0,
+                'test_time_by_average_test_case': 0.200,
             },
             {
                 'test_name': 'test_seven',
                 'test_time': 1.3,
-                'test_time_by_average_test_case': 5.0,
+                'test_time_by_average_test_case': 0.260,
             },
             {
                 'test_name': 'test_ten',
                 'test_time': 1.4,
-                'test_time_by_average_test_case': 6.0,
+                'test_time_by_average_test_case': 0.200,
             },
             {
                 'test_name': 'test_two',
                 'test_time': 1.4,
-                'test_time_by_average_test_case': 4.0,
+                'test_time_by_average_test_case': 0.200,
             },
             {
                 'test_name': 'test_eight',
                 'test_time': 1.5,
-                'test_time_by_average_test_case': 6.0,
-            },
-            {
-                'test_name': 'test_nine',
-                'test_time': 1.6,
-                'test_time_by_average_test_case': 170.0,
+                'test_time_by_average_test_case': 0.250,
             },
             {
                 'test_name': 'test_three',
                 'test_time': 1.7,
-                'test_time_by_average_test_case': 160.0,
+                'test_time_by_average_test_case': 1.700,
             },
             {
                 'test_name': 'test_one',
                 'test_time': 1.8,
-                'test_time_by_average_test_case': 4.0,
+                'test_time_by_average_test_case': 0.200,
             },
             {
                 'test_name': 'test_four',
                 'test_time': 2.3,
-                'test_time_by_average_test_case': 4.0,
+                'test_time_by_average_test_case': 2.300,
+            },
+            {
+                'test_name': 'test_nine',
+                'test_time': 33.0,
+                'test_time_by_average_test_case': 11.000,
             },
             {
                 'test_name': 'test_eleven',
                 'test_time': 164.4,
-                'test_time_by_average_test_case': 200.0,
+                'test_time_by_average_test_case': 13.700,
             },
         ]
         self.sorted_backend_test_times_by_avg_test_case = [
             {
-                'test_name': 'test_four',
-                'test_time': 2.3,
-                'test_time_by_average_test_case': 4.0,
-            },
-            {
-                'test_name': 'test_one',
-                'test_time': 1.8,
-                'test_time_by_average_test_case': 4.0,
-            },
-            {
-                'test_name': 'test_two',
-                'test_time': 1.4,
-                'test_time_by_average_test_case': 4.0,
-            },
-            {
                 'test_name': 'test_five',
                 'test_time': 1.2,
-                'test_time_by_average_test_case': 5.0,
-            },
-            {
-                'test_name': 'test_seven',
-                'test_time': 1.3,
-                'test_time_by_average_test_case': 5.0,
-            },
-            {
-                'test_name': 'test_six',
-                'test_time': 1.1,
-                'test_time_by_average_test_case': 5.0,
-            },
-            {
-                'test_name': 'test_eight',
-                'test_time': 1.5,
-                'test_time_by_average_test_case': 6.0,
+                'test_time_by_average_test_case': 0.200,
             },
             {
                 'test_name': 'test_ten',
                 'test_time': 1.4,
-                'test_time_by_average_test_case': 6.0,
+                'test_time_by_average_test_case': 0.200,
+            },
+            {
+                'test_name': 'test_two',
+                'test_time': 1.4,
+                'test_time_by_average_test_case': 0.200,
+            },
+            {
+                'test_name': 'test_one',
+                'test_time': 1.8,
+                'test_time_by_average_test_case': 0.200,
+            },
+            {
+                'test_name': 'test_six',
+                'test_time': 1.1,
+                'test_time_by_average_test_case': 0.220,
+            },
+            {
+                'test_name': 'test_eight',
+                'test_time': 1.5,
+                'test_time_by_average_test_case': 0.250,
+            },
+            {
+                'test_name': 'test_seven',
+                'test_time': 1.3,
+                'test_time_by_average_test_case': 0.260,
             },
             {
                 'test_name': 'test_three',
                 'test_time': 1.7,
-                'test_time_by_average_test_case': 160.0,
+                'test_time_by_average_test_case': 1.700,
+            },
+            {
+                'test_name': 'test_four',
+                'test_time': 2.3,
+                'test_time_by_average_test_case': 2.300,
             },
             {
                 'test_name': 'test_nine',
-                'test_time': 1.6,
-                'test_time_by_average_test_case': 170.0,
+                'test_time': 33.0,
+                'test_time_by_average_test_case': 11.000,
             },
             {
                 'test_name': 'test_eleven',
                 'test_time': 164.4,
-                'test_time_by_average_test_case': 200.0,
+                'test_time_by_average_test_case': 13.700,
             },
         ]
 
@@ -277,18 +290,17 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             'test_ten: 1.4 SECONDS.',
             'test_two: 1.4 SECONDS.',
             'test_eight: 1.5 SECONDS.',
-            'test_nine: 1.6 SECONDS.',
             'test_three: 1.7 SECONDS.',
             'test_one: 1.8 SECONDS.',
             'test_four: 2.3 SECONDS.',
+            'test_nine: 33.0 SECONDS.',
             'test_eleven: 164.4 SECONDS.',
             '\033[1mBACKEND TEST TIMES OVER 150.0 SECONDS:\033[0m',
             'test_eleven: 164.4 SECONDS.',
-            '\033[1mBACKEND TEST TIMES WITH AVERAGE TEST CASE TIME '
-            'OVER 150.0 SECONDS:\033[0m',
-            'test_three: 160.0 SECONDS BY AVERAGE TEST CASE TIME.',
-            'test_nine: 170.0 SECONDS BY AVERAGE TEST CASE TIME.',
-            'test_eleven: 200.0 SECONDS BY AVERAGE TEST CASE TIME.',
+            '\033[1mBACKEND TEST TIMES WITH AVERAGE TIME PER TEST CASE '
+            'OVER 10.0 SECONDS:\033[0m',
+            'test_nine: 11.000 SECONDS AVERAGE TIME PER TEST CASE.',
+            'test_eleven: 13.700 SECONDS AVERAGE TIME PER TEST CASE.',
         ]
         self.assertEqual(sorted_backend_test_times_message, self.print_arr)
         backend_test_times_temp_file.close()
