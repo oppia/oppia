@@ -534,6 +534,11 @@ class TranslatableTextHandler(
             reviewable_language_codes = (
                 contribution_rights.can_review_translation_for_language_codes
             )
+        # Check if the unfiltered mapping has any set_of_strings content
+        # before stripping, so we can tell the frontend about it.
+        has_data_format_list_content = self._has_data_format_list_content(
+            state_names_to_content_id_mapping
+        )
         if language_code not in reviewable_language_codes:
             state_names_to_content_id_mapping = (
                 self._get_state_names_to_not_set_content_id_mapping(
@@ -551,9 +556,36 @@ class TranslatableTextHandler(
                 state_names_to_not_in_review_content_id_mapping
             ),
             'version': exp.version,
+            'has_data_format_list_content': has_data_format_list_content,
         }
 
         self.render_json(self.values)
+
+    def _has_data_format_list_content(
+        self,
+        state_names_to_content_id_mapping: Dict[
+            str, Dict[str, translation_domain.TranslatableContent]
+        ],
+    ) -> bool:
+        """Returns whether any content in the mapping has a list data format
+        (set_of_strings).
+
+        Args:
+            state_names_to_content_id_mapping:
+                dict(str, dict(str, TranslatableItem)). A dict whose keys are
+                state names, and whose corresponding values are each dicts
+                mapping content IDs to the corresponding translatable items.
+
+        Returns:
+            bool. Whether any content has a list data format.
+        """
+        for state_name in state_names_to_content_id_mapping:
+            for content_id, translatable_item in (
+                state_names_to_content_id_mapping[state_name].items()
+            ):
+                if translatable_item.is_data_format_list():
+                    return True
+        return False
 
     def _get_state_names_to_not_set_content_id_mapping(
         self,

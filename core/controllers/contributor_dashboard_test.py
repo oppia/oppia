@@ -1484,6 +1484,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             # Define the expected output based on the updated exploration state.
             expected_output = {
                 'version': 1,
+                'has_data_format_list_content': True,
                 'state_names_to_content_id_mapping': {
                     'End State': {
                         'content_03': {
@@ -1528,6 +1529,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         expected_output = {
             'version': 2,
+            'has_data_format_list_content': False,
             'state_names_to_content_id_mapping': {
                 'Introduction': {
                     'content_0': {
@@ -1581,6 +1583,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         expected_output = {
             'version': 1,
+            'has_data_format_list_content': False,
             'state_names_to_content_id_mapping': {
                 'End State': {
                     'content_3': {

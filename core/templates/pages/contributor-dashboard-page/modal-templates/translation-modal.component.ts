@@ -116,6 +116,7 @@ export class TranslationModalComponent {
   heading!: string;
   loadingData: boolean = true;
   moreAvailable: boolean = false;
+  hasDataFormatListContent: boolean = false;
   textToTranslate: string | string[] = '';
   activeStatus!: Status;
   activeLanguageCode!: string;
@@ -218,6 +219,8 @@ export class TranslationModalComponent {
             this.translateTextService.getTextToTranslate();
           this.updateActiveState(translatableItem);
           ({more: this.moreAvailable} = translatableItem);
+          this.hasDataFormatListContent =
+            this.translateTextService.hasDataFormatListContent;
           this.loadingData = false;
         }
       );

@@ -39,12 +39,14 @@ export interface StateNamesToContentIdMapping {
 export interface TranslatableTextsBackendDict {
   state_names_to_content_id_mapping: StateNamesToContentIdBackendDictMapping;
   version: string;
+  has_data_format_list_content: boolean;
 }
 
 export class TranslatableTexts {
   constructor(
     private readonly stateNamesToContentIdMapping: StateNamesToContentIdMapping,
-    private readonly version: string
+    private readonly version: string,
+    private readonly _hasDataFormatListContent: boolean
   ) {}
 
   static createFromBackendDict(
@@ -64,7 +66,8 @@ export class TranslatableTexts {
     }
     return new TranslatableTexts(
       stateNamesToContentIdMapping,
-      backendDict.version
+      backendDict.version,
+      backendDict.has_data_format_list_content
     );
   }
 
@@ -74,5 +77,9 @@ export class TranslatableTexts {
 
   get explorationVersion(): string {
     return this.version;
+  }
+
+  get hasDataFormatListContent(): boolean {
+    return this._hasDataFormatListContent;
   }
 }

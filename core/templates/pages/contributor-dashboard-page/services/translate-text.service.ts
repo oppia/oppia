@@ -72,6 +72,7 @@ export class TranslateTextService {
   activeStateName: string;
   activeContentText: string;
   activeContentStatus: Status;
+  hasDataFormatListContent: boolean = false;
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
@@ -161,6 +162,8 @@ export class TranslateTextService {
       .then((translatableTexts: TranslatableTexts) => {
         this.stateWiseContents = translatableTexts.stateWiseContents;
         this.activeExpVersion = translatableTexts.explorationVersion;
+        this.hasDataFormatListContent =
+          translatableTexts.hasDataFormatListContent;
         for (const stateName in this.stateWiseContents) {
           let stateHasText: boolean = false;
           const contentIds = [];
