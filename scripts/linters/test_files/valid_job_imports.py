@@ -33,6 +33,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     exploration_voiceover_sync_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
+    number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
     skill_inspection_jobs,
@@ -80,6 +81,10 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     audit_non_existent_threads_messages_jobs,
+
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    audit_threads_with_missing_suggestions_jobs,
 )
 
 
