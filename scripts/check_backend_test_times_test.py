@@ -48,12 +48,6 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
 
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
-        # Second value in each tuple is the average time per test case,
-        # i.e. test_time / test_count. Examples:
-        #   test_one:   1.8s total / 9 tests  = 0.200s avg
-        #   test_two:   1.4s total / 7 tests  = 0.200s avg
-        #   test_three: 1.7s total / 1 test   = 1.700s avg
-        #   test_four:  2.3s total / 1 test   = 2.300s avg
         with open(backend_test_time_report_one, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
@@ -66,9 +60,6 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
                 )
             )
 
-        # test_five:  1.2s total / 6 tests  = 0.200s avg
-        # test_six:   1.1s total / 5 tests  = 0.220s avg
-        # test_seven: 1.3s total / 5 tests  = 0.260s avg
         with open(backend_test_time_report_two, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
@@ -80,10 +71,6 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
                 )
             )
 
-        # test_eight:  1.5s total / 6 tests   = 0.250s avg
-        # test_nine:  33.0s total / 3 tests   = 11.000s avg  (> 10s threshold)
-        # test_ten:    1.4s total / 7 tests   = 0.200s avg
-        # test_eleven: 164.4s total / 12 tests = 13.700s avg (> 10s threshold, > 150s total)
         with open(backend_test_time_report_three, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
