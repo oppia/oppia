@@ -1415,6 +1415,31 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
     print('Build completed.')
 
 
+def vendor_ckeditor_from_npm() -> None:
+    """Vendors CKEditor4 and bootstrapck skin from npm into third_party/static."""
+
+    print('Vendoring CKEditor4 + bootstrapck from node_modules...')
+
+    ckeditor_src = os.path.join('node_modules', 'ckeditor4')
+    bootstrap_src = os.path.join('node_modules', 'ckeditor4-bootstrapck')
+
+    ckeditor_dst = os.path.join('third_party', 'static', 'ckeditor')
+    bootstrap_dst = os.path.join(
+        'third_party', 'static', 'ckeditor-bootstrapck'
+    )
+
+    # Clean existing copies.
+    if os.path.exists(ckeditor_dst):
+        shutil.rmtree(ckeditor_dst)
+    if os.path.exists(bootstrap_dst):
+        shutil.rmtree(bootstrap_dst)
+
+    shutil.copytree(ckeditor_src, ckeditor_dst)
+    shutil.copytree(bootstrap_src, bootstrap_dst)
+
+    print('CKEditor4 vendored successfully.')
+
+
 def generate_python_package() -> None:
     """Generates Python package using setup.py."""
 
@@ -1455,6 +1480,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
+    # Vendor CKEditor4 from node_modules into third_party/static so that
+    # subsequent build steps can find it.
+    try:
+        vendor_ckeditor_from_npm()
+    except Exception:
+        print('Warning: vendoring CKEditor4 failed; continuing build.')
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the

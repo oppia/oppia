@@ -16,5 +16,5 @@
  * @fileoverview This file imports the ckeditor library.
  */
 
-import 'ckeditor4';
-export {};
+window.CKEDITOR_BASEPATH = '/third_party/static/ckeditor/';
+require('static/ckeditor/ckeditor.js');
