@@ -26,6 +26,20 @@ import {CollectionCreationService} from 'components/entity-creation-services/col
 import {LoaderService} from 'services/loader.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {UserService} from 'services/user.service';
+import {UserInfo} from 'domain/user/user-info.model';
+
+class MockUserService {
+  isLoggedIn(): boolean {
+    return false;
+  }
+
+  getUserInfoAsync(): Promise<UserInfo> {
+    return Promise.resolve({
+      isLoggedIn: () => true,
+    } as UserInfo);
+  }
+}
 
 describe('Collection Creation service', () => {
   let collectionCreationService: CollectionCreationService;
@@ -39,6 +53,12 @@ describe('Collection Creation service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: UserService,
+          useClass: MockUserService,
+        },
+      ],
     });
 
     collectionCreationService = TestBed.inject(CollectionCreationService);
