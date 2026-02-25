@@ -252,3 +252,33 @@ oppia-blog-home-page .blog-post-card {
   color: inherit;
   text-decoration: none;
 }
+
+.blog-search-input-wrapper {
+  width: 100%;
+}
+
+.blog-search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid #d6d9dc;
+  background-color: #ffffff;
+  font-size: 15px;
+  box-shadow: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-search-input:hover {
+  border-color: #aab0b6;
+}
+
+.blog-search-input:focus {
+  outline: none;
+  border-color: #0d7a5f;
+  box-shadow: 0 0 0 2px rgba(13, 122, 95, 0.15);
+}
+
+.blog-search-input::placeholder {
+  color: #8f9aa3;
+}
