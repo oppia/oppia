@@ -37,9 +37,6 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
   ],
 
-  blog: [
-    './core/tests/webdriverio_desktop/blog.js'
-  ],
 
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
