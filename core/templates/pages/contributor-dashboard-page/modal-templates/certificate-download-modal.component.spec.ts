@@ -257,6 +257,165 @@ describe('Contributor Certificate Download Modal Component', () => {
     }).toThrowError();
   });
 
+  it('should print certificate when data is available', fakeAsync(() => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate');
+
+    component.printCertificate();
+
+    expect(component.isPrinting).toBeTrue();
+    expect(component.isCancelled).toBeFalse();
+
+    flushMicrotasks();
+
+    expect(component.createCertificate).toHaveBeenCalledWith(
+      certificateData,
+      true
+    );
+    expect(component.isPrinting).toBeFalse();
+  }));
+
+  it('should show error when printing with no contributions', fakeAsync(() => {
+    component.fromDate = '2020/01/01';
+    component.toDate = '2020/01/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(emptyCertificateDataResponse));
+
+    component.printCertificate();
+
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual(
+      'There are no contributions for the given date range.'
+    );
+    expect(component.isPrinting).toBeFalse();
+  }));
+
+  it('should handle errors in printCertificate', fakeAsync(() => {
+    const mockError = new HttpErrorResponse({error: {error: 'Print error'}});
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    component.printCertificate();
+
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.isPrinting).toBeFalse();
+    expect(component.errorMessage).toBe('Print error');
+  }));
+
+  it('should not proceed with print if cancelled', fakeAsync(() => {
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate');
+
+    component.printCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.createCertificate).not.toHaveBeenCalled();
+  }));
+
+  it('should not proceed with download if cancelled', fakeAsync(() => {
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate');
+
+    component.downloadCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.createCertificate).not.toHaveBeenCalled();
+  }));
+
+  it('should not show error if download is cancelled during error', fakeAsync(() => {
+    const mockError = new HttpErrorResponse({error: {error: 'Network error'}});
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    component.downloadCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.errorsFound).toBeFalse();
+  }));
+
+  it('should not show error if print is cancelled during error', fakeAsync(() => {
+    const mockError = new HttpErrorResponse({error: {error: 'Network error'}});
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    component.printCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.errorsFound).toBeFalse();
+  }));
+
+  it('should return true for isDownloadDisabled when downloading', () => {
+    component.isDownloading = true;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return true for isDownloadDisabled when printing', () => {
+    component.isPrinting = true;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return true for isDownloadDisabled when errors found', () => {
+    component.errorsFound = true;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return true for isDownloadDisabled when dates are undefined', () => {
+    component.fromDate = undefined as unknown as string;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return false for isDownloadDisabled when everything is valid', () => {
+    component.isDownloading = false;
+    component.isPrinting = false;
+    component.errorsFound = false;
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    expect(component.isDownloadDisabled).toBeFalse();
+  });
+
+  it('should set isCancelled to true when close is called', () => {
+    spyOn(activeModal, 'close');
+    expect(component.isCancelled).toBeFalse();
+    component.close();
+    expect(component.isCancelled).toBeTrue();
+    expect(activeModal.close).toHaveBeenCalled();
+  });
+
   afterEach(() => {
     httpTestingController.verify();
   });
