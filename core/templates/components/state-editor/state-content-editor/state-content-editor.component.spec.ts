@@ -162,26 +162,6 @@ describe('StateHintsEditorComponent', () => {
     expect(component.saveStateContent.emit).toHaveBeenCalled();
   });
 
-  it('should update when card height limit is reached', () => {
-    component.cardHeightLimitReached = false;
-    spyOn(component, 'isCardHeightLimitReached').and.returnValue(
-      !component.cardHeightLimitReached
-    );
-
-    component.ngAfterViewChecked();
-
-    expect(component.cardHeightLimitReached).toBeTrue();
-    expect(component.isCardHeightLimitReached).toHaveBeenCalled();
-  });
-
-  it('should return false if shadow preview card is not present', () => {
-    spyOn(document, 'querySelector').and.returnValue(null);
-
-    const result = component.isCardHeightLimitReached();
-
-    expect(result).toBeFalse();
-  });
-
   it('should return false when preview card is not found', () => {
     spyOn(document, 'querySelector').and.returnValue(null);
 
@@ -204,14 +184,18 @@ describe('StateHintsEditorComponent', () => {
     expect(component.isCardHeightLimitReached()).toBeTrue();
   });
 
-  it('should update cardHeightLimitReached after view check', () => {
+  it('should call detectChanges when card height state changes', () => {
+    component.cardHeightLimitReached = false;
+
     spyOn(component, 'isCardHeightLimitReached').and.returnValue(true);
-    const cdRef = TestBed.inject(ChangeDetectorRef);
+
+    const cdRef = (component as any).changeDetectorRef;
     spyOn(cdRef, 'detectChanges');
 
     component.ngAfterViewChecked();
 
     expect(component.cardHeightLimitReached).toBeTrue();
+    expect(cdRef.detectChanges).toHaveBeenCalled();
   });
 
   it('should not autosave when editor is closed', () => {
@@ -279,5 +263,30 @@ describe('StateHintsEditorComponent', () => {
     component.ngOnDestroy();
 
     expect(clearTimeout).toHaveBeenCalled();
+  });
+
+  it('should not call detectChanges if card height state did not change', () => {
+    component.cardHeightLimitReached = true;
+
+    spyOn(component, 'isCardHeightLimitReached').and.returnValue(true);
+
+    const cdRef = (component as any).changeDetectorRef;
+    spyOn(cdRef, 'detectChanges');
+
+    component.ngAfterViewChecked();
+
+    expect(component.cardHeightLimitReached).toBeTrue();
+    expect(cdRef.detectChanges).not.toHaveBeenCalled();
+  });
+
+  it('should call detectContentChangeAndAutosave during ngAfterViewChecked', () => {
+    spyOn(component as any, 'detectContentChangeAndAutosave');
+    spyOn(component, 'isCardHeightLimitReached').and.returnValue(false);
+
+    component.ngAfterViewChecked();
+
+    expect(
+      (component as any).detectContentChangeAndAutosave
+    ).toHaveBeenCalled();
   });
 });
