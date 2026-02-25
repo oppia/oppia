@@ -19,23 +19,25 @@
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TestBed} from '@angular/core/testing';
-import {SubtopicPage} from './subtopic-page.model';
-import {StudyGuide} from './study-guide.model';
+import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+import {StudyGuide} from 'domain/topic/study-guide.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {StudyGuideSection} from './study-guide-sections.model';
+import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
+import {Subtopic} from 'domain/topic/subtopic.model';
 
 describe('Topic update service', function () {
-  let topicUpdateService: TopicUpdateService;
-  let undoRedoService: UndoRedoService = null;
-  let _sampleTopic = null;
-  let _firstSkillSummary = null;
-  let _secondSkillSummary = null;
-  let _thirdSkillSummary = null;
-  let _sampleSubtopicPage = null;
-  let _sampleStudyGuide = null;
+  let topicUpdateService!: TopicUpdateService;
+  let undoRedoService!: UndoRedoService;
+  let _sampleTopic!: Topic;
+  let _firstSkillSummary!: ShortSkillSummary;
+  let _secondSkillSummary!: ShortSkillSummary;
+  let _thirdSkillSummary!: ShortSkillSummary;
+  let _sampleSubtopicPage!: SubtopicPage;
+  let _sampleStudyGuide!: StudyGuide;
 
   let sampleTopicBackendObject = {
     topicDict: {
@@ -123,8 +125,8 @@ describe('Topic update service', function () {
   };
 
   beforeEach(() => {
-    topicUpdateService = TestBed.get(TopicUpdateService);
-    undoRedoService = TestBed.get(UndoRedoService);
+    topicUpdateService = TestBed.inject(TopicUpdateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
 
     _firstSkillSummary = ShortSkillSummary.create('skill_1', 'Description 1');
     _secondSkillSummary = ShortSkillSummary.create('skill_2', 'Description 2');
@@ -137,7 +139,26 @@ describe('Topic update service', function () {
       sampleStudyGuideObject
     );
     _sampleTopic = Topic.create(
-      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      {
+        id: 'topic_id',
+        name: 'Topic Name',
+        description: 'Topic Description',
+        version: 1,
+        uncategorized_skill_ids: [],
+        canonical_story_references: [],
+        additional_story_references: [],
+        subtopics: [],
+        next_subtopic_id: 1,
+        language_code: 'en',
+        skill_ids_for_diagnostic_test: [],
+        abbreviated_name: 'topic-name',
+        thumbnail_filename: 'topic.svg',
+        thumbnail_bg_color: '#C6D1FF',
+        url_fragment: 'topic-url',
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'meta content',
+        page_title_fragment_for_web: 'page title',
+      } as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
   });
@@ -339,7 +360,7 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a topic's abbreviated name", () => {
-    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+    expect(_sampleTopic.getAbbreviatedName()).toBeUndefined();
 
     topicUpdateService.setAbbreviatedTopicName(
       _sampleTopic,
@@ -348,7 +369,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getAbbreviatedName()).toEqual('new unique value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+    expect(_sampleTopic.getAbbreviatedName()).toBeUndefined();
   });
 
   it(
@@ -366,18 +387,18 @@ describe('Topic update service', function () {
           new_value: 'new unique value',
           old_value: null,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
   it("should set/unset changes to a topic's meta tag content", () => {
-    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+    expect(_sampleTopic.getMetaTagContent()).toBeUndefined();
 
     topicUpdateService.setMetaTagContent(_sampleTopic, 'new meta tag content');
     expect(_sampleTopic.getMetaTagContent()).toEqual('new meta tag content');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+    expect(_sampleTopic.getMetaTagContent()).toBeUndefined();
   });
 
   it(
@@ -395,7 +416,7 @@ describe('Topic update service', function () {
           new_value: 'new meta tag content',
           old_value: null,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
@@ -426,7 +447,7 @@ describe('Topic update service', function () {
           new_value: 'new page title',
           old_value: null,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
@@ -456,18 +477,18 @@ describe('Topic update service', function () {
           new_value: true,
           old_value: null,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
   it("should set/unset changes to a topic's url fragment", () => {
-    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getUrlFragment()).toBeUndefined();
 
     topicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
     expect(_sampleTopic.getUrlFragment()).toEqual('new-unique-value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getUrlFragment()).toBeUndefined();
   });
 
   it(
@@ -482,12 +503,12 @@ describe('Topic update service', function () {
           new_value: 'new-unique-value',
           old_value: null,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
   it("should set/unset changes to a topic's thumbnail filename", () => {
-    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailFilename()).toBeUndefined();
 
     topicUpdateService.setTopicThumbnailFilename(
       _sampleTopic,
@@ -496,7 +517,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getThumbnailFilename()).toEqual('new unique value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailFilename()).toBeUndefined();
   });
 
   it(
@@ -514,18 +535,18 @@ describe('Topic update service', function () {
           new_value: 'new unique value',
           old_value: null,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
   it("should set/unset changes to a topic's thumbnail bg color", () => {
-    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailBgColor()).toBeUndefined();
 
     topicUpdateService.setTopicThumbnailBgColor(_sampleTopic, '#ffffff');
     expect(_sampleTopic.getThumbnailBgColor()).toEqual('#ffffff');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailBgColor()).toBeUndefined();
   });
 
   it(
@@ -543,7 +564,7 @@ describe('Topic update service', function () {
           new_value: 'new unique value',
           old_value: null,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
@@ -664,7 +685,7 @@ describe('Topic update service', function () {
           new_value: 'filename',
           old_value: undefined,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
@@ -700,7 +721,7 @@ describe('Topic update service', function () {
           new_value: 'subtopic-url',
           old_value: undefined,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
@@ -758,7 +779,7 @@ describe('Topic update service', function () {
           new_value: '#ffffff',
           old_value: undefined,
         },
-      ]);
+      ] as unknown as BackendChangeObject[]);
     }
   );
 
@@ -820,35 +841,56 @@ describe('Topic update service', function () {
       'skill_id_3',
     ];
     _sampleTopic = Topic.create(
-      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      {
+        id: 'topic_id',
+        name: 'Topic Name',
+        description: 'Topic Description',
+        version: 1,
+        uncategorized_skill_ids: [],
+        canonical_story_references: [],
+        additional_story_references: [],
+        subtopics: [],
+        next_subtopic_id: 1,
+        language_code: 'en',
+        skill_ids_for_diagnostic_test: [],
+        abbreviated_name: 'topic-name',
+        thumbnail_filename: 'topic.svg',
+        thumbnail_bg_color: '#C6D1FF',
+        url_fragment: 'topic-url',
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'meta content',
+        page_title_fragment_for_web: 'page title',
+      } as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
-    let skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    let skills = (
+      _sampleTopic.getSubtopicById(1) as Subtopic
+    ).getSkillSummaries();
     expect(skills.length).toEqual(3);
     expect(skills[0].getId()).toEqual('skill_id_1');
     expect(skills[1].getId()).toEqual('skill_id_2');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = (_sampleTopic.getSubtopicById(1) as Subtopic).getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_1');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = (_sampleTopic.getSubtopicById(1) as Subtopic).getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = (_sampleTopic.getSubtopicById(1) as Subtopic).getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_1');
     expect(skills[1].getId()).toEqual('skill_id_2');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     undoRedoService.undoChange(_sampleTopic);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = (_sampleTopic.getSubtopicById(1) as Subtopic).getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
@@ -863,7 +905,26 @@ describe('Topic update service', function () {
     sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
 
     _sampleTopic = Topic.create(
-      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      {
+        id: 'topic_id',
+        name: 'Topic Name',
+        description: 'Topic Description',
+        version: 1,
+        uncategorized_skill_ids: [],
+        canonical_story_references: [],
+        additional_story_references: [],
+        subtopics: [],
+        next_subtopic_id: 1,
+        language_code: 'en',
+        skill_ids_for_diagnostic_test: [],
+        abbreviated_name: 'topic-name',
+        thumbnail_filename: 'topic.svg',
+        thumbnail_bg_color: '#C6D1FF',
+        url_fragment: 'topic-url',
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'meta content',
+        page_title_fragment_for_web: 'page title',
+      } as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
     var subtopics = _sampleTopic.getSubtopics();
@@ -975,12 +1036,10 @@ describe('Topic update service', function () {
       'when error is thrown',
     () => {
       expect(() => {
-        topicUpdateService.moveSkillToSubtopic(
-          _sampleTopic,
-          1,
-          null,
-          undefined
-        );
+        topicUpdateService.moveSkillToSubtopic(_sampleTopic, 1, 0, {
+          id: 'skill_1',
+          description: 'Description',
+        } as ShortSkillSummary);
       }).toThrowError('New subtopic cannot be null');
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
