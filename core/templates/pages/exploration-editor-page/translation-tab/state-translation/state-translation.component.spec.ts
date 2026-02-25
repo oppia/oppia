@@ -2112,18 +2112,16 @@ describe('State translation component', () => {
       });
 
       it('should correctly identify RTL languages', () => {
-        spyOn(
-          translationLanguageService,
-          'getActiveLanguageCode'
+        (
+          translationLanguageService.getActiveLanguageCode as jasmine.Spy
         ).and.returnValue('ar');
 
         expect(component.isTranslationLanguageRTL()).toBe(true);
       });
 
       it('should correctly identify LTR languages', () => {
-        spyOn(
-          translationLanguageService,
-          'getActiveLanguageCode'
+        (
+          translationLanguageService.getActiveLanguageCode as jasmine.Spy
         ).and.returnValue('en');
 
         expect(component.isTranslationLanguageRTL()).toBe(false);
