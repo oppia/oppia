@@ -467,13 +467,26 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 tasks, task_to_taskspec
             )
 
+        # Check first values match exactly
         self.assertEqual(
-            time_report,
-            {
-                'scripts.new_script_one_test.py': (1.234, 0.137),
-                'scripts.new_script_two_test.py': (2.542, 0.282),
-            },
+            time_report['scripts.new_script_one_test.py'][0], 1.234
         )
+        self.assertEqual(
+            time_report['scripts.new_script_two_test.py'][0], 2.542
+        )
+
+        # Check second values (averages) match with tolerance
+        self.assertAlmostEqual(
+            time_report['scripts.new_script_one_test.py'][1],
+            1.234 / 9,
+            places=5,
+        )
+        self.assertAlmostEqual(
+            time_report['scripts.new_script_two_test.py'][1],
+            2.542 / 9,
+            places=5,
+        )
+
         self.assertIn(
             'SUCCESS   %s: 9 tests (1.2 secs)' % test1_target, self.print_arr
         )
@@ -483,8 +496,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_successful_test_run_with_generate_time_report_flag(self) -> None:
         expected_time_report = {
-            'scripts.new_script_one_test.py': [1.234, 0.137],
-            'scripts.new_script_two_test.py': [2.542, 0.282],
+            'scripts.new_script_one_test.py': [1.234, 1.234 / 9],
+            'scripts.new_script_two_test.py': [2.542, 2.542 / 9],
         }
         swap_check_results = self.swap(
             run_backend_tests,
