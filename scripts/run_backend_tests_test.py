@@ -467,7 +467,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 tasks, task_to_taskspec
             )
 
-        # Check first values match exactly
+        # Check first values match exactly.
         self.assertEqual(
             time_report['scripts.new_script_one_test.py'][0], 1.234
         )
@@ -475,7 +475,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             time_report['scripts.new_script_two_test.py'][0], 2.542
         )
 
-        # Check second values (averages) match with tolerance
+        # Check second values (averages) match with tolerance.
         self.assertAlmostEqual(
             time_report['scripts.new_script_one_test.py'][1],
             1.234 / 9,
