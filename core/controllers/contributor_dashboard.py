@@ -580,9 +580,10 @@ class TranslatableTextHandler(
             bool. Whether any content has a list data format.
         """
         for state_name in state_names_to_content_id_mapping:
-            for content_id, translatable_item in (
-                state_names_to_content_id_mapping[state_name].items()
-            ):
+            for (
+                content_id,
+                translatable_item,
+            ) in state_names_to_content_id_mapping[state_name].items():
                 if translatable_item.is_data_format_list():
                     return True
         return False
