@@ -1890,9 +1890,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
     def test_cannot_assign_role_to_user_without_title(self) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        new_user_id = user_services.get_user_id_from_username(
-            self.NEW_USER_USERNAME
-        )
 
         # Owner creates exploration without title.
         self.login(self.OWNER_EMAIL)
