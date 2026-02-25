@@ -316,6 +316,12 @@ def synthesize_voiceover_for_html_string(
     )
 
     parsed_text = parse_html(content_html)
+
+    if not parsed_text:
+        raise Exception(
+            'The provided HTML content does not contain any text to synthesize.'
+        )
+
     logging.info(
         'Voiceover synthesis log: Oppia project ID: %s.' % oppia_project_id
     )

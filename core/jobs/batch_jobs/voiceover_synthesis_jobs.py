@@ -373,10 +373,6 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                     entity_voiceovers_id, default_entity_voiceovers
                 )
 
-                logs_during_voiceover_generation += (
-                    'Generating voiceovers for Entityvoiceover with ID: %s.\n'
-                    % entity_voiceovers_id
-                )
                 logging.info(
                     'Voiceover synthesis log: Generating voiceovers for Entityvoiceover with ID: %s.',
                     entity_voiceovers_id,
@@ -430,10 +426,6 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                             content_id, sentence_tokens_with_durations
                         )
 
-                        logs_during_voiceover_generation += (
-                            'Generated voiceover for content_id: %s.\n'
-                            % content_id
-                        )
                         logging.info(
                             'Voiceover synthesis log: Generated voiceover for content_id: %s.',
                             content_id,
