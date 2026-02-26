@@ -103,7 +103,7 @@ describe('Preview Summary Tile Modal Controller', function () {
   });
 
   it('should get exploration tags', function () {
-    explorationTagsService.init(['programming', 'math']);
+    explorationTagsService.displayed = ['programming', 'math'];
     expect(component.getTags()).toEqual(['programming', 'math']);
   });
 });
