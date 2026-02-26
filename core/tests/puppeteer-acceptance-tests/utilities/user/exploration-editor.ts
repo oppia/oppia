@@ -2854,12 +2854,12 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.page.waitForSelector(stateEditSelector, {
-      visible: true,
-    });
     // Dismiss the welcome modal if it appears (handles race condition where
     // modal appears after previous dismissWelcomeModal call).
     await this.dismissWelcomeModalIfPresent();
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
     await this.typeInInputField(stateContentInputField, `${content}`);
