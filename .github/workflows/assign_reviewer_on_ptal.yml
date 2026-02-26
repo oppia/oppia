@@ -117,4 +117,3 @@ jobs:
         with:
           message: "Failed to assign reviewers in PR workflow"
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-
