@@ -753,8 +753,15 @@ describe('Blog home page component', () => {
       component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 1;
       blogHomePageDataObject.numOfPublishedBlogPosts = 3;
 
-      const blogPostSummary2 = {...blogPostSummaryObject, _id: 'sampleBlogId2'};
-      const blogPostSummary3 = {...blogPostSummaryObject, _id: 'sampleBlogId3'};
+      const blogPostSummary2 = BlogPostSummary.createFromBackendDict({
+        ...blogPostSummary,
+        id: 'sampleBlogId2',
+      });
+
+      const blogPostSummary3 = BlogPostSummary.createFromBackendDict({
+        ...blogPostSummary,
+        id: 'sampleBlogId3',
+      });
 
       blogHomePageDataObject.blogPostSummaryDicts = [
         blogPostSummaryObject,
@@ -806,7 +813,7 @@ describe('Blog home page component', () => {
     }));
 
     it('should load data for page on changing page', () => {
-      if (!urlService.getUrlParams.calls) {
+      if (!(urlService.getUrlParams as jasmine.Spy)) {
         spyOn(urlService, 'getUrlParams').and.returnValue({});
       }
 
@@ -923,7 +930,6 @@ describe('Blog home page component', () => {
   });
 
   it('should tell searching status', () => {
-    spyOn(searchService, 'isSearchInProgress').and.returnValue(false);
     expect(component.isSearchInProgress()).toBe(false);
   });
 
@@ -934,5 +940,184 @@ describe('Blog home page component', () => {
     ).and.returnValue('image_url');
 
     expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
+  });
+
+  it('should unsubscribe directiveSubscriptions on destroy', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should show warning if loadBlogPostsForPage fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogHomePageDataAsync'
+    ).and.returnValue(
+      Promise.reject({
+        error: {error: 'Backend error'},
+        status: 500,
+      })
+    );
+
+    component.loadBlogPostsForPage(0);
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalled();
+  }));
+
+  it('should redirect when pathname does not match search path', () => {
+    windowRef.nativeWindow.location.pathname = '/different-path';
+
+    spyOn(searchService, 'executeSearchQuery').and.callFake(
+      (_query, _tags, successCallback) => {
+        successCallback();
+      }
+    );
+
+    component.searchQuery = 'test';
+    component.selectedTags = [];
+
+    component.onSearchQueryChangeExec();
+
+    expect(windowRef.nativeWindow.location.href).toContain('/blog/search/find');
+  });
+
+  it('should not call onSearchQueryChangeExec if search fields are unchanged', () => {
+    const sameTags: string[] = [];
+
+    const sameQuery = {
+      searchQuery: '',
+      selectedTags: sameTags,
+    };
+
+    component.searchQuery = '';
+    component.selectedTags = sameTags;
+
+    spyOn(searchService, 'updateSearchFieldsBasedOnUrlQuery').and.returnValue(
+      sameQuery
+    );
+
+    spyOn(component, 'onSearchQueryChangeExec');
+
+    component.updateSearchFieldsBasedOnUrlQuery();
+
+    expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
+  });
+
+  it('should not emit search query if search button is active', () => {
+    component.searchButtonIsActive = true;
+    spyOn(component.searchQueryChanged, 'next');
+
+    component.searchToBeExec({
+      target: {value: 'test'},
+    });
+
+    expect(component.searchQueryChanged.next).not.toHaveBeenCalled();
+  });
+
+  it('should preserve current page if search query is unchanged', () => {
+    spyOn(searchService, 'executeSearchQuery').and.callFake(
+      (_query, _tags, successCallback) => {
+        successCallback();
+      }
+    );
+
+    windowRef.nativeWindow.location = new URL(
+      'http://localhost/blog/search/find?q=test&page=3'
+    );
+
+    component.searchQuery = 'test';
+    component.selectedTags = [];
+
+    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    component.onSearchQueryChangeExec();
+
+    expect(pushStateSpy).toHaveBeenCalledWith(
+      {},
+      '',
+      jasmine.stringMatching('page=3')
+    );
+  });
+
+  it('should not show warning if non-fatal error occurs while fetching homepage data', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogHomePageDataAsync'
+    ).and.returnValue(
+      Promise.reject({
+        error: {error: 'Some error'},
+        status: 0,
+      })
+    );
+
+    component.loadInitialBlogHomePageData();
+    tick();
+
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  }));
+
+  it('should load more search data when in search mode', () => {
+    component.searchPageIsActive = true;
+
+    spyOn(searchService, 'loadMoreData').and.callFake(
+      (successCallback: Function) => {
+        successCallback(searchResponseData);
+      }
+    );
+
+    spyOn(component, 'loadSearchResultsPageData');
+
+    component.loadPage();
+
+    expect(component.loadSearchResultsPageData).toHaveBeenCalled();
+  });
+
+  it('should pushState if already on search path', () => {
+    windowRef.nativeWindow.location = new URL(
+      'http://localhost/blog/search/find'
+    );
+
+    spyOn(searchService, 'executeSearchQuery').and.callFake(
+      (_q, _t, successCallback) => {
+        successCallback();
+      }
+    );
+
+    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    component.searchQuery = 'test';
+    component.selectedTags = [];
+
+    component.onSearchQueryChangeExec();
+
+    expect(pushStateSpy).toHaveBeenCalled();
+  });
+
+  it('should pushState and reload homepage if clearing search on blog path', () => {
+    windowRef.nativeWindow.location = new URL('http://localhost/blog');
+
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    spyOn(component, 'loadInitialBlogHomePageData');
+
+    component.searchQuery = '';
+    component.selectedTags = [];
+
+    component.onSearchQueryChangeExec();
+
+    expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
+  });
+
+  it('should calculate last post correctly when exceeding total posts', () => {
+    component.totalBlogPosts = 3;
+
+    component.calculateLastPostOnPageNum(2, 5);
+
+    expect(component.lastPostOnPageNum).toBe(3);
   });
 });
