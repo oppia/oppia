@@ -79,15 +79,27 @@ jobs:
         with:
           message: "Prettier formatting failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+<<<<<<< HEAD
+  backend_formatter:
+    name: Backend formatting with Ruff
+=======
+<<<<<<< HEAD
+  black_formatter:
+    name: Frontend formatting with prettier
+>>>>>>> 3ff699ea61 (chore: migrate from Black to Ruff formatter)
+    runs-on: ubuntu-22.04
+    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+=======
   backend_formatter:
     name: Backend formatting with Ruff
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+>>>>>>> ef4a83ad3f (chore: migrate from Black to Ruff formatter)
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+<<<<<<< HEAD
       - name: Check Python formatting with Ruff
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
@@ -96,9 +108,35 @@ jobs:
       - name: Explain how to fix the issue
         if: ${{ failure() }}
         run: echo "Run 'ruff format .' locally to fix formatting issues. See https://github.com/oppia/oppia/wiki/Formatters for more details."
+=======
+<<<<<<< HEAD
+      - name: Black formatting
+        run: black --check .
+      - name: Explain how to fix the issue
+        if: ${{ failure() }}
+        run: echo "Read https://github.com/oppia/oppia/wiki/Formatters to understand how to fix this issue."
+=======
+      - name: Check Python formatting with Ruff
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: |
+          pip install ruff
+          ruff format --check .
+      - name: Explain how to fix the issue
+        if: ${{ failure() }}
+        run: echo "Run 'ruff format .' locally to fix formatting issues. See https://github.com/oppia/oppia/wiki/Formatters for more details."
+>>>>>>> ef4a83ad3f (chore: migrate from Black to Ruff formatter)
+>>>>>>> 3ff699ea61 (chore: migrate from Black to Ruff formatter)
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
+<<<<<<< HEAD
           message: "Ruff formatting failed on the upstream develop branch."
+=======
+<<<<<<< HEAD
+          message: "Black formatting failed on the upstream develop branch."
+=======
+          message: "Ruff formatting failed on the upstream develop branch."
+>>>>>>> ef4a83ad3f (chore: migrate from Black to Ruff formatter)
+>>>>>>> 3ff699ea61 (chore: migrate from Black to Ruff formatter)
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
