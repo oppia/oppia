@@ -318,5 +318,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Hasi saioa Googlerekin",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Irakatsi Oppia erabiliz",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "<[totalSubscribers]> harpidedun dituzu denera.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Harpidetza kendu"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Harpidetza kendu",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Ezagutu Oppiako gelak"
 }

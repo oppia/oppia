@@ -592,5 +592,6 @@
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "サブスクライブしている人は合計<[totalSubscribers]>人です。",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "サブスクライブ解除",
 	"I18N_VOLUNTEER_PAGE_TITLE": "ボランティア | Oppia",
-	"I18N_YES": "はい"
+	"I18N_YES": "はい",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Oppia教室を探索"
 }

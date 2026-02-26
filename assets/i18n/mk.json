@@ -359,5 +359,6 @@
 	"I18N_TOPNAV_SIGN_IN": "Најава",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Подучувајте со Опија",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Имате вкупно <[totalSubscribers]> претплатници.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Отпиши ме"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Отпиши ме",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Истражете училниците на Oppia"
 }

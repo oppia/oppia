@@ -1032,5 +1032,6 @@
 	"I18N_VOLUNTEER_PAGE_TITLE": "Vapaaehtoisuus | Oppia",
 	"I18N_WARNING_MODAL_DESCRIPTION": "Tämä näyttää täydellisen ratkaisun. Oletko varma?",
 	"I18N_WARNING_MODAL_TITLE": "Varoitus!",
-	"I18N_YES": "Kyllä"
+	"I18N_YES": "Kyllä",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Tutki Oppia-luokkahuoneita"
 }

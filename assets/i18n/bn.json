@@ -871,5 +871,6 @@
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "সফটওয়্যার",
 	"I18N_WARNING_MODAL_DESCRIPTION": "এটি সম্পূর্ণ সমাধান দেখাবে। আপনি কি নিশ্চিত?",
 	"I18N_WARNING_MODAL_TITLE": "সতর্কীকরণ!",
-	"I18N_YES": "হ্যাঁ"
+	"I18N_YES": "হ্যাঁ",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Oppia ক্লাসরুম অন্বেষণ করুন"
 }

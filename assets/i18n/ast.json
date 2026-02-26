@@ -335,5 +335,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Aniciar sesión con Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseñar con Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Tienes un total de <[totalSubscribers]> suscriptores.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Quitar la suscripción"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Quitar la suscripción",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Esplora les aules d'Oppia"
 }

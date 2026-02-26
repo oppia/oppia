@@ -146,5 +146,6 @@
 	"I18N_TOPNAV_LIBRARY": "Абиблиотека",
 	"I18N_TOPNAV_LOGOUT": "Иҭыҵтәуп",
 	"I18N_TOPNAV_PREFERENCES": "Архиарақәа",
-	"I18N_TOPNAV_SIGN_IN": "Иҭалатәуп"
+	"I18N_TOPNAV_SIGN_IN": "Иҭалатәуп",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Explore Oppia Classrooms"
 }

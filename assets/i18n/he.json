@@ -325,5 +325,6 @@
 	"I18N_VIEW_ALL_TOPICS": "צפה בכל נושאי ה-<[classroomName]>",
 	"I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL2": "כישורי כתיבה, מחקר והוראה",
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "תוכנה",
-	"I18N_YES": "כן"
+	"I18N_YES": "כן",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "חקור את כיתות Oppia"
 }
