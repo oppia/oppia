@@ -68,7 +68,6 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
     """Test the NdbWsgiMiddleware."""
 
     def test_ndb_wsgi_middleware_properly_wraps_given_function(self) -> None:
-
         def wsgi_app_mock(
             environ: Dict[str, str], response: webtest.TestResponse
         ) -> webtest.TestResponse:

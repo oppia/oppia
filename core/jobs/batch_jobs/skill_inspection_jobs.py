@@ -112,13 +112,12 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             >> beam.Filter(
                 # Keep only skills that don't exist (False) or have a
                 # superseding skill.
-                lambda result: not result[1]
-                or result[2] is not None
+                lambda result: not result[1] or result[2] is not None
             )
             | 'Create collection of hanging prerequisites'
             >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f"""Skill with ID: {result[0]}{f' (Description: {result[3]})' if result[3]!='' else ''} is referenced as a prerequisite but {'does not exist' if not result[1] else f'is superseded by skill with ID: {result[2]}'}"""  # pylint: disable=line-too-long
+                    f"""Skill with ID: {result[0]}{f' (Description: {result[3]})' if result[3] != '' else ''} is referenced as a prerequisite but {'does not exist' if not result[1] else f'is superseded by skill with ID: {result[2]}'}"""  # pylint: disable=line-too-long
                 )
             )
         )

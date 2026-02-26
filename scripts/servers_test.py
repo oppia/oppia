@@ -60,7 +60,6 @@ def mock_context_manager() -> MockCompilerContextManager:
 
 
 class ManagedProcessTests(test_utils.TestBase):
-
     # Helper class for improving the readability of tests.
     POPEN_CALL = collections.namedtuple(
         'POPEN_CALL', ['program_args', 'kwargs']
@@ -1323,7 +1322,6 @@ class ManagedProcessTests(test_utils.TestBase):
 
 
 class GetChromedriverVersionTests(test_utils.TestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.print_arr: list[str] = []

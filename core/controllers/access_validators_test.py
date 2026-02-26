@@ -59,7 +59,6 @@ ACCESS_VALIDATION_HANDLER_PREFIX: Final = (
 
 
 class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -103,7 +102,6 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
 
 class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -313,7 +311,6 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
 
 
 class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
-
     def test_validation_returns_false_if_no_public_classrooms_are_present(
         self,
     ) -> None:
@@ -816,7 +813,6 @@ class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
     def test_exploration_player_page_raises_error_with_invalid_exploration_version(  # pylint: disable=line-too-long
         self,
     ) -> None:
-
         self.get_html_response(
             '%s/can_access_exploration_player_page/%s'
             % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
@@ -829,7 +825,6 @@ class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
     def test_exploration_player_page_with_valid_exploration_version(
         self,
     ) -> None:
-
         self.get_html_response(
             '%s/can_access_exploration_player_page/%s'
             % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
@@ -882,7 +877,6 @@ class DiagnosticTestPlayerPageAccessValidationHandlerTests(
 
 
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -924,7 +918,6 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
 
 class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
-
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
     username = 'user'
@@ -954,7 +947,6 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
 class ViewLearnerGroupPageAccessValidationHandlerTests(
     test_utils.GenericTestBase
 ):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -1019,7 +1011,6 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
 class EditLearnerGroupPageAccessValidationHandlerTests(
     test_utils.GenericTestBase
 ):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -1169,7 +1160,6 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 class CreateLearnerGroupPageAccessValidationHandlerTests(
     test_utils.GenericTestBase
 ):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -1655,7 +1645,6 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
 
 class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()

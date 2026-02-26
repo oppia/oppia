@@ -51,7 +51,6 @@ class FailingJob(base_jobs.JobBase):
 
 
 class RunJobTests(test_utils.GenericTestBase):
-
     def test_working_sync_job(self) -> None:
         run = jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
 
@@ -115,7 +114,6 @@ class RunJobTests(test_utils.GenericTestBase):
 
 
 class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -200,7 +198,6 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
 
 
 class CancelJobTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 

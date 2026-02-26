@@ -32,7 +32,6 @@ from core.tests import test_utils
 
 
 class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -152,9 +151,9 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {'translations_mapping': {'content': {}}}
+        self.written_translations_dict: translation_domain.WrittenTranslationsDict = {
+            'translations_mapping': {'content': {}}
+        }
         self.subtopic_page_1.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict(
                 {'html': '<p>hello world</p>', 'content_id': 'content'}

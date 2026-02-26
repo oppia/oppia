@@ -26,7 +26,6 @@ import result
 
 
 class DrainResultsOnErrorTests(job_test_utils.PipelinedTestBase):
-
     def test_error_results_returns_empty_collection(self) -> None:
         transform_result = (
             self.pipeline

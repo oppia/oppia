@@ -182,7 +182,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', int(target_schema_version)
         ):
-
             # Create and migrate the exploration.
             self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
             exp_services.update_exploration(
@@ -487,7 +486,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'new_value': state_domain.SubtitledHtml(
                         'content',
                         (
-                            '<oppia-noninteractive-tabs tab_contents-with-value=\"'
+                            '<oppia-noninteractive-tabs tab_contents-with-value="'
                             '[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;'
                             'quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
                             '&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},'
@@ -497,7 +496,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                             'oppia-noninteractive-image filepath-with-value=\\'
                             '&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;'
                             'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/'
-                            'oppia-noninteractive-image&amp;gt;&amp;quot;}]\">'
+                            'oppia-noninteractive-image&amp;gt;&amp;quot;}]">'
                             '</oppia-noninteractive-tabs>'
                         ),
                     ).to_dict(),

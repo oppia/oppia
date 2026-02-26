@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class RegistryTests(test_utils.TestBase):
-
     unique_obj = object()
 
     # Here we use object because we need to mock the behavior of

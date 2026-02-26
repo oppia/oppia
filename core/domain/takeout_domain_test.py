@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class TakeoutDataTests(test_utils.GenericTestBase):
-
     def test_that_domain_object_is_created_correctly(self) -> None:
         user_data = {
             'model_name': {'property1': 'value1', 'property2': 'value2'}
@@ -34,7 +33,6 @@ class TakeoutDataTests(test_utils.GenericTestBase):
 
 
 class TakeoutImageTests(test_utils.GenericTestBase):
-
     def test_that_domain_object_is_created_correctly(self) -> None:
         takeout_image_data = takeout_domain.TakeoutImage(
             'b64_fake_image_data', '/test/'

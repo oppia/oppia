@@ -43,7 +43,6 @@ elastic_search_services = models.Registry.import_search_services()
 
 
 class BlogServicesUnitTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
@@ -740,10 +739,15 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(add_docs_counter.times_called, 1)
 
         mock_index_func = test_utils.CallCounter(lambda _: None)
-        with self.swap(
-            blog_services, 'get_blog_post_summary_models_by_ids', lambda ids: []
-        ), self.swap(
-            search_services, 'index_blog_post_summaries', mock_index_func
+        with (
+            self.swap(
+                blog_services,
+                'get_blog_post_summary_models_by_ids',
+                lambda ids: [],
+            ),
+            self.swap(
+                search_services, 'index_blog_post_summaries', mock_index_func
+            ),
         ):
             blog_services.index_blog_post_summaries_given_ids(
                 ['nonexistent_id']
@@ -782,7 +786,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with add_docs_swap:
-
             blog_services.update_blog_post(
                 blog_post.id,
                 old_blog_post_change_dict,
@@ -921,7 +924,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
 
 class BlogAuthorDetailsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         auth_id = 'someUser'
@@ -1220,7 +1222,6 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_search_blog_post_summaries(self) -> None:
-
         # Search for blog posts containing 'Oppia'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
             'Oppia',
@@ -1435,16 +1436,21 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
 
             return [DummyModel()]
 
-        with self.swap(
-            search_services,
-            'search_blog_post_summaries',
-            mock_search_blog_post_summaries,
-        ), self.swap(
-            blog_models.BlogPostSummaryModel, 'get_multi', mock_get_multi
-        ), self.swap(
-            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 3
-        ), self.swap(
-            blog_services, 'MAX_ITERATIONS', 2
+        with (
+            self.swap(
+                search_services,
+                'search_blog_post_summaries',
+                mock_search_blog_post_summaries,
+            ),
+            self.swap(
+                blog_models.BlogPostSummaryModel, 'get_multi', mock_get_multi
+            ),
+            self.swap(
+                feconf,
+                'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE',
+                3,
+            ),
+            self.swap(blog_services, 'MAX_ITERATIONS', 2),
         ):
             blog_services.get_blog_post_ids_matching_query('', [], 3)
 

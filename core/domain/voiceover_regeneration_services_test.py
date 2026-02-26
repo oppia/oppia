@@ -98,10 +98,10 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
     def test_video_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"20\" start-with-value=\"13\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            '<oppia-noninteractive-video autoplay-with-value="true" '
+            'end-with-value="20" start-with-value="13"'
+            ' video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
         expected_parsed_text = ''

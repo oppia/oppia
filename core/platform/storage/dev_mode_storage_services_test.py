@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class DevModeStorageServicesTests(test_utils.TestBase):
-
     def setUp(self) -> None:
         dev_mode_storage_services.CLIENT.reset()
         super().setUp()

@@ -179,9 +179,9 @@ def get_e2e_test_suites_from_webdriverio_config_file() -> List[TestSuiteDict]:
     return sorted(e2e_test_suites, key=lambda x: x['name'])
 
 
-def get_acceptance_test_suites_from_acceptance_directory() -> (
-    List[TestSuiteDict]
-):  # pylint: disable=line-too-long
+def get_acceptance_test_suites_from_acceptance_directory() -> List[
+    TestSuiteDict
+]:  # pylint: disable=line-too-long
     """Gets the acceptance test suites from the acceptance test
     specs directory.
 
@@ -252,8 +252,7 @@ def main() -> None:
     """
 
     print(
-        'Checking all acceptance test suites are captured in CI '
-        'config files...'
+        'Checking all acceptance test suites are captured in CI config files...'
     )
     acceptance_test_suites_from_config = (
         get_acceptance_test_suites_from_ci_config_file()

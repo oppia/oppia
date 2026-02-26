@@ -71,7 +71,6 @@ class AuditErrorsTestBase(core_test_utils.TestBase):
 
 
 class BaseValidationErrorTests(AuditErrorsTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.model = base_models.BaseModel(id='123')
@@ -99,8 +98,11 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
             job_utils, 'get_model_id', mock_get_model_id
         )
 
-        with get_model_id_swap, self.assertRaisesRegex(
-            AssertionError, 'Model ID should not be none'
+        with (
+            get_model_id_swap,
+            self.assertRaisesRegex(
+                AssertionError, 'Model ID should not be none'
+            ),
         ):
             FooError(self.model)
 
@@ -171,7 +173,6 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
 
 
 class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
-
     def test_message(self) -> None:
         model = base_models.BaseModel(
             id='123', created_on=self.NOW, last_updated=self.YEAR_AGO
@@ -190,7 +191,6 @@ class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
 
 
 class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
-
     def test_message_for_invalid_post_commit_status(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='123',
@@ -273,7 +273,6 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
 
 
 class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
-
     def test_message(self) -> None:
         model = base_models.BaseModel(
             id='123', created_on=self.NOW, last_updated=self.YEAR_LATER
@@ -289,7 +288,6 @@ class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 
 
 class ModelIdRegexErrorTests(AuditErrorsTestBase):
-
     def test_message(self) -> None:
         model = base_models.BaseModel(
             id='?!"', created_on=self.YEAR_AGO, last_updated=self.NOW
@@ -304,7 +302,6 @@ class ModelIdRegexErrorTests(AuditErrorsTestBase):
 
 
 class ModelExpiredErrorTests(AuditErrorsTestBase):
-
     def test_message(self) -> None:
         model = base_models.BaseModel(
             id='123',
@@ -323,7 +320,6 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
 
 
 class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
-
     def test_model_domain_object_validate_error(self) -> None:
         model = base_models.BaseModel(
             id='123',
@@ -346,7 +342,6 @@ class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
 
 
 class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
-
     def test_model_invalid_id_error(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='123',
@@ -367,7 +362,6 @@ class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
 
 
 class ModelRelationshipErrorTests(AuditErrorsTestBase):
-
     def test_message(self) -> None:
         error = base_validation_errors.ModelRelationshipError(
             model_property.ModelProperty(FooModel, FooModel.bar_id),
@@ -385,7 +379,6 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
 
 class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
-
     def test_message(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='invalid',
@@ -407,7 +400,6 @@ class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
 
 
 class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
-
     def test_message(self) -> None:
         model = base_models.BaseCommitLogEntryModel(
             id='invalid',

@@ -727,9 +727,7 @@ class Question(translation_domain.BaseTranslatableObject):
                         # property.
                         del question_state_dict['recorded_voiceovers'][  # type: ignore[typeddict-item]
                             'voiceovers_mapping'
-                        ][
-                            content_id
-                        ]
+                        ][content_id]
                     if (
                         content_id
                         in question_state_dict[
@@ -746,14 +744,12 @@ class Question(translation_domain.BaseTranslatableObject):
                         # property in the latest schema.
                         del question_state_dict['written_translations'][  # type: ignore[typeddict-item]
                             'translations_mapping'
-                        ][
-                            content_id
-                        ]
+                        ][content_id]
 
                 question_state_dict['interaction']['id'] = new_interaction_id
-                question_state_dict['interaction'][
-                    'answer_groups'
-                ] = new_answer_groups
+                question_state_dict['interaction']['answer_groups'] = (
+                    new_answer_groups
+                )
                 if question_state_dict['interaction']['solution'] is not None:
                     # Ruling out the possibility of any other type for MyPy type
                     # checking, because for 'ExpressionInput' interactions, the
@@ -818,9 +814,9 @@ class Question(translation_domain.BaseTranslatableObject):
             # Move 'html' field to 'translation' field and set 'data_format'
             # to 'html' for all WrittenTranslations.
             for lang_code in translations_mapping[content_id]:
-                translations_mapping[content_id][lang_code][
-                    'data_format'
-                ] = 'html'
+                translations_mapping[content_id][lang_code]['data_format'] = (
+                    'html'
+                )
                 translations_mapping[content_id][lang_code]['translation'] = (
                     translations_mapping[content_id][lang_code]['html']
                 )
@@ -889,11 +885,7 @@ class Question(translation_domain.BaseTranslatableObject):
             for ca_spec_dict in (
                 interaction_registry.Registry.get_all_specs_for_state_schema_version(
                     36
-                )[
-                    interaction_id
-                ][
-                    'customization_arg_specs'
-                ]
+                )[interaction_id]['customization_arg_specs']
             )
         ]
 
@@ -1045,9 +1037,7 @@ class Question(translation_domain.BaseTranslatableObject):
             # dict doesn't contains written_translations property.
             question_state_dict['written_translations'][  # type: ignore[typeddict-item]
                 'translations_mapping'
-            ][
-                new_content_id
-            ] = {}
+            ][new_content_id] = {}
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
             question_state_dict[
@@ -1787,9 +1777,9 @@ class Question(translation_domain.BaseTranslatableObject):
                     filtered_answer_groups.append(
                         copy.deepcopy(answer_group_dict)
                     )
-            question_state_dict['interaction'][
-                'answer_groups'
-            ] = filtered_answer_groups
+            question_state_dict['interaction']['answer_groups'] = (
+                filtered_answer_groups
+            )
 
             # Renaming cust arg.
         if (
@@ -2152,8 +2142,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         if not at_least_one_correct_answer:
             raise utils.ValidationError(
-                'Expected at least one answer group to have a correct '
-                'answer.'
+                'Expected at least one answer group to have a correct answer.'
             )
 
         if dest_is_specified:

@@ -63,7 +63,6 @@ class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
 
 
 class LibraryPageTests(test_utils.GenericTestBase):
-
     COL_ID_0: Final = '0_arch_bridges_in_england'
     COL_ID_1: Final = '1_welcome_introduce_oppia'
     COL_ID_2: Final = '2_welcome_introduce_oppia_interactions'
@@ -458,7 +457,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -624,7 +622,6 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -804,7 +801,6 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 
 
 class CategoryConfigTests(test_utils.GenericTestBase):
-
     def test_thumbnail_icons_exist_for_each_category(self) -> None:
         all_categories = list(constants.CATEGORIES_TO_COLORS.keys())
 
@@ -847,7 +843,6 @@ class LibraryRedirectPageTest(test_utils.GenericTestBase):
 
 
 class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
-
     PRIVATE_EXP_ID_EDITOR = 'eid0'
     PUBLIC_EXP_ID_EDITOR = 'eid1'
     PRIVATE_EXP_ID_VIEWER = 'eid2'

@@ -66,7 +66,6 @@ EXPECTED_MESSAGE_KEYS: Final = [
 
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
-
     EXP_ID: Final = '0'
 
     def setUp(self) -> None:
@@ -163,7 +162,6 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
 
 class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
-
     EXP_ID: Final = '0'
 
     def setUp(self) -> None:
@@ -446,7 +444,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
 
 class FeedbackThreadTests(test_utils.GenericTestBase):
-
     OWNER_EMAIL_1: Final = 'owner1@example.com'
     OWNER_USERNAME_1: Final = 'owner1'
 
@@ -702,7 +699,6 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
 
 class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -762,7 +758,6 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
 
 
 class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -805,7 +800,6 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
 
 class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)

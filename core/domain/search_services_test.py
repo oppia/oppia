@@ -244,7 +244,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
 
     def test_delete_explorations_from_search_index(self) -> None:
-
         def _mock_delete_docs(ids: List[str], index: str) -> None:
             """Mocks delete_documents_from_index()."""
             self.assertEqual(ids, [self.EXP_ID])
@@ -264,7 +263,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(delete_docs_counter.times_called, 1)
 
     def test_delete_collections_from_search_index(self) -> None:
-
         def _mock_delete_docs(ids: List[str], index: str) -> None:
             """Mocks delete_documents_from_index()."""
             self.assertEqual(ids, [self.COLLECTION_ID])
@@ -287,7 +285,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
 
 class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -367,7 +364,6 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
 
     def test_delete_blog_posts_from_search_index(self) -> None:
-
         def _mock_delete_docs(ids: List[str], index: str) -> None:
             """Mocks delete_documents_from_index()."""
             self.assertEqual(ids, [self.blog_post_a_id])

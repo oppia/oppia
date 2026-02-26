@@ -32,7 +32,6 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.longMessage = True
 
     def test_whitelisted_tags(self) -> None:
-
         self.assertTrue(
             html_cleaner.filter_a('a', 'href', 'http://www.oppia.com')
         )
@@ -204,7 +203,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                     'start-with-value': 0,
                     'end-with-value': 0,
                     'video_id-with-value': (
-                        'https://www.youtube.com/watch?' 'v=Ntcw0H0hwPU'
+                        'https://www.youtube.com/watch?v=Ntcw0H0hwPU'
                     ),
                     'autoplay-with-value': False,
                 },

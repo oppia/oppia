@@ -4297,9 +4297,9 @@ def to_exploration_dict_for_android(
             state_domain.StateDictForAndroid, state.to_dict()
         )
 
-        voiceovers_mapping: Dict[str, Dict[str, state_domain.VoiceoverDict]] = (
-            {}
-        )
+        voiceovers_mapping: Dict[
+            str, Dict[str, state_domain.VoiceoverDict]
+        ] = {}
 
         for content_id in content_ids:
             if content_id not in voiceovers_mapping:
@@ -4309,13 +4309,12 @@ def to_exploration_dict_for_android(
                 language_code,
                 content_id_to_voiceover,
             ) in language_code_to_content_voiceover_mapping.items():
-
                 voiceover_dict = content_id_to_voiceover.get(content_id)
 
                 if voiceover_dict is not None:
-                    voiceovers_mapping[content_id][
-                        language_code
-                    ] = voiceover_dict
+                    voiceovers_mapping[content_id][language_code] = (
+                        voiceover_dict
+                    )
         state_name_to_state_dict[state_name]['recorded_voiceovers'] = {
             'voiceovers_mapping': voiceovers_mapping
         }

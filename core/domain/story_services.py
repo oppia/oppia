@@ -1114,9 +1114,9 @@ def record_completed_node_in_story_context(
         progress_model.put()
 
 
-def get_chapter_notifications_stories_list() -> (
-    List[story_domain.StoryPublicationTimeliness]
-):
+def get_chapter_notifications_stories_list() -> List[
+    story_domain.StoryPublicationTimeliness
+]:
     """Returns a list of stories with behind-schedule or upcoming chapters.
 
     Returns:

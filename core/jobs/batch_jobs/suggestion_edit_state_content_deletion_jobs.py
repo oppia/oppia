@@ -43,7 +43,9 @@ if MYPY:  # pragma: no cover
 class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all edit state content suggestion models."""
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[suggestion_models.GeneralSuggestionModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -57,10 +59,8 @@ class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform):  # type: i
             >> (
                 beam.Filter(
                     lambda model: (
-                        (
-                            model.suggestion_type
-                            == (feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
-                        )
+                        model.suggestion_type
+                        == (feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
                     )
                 )
             )
@@ -88,7 +88,6 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
         (
             suggestion_edit_state_content_model_to_delete,
             (suggestion_edit_state_content_model_to_delete_result),
@@ -111,7 +110,6 @@ class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(
     """Job that audit edit state content suggestion."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
         job_run_results = (
             self.pipeline
             | 'Perform fetching and deletion of edit state content'

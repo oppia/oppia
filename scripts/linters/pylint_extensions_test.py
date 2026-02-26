@@ -32,7 +32,6 @@ from . import pylint_extensions
 
 
 class HangingIndentCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -234,7 +233,6 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
 
 class DocstringParameterCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -1985,7 +1983,6 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
 
 class ImportOnlyModulesCheckerTests(unittest.TestCase):
-
     def test_finds_import_from(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2075,7 +2072,6 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
 
 
 class BackslashContinuationCheckerTests(unittest.TestCase):
-
     def test_finds_backslash_continuation(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2112,7 +2108,6 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
 
 
 class FunctionArgsOrderCheckerTests(unittest.TestCase):
-
     def test_finds_function_def(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2161,7 +2156,6 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
 
 
 class RestrictedImportCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -2461,7 +2455,6 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
 
 class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
-
     def test_checks_single_char_and_newline_eof(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
@@ -2525,7 +2518,6 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
 
 class TypeIgnoreCommentCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -3028,7 +3020,6 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
 
 
 class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -3552,7 +3543,6 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
 
 
 class SingleLineCommentCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -3872,7 +3862,6 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 
 
 class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4106,7 +4095,6 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 
 
 class SingleLinePragmaCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4269,7 +4257,6 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
 
 
 class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4414,7 +4401,6 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
 
 class InequalityWithNoneCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4655,7 +4641,6 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 
 
 class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4727,7 +4712,6 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
 
 class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4737,7 +4721,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_schema_handlers_without_request_args_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4761,7 +4744,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             )
 
     def test_schema_handlers_without_url_path_args_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4786,7 +4768,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             )
 
     def test_handlers_with_valid_schema_do_not_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4929,7 +4910,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
 
 class DisallowedImportsCheckerTests(unittest.TestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()

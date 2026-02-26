@@ -86,7 +86,9 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         )
         option_names = {'header': 'Pretty Tiles!', 'use_percentages': True}
         sorted_tiles_instance = sorted_tiles(
-            'AnswerFrequencies', option_names, 'invalid_value'  # type: ignore[arg-type]
+            'AnswerFrequencies',
+            option_names,
+            'invalid_value',  # type: ignore[arg-type]
         )
 
         with self.assertRaisesRegex(
@@ -113,7 +115,6 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
 
 
 class VisualizationsNameTests(test_utils.GenericTestBase):
-
     def test_visualization_names(self) -> None:
         """This function checks for duplicate visualizations."""
 

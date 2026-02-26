@@ -1,17 +1,21 @@
-[tool.black]
-line-length = 80
-skip-string-normalization = true
+# Black configuration removed - now using Ruff for formatting.
+# See [tool.ruff.format] below.
 
 [tool.ruff]
 line-length = 80
+target-version = "py311"
 extend-exclude = [
     "scripts/linters/test_files/invalid_*.py",
     "scripts/linters/test_files/*invalid*.py",
 ]
 
 [tool.ruff.format]
-quote-style = "preserve"
-skip-magic-trailing-comma = false
+# Match Black's behavior exactly.
+quote-style = "preserve"            # Match Black's skip-string-normalization = true
+indent-style = "space"              # Black's default
+skip-magic-trailing-comma = false   # Respect trailing commas like Black
+line-ending = "auto"                # Auto-detect like Black
+docstring-code-format = false       # Don't reformat docstring code (Black doesn't)
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]

@@ -280,9 +280,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_webdriverio_server(
             **unused_kwargs: str,
-        ) -> ContextManager[
-            scripts_test_utils.PopenStub
-        ]:  # pylint: disable=unused-argument
+        ) -> ContextManager[scripts_test_utils.PopenStub]:  # pylint: disable=unused-argument
             return contextlib.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
                     stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),

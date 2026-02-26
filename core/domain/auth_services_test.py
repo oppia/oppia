@@ -41,7 +41,6 @@ platform_auth_services = models.Registry.import_auth_services()
 
 
 class AuthServicesTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 

@@ -37,7 +37,6 @@ if MYPY:  # pragma: no cover
 
 
 class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
-
     SUBMITTER_EMAIL: Final = 'submit@example.com'
     SUBMITTER_USERNAME: Final = 'submit'
     USER_A_EMAIL: Final = 'a@example.com'

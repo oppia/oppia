@@ -71,7 +71,6 @@ if MYPY:  # pragma: no cover
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super().setUp()
@@ -142,7 +141,6 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
 
 
 class EditorTests(BaseEditorControllerTests):
-
     def setUp(self) -> None:
         super().setUp()
         exp_services.load_demo('0')
@@ -1076,7 +1074,6 @@ solicit_answer_details: false
 
 
 class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1155,7 +1152,6 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
 
 class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1237,7 +1233,6 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
 
 class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1269,7 +1264,6 @@ class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
 
 class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1294,7 +1288,6 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
 
 class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1363,7 +1356,6 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
 
 class ExplorationDeletionRightsTests(BaseEditorControllerTests):
-
     def test_deletion_rights_for_unpublished_exploration(self) -> None:
         """Test rights management for deletion of unpublished explorations."""
         # Unpublished exploration id.
@@ -1467,8 +1459,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             if msg != log_from_google_app_engine:
                 observed_log_messages.append(msg)
 
-        with self.swap(logging, 'info', mock_logging_function), self.swap(
-            logging, 'debug', mock_logging_function
+        with (
+            self.swap(logging, 'info', mock_logging_function),
+            self.swap(logging, 'debug', mock_logging_function),
         ):
             # Checking for non-moderator/non-admin.
 
@@ -2126,8 +2119,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=401,
         )
         error_msg = (
-            'You do not have credentials to change rights '
-            'for this exploration.'
+            'You do not have credentials to change rights for this exploration.'
         )
         self.assertEqual(response['error'], error_msg)
         reader_dict = self.get_json(
@@ -2276,8 +2268,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=401,
         )
         error_msg = (
-            'You do not have credentials to change rights '
-            'for this exploration.'
+            'You do not have credentials to change rights for this exploration.'
         )
         self.assertEqual(response['error'], error_msg)
         reader_dict = self.get_json(
@@ -2420,8 +2411,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=401,
         )
         error_msg = (
-            'You do not have credentials to change rights '
-            'for this exploration.'
+            'You do not have credentials to change rights for this exploration.'
         )
         self.assertEqual(response['error'], error_msg)
         reader_dict = self.get_json(
@@ -3492,7 +3482,6 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_error_on_passing_invalid_exploration_version(self) -> None:
-
         with self.login_context(self.MODERATOR_EMAIL):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
@@ -3822,7 +3811,6 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
 
 class HasSeenTutorialTests(BaseEditorControllerTests):
-
     def test_get_user_has_seen_editor_tutorial(self) -> None:
         self.login(self.OWNER_EMAIL)
 
@@ -3867,7 +3855,6 @@ class HasSeenTutorialTests(BaseEditorControllerTests):
 
 
 class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
-
     def test_get_invalid_exploration_id(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             illegal_id = '@#$%^&*'
@@ -3919,7 +3906,6 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 
 
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
-
     def setUp(self) -> None:
         super().setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -4183,7 +4169,6 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
 
 class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
-
     def test_rights_handler_returns_appropriate_rights(self) -> None:
         """Test that rights handler returns the correct rights of a user
         for an exploration.
@@ -4211,7 +4196,6 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
 
 
 class ImageUploadHandlerTests(BaseEditorControllerTests):
-
     def test_return_error_when_image_not_uploaded(self) -> None:
         """Test that an error is returned when no image is uploaded."""
 

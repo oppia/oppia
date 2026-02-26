@@ -127,8 +127,7 @@ class LearnerGroup:
 
         if len(facilitator_set.intersection(invited_learner_set)) > 0:
             raise utils.ValidationError(
-                'Learner group facilitator cannot be invited to '
-                'join the group.'
+                'Learner group facilitator cannot be invited to join the group.'
             )
 
 

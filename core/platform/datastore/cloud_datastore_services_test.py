@@ -180,9 +180,12 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             'get_multi failed after %s retries'
             % cloud_datastore_services.MAX_GET_RETRIES
         )
-        with self.swap_to_always_raise(
-            ndb, 'get_multi', Exception('Mock key error')
-        ), self.swap(logging, 'exception', _mock_logging_function):
+        with (
+            self.swap_to_always_raise(
+                ndb, 'get_multi', Exception('Mock key error')
+            ),
+            self.swap(logging, 'exception', _mock_logging_function),
+        ):
             with self.assertRaisesRegex(Exception, error_msg):
                 cloud_datastore_services.get_multi(dummy_keys)
         self.assertEqual(
@@ -251,8 +254,6 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             bool,
         ] = user_models.UserQueryModel.query(
             user_models.UserQueryModel.submitter_id == self.admin_user_id,
-        ).fetch_page(
-            2, cloud_datastore_services.make_cursor()
-        )
+        ).fetch_page(2, cloud_datastore_services.make_cursor())
 
         self.assertEqual(results[0], [user_query_model1, user_query_model2])

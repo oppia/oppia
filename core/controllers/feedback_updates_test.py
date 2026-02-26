@@ -41,7 +41,6 @@ if MYPY:  # pragma: no cover
 
 
 class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
-
     EXP_ID_1 = 'EXP_ID_1'
     EXP_TITLE_1 = 'Exploration title 1'
 
@@ -173,7 +172,6 @@ class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
 
 
 class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
-
     EXP_ID_1 = '0'
 
     def setUp(self) -> None:

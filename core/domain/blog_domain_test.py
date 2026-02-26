@@ -195,7 +195,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     # test wrong inputs that we can normally catch by typing.
     def test_title_with_strict_validation(self) -> None:
         self._assert_strict_valid_title_for_blog_post(
-            'Title should be a string.', 123  # type: ignore[arg-type]
+            'Title should be a string.',
+            123,  # type: ignore[arg-type]
         )
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', ''
@@ -410,7 +411,6 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
 
 class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
@@ -440,7 +440,6 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
 
 
 class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
@@ -829,8 +828,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             'ABC12&heloo',
         )
         self._assert_valid_displayed_author_name(
-            'This name contains reserved username. Please use some '
-            'other name',
+            'This name contains reserved username. Please use some other name',
             'name admin',
         )
 

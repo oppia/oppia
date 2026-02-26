@@ -685,9 +685,7 @@ class SuggestionsProviderHandler(
     """Provides suggestions for a user and given suggestion type."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: (
-        SuggestionsProviderHandlerUrlPathArgsSchemaDictType
-    ) = {}
+    URL_PATH_ARGS_SCHEMAS: SuggestionsProviderHandlerUrlPathArgsSchemaDictType = {}
     HANDLER_ARGS_SCHEMAS: SuggestionsProviderHandlerArgsSchemaDictType = {}
 
     def _require_valid_suggestion_and_target_types(

@@ -482,7 +482,6 @@ def mark_exploration_as_incomplete(
         exploration_id not in exploration_ids
         and exploration_id not in subscribed_exploration_ids
     ):
-
         if exploration_id not in incomplete_activities.exploration_ids:
             # Remove the exploration from the learner playlist (if present) as
             # it is currently now being completed.
@@ -686,7 +685,6 @@ def add_collection_to_learner_playlist(
         collection_id not in completed_collection_ids
         and collection_id not in incomplete_collection_ids
     ):
-
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_collection_to_be_played_later(
                 user_id,
@@ -741,7 +739,6 @@ def add_exp_to_learner_playlist(
         exploration_id not in completed_exploration_ids
         and exploration_id not in incomplete_exploration_ids
     ):
-
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_exploration_to_be_played_later(
                 user_id,

@@ -26,7 +26,6 @@ from typing import Type
 
 
 class DummyPassJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[dummy_jobs.DummyPassJob] = dummy_jobs.DummyPassJob
 
     def test_dummy_pass_job_outputs_success(self) -> None:
@@ -41,7 +40,6 @@ class DummyPassJobTests(job_test_utils.JobTestBase):
 
 
 class DummyFailJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[dummy_jobs.DummyFailJob] = dummy_jobs.DummyFailJob
 
     def test_dummy_fail_job_outputs_failure(self) -> None:

@@ -339,8 +339,7 @@ class BaseSuggestion:
         before accepting the suggestion.
         """
         raise NotImplementedError(
-            'Subclasses of BaseSuggestion should implement '
-            'pre_accept_validate.'
+            'Subclasses of BaseSuggestion should implement pre_accept_validate.'
         )
 
     def populate_old_value_of_change(self) -> None:
@@ -361,8 +360,7 @@ class BaseSuggestion:
         before updating the suggestion.
         """
         raise NotImplementedError(
-            'Subclasses of BaseSuggestion should implement '
-            'pre_update_validate.'
+            'Subclasses of BaseSuggestion should implement pre_update_validate.'
         )
 
     def get_all_html_content_strings(self) -> List[str]:
@@ -953,9 +951,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change_cmd: (
-            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd
-        ) = question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(  # pylint: disable=line-too-long
+        self.change_cmd: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(  # pylint: disable=line-too-long
             change_cmd
         )
         self.score_category = score_category

@@ -115,7 +115,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'Expected list of filenames, got \'invalid source filename\'',
         ):
             install_dependencies_json_packages.download_files(
-                'source_url', 'target_dir', 'invalid source filename'  # type: ignore[arg-type]
+                'source_url',
+                'target_dir',
+                'invalid source filename',  # type: ignore[arg-type]
             )
 
     def test_download_files_with_valid_source_filenames(self) -> None:
@@ -238,8 +240,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.expected_check_function_calls = dict(self.check_function_calls)
 
         with (
-            exists_swap
-        ), self.url_retrieve_swap, self.remove_swap, self.rename_swap, self.extract_swap:
+            exists_swap,
+            self.url_retrieve_swap,
+            self.remove_swap,
+            self.rename_swap,
+            self.extract_swap,
+        ):
             install_dependencies_json_packages.download_and_unzip_files(
                 'source url', 'target dir', 'zip root', 'target root'
             )
@@ -308,7 +314,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         remove_swap = self.swap(os, 'remove', mock_remove)
 
         with exists_swap, zipfile_swap, url_open_swap, remove_swap:
-            with self.dir_exists_swap, self.url_retrieve_swap, self.rename_swap, self.unzip_swap:
+            with (
+                self.dir_exists_swap,
+                self.url_retrieve_swap,
+                self.rename_swap,
+                self.unzip_swap,
+            ):
                 with self.extract_swap:
                     install_dependencies_json_packages.download_and_unzip_files(
                         'http://src', 'target dir', 'zip root', 'target root'
@@ -462,12 +473,15 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         return_json_swap = self.swap(
             install_dependencies_json_packages, 'return_json', mock_return_json
         )
-        with return_json_swap, self.assertRaisesRegex(
-            Exception,
-            re.escape(
-                'downloadFormat not specified in {\'version\': \'2.7.5\', '
-                '\'url\': \'https://github.com/mathjax/2.7.5.zip\', '
-                '\'targetDirPrefix\': \'MathJax-\'}'
+        with (
+            return_json_swap,
+            self.assertRaisesRegex(
+                Exception,
+                re.escape(
+                    'downloadFormat not specified in {\'version\': \'2.7.5\', '
+                    '\'url\': \'https://github.com/mathjax/2.7.5.zip\', '
+                    '\'targetDirPrefix\': \'MathJax-\'}'
+                ),
             ),
         ):
             install_dependencies_json_packages.validate_dependencies('filepath')
@@ -615,8 +629,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         )
 
         with (
-            validate_swap
-        ), return_json_swap, download_files_swap, unzip_files_swap:
+            validate_swap,
+            return_json_swap,
+            download_files_swap,
+            unzip_files_swap,
+        ):
             install_dependencies_json_packages.main()
 
         expected_check_function_calls = {
@@ -764,9 +781,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_open(_path: str, _options: str) -> NoReturn:
             raise AssertionError('open() should not be called')
 
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> NoReturn:  # pylint: disable=unused-argument
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
             raise AssertionError('urlopen() should not be called')
 
         open_swap = self.swap(builtins, 'open', mock_open)

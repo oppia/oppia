@@ -207,7 +207,8 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             # ignore[arg-type] is used to test method get_by_hash()
             # for invalid input type.
             email_models.SentEmailModel.get_by_hash(
-                'Email Hash', sent_datetime_lower_bound='Not a datetime object'  # type: ignore[arg-type]
+                'Email Hash',
+                sent_datetime_lower_bound='Not a datetime object',  # type: ignore[arg-type]
             )
 
     def test_get_export_policy(self) -> None:

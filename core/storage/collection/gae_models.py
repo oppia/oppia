@@ -533,9 +533,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         """Model is exported as one instance shared across users since multiple
         users contribute to collections and have varying rights.
         """
-        return (
-            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
-        )
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:

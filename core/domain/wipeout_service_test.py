@@ -2746,7 +2746,6 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             )
 
     def test_one_feedback_with_multiple_users_is_pseudonymized(self) -> None:
-
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )

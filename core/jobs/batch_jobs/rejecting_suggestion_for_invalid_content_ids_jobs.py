@@ -309,8 +309,7 @@ def _get_suggestion_dicts(
         #   exploration: [exploration]
         # }>.
         | 'Group by exploration ID' >> beam.CoGroupByKey()
-        | 'Remove keys'
-        >> beam.Values()  # pylint: disable=no-value-for-parameter
+        | 'Remove keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
         | 'Filter out explorations with no suggestions'
         >> beam.Filter(lambda exp_id_dict: len(exp_id_dict['suggestions']) != 0)
         | 'Get single exploration for exploration key'

@@ -297,8 +297,10 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             self.user_id
         )
 
-        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to(  # pylint: disable=line-too-long
-            self.user_id
+        creators_subscribed_to = (
+            subscription_services.get_all_creators_subscribed_to(  # pylint: disable=line-too-long
+                self.user_id
+            )
         )
         creators_settings = user_services.get_users_settings(
             creators_subscribed_to, strict=True

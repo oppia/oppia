@@ -94,9 +94,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>state customization arg html 4</p>',
             },
         ]
-        state_customization_args_dict: (
-            state_domain.CustomizationArgsDictType
-        ) = {
+        state_customization_args_dict: state_domain.CustomizationArgsDictType = {
             'choices': {'value': choices_subtitled_dicts},
             'allowMultipleItemsInSamePosition': {'value': True},
         }
@@ -120,7 +118,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.RuleSpec(
                     'HasElementXAtPositionY',
                     {
-                        'x': '<p>HasElementXAtPositionY rule_spec ' 'html</p>',
+                        'x': '<p>HasElementXAtPositionY rule_spec html</p>',
                         'y': 2,
                     },
                 ),
@@ -462,12 +460,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ),
                 state_domain.RuleSpec(
                     'DoesNotContainAtLeastOneOf',
-                    {
-                        'x': [
-                            '<p>DoesNotContainAtLeastOneOf rule_'
-                            'spec html</p>'
-                        ]
-                    },
+                    {'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']},
                 ),
             ],
             [],
@@ -613,12 +606,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 ),
                 state_domain.RuleSpec(
                     'DoesNotContainAtLeastOneOf',
-                    {
-                        'x': [
-                            '<p>DoesNotContainAtLeastOneOf rule_'
-                            'spec html</p>'
-                        ]
-                    },
+                    {'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']},
                 ),
             ],
             [],
@@ -1102,10 +1090,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'feedback_1',
                     (
                         '<oppia-noninteractive-tabs tab_contents-with-value'
-                        '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                        '="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
                         '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                         'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
-                        'quot;:&amp;quot;hello&amp;quot;}]\">'
+                        'quot;:&amp;quot;hello&amp;quot;}]">'
                         '</oppia-noninteractive-tabs>'
                     ),
                 ),
@@ -1146,10 +1134,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content_0',
                     'html': (
                         '<oppia-noninteractive-tabs tab_contents-with-value'
-                        '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                        '="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
                         '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                         'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
-                        'quot;:&amp;quot;hello&amp;quot;}]\">'
+                        'quot;:&amp;quot;hello&amp;quot;}]">'
                         '</oppia-noninteractive-tabs>'
                     ),
                 }
@@ -3059,7 +3047,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
 
             exploration.init_state.convert_state_dict_to_yaml(
-                'invalid_state_dict', 10  # type: ignore[arg-type]
+                'invalid_state_dict',
+                10,  # type: ignore[arg-type]
             )
 
         self.assertEqual(len(captured_logs), 1)
@@ -3763,7 +3752,6 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
@@ -3860,7 +3848,6 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
 
 
 class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
-
     def test_state_version_history_gets_created(self) -> None:
         expected_dict: state_domain.StateVersionHistoryDict = {
             'previously_edited_in_version': 1,

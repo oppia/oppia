@@ -51,7 +51,6 @@ if MYPY:  # pragma: no cover
 
 
 class ExplorationChangeTests(test_utils.GenericTestBase):
-
     def test_exp_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -536,7 +535,6 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
 
 class ExpVersionReferenceTests(test_utils.GenericTestBase):
-
     def test_create_exp_version_reference_object(self) -> None:
         exp_version_reference = exp_domain.ExpVersionReference('exp_id', 1)
 
@@ -1475,7 +1473,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
-            'caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'caption-with-value="&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -1488,7 +1486,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-            'aaaaaa&amp;quot;\"></oppia-noninteractive-image>'
+            'aaaaaa&amp;quot;"></oppia-noninteractive-image>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1512,8 +1510,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             self.new_exploration,
-            'Image tag \'filepath-with-value\' attribute '
-            'should not be empty.',
+            'Image tag \'filepath-with-value\' attribute should not be empty.',
         )
 
         self.state.content.html = (
@@ -1529,7 +1526,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         """Validate SkillReview tag."""
         self.state.content.html = (
             '<oppia-noninteractive-skillreview skill_id-with-value='
-            '\"&amp;quot;&amp;quot;\" ></oppia-noninteractive-skillreview>'
+            '"&amp;quot;&amp;quot;" ></oppia-noninteractive-skillreview>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1538,8 +1535,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-skillreview skill_id-with-value='
-            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
-            '&amp;quot;\"></oppia-noninteractive-skillreview>'
+            '"&amp;quot;&amp;quot;" text-with-value="&amp;quot;'
+            '&amp;quot;"></oppia-noninteractive-skillreview>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1548,19 +1545,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.state.content.html = (
-            '<oppia-noninteractive-skillreview text-with-value=\"&amp;quot;'
-            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+            '<oppia-noninteractive-skillreview text-with-value="&amp;quot;'
+            'text&amp;quot;"></oppia-noninteractive-skillreview>'
         )
         self._assert_validation_error(
             self.new_exploration,
-            'SkillReview tag does not have '
-            '\'skill_id-with-value\' attribute.',
+            'SkillReview tag does not have \'skill_id-with-value\' attribute.',
         )
 
         self.state.content.html = (
             '<oppia-noninteractive-skillreview skill_id-with-value='
-            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
-            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+            '"&amp;quot;&amp;quot;" text-with-value="&amp;quot;'
+            'text&amp;quot;"></oppia-noninteractive-skillreview>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1571,10 +1567,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_video_rte_tag(self) -> None:
         """Validate Video tag."""
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"11\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            '<oppia-noninteractive-video autoplay-with-value="true" '
+            'end-with-value="11"'
+            ' video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1582,10 +1578,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"11\" start-with-value=\"\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            '<oppia-noninteractive-video autoplay-with-value="true" '
+            'end-with-value="11" start-with-value=""'
+            ' video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1593,10 +1589,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'start-with-value=\"13\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            '<oppia-noninteractive-video autoplay-with-value="true" '
+            'start-with-value="13"'
+            ' video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1604,10 +1600,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"\" start-with-value=\"13\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            '<oppia-noninteractive-video autoplay-with-value="true" '
+            'end-with-value="" start-with-value="13"'
+            ' video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1616,9 +1612,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-video '
-            'end-with-value=\"11\" start-with-value=\"9\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            'end-with-value="11" start-with-value="9"'
+            ' video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1626,10 +1622,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"not valid\" '
-            'end-with-value=\"11\" start-with-value=\"9\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            '<oppia-noninteractive-video autoplay-with-value="not valid" '
+            'end-with-value="11" start-with-value="9"'
+            ' video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1638,8 +1634,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"11\" start-with-value=\"9\">'
+            '<oppia-noninteractive-video autoplay-with-value="true" '
+            'end-with-value="11" start-with-value="9">'
             '</oppia-noninteractive-video>'
         )
         self._assert_validation_error(
@@ -1648,10 +1644,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"11\" start-with-value=\"9\"'
-            ' video_id-with-value=\"&amp;quot;&amp;'
-            'quot;\"></oppia-noninteractive-video>'
+            '<oppia-noninteractive-video autoplay-with-value="true" '
+            'end-with-value="11" start-with-value="9"'
+            ' video_id-with-value="&amp;quot;&amp;'
+            'quot;"></oppia-noninteractive-video>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1662,7 +1658,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         """Validate Link tag."""
         self.state.content.html = (
             '<oppia-noninteractive-link '
-            'url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">'
+            'url-with-value="&amp;quot;http://www.example.com&amp;quot;">'
             '</oppia-noninteractive-link>'
         )
         self._assert_validation_error(
@@ -1672,7 +1668,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-link'
-            ' text-with-value=\"&amp;quot;something&amp;quot;\">'
+            ' text-with-value="&amp;quot;something&amp;quot;">'
             '</oppia-noninteractive-link>'
         )
         self._assert_validation_error(
@@ -1682,8 +1678,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-link'
-            ' text-with-value=\"&amp;quot;something&amp;quot;\"'
-            ' url-with-value=\"\"></oppia-noninteractive-link>'
+            ' text-with-value="&amp;quot;something&amp;quot;"'
+            ' url-with-value=""></oppia-noninteractive-link>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1715,7 +1711,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-math'
-            ' math_content-with-value=\"\"></oppia-noninteractive-math>'
+            ' math_content-with-value=""></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1725,8 +1721,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-math math_content-with-value='
-            '\"{&amp;quot;svg_filename&amp;quot;:&amp;quot;'
-            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+            '"{&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'mathImg.svgas&amp;quot;}"></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1735,20 +1731,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-math math_content-with-value='
-            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;'
+            '"{&amp;quot;raw_latex&amp;quot;:&amp;quot;'
             '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
-            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+            'mathImg.svgas&amp;quot;}"></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
             self.new_exploration,
-            'Math tag \'raw_latex-with-value\' attribute '
-            'should not be empty.',
+            'Math tag \'raw_latex-with-value\' attribute should not be empty.',
         )
 
         self.state.content.html = (
             '<oppia-noninteractive-math math_content-with-value='
-            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;not empty'
-            '&amp;quot;}\"></oppia-noninteractive-math>'
+            '"{&amp;quot;raw_latex&amp;quot;:&amp;quot;not empty'
+            '&amp;quot;}"></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1757,9 +1752,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-math math_content-with-value='
-            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
             '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
-            '&amp;quot;}\"></oppia-noninteractive-math>'
+            '&amp;quot;}"></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -1769,9 +1764,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.content.html = (
             '<oppia-noninteractive-math math_content-with-value='
-            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
             '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
-            'image.png&amp;quot;}\"></oppia-noninteractive-math>'
+            'image.png&amp;quot;}"></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
             self.new_exploration,
@@ -2208,9 +2203,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state.interaction.customization_args[
             'allowNonzeroIntegerPart'
         ].value = False
-        state.interaction.customization_args['allowImproperFraction'].value = (
-            False
-        )
+        state.interaction.customization_args[
+            'allowImproperFraction'
+        ].value = False
         state.interaction.customization_args['requireSimplestForm'].value = True
         rule_specs = state.interaction.answer_groups[0].rule_specs
 
@@ -2249,9 +2244,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        state.interaction.customization_args['allowImproperFraction'].value = (
-            True
-        )
+        state.interaction.customization_args[
+            'allowImproperFraction'
+        ].value = True
         with self.assertRaisesRegex(
             utils.ValidationError,
             'The rule \'1\' of answer group \'0\' has '
@@ -4516,9 +4511,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.default_outcome.labelled_as_correct
         ) = True
 
-        (exploration.init_state.interaction.default_outcome.dest) = (
-            exploration.init_state_name
-        )
+        (
+            exploration.init_state.interaction.default_outcome.dest
+        ) = exploration.init_state_name
 
         with self.assertRaisesRegex(
             Exception,
@@ -4634,8 +4629,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         the old version yaml convert to latest Exploration object.
         It verifies whether the these objects are equal.
         """
-        old_version_yaml_content: str = (
-            """author_notes: ''
+        old_version_yaml_content: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -4751,7 +4745,6 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
         mock_import_module.return_value = 'mocked_memcache_key'
         exploration_id = 'mocked_memcache_key'
         old_version_exploration = create_old_schema_exploration(
@@ -4959,7 +4952,6 @@ title: Title
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -5377,8 +5369,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
     SAMPLE_YAML_CONTENT: str = (
-        (
-            """author_notes: ''
+        """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -5450,18 +5441,15 @@ tags: []
 title: Title
 version: 0
 """
-        )
-        % (
-            feconf.DEFAULT_INIT_STATE_NAME,
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
+    ) % (
+        feconf.DEFAULT_INIT_STATE_NAME,
+        exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+        feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.CURRENT_STATE_SCHEMA_VERSION,
     )
 
-    YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = (
-        """author_notes: ''
+    YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5606,7 +5594,6 @@ states_schema_version: 10000
 tags: []
 title: Title
 """
-    )
 
     EXP_ID: Final = 'An exploration_id'
 
@@ -5726,8 +5713,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V46: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V46: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5869,10 +5855,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V47: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V47: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6014,10 +5998,8 @@ states_schema_version: 42
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V48: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V48: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6159,10 +6141,8 @@ states_schema_version: 43
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V49: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V49: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6306,10 +6286,8 @@ states_schema_version: 44
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V50: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V50: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6456,10 +6434,8 @@ states_schema_version: 45
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V51: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V51: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6606,10 +6582,8 @@ states_schema_version: 46
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V52: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V52: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6756,10 +6730,8 @@ states_schema_version: 47
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V53: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V53: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6906,10 +6878,8 @@ states_schema_version: 48
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V54: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V54: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7045,10 +7015,8 @@ states_schema_version: 49
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V55: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V55: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7183,10 +7151,8 @@ states_schema_version: 50
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V56: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V56: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7328,10 +7294,8 @@ states_schema_version: 51
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V58: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V58: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7475,10 +7439,8 @@ states_schema_version: 53
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V59: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V59: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7622,10 +7584,8 @@ states_schema_version: 55
 tags: []
 title: Title
 """
-    )
 
-    YAML_CONTENT_V61: Final = (
-        """author_notes: ''
+    YAML_CONTENT_V61: Final = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7760,14 +7720,12 @@ states_schema_version: 57
 tags: []
 title: Title
 """
-    )
 
     _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V61
 
     def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
         """Tests the migration of ItemSelectionInput rule inputs."""
-        sample_yaml_content: str = (
-            """author_notes: ''
+        sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -7883,10 +7841,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
 
-        latest_sample_yaml_content: str = (
-            """author_notes: ''
+        latest_sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -7986,7 +7942,6 @@ tags: []
 title: Title
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content
@@ -7997,8 +7952,7 @@ version: 0
         self,
     ) -> None:
         """Tests the migration of DragAndDropSortInput rule inputs."""
-        sample_yaml_content: str = (
-            """author_notes: ''
+        sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8124,10 +8078,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
 
-        latest_sample_yaml_content: str = (
-            """author_notes: ''
+        latest_sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8237,7 +8189,6 @@ tags: []
 title: Title
 version: 0
 """
-        )
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content
         )
@@ -8247,8 +8198,7 @@ version: 0
         self,
     ) -> None:
         """Tests the migration of unicode written translations rule inputs."""
-        sample_yaml_content: str = (
-            """author_notes: ''
+        sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8336,10 +8286,8 @@ states_schema_version: 41
 tags: []
 title: Title
 """
-        )
 
-        latest_sample_yaml_content: str = (
-            """author_notes: ''
+        latest_sample_yaml_content: str = """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8408,7 +8356,6 @@ tags: []
 title: Title
 version: 0
 """
-        )
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content
         )
@@ -8421,8 +8368,7 @@ version: 0
         `labelled_as_correct` should be false. Migrates the invalid data.
         """
 
-        sample_yaml_content_for_lab_as_correct: str = (
-            """author_notes: ''
+        sample_yaml_content_for_lab_as_correct: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -8527,10 +8473,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_lab_as_correct: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_lab_as_correct: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -8613,7 +8557,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_lab_as_correct
@@ -8627,8 +8570,7 @@ version: 0
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        sample_yaml_content_for_rte: str = (
-            """author_notes: ''
+        sample_yaml_content_for_rte: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -8775,13 +8717,11 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
         # pylint: disable=anomalous-backslash-in-string
-        latest_sample_yaml_content_for_rte: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_rte: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -8893,7 +8833,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_rte
         )
@@ -8910,8 +8849,7 @@ version: 0
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        sample_yaml_content_for_cont_and_end_interac_1: str = (
-            """author_notes: ''
+        sample_yaml_content_for_cont_and_end_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9014,12 +8952,10 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        latest_sample_yaml_content_for_cont_and_end_interac_1: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_cont_and_end_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9096,7 +9032,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_cont_and_end_interac_1
@@ -9106,8 +9041,7 @@ version: 0
             latest_sample_yaml_content_for_cont_and_end_interac_1,
         )
 
-        sample_yaml_content_for_cont_and_end_interac_2: str = (
-            """author_notes: ''
+        sample_yaml_content_for_cont_and_end_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9194,10 +9128,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_cont_and_end_interac_2: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_cont_and_end_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9269,7 +9201,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_cont_and_end_interac_2
@@ -9286,8 +9217,7 @@ version: 0
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        sample_yaml_content_for_numeric_interac: str = (
-            """author_notes: ''
+        sample_yaml_content_for_numeric_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9581,12 +9511,10 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        latest_sample_yaml_content_for_numeric_interac: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_numeric_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9729,7 +9657,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_numeric_interac
@@ -9744,8 +9671,7 @@ version: 0
         data from version less than 58.
         """
 
-        sample_yaml_content_for_fraction_interac: str = (
-            """author_notes: ''
+        sample_yaml_content_for_fraction_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -9993,10 +9919,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_fraction_interac: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_fraction_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10147,7 +10071,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_fraction_interac
@@ -10157,8 +10080,7 @@ version: 0
             latest_sample_yaml_content_for_fraction_interac,
         )
 
-        sample_yaml_content_for_fraction_interac_2: str = (
-            """author_notes: ''
+        sample_yaml_content_for_fraction_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10282,10 +10204,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_fraction_interac_2: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_fraction_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10380,7 +10300,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_fraction_interac_2
@@ -10397,8 +10316,7 @@ version: 0
         data from version less than 58.
         """
 
-        sample_yaml_content_for_multiple_choice_interac: str = (
-            """author_notes: ''
+        sample_yaml_content_for_multiple_choice_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10568,10 +10486,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_multiple_choice_interac: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_multiple_choice_interac: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10678,7 +10594,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_multiple_choice_interac
@@ -10697,8 +10612,7 @@ version: 0
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        sample_yaml_content_for_item_selection_interac_1: str = (
-            """author_notes: ''
+        sample_yaml_content_for_item_selection_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10859,12 +10773,10 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
         # pylint: disable=single-line-pragma
         # pylint: disable=line-too-long
-        latest_sample_yaml_content_for_item_selection_interac_1: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_item_selection_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -10996,7 +10908,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_item_selection_interac_1
@@ -11006,8 +10917,7 @@ version: 0
             latest_sample_yaml_content_for_item_selection_interac_1,
         )
 
-        sample_yaml_content_for_item_selection_interac_2: str = (
-            """author_notes: ''
+        sample_yaml_content_for_item_selection_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -11203,10 +11113,8 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
-        latest_sample_yaml_content_for_item_selection_interac_2: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_item_selection_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -11308,7 +11216,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_item_selection_interac_2
@@ -11318,8 +11225,7 @@ version: 0
             latest_sample_yaml_content_for_item_selection_interac_2,
         )
 
-        sample_yaml_content_for_item_selection_interac_3: str = (
-            """author_notes: ''
+        sample_yaml_content_for_item_selection_interac_3: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -11458,10 +11364,8 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
-        latest_sample_yaml_content_for_item_selection_interac_3: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_item_selection_interac_3: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -11558,7 +11462,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_item_selection_interac_3
@@ -11568,8 +11471,7 @@ version: 0
             latest_sample_yaml_content_for_item_selection_interac_3,
         )
 
-        sample_yaml_content_for_item_selection_interac_4: str = (
-            """author_notes: ''
+        sample_yaml_content_for_item_selection_interac_4: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -11680,10 +11582,8 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
-        latest_sample_yaml_content_for_item_selection_interac_4: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_item_selection_interac_4: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -11775,7 +11675,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_item_selection_interac_4
@@ -11792,8 +11691,7 @@ version: 0
         data from version less than 58.
         """
 
-        sample_yaml_content_for_drag_and_drop_interac_1: str = (
-            """author_notes: ''
+        sample_yaml_content_for_drag_and_drop_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -12013,10 +11911,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_drag_and_drop_interac_1: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_drag_and_drop_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -12134,7 +12030,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_drag_and_drop_interac_1
         )
@@ -12143,8 +12038,7 @@ version: 0
             latest_sample_yaml_content_for_drag_and_drop_interac_1,
         )
 
-        sample_yaml_content_for_drag_and_drop_interac_2: str = (
-            """author_notes: ''
+        sample_yaml_content_for_drag_and_drop_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -12288,10 +12182,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_drag_and_drop_interac_2: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_drag_and_drop_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -12406,7 +12298,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_drag_and_drop_interac_2
@@ -12416,8 +12307,7 @@ version: 0
             latest_sample_yaml_content_for_drag_and_drop_interac_2,
         )
 
-        sample_yaml_content_for_drag_and_drop_interac_3: str = (
-            """author_notes: ''
+        sample_yaml_content_for_drag_and_drop_interac_3: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -12567,10 +12457,8 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
-        latest_sample_yaml_content_for_drag_and_drop_interac_3: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_drag_and_drop_interac_3: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -12673,7 +12561,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_drag_and_drop_interac_3
@@ -12687,8 +12574,7 @@ version: 0
         """Tests the migration of invalid TextInput interaction exploration
         data from version less than 58.
         """
-        sample_yaml_content_for_text_interac_1: str = (
-            """author_notes: ''
+        sample_yaml_content_for_text_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -12960,10 +12846,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_text_interac_1: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_text_interac_1: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -13138,7 +13022,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_text_interac_1
@@ -13147,8 +13030,7 @@ version: 0
             exploration.to_yaml(), latest_sample_yaml_content_for_text_interac_1
         )
 
-        sample_yaml_content_for_text_interac_2: str = (
-            """author_notes: ''
+        sample_yaml_content_for_text_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -13257,10 +13139,8 @@ states_schema_version: 52
 tags: []
 title: ''
 """
-        )
 
-        latest_sample_yaml_content_for_text_interac_2: str = (
-            """author_notes: ''
+        latest_sample_yaml_content_for_text_interac_2: str = """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
@@ -13353,7 +13233,6 @@ tags: []
 title: ''
 version: 0
 """
-        )
 
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_text_interac_2
@@ -13479,7 +13358,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 
     def test_all_html_strings_are_collected(self) -> None:
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category'
         )
@@ -19830,7 +19708,6 @@ class ExplorationChangesMergeabilityUnitTests(
 
 
 class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
-
     def _require_metadata_properties_to_be_synced(self) -> None:
         """Raises error if there is a new metadata property in the Exploration
         object and it is not added in the ExplorationMetadata domain object.
@@ -19966,8 +19843,9 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
             'constants.NON_METADATA_PROPERTIES if you don\'t want '
             'to use this as a metadata property.'
         )
-        with swapped_metadata_properties, self.assertRaisesRegex(
-            Exception, error_message
+        with (
+            swapped_metadata_properties,
+            self.assertRaisesRegex(Exception, error_message),
         ):
             self._require_metadata_properties_to_be_synced()
 
@@ -19998,14 +19876,14 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
             'new property in the ExplorationMetadata domain object '
             'also.' % ('new_property')
         )
-        with swapped_metadata_properties, self.assertRaisesRegex(
-            Exception, error_message
+        with (
+            swapped_metadata_properties,
+            self.assertRaisesRegex(Exception, error_message),
         ):
             self._require_metadata_properties_to_be_synced()
 
 
 class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
-
     def test_metadata_version_history_gets_created(self) -> None:
         expected_dict = {
             'last_edited_version_number': 1,
@@ -20035,7 +19913,6 @@ class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
 
 class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
-
     def test_exploration_version_history_gets_created(self) -> None:
         state_version_history_dict = {
             'state 1': state_domain.StateVersionHistory(
@@ -20139,7 +20016,9 @@ class OldVersionExploration(translation_domain.BaseTranslatableObject):
         # dictionary representation of domain object (OldVersionExploration)
         # that assign with SerializableExplorationDict to put in cache for
         # testing purpose.
-        exploration_dict: exp_domain.SerializableExplorationDict = self.to_dict()  # type: ignore[assignment]
+        exploration_dict: exp_domain.SerializableExplorationDict = (
+            self.to_dict()
+        )  # type: ignore[assignment]
         exploration_dict['version'] = self.version
         return json.dumps(exploration_dict)
 

@@ -36,7 +36,6 @@ if MYPY:  # pragma: no cover
 
 
 class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             subtopic_models.SubtopicPageSnapshotContentModel.get_deletion_policy(),

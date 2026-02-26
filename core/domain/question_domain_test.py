@@ -392,7 +392,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Checks the tagged skill misconception id's format."""
         state = self.question.question_state_data
         state.update_interaction_answer_groups([self.state_answer_group])
-        state.interaction.answer_groups[0].tagged_skill_misconception_id = (
+        state.interaction.answer_groups[
+            0
+        ].tagged_skill_misconception_id = (
             'invalid_tagged_skill_misconception_id'
         )
         with self.assertRaisesRegex(
@@ -406,9 +408,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because we want to add a test which would
         # check the tagged_skill_misconception_id's format as well as the
         # regex.
-        state.interaction.answer_groups[
-            0
-        ].tagged_skill_misconception_id = 1  # type: ignore[assignment]
+        state.interaction.answer_groups[0].tagged_skill_misconception_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected tagged skill misconception id to be a str, received 1',
@@ -852,11 +852,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers'], test_data  # type: ignore[typeddict-item]
+            test_value['state']['recorded_voiceovers'],
+            test_data,  # type: ignore[typeddict-item]
         )
 
     def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
-
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
         # Removing 'solicit_answer_details' from question_data.
@@ -936,9 +936,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'duration_secs',
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'][  # type: ignore[typeddict-item]
                 'content'
-            ][
-                'audio_metadata'
-            ],
+            ]['audio_metadata'],
         )
 
         question_domain.Question.update_state_from_model(
@@ -952,25 +950,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'duration_secs',
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'][  # type: ignore[typeddict-item]
                 'content'
-            ][
-                'audio_metadata'
-            ],
+            ]['audio_metadata'],
         )
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'][  # type: ignore[typeddict-item]
                 'content'
-            ][
-                'audio_metadata'
-            ][
-                'duration_secs'
-            ],
+            ]['audio_metadata']['duration_secs'],
             0.0,
         )
 
     def test_question_state_dict_conversion_from_v31_to_v32(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'SetInput'
 
         test_value: question_domain.VersionedQuestionStateDict = {
@@ -993,7 +984,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v32_to_v33(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'MultipleChoiceInput'
 
         test_value: question_domain.VersionedQuestionStateDict = {
@@ -1016,7 +1006,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v33_to_v34(self) -> None:
-
         # Ruling out the possibility of None for mypy type checking.
         assert (
             self.question_state_dict['interaction']['default_outcome']
@@ -1056,7 +1045,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v34_to_v35(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'MathExpressionInput'
         self.question_state_dict['interaction']['solution'] = {
             'answer_is_exclusive': False,
@@ -1554,7 +1542,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v36_to_v37(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'TextInput'
         self.question_state_dict['interaction']['answer_groups'] = [
             {
@@ -1596,7 +1583,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v37_to_v38(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'MathEquationInput'
         self.question_state_dict['interaction']['answer_groups'] = [
             {
@@ -1641,7 +1627,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v38_to_v39(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
         self.question_state_dict['interaction']['customization_args'] = {}
         # Here we use MyPy ignore because the latest schema of state
@@ -1692,7 +1677,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v39_to_v40(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'TextInput'
         self.question_state_dict['interaction']['answer_groups'] = [
             {
@@ -1977,9 +1961,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         # Testing with interaction id 'DragAndDropSortInput'.
         test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
-        test_value['state']['interaction'][
-            'solution'
-        ] = drag_and_drop_test_solution_dict
+        test_value['state']['interaction']['solution'] = (
+            drag_and_drop_test_solution_dict
+        )
         ca_choices_dicts = [
             {'html': 'correct_value', 'content_id': 'content_id_1'},
             {'html': 'value_2', 'content_id': 'content_id_2'},
@@ -2070,7 +2054,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v42_to_v43(self) -> None:
-
         self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
 
         test_value: question_domain.VersionedQuestionStateDict = {
@@ -2143,7 +2126,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state'], initial_json)
 
     def test_question_state_dict_conversion_from_v46_to_v47(self) -> None:
-
         self.question_state_dict['content']['html'] = (
             '<oppia-noninteractive-svgdiagram '
             'svg_filename-with-value="filename.svg">'
@@ -2169,7 +2151,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v47_to_v48(self) -> None:
-
         self.question_state_dict['content']['html'] = '&nbsp;'
 
         test_value: question_domain.VersionedQuestionStateDict = {
@@ -2207,9 +2188,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
-        self.question_state_dict['interaction'][
-            'id'
-        ] = 'AlgebraicExpressionInput'
+        self.question_state_dict['interaction']['id'] = (
+            'AlgebraicExpressionInput'
+        )
         self.question_state_dict['interaction']['customization_args'] = {
             'customOskLetters': {'value': ['a', 'b', 'c']}
         }
@@ -2478,8 +2459,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.observed_object.misconception_ids = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected misconception ids to be a list of strings, '
-            'received 123',
+            'Expected misconception ids to be a list of strings, received 123',
         ):
             self.observed_object.validate()
 

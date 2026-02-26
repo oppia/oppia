@@ -1875,9 +1875,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 )
 
             with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
-                results = (
-                    suggestion_models.GeneralSuggestionModel.get_new_suggestions_waiting_for_review()
-                )
+                results = suggestion_models.GeneralSuggestionModel.get_new_suggestions_waiting_for_review()
 
         self.assertEqual(len(results), max_suggestions)
 
@@ -1912,9 +1910,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                suggestions_waiting_too_long_for_review = (
-                    suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-                )
+                suggestions_waiting_too_long_for_review = suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
@@ -1941,9 +1937,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             1,
         ):
-            suggestions_waiting_too_long_for_review = (
-                suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-            )
+            suggestions_waiting_too_long_for_review = suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
@@ -1977,9 +1971,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
             ):
-                suggestions_waiting_too_long_for_review = (
-                    suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-                )
+                suggestions_waiting_too_long_for_review = suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
@@ -2014,9 +2006,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
             ):
-                suggestions_waiting_too_long_for_review = (
-                    suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-                )
+                suggestions_waiting_too_long_for_review = suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 0)
 
@@ -2042,9 +2032,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             0,
         ):
-            suggestions_waiting_too_long_for_review = (
-                suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-            )
+            suggestions_waiting_too_long_for_review = suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 1)
 
@@ -2094,9 +2082,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
             ):
-                suggestions_waiting_too_long_for_review = (
-                    suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-                )
+                suggestions_waiting_too_long_for_review = suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
 
         # The question suggestion was created 2 days after the translation
         # suggestion, so it has only waited 1 day for a review, which is less
@@ -2156,9 +2142,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             0,
         ):
-            suggestions_waiting_too_long_for_review = (
-                suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-            )
+            suggestions_waiting_too_long_for_review = suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(len(suggestions_waiting_too_long_for_review), 3)
         # Assert that the order of the returned suggestion models represents
@@ -2379,9 +2363,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.question_language_code,
         )
 
-        question_suggestion_models = (
-            suggestion_models.GeneralSuggestionModel.get_question_suggestions_waiting_longest_for_review()
-        )
+        question_suggestion_models = suggestion_models.GeneralSuggestionModel.get_question_suggestions_waiting_longest_for_review()
 
         self.assertEqual(len(question_suggestion_models), 3)
         # Assert that the order of the returned suggestion models represents
@@ -2568,9 +2550,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS',
             1,
         ):
-            question_suggestion_models = (
-                suggestion_models.GeneralSuggestionModel.get_question_suggestions_waiting_longest_for_review()
-            )
+            question_suggestion_models = suggestion_models.GeneralSuggestionModel.get_question_suggestions_waiting_longest_for_review()
 
         # There should only be one question suggestion returned since we
         # changed the maximum questions to fetch to 1.

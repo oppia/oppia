@@ -81,9 +81,9 @@ class PytestConfigureHookTests(unittest.TestCase):
 
             # Verify no duplicates were added.
             for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-                assert (
-                    sys.path.count(directory) == path_counts[directory]
-                ), f'Directory {directory} was duplicated in sys.path'
+                assert sys.path.count(directory) == path_counts[directory], (
+                    f'Directory {directory} was duplicated in sys.path'
+                )
         finally:
             # Restore original sys.path.
             sys.path[:] = original_sys_path
@@ -100,9 +100,9 @@ class PytestConfigureHookTests(unittest.TestCase):
         # Verify all existing directories are in sys.path.
         for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
             assert os.path.exists(directory)
-            assert (
-                directory in sys.path
-            ), f'Required directory {directory} not found in sys.path'
+            assert directory in sys.path, (
+                f'Required directory {directory} not found in sys.path'
+            )
 
 
 class EnvironmentSetupTests(unittest.TestCase):
@@ -121,9 +121,9 @@ class EnvironmentSetupTests(unittest.TestCase):
 
         for var, expected_value in expected_vars.items():
             assert var in os.environ, f'Environment variable {var} not set'
-            assert (
-                os.environ[var] == expected_value
-            ), f'Environment variable {var} has wrong value'
+            assert os.environ[var] == expected_value, (
+                f'Environment variable {var} has wrong value'
+            )
 
     def test_curr_dir_added_to_sys_path(self) -> None:
         """Test that CURR_DIR is added to sys.path at module load time."""

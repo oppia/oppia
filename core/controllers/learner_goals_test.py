@@ -28,7 +28,6 @@ from core.tests import test_utils
 
 
 class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
-
     TOPIC_ID_1 = 'Topic_id_1'
     TOPIC_NAME_1 = 'Topic name 1'
     TOPIC_ID_2 = 'Topic_id_2'

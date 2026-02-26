@@ -129,7 +129,9 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
             )
             yield (story_id, story_change)
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -216,8 +218,7 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
                 'story_change': story_changes,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         transformed_story_objects_list = (

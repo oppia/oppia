@@ -72,7 +72,6 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test_create_new_model_successfully(self) -> None:
-
         model = cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
             cloud_task_run_model_id=(
                 cloud_task_models.CloudTaskRunModel.get_new_id()

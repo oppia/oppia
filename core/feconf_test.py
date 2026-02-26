@@ -37,8 +37,11 @@ class FeconfTests(test_utils.GenericTestBase):
             return 'Development'
 
         swap_getenv = self.swap(os, 'getenv', mock_getenv)
-        with swap_getenv, self.assertRaisesRegex(
-            Exception, 'DEV_MODE can\'t be true on production.'
+        with (
+            swap_getenv,
+            self.assertRaisesRegex(
+                Exception, 'DEV_MODE can\'t be true on production.'
+            ),
         ):
             feconf.check_dev_mode_is_true()
 

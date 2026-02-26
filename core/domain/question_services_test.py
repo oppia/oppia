@@ -774,7 +774,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             Exception, 'Expected a commit message, received none.'
         ):
             question_services.update_question(
-                self.editor_id, self.question_id, change_list, None  # type: ignore[arg-type]
+                self.editor_id,
+                self.question_id,
+                change_list,
+                None,  # type: ignore[arg-type]
             )
 
     def test_cannot_update_question_with_no_change_list(self) -> None:
@@ -1011,7 +1014,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_raises_error_when_the_question_provided_with_no_created_on_data(
         self,
     ) -> None:
-
         question = question_services.get_question_by_id(self.question_id)
         question.created_on = None
 
@@ -1600,8 +1602,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because we need to test
         # populate_question_summary_model_fields when the there is no
         # input QuestionSummaryModel.
-        populated_model = question_services.populate_question_summary_model_fields(
-            None, question_summary  # type: ignore[arg-type]
+        populated_model = (
+            question_services.populate_question_summary_model_fields(
+                None,
+                question_summary,  # type: ignore[arg-type]
+            )
         )
         self.assertEqual(
             populated_model.question_model_last_updated,
@@ -1625,7 +1630,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
-
     def test_migrate_question_state_from_v29_to_latest(self) -> None:
         answer_group = {
             'outcome': {

@@ -129,7 +129,6 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         testcase = self
 
         class MockWrapper(test_utils.FunctionWrapper):
-
             def pre_call_hook(self, args: OrderedDict[str, str]) -> None:
                 """Mock pre call hook.
 
@@ -447,7 +446,6 @@ class CallCounterTests(test_utils.GenericTestBase):
 
 
 class FailingFunctionTests(test_utils.GenericTestBase):
-
     def test_failing_function_never_succeeds_when_n_is_infinity(self) -> None:
         class MockError(Exception):
             pass
@@ -479,7 +477,6 @@ class FailingFunctionTests(test_utils.GenericTestBase):
 
 
 class TestUtilsTests(test_utils.GenericTestBase):
-
     def test_get_static_asset_url(self) -> None:
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
         self.assertEqual(asset_url, '/assets/images/subjects/Lightbulb.svg')
@@ -535,7 +532,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_cannot_get_response_with_non_dict_params(self) -> None:
         with self.assertRaisesRegex(Exception, 'Expected params to be a dict'):
             self.get_response_without_checking_for_errors(
-                'random_url', [200], params='invalid_params'  # type: ignore[arg-type]
+                'random_url',
+                [200],
+                params='invalid_params',  # type: ignore[arg-type]
             )
 
     def test_capture_logging(self) -> None:
@@ -714,7 +713,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
     def test_swap_with_check_on_expected_kwargs(self) -> None:
         def mock_getenv(
-            key: str, default: str  # pylint: disable=unused-argument
+            key: str,
+            default: str,  # pylint: disable=unused-argument
         ) -> None:
             return
 
@@ -733,7 +733,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         def mock_getenv(
-            key: str, default: str  # pylint: disable=unused-argument
+            key: str,
+            default: str,  # pylint: disable=unused-argument
         ) -> None:
             return
 
@@ -875,7 +876,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
-
     def test_png_image_yields_true(self) -> None:
         self.assertTrue(test_utils.check_image_png_or_webp('data:image/png'))
 
@@ -887,7 +887,6 @@ class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
 
 class ElasticSearchStubTests(test_utils.GenericTestBase):
-
     def test_duplicate_index_yields_error(self) -> None:
         stub = test_utils.ElasticSearchStub()
         stub.mock_create_index('index1')

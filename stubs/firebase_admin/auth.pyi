@@ -1,7 +1,16 @@
 from core.domain import auth_domain
 
 import datetime
-from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Union,
+)
 
 from . import App
 
@@ -56,7 +65,7 @@ class ListUsersPage:
         self,
         download: Callable[[Optional[str], int], Dict[str, Any]],
         page_token: Optional[str],
-        max_results: int
+        max_results: int,
     ) -> None: ...
     @property
     def users(self) -> List[ExportedUserRecord]: ...

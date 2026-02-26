@@ -274,7 +274,8 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
             'At \'http://localhost/skill_mastery_handler/data\' '
             'these errors are happening:\n'
             'Schema validation for \'mastery_change_per_skill\' failed: '
-            + 'Expected dict, received %s' % (mastery_change_per_skill),
+            + 'Expected dict, received %s'
+            % (mastery_change_per_skill),
         )
 
         self.logout()

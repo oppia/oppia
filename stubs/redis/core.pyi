@@ -44,7 +44,7 @@ class ScanCommands(Generic[_StrType]):
         match: Optional[_Key] = ...,
         count: Optional[int] = ...,
         _type: Optional[str] = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Iterator[_StrType]: ...
 
 class DataAccessCommands(

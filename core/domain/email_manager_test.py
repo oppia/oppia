@@ -1825,7 +1825,6 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
 
 class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -6401,10 +6400,12 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
-        translation_suggestion = self._create_translation_suggestion_in_lang_with_html_and_datetime(  # pylint: disable=line-too-long
-            'en',
-            '<p>What is the meaning of life?</p>',
-            self.mocked_review_submission_datetime,
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(  # pylint: disable=line-too-long
+                'en',
+                '<p>What is the meaning of life?</p>',
+                self.mocked_review_submission_datetime,
+            )
         )
         self.reviewable_suggestion_email_info = suggestion_services.create_reviewable_suggestion_email_info_from_suggestion(
             translation_suggestion
@@ -8082,7 +8083,6 @@ class BulkEmailsTests(test_utils.EmailTestBase):
 
 
 class EmailPreferencesTests(test_utils.EmailTestBase):
-
     def test_can_users_receive_thread_email(self) -> None:
         gae_ids = ('someUser1', 'someUser2')
         exp_id = 'someExploration'

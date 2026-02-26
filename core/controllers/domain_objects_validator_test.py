@@ -160,8 +160,7 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
         }
         with self.assertRaisesRegex(
             Exception,
-            'Platform parameter name should be a string, received'
-            ': %s' % 1234,
+            'Platform parameter name should be a string, received: %s' % 1234,
         ):
             (
                 # TODO(#13059): Here we use MyPy ignore because after we fully
@@ -290,8 +289,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             Exception,
-            'Expected each tag in \'tags\' to be a string,'
-            ' received: \'123\'',
+            'Expected each tag in \'tags\' to be a string, received: \'123\'',
         ):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change

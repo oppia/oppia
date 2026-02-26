@@ -2996,12 +2996,14 @@ def send_email_to_removed_cd_user(
 
     category_data = REMOVED_CD_USER_EMAIL_DATA[category]
     if category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION:
-        email_subject = 'You have been unassigned as a %s submitter' % (
-            category_data['category']
+        email_subject = (
+            'You have been unassigned as a %s submitter'
+            % (category_data['category'])
         )
     else:
-        email_subject = 'You have been unassigned as a %s reviewer' % (
-            category_data['category']
+        email_subject = (
+            'You have been unassigned as a %s reviewer'
+            % (category_data['category'])
         )
 
     if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:

@@ -20,5 +20,5 @@ class IndicesClient(NamespacedClient):
         ignore: Optional[Union[int, Collection[int]]] = ...,
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
-        headers: Optional[MutableMapping[str, str]] = ...
+        headers: Optional[MutableMapping[str, str]] = ...,
     ) -> Any: ...

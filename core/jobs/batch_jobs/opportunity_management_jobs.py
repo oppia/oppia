@@ -216,8 +216,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | 'Merge by skill ID' >> beam.CoGroupByKey()
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
-            | 'Remove skill IDs'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove skill IDs' >> beam.Values()  # pylint: disable=no-value-for-parameter
             # We are using itertools.chain.from_iterable to flatten
             # question_skill_links from a 2D list into a 1D list.
             | 'Flatten skill and question_skill_links'
@@ -449,8 +448,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             )
             | 'Allow only one item per key'
             >> (beam.combiners.Sample.FixedSizePerKey(1))
-            | 'Remove the IDs'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Remove the IDs' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Flatten the list of lists of models' >> beam.FlatMap(lambda x: x)
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )

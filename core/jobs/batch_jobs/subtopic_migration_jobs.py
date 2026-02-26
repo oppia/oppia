@@ -121,7 +121,9 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
             )
             yield (study_guide_id, study_guide_change)
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -189,8 +191,7 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
                 'study_guide_changes': study_guide_changes,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         transformed_study_guide_objects_list = (

@@ -34,7 +34,6 @@ from core.tests import test_utils
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -134,7 +133,6 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 class TopicPageDataHandlerTests(
     BaseTopicViewerControllerTests, test_utils.EmailTestBase
 ):
-
     def test_get_with_no_user_logged_in(self) -> None:
         self.math_classroom.topic_id_to_prerequisite_topic_ids = {
             self.topic_id: []

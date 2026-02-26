@@ -27,7 +27,6 @@ from typing import Any, Mapping, cast
 
 # TODO(#14219): Update these tests to fully cover file change_domain.py.
 class ChangeDomainTests(test_utils.GenericTestBase):
-
     def test_that_domain_object_is_created_correctly(self) -> None:
         change_object = change_domain.BaseChange(
             {'cmd': feconf.CMD_DELETE_COMMIT}

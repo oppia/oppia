@@ -105,7 +105,6 @@ class FeaturedActivitiesHandler(
                 )
                 self.render_json({})
             else:
-
                 # Create empty error message that can be added to
                 # with following, more specific error messages.
                 error_message = ''
@@ -116,7 +115,7 @@ class FeaturedActivitiesHandler(
                 # with the beginning component of the message.
                 if non_existent_exploration_ids:
                     ids = ', '.join(map(str, non_existent_exploration_ids))
-                    error = f'These Exploration IDs do not exist: ' f'{ids}. '
+                    error = f'These Exploration IDs do not exist: {ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error
@@ -127,7 +126,7 @@ class FeaturedActivitiesHandler(
                 # list with the beginning component of the message.
                 if non_existent_collection_ids:
                     ids = ', '.join(map(str, non_existent_collection_ids))
-                    error = f'These Collection IDs do not exist: ' f'{ids}. '
+                    error = f'These Collection IDs do not exist: {ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error
@@ -138,7 +137,7 @@ class FeaturedActivitiesHandler(
                 # the beginning component of the message.
                 if private_exploration_ids:
                     ids = ', '.join(map(str, private_exploration_ids))
-                    error = f'These Exploration IDs are private: ' f'{ids}. '
+                    error = f'These Exploration IDs are private: {ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error
@@ -149,7 +148,7 @@ class FeaturedActivitiesHandler(
                 # the beginning component of the message.
                 if private_collection_ids:
                     ids = ', '.join(map(str, private_collection_ids))
-                    error = f'These Collection IDs are private: ' f'{ids}. '
+                    error = f'These Collection IDs are private: {ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error

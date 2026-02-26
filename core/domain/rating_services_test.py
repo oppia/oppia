@@ -221,7 +221,9 @@ class RatingServicesTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
-                self.USER_ID_1, self.EXP_ID, '2'  # type: ignore[arg-type]
+                self.USER_ID_1,
+                self.EXP_ID,
+                '2',  # type: ignore[arg-type]
             )
 
         with self.assertRaisesRegex(
@@ -231,7 +233,9 @@ class RatingServicesTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             rating_services.assign_rating_to_exploration(
-                self.USER_ID_1, self.EXP_ID, 'aaa'  # type: ignore[arg-type]
+                self.USER_ID_1,
+                self.EXP_ID,
+                'aaa',  # type: ignore[arg-type]
             )
 
     def test_invalid_exploration_ids_are_forbidden(self) -> None:

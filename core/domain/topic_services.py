@@ -734,9 +734,9 @@ def apply_change_list(
                     new_sections_dict_list: List[
                         study_guide_domain.StudyGuideSectionDict
                     ] = update_study_guide_sections_cmd.new_value
-                    new_sections: List[study_guide_domain.StudyGuideSection] = (
-                        []
-                    )
+                    new_sections: List[
+                        study_guide_domain.StudyGuideSection
+                    ] = []
 
                     # For updating the page_contents of the subtopic page corresponding to the study guide.
                     concatenated_html_parts: List[str] = []
@@ -783,9 +783,7 @@ def apply_change_list(
                         modified_subtopic_pages[subtopic_page_id] = (
                             temporary_subtopic_page
                         )
-                        old_value = (
-                            temporary_subtopic_page.page_contents.subtitled_html.html
-                        )
+                        old_value = temporary_subtopic_page.page_contents.subtitled_html.html
                         update_subtopic_page_property_cmd = (
                             subtopic_page_domain.SubtopicPageChange
                         )(

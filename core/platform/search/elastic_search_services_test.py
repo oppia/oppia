@@ -37,7 +37,6 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             document: Mapping[str, str],
             id: str,  # pylint: disable=redefined-builtin
         ) -> Dict[str, Dict[str, int]]:
-
             self.assertEqual(index, correct_index_name)
             self.assertEqual(document, {'id': correct_id})
             self.assertEqual(id, correct_id)

@@ -138,7 +138,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_run = self.swap(subprocess, 'run', mock_run)
 
         class MockErrorProcess:
-
             def __init__(self) -> None:
                 self.returncode = 1
 
@@ -556,7 +555,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_main_without_library_mismatches_calls_correct_functions(
         self,
     ) -> None:
-
         def mock_get_mismatches() -> (
             install_python_prod_dependencies.MismatchType
         ):

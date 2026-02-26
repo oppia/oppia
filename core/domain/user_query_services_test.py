@@ -33,7 +33,6 @@ if MYPY:  # pragma: no cover
 
 
 class UserQueryServicesTests(test_utils.GenericTestBase):
-
     USER_QUERY_1_ID = 'user_query_1_id'
     USER_QUERY_2_ID = 'user_query_2_id'
 

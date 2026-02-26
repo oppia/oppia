@@ -188,9 +188,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'Task output.',
                 )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap_with_checks(
@@ -222,9 +220,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'ABC error.',
                 )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap_with_checks(
@@ -259,9 +255,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'Task output.',
                 )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
@@ -301,9 +295,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     b'ABC error.',
                 )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
@@ -401,9 +393,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ) -> tuple[bytes, bytes]:
                 return (b'Task output', b'No error.')
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap_with_checks(
@@ -445,9 +435,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ) -> tuple[bytes, bytes]:
                 return (b'Task failed.', b'ABC error.')
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap_with_checks(
@@ -478,9 +466,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ) -> tuple[bytes, bytes]:
                 return (b'Task output', b'No error.')
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
@@ -536,9 +522,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=[('performance',)],
         )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
@@ -592,9 +576,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=[('performance',)],
         )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
@@ -665,9 +647,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=[('performance',)],
         )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
@@ -746,9 +726,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=[('performance',)],
         )
 
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)

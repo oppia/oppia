@@ -39,7 +39,6 @@ class ExpectedThreadDict(TypedDict):
 
 
 class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
-
     EXP_ID_1: Final = 'eid1'
 
     EXPECTED_THREAD_DICT: ExpectedThreadDict = {

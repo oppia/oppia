@@ -27,7 +27,6 @@ import apache_beam as beam
 
 
 class PutResultsTests(job_test_utils.PipelinedTestBase):
-
     JOB_ID = '123'
 
     def test_single_output(self) -> None:

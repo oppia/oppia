@@ -85,7 +85,6 @@ class OldCreatorDashboardRedirectPageTest(test_utils.GenericTestBase):
 
 
 class HomePageTests(test_utils.GenericTestBase):
-
     def test_logged_out_homepage(self) -> None:
         """Test the logged-out version of the home page."""
         response = self.get_html_response('/')
@@ -94,7 +93,6 @@ class HomePageTests(test_utils.GenericTestBase):
 
 
 class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
-
     COLLABORATOR_EMAIL: Final = 'collaborator@example.com'
     COLLABORATOR_USERNAME: Final = 'collaborator'
 
@@ -296,7 +294,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             'get_thread_analytics_multi',
             mock_get_thread_analytics_multi,
         ):
-
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
 

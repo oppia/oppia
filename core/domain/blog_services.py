@@ -329,8 +329,7 @@ def get_blog_post_summary_by_title(
     """
     blog_post_summary_model: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
-            blog_models.BlogPostSummaryModel.title
-            == title  # pylint: disable=singleton-comparison
+            blog_models.BlogPostSummaryModel.title == title  # pylint: disable=singleton-comparison
         ).fetch()
     )
 

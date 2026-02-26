@@ -183,10 +183,13 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            Exception,
-            'ERROR: The target branch name already exists locally. '
-            'Run "git branch -D new-branch" to delete it.',
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR: The target branch name already exists locally. '
+                'Run "git branch -D new-branch" to delete it.',
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_branch_does_not_already_exist(
@@ -208,9 +211,12 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            Exception,
-            'ERROR: The target branch name already exists on the remote repo.',
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR: The target branch name already exists on the remote repo.',
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_branch_does_not_already_exist(
@@ -241,8 +247,12 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because here 'getcode' is a method and
         # assignment to a method is not allowed by MyPy.
         self.mock_response.getcode = mock_getcode  # type: ignore[assignment]
-        with self.url_open_swap, self.assertRaisesRegex(
-            Exception, 'ERROR: Failed to fetch latest release info from GitHub.'
+        with (
+            self.url_open_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR: Failed to fetch latest release info from GitHub.',
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_version_compatible_with_latest_release(
@@ -255,9 +265,13 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'invalid-tag', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegex(
-            Exception,
-            'ERROR: Could not parse version number of latest GitHub release.',
+        with (
+            self.url_open_swap,
+            load_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR: Could not parse version number of latest GitHub release.',
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_version_compatible_with_latest_release(
@@ -270,8 +284,12 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v2.1.1', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegex(
-            AssertionError, 'Unexpected major version change.'
+        with (
+            self.url_open_swap,
+            load_swap,
+            self.assertRaisesRegex(
+                AssertionError, 'Unexpected major version change.'
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_version_compatible_with_latest_release(
@@ -284,8 +302,12 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v2.1.1', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegex(
-            Exception, 'ERROR: Could not parse target version.'
+        with (
+            self.url_open_swap,
+            load_swap,
+            self.assertRaisesRegex(
+                Exception, 'ERROR: Could not parse target version.'
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_version_compatible_with_latest_release(
@@ -298,10 +320,14 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.2.1', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegex(
-            AssertionError,
-            'The current patch version is not equal to previous '
-            'patch version plus one.',
+        with (
+            self.url_open_swap,
+            load_swap,
+            self.assertRaisesRegex(
+                AssertionError,
+                'The current patch version is not equal to previous '
+                'patch version plus one.',
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_version_compatible_with_latest_release(
@@ -314,10 +340,14 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.0.9', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegex(
-            AssertionError,
-            'The current minor version is not equal to previous minor '
-            'version plus one.',
+        with (
+            self.url_open_swap,
+            load_swap,
+            self.assertRaisesRegex(
+                AssertionError,
+                'The current minor version is not equal to previous minor '
+                'version plus one.',
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_version_compatible_with_latest_release(
@@ -332,8 +362,12 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             return {'tag_name': 'v1.1.9', 'test': 'release-test'}
 
         load_swap = self.swap(json, 'load', mock_load)
-        with self.url_open_swap, load_swap, self.assertRaisesRegex(
-            AssertionError, 'The current patch version is different than 0.'
+        with (
+            self.url_open_swap,
+            load_swap,
+            self.assertRaisesRegex(
+                AssertionError, 'The current patch version is different than 0.'
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_target_version_compatible_with_latest_release(
@@ -369,9 +403,12 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            AssertionError,
-            'The difference between two continuous hotfix numbers is not one.',
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                AssertionError,
+                'The difference between two continuous hotfix numbers is not one.',
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
@@ -394,8 +431,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output
         )
-        with check_output_swap, self.assertRaisesRegex(
-            AssertionError, 'Release branch is missing.'
+        with (
+            check_output_swap,
+            self.assertRaisesRegex(
+                AssertionError, 'Release branch is missing.'
+            ),
         ):
             (
                 cut_release_or_hotfix_branch.verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
@@ -443,8 +483,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
     def test_missing_release_version(self) -> None:
         args_swap = self.swap(sys, 'argv', ['cut_release_or_hotfix_branch.py'])
-        with args_swap, self.assertRaisesRegex(
-            Exception, 'ERROR: A "release_version" arg must be specified.'
+        with (
+            args_swap,
+            self.assertRaisesRegex(
+                Exception, 'ERROR: A "release_version" arg must be specified.'
+            ),
         ):
             cut_release_or_hotfix_branch.main()
 
@@ -496,10 +539,13 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             with self.verify_target_branch_swap:
                 with self.verify_target_version_swap, self.open_tab_swap:
                     with self.get_remote_alias_swap, self.check_call_swap:
-                        with input_swap, self.assertRaisesRegex(
-                            Exception,
-                            'Tests should pass on develop before this '
-                            'script is run.',
+                        with (
+                            input_swap,
+                            self.assertRaisesRegex(
+                                Exception,
+                                'Tests should pass on develop before this '
+                                'script is run.',
+                            ),
                         ):
                             cut_release_or_hotfix_branch.execute_branch_cut(
                                 '1.2.3', 0

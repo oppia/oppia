@@ -31,7 +31,6 @@ from core.tests import test_utils
 
 
 class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -78,7 +77,6 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 
 
 class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
-
     def test_get_questions_succeeds(self) -> None:
         for _ in range(4):
             question_id = question_services.get_new_question_id()
@@ -199,7 +197,6 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
 
 class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
-
     def test_get_question_count_succeeds(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()

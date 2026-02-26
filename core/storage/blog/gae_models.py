@@ -378,8 +378,7 @@ class BlogPostRightsModel(base_models.BaseModel):
                 # NOTE: Even though `editor_ids` is repeated, we can compare it to a
                 # single value and it will return models where any of the editor IDs
                 # are equal to user_id.
-                cls.editor_ids
-                == user_id
+                cls.editor_ids == user_id
             ).get(keys_only=True)
             is not None
         )
@@ -464,9 +463,7 @@ class BlogPostRightsModel(base_models.BaseModel):
         """Model is exported as one instance shared across users since multiple
         users can edit the blog post.
         """
-        return (
-            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
-        )
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:

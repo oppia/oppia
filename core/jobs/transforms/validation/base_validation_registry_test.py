@@ -24,7 +24,6 @@ from core.tests import test_utils
 
 
 class GetAuditsByKindTests(test_utils.TestBase):
-
     unique_obj = object()
 
     # Here we use object because we need to mock the behavior of
@@ -49,7 +48,6 @@ class GetAuditsByKindTests(test_utils.TestBase):
 
 
 class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
-
     unique_obj = object()
 
     # Here we use object because we need to mock the behavior of
@@ -75,7 +73,6 @@ class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
 
 
 class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
-
     unique_obj = object()
 
     # Here we use object because we need to mock the behavior of

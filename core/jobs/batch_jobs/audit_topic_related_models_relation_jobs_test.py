@@ -39,7 +39,6 @@ if MYPY:  # pragma: no cover
 class ValidateTopicModelsJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS: Type[
         (audit_topic_related_models_relation_jobs.ValidateTopicModelsJob)
     ] = audit_topic_related_models_relation_jobs.ValidateTopicModelsJob

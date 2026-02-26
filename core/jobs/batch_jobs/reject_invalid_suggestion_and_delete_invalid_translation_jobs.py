@@ -277,8 +277,7 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             | 'Filter model with latest entity version'
             >> beam.ParDo(GetLatestModel())
             # PCollection<entity_translation_model>.
-            | 'Get list of latest entity translation model'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get list of latest entity translation model' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         updated_exp_opportunity_models = (

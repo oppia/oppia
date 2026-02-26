@@ -919,7 +919,6 @@ class FirebaseAdminSdkStub:
 
 
 class EstablishFirebaseConnectionTests(test_utils.TestBase):
-
     APP = object()
 
     def test_initializes_when_connection_does_not_exist(self) -> None:
@@ -1065,7 +1064,6 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
 
 class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
-
     def test_updates_user_successfully(self) -> None:
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id='aid').put()
         self.firebase_sdk_stub.create_user('aid')
@@ -1135,7 +1133,6 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
 
 class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.id_token = self.firebase_sdk_stub.create_user(
@@ -1178,7 +1175,6 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
 
 class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
-
     def test_deletes_cookie_from_response(self) -> None:
         res = self.create_response(session_cookie='abc')
         self.assert_matches_regexps(
@@ -1193,7 +1189,6 @@ class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
 
 
 class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
-
     def test_returns_none_when_cookie_is_missing(self) -> None:
         id_token = self.firebase_sdk_stub.create_user(self.AUTH_ID)
 
@@ -1252,8 +1247,11 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_auth.ExpiredSessionCookieError('uh-oh', None),
         )
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
-            auth_domain.StaleAuthSessionError, 'expired'
+        with (
+            always_raise_expired_session_cookie_error,
+            self.assertRaisesRegex(
+                auth_domain.StaleAuthSessionError, 'expired'
+            ),
         ):
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)
@@ -1295,8 +1293,11 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_auth.UserDisabledError('uh-oh'),
         )
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
-            auth_domain.UserDisabledError, 'user is being deleted'
+        with (
+            always_raise_expired_session_cookie_error,
+            self.assertRaisesRegex(
+                auth_domain.UserDisabledError, 'user is being deleted'
+            ),
         ):
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)
@@ -1324,7 +1325,6 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):
-
     def test_get_association_that_is_present(self) -> None:
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid')
@@ -1587,7 +1587,6 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
 
 class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
-
     USER_ID = 'uid'
     AUTH_ID = 'sub'
 
@@ -1653,7 +1652,6 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
 
 
 class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
-
     EMAIL = 'some@email.com'
     USERNAME = 'username'
     AUTH_ID = 'authid'

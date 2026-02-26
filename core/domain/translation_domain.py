@@ -334,9 +334,7 @@ class BaseTranslatableObject:
                 language_code='',
             )
 
-        translatable_content_list = (
-            self.get_translatable_contents_collection().content_id_to_translatable_content.values()
-        )
+        translatable_content_list = self.get_translatable_contents_collection().content_id_to_translatable_content.values()
 
         content_id_to_translatable_content = {}
 
@@ -402,9 +400,7 @@ class BaseTranslatableObject:
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContent.
         """
-        content_id_to_translatable_content = (
-            self.get_translatable_contents_collection().content_id_to_translatable_content
-        )
+        content_id_to_translatable_content = self.get_translatable_contents_collection().content_id_to_translatable_content
         for (
             content_id,
             translatable_content,
@@ -473,9 +469,7 @@ class BaseTranslatableObject:
             next_content_id_index: int. The index for generating the Id
                 for a content.
         """
-        content_id_to_translatable_content = (
-            self.get_translatable_contents_collection().content_id_to_translatable_content
-        )
+        content_id_to_translatable_content = self.get_translatable_contents_collection().content_id_to_translatable_content
 
         for content_id in content_id_to_translatable_content.keys():
             content_id_suffix = content_id.split('_')[-1]
@@ -918,9 +912,9 @@ class WrittenTranslations:
                 language_code,
                 written_translation,
             ) in language_code_to_written_translation.items():
-                translations_mapping[content_id][
-                    language_code
-                ] = written_translation.to_dict()
+                translations_mapping[content_id][language_code] = (
+                    written_translation.to_dict()
+                )
         written_translations_dict: WrittenTranslationsDict = {
             'translations_mapping': translations_mapping
         }

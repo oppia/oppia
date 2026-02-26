@@ -120,7 +120,6 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
-
     def test_value_generator_names(self) -> None:
         """This function checks for duplicate value generators."""
 

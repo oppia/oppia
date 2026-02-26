@@ -209,11 +209,10 @@ def mark_user_for_deletion(user_id: str) -> None:
     assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
         if assoc_by_user_id_model is None
-        else
         # NOTE: We use get_multi(include_deleted=True) because get() returns
         # None for models with deleted=True, but we need to make changes to
         # those models when managing deletion.
-        auth_models.UserIdByFirebaseAuthIdModel.get_multi(
+        else auth_models.UserIdByFirebaseAuthIdModel.get_multi(
             [assoc_by_user_id_model.firebase_auth_id], include_deleted=True
         )[0]
     )

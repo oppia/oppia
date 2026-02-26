@@ -389,9 +389,9 @@ def get_current_branch_name() -> str:
     )
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
-    assert git_status_first_line.startswith(
-        branch_message_prefix
-    ), git_status_first_line
+    assert git_status_first_line.startswith(branch_message_prefix), (
+        git_status_first_line
+    )
     # Standard output is in bytes, we need to decode the line to print it.
     return git_status_first_line[len(branch_message_prefix) :]
 

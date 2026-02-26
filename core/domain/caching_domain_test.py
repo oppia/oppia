@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class CachingDomainTests(test_utils.GenericTestBase):
-
     def test_that_domain_object_is_created_correctly(self) -> None:
         memory_cache = caching_domain.MemoryCacheStats(64, 128, 16)
         self.assertEqual(memory_cache.total_allocated_in_bytes, 64)

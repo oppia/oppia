@@ -26,22 +26,20 @@ from scripts import check_tests_are_captured_in_ci
 
 from typing import List
 
-ACCEPTANCE_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = (
-    [  # pylint: disable=line-too-long
-        {
-            'name': 'test/acceptance_suite1',
-            'module': 'acceptance/specs/test/acceptance_suite1.spec.ts',
-        },
-        {
-            'name': 'test2/acceptance_suite2',
-            'module': 'acceptance/specs/test2/acceptance_suite2.spec.ts',
-        },
-        {
-            'name': 'test3/acceptance_suite3',
-            'module': 'acceptance/specs-old/test3/acceptance_suite3.spec.ts',
-        },
-    ]
-)
+ACCEPTANCE_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = [  # pylint: disable=line-too-long
+    {
+        'name': 'test/acceptance_suite1',
+        'module': 'acceptance/specs/test/acceptance_suite1.spec.ts',
+    },
+    {
+        'name': 'test2/acceptance_suite2',
+        'module': 'acceptance/specs/test2/acceptance_suite2.spec.ts',
+    },
+    {
+        'name': 'test3/acceptance_suite3',
+        'module': 'acceptance/specs-old/test3/acceptance_suite3.spec.ts',
+    },
+]
 
 E2E_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = [
     {'name': 'suiteA', 'module': 'webdriverio/suiteA.js'},
@@ -167,16 +165,12 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
 
     def test_get_acceptance_test_suites_from_ci_config_file(self) -> None:
         with self.acceptance_ci_test_suite_config_file_path_swap:
-            acceptance_test_suites = (
-                check_tests_are_captured_in_ci.get_acceptance_test_suites_from_ci_config_file()
-            )
+            acceptance_test_suites = check_tests_are_captured_in_ci.get_acceptance_test_suites_from_ci_config_file()
             self.assertEqual(acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
     def test_get_e2e_test_suites_from_ci_config_file(self) -> None:
         with self.e2e_ci_test_suite_config_file_path_swap:
-            e2e_test_suites = (
-                check_tests_are_captured_in_ci.get_e2e_test_suites_from_ci_config_file()
-            )
+            e2e_test_suites = check_tests_are_captured_in_ci.get_e2e_test_suites_from_ci_config_file()
             self.assertEqual(e2e_test_suites, E2E_TEST_SUITES)
 
     def test_read_webdriverio_config_file(self) -> None:
@@ -206,9 +200,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         os_listdir_swap = self.swap(os, 'listdir', mock_listdir)
 
         with os_listdir_swap:
-            e2e_test_modules = (
-                check_tests_are_captured_in_ci.get_e2e_test_modules_from_webdriverio_directory()
-            )
+            e2e_test_modules = check_tests_are_captured_in_ci.get_e2e_test_modules_from_webdriverio_directory()
             self.assertEqual(
                 e2e_test_modules,
                 ['suiteA.js', 'suiteB.js', 'suiteC.js', 'suiteD.js'],
@@ -216,16 +208,12 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
 
     def test_get_e2e_test_modules_from_webdriverio_config_file(self) -> None:
         with self.e2e_webdriverio_config_file_swap:
-            e2e_test_modules = (
-                check_tests_are_captured_in_ci.get_e2e_test_modules_from_webdriverio_config_file()
-            )
+            e2e_test_modules = check_tests_are_captured_in_ci.get_e2e_test_modules_from_webdriverio_config_file()
             self.assertEqual(e2e_test_modules, ['suiteA.js', 'suiteB.js'])
 
     def test_get_e2e_test_suites_from_webdriverio_config_file(self) -> None:
         with self.e2e_webdriverio_config_file_swap:
-            e2e_test_suites = (
-                check_tests_are_captured_in_ci.get_e2e_test_suites_from_webdriverio_config_file()
-            )
+            e2e_test_suites = check_tests_are_captured_in_ci.get_e2e_test_suites_from_webdriverio_config_file()
             print('e2e_test_suites:', e2e_test_suites)
             self.assertEqual(
                 e2e_test_suites,
@@ -245,9 +233,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         )
         with self.e2e_webdriverio_config_file_swap:
             with e2e_test_suites_that_are_not_run_in_ci_swap:
-                e2e_test_suites = (
-                    check_tests_are_captured_in_ci.get_e2e_test_suites_from_webdriverio_config_file()
-                )
+                e2e_test_suites = check_tests_are_captured_in_ci.get_e2e_test_suites_from_webdriverio_config_file()
                 self.assertEqual(
                     e2e_test_suites,
                     [{'name': 'suiteA', 'module': 'webdriverio/suiteA.js'}],
@@ -264,9 +250,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             self.acceptance_test_specs_old_directory_swap,
             os_getcwd_swap,
         ):
-            acceptance_test_suites = (
-                check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
-            )
+            acceptance_test_suites = check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
             self.assertEqual(acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
     def test_get_acceptance_test_suites_from_acceptance_directory_with_exclusion(
@@ -288,23 +272,21 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             os_getcwd_swap,
         ):
             with acceptance_test_suites_that_are_not_run_in_ci_swap:
-                acceptance_test_suites = (
-                    check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
-                )
+                acceptance_test_suites = check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
                 self.assertEqual(
                     acceptance_test_suites,
                     ACCEPTANCE_TEST_SUITES[:1] + ACCEPTANCE_TEST_SUITES[2:],
                 )
 
     def test_check_tests_are_captured_in_ci_with_acceptance_error(self) -> None:
-        def mock_get_acceptance_test_suites_from_ci_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_ci_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES[:1]
 
-        def mock_get_acceptance_test_suites_from_acceptance_directory() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_acceptance_directory() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES
 
         get_acceptance_test_suites_from_ci_config_file_swap = self.swap(
@@ -337,9 +319,9 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         def mock_get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
             return ['suiteA.js']
 
-        def mock_get_e2e_test_modules_from_webdriverio_config_file() -> (
-            List[str]
-        ):  # pylint: disable=line-too-long
+        def mock_get_e2e_test_modules_from_webdriverio_config_file() -> List[
+            str
+        ]:  # pylint: disable=line-too-long
             return ['suiteA.js', 'suiteB.js']
 
         get_e2e_test_modules_from_webdriverio_directory_swap = self.swap(
@@ -364,14 +346,14 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                     check_tests_are_captured_in_ci.main()
 
     def test_check_tests_are_captured_in_ci_with_e2e_error(self) -> None:
-        def mock_get_e2e_test_suites_from_ci_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_e2e_test_suites_from_ci_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return E2E_TEST_SUITES[:1]
 
-        def mock_get_e2e_test_suites_from_webdriverio_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_e2e_test_suites_from_webdriverio_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return E2E_TEST_SUITES
 
         get_e2e_test_suites_from_ci_config_file_swap = self.swap(
@@ -400,32 +382,32 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                     check_tests_are_captured_in_ci.main()
 
     def test_check_tests_are_captured_in_ci_with_no_error(self) -> None:
-        def mock_get_acceptance_test_suites_from_ci_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_ci_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES
 
-        def mock_get_acceptance_test_suites_from_acceptance_directory() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_acceptance_test_suites_from_acceptance_directory() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES
 
         def mock_get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
             return ['suiteA.js', 'suiteB.js']
 
-        def mock_get_e2e_test_modules_from_webdriverio_config_file() -> (
-            List[str]
-        ):  # pylint: disable=line-too-long
+        def mock_get_e2e_test_modules_from_webdriverio_config_file() -> List[
+            str
+        ]:  # pylint: disable=line-too-long
             return ['suiteA.js', 'suiteB.js']
 
-        def mock_get_e2e_test_suites_from_ci_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_e2e_test_suites_from_ci_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return E2E_TEST_SUITES
 
-        def mock_get_e2e_test_suites_from_webdriverio_config_file() -> (
-            List[check_tests_are_captured_in_ci.TestSuiteDict]
-        ):  # pylint: disable=line-too-long
+        def mock_get_e2e_test_suites_from_webdriverio_config_file() -> List[
+            check_tests_are_captured_in_ci.TestSuiteDict
+        ]:  # pylint: disable=line-too-long
             return E2E_TEST_SUITES
 
         get_acceptance_test_suites_from_ci_config_file_swap = self.swap(

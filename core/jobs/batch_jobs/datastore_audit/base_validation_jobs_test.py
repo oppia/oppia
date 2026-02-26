@@ -142,7 +142,6 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
 
 
 class BaseValidationJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[base_validation_jobs.BaseValidationJob] = (
         MockChildValidationJob
     )

@@ -39,7 +39,6 @@ if MYPY:  # pragma: no cover
 
 
 class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             collection_models.CollectionSnapshotContentModel.get_deletion_policy(),
@@ -94,7 +93,6 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
 
 class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
-
     COLLECTION_ID_1: Final = '1'
     USER_ID_1: Final = 'id_1'
     USER_ID_2: Final = 'id_2'
@@ -634,7 +632,9 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             # input type.
             (
                 collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
-                    2, None, max_age='invalid_max_age'  # type: ignore[arg-type]
+                    2,
+                    None,
+                    max_age='invalid_max_age',  # type: ignore[arg-type]
                 )
             )
 

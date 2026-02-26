@@ -2994,9 +2994,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             datastore_services.all_of(cls.language_code == language_code)
         ).order(sort)
 
-        sorted_results: List[TranslationReviewerTotalContributionStatsModel] = (
-            []
-        )
+        sorted_results: List[
+            TranslationReviewerTotalContributionStatsModel
+        ] = []
         today = datetime.date.today()
 
         if max_days_since_last_activity is not None:
@@ -3434,9 +3434,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             QuestionSubmitterTotalContributionStatsModel.
         """
         user_data = {}
-        stats_models: Sequence[
-            QuestionSubmitterTotalContributionStatsModel
-        ] = (  # pylint: disable=line-too-long
+        stats_models: Sequence[QuestionSubmitterTotalContributionStatsModel] = (  # pylint: disable=line-too-long
             cls.get_all().filter(cls.contributor_id == user_id).fetch()
         )
         for model in stats_models:
@@ -3783,9 +3781,7 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
         """Model is exported as one instance shared across users since multiple
         users can coordinate a single language.
         """
-        return (
-            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
-        )
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:

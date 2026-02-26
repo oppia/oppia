@@ -36,7 +36,6 @@ if MYPY:  # pragma: no cover
 
 
 class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):
-
     def test_reports_error_for_invalid_id(self) -> None:
         model_with_invalid_id = auth_models.FirebaseSeedModel(
             id='2', created_on=self.NOW, last_updated=self.NOW
@@ -77,7 +76,6 @@ class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):
 class ValidateUserIdByFirebaseAuthIdModelIdTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_reports_error_for_invalid_id(self) -> None:
         model_with_invalid_id = auth_models.UserIdByFirebaseAuthIdModel(
             id='-!\'"', user_id='1', created_on=self.NOW, last_updated=self.NOW
@@ -117,7 +115,6 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def test_user_auth_details_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(

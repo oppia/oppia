@@ -38,7 +38,6 @@ from typing import Callable, Dict, List
 
 
 class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -89,7 +88,6 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 class TopicsAndSkillsDashboardPageDataHandlerTests(
     BaseTopicsAndSkillsDashboardTests
 ):
-
     def test_get(self) -> None:
         # Check that non-admins or non-topic managers cannot access the
         # topics and skills dashboard data.
@@ -166,7 +164,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 class CategorizedAndUntriagedSkillsDataHandlerTests(
     BaseTopicsAndSkillsDashboardTests
 ):
-
     def test_get(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
@@ -203,7 +200,6 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
 
 
 class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
-
     def test_get(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
@@ -277,7 +273,6 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 
 class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
-
     def test_post(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -696,7 +691,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
-
     def setUp(self) -> None:
         super().setUp()
         self.url = feconf.NEW_TOPIC_URL
@@ -783,7 +777,6 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 
 class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
-
     def setUp(self) -> None:
         super().setUp()
         self.url = feconf.NEW_SKILL_URL
@@ -1104,7 +1097,6 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 
 class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
-
     def setUp(self) -> None:
         super().setUp()
         self.url = feconf.MERGE_SKILLS_URL

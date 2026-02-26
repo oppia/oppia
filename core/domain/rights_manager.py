@@ -1120,7 +1120,6 @@ def _assign_role(
             old_role = rights_domain.ROLE_VOICE_ARTIST
 
     elif new_role == rights_domain.ROLE_EDITOR:
-
         if activity_rights.is_editor(assignee_id) or activity_rights.is_owner(
             assignee_id
         ):
@@ -1139,7 +1138,6 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VOICE_ARTIST:
-
         if (
             activity_rights.is_editor(assignee_id)
             or activity_rights.is_voice_artist(assignee_id)
@@ -1156,7 +1154,6 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VIEWER:
-
         if (
             activity_rights.is_owner(assignee_id)
             or activity_rights.is_editor(assignee_id)

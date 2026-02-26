@@ -506,7 +506,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_all_interaction_ids()
         )
         for interaction_id in all_interaction_ids:
-
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
             hyphenated_interaction_id = utils.camelcase_to_hyphenated(

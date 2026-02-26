@@ -137,7 +137,9 @@ class MigrateSkillModels(beam.PTransform):  # type: ignore[misc]
             )
             yield (skill_id, skill_change)
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -210,8 +212,7 @@ class MigrateSkillModels(beam.PTransform):  # type: ignore[misc]
                 'skill_changes': skill_changes,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         transformed_skill_objects_list = (

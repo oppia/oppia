@@ -182,7 +182,6 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
         return result.Ok(updated_story_model_list)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
         fetched_story_models = (
             self.pipeline
             | 'Get story models'
@@ -206,8 +205,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
         topic_story_pairs = (
             (fetched_topic_models, fetched_story_models)
             | 'Merge topic and story models' >> beam.CoGroupByKey()
-            | 'Get rid of topic ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of topic ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         updated_story_models_results = (

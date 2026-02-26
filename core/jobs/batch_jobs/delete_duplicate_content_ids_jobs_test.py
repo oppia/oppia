@@ -46,9 +46,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for IdentifyExplorationsWithDuplicateContentIdsJob."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
 
     def test_identify_job_with_no_duplicates(self) -> None:
         """Test that the job finds no duplicates when there are none."""
@@ -102,9 +100,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for FixExplorationsWithDuplicateContentIdsJob."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob
 
     def test_fix_job_with_no_duplicates(self) -> None:
         """Test that the job does nothing when there are no duplicates."""
@@ -167,9 +163,7 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for IdentifyExplorationsWithDuplicateContentIdsJob in audit mode."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
 
     def test_audit_identify_job_with_duplicates(self) -> None:
         """Test that the audit job correctly identifies duplicates."""
@@ -212,9 +206,7 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
 ):
     """Tests for AuditFixExplorationsWithDuplicateContentIdsJob."""
 
-    JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.AuditFixExplorationsWithDuplicateContentIdsJob
-    )
+    JOB_CLASS = delete_duplicate_content_ids_jobs.AuditFixExplorationsWithDuplicateContentIdsJob
 
     def test_audit_fix_job_with_duplicates(self) -> None:
         """Test that the audit fix job shows what would be fixed."""

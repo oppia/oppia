@@ -191,7 +191,6 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             authors_settings.pop(0)
 
         for m, author_settings in zip(messages, authors_settings):
-
             if author_settings is None:
                 author_username = None
             else:

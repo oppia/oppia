@@ -130,7 +130,6 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
 
 
 class UserSettingsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -426,7 +425,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_cannot_set_existing_username(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Sorry, the username \"%s\" is already taken! Please pick '
+            'Sorry, the username "%s" is already taken! Please pick '
             'a different one.' % self.OWNER_USERNAME,
         ):
             user_services.set_username(self.owner_id, self.OWNER_USERNAME)
@@ -520,7 +519,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
 
 class UserGroupDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -596,7 +594,6 @@ class UserGroupDomainTests(test_utils.GenericTestBase):
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -638,8 +635,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.user_contributions.created_exploration_ids = [0]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             Exception,
-            'Expected exploration_id in created_exploration_ids '
-            'to be a string',
+            'Expected exploration_id in created_exploration_ids to be a string',
         ):
             self.user_contributions.validate()
 
@@ -660,8 +656,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.user_contributions.edited_exploration_ids = [0]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             Exception,
-            'Expected exploration_id in edited_exploration_ids '
-            'to be a string',
+            'Expected exploration_id in edited_exploration_ids to be a string',
         ):
             self.user_contributions.validate()
 

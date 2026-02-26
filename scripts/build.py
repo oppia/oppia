@@ -673,9 +673,9 @@ def build_using_ng() -> None:
     )
     with managed_ng_build_process as p:
         p.wait()
-    assert (
-        get_file_count('dist/oppia-angular-prod') > 0
-    ), 'angular generated bundle should be non-empty'
+    assert get_file_count('dist/oppia-angular-prod') > 0, (
+        'angular generated bundle should be non-empty'
+    )
 
 
 def build_using_webpack(config_path: str) -> None:
@@ -695,9 +695,9 @@ def build_using_webpack(config_path: str) -> None:
     )
     with managed_webpack_compiler as p:
         p.wait()
-    assert (
-        get_file_count('backend_prod_files/webpack_bundles/') > 0
-    ), 'webpack_bundles should be non-empty.'
+    assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (
+        'webpack_bundles should be non-empty.'
+    )
 
 
 def hash_should_be_inserted(filepath: str) -> bool:

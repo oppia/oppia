@@ -210,9 +210,7 @@ class BlogHomepageDataHandler(
             )
             self.render_json(self.values)
         else:
-            number_of_published_blog_post_summaries = (
-                blog_services.get_total_number_of_published_blog_post_summaries()
-            )
+            number_of_published_blog_post_summaries = blog_services.get_total_number_of_published_blog_post_summaries()
             list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
             self.values.update(
                 {

@@ -210,9 +210,7 @@ class PopenStub:
         self.poll_count += 1
         return None if self.alive else self._return_code
 
-    def wait(
-        self, timeout: Optional[int] = None
-    ) -> None:  # pylint: disable=unused-argument
+    def wait(self, timeout: Optional[int] = None) -> None:  # pylint: disable=unused-argument
         """Wait for the process completion.
 
         Mocks the process waiting for completion before it continues execution.

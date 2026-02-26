@@ -211,9 +211,7 @@ class ContributionOpportunitiesHandler(
                     in classroom_topic_skill_id_to_topic_name
                 ):
                     skill_opportunity_dict = skill_opportunity.to_dict()
-                    client_side_skill_opportunity_dict: (
-                        ClientSideSkillOpportunityDict
-                    ) = {
+                    client_side_skill_opportunity_dict: ClientSideSkillOpportunityDict = {
                         'id': skill_opportunity_dict['id'],
                         'skill_description': skill_opportunity_dict[
                             'skill_description'
@@ -766,10 +764,12 @@ class MachineTranslationStateTextsHandler(
             # only handles str.
             # TODO(#16621): Fix get_and_cache_machine_translation to handle
             # translatable content of rule_spec [list(str)].
-            translated_texts[
-                content_id
-            ] = translation_services.get_and_cache_machine_translation(
-                exp.language_code, target_language_code, source_text  # type: ignore[arg-type]
+            translated_texts[content_id] = (
+                translation_services.get_and_cache_machine_translation(
+                    exp.language_code,
+                    target_language_code,
+                    source_text,  # type: ignore[arg-type]
+                )
             )
 
         self.values = {'translated_texts': translated_texts}
@@ -818,11 +818,9 @@ class UserContributionRightsDataHandler(
                     else False
                 ),
                 'can_suggest_questions': (
-                    (
-                        contribution_rights.can_submit_questions
-                        if contribution_rights
-                        else False
-                    )
+                    contribution_rights.can_submit_questions
+                    if contribution_rights
+                    else False
                 ),
             }
         )

@@ -33,7 +33,6 @@ auth_models, user_models = models.Registry.import_models(
 
 
 class AuthIdUserIdPairTests(test_utils.TestBase):
-
     def test_unpacking(self) -> None:
         auth_id, user_id = auth_domain.AuthIdUserIdPair('aid', 'uid')
         self.assertEqual(auth_id, 'aid')
@@ -41,7 +40,6 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
 
 
 class ExternalAccountTests(test_utils.TestBase):
-
     def test_unpacking(self) -> None:
         auth_id, email, disabled = auth_domain.ExternalAccount(
             'a', 'a@a.com', True
@@ -52,7 +50,6 @@ class ExternalAccountTests(test_utils.TestBase):
 
 
 class AuthClaimsTests(test_utils.TestBase):
-
     def test_rejects_empty_auth_id(self) -> None:
         with self.assertRaisesRegex(Exception, 'auth_id must not be empty'):
             auth_domain.AuthClaims('', None, False)
@@ -100,7 +97,6 @@ class AuthClaimsTests(test_utils.TestBase):
 
 
 class UserAuthDetailsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

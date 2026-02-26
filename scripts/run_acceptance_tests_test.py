@@ -201,12 +201,15 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             )
         )
 
-        with self.compile_test_ts_files_swap, self.assertRaisesRegex(
-            SystemExit,
-            """
+        with (
+            self.compile_test_ts_files_swap,
+            self.assertRaisesRegex(
+                SystemExit,
+                """
             Oppia server is already running. Try shutting all the servers down
             before running the script.
         """,
+            ),
         ):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
@@ -287,9 +290,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_acceptance_tests_server(
             **unused_kwargs: str,
-        ) -> ContextManager[
-            scripts_test_utils.PopenStub
-        ]:  # pylint: disable=unused-argument, line-too-long
+        ) -> ContextManager[scripts_test_utils.PopenStub]:  # pylint: disable=unused-argument, line-too-long
             return contextlib.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
                     stdout='sample\n✓\noutput\n'.encode(encoding='utf-8'),

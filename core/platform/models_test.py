@@ -371,11 +371,14 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         mailgun.
         """
-        with self.swap(
-            feconf,
-            'EMAIL_SERVICE_PROVIDER',
-            feconf.EMAIL_SERVICE_PROVIDER_MAILGUN,
-        ), self.swap(constants, 'DEV_MODE', False):
+        with (
+            self.swap(
+                feconf,
+                'EMAIL_SERVICE_PROVIDER',
+                feconf.EMAIL_SERVICE_PROVIDER_MAILGUN,
+            ),
+            self.swap(constants, 'DEV_MODE', False),
+        ):
             from core.platform.email import mailgun_email_services
 
             self.assertEqual(
@@ -387,9 +390,12 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        with self.swap(
-            feconf, 'EMAIL_SERVICE_PROVIDER', 'invalid service provider'
-        ), self.swap(constants, 'DEV_MODE', False):
+        with (
+            self.swap(
+                feconf, 'EMAIL_SERVICE_PROVIDER', 'invalid service provider'
+            ),
+            self.swap(constants, 'DEV_MODE', False),
+        ):
             with self.assertRaisesRegex(
                 Exception,
                 'Invalid email service provider: invalid service provider',
@@ -400,11 +406,14 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         mailchimp.
         """
-        with self.swap(
-            feconf,
-            'BULK_EMAIL_SERVICE_PROVIDER',
-            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP,
-        ), self.swap(constants, 'EMULATOR_MODE', False):
+        with (
+            self.swap(
+                feconf,
+                'BULK_EMAIL_SERVICE_PROVIDER',
+                feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP,
+            ),
+            self.swap(constants, 'EMULATOR_MODE', False),
+        ):
             from core.platform.bulk_email import mailchimp_bulk_email_services
 
             self.assertEqual(
@@ -416,13 +425,17 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        with self.swap(
-            feconf, 'BULK_EMAIL_SERVICE_PROVIDER', 'invalid service provider'
-        ), self.swap(constants, 'EMULATOR_MODE', False):
+        with (
+            self.swap(
+                feconf,
+                'BULK_EMAIL_SERVICE_PROVIDER',
+                'invalid service provider',
+            ),
+            self.swap(constants, 'EMULATOR_MODE', False),
+        ):
             with self.assertRaisesRegex(
                 Exception,
-                'Invalid bulk email service provider: invalid service '
-                'provider',
+                'Invalid bulk email service provider: invalid service provider',
             ):
                 self.registry_instance.import_bulk_email_services()
 
@@ -519,8 +532,7 @@ class RegistryUnitTest(test_utils.TestBase):
         with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
-                'import_models() method is not overwritten in '
-                'derived classes'
+                'import_models() method is not overwritten in derived classes'
             ),
         ):
             models.Platform().import_models([models.Names.BASE_MODEL])

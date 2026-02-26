@@ -62,7 +62,6 @@ PADDING: Final = 1
 
 
 class HelperFunctionTests(test_utils.GenericTestBase):
-
     def test_load_template(self) -> None:
         oppia_root_path = os.path.join(
             'core', 'templates', 'pages', 'oppia-root'
@@ -96,7 +95,6 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
 
 
 class BaseHandlerTests(test_utils.GenericTestBase):
-
     TEST_LEARNER_EMAIL: Final = 'test.learner@example.com'
     TEST_LEARNER_USERNAME: Final = 'testlearneruser'
     TEST_CREATOR_EMAIL: Final = 'test.creator@example.com'
@@ -618,7 +616,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
 
 class MissingHandlerArgsTests(test_utils.GenericTestBase):
-
     class MissingArgsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler for testing."""
 
@@ -812,7 +809,6 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
-
     def test_create_and_validate_token(self) -> None:
         uid = 'user_id'
 
@@ -865,7 +861,6 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
 
 class EscapingTests(test_utils.GenericTestBase):
-
     class FakePage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Fake page for testing autoescaping."""
 
@@ -879,7 +874,7 @@ class EscapingTests(test_utils.GenericTestBase):
         # accordingly, but these methods in base_test.py do not.
         def post(self) -> None:  # type: ignore[override]
             """Handles POST requests."""
-            self.render_json({'big_value': u'\n<script>马={{'})
+            self.render_json({'big_value': '\n<script>马={{'})
 
     def setUp(self) -> None:
         super(EscapingTests, self).setUp()
@@ -907,7 +902,6 @@ class EscapingTests(test_utils.GenericTestBase):
 
 
 class RenderDownloadableTests(test_utils.GenericTestBase):
-
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler that subclasses BaseHandler and serves a response
         that is of a 'downloadable' type.
@@ -1146,9 +1140,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
                         html_key_list = self._extract_keys_from_html_file(
                             os.path.join(root, filename)
                         )
-                        if not set(html_key_list) <= set(
-                            en_key_list
-                        ):  # pylint: disable=unneeded-not
+                        if not set(html_key_list) <= set(en_key_list):  # pylint: disable=unneeded-not
                             self.log_line(
                                 'ERROR: Undefined keys in %s:'
                                 % os.path.join(root, filename)
@@ -1211,7 +1203,6 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
 
 class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
-
     class FakeHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """A fake handler class."""
 
@@ -1340,7 +1331,6 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
 
 
 class ControllerClassNameTests(test_utils.GenericTestBase):
-
     def test_controller_class_names(self) -> None:
         """This function checks that all controller class names end with
         either 'Handler', 'Page' or 'FileDownloader'.
@@ -1430,7 +1420,6 @@ class MockHandlerForTestingPageIframingNormalizedRequestDict(TypedDict):
 
 
 class IframeRestrictionTests(test_utils.GenericTestBase):
-
     class MockHandlerForTestingPageIframing(
         base.BaseHandler[
             Dict[str, str],
@@ -1508,7 +1497,6 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
 
 
 class SignUpTests(test_utils.GenericTestBase):
-
     def test_error_is_raised_on_opening_new_tab_during_signup(self) -> None:
         """Test that error is raised if user opens a new tab
         during signup.
@@ -1582,7 +1570,6 @@ class SignUpTests(test_utils.GenericTestBase):
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
-
     def test_valid_token_is_returned(self) -> None:
         """Test that a valid CSRF token is returned by
         the handler.
@@ -1842,9 +1829,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         """
 
         list_of_handlers_to_be_removed = []
-        handler_names_which_require_schemas = (
-            handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS
-        )
+        handler_names_which_require_schemas = handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas()
         )

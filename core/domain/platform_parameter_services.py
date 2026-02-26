@@ -74,9 +74,9 @@ def create_evaluation_context_for_client(
     )
 
 
-def get_all_platform_parameters_dicts() -> (
-    List[platform_parameter_domain.PlatformParameterDict]
-):
+def get_all_platform_parameters_dicts() -> List[
+    platform_parameter_domain.PlatformParameterDict
+]:
     """Returns dict representations of all platform parameters. This method
     is used for providing detailed platform parameters information to the
     release-coordinator page.

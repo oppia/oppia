@@ -40,7 +40,6 @@ if MYPY:  # pragma: no cover
 class ValidateExplorationSnapshotMetadataModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_validate_change_domain_implemented(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
@@ -331,7 +330,6 @@ class ValidateExplorationSnapshotMetadataModelTests(
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def test_exploration_context_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
@@ -358,7 +356,6 @@ class RelationshipsOfTests(test_utils.TestBase):
 class ValidateExplorationRightsSnapshotMetadataModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_exploration_rights_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel(
@@ -598,7 +595,6 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
 class ValidateExplorationCommitLogEntryModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_validate_rights_model(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
             id='rights_id123',

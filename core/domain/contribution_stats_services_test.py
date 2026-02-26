@@ -62,7 +62,6 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
 
     def setUp(self) -> None:
-
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,

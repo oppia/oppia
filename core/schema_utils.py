@@ -153,9 +153,9 @@ def normalize_against_schema(
         missing_keys = list(sorted(set(expected_dict_keys) - set(obj.keys())))
         extra_keys = list(sorted(set(obj.keys()) - set(expected_dict_keys)))
 
-        assert set(obj.keys()) == set(
-            expected_dict_keys
-        ), 'Missing keys: %s, Extra keys: %s' % (missing_keys, extra_keys)
+        assert set(obj.keys()) == set(expected_dict_keys), (
+            'Missing keys: %s, Extra keys: %s' % (missing_keys, extra_keys)
+        )
 
         normalized_obj = {}
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
@@ -219,11 +219,12 @@ def normalize_against_schema(
         assert isinstance(obj, list), 'Expected list, received %s' % obj
         item_schema = schema[SCHEMA_KEY_ITEMS]
         if SCHEMA_KEY_LEN in schema:
-            assert (
-                len(obj) == schema[SCHEMA_KEY_LEN]
-            ), 'Expected length of %s got %s' % (
-                schema[SCHEMA_KEY_LEN],
-                len(obj),
+            assert len(obj) == schema[SCHEMA_KEY_LEN], (
+                'Expected length of %s got %s'
+                % (
+                    schema[SCHEMA_KEY_LEN],
+                    len(obj),
+                )
             )
         normalized_obj = [
             normalize_against_schema(
@@ -285,11 +286,12 @@ def normalize_against_schema(
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
 
     if SCHEMA_KEY_CHOICES in schema:
-        assert (
-            normalized_obj in schema[SCHEMA_KEY_CHOICES]
-        ), 'Received %s which is not in the allowed range of choices: %s' % (
-            normalized_obj,
-            schema[SCHEMA_KEY_CHOICES],
+        assert normalized_obj in schema[SCHEMA_KEY_CHOICES], (
+            'Received %s which is not in the allowed range of choices: %s'
+            % (
+                normalized_obj,
+                schema[SCHEMA_KEY_CHOICES],
+            )
         )
 
     # When type normalization is finished, apply the post-normalizers in the
@@ -328,12 +330,13 @@ def normalize_against_schema(
         for validator in global_validators:
             kwargs = dict(validator)
             del kwargs['id']
-            assert get_validator(validator['id'])(
-                normalized_obj, **kwargs
-            ), 'Validation failed: %s (%s) for object %s' % (
-                validator['id'],
-                kwargs,
-                normalized_obj,
+            assert get_validator(validator['id'])(normalized_obj, **kwargs), (
+                'Validation failed: %s (%s) for object %s'
+                % (
+                    validator['id'],
+                    kwargs,
+                    normalized_obj,
+                )
             )
 
     return normalized_obj

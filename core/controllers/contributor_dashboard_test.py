@@ -831,7 +831,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with unittest.mock.patch.object(
             topic_fetchers, 'get_topic_by_name', return_value=mock_topic
         ):
-
             request_dict = {
                 'topic_id': topic_id,
                 'language_code': language_code,
@@ -849,7 +848,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_pin_translation_opportunity_with_language_code_set_to_none(
         self,
     ) -> None:
-
         self.login(self.OWNER_EMAIL)
         topic_id = ''
         language_code = ''
@@ -904,7 +902,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with unittest.mock.patch.object(
             topic_fetchers, 'get_topic_by_name', return_value=mock_topic
         ):
-
             request_dict = {
                 'topic_id': topic_id,
                 'language_code': language_code,
@@ -1465,7 +1462,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'get_translatable_text',
             return_value=mock_get_translatable_text_return_value,
         ):
-
             # Send a GET request to retrieve the content.
             output = self.get_json(
                 '/gettranslatabletexthandler',

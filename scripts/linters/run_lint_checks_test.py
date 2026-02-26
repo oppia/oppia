@@ -252,7 +252,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 run_lint_checks.main(args=['--path=%s' % INVALID_CSS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assert_same_list_elements(
-            ['19:16', 'Unexpected whitespace before \":\"'], self.linter_stdout
+            ['19:16', 'Unexpected whitespace before ":"'], self.linter_stdout
         )
 
     def test_main_with_invalid_filepath_with_path_arg(self) -> None:

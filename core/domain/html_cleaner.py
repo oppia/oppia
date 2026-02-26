@@ -254,7 +254,7 @@ def is_html_empty(html_str: str) -> bool:
         .replace('</em>', '')
         .replace('<strong>', '')
         .replace('</strong>', '')
-        .replace('\"\"', '')
+        .replace('""', '')
         .replace('\'\'', '')
     )
     if html_val.strip() == '':
@@ -412,7 +412,6 @@ def validate_rte_tags(
         )
 
     for tag in soup.find_all('oppia-noninteractive-video'):
-
         _raise_validation_errors_for_escaped_html_tag(
             tag, 'start-with-value', 'Video'
         )
@@ -431,8 +430,8 @@ def validate_rte_tags(
             'false',
             '\'true\'',
             '\'false\'',
-            '\"true\"',
-            '\"false\"',
+            '"true"',
+            '"false"',
             True,
             False,
         ):
@@ -465,8 +464,7 @@ def validate_rte_tags(
     for tag in soup.find_all('oppia-noninteractive-math'):
         if not tag.has_attr('math_content-with-value'):
             raise utils.ValidationError(
-                'Math tag does not have \'math_content-with-value\' '
-                'attribute.'
+                'Math tag does not have \'math_content-with-value\' attribute.'
             )
 
         if is_html_empty(tag['math_content-with-value']):
@@ -490,8 +488,7 @@ def validate_rte_tags(
 
         if 'svg_filename' not in math_content_list:
             raise utils.ValidationError(
-                'Math tag does not have \'svg_filename-with-value\' '
-                'attribute.'
+                'Math tag does not have \'svg_filename-with-value\' attribute.'
             )
 
         if is_html_empty(math_content_list['svg_filename']):

@@ -620,9 +620,7 @@ class Solution(translation_domain.BaseTranslatableObject):
             if solution_dict['correct_answer']:
                 for html_type in html_field_types_to_rule_specs.keys():
                     if html_type == interaction_spec['answer_type']:
-
                         if html_type == feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML:
-
                             # Here correct_answer can only be of type
                             # List[List[str]] because here html_type is
                             # 'ListOfSetsOfHtmlStrings'.
@@ -1407,9 +1405,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     'lb_inclusive': False,
                     'ub_inclusive': False,
                 }
-                matched_denominator: (
-                    InteractionInstance.MatchedDenominatorDict
-                ) = {
+                matched_denominator: InteractionInstance.MatchedDenominatorDict = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
                     'denominator': 0,
@@ -2267,7 +2263,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         for ca_spec in ca_specs_dict:
             ca_spec_name = ca_spec['name']
-            customization_args[ca_spec_name].value = (
+            customization_args[
+                ca_spec_name
+            ].value = (
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
                     ca_spec['schema'],
                     customization_args[ca_spec_name].value,
@@ -2318,11 +2316,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         ca_specs_dict = interaction_registry.Registry.get_all_specs_for_state_schema_version(
             state_schema_version, can_fetch_latest_specs=True
-        )[
-            interaction_id
-        ][
-            'customization_arg_specs'
-        ]
+        )[interaction_id]['customization_arg_specs']
 
         return InteractionCustomizationArg.convert_cust_args_dict_to_cust_args_based_on_specs(
             customization_args_dict, ca_specs_dict
@@ -3102,9 +3096,9 @@ class RecordedVoiceovers:
         ) in self.voiceovers_mapping.items():
             voiceovers_mapping[content_id] = {}
             for language_code, voiceover in language_code_to_voiceover.items():
-                voiceovers_mapping[content_id][
-                    language_code
-                ] = voiceover.to_dict()
+                voiceovers_mapping[content_id][language_code] = (
+                    voiceover.to_dict()
+                )
         recorded_voiceovers_dict: RecordedVoiceoversDict = {
             'voiceovers_mapping': voiceovers_mapping
         }
@@ -4198,7 +4192,6 @@ class State(translation_domain.BaseTranslatableObject):
             interaction_answer_groups.append(answer_group)
 
             for rule_spec in rule_specs_list:
-
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs
                 if not isinstance(rule_inputs, dict):
@@ -4545,9 +4538,7 @@ class State(translation_domain.BaseTranslatableObject):
             if state_uses_old_rule_template_schema:
                 interaction_spec = interaction_registry.Registry.get_all_specs_for_state_schema_version(
                     41
-                )[
-                    interaction_id
-                ]
+                )[interaction_id]
             else:
                 interaction_spec = (
                     interaction_registry.Registry.get_all_specs()[
@@ -4571,11 +4562,7 @@ class State(translation_domain.BaseTranslatableObject):
             # SubtitledHtml and SubtitledUnicode.
             ca_specs = interaction_registry.Registry.get_all_specs_for_state_schema_version(
                 35
-            )[
-                interaction_id
-            ][
-                'customization_arg_specs'
-            ]
+            )[interaction_id]['customization_arg_specs']
 
             interaction_customization_arg_has_html = False
             for customization_arg_spec in ca_specs:
@@ -4606,11 +4593,7 @@ class State(translation_domain.BaseTranslatableObject):
         else:
             ca_specs_dict = interaction_registry.Registry.get_all_specs_for_state_schema_version(
                 state_schema_version, can_fetch_latest_specs=True
-            )[
-                interaction_id
-            ][
-                'customization_arg_specs'
-            ]
+            )[interaction_id]['customization_arg_specs']
             state_dict['interaction'] = (
                 InteractionInstance.convert_html_in_interaction(
                     state_dict['interaction'], ca_specs_dict, conversion_fn
@@ -4631,9 +4614,7 @@ class State(translation_domain.BaseTranslatableObject):
         Raises:
             ValueError. The given content_id does not exist.
         """
-        content_id_to_translatable_content = (
-            self.get_translatable_contents_collection().content_id_to_translatable_content
-        )
+        content_id_to_translatable_content = self.get_translatable_contents_collection().content_id_to_translatable_content
 
         if content_id not in content_id_to_translatable_content:
             raise ValueError('Content ID %s does not exist' % content_id)

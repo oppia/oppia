@@ -41,7 +41,6 @@ StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
 class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
     ] = exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob

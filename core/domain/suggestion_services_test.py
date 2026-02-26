@@ -2001,7 +2001,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'get_exploration_by_id',
             self.mock_get_exploration_by_id,
         ):
-
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -2786,9 +2785,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         suggestion_1 = self._create_question_suggestion_with_skill_id('skill1')
         suggestion_2 = self._create_question_suggestion_with_skill_id('skill2')
         # Verify that both suggestions are returned and in the right order.
-        suggestions = (
-            suggestion_services.get_question_suggestions_waiting_longest_for_review()
-        )
+        suggestions = suggestion_services.get_question_suggestions_waiting_longest_for_review()
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(
             suggestions[0].suggestion_id, suggestion_1.suggestion_id
@@ -2807,9 +2804,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         )
 
         # Verify that only the suggestion that was created second is returned.
-        suggestions = (
-            suggestion_services.get_question_suggestions_waiting_longest_for_review()
-        )
+        suggestions = suggestion_services.get_question_suggestions_waiting_longest_for_review()
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(
             suggestions[0].suggestion_id, suggestion_2.suggestion_id
@@ -2833,9 +2828,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Verify that both suggestions are returned again and the suggestion
         # that was created second is now the first suggestion in the returned
         # list, since it has been waiting longer (due to it not being updated).
-        suggestions = (
-            suggestion_services.get_question_suggestions_waiting_longest_for_review()
-        )
+        suggestions = suggestion_services.get_question_suggestions_waiting_longest_for_review()
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(
             suggestions[0].suggestion_id, suggestion_2.suggestion_id
@@ -2852,9 +2845,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         suggestion_2 = self._create_question_suggestion_with_skill_id('skill2')
         suggestion_3 = self._create_question_suggestion_with_skill_id('skill3')
 
-        suggestions = (
-            suggestion_services.get_question_suggestions_waiting_longest_for_review()
-        )
+        suggestions = suggestion_services.get_question_suggestions_waiting_longest_for_review()
 
         # Assert that the suggestions are in the order that they were created.
         self.assertEqual(len(suggestions), 3)
@@ -2981,7 +2972,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
 
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
-
     EXP_ID: Final = 'exp1'
     TOPIC_ID: Final = 'topic1'
     STORY_ID: Final = 'story1'
@@ -3226,8 +3216,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 datetime.date.fromtimestamp(1616173837),
             ],
         )
-        translation_suggestion = suggestion_services.get_all_translation_contribution_stats(  # pylint: disable=line-too-long
-            'user_id'
+        translation_suggestion = (
+            suggestion_services.get_all_translation_contribution_stats(  # pylint: disable=line-too-long
+                'user_id'
+            )
         )
         self.assertEqual(len(translation_suggestion), 1)
         self.assertEqual(translation_suggestion[0].language_code, 'es')
@@ -4318,7 +4310,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_increment_translation_stats_for_than_100_suggestions_accepted(
         self,
     ) -> None:
-
         change_dict = self._set_up_topics_and_100_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -4420,7 +4411,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_increment_translation_stats_for_than_100_suggestions_rejected(
         self,
     ) -> None:
-
         change_dict = self._set_up_topics_and_100_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -5134,7 +5124,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_increment_question_stats_for_than_100_suggestions_accepted(
         self,
     ) -> None:
-
         for i in range(102):
             skill_id = self._create_skill()
             topic_id = topic_fetchers.get_new_topic_id()
@@ -5232,7 +5221,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_increment_question_stats_for_than_100_suggestions_rejected(
         self,
     ) -> None:
-
         for i in range(102):
             skill_id = self._create_skill()
             topic_id = topic_fetchers.get_new_topic_id()
@@ -5596,7 +5584,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup('user1@example.com', 'user1')
@@ -8061,9 +8048,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
             ):
-                info_about_suggestions_waiting_too_long_for_review = (
-                    suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
-                )
+                info_about_suggestions_waiting_too_long_for_review = suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(
             len(info_about_suggestions_waiting_too_long_for_review), 0
@@ -8080,9 +8065,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             1,
         ):
-            info_about_suggestions_waiting_too_long_for_review = (
-                suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
-            )
+            info_about_suggestions_waiting_too_long_for_review = suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(
             len(info_about_suggestions_waiting_too_long_for_review), 0
@@ -8107,9 +8090,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
             ):
-                info_about_suggestions_waiting_too_long_for_review = (
-                    suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
-                )
+                info_about_suggestions_waiting_too_long_for_review = suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(
             len(info_about_suggestions_waiting_too_long_for_review), 0
@@ -8132,7 +8113,6 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             mock_get_current_time_in_millisecs,
         ):
             with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
-
                 # Create and save new suggestion models.
                 suggestions = []
                 for _ in range(1, max_suggestions + 1):
@@ -8145,9 +8125,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                     threshold_days,
                 ):
-                    suggestion_info = (
-                        suggestion_services.get_new_suggestions_for_reviewer_notifications()
-                    )
+                    suggestion_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
 
                 # Assert that the correct number of suggestions is returned.
                 self.assertEqual(len(suggestion_info), 3)
@@ -8171,9 +8149,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
             ):
-                info_about_suggestions_waiting_too_long_for_review = (
-                    suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
-                )
+                info_about_suggestions_waiting_too_long_for_review = suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(
             len(info_about_suggestions_waiting_too_long_for_review), 0
@@ -8209,9 +8185,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
             ):
-                info_about_suggestions_waiting_too_long_for_review = (
-                    suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
-                )
+                info_about_suggestions_waiting_too_long_for_review = suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
 
         self.assertEqual(
             len(info_about_suggestions_waiting_too_long_for_review), 2
@@ -8248,9 +8222,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
             ):
-                info_about_suggestions_waiting_too_long_for_review = (
-                    suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
-                )
+                info_about_suggestions_waiting_too_long_for_review = suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
 
         # The question suggestion was created 2 days after the translation
         # suggestion, so it has only waited 1 day for a review, which is less
@@ -8974,9 +8946,9 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         ]
 
         question_state_data = test_question_dict['question_state_data']
-        question_state_data['content'][
-            'html'
-        ] = '<oppia-noninteractive-image></oppia-noninteractive-image>'
+        question_state_data['content']['html'] = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>'
+        )
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,

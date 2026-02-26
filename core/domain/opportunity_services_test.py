@@ -1224,8 +1224,11 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(observed_log_messages), 0)
 
-        with self.swap(logging, 'info', _mock_logging_function), self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES', mock_supported_languages
+        with (
+            self.swap(logging, 'info', _mock_logging_function),
+            self.swap(
+                constants, 'SUPPORTED_AUDIO_LANGUAGES', mock_supported_languages
+            ),
         ):
             opportunities = opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 ['0']

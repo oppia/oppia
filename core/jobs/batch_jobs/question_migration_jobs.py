@@ -128,8 +128,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             | 'Filter oks'
             >> beam.Filter(lambda result_item: result_item.is_ok())
             | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         unused_put_results = (
@@ -225,8 +224,7 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             | 'Filter oks'
             >> beam.Filter(lambda result_item: result_item.is_ok())
             | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         return regenerated_question_summary_results
@@ -299,7 +297,9 @@ class MigrateQuestionModels(beam.PTransform):  # type: ignore[misc]
             )
             yield (question_id, question_change)
 
-    def expand(self, pipeline: beam.Pipeline) -> Tuple[
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult],
     ]:
@@ -380,8 +380,7 @@ class MigrateQuestionModels(beam.PTransform):  # type: ignore[misc]
                 'question_changes': question_changes,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         transformed_question_objects_list = (

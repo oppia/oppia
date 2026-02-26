@@ -39,7 +39,6 @@ if MYPY:  # pragma: no cover
 class ValidatePlatformParameterSnapshotMetadataModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     CMD_EDIT_RULES: Final = (
         parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
     )

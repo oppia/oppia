@@ -32,7 +32,6 @@ if MYPY:  # pragma: no cover
 class DuplicateBlogTitleErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
@@ -54,7 +53,6 @@ class DuplicateBlogTitleErrorTests(
 class DuplicateBlogUrlErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
@@ -76,7 +74,6 @@ class DuplicateBlogUrlErrorTests(
 class DuplicateBlogAuthorModelErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         author_details_model = blog_models.BlogAuthorDetailsModel(
             id='id1',
@@ -100,7 +97,6 @@ class DuplicateBlogAuthorModelErrorTests(
 class InconsistentLastUpdatedTimestampsErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         model = blog_models.BlogPostModel(
             id='validblogid1',
@@ -127,7 +123,6 @@ class InconsistentLastUpdatedTimestampsErrorTests(
 class InconsistentPublishLastUpdatedTimestampsErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         model = blog_models.BlogPostModel(
             id='validblogid1',
@@ -154,7 +149,6 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
 class ModelMutatedDuringJobErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message_for_published_on(self) -> None:
         model = blog_models.BlogPostModel(
             id='validblogid1',

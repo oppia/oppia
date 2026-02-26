@@ -36,7 +36,6 @@ if MYPY:  # pragma: no cover
 class InvalidCompositeEntityErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         model = improvements_models.ExplorationStatsTaskEntryModel(
             id='23',

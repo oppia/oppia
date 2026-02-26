@@ -204,9 +204,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         if platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
         ):
-            info_about_suggestions_waiting_too_long_for_review = (
-                suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
-            )
+            info_about_suggestions_waiting_too_long_for_review = suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
             (
                 email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                     admin_ids,

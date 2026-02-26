@@ -133,10 +133,7 @@ CHANGE_DICT = {
 class RejectTranslationSuggestionsForTranslatedContentsJobTests(
     job_test_utils.JobTestBase
 ):
-
-    JOB_CLASS = (
-        reject_invalid_suggestion_and_delete_invalid_translation_jobs.RejectTranslationSuggestionsForTranslatedContentsJob
-    )
+    JOB_CLASS = reject_invalid_suggestion_and_delete_invalid_translation_jobs.RejectTranslationSuggestionsForTranslatedContentsJob
     EXP_1_ID = 'exp1'
     EXP_2_ID = 'exp2'
 
@@ -331,9 +328,7 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
 class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
     job_test_utils.JobTestBase
 ):
-    JOB_CLASS = (
-        reject_invalid_suggestion_and_delete_invalid_translation_jobs.AuditRejectTranslationSuggestionsForTranslatedContentsJob
-    )
+    JOB_CLASS = reject_invalid_suggestion_and_delete_invalid_translation_jobs.AuditRejectTranslationSuggestionsForTranslatedContentsJob
     EXP_1_ID = 'exp1'
     EXP_2_ID = 'exp2'
 
@@ -529,10 +524,7 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
 class DeleteTranslationsForInvalidContentIDsJobTests(
     job_test_utils.JobTestBase
 ):
-
-    JOB_CLASS = (
-        reject_invalid_suggestion_and_delete_invalid_translation_jobs.DeleteTranslationsForInvalidContentIDsJob
-    )
+    JOB_CLASS = reject_invalid_suggestion_and_delete_invalid_translation_jobs.DeleteTranslationsForInvalidContentIDsJob
     EXP_1_ID = 'exp1'
     TOPIC_1_ID = 'topic_1_id'
     STORY_1_ID = 'story_1_id'
@@ -682,9 +674,7 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
 class AuditDeleteTranslationsForInvalidContentIDsJobTests(
     job_test_utils.JobTestBase
 ):
-    JOB_CLASS = (
-        reject_invalid_suggestion_and_delete_invalid_translation_jobs.AuditDeleteTranslationsForInvalidContentIDsJob
-    )
+    JOB_CLASS = reject_invalid_suggestion_and_delete_invalid_translation_jobs.AuditDeleteTranslationsForInvalidContentIDsJob
     EXP_1_ID = 'exp1'
     TOPIC_1_ID = 'topic_1_id'
     STORY_1_ID = 'story_1_id'

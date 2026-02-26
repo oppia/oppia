@@ -96,9 +96,7 @@ def update_original_and_last_message_author_id_in_feedback_thread_dicts(
         last_nonempty_message_author_id = feedback_thread_dict[
             'last_nonempty_message_author_id'
         ]
-        updated_feedback_thread_dict: (
-            UpdatedLastMessageAuthorFeedbackThreadDict
-        ) = {
+        updated_feedback_thread_dict: UpdatedLastMessageAuthorFeedbackThreadDict = {
             'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
             'original_author_username': (
                 user_services.get_username(
@@ -141,9 +139,7 @@ def update_original_author_id_in_feedback_thread_dicts(
     """
     updated_feedback_thread_dicts = []
     for feedback_thread_dict in feedback_thread_dicts:
-        updated_feedback_thread_dict: (
-            UpdatedAuthorUsernameFeedbackThreadDict
-        ) = {
+        updated_feedback_thread_dict: UpdatedAuthorUsernameFeedbackThreadDict = {
             'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
             'original_author_username': (
                 user_services.get_username(
@@ -240,7 +236,6 @@ class ThreadListHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-
         feedback_thread_dicts = [
             thread.to_dict()
             for thread in feedback_services.get_all_threads(
@@ -297,7 +292,6 @@ class ThreadListHandlerForTopicsHandler(
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id: str) -> None:
-
         suggestion_thread_dicts = [
             thread.to_dict()
             for thread in feedback_services.get_all_threads(

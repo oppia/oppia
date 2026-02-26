@@ -259,10 +259,8 @@ class BuildTests(test_utils.GenericTestBase):
                 bad_filepath, file_hashes
             )
 
-        hashed_base_filename = (
-            build._insert_hash(  # pylint: disable=protected-access
-                base_filename, test_utils.generate_random_hexa_str()
-            )
+        hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
+            base_filename, test_utils.generate_random_hexa_str()
         )
         with self.assertRaisesRegex(
             KeyError,
@@ -944,7 +942,6 @@ class BuildTests(test_utils.GenericTestBase):
             build.safe_delete_file(non_existent_filepaths[0])
 
     def test_minify_third_party_libs(self) -> None:
-
         def _mock_safe_delete_file(unused_filepath: str) -> None:
             """Mocks build.safe_delete_file()."""
             pass
@@ -1188,7 +1185,6 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_using_webpack_command(self) -> None:
-
         @contextlib.contextmanager
         def mock_managed_webpack_compiler(
             config_path: str, max_old_space_size: int
@@ -1213,7 +1209,6 @@ class BuildTests(test_utils.GenericTestBase):
     def test_build_using_webpack_command_with_incorrect_filecount_fails(
         self,
     ) -> None:
-
         @contextlib.contextmanager
         def mock_managed_webpack_compiler(
             config_path: str, max_old_space_size: int
@@ -1239,7 +1234,6 @@ class BuildTests(test_utils.GenericTestBase):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
     def test_build_using_ng_command(self) -> None:
-
         @contextlib.contextmanager
         def mock_managed_ng_build(  # pylint: disable=unused-argument
             use_prod_env: bool, watch_mode: bool
@@ -1268,7 +1262,6 @@ class BuildTests(test_utils.GenericTestBase):
     def test_build_using_ng_command_with_incorrect_filecount_fails(
         self,
     ) -> None:
-
         @contextlib.contextmanager
         def mock_managed_ng_build(  # pylint: disable=unused-argument
             use_prod_env: bool, watch_mode: bool

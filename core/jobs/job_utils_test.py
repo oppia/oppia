@@ -54,7 +54,6 @@ class CoreModel(base_models.BaseModel):
 
 
 class CloneTests(test_utils.TestBase):
-
     def test_clone_model(self) -> None:
         model = base_models.BaseModel(id='123', deleted=True)
         clone = job_utils.clone_model(model)
@@ -106,7 +105,6 @@ class CloneTests(test_utils.TestBase):
 
 
 class GetModelClassTests(test_utils.TestBase):
-
     def test_get_from_existing_model(self) -> None:
         self.assertIs(
             job_utils.get_model_class('BaseModel'), base_models.BaseModel
@@ -118,7 +116,6 @@ class GetModelClassTests(test_utils.TestBase):
 
 
 class GetModelKindTests(test_utils.TestBase):
-
     def test_get_from_datastore_model(self) -> None:
         model = base_models.BaseModel()
 
@@ -138,7 +135,6 @@ class GetModelKindTests(test_utils.TestBase):
 
 
 class GetModelPropertyTests(test_utils.TestBase):
-
     def test_get_id_from_datastore_model(self) -> None:
         model = FooModel(id='123')
 
@@ -163,7 +159,6 @@ class GetModelPropertyTests(test_utils.TestBase):
 
 
 class GetModelIdTests(test_utils.TestBase):
-
     def test_get_id_from_datastore_model(self) -> None:
         model = FooModel(id='123')
 
@@ -178,13 +173,11 @@ class GetModelIdTests(test_utils.TestBase):
 
 
 class BeamEntityToAndFromModelTests(test_utils.TestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.oppia_project_id = 'dev-project-id'
 
     def test_get_beam_entity_from_model(self) -> None:
-
         model = FooModel(id='abc', project=self.oppia_project_id, prop='123')
 
         beam_entity = job_utils.get_beam_entity_from_ndb_model(model)
@@ -286,7 +279,6 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
 
 class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
-
     def test_query_everything(self) -> None:
         query = datastore_services.query_everything()
 

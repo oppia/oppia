@@ -384,9 +384,9 @@ class ExplorationDataForVoiceoverRegenerationHandler(
             )
         )
 
-        response_data: Dict[str, Optional[str | Dict[str, str | List[str]]]] = (
-            {}
-        )
+        response_data: Dict[
+            str, Optional[str | Dict[str, str | List[str]]]
+        ] = {}
 
         if exploration is None:
             response_data['exploration_data'] = None

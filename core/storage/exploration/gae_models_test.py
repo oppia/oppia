@@ -40,7 +40,6 @@ if MYPY:  # pragma: no cover
 
 
 class ExplorationSnapshotContentModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             exp_models.ExplorationSnapshotContentModel.get_deletion_policy(),
@@ -107,7 +106,6 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
 
 
 class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
-
     EXP_ID_1: Final = '1'
     USER_ID_1: Final = 'id_1'
     USER_ID_2: Final = 'id_2'
@@ -663,7 +661,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 _,
                 _,
             ) = exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
-                2, None, max_age=1  # type: ignore[arg-type]
+                2,
+                None,
+                max_age=1,  # type: ignore[arg-type]
             )
 
         max_age = datetime.timedelta(hours=1)

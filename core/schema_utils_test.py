@@ -252,11 +252,12 @@ def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
         AssertionError. The object fails to validate against the schema.
     """
     reference_dict = UI_CONFIG_SPECS[obj_type]
-    assert set(ui_config.keys()) <= set(
-        reference_dict.keys()
-    ), 'Missing keys: %s, Extra keys: %s' % (
-        list(set(reference_dict.keys()) - set(ui_config.keys())),
-        list(set(ui_config.keys()) - set(reference_dict.keys())),
+    assert set(ui_config.keys()) <= set(reference_dict.keys()), (
+        'Missing keys: %s, Extra keys: %s'
+        % (
+            list(set(reference_dict.keys()) - set(ui_config.keys())),
+            list(set(ui_config.keys()) - set(reference_dict.keys())),
+        )
     )
     for key, value in ui_config.items():
         schema_utils.normalize_against_schema(value, reference_dict[key])
@@ -407,10 +408,9 @@ def validate_schema(schema: Dict[str, Any]) -> None:
             assert isinstance(schema[SCHEMA_KEY_LEN], int), (
                 'Expected int, got %s' % schema[SCHEMA_KEY_LEN]
             )
-            assert (
-                schema[SCHEMA_KEY_LEN] > 0
-            ), 'Expected length greater than 0, got %s' % (
-                schema[SCHEMA_KEY_LEN]
+            assert schema[SCHEMA_KEY_LEN] > 0, (
+                'Expected length greater than 0, got %s'
+                % (schema[SCHEMA_KEY_LEN])
             )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         _validate_dict_keys(
@@ -428,14 +428,14 @@ def validate_schema(schema: Dict[str, Any]) -> None:
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION],
             )
-            assert isinstance(
-                prop[SCHEMA_KEY_NAME], str
-            ), 'Expected %s, got %s' % (str, prop[SCHEMA_KEY_NAME])
+            assert isinstance(prop[SCHEMA_KEY_NAME], str), (
+                'Expected %s, got %s' % (str, prop[SCHEMA_KEY_NAME])
+            )
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
-                assert isinstance(
-                    prop[SCHEMA_KEY_DESCRIPTION], str
-                ), 'Expected %s, got %s' % (str, prop[SCHEMA_KEY_DESCRIPTION])
+                assert isinstance(prop[SCHEMA_KEY_DESCRIPTION], str), (
+                    'Expected %s, got %s' % (str, prop[SCHEMA_KEY_DESCRIPTION])
+                )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
         _validate_dict_keys(
             schema,
@@ -444,8 +444,8 @@ def validate_schema(schema: Dict[str, Any]) -> None:
         )
         items = [SCHEMA_KEY_VALUES, SCHEMA_KEY_KEYS]
         for item in items:
-            assert isinstance(schema[item], dict), 'Expected dict, got %s' % (
-                schema[item]
+            assert isinstance(schema[item], dict), (
+                'Expected dict, got %s' % (schema[item])
             )
             _validate_dict_keys(
                 schema[item], [SCHEMA_KEY_SCHEMA], OPTIONAL_SCHEMA_KEYS

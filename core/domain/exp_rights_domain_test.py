@@ -24,7 +24,6 @@ from core.tests import test_utils
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -121,8 +120,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.exploration_rights.voice_artist_ids = [None]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected each id in voice_artist_ids to be string, '
-            'received None',
+            'Expected each id in voice_artist_ids to be string, received None',
         ):
             self.exploration_rights.validate()
 

@@ -95,7 +95,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         # names for our tests and create_platform_parameter only accepts
         # platform parameter name of type platform_parameter_list.ParamName.
         return registry.Registry.create_platform_parameter(
-            ParamName.PARAMETER_A, 'test', data_types  # type: ignore[arg-type]
+            ParamName.PARAMETER_A,
+            'test',
+            data_types,  # type: ignore[arg-type]
         )
 
     def test_create_platform_parameter(self) -> None:
@@ -116,7 +118,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             registry.Registry.create_platform_parameter(
-                ParamName.PARAMETER_A, 'test', DataType.INVALID  # type: ignore[arg-type]
+                ParamName.PARAMETER_A,
+                'test',
+                DataType.INVALID,  # type: ignore[arg-type]
             )
 
     def test_create_platform_parameter_with_the_same_name_failure(self) -> None:

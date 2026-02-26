@@ -72,3 +72,25 @@ jobs:
         with:
           message: "Prettier formatting failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  backend_formatter:
+    name: Backend formatting with Ruff
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Check Python formatting with Ruff
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: |
+          pip install ruff
+          ruff format --check .
+      - name: Explain how to fix the issue
+        if: ${{ failure() }}
+        run: echo "Run 'ruff format .' locally to fix formatting issues. See https://github.com/oppia/oppia/wiki/Formatters for more details."
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Ruff formatting failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

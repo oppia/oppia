@@ -180,10 +180,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
                 lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements(
-            [
-                'Duplicate pattern(s) found '
-                'in CODEOWNER_IMPORTANT_PATHS list.'
-            ],
+            ['Duplicate pattern(s) found in CODEOWNER_IMPORTANT_PATHS list.'],
             lint_task_report.trimmed_messages,
         )
         self.assertEqual('CODEOWNERS', lint_task_report.name)

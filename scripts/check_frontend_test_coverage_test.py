@@ -187,9 +187,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             check_function_calls['sys_exit_is_called'] = True
 
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
-        with (
-            sys_exit_swap
-        ), self.exists_swap, self.open_swap, self.print_swap:  # pylint: disable=line-too-long
+        with sys_exit_swap, self.exists_swap, self.open_swap, self.print_swap:  # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
                 check_frontend_test_coverage.check_coverage_changes()
             self.assertEqual(

@@ -52,7 +52,6 @@ StatsType = List[Tuple[str, Dict[str, Union[bool, int, str]]]]
 
 
 class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         suggestion_stats_computation_jobs.GenerateContributionStatsJob
     ] = suggestion_stats_computation_jobs.GenerateContributionStatsJob
@@ -1419,7 +1418,6 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
 
 class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         suggestion_stats_computation_jobs.AuditGenerateContributionStatsJob
     ] = suggestion_stats_computation_jobs.AuditGenerateContributionStatsJob

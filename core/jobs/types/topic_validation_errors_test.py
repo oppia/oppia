@@ -33,7 +33,6 @@ datastore_services = models.Registry.import_datastore_services()
 class ModelCanonicalNameMismatchErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         model = topic_models.TopicModel(
             id='test',

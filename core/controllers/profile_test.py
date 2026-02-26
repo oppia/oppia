@@ -48,7 +48,6 @@ secrets_services = models.Registry.import_secrets_services()
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
-
     def test_get_profile_page_of_existing_user(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
@@ -129,7 +128,6 @@ class ProfilePageTests(test_utils.GenericTestBase):
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
-
     def test_preference_page_updates(self) -> None:
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
@@ -289,7 +287,6 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
-
     USERNAME_A: Final = 'a'
     EMAIL_A: Final = 'a@example.com'
     USERNAME_B: Final = 'b'
@@ -374,7 +371,6 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
 
 class FirstContributionDateTests(test_utils.GenericTestBase):
-
     USERNAME: Final = 'abc123'
     EMAIL: Final = 'abc123@gmail.com'
 
@@ -416,7 +412,6 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
 
 
 class PreferencesHandlerTests(test_utils.GenericTestBase):
-
     EXP_ID: Final = 'exp_id'
     EXP_TITLE: Final = 'Exploration title'
 
@@ -628,8 +623,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             Exception,
-            'Non-boolean values found for keys: '
-            'can_receive_subscription_email',
+            'Non-boolean values found for keys: can_receive_subscription_email',
         ):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
@@ -721,7 +715,6 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
 
 
 class EmailPreferencesTests(test_utils.GenericTestBase):
-
     def test_missing_can_receive_email_updates_key_raises_error(self) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
@@ -962,7 +955,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
 
 class SignupTests(test_utils.GenericTestBase):
-
     def test_signup_page_does_not_have_top_right_menu(self) -> None:
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
@@ -1321,7 +1313,6 @@ class SignupTests(test_utils.GenericTestBase):
 
 
 class DeleteAccountPageTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1333,7 +1324,6 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
 
 
 class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
-
     def test_put_function(self) -> None:
         swap_add_fn = self.swap(
             user_services,
@@ -1427,7 +1417,6 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
 
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1587,7 +1576,6 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
 
 
 class DeleteAccountHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1778,14 +1766,12 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
-
     def test_get_pending_account_deletion_page(self) -> None:
         response = self.get_html_response('/pending-account-deletion')
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
-
     def test_username_check(self) -> None:
         self.signup('abc@example.com', 'abc')
 
@@ -1835,7 +1821,6 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
 
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1889,7 +1874,6 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
 
 class UserInfoHandlerTests(test_utils.GenericTestBase):
-
     def test_user_info_handler(self) -> None:
         """Test the language is saved in the preferences when handler is
         called.
@@ -1945,7 +1929,6 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
 
 
 class UrlHandlerTests(test_utils.GenericTestBase):
-
     def test_login_url_is_none_for_signed_in_user(self) -> None:
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)

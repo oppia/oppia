@@ -82,7 +82,9 @@ class FirebaseProxyPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     # to accomodate all firebase requests.
     @acl_decorators.open_access
     def get(
-        self, *args: Any, **kwargs: Any  # pylint: disable=unused-argument
+        self,
+        *args: Any,
+        **kwargs: Any,  # pylint: disable=unused-argument
     ) -> None:
         """Proxies GET requests to the firebase app."""
         self._firebase_proxy()
@@ -91,7 +93,9 @@ class FirebaseProxyPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     # to accomodate all firebase requests.
     @acl_decorators.open_access
     def post(
-        self, *args: Any, **kwargs: Any  # pylint: disable=unused-argument
+        self,
+        *args: Any,
+        **kwargs: Any,  # pylint: disable=unused-argument
     ) -> None:
         """Proxies POST requests to the firebase app."""
         self._firebase_proxy()

@@ -196,7 +196,6 @@ title: Title of exploration
 class MigrateExplorationJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = exp_migration_jobs.MigrateExplorationJob
 
     NEW_EXP_ID = 'exp_1'
@@ -668,10 +667,10 @@ class MigrateExplorationJobTests(
                 [
                     job_run_result.JobRunResult(
                         stderr=(
-                            'EXP RELATED MODELS GENERATED ERROR: \"('
+                            'EXP RELATED MODELS GENERATED ERROR: "('
                             '\'exp_1\', Exception('
                             '\'Error generating related models\''
-                            '))\": 1'
+                            '))": 1'
                         )
                     ),
                     job_run_result.JobRunResult(
@@ -693,7 +692,6 @@ class MigrateExplorationJobTests(
 class AuditExplorationMigrationJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = exp_migration_jobs.AuditExplorationMigrationJob
 
     NEW_EXP_ID = 'exp_1'
@@ -1667,7 +1665,6 @@ class ExpSnapshotsMigrationAuditJobTests(
 class ExpSnapshotsMigrationJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = exp_migration_jobs.ExpSnapshotsMigrationJob
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'

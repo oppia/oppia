@@ -37,7 +37,6 @@ if MYPY:  # pragma: no cover
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             stats_models.StateCounterModel.get_deletion_policy(),
@@ -1133,7 +1132,6 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_shard_count_is_updated_when_data_overflows(self) -> None:
-
         submitted_answer_list: List[stats_domain.SubmittedAnswerDict] = [
             {
                 'answer': 'value',

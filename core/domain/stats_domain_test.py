@@ -1208,9 +1208,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         )
 
     def test_from_dict(self) -> None:
-        expected_customization_args: (
-            stats_domain.IssuesCustomizationArgsDictType
-        ) = {
+        expected_customization_args: stats_domain.IssuesCustomizationArgsDictType = {
             'time_spent_in_exp_in_msecs': {'value': 0},
             'state_name': {'value': ''},
         }
@@ -1368,7 +1366,11 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # test updating exp_issue with no schema_version.
     def test_cannot_update_exp_issue_with_no_schema_version(self) -> None:
         exp_issue = stats_domain.ExplorationIssue(
-            'EarlyQuit', {}, [], None, True  # type: ignore[arg-type]
+            'EarlyQuit',
+            {},
+            [],
+            None,
+            True,  # type: ignore[arg-type]
         )
         exp_issue_dict = exp_issue.to_dict()
         stats_models.ExplorationIssuesModel.create(
@@ -1384,8 +1386,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception,
             re.escape(
-                'unsupported operand type(s) for +=: \'NoneType\' '
-                'and \'int\''
+                'unsupported operand type(s) for +=: \'NoneType\' and \'int\''
             ),
         ):
             stats_services.get_exp_issues_from_model(exp_issues_model)
@@ -1462,9 +1463,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     def test_comparison_between_exploration_issues_returns_correctly(
         self,
     ) -> None:
-        expected_customization_args: (
-            stats_domain.IssuesCustomizationArgsDictType
-        ) = {
+        expected_customization_args: stats_domain.IssuesCustomizationArgsDictType = {
             'time_spent_in_exp_in_msecs': {'value': 0},
             'state_name': {'value': ''},
         }
@@ -1625,7 +1624,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
     # updating learner_action with no schema_version.
     def test_cannot_update_learner_action_with_no_schema_version(self) -> None:
         learner_action = stats_domain.LearnerAction(
-            'ExplorationStart', {}, None  # type: ignore[arg-type]
+            'ExplorationStart',
+            {},
+            None,  # type: ignore[arg-type]
         )
         learner_action_dict = learner_action.to_dict()
 
@@ -1645,8 +1646,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception,
             re.escape(
-                'unsupported operand type(s) for +=: \'NoneType\' '
-                'and \'int\''
+                'unsupported operand type(s) for +=: \'NoneType\' and \'int\''
             ),
         ):
             stats_services.get_playthrough_from_model(playthrough_model)
@@ -2569,7 +2569,6 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
 
 
 class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.learner_answer_details = stats_domain.LearnerAnswerDetails(
@@ -2849,7 +2848,6 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
 
 class LearnerAnswerInfoTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.learner_answer_info = stats_domain.LearnerAnswerInfo(

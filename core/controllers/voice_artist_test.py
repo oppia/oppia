@@ -38,7 +38,6 @@ if MYPY:  # pragma: no cover
 
 
 class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
         super().setUp()
@@ -123,7 +122,6 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
             'Trying to update version 1 of exploration from version'
             ' 3, which is not possible. Please reload the page and try again.',
         ):
-
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID),
                 {
@@ -369,7 +367,6 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
 
 
 class VoiceArtistManagementTests(test_utils.GenericTestBase):
-
     published_exp_id_1 = 'exp_1'
     published_exp_id_2 = 'exp_2'
     private_exp_id_1 = 'exp_3'

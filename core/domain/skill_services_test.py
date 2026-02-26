@@ -133,7 +133,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, 'Invalid change dict.'):
             skill_services.apply_change_list(
-                self.SKILL_ID, invalid_skill_change_list, self.user_id_a  # type: ignore[arg-type]
+                self.SKILL_ID,
+                invalid_skill_change_list,
+                self.user_id_a,  # type: ignore[arg-type]
             )
 
     def test_compute_summary(self) -> None:
@@ -1886,7 +1888,6 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
 
 
 class SkillMigrationTests(test_utils.GenericTestBase):
-
     def test_migrate_skill_contents_to_latest_schema(self) -> None:
         commit_cmd = skill_domain.SkillChange(
             {'cmd': skill_domain.CMD_CREATE_NEW}
@@ -1900,9 +1901,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-math>'
         )
 
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content1': {
                     'en': {

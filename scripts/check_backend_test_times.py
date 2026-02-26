@@ -38,9 +38,9 @@ class BackendTestDict(TypedDict):
     test_time_by_average_test_case: float
 
 
-def get_sorted_backend_test_times_from_reports() -> (
-    Tuple[List[BackendTestDict], List[BackendTestDict]]
-):
+def get_sorted_backend_test_times_from_reports() -> Tuple[
+    List[BackendTestDict], List[BackendTestDict]
+]:
     """Returns a list of sorted backend test times from all backend time
     reports.
 

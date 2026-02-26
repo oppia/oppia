@@ -1279,8 +1279,10 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email('owner@example.com')
         self.save_new_valid_exploration('exp1', owner_id)
 
-        activity_rights_list = rights_manager._get_activity_rights_where_user_is_owner(  # pylint: disable=protected-access
-            constants.ACTIVITY_TYPE_EXPLORATION, owner_id
+        activity_rights_list = (
+            rights_manager._get_activity_rights_where_user_is_owner(  # pylint: disable=protected-access
+                constants.ACTIVITY_TYPE_EXPLORATION, owner_id
+            )
         )
 
         self.assertEqual(len(activity_rights_list), 1)

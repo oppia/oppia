@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
-
     EXP_ID_1 = 'exp_id_1'
     EXP_TITLE_1 = 'exp title 1'
     EXP_ID_2 = 'exp_id_2'

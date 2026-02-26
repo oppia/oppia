@@ -2188,9 +2188,9 @@ class Story:
             new_thumbnail_filename,
         )
         if fs.isfile(filepath):
-            self.story_contents.nodes[node_index].thumbnail_filename = (
-                new_thumbnail_filename
-            )
+            self.story_contents.nodes[
+                node_index
+            ].thumbnail_filename = new_thumbnail_filename
             self.story_contents.nodes[node_index].thumbnail_size_in_bytes = len(
                 fs.get(filepath)
             )
@@ -2211,9 +2211,9 @@ class Story:
                 color of the given node.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].thumbnail_bg_color = (
-            new_thumbnail_bg_color
-        )
+        self.story_contents.nodes[
+            node_index
+        ].thumbnail_bg_color = new_thumbnail_bg_color
 
     def mark_node_outline_as_finalized(self, node_id: str) -> None:
         """Updates the outline_is_finalized field of the node with the given
@@ -2246,9 +2246,9 @@ class Story:
                 list.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].acquired_skill_ids = (
-            new_acquired_skill_ids
-        )
+        self.story_contents.nodes[
+            node_index
+        ].acquired_skill_ids = new_acquired_skill_ids
 
     def update_node_prerequisite_skill_ids(
         self, node_id: str, new_prerequisite_skill_ids: List[str]
@@ -2261,9 +2261,9 @@ class Story:
                 skill id list.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].prerequisite_skill_ids = (
-            new_prerequisite_skill_ids
-        )
+        self.story_contents.nodes[
+            node_index
+        ].prerequisite_skill_ids = new_prerequisite_skill_ids
 
     def update_node_status(self, node_id: str, new_status: str) -> None:
         """Updates the status of a given node
@@ -2345,9 +2345,9 @@ class Story:
                 this node.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].unpublishing_reason = (
-            new_unpublishing_reason
-        )
+        self.story_contents.nodes[
+            node_index
+        ].unpublishing_reason = new_unpublishing_reason
 
     def update_node_destination_node_ids(
         self, node_id: str, new_destination_node_ids: List[str]
@@ -2360,9 +2360,9 @@ class Story:
                 node id list.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].destination_node_ids = (
-            new_destination_node_ids
-        )
+        self.story_contents.nodes[
+            node_index
+        ].destination_node_ids = new_destination_node_ids
 
     def rearrange_node_in_story(self, from_index: int, to_index: int) -> None:
         """Rearranges or moves a node in the story content.
@@ -2382,8 +2382,7 @@ class Story:
 
         if not isinstance(to_index, int):
             raise Exception(
-                'Expected to_index value to be a number, '
-                'received %s' % to_index
+                'Expected to_index value to be a number, received %s' % to_index
             )
 
         if from_index == to_index:
@@ -2452,9 +2451,9 @@ class Story:
                 'A node with exploration id %s already exists.'
                 % new_exploration_id
             )
-        self.story_contents.nodes[node_index].exploration_id = (
-            new_exploration_id
-        )
+        self.story_contents.nodes[
+            node_index
+        ].exploration_id = new_exploration_id
 
     def update_initial_node(self, new_initial_node_id: str) -> None:
         """Updates the starting node of the story.

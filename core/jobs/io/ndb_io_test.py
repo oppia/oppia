@@ -35,7 +35,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class NdbIoTests(job_test_utils.PipelinedTestBase):
-
     def get_base_models(self) -> List[base_models.BaseModel]:
         """Returns all models in the datastore.
 

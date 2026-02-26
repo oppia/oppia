@@ -44,10 +44,7 @@ if MYPY:
 
 
 class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
-
-    JOB_CLASS = (
-        suggestion_migration_jobs.RegenerateContentIdForTranslationSuggestionsInReviewJob
-    )
+    JOB_CLASS = suggestion_migration_jobs.RegenerateContentIdForTranslationSuggestionsInReviewJob
     TARGET_ID = 'exp1'
 
     def setUp(self) -> None:
@@ -270,16 +267,16 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'SUGGESTION TARGET PROCESSED ERROR: \"(16, '
+                        'SUGGESTION TARGET PROCESSED ERROR: "(16, '
                         '\'State name invalid_state_name does not exist in the '
-                        'exploration\')\": 1'
+                        'exploration\')": 1'
                     )
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
                         'SUGGESTION TARGET PROCESSED ERROR: '
-                        '\"(17, \'Content ID invalid does not exist in the '
-                        'exploration\')\": 1'
+                        '"(17, \'Content ID invalid does not exist in the '
+                        'exploration\')": 1'
                     )
                 ),
             ]
@@ -332,10 +329,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
 
 class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
-
-    JOB_CLASS = (
-        suggestion_migration_jobs.AuditRegenerateContentIdForTranslationSuggestionsInReviewJob
-    )
+    JOB_CLASS = suggestion_migration_jobs.AuditRegenerateContentIdForTranslationSuggestionsInReviewJob
     TARGET_ID = 'exp1'
 
     def setUp(self) -> None:
@@ -514,7 +508,6 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
 class MigrateQuestionSuggestionsJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = suggestion_migration_jobs.MigrateQuestionSuggestionsJob
 
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -645,7 +638,6 @@ class MigrateQuestionSuggestionsJobTests(
 class AuditMigrateQuestionSuggestionsJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
     JOB_CLASS = suggestion_migration_jobs.AuditMigrateQuestionSuggestionsJob
 
     AUTHOR_EMAIL: Final = 'author@example.com'

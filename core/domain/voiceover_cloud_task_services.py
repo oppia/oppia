@@ -258,7 +258,6 @@ def resolve_multiple_cloud_task_runs_for_exploration(
             ) in earlier_language_accent_to_content_status_map_clone[
                 language_accent
             ].items():
-
                 if (
                     content_id
                     not in later_language_accent_to_content_status_map[

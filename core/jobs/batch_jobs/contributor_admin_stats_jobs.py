@@ -113,8 +113,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 'opportunity': exp_opportunities,
             }
             | 'Merge translation suggestion objects' >> beam.CoGroupByKey()
-            | 'Get rid of key of submitted translation objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key of submitted translation objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         shortlisted_translation_suggestions = (
@@ -173,8 +172,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 'opportunity': skill_opportunities,
             }
             | 'Merge submitted question objects' >> beam.CoGroupByKey()
-            | 'Get rid of key of submitted question objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key of submitted question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         shortlisted_question_suggestions = (
@@ -272,7 +270,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             )
             | 'Transform translation contribution stats'
             >> beam.MapTuple(
-                lambda key, value: self.transform_translation_contribution_stats(
+                lambda key,
+                value: self.transform_translation_contribution_stats(
                     key,
                     value['translation_contribution_stats'],
                     value['translation_general_suggestions_stats'],
@@ -870,18 +869,20 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         )
 
         with datastore_services.get_ndb_context():
-            question_review_stats_models = suggestion_models.QuestionReviewerTotalContributionStatsModel(  # pylint: disable=line-too-long
-                id=entity_id,
-                contributor_id=reviewer_user_id,
-                topic_ids_with_question_reviews=topic_ids,
-                reviewed_questions_count=reviewed_questions_count,
-                accepted_questions_count=accepted_questions_count,
-                accepted_questions_with_reviewer_edits_count=(
-                    accepted_questions_with_reviewer_edits_count
-                ),
-                rejected_questions_count=rejected_questions_count,
-                first_contribution_date=first_contribution_date,
-                last_contribution_date=last_contribution_date,
+            question_review_stats_models = (
+                suggestion_models.QuestionReviewerTotalContributionStatsModel(  # pylint: disable=line-too-long
+                    id=entity_id,
+                    contributor_id=reviewer_user_id,
+                    topic_ids_with_question_reviews=topic_ids,
+                    reviewed_questions_count=reviewed_questions_count,
+                    accepted_questions_count=accepted_questions_count,
+                    accepted_questions_with_reviewer_edits_count=(
+                        accepted_questions_with_reviewer_edits_count
+                    ),
+                    rejected_questions_count=rejected_questions_count,
+                    first_contribution_date=first_contribution_date,
+                    last_contribution_date=last_contribution_date,
+                )
             )
             question_review_stats_models.update_timestamps()
             return question_review_stats_models
@@ -1026,8 +1027,7 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
             >> beam.Map(
                 lambda result: (
                     job_run_result.JobRunResult.as_stdout(
-                        'LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: '
-                        f'{result}'
+                        f'LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: {result}'
                     )
                 )
             )
@@ -1140,7 +1140,6 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
 
         with datastore_services.get_ndb_context():
             for s in general_suggestion_models:
-
                 story_id = exp_services.get_story_id_linked_to_exploration(
                     s.target_id
                 )
@@ -1163,10 +1162,11 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                     )
 
                     # Check if xploration opportunity model exists.
-                    opportunity_model_exists = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                        s.target_id
-                    ) is not (
-                        None
+                    opportunity_model_exists = (
+                        opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                            s.target_id
+                        )
+                        is not (None)
                     )
                     debug_logs += (
                         'exp_opportunity_model_exists: '
@@ -1196,10 +1196,11 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                         )
 
                         # Check if xploration opportunity model exists.
-                        opportunity_model_exists = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                            s.target_id
-                        ) is not (
-                            None
+                        opportunity_model_exists = (
+                            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                                s.target_id
+                            )
+                            is not (None)
                         )
                         debug_logs += (
                             'exp_opportunity_model_exists: '
@@ -1229,10 +1230,11 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                             )
 
                             # Check if xploration opportunity model exists.
-                            opportunity_model_exists = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                                s.target_id
-                            ) is not (
-                                None
+                            opportunity_model_exists = (
+                                opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                                    s.target_id
+                                )
+                                is not (None)
                             )
                             debug_logs += (
                                 'exp_opportunity_model_exists: '
@@ -1361,9 +1363,13 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             )
         )
 
-        translation_totals = self.pipeline | 'Get Translation Totals' >> ndb_io.GetModels(
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.get_all(
-                include_deleted=False
+        translation_totals = (
+            self.pipeline
+            | 'Get Translation Totals'
+            >> ndb_io.GetModels(
+                suggestion_models.TranslationSubmitterTotalContributionStatsModel.get_all(
+                    include_deleted=False
+                )
             )
         )
 
@@ -1411,8 +1417,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                 'opportunity': exp_opportunities,
             }
             | 'Merge translation suggestion objects' >> beam.CoGroupByKey()
-            | 'Get rid of key of submitted translation objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key of submitted translation objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         translation_suggestions = (
@@ -1430,9 +1435,13 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             >> beam.FlatMap(lambda grouped_data: list(grouped_data[0]))
         )
 
-        question_totals = self.pipeline | 'Get Question Totals' >> ndb_io.GetModels(
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_all(
-                include_deleted=False
+        question_totals = (
+            self.pipeline
+            | 'Get Question Totals'
+            >> ndb_io.GetModels(
+                suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_all(
+                    include_deleted=False
+                )
             )
         )
 
@@ -1479,8 +1488,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                 'opportunity': skill_opportunities,
             }
             | 'Merge submitted question objects' >> beam.CoGroupByKey()
-            | 'Get rid of key of submitted question objects'
-            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of key of submitted question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         question_suggestions = (

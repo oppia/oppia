@@ -59,7 +59,6 @@ ChangeType = Dict[
 
 
 class MockInvalidSuggestion(suggestion_registry.BaseSuggestion):
-
     def __init__(self) -> None:  # pylint: disable=super-init-not-called
         pass
 
@@ -2326,8 +2325,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected change_cmd to be an '
-            'instance of QuestionSuggestionChange',
+            'Expected change_cmd to be an instance of QuestionSuggestionChange',
         ):
             suggestion.validate()
 
@@ -4100,7 +4098,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats.set_translation_reviewer_count_for_language_code(
-                self.sample_language_code, self.non_integer_count  # type: ignore[arg-type]
+                self.sample_language_code,
+                self.non_integer_count,  # type: ignore[arg-type]
             )
         )
 
@@ -4123,7 +4122,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats.set_translation_suggestion_count_for_language_code(
-                self.sample_language_code, self.non_integer_count  # type: ignore[arg-type]
+                self.sample_language_code,
+                self.non_integer_count,  # type: ignore[arg-type]
             )
         )
 
@@ -4660,22 +4660,24 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
             ),
         }
 
-        actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats(  # pylint: disable=line-too-long
-            self.SUGGESTION_LANGUAGE_CODE,
-            user_settings.user_id,
-            [topic_id_1, topic_id_2],
-            self.RECENT_REVIEW_OUTCOMES,
-            self.RECENT_PERFORMANCE,
-            self.OVERALL_ACCURACY,
-            self.SUBMITTED_TRANSLATIONS_COUNT,
-            self.SUBMITTED_TRANSLATION_WORD_COUNT,
-            self.ACCEPTED_TRANSLATIONS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
-            self.ACCEPTED_TRANSLATION_WORD_COUNT,
-            self.REJECTED_TRANSLATIONS_COUNT,
-            self.REJECTED_TRANSLATION_WORD_COUNT,
-            self.FIRST_CONTRIBUTION_DATE,
-            self.LAST_CONTRIBUTION_DATE,
+        actual_stats = (
+            suggestion_registry.TranslationSubmitterTotalContributionStats(  # pylint: disable=line-too-long
+                self.SUGGESTION_LANGUAGE_CODE,
+                user_settings.user_id,
+                [topic_id_1, topic_id_2],
+                self.RECENT_REVIEW_OUTCOMES,
+                self.RECENT_PERFORMANCE,
+                self.OVERALL_ACCURACY,
+                self.SUBMITTED_TRANSLATIONS_COUNT,
+                self.SUBMITTED_TRANSLATION_WORD_COUNT,
+                self.ACCEPTED_TRANSLATIONS_COUNT,
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+                self.ACCEPTED_TRANSLATION_WORD_COUNT,
+                self.REJECTED_TRANSLATIONS_COUNT,
+                self.REJECTED_TRANSLATION_WORD_COUNT,
+                self.FIRST_CONTRIBUTION_DATE,
+                self.LAST_CONTRIBUTION_DATE,
+            )
         )
 
         self.assertDictEqual(
@@ -4761,17 +4763,19 @@ class TranslationReviewerTotalContributionStatsUnitTests(
             ),
         }
 
-        actual_stats = suggestion_registry.TranslationReviewerTotalContributionStats(  # pylint: disable=line-too-long
-            self.SUGGESTION_LANGUAGE_CODE,
-            user_settings.user_id,
-            [topic_id_1, topic_id_2],
-            self.REVIEWED_TRANSLATIONS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
-            self.ACCEPTED_TRANSLATION_WORD_COUNT,
-            self.REJECTED_TRANSLATIONS_COUNT,
-            self.FIRST_CONTRIBUTION_DATE,
-            self.LAST_CONTRIBUTION_DATE,
+        actual_stats = (
+            suggestion_registry.TranslationReviewerTotalContributionStats(  # pylint: disable=line-too-long
+                self.SUGGESTION_LANGUAGE_CODE,
+                user_settings.user_id,
+                [topic_id_1, topic_id_2],
+                self.REVIEWED_TRANSLATIONS_COUNT,
+                self.ACCEPTED_TRANSLATIONS_COUNT,
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+                self.ACCEPTED_TRANSLATION_WORD_COUNT,
+                self.REJECTED_TRANSLATIONS_COUNT,
+                self.FIRST_CONTRIBUTION_DATE,
+                self.LAST_CONTRIBUTION_DATE,
+            )
         )
 
         self.assertDictEqual(
@@ -4859,18 +4863,20 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
             ),
         }
 
-        actual_stats = suggestion_registry.QuestionSubmitterTotalContributionStats(  # pylint: disable=line-too-long
-            user_settings.user_id,
-            [topic_id_1, topic_id_2],
-            self.RECENT_REVIEW_OUTCOMES,
-            self.RECENT_PERFORMANCE,
-            self.OVERALL_ACCURACY,
-            self.SUBMITTED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
-            self.REJECTED_QUESTIONS_COUNT,
-            self.FIRST_CONTRIBUTION_DATE,
-            self.LAST_CONTRIBUTION_DATE,
+        actual_stats = (
+            suggestion_registry.QuestionSubmitterTotalContributionStats(  # pylint: disable=line-too-long
+                user_settings.user_id,
+                [topic_id_1, topic_id_2],
+                self.RECENT_REVIEW_OUTCOMES,
+                self.RECENT_PERFORMANCE,
+                self.OVERALL_ACCURACY,
+                self.SUBMITTED_QUESTIONS_COUNT,
+                self.ACCEPTED_QUESTIONS_COUNT,
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+                self.REJECTED_QUESTIONS_COUNT,
+                self.FIRST_CONTRIBUTION_DATE,
+                self.LAST_CONTRIBUTION_DATE,
+            )
         )
 
         self.assertDictEqual(
@@ -4950,15 +4956,17 @@ class QuestionReviewerTotalContributionStatsUnitTests(
             ),
         }
 
-        actual_stats = suggestion_registry.QuestionReviewerTotalContributionStats(  # pylint: disable=line-too-long
-            user_settings.user_id,
-            [topic_id_1, topic_id_2],
-            self.REVIEWED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
-            self.REJECTED_QUESTIONS_COUNT,
-            self.FIRST_CONTRIBUTION_DATE,
-            self.LAST_CONTRIBUTION_DATE,
+        actual_stats = (
+            suggestion_registry.QuestionReviewerTotalContributionStats(  # pylint: disable=line-too-long
+                user_settings.user_id,
+                [topic_id_1, topic_id_2],
+                self.REVIEWED_QUESTIONS_COUNT,
+                self.ACCEPTED_QUESTIONS_COUNT,
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+                self.REJECTED_QUESTIONS_COUNT,
+                self.FIRST_CONTRIBUTION_DATE,
+                self.LAST_CONTRIBUTION_DATE,
+            )
         )
 
         self.assertDictEqual(

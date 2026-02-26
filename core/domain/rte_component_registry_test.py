@@ -302,9 +302,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_get_component_types_to_component_classes(self) -> None:
         """Test get_component_types_to_component_classes method."""
-        component_types_to_component_classes = (
-            rte_component_registry.Registry.get_component_types_to_component_classes()
-        )  # pylint: disable=line-too-long
+        component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes()  # pylint: disable=line-too-long
         component_specs = (
             rte_component_registry.Registry.get_all_rte_components()
         )
@@ -358,9 +356,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         mock_loader = mock.MagicMock()
         mock_iter_modules.return_value = [(mock_loader, 'non_component', None)]
 
-        component_types = (
-            rte_component_registry.Registry.get_component_types_to_component_classes()
-        )
+        component_types = rte_component_registry.Registry.get_component_types_to_component_classes()
         self.assertEqual(component_types, {})
 
     def test_get_component_tag_names(self) -> None:

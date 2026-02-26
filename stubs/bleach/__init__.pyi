@@ -10,10 +10,9 @@ def clean(
     strip: bool = ...,
     strip_comments: bool = ...,
 ) -> str: ...
-
 def linkify(
     text: str,
     callbacks: Any = ...,
     skip_tags: Iterable[str] | None = ...,
-    parse_email: bool = ...
+    parse_email: bool = ...,
 ) -> str: ...

@@ -38,7 +38,6 @@ suggestion_model = suggestion_models.GeneralSuggestionModel
 class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     job_test_utils.JobTestBase
 ):
-
     jobs = suggestion_edit_state_content_deletion_jobs
 
     JOB_CLASS: Type[
@@ -173,7 +172,6 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
 class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     job_test_utils.JobTestBase
 ):
-
     jobs = suggestion_edit_state_content_deletion_jobs
 
     JOB_CLASS: Type[

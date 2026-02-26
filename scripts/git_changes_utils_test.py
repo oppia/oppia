@@ -186,17 +186,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 (['git', 'config', '--get', 'remote..url'],),
             ],
         )
-        with popen_swap, self.assertRaisesRegex(
-            Exception,
-            'Error: Please set the git \'upstream\' repository.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2a. If \'upstream\' is listed in the command output, then run the '
-            'command \'git remote set-url upstream '
-            'https://github.com/oppia/oppia.git\'\n'
-            '2b. If \'upstream\' is not listed in the command output, then run '
-            'the command \'git remote add upstream '
-            'https://github.com/oppia/oppia.git\'\n',
+        with (
+            popen_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Error: Please set the git \'upstream\' repository.\n'
+                'To do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2a. If \'upstream\' is listed in the command output, then run the '
+                'command \'git remote set-url upstream '
+                'https://github.com/oppia/oppia.git\'\n'
+                '2b. If \'upstream\' is not listed in the command output, then run '
+                'the command \'git remote add upstream '
+                'https://github.com/oppia/oppia.git\'\n',
+            ),
         ):
             git_changes_utils.get_upstream_git_repository_remote_name()
 
@@ -238,18 +241,21 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             ],
         )
 
-        with popen_swap, self.assertRaisesRegex(
-            Exception,
-            'Error: Please keep only one remote branch for oppia:develop.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2. This command will list the remote references. There will be '
-            'multiple remotes with the main oppia github reopsitory url, but we'
-            ' want to make sure that there is only one main \'upstream\' remote'
-            ' that uses the url https://github.com/oppia/oppia.git. Please use '
-            'the command, \'git remote remove <remote_name>\' on all remotes '
-            'that have the url https://github.com/oppia/oppia.git except for '
-            'the main \'upstream\' remote.\n',
+        with (
+            popen_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Error: Please keep only one remote branch for oppia:develop.\n'
+                'To do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2. This command will list the remote references. There will be '
+                'multiple remotes with the main oppia github reopsitory url, but we'
+                ' want to make sure that there is only one main \'upstream\' remote'
+                ' that uses the url https://github.com/oppia/oppia.git. Please use '
+                'the command, \'git remote remove <remote_name>\' on all remotes '
+                'that have the url https://github.com/oppia/oppia.git except for '
+                'the main \'upstream\' remote.\n',
+            ),
         ):
             git_changes_utils.get_upstream_git_repository_remote_name()
 
@@ -386,17 +392,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 (['git', 'config', '--get', 'remote..url'],),
             ],
         )
-        with popen_swap, self.assertRaisesRegex(
-            Exception,
-            'Error: Please set the git \'origin\' repository.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2a. If \'origin\' is listed in the command output, then run the '
-            'command \'git remote set-url origin '
-            '\"The URL of your fork of Oppia GitHub repository\"\'\n'
-            '2b. If \'origin\' is not listed in the command output, then run '
-            'the command \'git remote add origin '
-            '\"The URL of your fork of Oppia GitHub repository\"\'\n',
+        with (
+            popen_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Error: Please set the git \'origin\' repository.\n'
+                'To do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2a. If \'origin\' is listed in the command output, then run the '
+                'command \'git remote set-url origin '
+                '"The URL of your fork of Oppia GitHub repository"\'\n'
+                '2b. If \'origin\' is not listed in the command output, then run '
+                'the command \'git remote add origin '
+                '"The URL of your fork of Oppia GitHub repository"\'\n',
+            ),
         ):
             git_changes_utils.get_local_git_repository_remote_name()
 
@@ -438,18 +447,21 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             ],
         )
 
-        with popen_swap, self.assertRaisesRegex(
-            Exception,
-            'Error: Please keep only one remote branch for your Oppia fork.'
-            '\nTo do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2. This command will list the remote references. There will be '
-            'multiple remotes for an Oppia fork, but we'
-            ' want to make sure that there is only one main \'origin\' remote'
-            ' that uses an Oppia fork URL. Please use '
-            'the command, \'git remote remove <remote_name>\' on all remotes '
-            'that have an Oppia fork URL except for '
-            'the main \'origin\' remote.\n',
+        with (
+            popen_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'Error: Please keep only one remote branch for your Oppia fork.'
+                '\nTo do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2. This command will list the remote references. There will be '
+                'multiple remotes for an Oppia fork, but we'
+                ' want to make sure that there is only one main \'origin\' remote'
+                ' that uses an Oppia fork URL. Please use '
+                'the command, \'git remote remove <remote_name>\' on all remotes '
+                'that have an Oppia fork URL except for '
+                'the main \'origin\' remote.\n',
+            ),
         ):
             git_changes_utils.get_local_git_repository_remote_name()
 
@@ -492,8 +504,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             ],
         )
 
-        with subprocess_swap, self.assertRaisesRegex(
-            ValueError, 'test_oppia_error'
+        with (
+            subprocess_swap,
+            self.assertRaisesRegex(ValueError, 'test_oppia_error'),
         ):
             git_changes_utils.git_diff_name_status('left', 'right')
 
@@ -683,10 +696,13 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         curr_dir_swap = self.swap(common, 'CURR_DIR', '/usr/opensource/oppia')
 
         with subprocess_swap, git_diff_swap, get_merge_base_swap:
-            with curr_dir_swap, self.assertRaisesRegex(
-                ValueError,
-                'Error: The file /usr/directory/file2.py is not inside the '
-                'oppia directory.',
+            with (
+                curr_dir_swap,
+                self.assertRaisesRegex(
+                    ValueError,
+                    'Error: The file /usr/directory/file2.py is not inside the '
+                    'oppia directory.',
+                ),
             ):
                 git_changes_utils.compare_to_remote(
                     'remote', 'local branch', 'remote/local branch'
@@ -1042,13 +1058,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, bytes]:
             return (b'local_sha1 local_ref', b'')
 
-        with self.swap(
-            common, 'get_current_branch_name', mock_get_branch
-        ), self.swap_with_checks(
-            common,
-            'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'show-ref', 'branch1'],)],
+        with (
+            self.swap(common, 'get_current_branch_name', mock_get_branch),
+            self.swap_with_checks(
+                common,
+                'start_subprocess_for_result',
+                mock_start_subprocess_for_result,
+                expected_args=[(['git', 'show-ref', 'branch1'],)],
+            ),
         ):
             self.assertEqual(
                 git_changes_utils.get_refs(),
@@ -1071,12 +1088,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, bytes]:
             return (b'local_sha1 local_ref\nremote_sha1 remote_ref', b'')
 
-        with self.swap(sys.stdin, 'isatty', lambda: True), self.swap(
-            common, 'get_current_branch_name', mock_get_branch
-        ), self.swap(
-            common,
-            'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
+        with (
+            self.swap(sys.stdin, 'isatty', lambda: True),
+            self.swap(common, 'get_current_branch_name', mock_get_branch),
+            self.swap(
+                common,
+                'start_subprocess_for_result',
+                mock_start_subprocess_for_result,
+            ),
         ):
             refs = git_changes_utils.get_refs()
             self.assertEqual(len(refs), 1)
@@ -1093,14 +1112,17 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
         with tempfile.NamedTemporaryFile() as temp_stdin_file:
             with open(temp_stdin_file.name, 'r', encoding='utf-8') as f:
-                with self.swap(sys, 'stdin', f), self.swap(
-                    sys.stdin, 'isatty', lambda: False
-                ), self.swap(
-                    common, 'get_current_branch_name', mock_get_branch
-                ), self.swap(
-                    common,
-                    'start_subprocess_for_result',
-                    mock_start_subprocess_for_result,
+                with (
+                    self.swap(sys, 'stdin', f),
+                    self.swap(sys.stdin, 'isatty', lambda: False),
+                    self.swap(
+                        common, 'get_current_branch_name', mock_get_branch
+                    ),
+                    self.swap(
+                        common,
+                        'start_subprocess_for_result',
+                        mock_start_subprocess_for_result,
+                    ),
                 ):
                     refs = git_changes_utils.get_refs()
                     self.assertEqual(len(refs), 1)
@@ -1345,7 +1367,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             mock_get_remote_name,
         )
 
-        with get_remote_name_swap, self.assertRaisesRegex(
-            SystemExit, 'Error: No remote repository found.'
+        with (
+            get_remote_name_swap,
+            self.assertRaisesRegex(
+                SystemExit, 'Error: No remote repository found.'
+            ),
         ):
             git_changes_utils.get_changed_python_test_files()

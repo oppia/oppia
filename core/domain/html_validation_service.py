@@ -598,9 +598,7 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
         str. Error message if the attributes of tag are invalid.
     """
 
-    component_types_to_component_classes = (
-        rte_component_registry.Registry.get_component_types_to_component_classes()
-    )  # pylint: disable=line-too-long
+    component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes()  # pylint: disable=line-too-long
     simple_component_tag_names = (
         rte_component_registry.Registry.get_simple_component_tag_names()
     )
@@ -786,8 +784,9 @@ def get_invalid_svg_tags_and_attrs(
     for element in soup.find_all():
         if element.name.lower() in constants.SVG_ATTRS_ALLOWLIST:
             for attr in element.attrs:
-                if attr.lower() not in (
-                    constants.SVG_ATTRS_ALLOWLIST[element.name.lower()]
+                if (
+                    attr.lower()
+                    not in (constants.SVG_ATTRS_ALLOWLIST[element.name.lower()])
                 ):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:

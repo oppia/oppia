@@ -24,7 +24,6 @@ from typing import Final
 
 
 class SubscriptionTests(test_utils.GenericTestBase):
-
     USER_EMAIL: Final = 'user@example.com'
     USER_USERNAME: Final = 'user'
     USER2_EMAIL: Final = 'user2@example.com'

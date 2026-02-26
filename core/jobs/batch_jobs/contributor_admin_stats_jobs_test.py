@@ -1223,7 +1223,6 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
 
 class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
-
     JOB_CLASS: Type[
         contributor_admin_stats_jobs.GenerateContributorAdminStatsJob
     ] = contributor_admin_stats_jobs.GenerateContributorAdminStatsJob
@@ -1332,9 +1331,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         )
 
         # Check for TranslationSubmitterTotalContributionStatsModel.
-        translation_submitter_all_models = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.get_all()
-        )
+        translation_submitter_all_models = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get_all()
         self.assertEqual(3, translation_submitter_all_models.count())
 
         translation_submitter_total_stats = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
@@ -1391,9 +1388,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         )
 
         # Check for TranslationReviewerTotalContributionStatsModel.
-        translation_reviewer_all_models = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.get_all()
-        )
+        translation_reviewer_all_models = suggestion_models.TranslationReviewerTotalContributionStatsModel.get_all()
         self.assertEqual(3, translation_reviewer_all_models.count())
 
         translation_reviewer_total_stats = suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
@@ -1432,9 +1427,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         )
 
         # Check for QuestionSubmitterTotalContributionStatsModel.
-        question_submitter_all_models = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_all()
-        )
+        question_submitter_all_models = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_all()
         self.assertEqual(3, question_submitter_all_models.count())
 
         question_submitter_total_stats = (
@@ -1477,9 +1470,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         )
 
         # Check for QuestionReviewerTotalContributionStatsModel.
-        question_reviewer_all_models = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.get_all()
-        )
+        question_reviewer_all_models = suggestion_models.QuestionReviewerTotalContributionStatsModel.get_all()
         self.assertEqual(3, question_reviewer_all_models.count())
 
         question_reviewer_total_stats = (
@@ -1713,7 +1704,6 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
-
     JOB_CLASS: Type[
         contributor_admin_stats_jobs.AuditGenerateContributorAdminStatsJob
     ] = contributor_admin_stats_jobs.AuditGenerateContributorAdminStatsJob
@@ -1722,7 +1712,6 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.assert_job_output_is_empty()
 
     def test_job_audits_admin_stats(self) -> None:
-
         self.translation_contribution_model_1.update_timestamps()
         self.translation_contribution_model_2.update_timestamps()
         self.translation_contribution_model_3.update_timestamps()
@@ -1900,12 +1889,9 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
     ContributorDashboardTest
 ):
-
     JOB_CLASS: Type[
         contributor_admin_stats_jobs.AuditAndLogIncorretDataInContributorAdminStatsJob
-    ] = (
-        contributor_admin_stats_jobs.AuditAndLogIncorretDataInContributorAdminStatsJob
-    )
+    ] = contributor_admin_stats_jobs.AuditAndLogIncorretDataInContributorAdminStatsJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is(
@@ -1920,7 +1906,6 @@ class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
         )
 
     def test_job_audits_admin_stats(self) -> None:
-
         self.translation_contribution_model_3.update_timestamps()
         self.translation_contribution_model_with_invalid_topic.update_timestamps()  # pylint: disable=line-too-long
         self.translation_review_model_1.update_timestamps()
@@ -2441,7 +2426,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: \"\nValidation failed for '
+                        'ERROR: "\nValidation failed for '
                         'TranslationSubmitterTotalContributionStatsModel '
                         'zz.user123:\n'
                         '-> missing topic_ids {\'topic1\'} in total stats\n'
@@ -2464,7 +2449,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                         '-> last contribution 2023-04-02 != 2022-05-02\n'
                         '-> recent outcomes [\'accepted\', \'rejected\'] != []\n'
                         '-> recent performance -1 != 0\n'
-                        '-> accuracy 100.0 != 0.0\n\": 1'
+                        '-> accuracy 100.0 != 0.0\n": 1'
                     )
                 ),
             ]
@@ -2572,7 +2557,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 # The detailed stderr log.
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: \"\nValidation failed for '
+                        'ERROR: "\nValidation failed for '
                         'QuestionSubmitterTotalContributionStatsModel user_q:\n'
                         '-> missing topic_ids {\'topic_q\'} in total stats\n'
                         '-> field submitted_questions_count aggregated 3 != total '
@@ -2588,7 +2573,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                         f'{self.CONTRIBUTION_DATES[0]}\n'
                         '-> recent outcomes [\'rejected\'] != []\n'
                         '-> recent performance -2 != 0\n'
-                        '-> accuracy 100.0 != 0.0\n\": 1'
+                        '-> accuracy 100.0 != 0.0\n": 1'
                     )
                 ),
             ]
@@ -3106,13 +3091,13 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: \"Missing '
+                        'ERROR: "Missing '
                         'TranslationSubmitterTotalContributionStatsModel for key '
                         '(\'u1\', \'lang1\'):\n'
                         '-> TranslationContributionStatsModel:\n'
                         '--101\n'
                         '-> Translation GeneralSuggestionModel:\n'
-                        '--102\n\": 1'
+                        '--102\n": 1'
                     )
                 ),
             ]
@@ -3178,13 +3163,13 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: \"Missing '
+                        'ERROR: "Missing '
                         'QuestionSubmitterTotalContributionStatsModel for '
                         'key uq:\n'
                         '-> QuestionContributionStatsModel:\n'
                         '--202\n'
                         '-> Question GeneralSuggestionModel:\n'
-                        '--203\n\": 1'
+                        '--203\n": 1'
                     )
                 ),
             ]

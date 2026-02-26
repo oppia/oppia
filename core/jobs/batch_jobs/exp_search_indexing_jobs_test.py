@@ -40,7 +40,6 @@ StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
 class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[exp_search_indexing_jobs.IndexExplorationsInSearchJob] = (
         exp_search_indexing_jobs.IndexExplorationsInSearchJob
     )

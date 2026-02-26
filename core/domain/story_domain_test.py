@@ -33,7 +33,6 @@ from typing import Final
 
 
 class StoryChangeTests(test_utils.GenericTestBase):
-
     def test_story_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -364,7 +363,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story(
-            'Expected thumbnail filename to be a string, received 10', 10  # type: ignore[arg-type]
+            'Expected thumbnail filename to be a string, received 10',
+            10,  # type: ignore[arg-type]
         )
         self._assert_valid_thumbnail_filename_for_story(
             'Thumbnail filename should not start with a dot.', '.name'
@@ -391,7 +391,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story_node(
-            'Expected thumbnail filename to be a string, received 10', 10  # type: ignore[arg-type]
+            'Expected thumbnail filename to be a string, received 10',
+            10,  # type: ignore[arg-type]
         )
         self._assert_valid_thumbnail_filename_for_story_node(
             'Thumbnail filename should not start with a dot.', '.name'
@@ -415,9 +416,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_node_thumbnail_size_in_bytes_validation(self) -> None:
         self.story.story_contents.nodes[0].thumbnail_filename = 'image.svg'
-        self.story.story_contents.nodes[0].thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0]
-        )
+        self.story.story_contents.nodes[
+            0
+        ].thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][
+            0
+        ]
         self.story.story_contents.nodes[0].thumbnail_size_in_bytes = 0
         self._assert_validation_error(
             'Story node thumbnail size in bytes cannot be zero.'
@@ -797,9 +800,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected title to be a string, received 1'
         )
 
-        self.story.story_contents.nodes[0].title = (
-            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
-        )
+        self.story.story_contents.nodes[
+            0
+        ].title = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
         self._assert_validation_error(
             'Chapter title should be less than 36 chars'
         )
@@ -1067,9 +1070,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected planned publication date to be a datetime, received '
             '10 July'
         )
-        self.story.story_contents.nodes[0].planned_publication_date = (
-            datetime.datetime.now()
-        )
+        self.story.story_contents.nodes[
+            0
+        ].planned_publication_date = datetime.datetime.now()
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
@@ -1078,9 +1081,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected last modified to be a datetime, received 1'
         )
-        self.story.story_contents.nodes[0].last_modified = (
-            datetime.datetime.now()
-        )
+        self.story.story_contents.nodes[
+            0
+        ].last_modified = datetime.datetime.now()
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
@@ -1092,18 +1095,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].first_publication_date = None
 
     def test_node_is_upcoming(self) -> None:
-        self.story.story_contents.nodes[0].status = (
-            constants.STORY_NODE_STATUS_DRAFT
-        )
-        self.story.story_contents.nodes[0].planned_publication_date = (
-            datetime.datetime(2023, 1, 1)
-        )
-        self.story.story_contents.nodes[1].status = (
-            constants.STORY_NODE_STATUS_READY_TO_PUBLISH
-        )
-        self.story.story_contents.nodes[1].planned_publication_date = (
-            datetime.datetime(2022, 12, 29)
-        )
+        self.story.story_contents.nodes[
+            0
+        ].status = constants.STORY_NODE_STATUS_DRAFT
+        self.story.story_contents.nodes[
+            0
+        ].planned_publication_date = datetime.datetime(2023, 1, 1)
+        self.story.story_contents.nodes[
+            1
+        ].status = constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        self.story.story_contents.nodes[
+            1
+        ].planned_publication_date = datetime.datetime(2022, 12, 29)
 
         def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
@@ -1121,18 +1124,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             )
 
     def test_node_is_behind_schedule(self) -> None:
-        self.story.story_contents.nodes[0].status = (
-            constants.STORY_NODE_STATUS_DRAFT
-        )
-        self.story.story_contents.nodes[0].planned_publication_date = (
-            datetime.datetime(2023, 1, 1)
-        )
-        self.story.story_contents.nodes[1].status = (
-            constants.STORY_NODE_STATUS_READY_TO_PUBLISH
-        )
-        self.story.story_contents.nodes[1].planned_publication_date = (
-            datetime.datetime(2022, 12, 29)
-        )
+        self.story.story_contents.nodes[
+            0
+        ].status = constants.STORY_NODE_STATUS_DRAFT
+        self.story.story_contents.nodes[
+            0
+        ].planned_publication_date = datetime.datetime(2023, 1, 1)
+        self.story.story_contents.nodes[
+            1
+        ].status = constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        self.story.story_contents.nodes[
+            1
+        ].planned_publication_date = datetime.datetime(2022, 12, 29)
 
         def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
@@ -2628,7 +2631,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
 
 class StorySummaryTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()

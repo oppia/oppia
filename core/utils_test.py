@@ -707,7 +707,8 @@ class UtilsTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename(
-            'Expected thumbnail filename to be a string, received 10', 10  # type: ignore[arg-type]
+            'Expected thumbnail filename to be a string, received 10',
+            10,  # type: ignore[arg-type]
         )
         self._assert_valid_thumbnail_filename(
             'Thumbnail filename should not start with a dot.', '.name'
@@ -746,7 +747,8 @@ class UtilsTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_image_filename(
-            'Expected image filename to be a string, received 10', 10  # type: ignore[arg-type]
+            'Expected image filename to be a string, received 10',
+            10,  # type: ignore[arg-type]
         )
         self._assert_valid_image_filename(
             'Image filename should not start with a dot.', '.name'

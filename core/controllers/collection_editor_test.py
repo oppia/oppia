@@ -34,7 +34,6 @@ from typing import Final
 
 
 class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super().setUp()
@@ -68,7 +67,6 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
 
 class CollectionEditorTests(BaseCollectionEditorControllerTests):
-
     COLLECTION_ID: Final = '0'
 
     def setUp(self) -> None:

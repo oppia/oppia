@@ -72,7 +72,6 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
         ]
     )
     def test_that_flag_exploration_emails_are_correct(self) -> None:
-
         expected_email_html_body = (
             'Hello Moderator,<br>'
             'newuser has flagged exploration "Title" on the following '

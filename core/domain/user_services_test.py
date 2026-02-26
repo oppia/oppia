@@ -145,7 +145,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_ids[0], username)
 
         error_msg = (
-            'Sorry, the username \"%s\" is already taken! Please pick '
+            'Sorry, the username "%s" is already taken! Please pick '
             'a different one.' % username
         )
 
@@ -171,7 +171,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_usernames_for_pseudonymous_ids(self) -> None:
-
         # Handle usernames that exists.
         self.assertEqual(
             ['User_Aaaaaaaa', 'User_Bbbbbbbb'],
@@ -2614,8 +2613,7 @@ class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
 
     EXP_ID: Final = 'exp_id0'
 
-    SAMPLE_EXPLORATION_YAML: Final = (
-        """
+    SAMPLE_EXPLORATION_YAML: Final = """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -2776,7 +2774,6 @@ states_schema_version: 42
 tags: []
 title: Title
 """
-    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -4387,7 +4384,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
 
 class UserContributionReviewRightsTests(test_utils.GenericTestBase):
-
     TRANSLATOR_EMAIL: Final = 'translator@community.org'
     TRANSLATOR_USERNAME: Final = 'translator'
     QUESTION_SUBMITTER_EMAIL: Final = 'submitter@community.org'
@@ -4867,7 +4863,6 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
             user_services.deassign_coordinator(guest_user, self.user_a, 'en')
 
     def test_non_admin_cannot_assign_roles(self) -> None:
-
         with self.assertRaisesRegex(
             Exception, 'UnauthorizedUserException: Could not assign new role.'
         ):

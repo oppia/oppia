@@ -266,7 +266,6 @@ def compute_translation_related_changes_upon_revert(
     new_translation_models = []
     translation_counts = {}
     for entity_translation in language_code_to_entity_translation.values():
-
         translation_counts[entity_translation.language_code] = (
             reverted_exploration.get_translation_count(entity_translation)
         )

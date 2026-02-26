@@ -26,7 +26,6 @@ from extensions.interactions.PencilCodeEditor import (  # pylint: disable=unused
 
 
 class PencilCodeEditorTests(test_utils.GenericTestBase):
-
     # At Oppia, we require all files to have an associated test file, since
     # that's how the backend test coverage checks detect that there are Python
     # files to cover in the first place. For files that don't have logic

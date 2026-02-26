@@ -33,7 +33,6 @@ if MYPY:
 
 
 class RemoveHangingStoryReferencesJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS = (
         remove_hanging_story_references_job.RemoveHangingStoryReferencesJob
     )

@@ -29,7 +29,6 @@ from core.tests import test_utils
 
 
 class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -129,7 +128,6 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
 
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
-
     def test_any_user_can_access_review_tests_data(self) -> None:
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.story_id_1, self.node_id

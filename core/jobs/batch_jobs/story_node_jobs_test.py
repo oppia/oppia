@@ -38,7 +38,6 @@ if MYPY:  # pragma: no cover
 
 
 class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[story_node_jobs.PopulateStoryNodeJob] = (
         story_node_jobs.PopulateStoryNodeJob
     )
@@ -325,7 +324,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult(
                     stderr=(
                         'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: '
-                        '\"(\'story_1_id\', StopIteration())\": 1'
+                        '"(\'story_1_id\', StopIteration())": 1'
                     )
                 )
             ]
@@ -393,9 +392,9 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"('
+                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: "('
                         '\'story_1_id\', Exception(\'Node was not created.\''
-                        '))\": 1'
+                        '))": 1'
                     )
                 )
             ]
@@ -403,7 +402,6 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
 
 class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[story_node_jobs.AuditPopulateStoryNodeJob] = (
         story_node_jobs.AuditPopulateStoryNodeJob
     )
@@ -641,8 +639,8 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
-                        'story_1_id\', StopIteration())\": 1'
+                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: "(\''
+                        'story_1_id\', StopIteration())": 1'
                     )
                 )
             ]
@@ -710,8 +708,8 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
-                        'story_1_id\', Exception(\'Node was not created.\'))\": 1'
+                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: "(\''
+                        'story_1_id\', Exception(\'Node was not created.\'))": 1'
                     )
                 )
             ]

@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class ClassroomDomainTests(test_utils.GenericTestBase):
-
     def test_that_domain_object_is_created_correctly(self) -> None:
         classroom_data = classroom_domain.Classroom(
             'exp', 'exp/', [], 'general details', 'general intro'

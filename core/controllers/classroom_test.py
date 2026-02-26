@@ -44,7 +44,6 @@ dummy_banner_data = classroom_config_domain.ImageData(
 
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -156,14 +155,12 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
 
 
 class ClassroomPageTests(BaseClassroomControllerTests):
-
     def test_any_user_can_access_classroom_page(self) -> None:
         response = self.get_html_response('/learn/math')
         self.assertIn('<oppia-root></oppia-root>', response)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
-
     def test_get(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
@@ -417,7 +414,6 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
 
 class ClassroomAdminTests(BaseClassroomControllerTests):
-
     def setUp(self) -> None:
         super().setUp()
         self.testapp = webtest.TestApp(main.app_without_context)
@@ -857,7 +853,6 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
 
 class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -992,7 +987,6 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
 
 
 class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1040,7 +1034,6 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
 
 
 class TopicsToClassroomsRelationHandlerTests(BaseClassroomControllerTests):
-
     def setUp(self) -> None:
         super().setUp()
         self.save_new_valid_classroom(
@@ -1097,7 +1090,6 @@ class TopicsToClassroomsRelationHandlerTests(BaseClassroomControllerTests):
 
 
 class NewClassroomHandlerTests(BaseClassroomControllerTests):
-
     def test_get_all_topics_classroom_info(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         new_classroom_handler = feconf.NEW_CLASSROOM_HANDLER_URL

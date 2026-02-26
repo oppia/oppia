@@ -375,16 +375,31 @@ class SkillSummaryModel(base_models.BaseModel):
             urlsafe_cursor=urlsafe_start_cursor
         )
         sort = -cls.skill_model_created_on
-        if sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingCreatedOn']
+        if (
+            sort_by
+            == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingCreatedOn'
+                ]
+            )
         ):
             sort = cls.skill_model_created_on
-        elif sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']
+        elif (
+            sort_by
+            == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'IncreasingUpdatedOn'
+                ]
+            )
         ):
             sort = -cls.skill_model_last_updated
-        elif sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']
+        elif (
+            sort_by
+            == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingUpdatedOn'
+                ]
+            )
         ):
             sort = cls.skill_model_last_updated
 

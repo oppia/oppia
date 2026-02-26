@@ -1502,9 +1502,9 @@ def get_multi_users_skills_mastery(
         if skill_mastery_model is None:
             degrees_of_masteries[user_id][skill_id] = None
         else:
-            degrees_of_masteries[user_id][
-                skill_id
-            ] = skill_mastery_model.degree_of_mastery
+            degrees_of_masteries[user_id][skill_id] = (
+                skill_mastery_model.degree_of_mastery
+            )
 
     return degrees_of_masteries
 

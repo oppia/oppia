@@ -36,7 +36,6 @@ from typing import Final
 
 
 class AssetDevHandlerImageTests(test_utils.GenericTestBase):
-
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
 
     def _get_image_url(
@@ -1043,7 +1042,6 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
 
 
 class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
-
     def test_value_generated_error(self) -> None:
         dummy_id = 'someID'
         response = self.get_json(

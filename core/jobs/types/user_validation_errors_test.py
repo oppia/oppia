@@ -42,7 +42,6 @@ datastore_services = models.Registry.import_datastore_services()
 class ModelIncorrectKeyErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         model = user_models.PendingDeletionRequestModel(id='test')
         incorrect_keys = ['incorrect key']
@@ -58,7 +57,6 @@ class ModelIncorrectKeyErrorTests(
 
 
 class ModelIdRegexErrorTests(base_validation_errors_test.AuditErrorsTestBase):
-
     def test_message(self) -> None:
         model = base_models.BaseModel(
             id='?!"', created_on=self.YEAR_AGO, last_updated=self.NOW
@@ -75,7 +73,6 @@ class ModelIdRegexErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 class DraftChangeListLastUpdatedNoneErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         draft_change_list = [
             {
@@ -108,7 +105,6 @@ class DraftChangeListLastUpdatedNoneErrorTests(
 class DraftChangeListLastUpdatedInvalidErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         draft_change_list = [
             {
@@ -143,7 +139,6 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
 class ArchivedModelNotMarkedDeletedErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):
-
     def test_message(self) -> None:
         model = user_models.UserQueryModel(
             id='test',

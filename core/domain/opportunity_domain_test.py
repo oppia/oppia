@@ -69,9 +69,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         )
 
     def test_to_and_from_dict_works_correctly(self) -> None:
-        exploration_opportunity_summary_dict: (
-            opportunity_domain.ExplorationOpportunitySummaryDict
-        ) = {
+        exploration_opportunity_summary_dict: opportunity_domain.ExplorationOpportunitySummaryDict = {
             'id': 'exp_1',
             'topic_id': 'topic_1',
             'topic_name': 'A topic',
@@ -130,9 +128,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         need_voice_artist_languages = (
             self.valid_exp_opp_summary.language_codes_needing_voice_artists
         )
-        assigned_voice_artist_languages = (
-            self.valid_exp_opp_summary.language_codes_with_assigned_voice_artists
-        )
+        assigned_voice_artist_languages = self.valid_exp_opp_summary.language_codes_with_assigned_voice_artists
 
         self.assertTrue(
             set(need_voice_artist_languages).isdisjoint(
@@ -311,9 +307,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        valid_skill_opportunity_dict: (
-            opportunity_domain.SkillOpportunityDict
-        ) = {
+        valid_skill_opportunity_dict: opportunity_domain.SkillOpportunityDict = {
             'id': 'skill_1',
             'skill_description': 'A new skill',
             'question_count': 5,
@@ -357,8 +351,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         self.valid_skill_opportunity.question_count = -5
         self._assert_validation_error(
             self.valid_skill_opportunity,
-            'Expected question_count to be a non-negative integer, '
-            'received -5',
+            'Expected question_count to be a non-negative integer, received -5',
         )
 
 
@@ -367,15 +360,15 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        valid_pinned_opportunity_dict: (
-            opportunity_domain.PinnedOpportunityDict
-        ) = {  # pylint: disable=line-too-long
+        valid_pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = {  # pylint: disable=line-too-long
             'language_code': 'en',
             'topic_id': 'topic_id_1',
             'opportunity_id': 'opportunity_id1',
         }
-        self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict(  # pylint: disable=line-too-long
-            valid_pinned_opportunity_dict
+        self.valid_pinned_opportunity = (
+            opportunity_domain.PinnedOpportunity.from_dict(  # pylint: disable=line-too-long
+                valid_pinned_opportunity_dict
+            )
         )
 
     def test_to_and_from_dict_works_correctly(self) -> None:
@@ -418,9 +411,7 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             self.mock_supported_audio_languages,
         )
 
-        self.valid_translation_opportunity_dict: (
-            opportunity_domain.TranslationOpportunityDict
-        ) = {
+        self.valid_translation_opportunity_dict: opportunity_domain.TranslationOpportunityDict = {
             'topic_ids': ['topic_1'],
             'entity_id': 'exploration_1',
             'content_count': 5,

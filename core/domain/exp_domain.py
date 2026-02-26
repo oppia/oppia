@@ -3266,9 +3266,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         filtered_answer_groups.append(
                             copy.deepcopy(answer_group_dict)
                         )
-                state_dict['interaction'][
-                    'answer_groups'
-                ] = filtered_answer_groups
+                state_dict['interaction']['answer_groups'] = (
+                    filtered_answer_groups
+                )
 
                 # Renaming cust arg.
                 if (
@@ -3632,18 +3632,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # dict doesn't contains written_translations property.
             choice_translations = state_dict['written_translations'][  # type: ignore[typeddict-item]
                 'translations_mapping'
-            ][
-                content_id
-            ]
+            ][content_id]
             for translation in choice_translations.values():
                 translation['needs_update'] = True
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
             choice_voiceovers = state_dict['recorded_voiceovers'][  # type: ignore[typeddict-item]
                 'voiceovers_mapping'
-            ][
-                content_id
-            ]
+            ][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
 
@@ -3924,18 +3920,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # dict doesn't contains written_translations property.
             continue_button_translations = state_dict['written_translations'][  # type: ignore[typeddict-item]
                 'translations_mapping'
-            ][
-                content_id
-            ]
+            ][content_id]
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
             choice_voiceovers = state_dict['recorded_voiceovers'][  # type: ignore[typeddict-item]
                 'voiceovers_mapping'
-            ][
-                content_id
-            ]
+            ][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
 
@@ -4365,9 +4357,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             answer_groups, state_name
         )
 
-        state_dict['interaction']['customization_args']['choices'][
-            'value'
-        ] = choices
+        state_dict['interaction']['customization_args']['choices']['value'] = (
+            choices
+        )
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
@@ -4486,9 +4478,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_dict['interaction']['customization_args'][
             'maxAllowableSelectionCount'
         ]['value'] = max_value
-        state_dict['interaction']['customization_args']['choices'][
-            'value'
-        ] = choices
+        state_dict['interaction']['customization_args']['choices']['value'] = (
+            choices
+        )
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
@@ -4807,9 +4799,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if rows_value < 1:
             state_dict['interaction']['customization_args']['rows']['value'] = 1
         if rows_value > 10:
-            state_dict['interaction']['customization_args']['rows'][
-                'value'
-            ] = 10
+            state_dict['interaction']['customization_args']['rows']['value'] = (
+                10
+            )
         for answer_group in answer_groups:
             assert isinstance(answer_group['rule_specs'], list)
             for rule_spec in answer_group['rule_specs']:
@@ -5060,8 +5052,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'false',
                     '\'true\'',
                     '\'false\'',
-                    '\"true\"',
-                    '\"false\"',
+                    '"true"',
+                    '"false"',
                     True,
                     False,
                 ):
@@ -6722,7 +6714,6 @@ class ExplorationChangeMergeVerifier:
     ]
 
     def __init__(self, composite_change_list: List[ExplorationChange]) -> None:
-
         self.added_state_names: List[str] = []
         self.deleted_state_names: List[str] = []
         self.new_to_old_state_names: Dict[str, str] = collections.defaultdict(

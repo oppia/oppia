@@ -238,8 +238,7 @@ class PromoBarHandler(
         registry.Registry.update_platform_parameter(
             'promo_bar_enabled',
             self.user_id,
-            'Update promo_bar_enabled property from release '
-            'coordinator page.',
+            'Update promo_bar_enabled property from release coordinator page.',
             rules_for_promo_bar_enabled_value,
             promo_bar_enabled_parameter.default_value,
         )
@@ -247,8 +246,7 @@ class PromoBarHandler(
         registry.Registry.update_platform_parameter(
             'promo_bar_message',
             self.user_id,
-            'Update promo_bar_message property from release '
-            'coordinator page.',
+            'Update promo_bar_message property from release coordinator page.',
             rules_for_promo_bar_message_value,
             promo_bar_message_parameter.default_value,
         )

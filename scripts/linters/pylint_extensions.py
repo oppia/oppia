@@ -237,11 +237,9 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     name = 'parameter_documentation'
     msgs = {
         'W9005': (
-            '"%s" has constructor parameters '
-            'documented in class and __init__',
+            '"%s" has constructor parameters documented in class and __init__',
             'multiple-constructor-doc',
-            'Please remove parameter declarations '
-            'in the class or constructor.',
+            'Please remove parameter declarations in the class or constructor.',
         ),
         'W9006': (
             '"%s" not documented as being raised',
@@ -585,10 +583,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # from the Args section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.has_params():
-            entries = (
-                node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_param_section
-                )
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_param_section
             )
             for entry in entries:
                 if entry.lstrip().startswith('*args') and not (
@@ -604,10 +600,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # from the Returns section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.has_returns():
-            entries = (
-                node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_returns_section
-                )
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_returns_section
             )
             entries = [''.join(entries)]
             for entry in entries:
@@ -620,10 +614,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # from the Yields section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.has_yields():
-            entries = (
-                node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_yields_section
-                )
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_yields_section
             )
             entries = [''.join(entries)]
             for entry in entries:
@@ -636,10 +628,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # from the Raises section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.exceptions():
-            entries = (
-                node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_raise_section
-                )
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_raise_section
             )
             for entry in entries:
                 match = re_raise_line.match(entry)
@@ -1341,7 +1331,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
     priority = -1
     msgs = {
         'C0003': (
-            'Import \"%s\" from \"%s\" is not a module.',
+            'Import "%s" from "%s" is not a module.',
             'import-only-modules',
             'Modules should only be imported.',
         ),
@@ -2014,8 +2004,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             ' of comments should be -> Here we use MyPy ignore because ...',
         ),
         'C0046': (
-            'Extra comment is present for MyPy type: ignore. Please'
-            ' remove it.',
+            'Extra comment is present for MyPy type: ignore. Please remove it.',
             'redundant-type-comment',
             'No corresponding \'type: ignore\' is found for the comment.',
         ),

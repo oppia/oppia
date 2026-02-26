@@ -130,8 +130,7 @@ class ExplorationRights(rights_domain.ActivityRights):
 
         if not isinstance(self.editor_ids, list):
             raise utils.ValidationError(
-                'Expected editor_ids to be list, '
-                'received %s' % self.editor_ids
+                'Expected editor_ids to be list, received %s' % self.editor_ids
             )
         for editor_id in self.editor_ids:
             if not isinstance(editor_id, str):
@@ -154,8 +153,7 @@ class ExplorationRights(rights_domain.ActivityRights):
 
         if not isinstance(self.viewer_ids, list):
             raise utils.ValidationError(
-                'Expected viewer_ids to be list, '
-                'received %s' % self.viewer_ids
+                'Expected viewer_ids to be list, received %s' % self.viewer_ids
             )
         for viewer_id in self.viewer_ids:
             if not isinstance(viewer_id, str):

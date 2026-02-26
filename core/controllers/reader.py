@@ -226,9 +226,7 @@ class ExplorationHandler(
             furthest_reached_checkpoint_state_name = (
                 synced_exp_user_data.furthest_reached_checkpoint_state_name
             )
-            most_recently_reached_checkpoint_exp_version = (
-                synced_exp_user_data.most_recently_reached_checkpoint_exp_version
-            )
+            most_recently_reached_checkpoint_exp_version = synced_exp_user_data.most_recently_reached_checkpoint_exp_version
             most_recently_reached_checkpoint_state_name = (
                 synced_exp_user_data.most_recently_reached_checkpoint_state_name
             )
@@ -262,18 +260,10 @@ class ExplorationHandler(
                 else:
                     synced_exp_logged_in_user_data = exp_user_data
 
-                furthest_reached_checkpoint_exp_version = (
-                    synced_exp_logged_in_user_data.furthest_reached_checkpoint_exp_version
-                )  # pylint: disable=line-too-long
-                furthest_reached_checkpoint_state_name = (
-                    synced_exp_logged_in_user_data.furthest_reached_checkpoint_state_name
-                )  # pylint: disable=line-too-long
-                most_recently_reached_checkpoint_exp_version = (
-                    synced_exp_logged_in_user_data.most_recently_reached_checkpoint_exp_version
-                )
-                most_recently_reached_checkpoint_state_name = (
-                    synced_exp_logged_in_user_data.most_recently_reached_checkpoint_state_name
-                )
+                furthest_reached_checkpoint_exp_version = synced_exp_logged_in_user_data.furthest_reached_checkpoint_exp_version  # pylint: disable=line-too-long
+                furthest_reached_checkpoint_state_name = synced_exp_logged_in_user_data.furthest_reached_checkpoint_state_name  # pylint: disable=line-too-long
+                most_recently_reached_checkpoint_exp_version = synced_exp_logged_in_user_data.most_recently_reached_checkpoint_exp_version
+                most_recently_reached_checkpoint_state_name = synced_exp_logged_in_user_data.most_recently_reached_checkpoint_state_name
 
         self.values.update(
             {
@@ -1400,8 +1390,10 @@ class ExplorationCompleteEventHandler(
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id
             )
-            next_exp_id_to_complete = collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
-                user_id, collection_id
+            next_exp_id_to_complete = (
+                collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
+                    user_id, collection_id
+                )
             )
 
             if not next_exp_id_to_complete:
@@ -1530,8 +1522,7 @@ class ExplorationMaybeLeaveHandler(
                     )
             else:
                 logging.error(
-                    'Could not find a story corresponding to %s '
-                    'id.' % story_id
+                    'Could not find a story corresponding to %s id.' % story_id
                 )
                 self.render_json({})
                 return

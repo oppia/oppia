@@ -58,8 +58,11 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
         # after the backend is fully type-annotated. Here ignore[arg-type]
         # is used to test the constructor of ActivityReference for invalid
         # argument type.
-        invalid_activity_reference_with_invalid_id = activity_domain.ActivityReference(
-            'exploration', 1234  # type: ignore[arg-type]
+        invalid_activity_reference_with_invalid_id = (
+            activity_domain.ActivityReference(
+                'exploration',
+                1234,  # type: ignore[arg-type]
+            )
         )
         with self.assertRaisesRegex(
             Exception, ('Expected id to be a string but found 1234')

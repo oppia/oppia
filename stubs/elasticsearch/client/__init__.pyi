@@ -13,7 +13,7 @@ class Elasticsearch(object):
         self,
         hosts: Any = ...,
         transport_class: Type[Transport] = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None: ...
     def __repr__(self) -> str: ...
     def __enter__(self) -> 'Elasticsearch': ...
@@ -69,7 +69,7 @@ class Elasticsearch(object):
         ignore: Optional[Union[int, Collection[int]]] = ...,
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
-        headers: Optional[MutableMapping[str, str]] = ...
+        headers: Optional[MutableMapping[str, str]] = ...,
     ) -> bool: ...
     def delete(
         self,
@@ -93,7 +93,7 @@ class Elasticsearch(object):
         ignore: Optional[Union[int, Collection[int]]] = ...,
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
-        headers: Optional[MutableMapping[str, str]] = ...
+        headers: Optional[MutableMapping[str, str]] = ...,
     ) -> Any: ...
     def delete_by_query(
         self,
@@ -198,5 +198,5 @@ class Elasticsearch(object):
         ignore: Optional[Union[int, Collection[int]]] = ...,
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
-        headers: Optional[MutableMapping[str, str]] = ...
+        headers: Optional[MutableMapping[str, str]] = ...,
     ) -> Any: ...

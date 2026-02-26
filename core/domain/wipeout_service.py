@@ -1837,9 +1837,7 @@ def _pseudonymize_blog_post_models(
                 blog_models.BlogPostSummaryModel,
                 blog_models.BlogAuthorDetailsModel,
             ]
-        ] = (
-            blog_post_models_list + blog_post_summary_models_list
-        )
+        ] = blog_post_models_list + blog_post_summary_models_list
 
         for model in blog_posts_related_models:
             if isinstance(model, blog_author_details_model_class):

@@ -3476,9 +3476,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertTrue(self.USER_ID_2 in voiceover_reviewer_ids)
 
     def test_get_question_reviewer_user_ids(self) -> None:
-        question_reviewer_ids = (
-            user_models.UserContributionRightsModel.get_question_reviewer_user_ids()
-        )
+        question_reviewer_ids = user_models.UserContributionRightsModel.get_question_reviewer_user_ids()
         self.assertEqual(len(question_reviewer_ids), 0)
 
         user_models.UserContributionRightsModel(
@@ -3494,17 +3492,13 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
             can_review_questions=True,
         ).put()
 
-        question_reviewer_ids = (
-            user_models.UserContributionRightsModel.get_question_reviewer_user_ids()
-        )
+        question_reviewer_ids = user_models.UserContributionRightsModel.get_question_reviewer_user_ids()
         self.assertEqual(len(question_reviewer_ids), 1)
         self.assertFalse(self.USER_ID_1 in question_reviewer_ids)
         self.assertTrue(self.USER_ID_2 in question_reviewer_ids)
 
     def test_get_question_submitter_user_ids(self) -> None:
-        question_submitter_ids = (
-            user_models.UserContributionRightsModel.get_question_submitter_user_ids()
-        )
+        question_submitter_ids = user_models.UserContributionRightsModel.get_question_submitter_user_ids()
         self.assertEqual(len(question_submitter_ids), 0)
 
         user_models.UserContributionRightsModel(
@@ -3522,9 +3516,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
             can_submit_questions=True,
         ).put()
 
-        question_submitter_ids = (
-            user_models.UserContributionRightsModel.get_question_submitter_user_ids()
-        )
+        question_submitter_ids = user_models.UserContributionRightsModel.get_question_submitter_user_ids()
         self.assertEqual(len(question_submitter_ids), 1)
         self.assertFalse(self.USER_ID_1 in question_submitter_ids)
         self.assertTrue(self.USER_ID_2 in question_submitter_ids)
@@ -3976,9 +3968,9 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
         fetched_model = user_models.PinnedOpportunityModel.get_model(
             self.user_id, self.language_code, self.topic_id
         )
-        assert (
-            fetched_model is not None
-        ), 'Expected fetched_model to be not None'
+        assert fetched_model is not None, (
+            'Expected fetched_model to be not None'
+        )
         self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)
 
         user_models.PinnedOpportunityModel.create(
@@ -3988,9 +3980,9 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
         fetched_model = user_models.PinnedOpportunityModel.get_model(
             'user_id_2', 'en', 'topic_id_1'
         )
-        assert (
-            fetched_model is not None
-        ), 'Expected fetched_model to be not None'
+        assert fetched_model is not None, (
+            'Expected fetched_model to be not None'
+        )
         self.assertEqual(fetched_model.opportunity_id, 'opportunity_id_2')
 
     def test_create_raises_exception_for_existing_instance(self) -> None:

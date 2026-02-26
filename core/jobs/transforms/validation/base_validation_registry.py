@@ -60,9 +60,9 @@ def get_audit_do_fn_types_by_kind() -> Dict[str, FrozenSet[Type[beam.DoFn]]]:
     return validation_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
 
 
-def get_id_referencing_properties_by_kind_of_possessor() -> (
-    Dict[str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]]
-):
+def get_id_referencing_properties_by_kind_of_possessor() -> Dict[
+    str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
+]:
     """Returns properties whose values refer to the IDs of the corresponding
     set of model kinds, grouped by the kind of model the properties belong to.
 
@@ -71,9 +71,7 @@ def get_id_referencing_properties_by_kind_of_possessor() -> (
         (ModelProperty, tuple(kind of models)), grouped by the kind of model the
         properties belong to.
     """
-    return (
-        validation_decorators.RelationshipsOf.get_id_referencing_properties_by_kind_of_possessor()
-    )
+    return validation_decorators.RelationshipsOf.get_id_referencing_properties_by_kind_of_possessor()
 
 
 def get_all_model_kinds_referenced_by_properties() -> Set[str]:
@@ -83,6 +81,4 @@ def get_all_model_kinds_referenced_by_properties() -> Set[str]:
         set(str). All model kinds referenced by one or more properties,
         excluding the models' own ID.
     """
-    return (
-        validation_decorators.RelationshipsOf.get_all_model_kinds_referenced_by_properties()
-    )
+    return validation_decorators.RelationshipsOf.get_all_model_kinds_referenced_by_properties()

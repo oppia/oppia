@@ -105,10 +105,7 @@ CHANGE_DICT = {
 class RejectTranslationSuggestionsWithMissingContentIdJobTests(
     job_test_utils.JobTestBase
 ):
-
-    JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs.RejectTranslationSuggestionsWithMissingContentIdJob
-    )
+    JOB_CLASS = rejecting_suggestion_for_invalid_content_ids_jobs.RejectTranslationSuggestionsWithMissingContentIdJob
     TARGET_ID = 'exp1'
 
     def setUp(self) -> None:
@@ -201,9 +198,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
 class AuditTranslationSuggestionsWithMissingContentIdJobTests(
     job_test_utils.JobTestBase
 ):
-    JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs.AuditTranslationSuggestionsWithMissingContentIdJob
-    )
+    JOB_CLASS = rejecting_suggestion_for_invalid_content_ids_jobs.AuditTranslationSuggestionsWithMissingContentIdJob
     TARGET_ID = 'exp2'
 
     def setUp(self) -> None:

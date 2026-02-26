@@ -21,7 +21,6 @@ from core.tests import test_utils
 
 
 class OppiaRootPageTests(test_utils.GenericTestBase):
-
     def test_oppia_root_page(self) -> None:
         """Tests access to the unified entry page."""
         for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
@@ -38,7 +37,6 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
 
 
 class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
-
     def test_oppia_lightweight_root_page(self) -> None:
         response = self.get_html_response('/', expected_status_int=200)
         response.mustcontain(

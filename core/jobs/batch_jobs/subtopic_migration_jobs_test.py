@@ -35,7 +35,6 @@ if MYPY:
 
 
 class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[subtopic_migration_jobs.MigrateStudyGuideJob] = (
         subtopic_migration_jobs.MigrateStudyGuideJob
     )
@@ -184,7 +183,6 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
 
 
 class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[subtopic_migration_jobs.AuditStudyGuideMigrationJob] = (
         subtopic_migration_jobs.AuditStudyGuideMigrationJob
     )

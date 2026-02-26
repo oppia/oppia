@@ -471,7 +471,6 @@ class TestVersionedModel(base_models.VersionedModel):
 
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
-
     def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
         self.assertEqual(
             base_models.BaseCommitLogEntryModel.get_deletion_policy(),
@@ -502,7 +501,6 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
 
 class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
-
     def test_has_reference_to_user_id(self) -> None:
         model1 = base_models.BaseSnapshotMetadataModel(
             id='model_id-1',
@@ -638,7 +636,6 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
 
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
-
     def test_get_version_string(self) -> None:
         model1 = base_models.BaseSnapshotContentModel(id='model_id-1')
         model1.update_timestamps()
@@ -1022,9 +1019,7 @@ class TestBaseModel(base_models.BaseModel):
 
 
 class BaseModelTests(test_utils.GenericTestBase):
-
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
-
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             TestBaseModel,

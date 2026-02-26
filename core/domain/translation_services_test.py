@@ -44,7 +44,6 @@ translate_services = models.Registry.import_translate_services()
 
 
 class TranslationServiceTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         translation_models.MachineTranslationModel.create(

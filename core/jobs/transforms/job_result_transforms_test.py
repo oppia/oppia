@@ -27,7 +27,6 @@ import result
 
 
 class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
-
     def test_ok_results_without_prefix_correctly_outputs(self) -> None:
         transform_result = (
             self.pipeline
@@ -88,7 +87,6 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
 
 
 class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
-
     def test_three_objects_without_prefix_correctly_outputs(self) -> None:
         transform_result = (
             self.pipeline

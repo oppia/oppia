@@ -201,10 +201,8 @@ def get_beam_entity_from_ndb_model(
     # a functionality that we need and writing it ourselves would be
     # too complicated.
     with datastore_services.get_ndb_context():
-        model_to_put = (
-            ndb_model._entity_to_ds_entity(  # pylint: disable=protected-access
-                model
-            )
+        model_to_put = ndb_model._entity_to_ds_entity(  # pylint: disable=protected-access
+            model
         )
     return beam_datastore_types.Entity.from_client_entity(model_to_put)
 
@@ -224,9 +222,7 @@ def get_ndb_model_from_beam_entity(
     # We use private _lookup_model and _entity_from_ds_entity here because it
     # provides a functionality that we need and writing it ourselves would be
     # too complicated.
-    ndb_model_class = get_model_class(
-        ndb_key.kind()
-    )  # pylint: disable=protected-access
+    ndb_model_class = get_model_class(ndb_key.kind())  # pylint: disable=protected-access
     return ndb_model._entity_from_ds_entity(  # pylint: disable=protected-access
         beam_entity.to_client_entity(), model_class=ndb_model_class
     )
@@ -243,10 +239,8 @@ def get_ndb_key_from_beam_key(
     Returns:
         datastore_services.Key. The NDB key.
     """
-    return (
-        datastore_services.Key._from_ds_key(  # pylint: disable=protected-access
-            beam_key.to_client_key()
-        )
+    return datastore_services.Key._from_ds_key(  # pylint: disable=protected-access
+        beam_key.to_client_key()
     )
 
 

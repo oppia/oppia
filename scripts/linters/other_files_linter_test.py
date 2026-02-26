@@ -271,10 +271,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 error_messages.get_report()[1], expected_error_messages
             )
             self.assert_same_list_elements(
-                [
-                    'There are no type definitions for Guppy in the '
-                    'typings dir.'
-                ],
+                ['There are no type definitions for Guppy in the typings dir.'],
                 error_messages.get_report(),
             )
             self.assertEqual('Third party type defs', error_messages.name)

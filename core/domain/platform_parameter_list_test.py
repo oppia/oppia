@@ -60,9 +60,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     ]
 
     def test_all_defined_parameters_are_valid(self) -> None:
-        all_names = (
-            platform_parameter_registry.Registry.get_all_platform_parameter_names()
-        )
+        all_names = platform_parameter_registry.Registry.get_all_platform_parameter_names()
         for name in all_names:
             param = platform_parameter_registry.Registry.get_platform_parameter(
                 name
@@ -101,9 +99,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         need to delete a parameter (this should not happen in most cases),
         make sure it's also deleted from EXPECTED_PARAM_NAMES.
         """
-        existing_names = (
-            platform_parameter_registry.Registry.get_all_platform_parameter_names()
-        )
+        existing_names = platform_parameter_registry.Registry.get_all_platform_parameter_names()
         missing_names = set(self.EXPECTED_PARAM_NAMES) - set(existing_names)
 
         self.assertFalse(
@@ -122,9 +118,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         If you are creating new platform parameters, make sure to add it to
         the EXPECTED_PARAM_NAMES list as well.
         """
-        existing_names = (
-            platform_parameter_registry.Registry.get_all_platform_parameter_names()
-        )
+        existing_names = platform_parameter_registry.Registry.get_all_platform_parameter_names()
         unexpected_names = set(existing_names) - set(self.EXPECTED_PARAM_NAMES)
 
         self.assertFalse(

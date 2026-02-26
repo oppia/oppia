@@ -130,10 +130,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with exists_swap, self.assertRaisesRegex(
-            Exception,
-            'ERROR    Please run start.py first to install node-eslint and '
-            'its dependencies.',
+        with (
+            exists_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'ERROR    Please run start.py first to install node-eslint and '
+                'its dependencies.',
+            ),
         ):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [VALID_TS_FILEPATH]

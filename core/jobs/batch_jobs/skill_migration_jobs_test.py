@@ -37,7 +37,6 @@ if MYPY:  # pragma: no cover
 
 
 class MigrateSkillJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[skill_migration_jobs.MigrateSkillJob] = (
         skill_migration_jobs.MigrateSkillJob
     )
@@ -403,7 +402,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
 
 
 class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[skill_migration_jobs.AuditSkillMigrationJob] = (
         skill_migration_jobs.AuditSkillMigrationJob
     )

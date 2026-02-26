@@ -57,7 +57,9 @@ class Model(type):
     ) -> TYPE_MODEL: ...
     def _pre_put_hook(self) -> None: ...
     @classmethod
-    def _lookup_model(cls: Type[TYPE_MODEL], kind: Optional[str]) -> TYPE_MODEL: ...
+    def _lookup_model(
+        cls: Type[TYPE_MODEL], kind: Optional[str]
+    ) -> TYPE_MODEL: ...
     @classmethod
     def _get_kind(cls) -> str: ...
 
@@ -104,7 +106,7 @@ class DateTimeProperty(Property):
         name: Optional[str] = ...,
         auto_now: bool = ...,
         auto_now_add: bool = ...,
-        **kwds: Any
+        **kwds: Any,
     ) -> None: ...
 
 class DateProperty(DateTimeProperty): ...
@@ -118,7 +120,7 @@ class JsonProperty(Property):
         name: Optional[str] = ...,
         compressed: bool = ...,
         json_type: Optional[Any] = ...,
-        **kwds: Any
+        **kwds: Any,
     ) -> None: ...
 
 class UserProperty(Property):
@@ -127,7 +129,7 @@ class UserProperty(Property):
         name: Optional[str] = ...,
         auto_current_user: bool = ...,
         auto_current_user_add: bool = ...,
-        **kwds: Any
+        **kwds: Any,
     ) -> None: ...
 
 class TextProperty(Property): ...

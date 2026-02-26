@@ -150,9 +150,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             }
         }
 
-        voiceover_regeneration_task_mapping_dict: (
-            cloud_task_domain.VoiceoverRegenerationTaskMappingDict
-        ) = {
+        voiceover_regeneration_task_mapping_dict: cloud_task_domain.VoiceoverRegenerationTaskMappingDict = {
             'exploration_id': exploration_id,
             'task_run_id': task_run_id,
             'language_accent_to_content_status_map': (

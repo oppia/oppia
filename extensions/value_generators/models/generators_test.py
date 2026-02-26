@@ -39,7 +39,6 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
             generator.generate_value({}, ['a', 'b', 'c']), ['a', 'b', 'c']
         )
         self.assertIn(
-            '[schema]="SCHEMA" '
-            '[(ngModel)]="customizationArgs.list_of_values"',
+            '[schema]="SCHEMA" [(ngModel)]="customizationArgs.list_of_values"',
             generator.get_html_template(),
         )

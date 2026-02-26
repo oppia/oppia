@@ -33,8 +33,7 @@ from core.tests import test_utils
 # utils.dict_from_yaml can isolate differences quickly.
 
 SAMPLE_YAML_CONTENT = (
-    (
-        """category: A category
+    """category: A category
 language_code: en
 nodes:
 - exploration_id: an_exploration_id
@@ -43,13 +42,10 @@ schema_version: %d
 tags: []
 title: A title
 """
-    )
-    % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-)
+) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
 class CollectionChangeTests(test_utils.GenericTestBase):
-
     def test_collection_change_object_with_missing_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'
@@ -568,9 +564,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because for test purposes we're defining
         # fields that do not match with defined VersionedCollectionDict. So,
         # in order to prevent MyPy errors we add an ignore statement here.
-        versioned_collection_contents: (
-            collection_domain.VersionedCollectionDict
-        ) = {
+        versioned_collection_contents: collection_domain.VersionedCollectionDict = {
             'schema_version': 1,
             'collection_contents': {},  # type: ignore[typeddict-item]
         }
@@ -599,9 +593,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because for test purposes we're defining
         # fields that do not match with defined VersionedCollectionDict. So,
         # in order to prevent MyPy errors we add an ignore statement here.
-        versioned_collection_contents: (
-            collection_domain.VersionedCollectionDict
-        ) = {
+        versioned_collection_contents: collection_domain.VersionedCollectionDict = {
             'schema_version': 5,
             'collection_contents': {  # type: ignore[typeddict-item]
                 'nodes': [
@@ -635,9 +627,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because for test purposes we're defining
         # fields that do not match with defined VersionedCollectionDict. So,
         # in order to prevent MyPy errors we add an ignore statement here.
-        versioned_collection_contents: (
-            collection_domain.VersionedCollectionDict
-        ) = {
+        versioned_collection_contents: collection_domain.VersionedCollectionDict = {
             'schema_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
             'collection_contents': {},  # type: ignore[typeddict-item]
         }
@@ -1138,7 +1128,6 @@ title: A title
 
 
 class CollectionSummaryTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()

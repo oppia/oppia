@@ -318,7 +318,8 @@ def get_learner_collection_dict_by_id(
     # difference in types, MyPy throws an error. Thus, to avoid the error,
     # we used ignore here.
     collection_dict['nodes'] = [
-        node.to_dict() for node in collection.nodes  # type: ignore[misc]
+        node.to_dict()
+        for node in collection.nodes  # type: ignore[misc]
     ]
 
     collection_dict['playthrough_dict'] = {
@@ -646,9 +647,9 @@ def _get_displayable_collection_summary_dicts(
             'title': u'Exploration 2 Albert title',
         }, ]
     """
-    displayable_collection_summaries: List[DisplayableCollectionSummaryDict] = (
-        []
-    )
+    displayable_collection_summaries: List[
+        DisplayableCollectionSummaryDict
+    ] = []
     for collection_summary in collection_summaries:
         if collection_summary and collection_summary.status != (
             rights_domain.ACTIVITY_STATUS_PRIVATE
@@ -826,7 +827,6 @@ def check_activity_id_validity(
     private_collection_ids = []
 
     for activities_info in activity_summaries_by_type:
-
         # If the activity is an Exploration.
         if activities_info['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
             for index, summary in enumerate(activities_info['summaries']):

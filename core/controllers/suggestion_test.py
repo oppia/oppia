@@ -59,7 +59,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
-
     ASSET_HANDLER_URL_PREFIX: Final = '/assetsdevhandler'
     TOPIC_ID = 'topic'
     STORY_ID = 'story'
@@ -910,7 +909,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         )
 
     def test_resubmit_rejected_suggestion(self) -> None:
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -2575,7 +2573,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
-
     AUTHOR_EMAIL: Final = 'author@example.com'
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
@@ -3051,7 +3048,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
 
 class SkillSuggestionTests(test_utils.GenericTestBase):
-
     AUTHOR_EMAIL: Final = 'author@example.com'
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 

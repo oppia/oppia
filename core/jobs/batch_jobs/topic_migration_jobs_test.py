@@ -37,7 +37,6 @@ if MYPY:
 
 
 class MigrateTopicJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[topic_migration_jobs.MigrateTopicJob] = (
         topic_migration_jobs.MigrateTopicJob
     )
@@ -140,7 +139,10 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_unmigrated_topic_with_unmigrated_prop_is_migrated(self) -> None:
-        with self.story_reference_schema_version_swap, self.update_story_reference_swap:  # pylint: disable=line-too-long
+        with (
+            self.story_reference_schema_version_swap,
+            self.update_story_reference_swap,
+        ):  # pylint: disable=line-too-long
             unmigrated_topic_model = self.create_model(
                 topic_models.TopicModel,
                 id=self.TOPIC_1_ID,
@@ -319,7 +321,6 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
 
 class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[topic_migration_jobs.AuditTopicMigrateJob] = (
         topic_migration_jobs.AuditTopicMigrateJob
     )

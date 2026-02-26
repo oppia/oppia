@@ -1420,8 +1420,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'You do not have credentials to create '
-                'exploration feedback.',
+                'You do not have credentials to create exploration feedback.',
             )
         self.logout()
 
@@ -4401,8 +4400,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.private_exp_id, expected_status_int=401
             )
         error_msg = (
-            'You do not have credentials to change rights '
-            'for this exploration.'
+            'You do not have credentials to change rights for this exploration.'
         )
         self.assertEqual(response['error'], error_msg)
         self.logout()
@@ -7505,8 +7503,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'You do not have credentials to submit'
-                ' images to explorations.',
+                'You do not have credentials to submit images to explorations.',
             )
         self.logout()
 

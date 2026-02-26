@@ -47,7 +47,6 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
         exp_models_pcoll = (
             self.pipeline
             | 'Get all ExplorationModels'

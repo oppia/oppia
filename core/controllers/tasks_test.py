@@ -43,7 +43,6 @@ if MYPY:  # pragma: no cover
 
 
 class TasksTests(test_utils.EmailTestBase):
-
     USER_A_EMAIL: Final = 'a@example.com'
     USER_B_EMAIL: Final = 'b@example.com'
     EMAIL_FOOTER: Final = (
@@ -424,7 +423,6 @@ class TasksTests(test_utils.EmailTestBase):
 
         with self.can_send_feedback_email_ctx:
             with get_moderator_id_as_list:
-
                 # Create thread.
                 feedback_services.create_thread(
                     feconf.ENTITY_TYPE_EXPLORATION,

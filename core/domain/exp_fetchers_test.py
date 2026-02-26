@@ -339,7 +339,8 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         ):
             (
                 exp_fetchers.get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-                    self.EXP_1_ID, [1, 2, 2.5, 3]  # type: ignore[list-item]
+                    self.EXP_1_ID,
+                    [1, 2, 2.5, 3],  # type: ignore[list-item]
                 )
             )
 
@@ -378,8 +379,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Couldn\'t find explorations with the following ids:\n'
-            'doesnt_exist',
+            'Couldn\'t find explorations with the following ids:\ndoesnt_exist',
         ):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist']
@@ -592,7 +592,6 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
         )
 
     def test_get_logged_out_user_progress(self) -> None:
-
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID
         )
@@ -648,8 +647,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     NEW_EXP_ID: Final = 'exp_id1'
 
     UPGRADED_EXP_YAML: Final = (
-        (
-            """author_notes: ''
+        """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Art
@@ -740,12 +738,10 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """
-        )
-        % (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
+    ) % (
+        exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+        feconf.DEFAULT_INIT_STATE_NAME,
+        feconf.CURRENT_STATE_SCHEMA_VERSION,
     )
 
     STATES_AT_V41 = {

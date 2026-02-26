@@ -35,7 +35,6 @@ if MYPY:  # pragma: no cover
 
 
 class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
-
     def test_validate_change_domain_implemented(self) -> None:
         valid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
@@ -263,7 +262,6 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 class ValidateSubtopicPageCommitLogEntryModelTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_validate_subtopic_page_model(self) -> None:
         valid_commit_cmd_model = (
             subtopic_models.SubtopicPageCommitLogEntryModel(

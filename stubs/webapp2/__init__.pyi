@@ -26,7 +26,7 @@ class Request:
         base_url: str = ...,
         headers: List[Tuple[str, str]] = ...,
         POST: Dict[str, Any] = ...,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Request: ...
 
 class ResponseHeaders(Dict[str, Any]):
@@ -79,7 +79,7 @@ class Route:
         template: Union[str, Pattern[str]],
         handler: Callable[..., object],
         *,
-        name: str = ...
+        name: str = ...,
     ) -> None: ...
 
 class RequestHandler:

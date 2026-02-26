@@ -93,9 +93,7 @@ def get_subtopic_page_from_model(
     Returns:
         SubtopicPage. The domain object corresponding to the given model object.
     """
-    versioned_page_contents: (
-        subtopic_page_domain.VersionedSubtopicPageContentsDict
-    ) = {
+    versioned_page_contents: subtopic_page_domain.VersionedSubtopicPageContentsDict = {
         'schema_version': subtopic_page_model.page_contents_schema_version,
         'page_contents': copy.deepcopy(subtopic_page_model.page_contents),
     }

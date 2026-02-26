@@ -50,9 +50,7 @@ KIND_BY_INDEX: Tuple[str, ...] = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 # properties belong to.
 ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR: Dict[
     str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
-] = (
-    base_validation_registry.get_id_referencing_properties_by_kind_of_possessor()
-)
+] = base_validation_registry.get_id_referencing_properties_by_kind_of_possessor()
 
 # Type is: set(str). All model kinds referenced by one or more properties.
 ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES: Set[str] = (

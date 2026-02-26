@@ -103,10 +103,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ),
             (
                 '<oppia-noninteractive-tabs tab_contents-with-value'
-                '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;'
+                '="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;'
                 '&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;gt;&amp;lt;/p'
                 '&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
-                'quot;hello&amp;quot;}]\"></oppia-noninteractive-tabs>'
+                'quot;hello&amp;quot;}]"></oppia-noninteractive-tabs>'
             ),
             (
                 '<oppia-noninteractive-collapsible '
@@ -182,10 +182,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 ),
                 (
                     '<oppia-noninteractive-tabs tab_contents-with-value'
-                    '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;'
+                    '="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;'
                     'gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;gt;&amp;lt;'
                     '/p&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
-                    'quot;hello&amp;quot;}]\"></oppia-noninteractive-tabs>'
+                    'quot;hello&amp;quot;}]"></oppia-noninteractive-tabs>'
                 ),
                 (
                     '<oppia-noninteractive-workedexample '
@@ -208,9 +208,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             (
                 '<p>Hello <b>this </b>is </p><p><br></p><p>test <b>case '
                 '</b>for </p><p><oppia-noninteractive-collapsible '
-                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
-                'heading-with-value=\"&amp;quot;Learn more about APIs&'
-                'amp;quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'content-with-value="&amp;quot;Hello oppia&amp;quot;" '
+                'heading-with-value="&amp;quot;Learn more about APIs&'
+                'amp;quot;"></oppia-noninteractive-collapsible><br></p><p>'
                 'for migration testing</p>'
             ),
             'Hello<div>oppia</div>testing <i>in progess</i>!',
@@ -632,9 +632,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'link.com&amp;quot;"></oppia-noninteractive-link></p>'
                 )
             ],
-            (
-                'Missing attributes: video_id-with-value, ' 'Extra attributes: '
-            ): [
+            ('Missing attributes: video_id-with-value, Extra attributes: '): [
                 (
                     '<oppia-noninteractive-video autoplay-with-value="false" '
                     'end-with-value="0" start-with-value="0">'

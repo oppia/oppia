@@ -68,14 +68,17 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             compiled_js_dir_swap = self.swap(
                 run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR
             )
-            with compiled_js_dir_swap, self.assertRaisesRegex(
-                Exception,
-                'COMPILED_JS_DIR: %s does not match the output directory '
-                'in %s: %s'
-                % (
-                    MOCK_COMPILED_JS_DIR,
-                    run_typescript_checks.TSCONFIG_FILEPATH,
-                    out_dir,
+            with (
+                compiled_js_dir_swap,
+                self.assertRaisesRegex(
+                    Exception,
+                    'COMPILED_JS_DIR: %s does not match the output directory '
+                    'in %s: %s'
+                    % (
+                        MOCK_COMPILED_JS_DIR,
+                        run_typescript_checks.TSCONFIG_FILEPATH,
+                        out_dir,
+                    ),
                 ),
             ):
                 run_typescript_checks.compile_and_check_typescript(
@@ -295,7 +298,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         print_arr: List[str] = []
 
         def mock_print(
-            msg: str, end: str = '\n'  # pylint: disable=unused-argument
+            msg: str,
+            end: str = '\n',  # pylint: disable=unused-argument
         ) -> None:
             print_arr.append(msg)
 
@@ -336,7 +340,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         print_arr: List[str] = []
 
         def mock_print(
-            msg: str, end: str = '\n'  # pylint: disable=unused-argument
+            msg: str,
+            end: str = '\n',  # pylint: disable=unused-argument
         ) -> None:
             print_arr.append(msg)
 

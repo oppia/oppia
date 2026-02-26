@@ -383,7 +383,6 @@ class ReferenceDict(TypedDict):
 
 
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):
-
     EXP_ID_1: Final = 'eid1'
     EXP_ID_2: Final = 'eid2'
     EXP_ID_3: Final = 'eid3'
@@ -1734,7 +1733,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1960,7 +1958,6 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
 
 class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)

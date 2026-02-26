@@ -39,7 +39,6 @@ if MYPY:  # pragma: no cover
 
 
 class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
-
     def test_process_reports_error_for_invalid_uid(self) -> None:
         model_with_invalid_id = user_models.UserSettingsModel(
             id='123',
@@ -84,7 +83,6 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
 class ValidateActivityMappingOnlyAllowedKeysTests(
     job_test_utils.PipelinedTestBase
 ):
-
     USER_ID: Final = 'test_id'
     EMAIL_ID: Final = 'a@a.com'
     INCORRECT_KEY: Final = 'audit'
@@ -141,7 +139,6 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
 
 
 class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
-
     VALID_USER_ID: Final = 'test_user'
     VALID_EXPLORATION_ID: Final = 'exploration_id'
     VALID_DRAFT_CHANGE_LIST: Final = [
@@ -221,7 +218,6 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
 
 
 class RelationshipsOfTests(test_utils.TestBase):
-
     def test_completed_activities_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
@@ -424,7 +420,6 @@ class RelationshipsOfTests(test_utils.TestBase):
 class ValidateArchivedModelsMarkedDeletedTests(
     job_test_utils.PipelinedTestBase
 ):
-
     def test_archived_model_not_marked_deleted(self) -> None:
         model = user_models.UserQueryModel(
             id='123',

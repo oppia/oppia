@@ -152,7 +152,6 @@ REPORT_JSON: app_feedback_report_domain.AndroidFeedbackReportDict = {
 
 
 class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.android_report_id = (
@@ -696,7 +695,6 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
 
 class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.user_supplied_feedback = (
@@ -845,7 +843,6 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
 
 class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.device_system_context = (
@@ -873,7 +870,6 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
 
 
 class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.device_system_context = (
@@ -1114,7 +1110,6 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
 
 class EntryPointDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.entry_point = app_feedback_report_domain.EntryPoint(
@@ -1141,7 +1136,6 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
 
 
 class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.entry_point = (
@@ -1188,7 +1182,6 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
 
 
 class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.entry_point = app_feedback_report_domain.LessonPlayerEntryPoint(
@@ -1340,7 +1333,6 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 
 
 class StudyGuideEntryPointDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.entry_point = app_feedback_report_domain.StudyGuideEntryPoint(
@@ -1426,7 +1418,6 @@ class StudyGuideEntryPointDomainTests(test_utils.GenericTestBase):
 
 
 class CrashEntryPointDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.entry_point = app_feedback_report_domain.CrashEntryPoint()
@@ -1469,7 +1460,6 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
 
 
 class AppContextDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         entry_point = app_feedback_report_domain.NavigationDrawerEntryPoint()
@@ -1500,7 +1490,6 @@ class AppContextDomainTests(test_utils.GenericTestBase):
 
 
 class AndroidAppContextDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         entry_point = app_feedback_report_domain.NavigationDrawerEntryPoint()
@@ -1670,7 +1659,6 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
 
 
 class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -1888,7 +1876,6 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
 
 class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -2109,7 +2096,6 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
 
 class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
-
     def test_to_dict(self) -> None:
         counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
             {PLATFORM_ANDROID: 1, PLATFORM_WEB: 1}
@@ -2163,7 +2149,6 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
 
 
 class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(

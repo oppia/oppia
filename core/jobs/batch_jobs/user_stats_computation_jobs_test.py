@@ -36,7 +36,6 @@ if MYPY:
 
 
 class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
-
     JOB_CLASS: Type[
         user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
     ] = user_stats_computation_jobs.CollectWeeklyDashboardStatsJob

@@ -552,8 +552,7 @@ class ExplorationRightsHandler(
                 )
             if new_member_id == self.user_id:
                 raise self.InvalidInputException(
-                    'Users are not allowed to assign other roles to '
-                    'themselves.'
+                    'Users are not allowed to assign other roles to themselves.'
                 )
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role

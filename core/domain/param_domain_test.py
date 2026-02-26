@@ -27,9 +27,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
     def setUp(self) -> None:
-        self.sample_customization_args: (
-            param_domain.CustomizationArgsDictWithValue
-        ) = {
+        self.sample_customization_args: param_domain.CustomizationArgsDictWithValue = {
             'value': '5',
             'parse_with_jinja': True,
         }
@@ -116,7 +114,9 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             # test wrong inputs that we can normally catch by typing.
             customization_args_dict = {1: '1'}
             param_domain.ParamChange(
-                'abc', 'Copier', customization_args_dict  # type: ignore[arg-type]
+                'abc',
+                'Copier',
+                customization_args_dict,  # type: ignore[arg-type]
             ).validate()
 
     def test_param_spec_to_dict(self) -> None:

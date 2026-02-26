@@ -56,7 +56,6 @@ class BeamHandlerTestBase(test_utils.GenericTestBase):
 
 
 class BeamJobHandlerTests(BeamHandlerTestBase):
-
     def test_get_returns_registered_jobs(self) -> None:
         job = beam_job_domain.BeamJob(FooJob)
         get_beam_jobs_swap = self.swap_to_always_return(
@@ -75,7 +74,6 @@ class BeamJobHandlerTests(BeamHandlerTestBase):
 
 
 class BeamJobRunHandlerTests(BeamHandlerTestBase):
-
     def test_get_returns_all_runs(self) -> None:
         beam_job_services.create_beam_job_run_model('FooJob').put()
         beam_job_services.create_beam_job_run_model('FooJob').put()
@@ -125,7 +123,6 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
 
 
 class BeamJobRunResultHandlerTests(BeamHandlerTestBase):
-
     def test_get_returns_job_output(self) -> None:
         run_model = beam_job_services.create_beam_job_run_model('WorkingJob')
         run_model.put()

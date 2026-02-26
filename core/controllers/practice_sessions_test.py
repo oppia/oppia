@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 
 class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -98,7 +97,6 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
-
     def test_get_fails_when_skill_ids_dont_exist(self) -> None:
         topic = topic_domain.Topic.create_default_topic(
             'topic_id_3',
