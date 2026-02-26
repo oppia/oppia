@@ -28,8 +28,7 @@ from typing import Dict, Iterable, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import opportunity_models
-    from mypy_imports import translation_models
+    from mypy_imports import opportunity_models, translation_models
 
 (opportunity_models, translation_models) = models.Registry.import_models(
     [
