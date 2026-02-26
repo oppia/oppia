@@ -42,6 +42,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     suggestion_migration_jobs,
     suggestion_stats_computation_jobs,
     topic_migration_jobs,
+    translation_audit_jobs,
     translation_migration_jobs,
     user_bios_change_jobs,
     user_stats_computation_jobs,
@@ -76,7 +77,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     missing_translation_images_repair_jobs,
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    audit_stories_with_disconnected_node_ids_job
+    audit_stories_with_disconnected_node_ids_job,
 )
 
 
