@@ -86,8 +86,8 @@ class FirebaseAuditRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'WARNING: Oppia user (user_id=\'uid_a\') unlinked to '
-                        'Firebase record'
+                        'WARNING: Oppia user (user_id=\'uid_a\') linked to '
+                        'missing Firebase record (firebase_id=\'fb_a\')'
                     )
                 ),
             ],
@@ -103,7 +103,7 @@ class FirebaseAuditRecordsJobTests(
                 job_run_result.JobRunResult(
                     stderr=(
                         'WARNING: Firebase record (firebase_id=\'fb_a\') '
-                        'unlinked to Oppia user'
+                        'linked to missing Oppia user'
                     )
                 ),
             ],
@@ -139,11 +139,10 @@ class FirebaseAuditRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: OPPIA USERS '
-                        '(user_ids=[\'uid_a\', \'uid_b\']) ARE USING THE '
-                        'SAME EMAIL! Server admin needs to manually '
-                        'resolve this collision by changing the email '
-                        'of one of the users.'
+                        'ERROR: OPPIA USERS (user_ids=[\'uid_a\', \'uid_b\']) '
+                        'ARE USING THE SAME EMAIL! A server admin must '
+                        'manually resolve these collisions by giving each user '
+                        'a UNIQUE email.'
                     )
                 ),
             ],
@@ -191,9 +190,10 @@ class FirebaseAuditRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'WARNING: Oppia user (user_id=\'uid_a\') inconsistent '
-                        'with Firebase (firebase_id=\'fb_a\'): the field '
-                        '\'disabled\' in firebase=True but in oppia=False'
+                        'WARNING: Oppia user (user_id=\'uid_a\') is '
+                        'inconsistent with its Firebase record '
+                        '(firebase_id=\'fb_a\'): the field \'disabled\' is '
+                        'True in Firebase but False in Oppia'
                     )
                 ),
             ],
@@ -232,11 +232,10 @@ class FirebaseAuditRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: OPPIA USERS '
-                        '(user_ids=[\'uid_a\', \'uid_b\']) ARE USING THE '
-                        'SAME EMAIL! Server admin needs to manually '
-                        'resolve this collision by changing the email '
-                        'of one of the users.'
+                        'ERROR: OPPIA USERS (user_ids=[\'uid_a\', \'uid_b\']) '
+                        'ARE USING THE SAME EMAIL! A server admin must '
+                        'manually resolve these collisions by giving each user '
+                        'a UNIQUE email.'
                     )
                 ),
             ],
@@ -286,11 +285,10 @@ class FirebaseAuditRecordsJobTests(
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: OPPIA USERS '
-                        '(user_ids=[\'uid_a\', \'uid_b\']) ARE USING THE '
-                        'SAME EMAIL! Server admin needs to manually '
-                        'resolve this collision by changing the email '
-                        'of one of the users.'
+                        'ERROR: OPPIA USERS (user_ids=[\'uid_a\', \'uid_b\']) '
+                        'ARE USING THE SAME EMAIL! A server admin must '
+                        'manually resolve these collisions by giving each user '
+                        'a UNIQUE email.'
                     )
                 ),
             ],
@@ -321,13 +319,11 @@ class FirebaseAuditRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'WARNING: Oppia user (user_id=\'uid_a\') '
-                        'inconsistent with Firebase '
-                        '(firebase_id=\'fb_x\'): '
-                        'the field \'auth_id\' in firebase=\'fb_x\' but in '
-                        'oppia=\'fb_a\', '
-                        'the field \'disabled\' in firebase=True but in '
-                        'oppia=False'
+                        'WARNING: Oppia user (user_id=\'uid_a\') is '
+                        'inconsistent with its Firebase record '
+                        '(firebase_id=\'fb_x\'): the field \'auth_id\' is '
+                        '\'fb_x\' in Firebase but \'fb_a\' in Oppia, the field '
+                        '\'disabled\' is True in Firebase but False in Oppia'
                     )
                 ),
             ],
@@ -367,8 +363,8 @@ class FirebaseAuditRecordsJobTests(
                 job_run_result.JobRunResult(stdout='OK: 1'),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'WARNING: Oppia user (user_id=\'uid_b\') unlinked to '
-                        'Firebase record'
+                        'WARNING: Oppia user (user_id=\'uid_b\') linked to '
+                        'missing Firebase record (firebase_id=\'fb_b\')'
                     )
                 ),
             ],

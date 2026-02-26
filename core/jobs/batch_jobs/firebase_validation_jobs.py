@@ -25,12 +25,11 @@ from core.jobs.io import firebase_io
 from core.jobs.types import firebase_adapters, job_run_result
 
 import apache_beam as beam
-from apache_beam import pvalue
 from typing import Iterable, TypedDict
 
-TAG_OK = 'OK'
-TAG_WARNING = 'WARNING'
 TAG_ERROR = 'ERROR'
+TAG_WARNING = 'WARNING'
+TAG_OK = 'OK'
 
 
 class FirebaseAuditRecordsJob(base_jobs.JobBase):
@@ -58,17 +57,15 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
             | 'Drop email key' >> beam.Map(lambda key_value: key_value[1])
             | 'Audit grouped records'
             >> beam.FlatMap(self._audit_grouped_records).with_outputs(
-                TAG_OK, TAG_WARNING, TAG_ERROR
+                TAG_ERROR, TAG_WARNING, TAG_OK
             )
         )
 
-        ok_results = (
-            audited_groups[TAG_OK]
-            | 'Count OKs' >> beam.CombineGlobally(sum)
-            | 'Omit OKs when zero' >> beam.Filter(lambda oks: oks > 0)
-            | 'Format OKs' >> beam.Map(lambda oks: f'OK: {oks}')
-            | 'Dump OKs into stdout'
-            >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        error_results = (
+            audited_groups[TAG_ERROR]
+            | 'Format errors' >> beam.Map(lambda msg: f'ERROR: {msg}')
+            | 'Dump errors into stderr'
+            >> beam.Map(job_run_result.JobRunResult.as_stderr)
         )
 
         warning_results = (
@@ -78,11 +75,13 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
             >> beam.Map(job_run_result.JobRunResult.as_stderr)
         )
 
-        error_results = (
-            audited_groups[TAG_ERROR]
-            | 'Format errors' >> beam.Map(lambda msg: f'ERROR: {msg}')
-            | 'Dump errors into stderr'
-            >> beam.Map(job_run_result.JobRunResult.as_stderr)
+        ok_results = (
+            audited_groups[TAG_OK]
+            | 'Count OKs' >> beam.CombineGlobally(sum)
+            | 'Omit OKs when zero' >> beam.Filter(lambda oks: oks > 0)
+            | 'Format OKs' >> beam.Map(lambda oks: f'OK: {oks}')
+            | 'Dump OKs into stdout'
+            >> beam.Map(job_run_result.JobRunResult.as_stdout)
         )
 
         return (ok_results, error_results, warning_results) | beam.Flatten()
@@ -95,71 +94,71 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
 
     def _audit_grouped_records(
         self, grouped: _RecordsGroupedByEmail
-    ) -> Iterable[pvalue.TaggedOutput]:
-        """Yields tagged details about the records grouped with the given email.
+    ) -> Iterable[beam.TaggedOutput]:
+        """Audits records using tagged outputs to group messages by severity."""
 
-        Args:
-            grouped: RecordsGroupedByEmail. The grouped records.
-
-        Yields:
-            pvalue.TaggedOutput. An OK tag with ok count or ERR tag with reason.
-        """
-        from_firebase = tuple(grouped['from_firebase'])
         from_oppia = tuple(grouped['from_oppia'])
+        from_firebase = tuple(grouped['from_firebase'])
         collisions_found = False
 
-        if len(firebase_ids := sorted({r.auth_id for r in from_firebase})) > 1:
-            yield pvalue.TaggedOutput(
-                TAG_WARNING, f'Firebase records share email: {firebase_ids=!r}'
+        if len(user_ids := sorted({r.user_id for r in from_oppia})) > 1:
+            yield beam.TaggedOutput(
+                TAG_ERROR,
+                f'OPPIA USERS ({user_ids=!r}) ARE USING THE SAME EMAIL! '
+                'A server admin must manually resolve these collisions by '
+                'giving each user a UNIQUE email.',
             )
             collisions_found = True
 
-        if len(user_ids := sorted({r.user_id for r in from_oppia})) > 1:
-            yield pvalue.TaggedOutput(
-                TAG_ERROR,
-                f'OPPIA USERS ({user_ids=!r}) ARE USING THE SAME EMAIL! '
-                'Server admin needs to manually resolve this collision by '
-                'changing the email of one of the users.',
+        if len(firebase_ids := sorted({r.auth_id for r in from_firebase})) > 1:
+            yield beam.TaggedOutput(
+                TAG_WARNING,
+                f'Firebase records share email: {firebase_ids=!r}',
             )
             collisions_found = True
 
         if collisions_found:
             return
 
-        firebase_record = from_firebase[0] if from_firebase else None
         oppia_record = from_oppia[0] if from_oppia else None
-
-        if firebase_record and not oppia_record:
-            firebase_id = firebase_record.auth_id
-            yield pvalue.TaggedOutput(
-                TAG_WARNING,
-                f'Firebase record ({firebase_id=!r}) unlinked to Oppia user',
-            )
-            return
+        firebase_record = from_firebase[0] if from_firebase else None
 
         if oppia_record and not firebase_record:
             user_id = oppia_record.user_id
-            yield pvalue.TaggedOutput(
+            firebase_id = oppia_record.auth_id
+            yield beam.TaggedOutput(
                 TAG_WARNING,
-                f'Oppia user (user_id={user_id!r}) unlinked to Firebase record',
+                f'Oppia user ({user_id=!r}) linked to missing '
+                f'Firebase record ({firebase_id=!r})',
             )
-            return
 
-        if firebase_record == oppia_record:
-            yield pvalue.TaggedOutput(TAG_OK, 1)
-            return
+        elif not oppia_record and firebase_record:
+            firebase_id = firebase_record.auth_id
+            yield beam.TaggedOutput(
+                TAG_WARNING,
+                f'Firebase record ({firebase_id=!r}) linked to missing '
+                'Oppia user',
+            )
 
-        firebase_dict = dataclasses.asdict(firebase_record)
-        oppia_dict = dataclasses.asdict(oppia_record)
+        elif oppia_record != firebase_record:
+            oppia_dict = dataclasses.asdict(oppia_record)
+            user_id = oppia_dict["user_id"]
 
-        diffs = ', '.join(
-            f'the field {k!r} in {firebase=!r} but in {oppia=!r}'
-            for k in sorted(firebase_dict.keys() & oppia_dict.keys())
-            if (firebase := firebase_dict[k]) != (oppia := oppia_dict[k])
-        )
+            firebase_dict = dataclasses.asdict(firebase_record)
+            firebase_id = firebase_dict["auth_id"]
 
-        yield pvalue.TaggedOutput(
-            TAG_WARNING,
-            f'Oppia user (user_id={oppia_dict["user_id"]!r}) inconsistent with '
-            f'Firebase (firebase_id={firebase_dict["auth_id"]!r}): {diffs}',
-        )
+            inconsistent_fields = ', '.join(
+                f'the field {k!r} is {firebase!r} in Firebase but {oppia!r} in '
+                'Oppia'
+                for k in sorted(firebase_dict.keys() & oppia_dict.keys())
+                if (firebase := firebase_dict[k]) != (oppia := oppia_dict[k])
+            )
+
+            yield beam.TaggedOutput(
+                TAG_WARNING,
+                f'Oppia user ({user_id=!r}) is inconsistent with its '
+                f'Firebase record ({firebase_id=!r}): {inconsistent_fields}',
+            )
+
+        else:
+            yield beam.TaggedOutput(TAG_OK, 1)

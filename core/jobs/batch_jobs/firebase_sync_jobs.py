@@ -35,6 +35,7 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
     """Regenerate all Firebase records based on Oppia's user & auth models."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+
         if (
             feature_flag_domain.get_server_mode()
             == feature_flag_domain.ServerMode.PROD
@@ -97,7 +98,7 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
     def _categorize_grouped_records(
         self, groups: _RecordsGroupedByEmail
     ) -> Iterable[beam.TaggedOutput]:
-        """Splits records into tagged outputs based on which action to take."""
+        """Categorizes records using tagged outputs to group them by action."""
 
         from_oppia = frozenset(groups['from_oppia'])
         from_firebase = frozenset(groups['from_firebase'])
