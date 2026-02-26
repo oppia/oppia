@@ -28,8 +28,8 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
   templateUrl: './music-notes-input-response.component.html',
 })
 export class ResponseMusicNotesInput implements OnInit {
-  @Input() answer;
-  displayedAnswer: string;
+  @Input() answer!: string;
+  displayedAnswer!: string;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 

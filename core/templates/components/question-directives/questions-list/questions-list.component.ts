@@ -77,39 +77,44 @@ interface GroupedSkillSummaries {
   templateUrl: './questions-list.component.html',
 })
 export class QuestionsListComponent implements OnInit, OnDestroy {
-  @Input() allSkillSummaries: ShortSkillSummary[];
-  @Input() canEditQuestion: boolean;
-  @Input() groupedSkillSummaries: GroupedSkillSummaries;
-  @Input() selectedSkillId: string;
-  @Input() selectSkillModalIsShown: boolean;
-  @Input() skillIdToRubricsObject: Record<string, Rubric>;
-  @Input() skillsCategorizedByTopics: CategorizedSkills;
-  @Input() untriagedSkillSummaries: SkillSummary[];
-  @Input() skillDescriptionsAreShown: boolean;
+  @Input() allSkillSummaries!: ShortSkillSummary[];
+  @Input() canEditQuestion!: boolean;
+  @Input() groupedSkillSummaries!: GroupedSkillSummaries;
+  @Input() selectedSkillId!: string;
+  @Input() selectSkillModalIsShown!: boolean;
+  @Input() skillIdToRubricsObject!: Record<string, Rubric>;
+  @Input() skillsCategorizedByTopics!: CategorizedSkills;
+  @Input() untriagedSkillSummaries!: SkillSummary[];
+  @Input() skillDescriptionsAreShown!: boolean;
 
-  associatedSkillSummaries: ShortSkillSummary[];
-  deletedQuestionIds: string[];
-  difficulty: number;
-  difficultyCardIsShown: boolean;
-  editorIsOpen: boolean;
-  isSkillDifficultyChanged: boolean;
-  linkedSkillsWithDifficulty: SkillDifficulty[];
-  misconceptionIdsForSelectedSkill: number[];
-  misconceptionsBySkill: MisconceptionSkillMap;
-  newQuestionIsBeingCreated: boolean;
-  newQuestionSkillDifficulties: number[];
-  newQuestionSkillIds: string[];
-  question: Question;
-  questionId: string;
-  questionIsBeingSaved: boolean;
-  questionIsBeingUpdated: boolean;
-  questionStateData: State;
+  associatedSkillSummaries!: ShortSkillSummary[];
+  deletedQuestionIds!: string[];
+  difficulty!: number;
+  difficultyCardIsShown!: boolean;
+  editorIsOpen!: boolean;
+  isSkillDifficultyChanged!: boolean;
+  linkedSkillsWithDifficulty!: SkillDifficulty[];
+  misconceptionIdsForSelectedSkill!: number[];
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  newQuestionIsBeingCreated!: boolean;
+  newQuestionSkillDifficulties!: number[];
+  newQuestionSkillIds!: string[];
+  question!: Question;
+  questionId!: string;
+  questionIsBeingSaved!: boolean;
+  questionIsBeingUpdated!: boolean;
+  questionStateData!: State;
+
   questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
-  showDifficultyChoices: boolean;
-  skillLinkageModificationsArray: SkillLinkageModificationsArray[];
+
+  showDifficultyChoices!: boolean;
+  skillLinkageModificationsArray!: SkillLinkageModificationsArray[];
+
   directiveSubscriptions = new Subscription();
+
   MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
-  difficultyCount: number;
+
+  difficultyCount!: number;
 
   constructor(
     private alertsService: AlertsService,

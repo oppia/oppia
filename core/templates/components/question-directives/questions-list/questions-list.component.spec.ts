@@ -69,7 +69,7 @@ class MockNgbModal {
 }
 
 class MockUrlInterpolationService {
-  interpolateUrl(value) {
+  interpolateUrl(value: string): string {
     return value;
   }
 }
@@ -89,8 +89,8 @@ describe('Questions List Component', () => {
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
   let skill: Skill;
-  let question = null;
-  let questionStateData = null;
+  let question: Question | null = null;
+  let questionStateData: State | null = null;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

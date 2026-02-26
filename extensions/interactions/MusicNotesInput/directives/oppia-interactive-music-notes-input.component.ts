@@ -116,7 +116,7 @@ export class MusicNotesInputComponent
   NOTE_NAMES_TO_MIDI_VALUES =
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
-  staffContainerElt: HTMLElement | null;
+  staffContainerElt!: HTMLElement | null;
 
   placedNotes: Note[] = [];
 

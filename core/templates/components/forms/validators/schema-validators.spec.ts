@@ -57,15 +57,13 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.hasLengthAtLeast(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned.hasLengthAtLeast)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned!.hasLengthAtLeast).toBeDefined();
       });
     });
     it('should throw an error when the value is not a string', () => {
@@ -102,15 +100,13 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.hasLengthAtMost(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned.hasLengthAtMost)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned.hasLengthAtMost).toBeDefined();
       });
     });
 
@@ -148,15 +144,13 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtLeast(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned.isAtLeast)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned!.isAtLeast).toBeDefined();
       });
     });
   });
@@ -180,15 +174,13 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtMost(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned.isAtMost)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned!.isAtMost).toBeDefined();
       });
     });
   });
@@ -230,18 +222,16 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isFloat();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null);
           return;
         }
         if (errorsReturned === null) {
           throw new Error(testCase.controlValue);
         }
-        expect(errorsReturned.isFloat)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned!.isFloat).toBeDefined();
       });
     });
   });
@@ -260,15 +250,13 @@ describe('Schema validators', () => {
 
       const filter = SchemaValidators.isInteger();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned.isInteger)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned!.isInteger).toBeDefined();
       });
     });
   });
@@ -285,15 +273,13 @@ describe('Schema validators', () => {
 
       const filter = SchemaValidators.isNonempty();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned.isNonempty)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned!.isNonempty).toBeDefined();
       });
     });
   });
@@ -311,7 +297,7 @@ describe('Schema validators', () => {
 
     const expectValidationToPass = (controlValue: string) => {
       control.setValue(controlValue);
-      expect(filter(control)).withContext(controlValue).toBe(null);
+      expect(filter(control)).toBe(null);
     };
 
     const expectValidationToFail = (controlValue: string) => {
@@ -423,10 +409,8 @@ describe('Schema validators', () => {
         {controlValue: 'special\\chars', expectedResult: false},
       ];
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
-        expect(filter(control))
-          .withContext(testCase.toString())
-          .toEqual(errorMsg);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
+        expect(filter(control)).toEqual(errorMsg);
       });
     });
 

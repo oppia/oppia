@@ -153,13 +153,13 @@ export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal
   implements OnInit, AfterContentChecked
 {
-  customizationArgSpecs: CustomizationArgSpecsInterface[];
-  originalContentIdToContent: object;
-  hasCustomizationArgs: boolean;
-  allowedInteractionCategories: AllowedInteractionCategories[];
-  explorationIsLinkedToStory: boolean;
-  customizationModalReopened: boolean;
-  isinteractionOpen: boolean;
+  customizationArgSpecs!: CustomizationArgSpecsInterface[];
+  originalContentIdToContent!: object;
+  hasCustomizationArgs!: boolean;
+  allowedInteractionCategories!: AllowedInteractionCategories[];
+  explorationIsLinkedToStory!: boolean;
+  customizationModalReopened!: boolean;
+  isinteractionOpen!: boolean;
 
   @ViewChild('customizeInteractionHeader')
   customizeInteractionHeader!: ElementRef;
