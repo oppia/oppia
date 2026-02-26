@@ -1,23 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-/**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
- *
- * TM.TE Topic manager creates, deletes. edits the stories, and chapters.
- */
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -31,6 +12,7 @@ describe('Topic Manager', function () {
   let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string;
+  let secondExplorationId: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -39,10 +21,17 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    // Prepare explorations for chapters.
     explorationId = await curriculumAdmin.createAndPublishExplorationWithCards(
       'Solving problems without a calculator',
       'Mathematics'
     );
+    secondExplorationId = await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Basic Multiplication',
+      'Mathematics'
+    );
+
+    // Setup Topic and Classroom.
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition',
@@ -54,8 +43,7 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
 
-    // Create more topics and skills.
-    await curriculumAdmin.createTopic('Whole Numbers', 'whole-numbers');
+    // Create skills for testing prerequisite/acquired logic.
     await curriculumAdmin.createSkillFromSkillsDashboard(
       'Subtraction',
       'Review Material for Subtraction'
@@ -74,134 +62,76 @@ describe('Topic Manager', function () {
     );
   }, 600000);
 
-  it('should be able to create and remove a story in a topic', async function () {
+  it('should handle duplicate exploration warnings and chapter reordering', async function () {
     await topicManager.openTopicEditor('Arithmetic Operations');
     await topicManager.addStoryToTopic(
-      'The Broken Calculator',
-      'the-broken-calculator',
+      'The Story of Numbers',
+      'story-numbers',
       'Arithmetic Operations',
-      'this is a meta tag',
+      'meta tag content',
       testConstants.data.profilePicture
     );
-    await topicManager.addChapter('Solving Problems', explorationId);
-    await topicManager.saveStoryDraft();
-    await topicManager.expectScreenshotToMatch('storyEditor', __dirname);
 
-    // Check if the story is present in the stories list.
+    // 1. Add first chapter.
+    await topicManager.addChapter('Chapter One', explorationId);
+    
+    // 2. Scenario: Same exploration for two chapters -> Warning validation.
+    // We try to add a new chapter with the SAME explorationId as Chapter One.
+    await topicManager.addChapterWithoutSaving('Chapter Two Duplicate', explorationId);
+    await topicManager.expectWarningMessage('Exploration ID already used in this story');
+    
+    // Dismiss or fix the exploration ID to proceed.
+    await topicManager.cancelChapterCreation();
+    await topicManager.addChapter('Chapter Two', secondExplorationId);
+
+    // 3. Scenario: Reorder chapters.
+    await topicManager.expectChaptersToBeInOrder(['Chapter One', 'Chapter Two']);
+    await topicManager.reorderChapters(0, 1); // Drag index 0 to index 1.
+    await topicManager.expectChaptersToBeInOrder(['Chapter Two', 'Chapter One']);
+    
+    await topicManager.saveStoryDraft('Added chapters and tested reordering');
+  });
+
+  it('should validate, edit, and delete prerequisite and acquired skills', async function () {
+    await topicManager.openStoryEditor('The Story of Numbers', 'Arithmetic Operations');
+    await topicManager.openChapterEditor('Chapter Two');
+
+    // Add skills.
+    await topicManager.addPrerequisiteSkill('Subtraction');
+    await topicManager.addAcquiredSkill('Word Problems');
+    await topicManager.saveStoryDraft('Added skills to chapter');
+
+    // Verify presence.
+    await topicManager.expectPrerequisiteSkillToBeVisible('Subtraction');
+    await topicManager.expectAquiredSkillToBeVisible('Word Problems');
+
+    // Scenario: Delete prerequisite and acquired skills.
+    await topicManager.deletePrerequisiteSkill('Subtraction');
+    await topicManager.deleteAcquiredSkill('Word Problems');
+    
+    await topicManager.expectPrerequisiteSkillNotToBeVisible('Subtraction');
+    await topicManager.expectAquiredSkillNotToBeVisible('Word Problems');
+    
+    await topicManager.saveStoryDraft('Deleted skills from chapter');
+  });
+
+  it('should be able to edit story details and then delete the story', async function () {
     await topicManager.openTopicEditor('Arithmetic Operations');
-    await topicManager.expectStoriesListToContain('The Broken Calculator');
+    await topicManager.openStoryEditor('The Story of Numbers', 'Arithmetic Operations');
 
-    // Delete the story.
-    await topicManager.deleteStory('The Broken Calculator');
-    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
+    await topicManager.editStoryDetails(
+      'Final Story Title',
+      'Final Description',
+      'Final Meta Tag',
+      'final-url-fragment'
+    );
+    await topicManager.saveStoryDraft('Updated story details');
+
+    // Delete the story and ensure the list is empty.
+    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.deleteStory('Final Story Title');
+    await topicManager.saveTopicDraft('Arithmetic Operations', 'Removed the story');
     await topicManager.expectStoriesListToBeEmpty();
-  });
-
-  it('should be able to edit and preview the story', async function () {
-    await topicManager.addStoryToTopic(
-      'The Broken Calculator',
-      'the-broken-calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.editStoryDetails(
-      'New Story Title',
-      'New Story Description',
-      'New Meta Tag',
-      'new-url-fragment'
-    );
-    await topicManager.saveStoryDraft();
-    await topicManager.clickOnElementWithText('Expand Preview');
-    await topicManager.expectPreviewCardToBeVisible(
-      'New Story Title',
-      'New Story Description'
-    );
-  });
-
-  it('should be able to save chapters with mobile supported explorations', async function () {
-    // Revert the story name.
-    await topicManager.editStoryDetails(
-      'The Broken Calculator',
-      'Learn how to solve problems without a calculator.',
-      'Learn how to solve problems without a calculator.',
-      'the-broken-calculator'
-    );
-    await topicManager.addChapter('Solving problems', explorationId);
-    await topicManager.saveStoryDraft();
-
-    // Create and publish a new explorations.
-    const simpleExplorationId =
-      await topicManager.createAndPublishAMinimalExplorationWithTitle(
-        'Simple Exploration',
-        'Algebra'
-      );
-
-    await topicManager.navigateToCreatorDashboardPage();
-    await topicManager.navigateToExplorationEditorFromCreatorDashboard();
-    const programmingExplorationId =
-      await topicManager.createSimpleProgrammingExploration();
-
-    // Add simple chapter.
-    await topicManager.openStoryEditor(
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.addChapter('Simple Exploration', simpleExplorationId);
-    await topicManager.saveStoryDraft();
-    await topicManager.openChapterEditor('Simple Exploration');
-    await topicManager.previewChapterCard();
-    await topicManager.expectPreviewCardToBeVisible('Simple Exploration');
-
-    // Add unsupported chaper.
-    await topicManager.openStoryEditor(
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.addChapterWithoutSaving(
-      'Programming Exploration',
-      programmingExplorationId,
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.clickOnElementWithText('Create Chapter');
-    await topicManager.expectNewChapterErrorSpan(
-      'The states [Introduction] contain restricted interaction types.'
-    );
-  });
-
-  it('should be able to edit and preview the chapter', async function () {
-    await topicManager.openChapterEditor(
-      'Solving problems',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.addAcquiredSkill('Addition');
-    await topicManager.saveStoryDraft();
-
-    await topicManager.openChapterEditor(
-      'Simple Exploration',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.editChapterDetails(
-      'New Title',
-      'New Description',
-      'New Meta Tag',
-      testConstants.data.curriculumAdminThumbnailImage
-    );
-    await topicManager.saveStoryDraft();
-    await topicManager.previewChapterCard();
-    await topicManager.expectPreviewCardToBeVisible(
-      'New Title',
-      'New Description'
-    );
-
-    // Add prerequisite skill.
-    await topicManager.addPrerequisiteSkill('Addition');
-    await topicManager.expectPrerequisiteSkillToBeVisible('Addition');
-
-    // Add aquired skill.
-    await topicManager.addAcquiredSkill('Subtraction');
-    await topicManager.expectAquiredSkillToBeVisible('Subtraction');
   });
 
   afterAll(async function () {

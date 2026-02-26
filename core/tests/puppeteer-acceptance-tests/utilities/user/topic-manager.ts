@@ -4359,7 +4359,45 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(publishTopicButton);
 
       await this.page.waitForSelector(publishTopicButton, {hidden: true});
+      
     }
+  }
+  async reorderChapters(fromIndex: number, toIndex: number): Promise<void> {
+    const chapterCards = await this.page.$$('.mastery-check-item');
+    const sourceElement = chapterCards[fromIndex];
+    const targetElement = chapterCards[toIndex];
+    const sourceBox = await sourceElement.boundingBox();
+    const targetBox = await targetElement.boundingBox();
+
+    if (sourceBox && targetBox) {
+      await this.page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+      await this.page.mouse.down();
+      await this.page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
+      await this.page.mouse.up();
+    }
+  }
+
+  async expectChaptersToBeInOrder(expectedTitles: string[]): Promise<void> {
+    const actualTitles = await this.page.$$eval('.chapter-title-label', elements => elements.map(el => el.textContent?.trim()));
+    expect(actualTitles).toEqual(expectedTitles);
+  }
+
+  async expectWarningMessage(message: string): Promise<void> {
+    await this.page.waitForSelector('.oppia-serious-warning-text');
+    const warningText = await this.page.$eval('.oppia-serious-warning-text', el => el.textContent);
+    expect(warningText).toContain(message);
+  }
+
+  async deletePrerequisiteSkill(skillName: string): Promise<void> {
+    await this.page.click(`.prerequisite-skill-name[title="${skillName}"] .oppia-delete-skill-button`);
+  }
+
+  async deleteAcquiredSkill(skillName: string): Promise<void> {
+    await this.page.click(`.acquired-skill-name[title="${skillName}"] .oppia-delete-skill-button`);
+  }
+  
+  async cancelChapterCreation(): Promise<void> {
+    await this.page.click('.oppia-cancel-chapter-creation-button');
   }
 }
 
