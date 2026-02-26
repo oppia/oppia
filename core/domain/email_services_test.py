@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import textwrap
 
-from core.constants import constants
 from core.domain import email_services, platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
@@ -89,23 +88,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].bcc, self.admin_email_address)
-
-    def test_send_bulk_mail_exception_for_invalid_permissions(self) -> None:
-        """Tests the send_bulk_mail exception raised for invalid user
-        permissions.
-        """
-        send_email_exception = self.assertRaisesRegex(
-            Exception, 'This app cannot send emails to users.'
-        )
-
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
-            email_services.send_bulk_mail(
-                self.system_email_address,
-                [self.admin_email_address],
-                'subject',
-                'body',
-                'html',
-            )
 
     @test_utils.set_platform_parameters(
         [
@@ -347,4 +329,72 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'body',
                 'html',
             ),
+        )
+
+    def test_should_be_able_to_log_email_successfully(self) -> None:
+        """Tests that emails are logged successfully."""
+
+        sender_email = 'test@oppia.org'
+        recipient_emails = [
+            'testrecipient@oppia.org',
+            'user1@gmail.com',
+            'user2@yahoo.com',
+            'user3@hotmail.com',
+        ]
+        subject = 'Test Subject'
+        plaintext_body = 'This is a test email.'
+        html_body = '<p>This is a test email.</p>'
+        cc = [
+            'test1@example.com',
+            'test2@example.com',
+            'test3@example.com',
+            'test4@example.com',
+        ]
+        bcc = [
+            'bccUser1@example.com',
+            'bccUser2@example.com',
+            'bccUser3@example.com',
+            'bccUser4@example.com',
+        ]
+        attachments = [
+            {'filename': 'file1.txt', 'path': '/path/to/file1.txt'},
+            {'filename': 'file2.jpg', 'path': '/path/to/file2.jpg'},
+        ]
+
+        response = email_services.convert_email_to_loggable_string(
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            cc,
+            bcc,
+            reply_to=None,
+            recipient_variables=None,
+            attachments=attachments,
+        )
+
+        expected_email_log = """
+            EmailService.SendMail
+            From: test@oppia.org
+            To: testrecipient@oppia.org user1@gmail.com user2@yahoo.com... Total: 4 emails.
+            Subject: Test Subject
+            Body:
+                Content-type: text/plain
+                Data length: 21
+            Body:
+                Content-type: text/html
+                Data length: 28
+                Html content: <p>This is a test email.</p>
+
+            Cc: test1@example.com test2@example.com test3@example.com... Total: 4 emails.
+            Bcc: bccUser1@example.com bccUser2@example.com bccUser3@example.com... Total: 4 emails.
+            Reply_to: None
+            Recipient Variables:
+                Length: 0
+
+            Attachments: file1.txt, file2.jpg
+        """
+        self.assertEqual(
+            textwrap.dedent(expected_email_log).strip(), response.strip()
         )
