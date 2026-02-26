@@ -87,7 +87,7 @@ class FirebaseAuditRecordsJobTests(
                 job_run_result.JobRunResult(
                     stderr=(
                         'WARNING: Oppia user (user_id=\'uid_a\') linked to '
-                        'missing Firebase record (firebase_id=\'fb_a\')'
+                        'non-existent Firebase record (firebase_id=\'fb_a\')'
                     )
                 ),
             ],
@@ -103,7 +103,7 @@ class FirebaseAuditRecordsJobTests(
                 job_run_result.JobRunResult(
                     stderr=(
                         'WARNING: Firebase record (firebase_id=\'fb_a\') '
-                        'linked to missing Oppia user'
+                        'linked to non-existent Oppia user'
                     )
                 ),
             ],
@@ -193,7 +193,7 @@ class FirebaseAuditRecordsJobTests(
                         'WARNING: Oppia user (user_id=\'uid_a\') is '
                         'inconsistent with its Firebase record '
                         '(firebase_id=\'fb_a\'): the field \'disabled\' is '
-                        'True in Firebase but False in Oppia'
+                        'False in Oppia but True in Firebase'
                     )
                 ),
             ],
@@ -322,8 +322,8 @@ class FirebaseAuditRecordsJobTests(
                         'WARNING: Oppia user (user_id=\'uid_a\') is '
                         'inconsistent with its Firebase record '
                         '(firebase_id=\'fb_x\'): the field \'auth_id\' is '
-                        '\'fb_x\' in Firebase but \'fb_a\' in Oppia, the field '
-                        '\'disabled\' is True in Firebase but False in Oppia'
+                        '\'fb_a\' in Oppia but \'fb_x\' in Firebase, the field '
+                        '\'disabled\' is False in Oppia but True in Firebase'
                     )
                 ),
             ],
@@ -364,7 +364,7 @@ class FirebaseAuditRecordsJobTests(
                 job_run_result.JobRunResult(
                     stderr=(
                         'WARNING: Oppia user (user_id=\'uid_b\') linked to '
-                        'missing Firebase record (firebase_id=\'fb_b\')'
+                        'non-existent Firebase record (firebase_id=\'fb_b\')'
                     )
                 ),
             ],

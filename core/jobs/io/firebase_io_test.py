@@ -290,7 +290,7 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='import_users error at slice=[0:1]: error'
+                        stderr='ERROR: import_users at slice=[0:1]: error'
                     ),
                 ],
             )
@@ -314,7 +314,10 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='import_users error at slice=[0:1]: invalid records'
+                        stderr=(
+                            'ERROR: import_users at slice=[0:1]: invalid '
+                            'records'
+                        )
                     ),
                 ],
             )
@@ -340,7 +343,10 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='import_users error at slice=[0:1]: invalid records'
+                        stderr=(
+                            'ERROR: import_users at slice=[0:1]: invalid '
+                            'records'
+                        )
                     ),
                 ],
             )
@@ -370,7 +376,7 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='import_users error at index=[0]: bad record'
+                        stderr='ERROR: import_users at index=[0]: bad record'
                     ),
                 ],
             )
@@ -392,7 +398,7 @@ class DeleteRecordsTests(AuthIoTestBase):
 
     def test_delete_with_value_error_reports_error(self) -> None:
         expected = job_run_result.JobRunResult(
-            stderr='delete_users error at slice=[0:1]: invalid uids'
+            stderr='ERROR: delete_users at slice=[0:1]: invalid uids'
         )
 
         with self.firebase_sdk_stub.mock_delete_users_error(
@@ -422,7 +428,7 @@ class DeleteRecordsTests(AuthIoTestBase):
                 | firebase_io.DeleteRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='delete_users error at slice=[0:1]: error'
+                        stderr='ERROR: delete_users at slice=[0:1]: error'
                     ),
                 ],
             )
@@ -437,7 +443,7 @@ class DeleteRecordsTests(AuthIoTestBase):
                 | firebase_io.DeleteRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='delete_users error at index=[0]: bad uid'
+                        stderr='ERROR: delete_users at index=[0]: bad uid'
                     ),
                 ],
             )

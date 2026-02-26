@@ -25,8 +25,7 @@ from core.jobs.types import job_run_result
 import apache_beam as beam
 import firebase_admin.auth as firebase_auth
 import firebase_admin.exceptions as firebase_exceptions
-from apache_beam import pvalue
-from typing import Generic, Iterable, Iterator, TypeVar
+from typing import Generic, Iterator, TypeVar
 
 FIREBASE_BATCH_LIMIT = 1000
 
@@ -40,8 +39,8 @@ FirebaseBatchOutputType = TypeVar(
     bound=(firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult),
 )
 
-SUCCESS_TAG = 'success'
-ERROR_TAG = 'error'
+OK_TAG = 'OK'
+ERROR_TAG = 'ERROR'
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -59,35 +58,32 @@ class FirebaseBatchOperation(
         self,
         inputs: beam.PCollection[FirebaseBatchInputType],
     ) -> beam.PCollection[job_run_result.JobRunResult]:
-        result = (
+        batch_operation_results = (
             inputs
-            | 'Gather all inputs into a single worker'
-            >> beam.combiners.ToList()
-            | f'Handle inputs in batches using {self.operation_name}'
-            >> beam.FlatMap(self._handle_inputs).with_outputs(
-                SUCCESS_TAG, ERROR_TAG
-            )
+            | 'Load all inputs into one worker' >> beam.combiners.ToList()
+            | f'Handle inputs in batches with {self.operation_name}'
+            >> beam.FlatMap(self._handle_inputs).with_outputs(OK_TAG, ERROR_TAG)
         )
 
-        stdout = (
-            result[SUCCESS_TAG]
-            | 'Count the inputs successfully handled'
-            >> beam.CombineGlobally(sum)
-            | 'Apply a standard format to success count'
-            >> beam.FlatMap(self._format_success_count)
-            | 'Build stdout from the formatted success count'
+        ok_results = (
+            batch_operation_results[OK_TAG]
+            | 'Count OKs' >> beam.CombineGlobally(sum)
+            | 'Omit OKs when zero' >> beam.Filter(lambda oks: oks > 0)
+            | 'Format OKs'
+            >> beam.Map(lambda oks: f'{self.operation_name} success: {oks}')
+            | 'Dump OKs into stdout'
             >> beam.Map(job_run_result.JobRunResult.as_stdout)
         )
 
-        stderr = (
-            result[ERROR_TAG]
-            | 'Apply a standard format to error details'
-            >> beam.Map(self._format_error_details)
-            | 'Build stderr from the formatted error messages'
+        error_results = (
+            batch_operation_results[ERROR_TAG]
+            | 'Format errors'
+            >> beam.Map(lambda msg: f'ERROR: {self.operation_name} at {msg}')
+            | 'Dump errors into stderr'
             >> beam.Map(job_run_result.JobRunResult.as_stderr)
         )
 
-        return (stdout, stderr) | beam.Flatten()
+        return (ok_results, error_results) | beam.Flatten()
 
     def handle_input_batch(
         self,
@@ -113,41 +109,32 @@ class FirebaseBatchOperation(
             inputs: list[FirebaseBatchInputType]. All items to process.
 
         Yields:
-            beam.TaggedOutput. Tagged outputs for success counts and errors.
+            TaggedOutput. Tagged outputs for success counts and errors.
         """
         input_iter = iter(inputs)
         handled_count = 0
         failure_count = 0
-        failure_details = []
+        failure_messages = []
 
         while batch := list(itertools.islice(input_iter, FIREBASE_BATCH_LIMIT)):
             try:
                 output = self.handle_input_batch(batch)
             except (ValueError, firebase_exceptions.FirebaseError) as e:
                 failure_count += len(batch)
-                failure_details.append(
+                failure_messages.append(
                     f'slice=[{handled_count}:{handled_count + len(batch)}]: {e}'
                 )
             else:
                 failure_count += output.failure_count
-                failure_details.extend(
+                failure_messages.extend(
                     f'index=[{handled_count + e.index}]: {e.reason}'
                     for e in output.errors
                 )
             finally:
                 handled_count += len(batch)
 
-        if (success_count := handled_count - failure_count) > 0:
-            yield pvalue.TaggedOutput(SUCCESS_TAG, success_count)
+        if ok_count := handled_count - failure_count:
+            yield beam.TaggedOutput(OK_TAG, ok_count)
 
-        for reason in failure_details:
-            yield pvalue.TaggedOutput(ERROR_TAG, reason)
-
-    def _format_success_count(self, count: int) -> Iterable[str]:
-        """Yields positive counts with a standard format."""
-        if count > 0:
-            yield f'{self.operation_name} success: {count}'
-
-    def _format_error_details(self, details: str) -> str:
-        """Returns the error message with a standard format."""
-        return f'{self.operation_name} error at {details}'
+        for message in failure_messages:
+            yield beam.TaggedOutput(ERROR_TAG, message)

@@ -62,11 +62,11 @@ class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
         """
         return (
             pbegin
-            | 'Push unused "impulse" PCollection that will begin the pipeline'
-            >> beam.Create([None])
-            | 'Load records from the Firebase Admin SDK from within pipeline'
+            | 'Create singleton PCollection to begin with exactly ONE worker'
+            >> beam.Create((None,))
+            | 'Load all Firebase records into worker with Firebase Admin SDK'
             >> beam.ParDo(lambda _: firebase_auth.list_users().iterate_all())
-            | 'Wrap the records with our adapter type'
+            | 'Build adapter records'
             >> beam.Map(firebase_adapters.StrongRecord.from_export)
         )
 
@@ -91,67 +91,70 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
         Returns:
             PCollection[WeakRecord]. The records assumed to exist in Firebase.
         """
-        id_to_settings = (
+        settings_models = (
             pbegin
             | 'Get UserSettingsModels'
             >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=True)
             )
-            | 'Key UserSettingsModels by User ID'
+            | 'Key UserSettingsModels by id'
             >> beam.Map(lambda settings: (settings.id, settings))
         )
-        id_to_auth_details = (
+
+        auth_details_models = (
             pbegin
             | 'Get UserAuthDetailsModels'
             >> ndb_io.GetModels(
                 auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
             )
-            | 'Key UserAuthDetailsModels by User ID'
-            >> beam.Map(lambda details: (details.id, details))
-        )
-        return (
-            {'settings': id_to_settings, 'auth_details': id_to_auth_details}
-            | 'Group models by User ID' >> beam.CoGroupByKey()
-            | 'Build WeakRecords' >> beam.FlatMapTuple(self._build_weak_records)
+            | 'Key UserAuthDetailsModels by id'
+            >> beam.Map(lambda auth_details: (auth_details.id, auth_details))
         )
 
-    class _OppiaModelsGroupedByUserId(TypedDict):
+        return (
+            {'settings': settings_models, 'auth_details': auth_details_models}
+            | 'Group models by id' >> beam.CoGroupByKey()
+            | 'Build adapter records'
+            >> beam.FlatMapTuple(self._build_adapter_record)
+        )
+
+    class _ModelsGroupedById(TypedDict):
         """Typings for the CoGroupByKey() output of joined models."""
 
         settings: Iterable[user_models.UserSettingsModel]
         auth_details: Iterable[auth_models.UserAuthDetailsModel]
 
-    def _build_weak_records(
-        self, user_id: str, grouped_models: _OppiaModelsGroupedByUserId
+    def _build_adapter_record(
+        self, user_id: str, grouped: _ModelsGroupedById
     ) -> Iterable[firebase_adapters.WeakRecord]:
-        """Builds a WeakRecord from the models in the given group.
+        """Builds an adapter Firebase record from the models in the given group.
 
         Sub-users (`UserAuthDetailsModel.parent_user_id` != None) rely on their
         "parent" user for signing in, so they are skipped by this function.
 
         Args:
             user_id: str. The user ID shared by the models.
-            grouped_models: OppiaModelsGroupedByUserId. The grouped models.
+            grouped: OppiaModelsGroupedByUserId. The grouped models.
 
         Yields:
-            firebase_adapters.WeakRecord. A record built from the grouped models.
+            WeakRecord. A record built from the grouped models.
 
         Raises:
             ValueError. If the group doesn't hold EXACTLY ONE of each model.
         """
-        settings_models = list(grouped_models['settings'])
-        auth_details_models = list(grouped_models['auth_details'])
+        settings_models = tuple(grouped['settings'])
+        auth_details_models = tuple(grouped['auth_details'])
         try:
-            [(settings, auth_details)] = zip(
+            [(settings_model, auth_details_model)] = zip(
                 settings_models, auth_details_models, strict=True
             )
         except ValueError as e:
             raise ValueError(
-                f'Oppia User ({user_id=!r}) needs EXACTLY ONE of each model, '
+                f'Oppia user ({user_id=!r}) needs EXACTLY ONE of each model, '
                 f'but {len(settings_models)=} and {len(auth_details_models)=}'
             ) from e
         if record := firebase_adapters.WeakRecord.from_oppia_models(
-            settings, auth_details
+            settings_model, auth_details_model
         ):
             yield record
 

@@ -32,10 +32,9 @@ IMPORT_ACTION = 'IMPORT'
 
 
 class FirebaseSyncRecordsJob(base_jobs.JobBase):
-    """Regenerate all Firebase records based on Oppia's user & auth models."""
+    """Sync Firebase records to match with Oppia's user & auth models."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
         if (
             feature_flag_domain.get_server_mode()
             == feature_flag_domain.ServerMode.PROD
@@ -59,7 +58,7 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
 
         categorized_groups = (
             {'from_oppia': from_oppia, 'from_firebase': from_firebase}
-            | 'Group by email' >> beam.CoGroupByKey()
+            | 'Group records by email' >> beam.CoGroupByKey()
             | 'Drop email key' >> beam.Map(lambda key_value: key_value[1])
             | 'Categorize grouped records'
             >> beam.FlatMap(self._categorize_grouped_records).with_outputs(
@@ -99,11 +98,10 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
         self, groups: _RecordsGroupedByEmail
     ) -> Iterable[beam.TaggedOutput]:
         """Categorizes records using tagged outputs to group them by action."""
-
         from_oppia = frozenset(groups['from_oppia'])
         from_firebase = frozenset(groups['from_firebase'])
 
-        if ok_count := len(from_firebase.intersection(from_oppia)):
+        if ok_count := len(from_oppia.intersection(from_firebase)):
             yield beam.TaggedOutput(REPORT_ACTION, ok_count)
 
         for record in from_firebase.difference(from_oppia):

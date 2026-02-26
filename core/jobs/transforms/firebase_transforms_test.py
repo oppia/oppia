@@ -127,7 +127,7 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             output,
             [
                 job_run_result.JobRunResult(
-                    stderr='fake_operation error at slice=[0:1]: bad input'
+                    stderr='ERROR: fake_operation at slice=[0:1]: bad input'
                 ),
             ],
         )
@@ -144,7 +144,7 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             output,
             [
                 job_run_result.JobRunResult(
-                    stderr='fake_operation error at slice=[0:2]: missing'
+                    stderr='ERROR: fake_operation at slice=[0:2]: missing'
                 ),
             ],
         )
@@ -164,10 +164,10 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             [
                 job_run_result.JobRunResult(stdout='fake_operation success: 1'),
                 job_run_result.JobRunResult(
-                    stderr='fake_operation error at index=[0]: fail-a'
+                    stderr='ERROR: fake_operation at index=[0]: fail-a'
                 ),
                 job_run_result.JobRunResult(
-                    stderr='fake_operation error at index=[2]: fail-c'
+                    stderr='ERROR: fake_operation at index=[2]: fail-c'
                 ),
             ],
         )
@@ -186,7 +186,7 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             [
                 job_run_result.JobRunResult(stdout='fake_operation success: 1'),
                 job_run_result.JobRunResult(
-                    stderr='fake_operation error at index=[1]: fail-b'
+                    stderr='ERROR: fake_operation at index=[1]: fail-b'
                 ),
             ],
         )
@@ -205,10 +205,10 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             output,
             [
                 job_run_result.JobRunResult(
-                    stderr='fake_operation error at index=[0]: fail-a'
+                    stderr='ERROR: fake_operation at index=[0]: fail-a'
                 ),
                 job_run_result.JobRunResult(
-                    stderr='fake_operation error at index=[1]: fail-b'
+                    stderr='ERROR: fake_operation at index=[1]: fail-b'
                 ),
             ],
         )
@@ -239,8 +239,8 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
                     ),
                     job_run_result.JobRunResult(
                         stderr=(
-                            'fake_operation error at '
-                            'slice=[2:3]: batch-2-error'
+                            'ERROR: fake_operation at slice=[2:3]: '
+                            'batch-2-error'
                         )
                     ),
                 ],

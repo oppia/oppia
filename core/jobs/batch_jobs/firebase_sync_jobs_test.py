@@ -119,7 +119,9 @@ class FirebaseSyncRecordsJobTests(
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
-                        stderr='delete_users error at slice=[0:1]: service down'
+                        stderr=(
+                            'ERROR: delete_users at slice=[0:1]: service down'
+                        )
                     ),
                 ],
             )

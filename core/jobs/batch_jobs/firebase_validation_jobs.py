@@ -36,7 +36,6 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
     """Audit Firebase records against the records that Oppia claims to exist."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
         with_email_keys = lambda record: (record.email, record)
 
         from_oppia = (
@@ -53,7 +52,7 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
 
         audited_groups = (
             {'from_oppia': from_oppia, 'from_firebase': from_firebase}
-            | 'Group by email' >> beam.CoGroupByKey()
+            | 'Group records by email' >> beam.CoGroupByKey()
             | 'Drop email key' >> beam.Map(lambda key_value: key_value[1])
             | 'Audit grouped records'
             >> beam.FlatMap(self._audit_grouped_records).with_outputs(
@@ -96,7 +95,6 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
         self, grouped: _RecordsGroupedByEmail
     ) -> Iterable[beam.TaggedOutput]:
         """Audits records using tagged outputs to group messages by severity."""
-
         from_oppia = tuple(grouped['from_oppia'])
         from_firebase = tuple(grouped['from_firebase'])
         collisions_found = False
@@ -128,7 +126,7 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
             firebase_id = oppia_record.auth_id
             yield beam.TaggedOutput(
                 TAG_WARNING,
-                f'Oppia user ({user_id=!r}) linked to missing '
+                f'Oppia user ({user_id=!r}) linked to non-existent '
                 f'Firebase record ({firebase_id=!r})',
             )
 
@@ -136,20 +134,20 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
             firebase_id = firebase_record.auth_id
             yield beam.TaggedOutput(
                 TAG_WARNING,
-                f'Firebase record ({firebase_id=!r}) linked to missing '
+                f'Firebase record ({firebase_id=!r}) linked to non-existent '
                 'Oppia user',
             )
 
         elif oppia_record != firebase_record:
             oppia_dict = dataclasses.asdict(oppia_record)
-            user_id = oppia_dict["user_id"]
+            user_id = oppia_dict['user_id']
 
             firebase_dict = dataclasses.asdict(firebase_record)
-            firebase_id = firebase_dict["auth_id"]
+            firebase_id = firebase_dict['auth_id']
 
             inconsistent_fields = ', '.join(
-                f'the field {k!r} is {firebase!r} in Firebase but {oppia!r} in '
-                'Oppia'
+                f'the field {k!r} is {oppia!r} in Oppia but {firebase!r} in '
+                'Firebase'
                 for k in sorted(firebase_dict.keys() & oppia_dict.keys())
                 if (firebase := firebase_dict[k]) != (oppia := oppia_dict[k])
             )
