@@ -54,8 +54,8 @@ describe('Preview Summary Tile Modal Controller', function () {
           useClass: MockActiveModal,
         },
         ExplorationCategoryService,
-        ExplorationOagsService,
-        ExplorationTbjectiveService,
+        ExplorationObjectiveService,
+        ExplorationTagsService,
         ExplorationTitleService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -66,8 +66,8 @@ describe('Preview Summary Tile Modal Controller', function () {
     component = fixture.componentInstance;
 
     explorationCategoryService = TestBed.inject(ExplorationCategoryService);
-    explorationOagsService = TestBed.inject(ExplorationTagsService);
-    explorationTbjectiveService = TestBed.inject(ExplorationObjectiveService);
+    explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
+    explorationTagsService = TestBed.inject(ExplorationTagsService);
     explorationTitleService = TestBed.inject(ExplorationTitleService);
     fixture.detectChanges();
   });
@@ -100,10 +100,10 @@ describe('Preview Summary Tile Modal Controller', function () {
   it('should get thumbnail bg color if category is not listed', function () {
     explorationCategoryService.init('Astrology');
     expect(component.getThumbnailBgColor()).toBe('#a33f40');
+  });
 
-    it('should get exploration tags', function () {
-      explorationTagsService.init(['programming', 'math']);
-      expect(component.getTags()).toEqual(['programming', 'math']);
-    });
+  it('should get exploration tags', function () {
+    explorationTagsService.init(['programming', 'math']);
+    expect(component.getTags()).toEqual(['programming', 'math']);
   });
 });
