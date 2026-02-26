@@ -170,13 +170,21 @@ class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
 class MigrateExplorationDraftsJob(base_jobs.JobBase):
     """Job that migrates exploration drafts."""
 
+    DATASTORE_UPDATES_ALLOWED = True
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         migrated_models, job_run_results = (
             self.pipeline | 'Migrate Drafts' >> MigrateExplorationDrafts()
         )
-
-        unused_put_results = (
-            migrated_models | 'Put updated User Models' >> ndb_io.PutModels()
-        )
-
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                migrated_models
+                | 'Put updated User Models' >> ndb_io.PutModels()
+            )
         return job_run_results
+
+
+class AuditMigrateExplorationDraftsJob(MigrateExplorationDraftsJob):
+    """Job that audits the migration of exploration drafts without saving."""
+
+    DATASTORE_UPDATES_ALLOWED = False

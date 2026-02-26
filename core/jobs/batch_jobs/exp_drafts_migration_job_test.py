@@ -247,3 +247,51 @@ class MigrateExplorationDraftsJobTests(
         no_draft_model.put()
 
         self.assert_job_output_is_empty()
+
+
+class AuditMigrateExplorationDraftsJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
+
+    JOB_CLASS = exp_drafts_migration_job.AuditMigrateExplorationDraftsJob
+
+    EXP_ID = 'exp_1'
+    USER_ID = 'user_1'
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_audits_draft_successfully_without_saving(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+        old_draft_list = [{'cmd': 'old_cmd'}]
+        user_data_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id='%s.%s' % (self.USER_ID, self.EXP_ID),
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID,
+            draft_change_list=old_draft_list,
+            draft_change_list_last_updated=None,
+        )
+        user_data_model.update_timestamps()
+        user_data_model.put()
+
+        new_change_list = [{'cmd': 'new_cmd'}]
+        with self.swap_to_always_return(
+            exp_services,
+            'migrate_draft_change_list_to_latest_schema',
+            new_change_list,
+        ):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='DRAFT PROCESSED SUCCESS: 1'
+                    )
+                ]
+            )
+
+        unmigrated_model = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, self.EXP_ID
+        )
+
+        assert unmigrated_model is not None
+        self.assertEqual(unmigrated_model.draft_change_list, old_draft_list)
