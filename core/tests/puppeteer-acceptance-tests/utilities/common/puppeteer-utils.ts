@@ -231,7 +231,6 @@ export class BaseUser {
 
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
-
           if (acceptedBrowserAlerts.includes(alertText)) {
             await dialog.accept();
           } else {
