@@ -44,26 +44,28 @@ if MYPY:  # pragma: no cover
 
 
 class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
-    """Job that validates translation_counts in ExplorationOpportunitySummaryModel.
+    """Job that validates translation_counts in
+    ExplorationOpportunitySummaryModel.
 
-    This job computes the true translation counts by looking at EntityTranslationsModel
-    and compares it to the translation_counts recorded in ExplorationOpportunitySummaryModel.
-    It returns SUCCESS if all counts match, and logs the mismatches otherwise.
+    This job computes the true translation counts by looking at
+    EntityTranslationsModel and compares it to the translation_counts
+    recorded in ExplorationOpportunitySummaryModel. It returns SUCCESS
+    if all counts match, and logs the mismatches otherwise.
     """
 
     def _get_translation_counts(
         self, translation_model: translation_models.EntityTranslationsModel
     ) -> Tuple[str, Tuple[str, int]]:
-        """Extracts the number of translations for an entity from EntityTranslationsModel.
+        """Extracts translation counts from an EntityTranslationsModel.
 
         Args:
-            translation_model: EntityTranslationsModel. The translation model.
+            translation_model: EntityTranslationsModel. The model
+                to extract counts from.
 
         Returns:
-            Tuple[str, Tuple[str, int]]. A tuple structured as
+            tuple(str, tuple(str, int)). A tuple of
             (exploration_id, (language_code, translation_count)).
         """
-        # translations field is a JSON property mapping content_id to translation
         translation_count = len(translation_model.translations)
         return (
             translation_model.entity_id,
@@ -73,26 +75,27 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
     def _validate_counts(
         self,
         exploration_id: str,
-        opportunity_summary_models: Iterable[
+        opportunity_summary_models_list: Iterable[
             opportunity_models.ExplorationOpportunitySummaryModel
         ],
-        translation_counts: Iterable[Tuple[str, int]],
-        exploration_models: Iterable[exp_models.ExplorationModel],
+        translation_counts_list: Iterable[Tuple[str, int]],
     ) -> Iterable[job_run_result.JobRunResult]:
         """Validates the translation counts for a given exploration.
 
         Args:
             exploration_id: str. The exploration ID.
-            opportunity_summary_models: Iterable[ExplorationOpportunitySummaryModel].
-            translation_counts: Iterable[Tuple[language_code, count]]. True counts from EntityTranslationsModel.
-            exploration_models: Iterable[ExplorationModel].
+            opportunity_summary_models_list:
+                list(ExplorationOpportunitySummaryModel). The list
+                of opportunity summary models for the exploration.
+            translation_counts_list: list(tuple(str, int)). True
+                counts from EntityTranslationsModel.
 
         Yields:
-            JobRunResult. Results detailing whether counts match or describing the mismatches.
+            JobRunResult. Results detailing whether counts match or
+            describing the mismatches.
         """
-        summary_models = list(opportunity_summary_models)
-        actual_translations = list(translation_counts)
-        exps = list(exploration_models)
+        summary_models = list(opportunity_summary_models_list)
+        actual_translations = list(translation_counts_list)
 
         if not summary_models:
             return
@@ -100,55 +103,55 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
         summary_model = summary_models[0]
         stored_translation_counts = summary_model.translation_counts
 
-        # Convert actual translations to dict
         actual_translation_counts_dict: Dict[str, int] = {}
         for language_code, count in actual_translations:
             actual_translation_counts_dict[language_code] = count
 
         mismatch_found = False
 
-        # Compare recorded vs actual for each language in record
         for lang_code, stored_count in stored_translation_counts.items():
             actual_count = actual_translation_counts_dict.get(lang_code, 0)
             if stored_count != actual_count:
                 mismatch_found = True
                 yield job_run_result.JobRunResult.as_stderr(
-                    f'Mismatch for exploration {exploration_id} in {lang_code}: '
-                    f'stored={stored_count}, actual={actual_count}'
+                    'Mismatch for exploration %s in %s: '
+                    'stored=%s, actual=%s'
+                    % (exploration_id, lang_code, stored_count, actual_count)
                 )
 
-        # Check for languages that have translations but aren't in the opportunity model
         for lang_code, actual_count in actual_translation_counts_dict.items():
             if lang_code not in stored_translation_counts and actual_count > 0:
                 mismatch_found = True
                 yield job_run_result.JobRunResult.as_stderr(
-                    f'Mismatch for exploration {exploration_id} in {lang_code}: '
-                    f'stored=0 (missing), actual={actual_count}'
+                    'Mismatch for exploration %s in %s: '
+                    'stored=0 (missing), actual=%s'
+                    % (exploration_id, lang_code, actual_count)
                 )
 
         if not mismatch_found:
             yield job_run_result.JobRunResult.as_stdout(
-                f'SUCCESS - Exploration {exploration_id} counts are valid.'
+                'SUCCESS - Exploration %s counts are valid.' % exploration_id
             )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the translation count validation.
+        """Returns a PCollection of results from the translation
+        count validation.
 
         Returns:
             PCollection. A PCollection of JobRunResult objects.
         """
-        # Fetch ExplorationOpportunitySummaryModel and key by exploration_id
-        opportunity_summary_models = (
+        opportunity_summaries = (
             self.pipeline
             | 'Get all ExplorationOpportunitySummaryModels'
             >> ndb_io.GetModels(
                 opportunity_models.ExplorationOpportunitySummaryModel.get_all()
             )
             | 'Key Opportunity by exploration_id'
-            >> beam.WithKeys(lambda model: model.id)
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.id
+            )
         )
 
-        # Fetch EntityTranslationsModel for explorations and key by entity_id
         translation_counts = (
             self.pipeline
             | 'Get all Exploration EntityTranslationsModels'
@@ -162,25 +165,15 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
             >> beam.Map(self._get_translation_counts)
         )
 
-        exploration_models = (
-            self.pipeline
-            | 'Get all ExplorationModels'
-            >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
-            | 'Key Exploration by id' >> beam.WithKeys(lambda model: model.id)
-        )
-
-        # CoGroupByKey to join the models by exploration_id
         grouped_data = {
-            'opportunity_summary': opportunity_summary_models,
+            'opportunity_summary': opportunity_summaries,
             'translation_counts': translation_counts,
-            'exploration': exploration_models,
         } | 'Group by exploration_id' >> beam.CoGroupByKey()
 
         return grouped_data | 'Process and Validate Counts' >> beam.FlatMap(
             lambda kv: self._validate_counts(
                 exploration_id=kv[0],
-                opportunity_summary_models=kv[1]['opportunity_summary'],
-                translation_counts=kv[1]['translation_counts'],
-                exploration_models=kv[1]['exploration'],
+                opportunity_summary_models_list=(kv[1]['opportunity_summary']),
+                translation_counts_list=kv[1]['translation_counts'],
             )
         )
