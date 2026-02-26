@@ -152,6 +152,11 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
                 'test_time_by_average_test_case': 0.200,
             },
             {
+                'test_name': 'test_one',
+                'test_time': 1.8,
+                'test_time_by_average_test_case': 0.200,
+            },
+            {
                 'test_name': 'test_ten',
                 'test_time': 1.4,
                 'test_time_by_average_test_case': 0.200,
@@ -159,11 +164,6 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             {
                 'test_name': 'test_two',
                 'test_time': 1.4,
-                'test_time_by_average_test_case': 0.200,
-            },
-            {
-                'test_name': 'test_one',
-                'test_time': 1.8,
                 'test_time_by_average_test_case': 0.200,
             },
             {
