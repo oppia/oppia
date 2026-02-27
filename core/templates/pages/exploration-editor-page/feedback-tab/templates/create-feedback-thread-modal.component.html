@@ -1,82 +1,99 @@
 <div class="modal-header">
   <h3 tabindex="0">Start New Feedback Thread</h3>
 </div>
+
 <div class="modal-body">
-<!-- THREAD SUBJECT -->
-<p>
+
+  <!-- THREAD SUBJECT -->
+  <p>
     Thread subject:
-<input aria-label="Thread subject"
-       class="oppia-feedback-modal-input oppia-autofocus"
-       type="text"
-       name="threadSubject"
-       required
-       minlength="5"
-       maxlength="200"
-       #subjectInput="ngModel"
-       [(ngModel)]="newThreadSubject">
-<!-- Error Messages -->
-<span class="text-danger"
+    <input
+      aria-label="Thread subject"
+      class="oppia-feedback-modal-input oppia-autofocus"
+      type="text"
+      name="threadSubject"
+      required
+      minlength="5"
+      maxlength="200"
+      #subjectInput="ngModel"
+      [(ngModel)]="newThreadSubject">
+
+    <!-- Error Messages -->
+    <span
+      class="text-danger"
       *ngIf="subjectInput.invalid && subjectInput.touched">
-<span *ngIf="subjectInput.errors?.['required']">
+      <span *ngIf="subjectInput.errors?.['required']">
         Subject is required.
-</span>
-<span *ngIf="subjectInput.errors?.['minlength']">
+      </span>
+      <span *ngIf="subjectInput.errors?.['minlength']">
         Subject must be at least 5 characters long.
-</span>
-</span>
-</p>
-<!-- MESSAGE TEXT -->
-<p>
+      </span>
+    </span>
+  </p>
+
+  <!-- MESSAGE TEXT -->
+  <p>
     Message text
-<textarea aria-label="Message text"
-          class="oppia-feedback-modal-textarea"
-          name="threadMessage"
-          required
-          minlength="10"
-          maxlength="5000"
-          rows="6"
-          #messageInput="ngModel"
-          [(ngModel)]="newThreadText">
-</textarea>
-<!-- Error Messages -->
-<span class="text-danger"
+    <textarea
+      aria-label="Message text"
+      class="oppia-feedback-modal-textarea"
+      name="threadMessage"
+      required
+      minlength="10"
+      maxlength="5000"
+      rows="6"
+      #messageInput="ngModel"
+      [(ngModel)]="newThreadText">
+    </textarea>
+
+    <!-- Error Messages -->
+    <span
+      class="text-danger"
       *ngIf="messageInput.invalid && messageInput.touched">
-<span *ngIf="messageInput.errors?.['required']">
+      <span *ngIf="messageInput.errors?.['required']">
         Message cannot be empty.
-</span>
-<span *ngIf="messageInput.errors?.['minlength']">
+      </span>
+      <span *ngIf="messageInput.errors?.['minlength']">
         Message must be at least 10 characters long.
-</span>
-</span>
-</p>
+      </span>
+    </span>
+  </p>
+
 </div>
+
 <div class="modal-footer">
-<button class="btn btn-secondary e2e-test-cancel-new-feedback-btn"
-        (click)="cancel()">
+  <button
+    class="btn btn-secondary e2e-test-cancel-new-feedback-btn"
+    (click)="cancel()">
     Cancel
-</button>
-<button class="btn btn-success e2e-test-create-new-feedback-btn"
-        (click)="create(newThreadSubject?.trim(), newThreadText?.trim())"
-        [disabled]="
+  </button>
+
+  <button
+    class="btn btn-success e2e-test-create-new-feedback-btn"
+    (click)="create(newThreadSubject?.trim(), newThreadText?.trim())"
+    [disabled]="
       subjectInput.invalid ||
       messageInput.invalid ||
       !newThreadSubject?.trim() ||
       !newThreadText?.trim()
     ">
     Create Thread
-</button>
+  </button>
 </div>
+
 <style>
-.oppia-feedback-modal-input {
-min-height: 35px;
+  .oppia-feedback-modal-input {
+    min-height: 35px;
   }
-.oppia-feedback-modal-textarea {
-margin-top: 5px;
-min-height: 175px;
+
+  .oppia-feedback-modal-textarea {
+    margin-top: 5px;
+    min-height: 175px;
   }
-.text-danger {
-display: block;
-font-size: 13px;
-margin-top: 4px;
+
+  .text-danger {
+    display: block;
+    font-size: 13px;
+    margin-top: 4px;
   }
 </style>
