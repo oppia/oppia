@@ -19,7 +19,8 @@
       [(ngModel)]="newThreadSubject">
 
     <!-- Error Messages -->
-    <span class="text-danger"
+    <span
+      class="text-danger"
       *ngIf="subjectInput.invalid && subjectInput.touched">
 
       <span *ngIf="subjectInput.errors?.['required']">
@@ -32,7 +33,6 @@
 
     </span>
   </p>
-
 
   <!-- MESSAGE TEXT -->
   <p>
@@ -51,7 +51,8 @@
     </textarea>
 
     <!-- Error Messages -->
-    <span class="text-danger"
+    <span
+      class="text-danger"
       *ngIf="messageInput.invalid && messageInput.touched">
 
       <span *ngIf="messageInput.errors?.['required']">
@@ -63,7 +64,6 @@
       </span>
 
     </span>
-
   </p>
 
 </div>
@@ -91,20 +91,18 @@
 </div>
 
 <style>
+  .oppia-feedback-modal-input {
+    min-height: 35px;
+  }
 
-.oppia-feedback-modal-input {
-  min-height: 35px;
-}
+  .oppia-feedback-modal-textarea {
+    margin-top: 5px;
+    min-height: 175px;
+  }
 
-.oppia-feedback-modal-textarea {
-  margin-top: 5px;
-  min-height: 175px;
-}
-
-.text-danger {
-  display: block;
-  margin-top: 4px;
-  font-size: 13px;
-}
-
+  .text-danger {
+    display: block;
+    font-size: 13px;
+    margin-top: 4px;
+  }
 </style>
