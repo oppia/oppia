@@ -2947,7 +2947,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because we remove this test after
         # the backend is fully type-annotated. Here ignore[assignment]
         # is used to test method validate() input type.
-        self.learner_answer_info.answer = 42  # type: ignore[assignment]
+        self.learner_answer_info.answer = 42
         self.learner_answer_info.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
