@@ -390,4 +390,61 @@ describe('Contribution and review backend API service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failureHandler).not.toHaveBeenCalled();
   }));
+
+  it('should fetch contributor certificate without language', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failureHandler = jasmine.createSpy('failure');
+    const url =
+      '/contributorcertificate/user/translate_content?' +
+      'from_date=2022-01-01&to_date=2022-01-02';
+    const response = {
+      from_date: '1 Nov 2022',
+      to_date: '1 Dec 2022',
+      contribution_hours: 1.0,
+      team_lead: 'Test User',
+      language: null,
+    };
+
+    carbas
+      .downloadContributorCertificateAsync(
+        'user',
+        'translate_content',
+        null,
+        '2022-01-01',
+        '2022-01-02'
+      )
+      .then(successHandler, failureHandler);
+    const req = http.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush(response);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failureHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should return empty response when limit is 0', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failureHandler = jasmine.createSpy('failure');
+
+    carbas
+      .fetchReviewableSuggestionsAsync(
+        'exploration',
+        'translate_content',
+        0,
+        0,
+        'Date',
+        null,
+        null
+      )
+      .then(successHandler, failureHandler);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      suggestions: [],
+      target_id_to_opportunity_dict: {},
+      next_offset: 0,
+    });
+    expect(failureHandler).not.toHaveBeenCalled();
+  }));
 });
