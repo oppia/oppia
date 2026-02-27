@@ -188,7 +188,7 @@ describe('Voiceover Submitter', function () {
       'Solutions for the state'
     );
 
-    // Select language accent
+    // Select language accent.
     await voiceoverSubmitter.selectVoiceoverLanguageAccent('English (India)');
 
     await voiceoverSubmitter.clickOnAddManualVoiceoverButton();
