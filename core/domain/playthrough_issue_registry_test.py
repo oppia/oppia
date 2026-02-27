@@ -4,7 +4,6 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -47,7 +46,9 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         self.invalid_issue_type = 'InvalidIssueType'
 
     def tearDown(self) -> None:
-        playthrough_issue_registry.Registry._issues = {}
+        playthrough_issue_registry.Registry._issues = (  # pylint: disable=protected-access
+            {}
+        )
         super().tearDown()
 
     def test_issue_registry(self) -> None:
@@ -73,8 +74,13 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def test_refresh_skips_classes_not_inheriting_base_issue_spec(
         self,
     ) -> None:
+        """Test that _refresh skips classes whose base class is not
+        BaseExplorationIssueSpec.
+        """
 
         class NotAnIssue:
+            """Dummy class."""
+
             pass
 
         original_import = importlib.import_module
@@ -86,13 +92,18 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
             return module
 
         with self.swap(importlib, 'import_module', mock_import_module):
-            playthrough_issue_registry.Registry._refresh()
+            playthrough_issue_registry.Registry._refresh()  # pylint: disable=protected-access
 
         self.assertNotIn(
             'EarlyQuit',
-            playthrough_issue_registry.Registry._issues,
+            playthrough_issue_registry.Registry._issues,  # pylint: disable=protected-access
         )
-        self.assertTrue(len(playthrough_issue_registry.Registry._issues) > 0)
+        self.assertTrue(
+            len(
+                playthrough_issue_registry.Registry._issues  # pylint: disable=protected-access
+            )
+            > 0
+        )
 
     def test_get_all_issues_returns_cached_when_already_populated(
         self,
