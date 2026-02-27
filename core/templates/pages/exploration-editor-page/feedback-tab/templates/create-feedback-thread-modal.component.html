@@ -30,16 +30,15 @@
   <!-- MESSAGE TEXT -->
   <p>
     Message text
-    <textarea
-     aria-label="Message text"
-     class="oppia-feedback-modal-textarea"
-     name="threadMessage"
-     required
-     minlength="10"
-     maxlength="5000"
-     rows="6"
-     #messageInput="ngModel"
-     [(ngModel)]="newThreadText">
+    <textarea aria-label="Message text"
+              class="oppia-feedback-modal-textarea"
+              name="threadMessage"
+              required
+              minlength="10"
+              maxlength="5000"
+              rows="6"
+              #messageInput="ngModel"
+              [(ngModel)]="newThreadText">
     </textarea>
 
     <!-- Error Messages -->
