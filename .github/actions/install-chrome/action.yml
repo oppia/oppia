@@ -7,15 +7,15 @@ runs:
     - id: install-chrome
       name: Install Chrome (retries on error)
       uses: nick-fields/retry@v3
-      env:
-        CHROME_VERSION: "145.0.7632.76"
-        PLATFORM: "linux64"
       with:
         max_attempts: 3
         retry_on: error
         shell: bash
         timeout_minutes: 10
         command: |
+          CHROME_VERSION="145.0.7632.76"
+          PLATFORM="linux64"
+          
           sudo apt-get update
           sudo apt-get install -y \
             libnss3 \
@@ -29,13 +29,11 @@ runs:
             fonts-liberation \
             xdg-utils
             
-          # Download Chrome for Testing
-          wget -q "https://storage.googleapis.com/chrome-for-testing-public/${{ env.CHROME_VERSION }}/${{ env.PLATFORM }}/chrome-${{ env.PLATFORM }}.zip"
-          unzip -q chrome-${{ env.PLATFORM }}.zip
+          wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/${PLATFORM}/chrome-${PLATFORM}.zip"
+          unzip -q chrome-${PLATFORM}.zip
 
-          # Install Chrome
           sudo mkdir -p /opt/google/chrome
-          sudo mv chrome-${{ env.PLATFORM }}/* /opt/google/chrome/
+          sudo mv chrome-${PLATFORM}/* /opt/google/chrome/
           sudo chmod +x /opt/google/chrome/chrome
 
           sudo mv /opt/google/chrome/chrome /opt/google/chrome/chrome-real
@@ -45,12 +43,10 @@ runs:
           printf '#!/bin/bash\nexec /opt/google/chrome/chrome-real --no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox "$@"\n' | sudo tee /usr/bin/google-chrome > /dev/null
           sudo chmod +x /usr/bin/google-chrome
 
-          # Download ChromeDriver
-          wget -q "https://storage.googleapis.com/chrome-for-testing-public/${{ env.CHROME_VERSION }}/${{ env.PLATFORM }}/chromedriver-${{ env.PLATFORM }}.zip"
-          unzip -q chromedriver-${{ env.PLATFORM }}.zip
+          wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/${PLATFORM}/chromedriver-${PLATFORM}.zip"
+          unzip -q chromedriver-${PLATFORM}.zip
 
-          # Install ChromeDriver
-          sudo mv chromedriver-${{ env.PLATFORM }}/chromedriver /usr/local/bin/
+          sudo mv chromedriver-${PLATFORM}/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
           echo "CHROME_BIN=/usr/bin/google-chrome" >> $GITHUB_ENV
@@ -58,4 +54,4 @@ runs:
 
           chrome_version=$(google-chrome --version 2>&1 | grep -oP '\d+\.\d+\.\d+\.\d+')
           echo "Installed Chrome version: $chrome_version"
-          [[ "${{ env.CHROME_VERSION }}" == "$chrome_version" ]] || { echo "Error: Version mismatch. Expected ${{ env.CHROME_VERSION }}, got $chrome_version"; exit 1; }
+          [[ "${CHROME_VERSION}" == "$chrome_version" ]] || { echo "Error: Version mismatch. Expected ${CHROME_VERSION}, got $chrome_version"; exit 1; }

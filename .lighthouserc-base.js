@@ -29,6 +29,14 @@ module.exports = {
   puppeteerScript: 'puppeteer-login-script.js',
   urls: LIGHTHOUSE_URLS_TO_RUN,
   chromeFlags: '--no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox',
+  chromePath: '/usr/bin/google-chrome',
+  puppeteerLaunchOptions: {
+    args: [
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-setuid-sandbox',
+    ],
+  },
   basePerformanceAssertMatrix: {
     matchingUrlPattern: '.*',
     assertions: {
