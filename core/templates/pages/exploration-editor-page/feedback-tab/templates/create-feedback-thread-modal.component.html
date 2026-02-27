@@ -7,21 +7,12 @@
   <!-- THREAD SUBJECT -->
   <p>
     Thread subject:
-    <input
-      aria-label="Thread subject"
-      class="oppia-feedback-modal-input oppia-autofocus"
-      type="text"
-      name="threadSubject"
-      required
-      minlength="5"
-      maxlength="200"
-      #subjectInput="ngModel"
+    <input aria-label="Thread subject" class="oppia-feedback-modal-input oppia-autofocus" type="text"
+      name="threadSubject" required minlength="5" maxlength="200" #subjectInput="ngModel"
       [(ngModel)]="newThreadSubject">
 
     <!-- Error Messages -->
-    <span
-      class="text-danger"
-      *ngIf="subjectInput.invalid && subjectInput.touched">
+    <span class="text-danger" *ngIf="subjectInput.invalid && subjectInput.touched">
       <span *ngIf="subjectInput.errors?.['required']">
         Subject is required.
       </span>
@@ -34,22 +25,12 @@
   <!-- MESSAGE TEXT -->
   <p>
     Message text
-    <textarea
-      aria-label="Message text"
-      class="oppia-feedback-modal-textarea"
-      name="threadMessage"
-      required
-      minlength="10"
-      maxlength="5000"
-      rows="6"
-      #messageInput="ngModel"
-      [(ngModel)]="newThreadText">
+    <textarea aria-label="Message text" class="oppia-feedback-modal-textarea" name="threadMessage" required
+      minlength="10" maxlength="5000" rows="6" #messageInput="ngModel" [(ngModel)]="newThreadText">
     </textarea>
 
     <!-- Error Messages -->
-    <span
-      class="text-danger"
-      *ngIf="messageInput.invalid && messageInput.touched">
+    <span class="text-danger" *ngIf="messageInput.invalid && messageInput.touched">
       <span *ngIf="messageInput.errors?.['required']">
         Message cannot be empty.
       </span>
@@ -62,16 +43,12 @@
 </div>
 
 <div class="modal-footer">
-  <button
-    class="btn btn-secondary e2e-test-cancel-new-feedback-btn"
-    (click)="cancel()">
+  <button class="btn btn-secondary e2e-test-cancel-new-feedback-btn" (click)="cancel()">
     Cancel
   </button>
 
-  <button
-    class="btn btn-success e2e-test-create-new-feedback-btn"
-    (click)="create(newThreadSubject?.trim(), newThreadText?.trim())"
-    [disabled]="
+  <button class="btn btn-success e2e-test-create-new-feedback-btn"
+    (click)="create(newThreadSubject?.trim(), newThreadText?.trim())" [disabled]="
       subjectInput.invalid ||
       messageInput.invalid ||
       !newThreadSubject?.trim() ||
