@@ -29,11 +29,11 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-out User', function () {
-  let interestParent: LoggedOutUser;
+  let interestedPartnerOrg: LoggedOutUser;
   let blogPostWriter: BlogPostEditor & LoggedInUser;
 
   beforeAll(async function () {
-    interestParent = await UserFactory.createLoggedOutUser();
+    interestedPartnerOrg = await UserFactory.createLoggedOutUser();
     blogPostWriter = await UserFactory.createNewUser(
       'blogPostWriter',
       'blog_post_writer@example.com',
@@ -44,11 +44,11 @@ describe('Logged-out User', function () {
   it(
     'should observe the welcome message and empty-state notice when no blog posts exist',
     async function () {
-      await interestParent.navigateToBlogPageViaNavbar();
-      await interestParent.expectBlogWelcomeMessageToBeVisible(
+      await interestedPartnerOrg.navigateToBlogPageViaNavbar();
+      await interestedPartnerOrg.expectBlogWelcomeMessageToBeVisible(
         'Welcome to the Oppia Blog!'
       );
-      await interestParent.expectNoBlogPostsMessageToBeVisible(
+      await interestedPartnerOrg.expectNoBlogPostsMessageToBeVisible(
         'Sorry, there are no blog posts matching this query.'
       );
     },
@@ -77,11 +77,11 @@ describe('Logged-out User', function () {
       await blogPostWriter.saveBlogBodyChanges();
       await blogPostWriter.saveTheDraftBlogPost();
 
-      // As interestParent: Refresh the page.
-      await interestParent.navigateToBlogPage();
+      // As interestedPartnerOrg: Refresh the page.
+      await interestedPartnerOrg.navigateToBlogPage();
 
-      await interestParent.expectNumberOfBlogPostsOnPageToBe(1);
-      await interestParent.expectBlogPostWithTitleToBePresent(
+      await interestedPartnerOrg.expectNumberOfBlogPostsOnPageToBe(1);
+      await interestedPartnerOrg.expectBlogPostWithTitleToBePresent(
         'International Blog'
       );
     },
@@ -105,11 +105,11 @@ describe('Logged-out User', function () {
       }
       // Pagination shows 10 blogs per page. Since 12 blogs exist,
       // page 1 should display 10 blogs and page 2 should display the remaining 2.
-      await interestParent.navigateToBlogPage();
-      await interestParent.expectNumberOfBlogPostsOnPageToBe(10);
+      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.expectNumberOfBlogPostsOnPageToBe(10);
 
-      await interestParent.clickNextBlogPage();
-      await interestParent.expectNumberOfBlogPostsOnPageToBe(2);
+      await interestedPartnerOrg.clickNextBlogPage();
+      await interestedPartnerOrg.expectNumberOfBlogPostsOnPageToBe(2);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -117,9 +117,9 @@ describe('Logged-out User', function () {
   it(
     'should display blog page with correct layout elements',
     async function () {
-      await interestParent.navigateToBlogPageViaNavbar();
+      await interestedPartnerOrg.navigateToBlogPageViaNavbar();
 
-      await interestParent.expectBlogPageLayoutToBeCorrect();
+      await interestedPartnerOrg.expectBlogPageLayoutToBeCorrect();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -127,13 +127,15 @@ describe('Logged-out User', function () {
   it(
     'should display blog post page with all required elements',
     async function () {
-      await interestParent.clickOnFirstBlogPost();
+      await interestedPartnerOrg.clickOnFirstBlogPost();
 
-      await interestParent.expectBlogPostTitleToBeVisible();
-      await interestParent.expectBlogPostAuthorToBeVisible();
-      await interestParent.expectBlogPostContentToBeVisible();
-      await interestParent.expectBlogShareButtonToBeVisible();
-      await interestParent.expectSuggestedBlogPostsSectionToBeVisible();
+      await interestedPartnerOrg.expectBlogPostTitleToBeVisible();
+      await interestedPartnerOrg.expectBlogPostAuthorToBeVisible();
+      await interestedPartnerOrg.expectBlogPostPublishDateToBeVisible();
+      await interestedPartnerOrg.expectBlogPostContentToBeVisible();
+      await interestedPartnerOrg.expectBlogPostTagsToBeVisible();
+      await interestedPartnerOrg.expectBlogShareButtonToBeVisible();
+      await interestedPartnerOrg.expectSuggestedBlogPostsSectionToBeVisible();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -141,17 +143,21 @@ describe('Logged-out User', function () {
   it(
     'should be able to search and filter blog posts',
     async function () {
-      await interestParent.navigateToBlogPage();
-      await interestParent.filterBlogPostsByTag('International');
-      await interestParent.expectBlogSearchResultsToHaveTag('International');
+      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.filterBlogPostsByTag('International');
+      await interestedPartnerOrg.expectBlogSearchResultsToHaveTag(
+        'International'
+      );
 
-      await interestParent.navigateToBlogPage();
-      await interestParent.filterBlogPostsByKeyword('International');
-      await interestParent.expectBlogSearchResultsToContain('International');
+      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.filterBlogPostsByKeyword('International');
+      await interestedPartnerOrg.expectBlogSearchResultsToContain(
+        'International'
+      );
 
-      await interestParent.navigateToBlogPage();
-      await interestParent.filterBlogPostsByKeyword('fashion');
-      await interestParent.expectNoBlogPostsMessageToBeVisible(
+      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.filterBlogPostsByKeyword('fashion');
+      await interestedPartnerOrg.expectNoBlogPostsMessageToBeVisible(
         'Sorry, there are no blog posts matching this query.'
       );
     },

@@ -434,8 +434,8 @@ const blogShareButtonSelector = '.share-blog-post-button';
 const blogSuggestedForYouSectionSelector = '.post-to-recommend-section';
 const blogSuggestedForYouHeadingSelector = '.post-to-recommend-section-heading';
 const navbarAboutTabBlogButton = '.e2e-test-navbar-about-menu-blog-button';
-const blogSearchFieldSelector = '.e2e-test-search-field';
 const postsDisplayHeadingSelector = '.posts-display-heading';
+const blogCardTagContainerSelector = '.blog-card-tag-container';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -7155,6 +7155,7 @@ export class LoggedOutUser extends BaseUser {
   async navigateToBlogPageViaNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       // On mobile, navigate directly to blog URL since there's no blog button in sidebar.
+      // Todo(#25094): Add blog button to mobile sidebar and remove this direct navigation.
       await this.navigateToBlogPage();
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
@@ -7231,7 +7232,6 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(blogPostAuthorSelector);
     await this.expectElementToBeVisible(blogPostPublishDateSelector);
     await this.expectElementToBeVisible(blogPostTagContainerSelector);
-    await this.expectElementToBeVisible(blogSearchFieldSelector);
 
     const paginationExists = await this.page.$(blogPaginationSelector);
     if (paginationExists) {
@@ -7278,10 +7278,24 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expects blog post publish date to be visible.
+   */
+  async expectBlogPostPublishDateToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+  }
+
+  /**
    * Expects blog post content to be visible.
    */
   async expectBlogPostContentToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogPostContentSelector);
+  }
+
+  /**
+   * Expects blog post tags to be visible.
+   */
+  async expectBlogPostTagsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogCardTagContainerSelector);
   }
 
   /**
