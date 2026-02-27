@@ -7,9 +7,14 @@
   <!-- THREAD SUBJECT -->
   <p>
     Thread subject:
-    <input aria-label="Thread subject" class="oppia-feedback-modal-input oppia-autofocus" type="text"
-    name="threadSubject" required minlength="5" maxlength="200" #subjectInput="ngModel"
-      [(ngModel)]="newThreadSubject">
+    <input aria-label="Thread subject" 
+           class="oppia-feedback-modal-input oppia-autofocus" 
+           type="text"
+           name="threadSubject" 
+           required minlength="5" 
+           maxlength="200" 
+           #subjectInput="ngModel"
+           [(ngModel)]="newThreadSubject">
 
     <!-- Error Messages -->
     <span class="text-danger" *ngIf="subjectInput.invalid && subjectInput.touched">
