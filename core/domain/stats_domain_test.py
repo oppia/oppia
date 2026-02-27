@@ -2944,9 +2944,6 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_answer(self) -> None:
         """Test that validation passes when the answer is an int."""
-        # Here we use MyPy ignore because we remove this test after
-        # the backend is fully type-annotated. Here ignore[assignment]
-        # is used to test method validate() input type.
         self.learner_answer_info.answer = 42
         self.learner_answer_info.validate()
 
