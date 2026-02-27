@@ -45,7 +45,7 @@ export class LearnerAnswerInfo {
     answer: string,
     answerDetails: string
   ): LearnerAnswerInfo {
-    return new LearnerAnswerInfo(null, answer, answerDetails, null);
+    return new LearnerAnswerInfo('', answer, answerDetails, 0);
   }
 
   static createFromBackendDict(

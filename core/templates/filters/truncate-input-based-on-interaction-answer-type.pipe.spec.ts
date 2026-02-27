@@ -33,8 +33,8 @@ describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   it('should correctly truncate input data', () => {
     let data = {
       code: 'Hey oppia  users!',
-      output: null,
-      evaluation: null,
+      output: '',
+      evaluation: '',
       error: 'error',
     };
 

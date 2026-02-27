@@ -41,11 +41,11 @@ describe('Learner answer info model', () => {
       'This is answer details'
     );
 
-    expect(learnerAnswerInfo.getId()).toBeNull();
+    expect(learnerAnswerInfo.getId()).toEqual('');
     expect(learnerAnswerInfo.getAnswer()).toEqual('This is answer');
     expect(learnerAnswerInfo.getAnswerDetails()).toEqual(
       'This is answer details'
     );
-    expect(learnerAnswerInfo.getCreatedOn()).toBeNull();
+    expect(learnerAnswerInfo.getCreatedOn()).toEqual(0);
   });
 });

@@ -21,17 +21,18 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {Question} from 'domain/question/question.model';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   EditableQuestionBackendApiService,
+  FetchQuestionResponse,
   SkillLinkageModificationsArray,
 } from 'domain/question/editable-question-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('EditableQuestionBackendApiService', () => {
-  let editableQuestionBackendApiService: EditableQuestionBackendApiService;
-  let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService;
+  let editableQuestionBackendApiService!: EditableQuestionBackendApiService;
+  let httpTestingController!: HttpTestingController;
+  let csrfService!: CsrfTokenService;
 
   const sampleDataResults = {
     questionDict: {
@@ -39,6 +40,7 @@ describe('EditableQuestionBackendApiService', () => {
       question_state_data: {
         content: {
           html: 'Question 1',
+          content_id: 'content_1',
         },
         interaction: {
           answer_groups: [],
@@ -56,18 +58,22 @@ describe('EditableQuestionBackendApiService', () => {
             },
           },
           default_outcome: {
-            dest: null,
+            dest: '',
             dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
+              content_id: 'content_2',
             },
             param_changes: [],
             labelled_as_correct: true,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           hints: [
             {
               hint_content: {
                 html: 'Hint 1',
+                content_id: 'hint_1',
               },
             },
           ],
@@ -76,20 +82,32 @@ describe('EditableQuestionBackendApiService', () => {
             answer_is_exclusive: false,
             explanation: {
               html: 'Solution explanation',
+              content_id: 'solution_1',
             },
           },
           id: 'TextInput',
         },
         param_changes: [],
         solicit_answer_details: false,
+        classifier_model_id: null,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
       },
       language_code: 'en',
       version: 1,
+      question_state_data_schema_version: 45,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: [],
+      next_content_id_index: 1,
     },
     associated_skill_dicts: [],
   };
 
-  const sampleDataResultsObjects = {
+  const sampleDataResultsObjects: {
+    questionObject: Question | null;
+    associated_skill_dicts: object[];
+  } = {
     questionObject: null,
     associated_skill_dicts: [],
   };
@@ -132,12 +150,15 @@ describe('EditableQuestionBackendApiService', () => {
     };
     const skillsId = ['0', '01', '02'];
     const skillDifficulties = [1, 1, 2];
-    const questionObject = sampleDataResultsObjects.questionObject;
+    const questionObject = sampleDataResultsObjects.questionObject as Question;
 
     editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
-        imageData,
-      ])
+      .createQuestionAsync(
+        skillsId,
+        skillDifficulties,
+        questionObject.toBackendDict(true),
+        [imageData]
+      )
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -157,7 +178,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     const skillsId = ['0', '01', '02'];
     const skillDifficulties = [1, 1, 2];
-    const questionObject = sampleDataResultsObjects.questionObject;
+    const questionObject = sampleDataResultsObjects.questionObject as Question;
     const imageBlob = new Blob(['data:image/png;base64,xyz'], {
       type: 'image/png',
     });
@@ -167,9 +188,12 @@ describe('EditableQuestionBackendApiService', () => {
     };
 
     editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
-        imageData,
-      ])
+      .createQuestionAsync(
+        skillsId,
+        skillDifficulties,
+        questionObject.toBackendDict(true),
+        [imageData]
+      )
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -237,11 +261,13 @@ describe('EditableQuestionBackendApiService', () => {
   it('should update a question after fetching it from the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    let question;
+    let question!: QuestionBackendDict;
 
-    editableQuestionBackendApiService.fetchQuestionAsync('0').then(data => {
-      question = data.questionObject.toBackendDict(false);
-    });
+    editableQuestionBackendApiService
+      .fetchQuestionAsync('0')
+      .then((data: FetchQuestionResponse) => {
+        question = data.questionObject.toBackendDict(false);
+      });
 
     const req = httpTestingController.expectOne(
       '/question_editor_handler/data/0'
@@ -254,15 +280,15 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     question.question_state_data.content.html = 'New Question Content';
-    question.version = '2';
+    question.version = 2;
     const questionWrapper = {
       questionDict: question,
     };
 
     editableQuestionBackendApiService
       .updateQuestionAsync(
-        question.id,
-        question.version,
+        question.id as string,
+        String(question.version),
         'Question Data is updated',
         []
       )
@@ -312,6 +338,7 @@ describe('EditableQuestionBackendApiService', () => {
       {
         id: 'skillId',
         task: 'remove',
+        difficulty: 0.3,
       },
     ];
 
@@ -339,6 +366,7 @@ describe('EditableQuestionBackendApiService', () => {
       {
         id: 'skillId',
         task: 'remove',
+        difficulty: 0.3,
       },
     ];
 

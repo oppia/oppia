@@ -26,7 +26,7 @@ import {QuestionDomainConstants} from 'domain/question/question-domain.constants
 import cloneDeep from 'lodash/cloneDeep';
 import {Injectable} from '@angular/core';
 import {StateBackendDict} from 'domain/state/state.model';
-import {Question} from './question.model';
+import {Question} from 'domain/question/question.model';
 
 interface ApplyParams {
   property_name: string;
@@ -45,8 +45,8 @@ export class QuestionUpdateService {
     question: Question,
     command: string,
     params: ApplyParams | BackendChangeObject,
-    apply: Function,
-    reverse: Function
+    apply: (changeDict: BackendChangeObject, question: Question) => void,
+    reverse: (changeDict: BackendChangeObject, question: Question) => void
   ): void {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
@@ -69,8 +69,8 @@ export class QuestionUpdateService {
     propertyName: string,
     newValue: StateBackendDict | string | string[] | number,
     oldValue: StateBackendDict | string | string[] | number,
-    apply: Function,
-    reverse: Function
+    apply: (changeDict: BackendChangeObject, question: Question) => void,
+    reverse: (changeDict: BackendChangeObject, question: Question) => void
   ): void {
     this._applyChange(
       question,
@@ -90,7 +90,9 @@ export class QuestionUpdateService {
     changeDict: BackendChangeObject,
     paramName: string
   ): string | string[] {
-    return changeDict[paramName];
+    return (changeDict as unknown as Record<string, string | string[]>)[
+      paramName
+    ];
   }
 
   _getNewPropertyValueFromChangeDict(
@@ -161,17 +163,19 @@ export class QuestionUpdateService {
       QuestionDomainConstants.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
       newValue,
       oldValue,
-      (changeDict, question) => {
+      (changeDict: BackendChangeObject, question: Question) => {
         var newValue = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setNextContentIdIndex(newValue);
+        question.setNextContentIdIndex(newValue as unknown as number);
       },
-      (changeDict, question) => {
-        question.setNextContentIdIndex(changeDict.old_value);
+      (changeDict: BackendChangeObject, question: Question) => {
+        question.setNextContentIdIndex(
+          (changeDict as unknown as ApplyParams).old_value as number
+        );
       }
     );
   }
 
-  setQuestionStateData(question: Question, updateFunction: Function): void {
+  setQuestionStateData(question: Question, updateFunction: () => void): void {
     let oldStateData = cloneDeep(question.getStateData());
     // We update the question here before making the change,
     // so that we can obtain the new state to save to the backend via
