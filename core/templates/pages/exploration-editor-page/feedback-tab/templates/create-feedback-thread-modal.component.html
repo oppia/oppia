@@ -8,7 +8,7 @@
   <p>
     Thread subject:
     <input aria-label="Thread subject" class="oppia-feedback-modal-input oppia-autofocus" type="text"
-      name="threadSubject" required minlength="5" maxlength="200" #subjectInput="ngModel"
+    name="threadSubject" required minlength="5" maxlength="200" #subjectInput="ngModel"
       [(ngModel)]="newThreadSubject">
 
     <!-- Error Messages -->
@@ -26,7 +26,7 @@
   <p>
     Message text
     <textarea aria-label="Message text" class="oppia-feedback-modal-textarea" name="threadMessage" required
-      minlength="10" maxlength="5000" rows="6" #messageInput="ngModel" [(ngModel)]="newThreadText">
+    minlength="10" maxlength="5000" rows="6" #messageInput="ngModel" [(ngModel)]="newThreadText">
     </textarea>
 
     <!-- Error Messages -->
@@ -48,7 +48,7 @@
   </button>
 
   <button class="btn btn-success e2e-test-create-new-feedback-btn"
-    (click)="create(newThreadSubject?.trim(), newThreadText?.trim())" [disabled]="
+  (click)="create(newThreadSubject?.trim(), newThreadText?.trim())" [disabled]="
       subjectInput.invalid ||
       messageInput.invalid ||
       !newThreadSubject?.trim() ||
