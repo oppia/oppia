@@ -60,12 +60,13 @@
   </button>
 
   <button class="btn btn-success e2e-test-create-new-feedback-btn"
-  (click)="create(newThreadSubject?.trim(), newThreadText?.trim())" [disabled]="
-      subjectInput.invalid ||
-      messageInput.invalid ||
-      !newThreadSubject?.trim() ||
-      !newThreadText?.trim()
-    ">
+          (click)="create(newThreadSubject?.trim(), newThreadText?.trim())"
+          [disabled]="
+          subjectInput.invalid ||
+          messageInput.invalid ||
+          !newThreadSubject?.trim() ||
+          !newThreadText?.trim()
+  ">
     Create Thread
   </button>
 </div>
