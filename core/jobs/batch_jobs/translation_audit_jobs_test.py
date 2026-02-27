@@ -123,3 +123,78 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
                 )
             ]
         )
+
+    def test_no_opportunity_summary_for_translation(self) -> None:
+        """Test that translations without a corresponding opportunity summary
+        produce no output.
+        """
+        exp_id = 'exp_no_summary'
+        translation_model = translation_models.EntityTranslationsModel(
+            id='exploration-%s-1-hi' % exp_id,
+            entity_id=exp_id,
+            entity_type='exploration',
+            entity_version=1,
+            language_code='hi',
+            translations={'content_0': {}, 'content_1': {}},
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
+        self.assert_job_output_is_empty()
+
+    def test_mismatch_language_in_translations_but_not_in_summary(
+        self,
+    ) -> None:
+        """Test that a language present in EntityTranslationsModel but missing
+        from the opportunity summary's translation_counts is reported as a
+        mismatch.
+        """
+        exp_id = 'exp_extra_lang'
+        summary_model = opportunity_models.ExplorationOpportunitySummaryModel(
+            id=exp_id,
+            topic_id='topic1',
+            topic_name='Topic 1',
+            story_id='story_1',
+            story_title='Story 1',
+            chapter_title='Chapter 1',
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 3},
+            language_codes_needing_voice_artists=[],
+            language_codes_with_assigned_voice_artists=[],
+        )
+        summary_model.update_timestamps()
+        summary_model.put()
+
+        translation_hi = translation_models.EntityTranslationsModel(
+            id='exploration-%s-1-hi' % exp_id,
+            entity_id=exp_id,
+            entity_type='exploration',
+            entity_version=1,
+            language_code='hi',
+            translations={'content_%d' % i: {} for i in range(3)},
+        )
+        translation_hi.update_timestamps()
+        translation_hi.put()
+
+        # 'es' translations exist but are not in the summary's
+        # translation_counts.
+        translation_es = translation_models.EntityTranslationsModel(
+            id='exploration-%s-1-es' % exp_id,
+            entity_id=exp_id,
+            entity_type='exploration',
+            entity_version=1,
+            language_code='es',
+            translations={'content_0': {}, 'content_1': {}},
+        )
+        translation_es.update_timestamps()
+        translation_es.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'Mismatch for exploration %s in es: '
+                    'stored=0 (missing), actual=2' % exp_id
+                )
+            ]
+        )
