@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 import pathlib
+import tempfile
 
 from core import feconf, utils
 from core.constants import constants
@@ -3165,6 +3166,9 @@ def _generate_attachments_for_failed_voiceovers(
 
     filename = 'voiceover_regeneration_errors.txt'
 
+    temp_dir = tempfile.gettempdir()
+    file_path = pathlib.Path(temp_dir) / filename
+
     lines = [
         'Synthesis details for each piece of content are presented below.\n',
         'Date: %s\n' % date,
@@ -3187,11 +3191,9 @@ def _generate_attachments_for_failed_voiceovers(
             )
             lines.append('\n----------------------------------------\n')
 
-    file = open(filename, 'w', encoding='utf-8')
-    file.writelines(lines)
-    file.close()
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.writelines(lines)
 
-    file_path = pathlib.Path(filename).resolve()
     return [{'filename': filename, 'path': str(file_path)}]
 
 
