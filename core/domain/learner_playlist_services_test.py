@@ -598,7 +598,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         """Test that adding an exploration already in the playlist with no
         position specified does nothing.
         """
-        # First add the exploration to the playlist.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_0
         )
@@ -606,8 +605,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(self.user_id),
             [self.EXP_ID_0],
         )
-        # Add the same exploration again with no position (default None).
-        # The condition on line 130 should be False, jumping to line 148.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_0
         )
@@ -642,7 +639,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         """Test that adding a collection already in the playlist with no
         position specified does nothing.
         """
-        # First add the collection to the playlist.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_0
         )
@@ -650,8 +646,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(self.user_id),
             [self.COL_ID_0],
         )
-        # Add the same collection again with no position (default None).
-        # The condition on line 199 should be False, jumping to line 217.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_0
         )
@@ -666,12 +660,10 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         """Test that remove_exploration_from_learner_playlist does nothing
         when the user has no learner playlist model.
         """
-        # Ensure no playlist model exists for a fresh user.
         self.signup('noplaylist@example.com', 'noplaylistuser')
         no_playlist_user_id = self.get_user_id_from_email(
             'noplaylist@example.com'
         )
-        # This should not raise any errors.
         learner_playlist_services.remove_exploration_from_learner_playlist(
             no_playlist_user_id, self.EXP_ID_0
         )
@@ -686,7 +678,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         no_playlist_user_id = self.get_user_id_from_email(
             'noplaylist2@example.com'
         )
-        # This should not raise any errors.
         learner_playlist_services.remove_collection_from_learner_playlist(
             no_playlist_user_id, self.COL_ID_0
         )
