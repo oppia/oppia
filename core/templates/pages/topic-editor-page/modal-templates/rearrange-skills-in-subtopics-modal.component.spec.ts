@@ -125,6 +125,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       topicDict: {
         id: 'sample_topic_id',
         name: 'Topic name',
+        abbreviated_name: 'topic',
+        url_fragment: 'topic-name',
         description: 'Topic description',
         version: 1,
         uncategorized_skill_ids: ['skill_1'],
@@ -158,7 +160,12 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
         next_subtopic_id: 2,
         language_code: 'en',
         skill_ids_for_diagnostic_test: [],
-      },
+        thumbnail_filename: 'thumbnail.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'topic meta tag',
+        page_title_fragment_for_web: 'topic page title',
+      } as TopicBackendDict,
       skillIdToDescriptionDict: {
         skill_1: 'Description 1',
         skill_2: 'Description 2',
@@ -173,7 +180,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = Topic.create(
-      sampleTopicBackendObject.topicDict as unknown as TopicBackendDict,
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
     topic._subtopics = [subtopic];
