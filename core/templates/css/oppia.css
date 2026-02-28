@@ -1029,8 +1029,11 @@ textarea {
 }
 
 .oppia-navbar-breadcrumb-separator {
-  display: inline-block;
-  margin-inline: 8px;
+  margin-right: 8px;
+}
+
+[dir='rtl'] .oppia-navbar-breadcrumb-separator {
+  margin-right: 8px /*rtl:ignore*/;
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
