@@ -286,7 +286,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {'schema': {'type': 'basestring'}},
         'exploration_version': {'schema': {'type': 'int'}},
-        'exploration_title': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
@@ -295,7 +294,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(
         self,
         exploration_id: str,
         exploration_version: int,
-        exploration_title: str,
     ) -> None:
         """Regenerates the voiceover for the given exploration data when an
         exploration is updated.
@@ -314,6 +312,7 @@ class RegenerateVoiceoverOnExpUpdateHandler(
                 ],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
+                exploration_version,
             )
         self.render_json(self.values)
 

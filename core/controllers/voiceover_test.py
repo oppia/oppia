@@ -362,31 +362,23 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
             function_id: str,
             queue_name: str,
             exploration_id: str,
-            exploration_title: str,
             exploration_version: int,
-            committer_id: str,
-            datetime_str: str,
         ) -> None:
             deferred_calls.append(
                 {
                     'function_id': function_id,
                     'queue_name': queue_name,
                     'exploration_id': exploration_id,
-                    'exploration_title': exploration_title,
                     'exploration_version': exploration_version,
-                    'committer_id': committer_id,
-                    'datetime_str': datetime_str,
                 }
             )
 
         exploration_id = self.exploration.id
         exploration_version = self.exploration.version
-        exploration_title = self.exploration.title
 
-        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s' % (
             exploration_id,
             exploration_version,
-            exploration_title,
         )
 
         with (
@@ -411,9 +403,6 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(args['function_id'], expected_func_name)
         self.assertEqual(args['queue_name'], 'voiceover-regeneration')
         self.assertEqual(args['exploration_id'], exploration_id)
-        self.assertEqual(args['exploration_title'], exploration_title)
-        self.assertEqual(args['exploration_version'], exploration_version)
-        self.assertEqual(args['committer_id'], feconf.SYSTEM_COMMITTER_ID)
         self.logout()
 
 
@@ -711,7 +700,6 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
         function_id = cloud_task_runs[0].function_id
         task_run_id = cloud_task_runs[0].task_run_id
-        created_on_time_str = cloud_task_runs[0].created_on.isoformat()
 
         # Verifying that a Cloud Task run is created to regenerate the
         # voiceovers.
@@ -736,9 +724,20 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         # via a deferred job.
         voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
             self.exploration_id,
-            created_on_time_str,
-            feconf.SYSTEM_COMMITTER_ID,
             task_run_id,
+        )
+
+        updated_cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
+
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                child_task_run_id = cloud_run.task_run_id
+
+        voiceover_services.regenerate_voiceovers_for_batch_contents(
+            self.exploration_id, task_run_id, child_task_run_id
         )
 
         entity_voiceovers = (
@@ -825,7 +824,6 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
         function_id = cloud_task_runs[0].function_id
         task_run_id = cloud_task_runs[0].task_run_id
-        created_on_time_str = cloud_task_runs[0].created_on.isoformat()
 
         # Verifying that a Cloud Task run is created to regenerate the
         # voiceovers.
@@ -850,9 +848,20 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         # via a deferred job.
         voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
             self.exploration_id,
-            created_on_time_str,
-            feconf.SYSTEM_COMMITTER_ID,
             task_run_id,
+        )
+
+        updated_cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
+
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                child_task_run_id = cloud_run.task_run_id
+
+        voiceover_services.regenerate_voiceovers_for_batch_contents(
+            self.exploration_id, task_run_id, child_task_run_id
         )
 
         entity_voiceovers = (
@@ -893,10 +902,9 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         # Simulating the frontend request that triggers voiceover regeneration
         # after an exploration update via a deferred job.
-        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s' % (
             self.exploration_id,
             updated_exp.version,
-            updated_exp.title,
         )
         csrf_token = self.get_new_csrf_token()
         self.post_json(handler_url, {}, csrf_token=csrf_token)
@@ -909,10 +917,9 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         # Updating a curated exploration triggers voiceover regeneration via
         # the Cloud Task service, confirming that a deferred request exists in
         # the model.
-        cloud_task_run = cloud_task_runs[1]
+        cloud_task_run = cloud_task_runs[2]
         function_id = cloud_task_run.function_id
         task_run_id = cloud_task_run.task_run_id
-        created_on_time_str = cloud_task_run.created_on.isoformat()
         self.assertEqual(
             function_id,
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
@@ -924,10 +931,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         # via a deferred job.
         voiceover_services.regenerate_voiceovers_on_exploration_update(
             self.exploration_id,
-            updated_exp.title,
             updated_exp.version,
-            feconf.SYSTEM_COMMITTER_ID,
-            created_on_time_str,
             task_run_id,
         )
 
@@ -1015,7 +1019,6 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
         function_id = cloud_task_runs[0].function_id
         task_run_id = cloud_task_runs[0].task_run_id
-        created_on_time_str = cloud_task_runs[0].created_on.isoformat()
 
         # Verifying that a Cloud Task run is created to regenerate the
         # voiceovers.
@@ -1040,10 +1043,22 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         # via a deferred job.
         voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
             self.exploration_id,
-            created_on_time_str,
-            feconf.SYSTEM_COMMITTER_ID,
             task_run_id,
         )
+
+        updated_cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
+        child_task_run_ids = []
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                child_task_run_ids.append(cloud_run.task_run_id)
+
+        for child_task_run_id in child_task_run_ids:
+            voiceover_services.regenerate_voiceovers_for_batch_contents(
+                self.exploration_id, task_run_id, child_task_run_id
+            )
 
         entity_voiceovers = (
             voiceover_services.get_entity_voiceovers_for_given_exploration(
@@ -1102,10 +1117,9 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         # Simulating the frontend request that triggers voiceover regeneration
         # after an exploration update via a deferred job.
-        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s' % (
             self.exploration_id,
             updated_exp.version,
-            updated_exp.title,
         )
         csrf_token = self.get_new_csrf_token()
         self.post_json(handler_url, {}, csrf_token=csrf_token)
@@ -1118,10 +1132,9 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         # Updating a curated exploration triggers voiceover regeneration via
         # the Cloud Task service, confirming that a deferred request exists in
         # the model.
-        cloud_task_run = cloud_task_runs[1]
+        cloud_task_run = cloud_task_runs[2]
         function_id = cloud_task_run.function_id
         task_run_id = cloud_task_run.task_run_id
-        created_on_time_str = cloud_task_run.created_on.isoformat()
         self.assertEqual(
             function_id,
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
@@ -1133,12 +1146,35 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         # via a deferred job.
         voiceover_services.regenerate_voiceovers_on_exploration_update(
             self.exploration_id,
-            updated_exp.title,
             updated_exp.version,
-            feconf.SYSTEM_COMMITTER_ID,
-            created_on_time_str,
             task_run_id,
         )
+
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        second_iter_child_task_run_ids = []
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+                and cloud_run.task_run_id not in child_task_run_ids
+            ):
+                second_iter_child_task_run_ids.append(cloud_run.task_run_id)
+
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_on_exploration_update'
+            ):
+                second_iter_parent_task_run_id = cloud_run.task_run_id
+
+        for child_task_run_id in second_iter_child_task_run_ids:
+            voiceover_services.regenerate_voiceovers_for_batch_contents(
+                self.exploration_id,
+                second_iter_parent_task_run_id,
+                child_task_run_id,
+            )
 
         entity_voiceovers = sorted(
             voiceover_services.get_entity_voiceovers_for_given_exploration(
@@ -1255,6 +1291,30 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
             },
             csrf_token=csrf_token_2,
         )
+        cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
+
+        voiceover_services.regenerate_voiceovers_after_accepting_suggestion(
+            suggestion_to_accept['suggestion_id'],
+            cloud_task_runs[1].task_run_id,
+        )
+
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        child_task_run_ids = []
+        for cloud_run in updated_cloud_task_runs:
+            if (
+                cloud_run.function_id
+                == 'regenerate_voiceovers_for_batch_contents'
+            ):
+                child_task_run_ids.append(cloud_run.task_run_id)
+        for child_task_run_id in child_task_run_ids:
+            voiceover_services.regenerate_voiceovers_for_batch_contents(
+                self.exploration_id,
+                cloud_task_runs[1].task_run_id,
+                child_task_run_id,
+            )
 
         self.logout()
 
@@ -1622,11 +1682,9 @@ class RegenerateVoiceoversForExplorationHandlerTests(
     def mock_defer(
         self,
         _function_id: str,
-        _queue_id: str,
+        _queue_name: str,
         _exploration_id: str,
         _language_accent_code: str,
-        _user_id: str,
-        _datetime_str: str,
     ) -> None:
         pass
 

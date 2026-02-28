@@ -110,6 +110,11 @@ def defer(
     cloud_task_model.put()
 
 
+# Here we use type Any because in defer() function '*args' points to the
+# positional arguments of any other function and those arguments can be of
+# type str, list, int and other types too. Similarly, '**kwargs' points to
+# the keyword arguments of any other function and those can also accept
+# different types of values like '*args'.
 def defer_voiceover_regeneration_task_in_batches(
     fn_identifier: str,
     queue_name: str,
@@ -291,7 +296,7 @@ def get_cloud_task_runs_by_model_ids(
         model_ids.
     """
     cloud_task_model_instances = cloud_task_models.CloudTaskRunModel.get_multi(
-        model_ids, strict=False
+        model_ids
     )
 
     return [

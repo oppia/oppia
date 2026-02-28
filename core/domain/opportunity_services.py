@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import collections
-import datetime
 import logging
 
 from core import feature_flag_list, feconf
@@ -283,8 +282,6 @@ def create_exp_opportunity_summary(
             ],
             taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
             exploration.id,
-            datetime.datetime.utcnow().isoformat(),
-            feconf.SYSTEM_COMMITTER_ID,
         )
     return exploration_opportunity_summary
 

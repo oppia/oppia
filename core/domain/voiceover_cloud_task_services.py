@@ -380,6 +380,9 @@ def is_voiceover_regeneration_defer_function(function_id: str) -> bool:
             'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
         ],
         feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
+        ],
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
             'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
         ],
     ]
@@ -467,18 +470,15 @@ def create_voiceover_regeneration_task_batch_models(
     voiceover_regeneration_task_batch_instances: List[
         cloud_task_domain.VoiceoverRegenerationTaskBatch
     ],
-) -> List[cloud_task_models.VoiceoverRegenerationBatchExecutionModel]:
+) -> None:
     """Creates new instances of VoiceoverRegenerationBatchExecutionModel for the
     given list of VoiceoverRegenerationTaskBatch domain objects.
 
     Args:
-        voiceover_regeneration_task_batch: VoiceoverRegenerationTaskBatch. The
-            domain object containing the details of the voiceover regeneration
-            task batch for which the model instance needs to be created.
-
-    Returns:
-        VoiceoverRegenerationBatchExecutionModel. The newly created instance of
-        VoiceoverRegenerationBatchExecutionModel.
+        voiceover_regeneration_task_batch_instances: list(
+            VoiceoverRegenerationTaskBatch). The domain objects containing the
+            details of the voiceover regeneration task batches for which the
+            model instances need to be created.
     """
     model_instances = []
     for (
@@ -506,7 +506,7 @@ def create_voiceover_regeneration_task_batch_models(
     )
 
 
-def get_voiceover_regeneration_task_batch_instances_by_parent_cloud_task_run_id(
+def get_voiceover_regeneration_batch_instances_by_parent_task_run_id(
     parent_cloud_task_run_id: str,
 ) -> List[cloud_task_domain.VoiceoverRegenerationTaskBatch]:
     """Returns the list of VoiceoverRegenerationTaskBatch instances corresponding
@@ -599,10 +599,6 @@ def create_or_update_voiceover_regeneration_task_batch_model(
     Args:
         domain_instance: VoiceoverRegenerationTaskBatch. The instance of
             VoiceoverRegenerationTaskBatch to be converted.
-
-    Returns:
-        VoiceoverRegenerationBatchExecutionModel. The corresponding model object for
-        the given instance of VoiceoverRegenerationTaskBatch.
     """
     model_id = '%s:%s' % (
         domain_instance.parent_cloud_task_run_id,

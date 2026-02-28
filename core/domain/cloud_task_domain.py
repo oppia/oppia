@@ -262,6 +262,48 @@ class VoiceoverRegenerationJob:
                     return False
         return True
 
+    def update_failed_content_status(
+        self, language_accent_code: str, failed_content_ids: List[str]
+    ) -> None:
+        """Updates the content-status map for a given language-accent code by
+        marking the content IDs in failed_content_ids as FAILED.
+
+        Args:
+            language_accent_code: str. The language accent code.
+            failed_content_ids: List[str]. The list of content IDs for which
+                voiceover regeneration has failed.
+        """
+        content_status_map = self.language_accent_to_content_status_map.get(
+            language_accent_code, {}
+        )
+
+        for content_id in failed_content_ids:
+            if content_id in content_status_map:
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.FAILED.value
+                )
+
+    def update_succeeded_content_status(
+        self, language_accent_code: str, succeeded_content_ids: List[str]
+    ) -> None:
+        """Updates the content-status map for a given language-accent code by
+        marking the content IDs in succeeded_content_ids as SUCCEEDED.
+
+        Args:
+            language_accent_code: str. The language accent code.
+            succeeded_content_ids: List[str]. The list of content IDs for which
+                voiceover regeneration has succeeded.
+        """
+        content_status_map = self.language_accent_to_content_status_map.get(
+            language_accent_code, {}
+        )
+
+        for content_id in succeeded_content_ids:
+            if content_id in content_status_map:
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                )
+
     def update_final_content_status(
         self, language_accent_code: str, failed_content_ids: List[str]
     ) -> None:
@@ -308,6 +350,29 @@ class VoiceoverRegenerationJob:
         self.language_accent_to_content_status_map[language_accent_code] = (
             content_status_map
         )
+
+    def count_total_failed_contents(self) -> int:
+        """Counts the total number of contents for which voiceover regeneration
+        has failed.
+
+        Returns:
+            int. The total number of contents for which voiceover regeneration
+            has failed.
+        """
+        total_failed_contents = 0
+        for (
+            content_id_to_regeneration_status
+        ) in self.language_accent_to_content_status_map.values():
+            for (
+                regeneration_status
+            ) in content_id_to_regeneration_status.values():
+                if (
+                    regeneration_status
+                    == feconf.VoiceoverRegenerationState.FAILED.value
+                ):
+                    total_failed_contents += 1
+
+        return total_failed_contents
 
 
 class VoiceoverRegenerationTaskBatch:

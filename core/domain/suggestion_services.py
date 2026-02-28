@@ -43,7 +43,6 @@ from core.domain import (
     translation_domain,
     user_domain,
     user_services,
-    voiceover_services,
 )
 from core.platform import models
 
@@ -911,14 +910,12 @@ def accept_suggestion(
         )
         and suggestion.change_cmd.cmd == 'add_written_translation'
     ):
-        translated_content = suggestion.change_cmd.translation_html
-        content_id = suggestion.change_cmd.content_id
-        voiceover_services.generate_voiceover_from_translated_content(
-            suggestion.target_id,
-            suggestion.target_version_at_submission,
-            translated_content,
-            content_id,
-            suggestion.language_code,
+        taskqueue_services.defer(
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
+            ],
+            taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+            suggestion.suggestion_id,
         )
 
 

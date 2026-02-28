@@ -326,6 +326,10 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             assert cloud_task_run_domain_instance is not None
             cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
 
+            taskqueue_services.update_cloud_task_run_model(
+                cloud_task_run_domain_instance
+            )
+
             deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
                 payload['fn_identifier']
             ]
@@ -349,6 +353,21 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 payload['args'].append(cloud_task_model_id)
 
             deferred_task_function(*payload['args'], **payload['kwargs'])
+
+            updated_cloud_task_run_domain_instance = (
+                taskqueue_services.get_cloud_task_run_by_model_id(
+                    cloud_task_model_id
+                )
+            )
+            assert updated_cloud_task_run_domain_instance is not None
+
+            if (
+                updated_cloud_task_run_domain_instance.latest_job_state
+                == 'PERMANENTLY_FAILED'
+            ):
+                # If the task has permanently failed during its execution,
+                # we do not update its state to SUCCEEDED.
+                return
 
             cloud_task_run_domain_instance.latest_job_state = 'SUCCEEDED'
 
