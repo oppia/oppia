@@ -18,10 +18,10 @@
 
     <!-- Error Messages -->
     <span class="text-danger" *ngIf="subjectInput.invalid && subjectInput.touched">
-      <span *ngIf="subjectInput.errors?.['required']">
+      <span *ngIf="subjectInput.errors?.required">
         Subject is required.
       </span>
-      <span *ngIf="subjectInput.errors?.['minlength']">
+      <span *ngIf="subjectInput.errors?.minlength">
         Subject must be at least 5 characters long.
       </span>
     </span>
@@ -43,10 +43,10 @@
 
     <!-- Error Messages -->
     <span class="text-danger" *ngIf="messageInput.invalid && messageInput.touched">
-      <span *ngIf="messageInput.errors?.['required']">
+      <span *ngIf="messageInput.errors?.required">
         Message cannot be empty.
       </span>
-      <span *ngIf="messageInput.errors?.['minlength']">
+      <span *ngIf="messageInput.errors?.minlength">
         Message must be at least 10 characters long.
       </span>
     </span>
