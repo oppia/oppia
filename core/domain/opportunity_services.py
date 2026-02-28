@@ -454,9 +454,14 @@ def update_translation_opportunity_with_accepted_suggestion(
         exp_opportunity_summary.content_count
         == exp_opportunity_summary.translation_counts[language_code]
     ):
-        exp_opportunity_summary.incomplete_translation_language_codes.remove(
+        if (
             language_code
-        )
+            in exp_opportunity_summary.incomplete_translation_language_codes
+        ):
+            exp_opportunity_summary.incomplete_translation_language_codes.remove(
+                language_code
+            )
+
         exp_opportunity_summary.language_codes_needing_voice_artists.append(
             language_code
         )
