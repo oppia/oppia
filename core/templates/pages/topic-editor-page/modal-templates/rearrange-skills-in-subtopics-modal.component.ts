@@ -49,7 +49,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
   oldSubtopicId: number | null = null;
   errorMsg!: string;
   editableName!: string;
-  selectedSubtopicId!: number;
+  selectedSubtopicId!: number | null;
   maxCharsInSubtopicTitle: number = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
 
   SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
