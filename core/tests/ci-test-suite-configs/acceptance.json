@@ -365,6 +365,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-new-lesson-player.spec.ts"
     },
     {
+      "name": "logged-out-learner/see-the-feedback-and-help-cards-from-the-new-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/see-the-feedback-and-help-cards-from-the-new-lesson-player.spec.ts"
+    },
+    {
       "name": "logged-out-learner/complete-the-embedded-lesson",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts"
     },

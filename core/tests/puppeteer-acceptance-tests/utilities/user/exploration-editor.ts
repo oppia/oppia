@@ -7158,6 +7158,24 @@ export class ExplorationEditor extends BaseUser {
       false
     );
   }
+
+  /**
+   * Function to choose created exploration and edit further from
+   * creator dashboard.
+   * @param explorationId - ID of the exploration.
+   */
+  async chooseExplorationForEditFromCreatorDashboard(
+    explorationId: string
+  ): Promise<void> {
+    const selector = `a[href="/create/${explorationId}"]`;
+
+    await this.page.waitForSelector(selector, {visible: true});
+
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+      this.page.click(selector),
+    ]);
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>

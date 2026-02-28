@@ -611,6 +611,24 @@ const voiceoverPlayPauseButton = '.voiceover-play-pause-button';
 const continueButtonSelector = '.oppia-learner-confirm-button';
 const voiceoverAudioSliderSelector = 'oppia-audio-slider mat-slider';
 const lessonReportButtonSelector = '.lesson-report-button';
+const conceptCardButton = '.concept-card-button';
+const checkpointSelector = '.progress-bar-container > div.mat-tooltip-trigger';
+const conceptCardContentSelector = '.e2e-test-concept-card-explanation';
+const conceptCardCloseButton = '.e2e-test-close-concept-card';
+const celebrationSelector = '.e2e-test-correct-feedback';
+const cardBackButton = '.oppia-back-button';
+const responseSubmitButton = '.oppia-learner-submit-answer-button';
+const cardTopContentSelector =
+  '.oppia-learner-view-card-top-content oppia-rte-output-display';
+const nextCardNavigationButton = '.oppia-next-button';
+const latestFeedbackSelector = '.e2e-test-conversation-feedback-latest';
+const submitResponseButton = '.oppia-learner-submit-answer-button';
+const hintModalBodySelector = '.oppia-learner-hint-and-solution-modal-body';
+const warningModalContainer = 'oppia-display-new-interstitial-modal';
+const warningModalTitleSelector =
+  '.oppia-learner-solution-interstitial-modal-title';
+const warningModalBodySelector =
+  '.oppia-learner-solution-interstitial-modal-body';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -5886,14 +5904,16 @@ export class LoggedOutUser extends BaseUser {
    * Open share modal in new lesson player page.
    */
   async clickShareLessonButton(): Promise<void> {
-    this.clickOnElementWithText('Share this lesson');
+    await this.clickOnElementWithText('Share this lesson');
   }
 
   /**
    * Copy share link in share model of new lesson player.
    */
   async clickCopyLinkButton(): Promise<void> {
-    await this.page.waitForSelector(lessonCopyLinkbutton);
+    await this.page.waitForSelector(lessonCopyLinkbutton, {
+      visible: true,
+    });
     await this.page.click(lessonCopyLinkbutton);
   }
 
@@ -6125,7 +6145,9 @@ export class LoggedOutUser extends BaseUser {
    * Click embed in webpage button.
    */
   async clickEmbedInWebpageButton(): Promise<void> {
-    await this.page.waitForSelector(lessonEmbedInWebpageButton);
+    await this.page.waitForSelector(lessonEmbedInWebpageButton, {
+      visible: true,
+    });
     await this.page.click(lessonEmbedInWebpageButton);
   }
 
@@ -6170,7 +6192,7 @@ export class LoggedOutUser extends BaseUser {
    * Open the feedback modal of new lesson player.
    */
   async clickFeedbackButton(): Promise<void> {
-    this.clickOnElementWithText('Feedback');
+    await this.clickOnElementWithText('Feedback');
   }
 
   /**
@@ -6313,7 +6335,21 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.page.click(continueButtonSelector);
     await this.expectElementToBeVisible(continueButtonSelector, false);
-    await this.page.waitForTimeout(10000);
+  }
+
+  /**
+   * Verifies that the continue button is visible on the current card.
+   */
+  async isContinueButtonPresent(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(continueButtonSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -6520,6 +6556,502 @@ export class LoggedOutUser extends BaseUser {
     const bodyText = await this.page.evaluate(() => document.body.innerText);
     return bodyText.includes(text);
   }
+
+  /**
+   * Get the checkpoint focused node number (1-indexed).
+   * This identifies the node currently marked as "in-progress".
+   */
+  async getCheckpointFocusNodeNumber(): Promise<number> {
+    await this.page.waitForSelector(checkpointSelector);
+
+    const focusIndex = await this.page.evaluate(selector => {
+      const nodes = Array.from(document.querySelectorAll(selector));
+      // Find the index of the node that has the 'in-progress' class.
+      return nodes.findIndex(node =>
+        node.classList.contains('in-progress-checkpoint-node')
+      );
+    }, checkpointSelector);
+
+    // Return 0-based index if found, otherwise 0 or -1.
+    return focusIndex;
+  }
+  /**
+   * Expect no color node in checkpoint bar.
+   * This verifies that no nodes are marked as 'completed' or 'in-progress'.
+   */
+  async expectNoColorNodeInCheckpoint(): Promise<void> {
+    const completedNodeSelector =
+      '.progress-bar-container .completed-checkpoint-node';
+
+    // Wait for the container to ensure the bar has actually rendered.
+    await this.page.waitForSelector('.progress-bar-container');
+
+    const coloredNodesCount = await this.page.evaluate(sel1 => {
+      const completed = document.querySelectorAll(sel1).length;
+      return completed;
+    }, completedNodeSelector);
+
+    if (coloredNodesCount > 0) {
+      throw new Error(
+        `Expected 0 colored checkpoint nodes, but found ${coloredNodesCount}.`
+      );
+    }
+  }
+  /**
+   * Function to check presence of save progress button in lesson player.
+   */
+  async isSaveLessonProgressButtonPresent(): Promise<boolean> {
+    try {
+      const element = await this.page.waitForXPath(
+        '//button[contains(text(), "Save")]',
+        {
+          visible: true,
+          timeout: 5000,
+        }
+      );
+      return element !== null;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Expect the concept card button in conversation.
+   */
+  async expectConceptCardButton(): Promise<void> {
+    await this.page.waitForSelector(conceptCardButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Open concept card from new lesson player.
+   */
+  async openConceptCard(): Promise<void> {
+    await this.page.waitForSelector(conceptCardButton, {
+      visible: true,
+    });
+    await this.page.click(conceptCardButton);
+    await this.page.waitForSelector('oppia-concept-card', {
+      visible: true,
+    });
+  }
+
+  /**
+   * Close concept card.
+   */
+  async closeConceptCard(): Promise<void> {
+    await this.page.waitForSelector(conceptCardCloseButton, {
+      visible: true,
+    });
+    await this.page.click(conceptCardCloseButton);
+    await this.expectElementToBeVisible(conceptCardButton, false);
+  }
+
+  /**
+   * Expect concept card content matches with expectedContent.
+   * @param expectedContent - Expected content of concept card.
+   */
+  async expectConceptCardContent(expectedContent: string): Promise<void> {
+    // Verify 'Concept Card' title is present in the modal header.
+    const modalHeaderSelector = '.modal-header h3';
+    await this.page.waitForSelector(modalHeaderSelector, {visible: true});
+
+    const headerText = await this.page.$eval(modalHeaderSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (headerText !== 'Concept Card') {
+      throw new Error(
+        `Expected modal header to be 'Concept Card' but found '${headerText}'`
+      );
+    }
+
+    // Verify the content with expected content.
+    await this.page.waitForSelector(conceptCardContentSelector, {
+      visible: true,
+    });
+
+    const actualContent = await this.page.$eval(
+      conceptCardContentSelector,
+      el => el.textContent?.trim()
+    );
+
+    if (actualContent !== expectedContent) {
+      throw new Error(
+        `Concept card content mismatch. Expected: "${expectedContent}", but got: "${actualContent}"`
+      );
+    }
+    showMessage('Concept card content is matched with expected content');
+  }
+  /**
+   * Expect checkpoint celebration appears.
+   */
+  async expectCheckpointCelebrationComponentAppears(): Promise<void> {
+    await this.page.waitForSelector(celebrationSelector, {
+      visible: true,
+    });
+
+    const celebrationText = await this.page.$eval(celebrationSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (celebrationText !== 'New Checkpoint reached!') {
+      throw new Error(
+        `Expected celebration text 'New Checkpoint reached!' but found '${celebrationText}'`
+      );
+    }
+    showMessage('Checkpoint celebration modal appeared');
+  }
+
+  /**
+   * Function to check presence of back button in new lesson player.
+   */
+  async isBackButtonPresent(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(cardBackButton, {
+        visible: true,
+        timeout: 5000,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Whether the given node is color (completed).
+   * @param nodeNumber - Zero-based index of the node.
+   */
+  async isCheckpointNodeColor(nodeNumber: number): Promise<boolean> {
+    await this.page.waitForSelector(checkpointSelector);
+
+    const isColored = await this.page.evaluate(
+      (selector, index) => {
+        const nodes = document.querySelectorAll(selector);
+        const targetNode = nodes[index];
+
+        if (!targetNode) {
+          return false;
+        }
+
+        // A node is "colored" if it is completed.
+        return targetNode.classList.contains('completed-checkpoint-node');
+      },
+      checkpointSelector,
+      nodeNumber
+    );
+
+    return isColored;
+  }
+
+  /**
+   * Whether response submit button is present.
+   */
+  async isResponseSubmitButtonPresent(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(responseSubmitButton, {
+        visible: true,
+        timeout: 50000,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Click on back button of lesson card to navigate
+   * previous card.
+   */
+  async clickBackCardButton(): Promise<void> {
+    await this.page.waitForSelector(cardBackButton, {
+      visible: true,
+    });
+    await this.page.click(cardBackButton);
+    await this.expectElementToBeVisible(cardBackButton, false);
+  }
+
+  /**
+   * Whether the next card navigation button visible.
+   */
+  async isNextCardNavigationButtonPresent(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(nextCardNavigationButton, {
+        visible: true,
+        timeout: 5000,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Click on next card button for navigation to next card.
+   */
+  async clickNextCardButton(): Promise<void> {
+    await this.page.waitForSelector(nextCardNavigationButton, {
+      visible: true,
+    });
+    await this.page.click(nextCardNavigationButton);
+    await this.expectElementToBeVisible(nextCardNavigationButton, false);
+  }
+
+  /**
+   * Expect the learner card top heading content.
+   * @param heading - Expected heading of the card content.
+   */
+  async expectLearnerCardHeading(heading: string): Promise<void> {
+    await this.page.waitForSelector(cardTopContentSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+
+    const actualHeading = await this.page.$eval(cardTopContentSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualHeading !== heading) {
+      throw new Error(
+        `Learner card heading mismatch. Expected: "${heading}", but found: "${actualHeading}"`
+      );
+    }
+    showMessage('Card heading content matched.');
+  }
+
+  /**
+   * Expect the latest feedback of the learner response same as
+   * given latestFeedback in new lesson player.
+   * @param latestFeedback - Expected latest feedback.
+   */
+  async expectLatestFeedbackContent(latestFeedback: string): Promise<void> {
+    await this.page.waitForSelector(latestFeedbackSelector, {
+      visible: true,
+    });
+
+    const actualFeedback = await this.page.$eval(latestFeedbackSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualFeedback !== latestFeedback) {
+      throw new Error(
+        `Feedback mismatch. Expected: "${latestFeedback}", but found: "${actualFeedback}"`
+      );
+    }
+    showMessage('Latest feedback matched with learner latest feedback');
+  }
+  /**
+   * Checks if submit button is visible.
+   * Danger: change the selector.
+   */
+  async expectSubmitButton(
+    state: 'Visible' | 'Hidden' | 'Disabled'
+  ): Promise<void> {
+    if (state === 'Disabled') {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const submitButton: HTMLButtonElement | null =
+            document.querySelector(selector);
+          return submitButton?.disabled;
+        },
+        {},
+        submitResponseButton
+      );
+    } else {
+      await this.expectElementToBeVisible(
+        submitResponseButton,
+        state === 'Visible'
+      );
+    }
+  }
+
+  /**
+   * Verifies that a conversation container with a specific button label
+   * contains the expected instructional text.
+   * @param buttonLabel - The text on the button (e.g., 'View Hint 2', 'View Solution').
+   * @param expectedText - The message text to verify.
+   */
+  async expectConversationContentByButton(
+    buttonLabel: string,
+    expectedText: string
+  ): Promise<void> {
+    const containerSelector = '.hint-solution-individual-container';
+
+    await this.page.waitForSelector(containerSelector, {visible: true});
+
+    const isMatch = await this.page.evaluate(
+      (sel, label, expected) => {
+        const containers = Array.from(document.querySelectorAll(sel));
+
+        const targetContainer = containers.find(container => {
+          const button = container.querySelector('button');
+          return button?.textContent?.trim().includes(label);
+        });
+
+        if (!targetContainer) {
+          throw new Error(`Could not find a container with button: "${label}"`);
+        }
+
+        const actualText =
+          targetContainer.querySelector('p')?.textContent?.trim() || '';
+        return actualText.includes(expected);
+      },
+      containerSelector,
+      buttonLabel,
+      expectedText
+    );
+
+    if (!isMatch) {
+      throw new Error(
+        `Text mismatch in container for "${buttonLabel}". Expected to include: "${expectedText}"`
+      );
+    }
+  }
+
+  /**
+   * Function to check hint modal content with given 'hint'.
+   * @param hint - Expected hint content in hint modal.
+   */
+  async expectHintContentInHintModal(hint: string): Promise<void> {
+    await this.page.waitForSelector(hintModalBodySelector, {
+      visible: true,
+    });
+
+    const actualHintContent = await this.page.$eval(hintModalBodySelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualHintContent !== hint) {
+      throw new Error(
+        `Hint modal content mismatch. Expected: "${hint}", but found: "${actualHintContent}"`
+      );
+    }
+    showMessage('Hint content matched.');
+  }
+
+  /**
+   * Expect the warning modal before view the solution modal.
+   */
+  async expectWarningModalBeforeViewSolution(): Promise<void> {
+    await this.page.waitForSelector(warningModalContainer, {
+      visible: true,
+    });
+
+    const actualTitle = await this.page.$eval(warningModalTitleSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualTitle !== 'Warning!') {
+      throw new Error(
+        `Warning modal title mismatch. Expected: "Warning!", but found: "${actualTitle}"`
+      );
+    }
+
+    const actualBodyText = await this.page.$eval(warningModalBodySelector, el =>
+      el.textContent?.trim()
+    );
+
+    const expectedBodyText = 'This will show the full solution. Are you sure?';
+    if (actualBodyText !== expectedBodyText) {
+      throw new Error(
+        `Warning modal body mismatch. Expected: "${expectedBodyText}", but found: "${actualBodyText}"`
+      );
+    }
+    showMessage('Warning modal appeared');
+  }
+
+  /**
+   * Expect solution modal visible.
+   */
+  async expectSolutionModelVisible(): Promise<void> {
+    const solutionModalContainer = 'oppia-displaynew-solution-modal';
+    const modalHeaderSelector = '.oppia-learner-hint-and-solution-modal-title';
+    const modalBodySelector = '.modal-body';
+
+    await this.page.waitForSelector(solutionModalContainer, {
+      visible: true,
+    });
+
+    // Verify the "Solution" title is present.
+    const actualTitle = await this.page.$eval(modalHeaderSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualTitle !== 'Solution') {
+      throw new Error(
+        `Solution modal title mismatch. Expected: "Solution", but found: "${actualTitle}"`
+      );
+    }
+
+    // Confirm the core content label "One solution is:" is present.
+    const bodyText = await this.page.$eval(modalBodySelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (!bodyText) {
+      throw new Error('Solution body is empty');
+    }
+    if (!bodyText.includes('One solution is:')) {
+      throw new Error(
+        'Solution modal appeared but "One solution is:" text was not found.'
+      );
+    }
+    showMessage('Solution modal appeared');
+  }
+
+  /**
+   * Function to check the solution with expected given 'solution'.
+   * @param solution - Expected solution text.
+   */
+  async expectSolution(solution: string): Promise<void> {
+    const solutionValueSelector =
+      'oppia-displaynew-solution-modal .modal-body > span:first-of-type';
+
+    await this.page.waitForSelector(solutionValueSelector, {visible: true});
+
+    const actualSolution = await this.page.$eval(solutionValueSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualSolution !== solution) {
+      throw new Error(
+        `Solution mismatch. Expected: "${solution}", but found: "${actualSolution}"`
+      );
+    }
+    showMessage('Solution matched.');
+  }
+
+  /**
+   * Function to check the solution explanation with expected solution.
+   * @param explanation - Expected explanation of solution.
+   */
+  async expectSolutionExplanation(explanation: string): Promise<void> {
+    const explanationSelector = '.oppia-learner-hint-and-solution-modal-body';
+
+    await this.page.waitForSelector(explanationSelector, {visible: true});
+
+    const actualExplanation = await this.page.$eval(explanationSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualExplanation !== explanation) {
+      throw new Error(
+        `Explanation mismatch. Expected: "${explanation}", but found: "${actualExplanation}"`
+      );
+    }
+    showMessage('Solution explanation matched.');
+  }
+
+  /**
+   * Close the solution modal.
+   */
+  async closeSolution(): Promise<void> {
+    await this.page.waitForSelector(gotItButtonSelector, {visible: true});
+    await this.clickOnElementWithSelector(gotItButtonSelector);
+    await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
+  }
+
   /**
    * TODO(#22716): Update naming to be more descriptive and start with expect.
    * Verifies that the feedback submission was successful by checking for the presence of the feedback popup.

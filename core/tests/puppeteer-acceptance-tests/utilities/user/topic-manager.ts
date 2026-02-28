@@ -622,6 +622,24 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Link a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
+  async linkSkillToState(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileToggleSkillCard);
+      }
+    }
+    await this.clickOnElementWithSelector(addSkillButton);
+    await this.typeInInputField(skillNameInput, skillName);
+    await this.clickOnElementWithSelector(skillItem);
+    await this.clickOnElementWithSelector(confirmSkillButton);
+  }
+
+  /**
    * This function checks if the error page heading is "Error 401".
    */
   async expectError401Unauthorized(): Promise<void> {

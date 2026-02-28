@@ -29,6 +29,10 @@ const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
+interface ChapterWithExploration {
+  chapterTitle: string;
+  explorationId: string;
+}
 const richTextAreaField = 'div.e2e-test-rte';
 const richTextParagraphTag = 'div.e2e-test-rte p';
 
@@ -1776,6 +1780,66 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.keyboard.press('Tab');
 
     await this.addChapter(chapterTitle, explorationId);
+
+    await this.saveStoryDraft();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOnElementWithSelector(mobilePublishStoryButton);
+    } else {
+      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
+      await this.clickOnElementWithSelector(publishStoryButton);
+      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+    }
+  }
+
+  /**
+   * Create a story with many chapters.
+   * @param storyTitle - Title of the story.
+   * @param storyUrlFragment - URL fragment of the story.
+   * @param chapters - Array of ChapterWithExploration,
+   * each containing chapterTitle and explorationId.
+   * @param topicName - Optional, Name of the topic.
+   */
+  async createAndPublishStoryWithChapters(
+    storyTitle: string,
+    storyUrlFragment: string,
+    chapters: ChapterWithExploration[],
+    topicName?: string
+  ): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileStoryDropdown);
+    }
+    await this.clickOnElementWithSelector(addStoryButton);
+    await this.typeInInputField(storyTitleField, storyTitle);
+    await this.page.waitForSelector(storyUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(storyUrlFragmentField, storyUrlFragment);
+    await this.typeInInputField(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
+
+    await this.clickOnElementWithSelector(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickAndWaitForNavigation(createStoryButton, true);
+
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+
+    for (const chapter of chapters) {
+      await this.addChapter(chapter.chapterTitle, chapter.explorationId);
+    }
 
     await this.saveStoryDraft();
     if (this.isViewportAtMobileWidth()) {
