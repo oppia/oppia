@@ -897,8 +897,8 @@ describe('Library Page Component', () => {
     // In ChromeHeadless (Karma), window.innerWidth does not represent a real browser viewport.
     // It starts with a default virtual width (often ~800px) and can change depending on page
     // layout, global styles, or other tests modifying the viewport.
-    // References:
-    //https://stackoverflow.com/questions/44796194/how-to-set-window-size-to-fullscreen-for-headless-chrome-using-chrome-options/44827872#44827872
+    // Reference:
+    // https://stackoverflow.com/questions/44796194/how-to-set-window-size-to-fullscreen-for-headless-chrome-using-chrome-options/44827872#44827872
     //
     // In our case, when innerWidth becomes greater than 778px, initCarousels() calculates
     // tileDisplayCount as 3, resulting in max-width = 600px instead of the expected
