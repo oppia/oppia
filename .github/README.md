@@ -28,10 +28,10 @@ Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/
 
 The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
 
-You can help with Oppia's development in many ways, including art, coding, design and documentation.
+You can help with Oppia's development in many ways, including art, coding, design, and documentation.
 
-- **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
-- **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
+- **Developers**: Please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
+- **All other contributors**: Please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
 
 If you'd like to donate to support our work, you can do so [here](https://www.oppia.org/donate).
 
@@ -43,7 +43,7 @@ Please report security issues directly to admin@oppia.org.
 
 ## License
 
-The Oppia code is released under the [Apache v2 license](https://github.com/oppia/oppia/blob/develop/LICENSE).
+The Oppia code is released under the [Apache v2 License](https://github.com/oppia/oppia/blob/develop/LICENSE).
 
 ## Keeping in touch
 
