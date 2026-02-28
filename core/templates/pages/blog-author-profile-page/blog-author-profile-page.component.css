@@ -132,7 +132,7 @@ oppia-blog-author-page .blog-post-card {
 
 @media (max-width: 570px) {
   .blog-author-page-breadcrumb .oppia-author-page-back-button {
-    margin-inline-start: -10px;
+    margin-left: -10px;
   }
 }
 
@@ -150,7 +150,7 @@ oppia-blog-author-page .blog-post-card {
 .blog-author-page-breadcrumb .oppia-navbar-breadcrumb {
   display: -webkit-inline-box;
   flex-flow: column;
-  margin-inline-start: -10px;
+  margin-left: -10px;
   overflow-wrap: break-word;
   padding-top: 3px;
 }
