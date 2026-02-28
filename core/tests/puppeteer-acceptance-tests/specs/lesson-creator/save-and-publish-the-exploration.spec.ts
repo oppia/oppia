@@ -97,7 +97,7 @@ describe('Lesson Creator', function () {
         'This is the second card.'
       );
     },
-    10 * 60 * 1000 //test takes longer than 5 minutes.
+    10 * 60 * 1000 // Test takes longer than 5 minutes.
   );
 
   it(

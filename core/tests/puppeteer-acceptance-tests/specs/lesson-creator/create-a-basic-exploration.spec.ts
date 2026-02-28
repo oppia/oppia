@@ -91,7 +91,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.saveExplorationDraftFromSaveRecommendationModal();
       await explorationEditor.expectSaveDraftButtonToBeDisabled(true);
     },
-    50 * 60 * 1000 //test takes longer that 35 minutes.
+    50 * 60 * 1000 // Test takes longer that 35 minutes.
   );
 
   afterAll(async function () {
