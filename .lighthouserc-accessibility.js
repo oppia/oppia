@@ -21,7 +21,7 @@ const baseConfig = require('./.lighthouserc-base.js');
 module.exports = {
   ci: {
     collect: {
-      numberOfRuns: baseConfig['numberOfRuns'],
+      numberOfRuns: 1,
       puppeteerScript: baseConfig['puppeteerScript'],
       url: baseConfig['urls'],
     },
