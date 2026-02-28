@@ -155,6 +155,9 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
             id: 1,
             title: 'Title',
             skill_ids: ['skill_2'],
+            thumbnail_filename: 'thumbnail.svg',
+            thumbnail_bg_color: '#C6DCDA',
+            url_fragment: 'title',
           },
         ],
         next_subtopic_id: 2,
@@ -388,7 +391,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
 
   it('should return false when skill description exists in isSkillDeleted', () => {
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
-    expect(component.isSkillDeleted(skillSummary)).toBeFalse();
+    expect(component.isSkillDeleted(skillSummary)).toBeFalsy();
   });
 
   it('should reset editableName when editNameOfSubtopicWithId is called with null', () => {
