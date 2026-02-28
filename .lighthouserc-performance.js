@@ -24,8 +24,6 @@ module.exports = {
       numberOfRuns: baseConfig['numberOfRuns'],
       puppeteerScript: baseConfig['puppeteerScript'],
       url: baseConfig['urls'],
-      chromePath: baseConfig['chromePath'],
-      puppeteerLaunchOptions: baseConfig['puppeteerLaunchOptions'],
     },
     assert: {
       assertMatrix: [

@@ -13,45 +13,17 @@ runs:
         shell: bash
         timeout_minutes: 10
         command: |
-          CHROME_VERSION="145.0.7632.76"
-          PLATFORM="linux64"
-          
           sudo apt-get update
           sudo apt-get install -y \
-            libnss3 \
-            libatk-bridge2.0-0 \
-            libgtk-3-0 \
-            libxss1 \
-            libasound2 \
-            libgbm1 \
-            libxshmfence1 \
-            libappindicator3-1 \
-            fonts-liberation \
-            xdg-utils
-            
-          wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/${PLATFORM}/chrome-${PLATFORM}.zip"
-          unzip -q chrome-${PLATFORM}.zip
+            wget \
+            gnupg \
+            libappindicator3-1
 
-          sudo mkdir -p /opt/google/chrome
-          sudo mv chrome-${PLATFORM}/* /opt/google/chrome/
-          sudo chmod +x /opt/google/chrome/chrome
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 
-          sudo mv /opt/google/chrome/chrome /opt/google/chrome/chrome-real
-          printf '#!/bin/bash\nexec /opt/google/chrome/chrome-real --no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox "$@"\n' | sudo tee /opt/google/chrome/chrome > /dev/null
-          sudo chmod +x /opt/google/chrome/chrome
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
 
-          printf '#!/bin/bash\nexec /opt/google/chrome/chrome-real --no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox "$@"\n' | sudo tee /usr/bin/google-chrome > /dev/null
-          sudo chmod +x /usr/bin/google-chrome
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
 
-          wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/${PLATFORM}/chromedriver-${PLATFORM}.zip"
-          unzip -q chromedriver-${PLATFORM}.zip
-
-          sudo mv chromedriver-${PLATFORM}/chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-
-          echo "CHROME_BIN=/usr/bin/google-chrome" >> $GITHUB_ENV
-          echo "CHROME_PATH=/usr/bin/google-chrome" >> $GITHUB_ENV
-
-          chrome_version=$(google-chrome --version 2>&1 | grep -oP '\d+\.\d+\.\d+\.\d+')
-          echo "Installed Chrome version: $chrome_version"
-          [[ "${CHROME_VERSION}" == "$chrome_version" ]] || { echo "Error: Version mismatch. Expected ${CHROME_VERSION}, got $chrome_version"; exit 1; }
+          google-chrome --version
