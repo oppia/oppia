@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-from core.domain import html_cleaner
 from core import utils
+from core.domain import html_cleaner
 from core.tests import test_utils
 
 from typing import List, Tuple
@@ -394,8 +394,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
     def test_get_image_filenames_from_html_strings_with_non_image_component(
         self,
     ) -> None:
-        """
-        Test get_image_filenames_from_html_strings ignores non-image
+        """Test get_image_filenames_from_html_strings ignores non-image
         and non-math RTE components like links.
         """
         html_strings = [
@@ -941,8 +940,7 @@ class ValidateRteTagsTests(test_utils.GenericTestBase):
     def test_no_error_when_nested_flag_true_but_no_tabs_or_collapsible(
         self,
     ) -> None:
-        """
-        Test that no error is raised when
+        """Test that no error is raised when
         is_tag_nested_inside_tabs_or_collapsible is True but the HTML
         contains no tabs or collapsible tags.
         """
