@@ -159,9 +159,9 @@ export class RearrangeSkillsInSubtopicsModalComponent
   }
 
   editNameOfSubtopicWithId(subtopicId: number | null): void {
-    if (subtopicId === null || subtopicId === -1) {
+    if (subtopicId === null) {
       this.editableName = '';
-      this.selectedSubtopicId = -1;
+      this.selectedSubtopicId = null;
     } else {
       this.selectedSubtopicId = subtopicId;
     }
