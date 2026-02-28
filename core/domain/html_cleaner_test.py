@@ -394,8 +394,10 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
     def test_get_image_filenames_from_html_strings_with_non_image_component(
         self,
     ) -> None:
-        """Test get_image_filenames_from_html_strings ignores non-image
-        and non-math RTE components like links."""
+        """
+        Test get_image_filenames_from_html_strings ignores non-image
+        and non-math RTE components like links.
+        """
         html_strings = [
             '<oppia-noninteractive-link '
             'text-with-value="&quot;Click here&quot;" '
@@ -455,7 +457,7 @@ class IsHtmlEmptyTests(test_utils.GenericTestBase):
 
     def test_single_quotes_only_is_empty(self) -> None:
         """Test that '' is considered empty."""
-        self.assertTrue(html_cleaner.is_html_empty("''"))
+        self.assertTrue(html_cleaner.is_html_empty('\'\''))
 
 
 class ValidateRteTagsTests(test_utils.GenericTestBase):
@@ -781,7 +783,7 @@ class ValidateRteTagsTests(test_utils.GenericTestBase):
 
     def test_math_missing_math_content_raises_error(self) -> None:
         """Test math tag without math_content-with-value raises error."""
-        html_data = '<oppia-noninteractive-math>' '</oppia-noninteractive-math>'
+        html_data = '<oppia-noninteractive-math></oppia-noninteractive-math>'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Math tag does not have \'math_content-with-value\' attribute.',
@@ -939,9 +941,11 @@ class ValidateRteTagsTests(test_utils.GenericTestBase):
     def test_no_error_when_nested_flag_true_but_no_tabs_or_collapsible(
         self,
     ) -> None:
-        """Test that no error is raised when
+        """
+        Test that no error is raised when
         is_tag_nested_inside_tabs_or_collapsible is True but the HTML
-        contains no tabs or collapsible tags."""
+        contains no tabs or collapsible tags.
+        """
         html_cleaner.validate_rte_tags(
             '<p>Plain text</p>',
             is_tag_nested_inside_tabs_or_collapsible=True,
@@ -959,7 +963,7 @@ class ValidateTabsAndCollapsibleRteTagsTests(test_utils.GenericTestBase):
 
     def test_tabs_missing_tab_contents_attribute_raises_error(self) -> None:
         """Test tabs tag without tab_contents-with-value raises error."""
-        html_data = '<oppia-noninteractive-tabs>' '</oppia-noninteractive-tabs>'
+        html_data = '<oppia-noninteractive-tabs></oppia-noninteractive-tabs>'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'No content attribute is present inside the tabs tag.',
