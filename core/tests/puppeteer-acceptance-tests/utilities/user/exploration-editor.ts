@@ -7191,6 +7191,12 @@ export class ExplorationEditor extends BaseUser {
     stateName: string,
     selectorToClick: string
   ): Promise<boolean> {
+    await this.page.waitForFunction(
+      (nodeSelector: string) =>
+        document.querySelectorAll(nodeSelector).length > 0,
+      {timeout: 60000},
+      explorationGraphNodeSelector
+    );
     return await this.page.evaluate(
       (name: string, selectorToClick: string, nodeSelector: string) => {
         const nodes = Array.from(document.querySelectorAll(nodeSelector));
@@ -7240,13 +7246,6 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(explorationGraphSelector);
-
-    await this.page.waitForFunction(
-      (nodeSelector: string) =>
-        document.querySelectorAll(nodeSelector).length > 0,
-      {timeout: 60000},
-      explorationGraphNodeSelector
-    );
 
     await this.clickOnGraphNodeElement(
       stateName,
@@ -7432,6 +7431,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Clicks on the save draft button in the save recommendation modal
+   * * @param commitMessage - The commit message text to be saved.
    */
   async saveExplorationDraftFromSaveRecommendationModal(
     commitMessage: string = 'Testing Testing'

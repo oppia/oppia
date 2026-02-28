@@ -79,10 +79,6 @@ describe('Lesson Creator', function () {
     );
   });
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
-
   it(
     'should restrict editing for read-only users',
     async function () {
@@ -154,4 +150,8 @@ describe('Lesson Creator', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

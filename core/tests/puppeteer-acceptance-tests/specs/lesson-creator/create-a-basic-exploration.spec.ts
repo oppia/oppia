@@ -33,10 +33,6 @@ describe('Lesson Creator', function () {
     );
   });
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
-
   it(
     'should create a new exploration',
     async function () {
@@ -95,6 +91,10 @@ describe('Lesson Creator', function () {
       await explorationEditor.saveExplorationDraftFromSaveRecommendationModal();
       await explorationEditor.expectSaveDraftButtonToBeDisabled(true);
     },
-    50 * 60 * 1000
+    50 * 60 * 1000 //test takes longer that 35 minutes.
   );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

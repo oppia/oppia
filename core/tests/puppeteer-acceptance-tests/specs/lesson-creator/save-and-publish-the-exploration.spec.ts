@@ -37,10 +37,6 @@ describe('Lesson Creator', function () {
     );
   });
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
-
   it(
     'should discard the draft exploration',
     async function () {
@@ -101,7 +97,7 @@ describe('Lesson Creator', function () {
         'This is the second card.'
       );
     },
-    10 * 60 * 1000
+    10 * 60 * 1000 //test takes longer than 5 minutes.
   );
 
   it(
@@ -115,4 +111,8 @@ describe('Lesson Creator', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

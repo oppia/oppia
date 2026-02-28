@@ -23,7 +23,6 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
 }
 
