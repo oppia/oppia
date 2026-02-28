@@ -43,7 +43,6 @@ from core.jobs import base_jobs
 # of every job.
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     audit_stories_with_disconnected_node_ids_job,
-    audit_topics_with_hanging_stories_job,
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
     collection_info_jobs,
@@ -59,7 +58,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
-    remove_hanging_story_references_job,
     skill_inspection_jobs,
     skill_migration_jobs,
     story_migration_jobs,
