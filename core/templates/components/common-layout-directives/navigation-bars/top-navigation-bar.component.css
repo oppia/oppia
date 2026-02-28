@@ -536,6 +536,14 @@
   border: 2px solid transparent;
 }
 
+.oppia-top-navigation-bar .e2e-test-profile-link {
+  display: block;
+  max-width: 200px; /* Constrains the width so it forces the ellipsis */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media screen and (max-width : 1212px) {
 
   .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left {
