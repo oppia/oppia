@@ -369,10 +369,12 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 # we do not update its state to SUCCEEDED.
                 return
 
-            cloud_task_run_domain_instance.latest_job_state = 'SUCCEEDED'
+            updated_cloud_task_run_domain_instance.latest_job_state = (
+                'SUCCEEDED'
+            )
 
             taskqueue_services.update_cloud_task_run_model(
-                cloud_task_run_domain_instance
+                updated_cloud_task_run_domain_instance
             )
         except Exception as e:
             assert cloud_task_run_domain_instance is not None

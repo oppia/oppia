@@ -52,8 +52,6 @@ if MYPY:  # pragma: no cover
 
 speech_synthesis_services = models.Registry.import_speech_synthesis_services()
 
-WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
-
 
 def _extract_text_from_link_tag(element: bs4.Tag) -> str:
     """Extracts and returns the text from an oppia-noninteractive-link tag.

@@ -1343,8 +1343,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
     def test_should_raise_error_while_regenerating_voiceover(self) -> None:
         exploration_id = 'exp_id_1'
         exploration_version = 2
-        self.signup('tester@org.com', 'tester')
-
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id,
             2,
@@ -1436,7 +1434,8 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         all_models: Sequence[email_models.SentEmailModel] = (
             email_models.SentEmailModel.get_all().fetch()
         )
-        self.assertEqual(len(all_models), 3)
+
+        self.assertEqual(len(all_models), 2)
 
         expected_html_body = (
             'Hi Voiceover Admins,<br><br>tester has initiated the generation '
@@ -1457,6 +1456,14 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 == 'Report on Automatic Voiceovers Generated for Test Exploration'
             ):
                 self.assertEqual(email_model.html_body, expected_html_body)
+
+        updated_cloud_task_run_model = cloud_task_models.CloudTaskRunModel.get(
+            parent_cloud_task_model_id
+        )
+        assert updated_cloud_task_run_model is not None
+        self.assertEqual(
+            updated_cloud_task_run_model.latest_job_state, 'PERMANENTLY_FAILED'
+        )
 
     def _create_exploration_and_arabic_translation(
         self, exploration_id: str, language_code: str
