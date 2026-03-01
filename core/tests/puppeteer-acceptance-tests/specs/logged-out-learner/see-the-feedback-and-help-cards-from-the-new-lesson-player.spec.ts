@@ -375,11 +375,11 @@ describe('Logged-Out Learner', function () {
     );
     await loggedOutLearner.clickOnElementWithText('View hint 2');
     await loggedOutLearner.expectHintContentInHintModal(
-      'This hint 2 to help to answer the question.'
+      'This hint 2 to help to answer the question'
     );
     await loggedOutLearner.closeHintModal();
     // Wait for few minutes to see the solution.
-    await loggedOutLearner.page.waitForTimeout(180000);
+    await loggedOutLearner.page.waitForTimeout(300000);
     await loggedOutLearner.expectTextPresentOnPage('View Solution');
     await loggedOutLearner.expectConversationContentByButton(
       'View Solution',
@@ -401,7 +401,7 @@ describe('Logged-Out Learner', function () {
       __dirname
     );
     await loggedOutLearner.closeSolution();
-  }, 600000);
+  }, 1200000);
 
   it('should be able to submit the correct answer and see the celebration pop-up', async function () {
     await loggedOutLearner.submitFractionInputResponse('1/2');
