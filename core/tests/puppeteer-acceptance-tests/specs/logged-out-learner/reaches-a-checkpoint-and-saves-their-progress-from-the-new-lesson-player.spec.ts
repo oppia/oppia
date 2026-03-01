@@ -164,7 +164,6 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to sign up to permanently save the progress', async function () {
-    await loggedOutLearner.page.waitForTimeout(900000);
     await loggedOutLearner.clickOnCreateAnAccountInSaveProgressModal();
     await loggedOutLearner.expectToBeOnLoginPage();
     await loggedOutLearner.signUpNewUser(
@@ -178,7 +177,7 @@ describe('Logged-Out Learner', function () {
     );
     await loggedOutLearner.expectProfileAvatarVisible();
     expect(await loggedOutLearner.expectSignInButton()).toBe(false);
-  }, 900000);
+  });
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
