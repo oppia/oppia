@@ -57,9 +57,19 @@ describe('MusicNotesInputValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
     goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], '')];
+    
+    // Initialize customizationArgs with valid values
+    customizationArgs = {
+      sequenceToGuess: {
+        value: [['C4', 'quarter']],
+      },
+      initialSequence: {
+        value: [['C4', 'quarter']],
+      },
+    };
   });
 
-  it('should return error when initialSequence is empty', () => {
+  it('should return critical warning when initialSequence is empty', () => {
     var warnings = validatorService.getAllWarnings(
       currentState,
       {
@@ -76,10 +86,28 @@ describe('MusicNotesInputValidationService', () => {
 
     expect(warnings).toEqual([
       {
-        type: AppConstants.WARNING_TYPES.ERROR,
+        type: AppConstants.WARNING_TYPES.CRITICAL,
         message: 'Initial sequence should not be empty.',
       },
     ]);
+  });
+
+  it('should return no warnings when initialSequence is not empty', () => {
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      {
+        sequenceToGuess: {
+          value: [['C4', 'quarter']],
+        },
+        initialSequence: {
+          value: [['C4', 'quarter']],  // Non-empty array with a note
+        },
+      },
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
+
+    expect(warnings).toEqual([]);
   });
 
   it('should throw error when rule HasLengthInclusivelyBetween is invalid', () => {
@@ -106,7 +134,7 @@ describe('MusicNotesInputValidationService', () => {
 
     var warnings = validatorService.getAllWarnings(
       currentState,
-      customizationArgs,
+      customizationArgs,  // Now this is properly initialized in beforeEach
       answerGroups,
       goodDefaultOutcome
     );
