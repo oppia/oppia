@@ -28,7 +28,12 @@ module.exports = {
   numberOfRuns: 3,
   puppeteerScript: 'puppeteer-login-script.js',
   urls: LIGHTHOUSE_URLS_TO_RUN,
-  chromeFlags: ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage'],
+  chromeFlags: [
+    '--headless=old',
+    '--no-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+  ],
   basePerformanceAssertMatrix: {
     matchingUrlPattern: '.*',
     assertions: {
