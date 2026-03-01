@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import collections
 import logging
 import traceback
 
@@ -243,9 +244,6 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             EntityVoiceoversModels that were updated or created.
         """
         logs_during_voiceover_generation = ''
-        logs_during_voiceover_generation += (
-            'Exploration ID: %s.\n' % exploration_model.id
-        )
 
         entity_translations_list = []
         entity_voiceovers_list = []
@@ -368,6 +366,9 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         language_accent_code,
                     )
                 )
+                error_message_to_content_ids_dict = collections.defaultdict(
+                    list
+                )
 
                 entity_voiceovers = entity_voiceovers_id_to_domain_object.get(
                     entity_voiceovers_id, default_entity_voiceovers
@@ -376,6 +377,9 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 logging.info(
                     'Voiceover synthesis log: Generating voiceovers for Entityvoiceover with ID: %s.',
                     entity_voiceovers_id,
+                )
+                logs_during_voiceover_generation += (
+                    'EntityVoiceovers ID: %s.\n' % entity_voiceovers_id
                 )
 
                 number_of_content_ids = len(content_ids_to_content_values)
@@ -431,13 +435,8 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                             content_id,
                         )
                     except Exception as error:
-                        logs_during_voiceover_generation += (
-                            VoiceoverSynthesisJob.generate_error_log(
-                                entity_id,
-                                content_id,
-                                language_accent_code,
-                                error,
-                            )
+                        error_message_to_content_ids_dict[str(error)].append(
+                            content_id
                         )
                         stack_trace = traceback.format_exc()
                         logging.error(
@@ -454,17 +453,25 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                             )
                         )
 
+                for (
+                    error_message,
+                    content_ids,
+                ) in error_message_to_content_ids_dict.items():
+                    comma_separated_content_ids = ', '.join(content_ids)
+                    logs_during_voiceover_generation += (
+                        'Content IDs failed: [%s]. Error message: %s\n'
+                        % (comma_separated_content_ids, error_message)
+                    )
+
                 entity_voiceovers.validate()
                 entity_voiceovers_id_to_domain_object[entity_voiceovers_id] = (
                     entity_voiceovers
                 )
 
                 final_report_logs = (
-                    'Completed voiceover generation for entity ID: %s. '
                     'Total content IDs processed: %d. '
                     'Total characters processed: %d.\n'
                     % (
-                        entity_voiceovers_id,
                         number_of_content_ids,
                         number_of_characters,
                     )
@@ -489,30 +496,6 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         return (
             entity_voiceover_models_to_put,
             logs_during_voiceover_generation,
-        )
-
-    @staticmethod
-    def generate_error_log(
-        exploration_id: str,
-        content_id: str,
-        language_accent_code: str,
-        error: Exception,
-    ) -> str:
-        """Generates a formatted error log string.
-
-        Args:
-            exploration_id: str. The ID of the exploration.
-            content_id: str. The ID of the content.
-            language_accent_code: str. The language accent code.
-            error: str. The error message.
-
-        Returns:
-            str. The formatted error log string.
-        """
-        return (
-            'Error for exploration_id: %s, content_id: %s, '
-            'language_accent_code: %s: %s\n'
-            % (exploration_id, content_id, language_accent_code, str(error))
         )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:

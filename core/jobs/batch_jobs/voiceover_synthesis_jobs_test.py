@@ -515,26 +515,18 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
         self._create_data_for_testing()
 
         expected_output_1 = (
-            'Exploration ID: exploration_id_1.\n'
-            'Error for exploration_id: exploration_id_1, content_id: default_outcome_1, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Error for exploration_id: exploration_id_1, content_id: ca_placeholder_2, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-en-US. '
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-en-US.\n'
+            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 101.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-hi-IN. '
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-hi-IN.\n'
             'Total content IDs processed: 1. Total characters processed: 41.\n'
         )
 
         expected_output_2 = (
-            'Exploration ID: exploration_id_2.\n'
-            'Error for exploration_id: exploration_id_2, content_id: default_outcome_1, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Error for exploration_id: exploration_id_2, content_id: ca_placeholder_2, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-en-US. '
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-en-US.\n'
+            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 103.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-pt-BR. '
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-pt-BR.\n'
             'Total content IDs processed: 1. Total characters processed: 53.\n'
         )
 
@@ -564,24 +556,20 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
         self._create_data_for_testing()
 
         expected_output_1 = (
-            'Exploration ID: exploration_id_1.\n'
-            'Error for exploration_id: exploration_id_1, content_id: content_0, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Error for exploration_id: exploration_id_1, content_id: default_outcome_1, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Error for exploration_id: exploration_id_1, content_id: ca_placeholder_2, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Error for exploration_id: exploration_id_1, content_id: content_3, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-en-US. Total content IDs processed: 4. Total characters processed: 0.\n'
-            'Error for exploration_id: exploration_id_1, content_id: content_0, language_accent_code: hi-IN: Failed to generate voiceovers.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-hi-IN. Total content IDs processed: 1. Total characters processed: 0.\n'
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-en-US.\n'
+            'Content IDs failed: [content_0, default_outcome_1, ca_placeholder_2, content_3]. Error message: Failed to generate voiceovers.\n'
+            'Total content IDs processed: 4. Total characters processed: 0.\n'
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-hi-IN.\n'
+            'Content IDs failed: [content_0]. Error message: Failed to generate voiceovers.\n'
+            'Total content IDs processed: 1. Total characters processed: 0.\n'
         )
         expected_output_2 = (
-            'Exploration ID: exploration_id_2.\n'
-            'Error for exploration_id: exploration_id_2, content_id: content_0, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Error for exploration_id: exploration_id_2, content_id: default_outcome_1, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Error for exploration_id: exploration_id_2, content_id: ca_placeholder_2, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Error for exploration_id: exploration_id_2, content_id: content_3, language_accent_code: en-US: Failed to generate voiceovers.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-en-US. Total content IDs processed: 4. Total characters processed: 0.\n'
-            'Error for exploration_id: exploration_id_2, content_id: content_0, language_accent_code: pt-BR: Failed to generate voiceovers.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-pt-BR. Total content IDs processed: 1. Total characters processed: 0.\n'
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-en-US.\n'
+            'Content IDs failed: [content_0, default_outcome_1, ca_placeholder_2, content_3]. Error message: Failed to generate voiceovers.\n'
+            'Total content IDs processed: 4. Total characters processed: 0.\n'
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-pt-BR.\n'
+            'Content IDs failed: [content_0]. Error message: Failed to generate voiceovers.\n'
+            'Total content IDs processed: 1. Total characters processed: 0.\n'
         )
 
         with self.swap(
@@ -611,26 +599,18 @@ class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
         self._create_data_for_testing()
 
         expected_output_1 = (
-            'Exploration ID: exploration_id_1.\n'
-            'Error for exploration_id: exploration_id_1, content_id: default_outcome_1, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Error for exploration_id: exploration_id_1, content_id: ca_placeholder_2, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-en-US. '
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-en-US.\n'
+            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 101.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-hi-IN. '
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-hi-IN.\n'
             'Total content IDs processed: 1. Total characters processed: 41.\n'
         )
 
         expected_output_2 = (
-            'Exploration ID: exploration_id_2.\n'
-            'Error for exploration_id: exploration_id_2, content_id: default_outcome_1, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Error for exploration_id: exploration_id_2, content_id: ca_placeholder_2, language_accent_code: en-US: '
-            'The provided HTML content does not contain any text to synthesize.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-en-US. '
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-en-US.\n'
+            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 103.\n'
-            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-pt-BR. '
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-pt-BR.\n'
             'Total content IDs processed: 1. Total characters processed: 53.\n'
         )
 
