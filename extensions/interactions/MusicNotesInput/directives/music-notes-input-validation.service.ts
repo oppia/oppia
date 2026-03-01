@@ -39,7 +39,14 @@ export class MusicNotesInputValidationService {
     customizationArgs: MusicNotesInputCustomizationArgs
   ): Warning[] {
     // TODO(#20442): Implement customization args validations.
-    return [];
+    const warningsList: Warning[] = [];
+    if (customizationArgs.initialSequence.value.length === 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL, // CHANGED: ERROR -> CRITICAL
+        message: 'Initial sequence should not be empty.',
+      });
+    }
+    return warningsList;
   }
 
   getAllWarnings(
@@ -63,7 +70,7 @@ export class MusicNotesInputValidationService {
         if (rule.type === 'HasLengthInclusivelyBetween') {
           if (rule.inputs.a > rule.inputs.b) {
             partialWarningsList.push({
-              type: AppConstants.WARNING_TYPES.ERROR,
+              type: AppConstants.WARNING_TYPES.ERROR, // CHANGED: CRITICAL -> ERROR
               message:
                 `The rule in response group ${groupId} is invalid -- ` +
                 `${rule.inputs.a} is more than ${rule.inputs.b}`,
