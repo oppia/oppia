@@ -4243,7 +4243,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '/getreviewablesuggestions/skill/add_question',
             {'offset': 0, 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE},
-            expected_status_int=500,
+            expected_status_int=400,
         )
 
     def test_handler_with_invalid_target_type_raise_error(self) -> None:
