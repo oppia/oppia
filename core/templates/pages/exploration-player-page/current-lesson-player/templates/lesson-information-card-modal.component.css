@@ -75,6 +75,7 @@
   font-size: 12px;
   height: 18px;
   width: 18px;
+  margin-bottom: 5px;
 }
 
 .oppia-info-card-title {
@@ -106,9 +107,9 @@
   margin-top: 20px;
 }
 
-/* This is necessary so that long usernames don't overflow the tooltip. */
 .oppia-lesson-exploration-progress-info .tooltip-inner {
   max-width: none;
+  white-space: nowrap;
 }
 
 .oppia-info-card-tag-icon {
@@ -118,6 +119,8 @@
 
 .oppia-info-card-exploration-contributors-profile {
   display: flex;
+  align-items: center;
+  justify-content: center;
   height: 34px;
   list-style-type: none;
   margin: 0;
