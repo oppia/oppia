@@ -57,8 +57,7 @@ describe('MusicNotesInputValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
     goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], '')];
-
-    // Initialize customizationArgs with valid values
+    // Initialize customizationArgs with valid values.
     customizationArgs = {
       sequenceToGuess: {
         value: [['C4', 'quarter']],
@@ -69,6 +68,7 @@ describe('MusicNotesInputValidationService', () => {
     };
   });
 
+  // Test for empty initialSequence.
   it('should return critical warning when initialSequence is empty', () => {
     var warnings = validatorService.getAllWarnings(
       currentState,
@@ -92,6 +92,7 @@ describe('MusicNotesInputValidationService', () => {
     ]);
   });
 
+  // Test for non-empty initialSequence.
   it('should return no warnings when initialSequence is not empty', () => {
     var warnings = validatorService.getAllWarnings(
       currentState,
@@ -100,7 +101,7 @@ describe('MusicNotesInputValidationService', () => {
           value: [['C4', 'quarter']],
         },
         initialSequence: {
-          value: [['C4', 'quarter']], // Non-empty array with a note
+          value: [['C4', 'quarter']], // Non-empty array with a note.
         },
       },
       goodAnswerGroups,
@@ -110,6 +111,7 @@ describe('MusicNotesInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
+  // Test for invalid rule.
   it('should throw error when rule HasLengthInclusivelyBetween is invalid', () => {
     var answerGroup = AnswerGroup.createNew(
       [
@@ -134,7 +136,7 @@ describe('MusicNotesInputValidationService', () => {
 
     var warnings = validatorService.getAllWarnings(
       currentState,
-      customizationArgs, // Now this is properly initialized in beforeEach
+      customizationArgs, // Now this is properly initialized in beforeEach.
       answerGroups,
       goodDefaultOutcome
     );
