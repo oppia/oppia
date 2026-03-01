@@ -289,7 +289,7 @@ export class OpportunitiesListComponent {
       this.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
         this.more = more;
         this.opportunities = this.opportunities.concat(opportunitiesDicts);
-        const updatedFiltered = this.getFilteredOpportunities();
+        const updatedFilteredOpportunities = this.getFilteredOpportunities();
         this.visibleOpportunities = updatedFiltered.slice(startIndex, endIndex);
         this.loadingOpportunityData = false;
         this.userIsOnLastPage = this.calculateUserIsOnLastPage(
