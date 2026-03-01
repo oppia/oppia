@@ -261,7 +261,7 @@ export class OpportunitiesListComponent {
       this.zone.run(() => {
         this.opportunities = opportunitiesDicts;
         this.more = more;
-        const filtered = this.getFilteredOpportunities();
+        const filteredOpportunities = this.getFilteredOpportunities();
         this.visibleOpportunities = filtered.slice(
           0,
           this.OPPORTUNITIES_PAGE_SIZE
