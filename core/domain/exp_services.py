@@ -2231,7 +2231,7 @@ def compute_models_to_put_when_saving_new_exp_version(
         updated_exploration,
         exp_rights,
         exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
-        skip_exploration_model_last_updated=True,
+        skip_exploration_model_last_updated=(committer_id == feconf.MIGRATION_BOT_USER_ID),
     )
     exp_summary.add_contribution_by_user(committer_id)
     exp_summary.version += 1
@@ -2344,9 +2344,7 @@ def update_exploration_summary(
         # TODO(#15895): Revisit this after we have validations for the model to
         # see whether exploration_model_last_updated and
         # ExplorationModel.last_updated are in sync or not.
-        exploration_model_last_updated = datetime.datetime.fromtimestamp(
-            get_last_updated_by_human_ms(exploration.id) / 1000.0
-        )
+        exploration_model_last_updated = datetime.datetime.utcnow()
 
     contributor_ids = list(exp_summary.contributors_summary.keys())
 
