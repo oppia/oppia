@@ -629,6 +629,13 @@ const warningModalTitleSelector =
   '.oppia-learner-solution-interstitial-modal-title';
 const warningModalBodySelector =
   '.oppia-learner-solution-interstitial-modal-body';
+const saveProgressModalSelector = 'oppia-save-progress-modal';
+const newProgressRemainderModalSelector = 'oppia-new-progress-reminder-modal';
+const progressContinueTextSelector =
+  '.e2e-test-progress-reminder-continue-text';
+const resumeLessonButtonSelector = '.resume-button';
+const profileAvatarSelector =
+  'img.oppia-navbar-profile-picture[alt="User Avatar"]';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -7086,54 +7093,161 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Click on save progress button from new lesson player.
    */
-  async clickOnSaveProgressButton(): Promise<void> {}
+  async clickOnSaveProgressButton(): Promise<void> {
+    await this.clickOnElementWithText('Save');
+  }
 
   /**
-   * Expect the save progress modal visible.
+   * Expect the save progress modal visible with all its text content.
    */
   async expectSaveProgressModal(): Promise<void> {
-    // 'Save Progress' text is displayed in modal header.
+    await this.page.waitForSelector(saveProgressModalSelector, {visible: true});
+
+    const expectedTexts = {
+      header: 'Save Progress',
+      checkpointStatus:
+        "Your progress will be saved up to the last checkpoint you've reached.",
+      signInPrompt:
+        'Create an account and have your progress saved automatically:',
+      temporaryLinkPrompt:
+        'Or copy the link below to save progress for 72 hours:',
+    };
+
+    await this.expectTextContentInElementWithSelectorToBe(
+      `${saveProgressModalSelector} .new-save-progress-menu h3`,
+      expectedTexts.header
+    );
+
+    await this.expectTextContentInElementWithSelectorToBe(
+      `${saveProgressModalSelector} .checkpoint-status p`,
+      expectedTexts.checkpointStatus
+    );
+
+    await this.expectTextContentInElementWithSelectorToBe(
+      `${saveProgressModalSelector} .sign-in-box p`,
+      expectedTexts.signInPrompt
+    );
+
+    await this.expectTextContentInElementWithSelectorToBe(
+      `${saveProgressModalSelector} .uid-box .guide-text`,
+      expectedTexts.temporaryLinkPrompt
+    );
+
+    await this.expectTextPresentOnPage('Copy');
+    showMessage('Save progress modal displayed');
   }
 
   /**
    * Click on copy button.
    */
-  async clickOnCopyButton(): Promise<void> {}
+  async clickOnCopyButton(): Promise<void> {
+    await this.clickOnElementWithText('Copy');
+  }
 
   /**
    * Paste copy link in new tab and resume lesson.
    */
   async pasteLinkAndResumeLesson(): Promise<Page> {
-    // Displayed progress-remainder modal.
+    // Get the link from the clipboard.
+    const copiedLink = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
 
-    // Text 'Do you want to continue' is present in modal body.
+    if (!copiedLink || !copiedLink.includes('/progress/')) {
+      throw new Error(
+        `Clipboard does not contain a valid progress link. Found: ${copiedLink}`
+      );
+    }
+
+    // Open a new tab and navigate to the copied link.
+    const newPage = await this.page.browser().newPage();
+    await newPage.goto(copiedLink, {waitUntil: 'networkidle0'});
+
+    // Verify the Progress Reminder Modal is displayed on the new page.
+    await newPage.waitForSelector(newProgressRemainderModalSelector, {
+      visible: true,
+    });
+
+    // Check for 'Do you want to continue?' text in the modal body.
+    const continueText = await newPage.$eval(progressContinueTextSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (!continueText || !continueText.includes('Do you want to continue?')) {
+      throw new Error(
+        `Expected "Do you want to continue?" but found "${continueText}"`
+      );
+    }
+
+    // Verify completion fraction (e.g., "1/3") is present.
+    const progressFraction = await newPage.$eval('.completion-fraction', el =>
+      el.textContent?.trim()
+    );
+    if (!progressFraction) {
+      throw new Error(
+        'Completion fraction (e.g., 1/3) is missing from the modal.'
+      );
+    }
 
     // Click on 'Yes, resume the lesson' button.
+    await newPage.click(resumeLessonButtonSelector);
 
-    return this.page;
+    // Wait for the modal to disappear.
+    await newPage.waitForSelector(newProgressRemainderModalSelector, {
+      hidden: true,
+    });
+    return newPage;
+  }
+
+  /**
+   * Expect the sign-in button present in new lesson player.
+   */
+  async expectSignInButton(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(loginButtonSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      return true;
+    } catch (error) {
+      showMessage(`Error: ${error}`);
+      return false;
+    }
   }
 
   /**
    * Click on 'Create an Account' button from save lesson
    * progress modal.
    */
-  async clickOnCreateAnAccountInSaveProgressModal(): Promise<void> {}
+  async clickOnCreateAnAccountInSaveProgressModal(): Promise<void> {
+    await this.clickAndWaitForNavigation('.create-account-btn');
+  }
 
   /**
-   * Expect the progress-remainder modal is displayed.
+   * Click on lesson resume button.
    */
-  async expectProgressRemainderModal(): Promise<void> {
-    // Text 'Do you want to continue' is displayed in modal body.
-  }
-
   async clickOnLessonResumeButton(): Promise<void> {
     // Click on the 'Yes, resume the lesson' button.
+    await this.page.waitForSelector(resumeLessonButtonSelector);
+    await this.page.click(resumeLessonButtonSelector);
   }
 
-  async expectProfileAvatarVisible(): Promise<void> {}
+  /**
+   * Expect the profile avatar to be visible in the navigation bar.
+   */
+  async expectProfileAvatarVisible(): Promise<void> {
+    await this.page.waitForSelector(profileAvatarSelector, {visible: true});
 
-  async isSignInButtonVisible(): Promise<boolean> {
-    return true;
+    const avatarSrc = await this.page.$eval(
+      profileAvatarSelector,
+      el => (el as HTMLImageElement).src
+    );
+
+    if (!avatarSrc || avatarSrc.includes('undefined')) {
+      throw new Error(
+        'Profile avatar is visible but the image source is invalid.'
+      );
+    }
   }
 
   /**

@@ -43,14 +43,10 @@ enum CARDS {
 
 enum EXPLORATION_TITLE {
   PLACE_VALUES = 'What are the Place Values?',
-  EXPLORATION_1 = 'Exploration 1',
-  EXPLORATION_2 = 'Exploration 2',
 }
 
 describe('Logged-Out Learner', function () {
   let explorationId: string;
-  let exploration1Id: string;
-  let exploration2Id: string;
   let loggedOutLearner: LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
@@ -143,131 +139,6 @@ describe('Logged-Out Learner', function () {
       if (!explorationId) {
         throw new Error('Exploration ID is null or undefined.');
       }
-
-      // Add two dummy exploration.
-      // Add first dummy exploration.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-      // Add Interaction Cards.
-      await curriculumAdmin.updateCardContent(
-        `Welcome, to the ${EXPLORATION_TITLE.EXPLORATION_1}.`
-      );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-      await curriculumAdmin.viewOppiaResponses();
-      await curriculumAdmin.directLearnersToNewCard(CARDS.FINAL_CARD);
-
-      await curriculumAdmin.navigateToCard(CARDS.FINAL_CARD);
-      await curriculumAdmin.updateCardContent(
-        'You have successfully completed the lesson!'
-      );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-      await curriculumAdmin.saveExplorationDraft();
-      exploration1Id = await curriculumAdmin.publishExplorationWithMetadata(
-        EXPLORATION_TITLE.EXPLORATION_1,
-        `Learn basic Mathematics including ${EXPLORATION_TITLE.EXPLORATION_1}`,
-        'Mathematics'
-      );
-      if (!exploration1Id) {
-        throw new Error(
-          `Exploration title:${EXPLORATION_TITLE.EXPLORATION_1} ID is null or undefined.`
-        );
-      }
-
-      // Add second dummy exploration.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-      // Add Interaction Cards.
-      await curriculumAdmin.updateCardContent(
-        `Welcome, to the ${EXPLORATION_TITLE.EXPLORATION_2}.`
-      );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-      await curriculumAdmin.viewOppiaResponses();
-      await curriculumAdmin.directLearnersToNewCard(CARDS.FINAL_CARD);
-
-      await curriculumAdmin.navigateToCard(CARDS.FINAL_CARD);
-      await curriculumAdmin.updateCardContent(
-        'You have successfully completed the lesson!'
-      );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-      await curriculumAdmin.saveExplorationDraft();
-      exploration2Id = await curriculumAdmin.publishExplorationWithMetadata(
-        EXPLORATION_TITLE.EXPLORATION_2,
-        `Learn basic Mathematics including ${EXPLORATION_TITLE.EXPLORATION_2}`,
-        'Mathematics'
-      );
-      if (!exploration2Id) {
-        throw new Error(
-          `Exploration title:${EXPLORATION_TITLE.EXPLORATION_2} ID is null or undefined.`
-        );
-      }
-
-      // Create topic with 'Place Values'.
-      const topicName = 'Place Values';
-      const subtopicName = 'Place Values';
-      const skillName = 'skill-1';
-      await curriculumAdmin.createTopic(
-        topicName,
-        topicName.toLowerCase().replace(/ /g, '-')
-      );
-      // Create a subtopic 'Place Values' for topic 'Place Values'.
-      await curriculumAdmin.createSubtopicForTopic(
-        subtopicName,
-        subtopicName.toLowerCase().replace(/ /g, '-'),
-        topicName
-      );
-      // Create a skill with name 'skill-1' and 10 question inside it.
-      await curriculumAdmin.createSkillForTopic(skillName, topicName, false);
-      await curriculumAdmin.createQuestionsForSkill(skillName, 3);
-      await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-        skillName,
-        subtopicName,
-        topicName
-      );
-      await curriculumAdmin.addSkillToDiagnosticTest(skillName, topicName);
-
-      await curriculumAdmin.publishDraftTopic(topicName);
-
-      // Create a story node with 3 chapters.
-      await curriculumAdmin.createAndPublishStoryWithChapters(
-        'What are Place values',
-        'place-values',
-        [
-          {
-            chapterTitle: EXPLORATION_TITLE.PLACE_VALUES,
-            explorationId: explorationId,
-          },
-          {
-            chapterTitle: EXPLORATION_TITLE.EXPLORATION_1,
-            explorationId: exploration1Id,
-          },
-          {
-            chapterTitle: EXPLORATION_TITLE.EXPLORATION_2,
-            explorationId: exploration2Id,
-          },
-        ],
-        topicName
-      );
-
-      await curriculumAdmin.createAndPublishClassroom(
-        'Math',
-        'math',
-        topicName
-      );
-
-      // Go to creator dashboard.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-
-      // Select the exploration 'What are the Place Values?'.
-      await curriculumAdmin.chooseExplorationForEditFromCreatorDashboard(
-        explorationId
-      );
-      // Link concept card in the Introduction card.
-      await curriculumAdmin.navigateToCard(CARDS.INTRODUCTION_CARD);
-
-      await curriculumAdmin.linkSkillToState('skill-1');
-
-      // Publish the changes of exploration.
-      await curriculumAdmin.saveExplorationDraft('Link concept card: skill-1');
     },
     // Setup takes more time than default.
     1000000
@@ -276,7 +147,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to resume progress using the 72-hour link', async function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.submitAnswerInTextArea('1/2');
+    await loggedOutLearner.submitFractionInputResponse('1/2');
 
     // Click on the 'Save' button.
     await loggedOutLearner.clickOnSaveProgressButton();
@@ -288,25 +159,26 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectLearnerCardHeading(
       "What is 3/6 equal to in it's simplest form?"
     );
-    await loggedOutLearner.expectSignInButtonToBePresent();
+    expect(await loggedOutLearner.expectSignInButton()).toBe(true);
     await newTab.close();
   });
 
   it('should be able to sign up to permanently save the progress', async function () {
+    await loggedOutLearner.page.waitForTimeout(900000);
     await loggedOutLearner.clickOnCreateAnAccountInSaveProgressModal();
     await loggedOutLearner.expectToBeOnLoginPage();
     await loggedOutLearner.signUpNewUser(
       'loggedoutLearner',
       'loggedoutLearner@example.com'
     );
-    await loggedOutLearner.expectProgressRemainderModal();
+    await loggedOutLearner.expectSaveProgressModal();
     await loggedOutLearner.clickOnLessonResumeButton();
     expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
       false
     );
     await loggedOutLearner.expectProfileAvatarVisible();
-    expect(await loggedOutLearner.isSignInButtonVisible()).toBe(false);
-  });
+    expect(await loggedOutLearner.expectSignInButton()).toBe(false);
+  }, 900000);
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

@@ -25,7 +25,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {timeout} from 'd3';
 
 const ROLES = testConstants.Roles;
 
