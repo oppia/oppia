@@ -1031,12 +1031,19 @@ textarea {
 .oppia-navbar-breadcrumb-separator {
   margin-right: 8px;
 }
-
-[dir='rtl'] .oppia-navbar-breadcrumb-separator {
-  margin-right: 8px /*rtl:ignore*/;
-}
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
+}
+
+.oppia-navbar-breadcrumb-rtl-separator {
+  margin-left: 8px;
+}
+.oppia-navbar-breadcrumb-rtl-separator:after {
+  content: "<";
+}
+
+[dir='rtl'] oppia-creator-dashboard-page-root .oppia-navbar-breadcrumb-separator {
+  margin-right: 8px /*rtl:ignore*/;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile a:hover {
