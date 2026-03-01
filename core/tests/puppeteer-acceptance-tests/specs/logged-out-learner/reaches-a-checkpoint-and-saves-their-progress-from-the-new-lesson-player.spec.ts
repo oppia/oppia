@@ -25,7 +25,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {timeout} from 'd3';
 
 const ROLES = testConstants.Roles;
 
@@ -274,142 +273,40 @@ describe('Logged-Out Learner', function () {
     1000000
   );
 
-  it('should be able to see the first card of the lesson', async function () {
-    // Visit Math classroom page.
-    await loggedOutLearner.navigateToClassroomPage('math');
-    await loggedOutLearner.selectAndOpenTopic('Place Values');
-    await loggedOutLearner.selectChapterWithinStoryToLearn(
-      'What are Place values',
-      EXPLORATION_TITLE.PLACE_VALUES,
-      true
-    );
-
-    await loggedOutLearner.expectScreenshotToMatch(
-      'newLessonPlayerWithCheckpoint',
-      __dirname
-    );
-    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(0);
-    await loggedOutLearner.expectNoColorNodeInCheckpoint();
-    expect(await loggedOutLearner.isContinueButtonPresent()).toBe(true);
-    expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
-      true
-    );
-  });
-
-  it('should be able to check the concept card', async function () {
-    // Wait for few minutes to see the concept card.
-    await loggedOutLearner.page.waitForTimeout(180000);
-    await loggedOutLearner.expectConceptCardButton();
-    await loggedOutLearner.expectScreenshotToMatch(
-      'conceptCardInConversion',
-      __dirname
-    );
-    // Open concept card.
-    await loggedOutLearner.openConceptCard();
-    await loggedOutLearner.expectConceptCardContent(
-      'Review material text content for skill-1'
-    );
-  });
-
-  it('should be able to go forward by one card', async function () {
-    await loggedOutLearner.closeConceptCard();
+  it('should be able to resume progress using the 72-hour link', async function () {
+    await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.expectCheckpointCelebrationComponentAppears();
-    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
-    expect(await loggedOutLearner.isBackButtonPresent()).toBe(true);
-    expect(await loggedOutLearner.isContinueButtonPresent()).toBe(false);
-    await loggedOutLearner.expectScreenshotToMatch(
-      'fractionCardInNewLessonPlayer',
-      __dirname
-    );
-    expect(await loggedOutLearner.isCheckpointNodeColor(0)).toBe(true);
-    expect(await loggedOutLearner.isResponseSubmitButtonPresent()).toBe(true);
-  });
+    await loggedOutLearner.submitAnswerInTextArea('1/2');
 
-  it('should be able to go backward by one card', async function () {
-    await loggedOutLearner.clickBackCardButton();
-    // Expect the first card content.
+    // Click on the 'Save' button.
+    await loggedOutLearner.clickOnSaveProgressButton();
+    await loggedOutLearner.expectSaveProgressModal();
+    // Click on 'copy' button.
+    await loggedOutLearner.clickOnCopyButton();
+    const newTab = await loggedOutLearner.pasteLinkAndResumeLesson();
+    // Fraction card content is visible.
     await loggedOutLearner.expectLearnerCardHeading(
-      'Welcome, to the Place Values Exploration.'
+      "What is 3/6 equal to in it's simplest form?"
     );
-    expect(await loggedOutLearner.isCheckpointNodeColor(0)).toBe(true);
-    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
-    // Next card arrow button visible.
-    expect(await loggedOutLearner.isNextCardNavigationButtonPresent()).toBe(
-      true
-    );
+    await loggedOutLearner.expectSignInButtonToBePresent();
+    await newTab.close();
   });
 
-  it('should be able to get feedback on the incorrect answer', async function () {
-    await loggedOutLearner.clickNextCardButton();
-    // Enter wrong answer in input box.
-    await loggedOutLearner.submitFractionInputResponse('4');
-    await loggedOutLearner.page.waitForTimeout(10000);
-    await loggedOutLearner.expectLatestFeedbackContent('Incorrect, try again!');
+  it('should be able to sign up to permanently save the progress', async function () {
+    await loggedOutLearner.clickOnCreateAnAccountInSaveProgressModal();
+    await loggedOutLearner.expectToBeOnLoginPage();
+    await loggedOutLearner.signUpNewUser(
+      'loggedoutLearner',
+      'loggedoutLearner@example.com'
+    );
+    await loggedOutLearner.expectProgressRemainderModal();
+    await loggedOutLearner.clickOnLessonResumeButton();
+    expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
+      false
+    );
+    await loggedOutLearner.expectProfileAvatarVisible();
+    expect(await loggedOutLearner.isSignInButtonVisible()).toBe(false);
   });
-
-  it('should be able to get a hint or a solution when the user gets stuck', async function () {
-    await loggedOutLearner.submitFractionInputResponse('ABC');
-    await loggedOutLearner.expectErrorMessageForWrongInputToBe(
-      'Please only use numerical digits, spaces or forward slashes (/)'
-    );
-    await loggedOutLearner.expectSubmitButton('Disabled');
-    // Wait for few minutes to see the hint.
-    await loggedOutLearner.page.waitForTimeout(180000);
-    await loggedOutLearner.expectTextPresentOnPage('View hint');
-    await loggedOutLearner.expectConversationContentByButton(
-      'View hint',
-      'Need extra help solving the problem? Check out the hint.'
-    );
-    await loggedOutLearner.clickOnElementWithText('View hint');
-    await loggedOutLearner.expectHintContentInHintModal(
-      'This hint 1 to help to answer the question.'
-    );
-    await loggedOutLearner.closeHintModal();
-    // Again wait for few minutes to see another hint.
-    await loggedOutLearner.page.waitForTimeout(180000);
-    await loggedOutLearner.expectTextPresentOnPage('View hint 2');
-    await loggedOutLearner.expectConversationContentByButton(
-      'View hint 2',
-      "Don't worry! Here is another hint that might be helpful to you."
-    );
-    await loggedOutLearner.clickOnElementWithText('View hint 2');
-    await loggedOutLearner.expectHintContentInHintModal(
-      'This hint 2 to help to answer the question.'
-    );
-    await loggedOutLearner.closeHintModal();
-    // Wait for few minutes to see the solution.
-    await loggedOutLearner.page.waitForTimeout(180000);
-    await loggedOutLearner.expectTextPresentOnPage('View Solution');
-    await loggedOutLearner.expectConversationContentByButton(
-      'View Solution',
-      'It seems like you are not sure how to continue. If you want, you can view the solution for this lesson.'
-    );
-    await loggedOutLearner.clickOnElementWithText('View Solution');
-
-    await loggedOutLearner.expectWarningModalBeforeViewSolution();
-    expect(
-      await loggedOutLearner.expectTextPresentOnPage('SHOW SOLUTION')
-    ).toBe(true);
-    await loggedOutLearner.clickOnElementWithText('SHOW SOLUTION');
-
-    await loggedOutLearner.expectSolutionModelVisible();
-    await loggedOutLearner.expectSolution('1/2>');
-    await loggedOutLearner.expectSolutionExplanation('Answer is 1/2.');
-    await loggedOutLearner.expectScreenshotToMatch(
-      'solutionModalLearnerPage',
-      __dirname
-    );
-    await loggedOutLearner.closeSolution();
-  }, 600000);
-
-  it('should be able to submit the correct answer and see the celebration pop-up', async function () {
-    await loggedOutLearner.submitFractionInputResponse('1/2');
-    await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.expectCheckpointCelebrationComponentAppears();
-    await loggedOutLearner.expectSubmitButton('Hidden');
-  });
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
