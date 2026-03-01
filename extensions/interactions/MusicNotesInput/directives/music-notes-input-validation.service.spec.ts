@@ -57,7 +57,7 @@ describe('MusicNotesInputValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
     goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], '')];
-    
+
     // Initialize customizationArgs with valid values
     customizationArgs = {
       sequenceToGuess: {
@@ -100,7 +100,7 @@ describe('MusicNotesInputValidationService', () => {
           value: [['C4', 'quarter']],
         },
         initialSequence: {
-          value: [['C4', 'quarter']],  // Non-empty array with a note
+          value: [['C4', 'quarter']], // Non-empty array with a note
         },
       },
       goodAnswerGroups,
@@ -134,7 +134,7 @@ describe('MusicNotesInputValidationService', () => {
 
     var warnings = validatorService.getAllWarnings(
       currentState,
-      customizationArgs,  // Now this is properly initialized in beforeEach
+      customizationArgs, // Now this is properly initialized in beforeEach
       answerGroups,
       goodDefaultOutcome
     );
