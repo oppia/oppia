@@ -92,8 +92,8 @@ class FirebaseSyncRecordsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='delete_users success: 1'),
-                job_run_result.JobRunResult(stdout='import_users success: 1'),
+                job_run_result.JobRunResult(stdout='Delete Records SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1'),
             ],
         )
 
@@ -120,7 +120,8 @@ class FirebaseSyncRecordsJobTests(
                 [
                     job_run_result.JobRunResult(
                         stderr=(
-                            'ERROR: delete_users at slice=[0:1]: service down'
+                            'Delete Records ERROR: with slice=[0:1]: '
+                            'service down'
                         )
                     ),
                 ],
@@ -147,7 +148,7 @@ class FirebaseSyncRecordsJobTests(
         )
 
         self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='OK: 1')],
+            [job_run_result.JobRunResult(stdout='CORRECT: 1')],
         )
 
         # Verify the Firebase record was left untouched.
@@ -178,8 +179,8 @@ class FirebaseSyncRecordsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='delete_users success: 1'),
-                job_run_result.JobRunResult(stdout='import_users success: 1'),
+                job_run_result.JobRunResult(stdout='Delete Records SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1'),
             ],
         )
 
@@ -230,9 +231,9 @@ class FirebaseSyncRecordsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='OK: 1'),
-                job_run_result.JobRunResult(stdout='delete_users success: 1'),
-                job_run_result.JobRunResult(stdout='import_users success: 1'),
+                job_run_result.JobRunResult(stdout='CORRECT: 1'),
+                job_run_result.JobRunResult(stdout='Delete Records SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1'),
             ],
         )
 
@@ -264,7 +265,7 @@ class FirebaseSyncRecordsJobTests(
         )
 
         self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='import_users success: 1')],
+            [job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1')],
         )
 
         with self.assertRaisesRegex(

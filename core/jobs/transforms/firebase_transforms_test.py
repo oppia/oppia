@@ -22,7 +22,7 @@ import unittest
 from unittest import mock
 
 from core.jobs import job_test_utils
-from core.jobs.transforms import firebase_transforms
+from core.jobs.transforms import firebase_transforms, job_result_transforms
 from core.jobs.types import job_run_result
 
 import apache_beam as beam
@@ -50,33 +50,24 @@ class FakeBatchResult(
 class FakeFirebaseBatchOperation(
     firebase_transforms.FirebaseBatchOperation[str, FakeBatchResult]
 ):
-    """Concrete subclass that delegates handle_input_batch to a callable."""
+    """Concrete subclass that delegates handle_batched_items to a callable."""
 
     def __init__(
-        self,
-        batch_handler: Callable[[list[str]], FakeBatchResult],
-        label: str | None = None,
+        self, batch_handler: Callable[[list[str]], FakeBatchResult]
     ) -> None:
-        super().__init__('fake_operation', label=label)
+        super().__init__()
         self._batch_handler = batch_handler
 
-    def handle_input_batch(self, batch: list[str]) -> FakeBatchResult:
+    def setup(self) -> None:
+        """Skips Firebase initialization in tests."""
+        pass
+
+    def handle_batched_items(self, batch: list[str]) -> FakeBatchResult:
         return self._batch_handler(batch)
 
 
 class FirebaseBatchOperationTests(unittest.TestCase):
     """Tests for FirebaseBatchOperation that don't require a pipeline."""
-
-    def test_init_with_operation_name_sets_attribute(self) -> None:
-        class StubOp(
-            firebase_transforms.FirebaseBatchOperation[str, FakeBatchResult]
-        ):
-            """Dummy subclass for testing."""
-
-            pass
-
-        op = StubOp('my_op')
-        self.assertEqual(op.operation_name, 'my_op')
 
     def test_handle_input_batch_without_subclass_override_raises_not_implemented(
         self,
@@ -88,31 +79,113 @@ class FirebaseBatchOperationTests(unittest.TestCase):
 
             pass
 
-        op = StubOp('my_op')
+        op = StubOp()
         with self.assertRaisesRegex(
-            NotImplementedError, 'Subclasses must override'
+            NotImplementedError, 'Subclasses must override this function'
         ):
-            op.handle_input_batch([])
+            op.handle_batched_items([])
+
+
+class DeleteRecordsPipelineTests(job_test_utils.PipelinedTestBase):
+    """Pipeline tests for DeleteRecords."""
+
+    def test_with_uids_reports_success_count(self) -> None:
+        do_fn = firebase_transforms.DeleteRecords()
+        inputs = self.pipeline | beam.Create(['uid1', 'uid2'])
+        output = (
+            inputs
+            | beam.combiners.ToList()
+            | beam.ParDo(do_fn).with_outputs(do_fn.SUCCESS_TAG, do_fn.ERROR_TAG)
+            | job_result_transforms.FromTaggedOutputs(
+                do_fn.SUCCESS_TAG,
+                do_fn.ERROR_TAG,
+                prefix='delete',
+            )
+        )
+        with (
+            mock.patch('firebase_admin.initialize_app'),
+            mock.patch.object(
+                firebase_auth,
+                'delete_users',
+                return_value=FakeBatchResult(),
+            ),
+        ):
+            self.assert_pcoll_equal(
+                output,
+                [job_run_result.JobRunResult(stdout='delete SUCCESS: 2')],
+            )
+
+
+class ImportRecordsPipelineTests(job_test_utils.PipelinedTestBase):
+    """Pipeline tests for ImportRecords."""
+
+    def test_with_records_reports_success_count(self) -> None:
+        do_fn = firebase_transforms.ImportRecords()
+        records = [
+            firebase_auth.ImportUserRecord(uid='uid1'),
+            firebase_auth.ImportUserRecord(uid='uid2'),
+        ]
+        inputs = self.pipeline | beam.Create(records)
+        output = (
+            inputs
+            | beam.combiners.ToList()
+            | beam.ParDo(do_fn).with_outputs(do_fn.SUCCESS_TAG, do_fn.ERROR_TAG)
+            | job_result_transforms.FromTaggedOutputs(
+                do_fn.SUCCESS_TAG,
+                do_fn.ERROR_TAG,
+                prefix='import',
+            )
+        )
+        with (
+            mock.patch('firebase_admin.initialize_app'),
+            mock.patch.object(
+                firebase_auth,
+                'import_users',
+                return_value=FakeBatchResult(),
+            ),
+        ):
+            self.assert_pcoll_equal(
+                output,
+                [job_run_result.JobRunResult(stdout='import SUCCESS: 2')],
+            )
 
 
 class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
     """Pipeline tests for FirebaseBatchOperation using a "fake" subclass."""
 
+    def _run_fake_operation(
+        self,
+        inputs: beam.PCollection,
+        batch_handler: Callable[[list[str]], FakeBatchResult],
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Test-only helper for producing the output type used in production."""
+        do_fn = FakeFirebaseBatchOperation(batch_handler=batch_handler)
+        return (
+            inputs
+            | beam.combiners.ToList()
+            | beam.ParDo(do_fn).with_outputs(do_fn.SUCCESS_TAG, do_fn.ERROR_TAG)
+            | job_result_transforms.FromTaggedOutputs(
+                do_fn.SUCCESS_TAG,
+                do_fn.ERROR_TAG,
+                prefix='fake_operation',
+            )
+        )
+
     def test_expand_with_no_inputs_produces_no_output(self) -> None:
         inputs = self.pipeline | beam.Create([])
-        output = inputs | FakeFirebaseBatchOperation(
-            batch_handler=lambda batch: FakeBatchResult()
+        output = self._run_fake_operation(
+            inputs, batch_handler=lambda batch: FakeBatchResult()
         )
         self.assert_pcoll_empty(output)
 
     def test_expand_with_successful_inputs_reports_ok_count(self) -> None:
         inputs = self.pipeline | beam.Create(['a', 'b', 'c'])
-        output = inputs | FakeFirebaseBatchOperation(
-            batch_handler=lambda batch: FakeBatchResult()
+        output = self._run_fake_operation(
+            inputs, batch_handler=lambda batch: FakeBatchResult()
         )
         self.assert_pcoll_equal(
             output,
-            [job_run_result.JobRunResult(stdout='fake_operation success: 3')],
+            [job_run_result.JobRunResult(stdout='fake_operation SUCCESS: 3')],
         )
 
     def test_expand_with_batch_value_error_reports_error(self) -> None:
@@ -120,14 +193,14 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             raise ValueError('bad input')
 
         inputs = self.pipeline | beam.Create(['a'])
-        output = inputs | FakeFirebaseBatchOperation(
-            batch_handler=raise_value_error
+        output = self._run_fake_operation(
+            inputs, batch_handler=raise_value_error
         )
         self.assert_pcoll_equal(
             output,
             [
                 job_run_result.JobRunResult(
-                    stderr='ERROR: fake_operation at slice=[0:1]: bad input'
+                    stderr='fake_operation ERROR: with slice=[0:1]: bad input'
                 ),
             ],
         )
@@ -137,37 +210,38 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             raise firebase_auth.UserNotFoundError('missing')
 
         inputs = self.pipeline | beam.Create(['a', 'b'])
-        output = inputs | FakeFirebaseBatchOperation(
-            batch_handler=raise_firebase_error
+        output = self._run_fake_operation(
+            inputs, batch_handler=raise_firebase_error
         )
         self.assert_pcoll_equal(
             output,
             [
                 job_run_result.JobRunResult(
-                    stderr='ERROR: fake_operation at slice=[0:2]: missing'
+                    stderr='fake_operation ERROR: with slice=[0:2]: missing'
                 ),
             ],
         )
 
     def test_expand_with_individual_failures_reports_each_error(self) -> None:
         inputs = self.pipeline | beam.Create(['a', 'b', 'c'])
-        output = inputs | FakeFirebaseBatchOperation(
+        output = self._run_fake_operation(
+            inputs,
             batch_handler=lambda batch: FakeBatchResult(
                 errors=[
                     FakeBatchError(0, 'fail-a'),
                     FakeBatchError(2, 'fail-c'),
                 ],
-            )
+            ),
         )
         self.assert_pcoll_equal(
             output,
             [
-                job_run_result.JobRunResult(stdout='fake_operation success: 1'),
+                job_run_result.JobRunResult(stdout='fake_operation SUCCESS: 1'),
                 job_run_result.JobRunResult(
-                    stderr='ERROR: fake_operation at index=[0]: fail-a'
+                    stderr='fake_operation ERROR: with index=[0]: fail-a'
                 ),
                 job_run_result.JobRunResult(
-                    stderr='ERROR: fake_operation at index=[2]: fail-c'
+                    stderr='fake_operation ERROR: with index=[2]: fail-c'
                 ),
             ],
         )
@@ -176,39 +250,43 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
         self,
     ) -> None:
         inputs = self.pipeline | beam.Create(['a', 'b'])
-        output = inputs | FakeFirebaseBatchOperation(
+        output = self._run_fake_operation(
+            inputs,
             batch_handler=lambda batch: FakeBatchResult(
                 errors=[FakeBatchError(1, 'fail-b')],
-            )
+            ),
         )
         self.assert_pcoll_equal(
             output,
             [
-                job_run_result.JobRunResult(stdout='fake_operation success: 1'),
+                job_run_result.JobRunResult(stdout='fake_operation SUCCESS: 1'),
                 job_run_result.JobRunResult(
-                    stderr='ERROR: fake_operation at index=[1]: fail-b'
+                    stderr='fake_operation ERROR: with index=[1]: fail-b'
                 ),
             ],
         )
 
-    def test_expand_with_all_inputs_failed_produces_no_ok_count(self) -> None:
+    def test_expand_with_all_inputs_failed_produces_no_ok_count(
+        self,
+    ) -> None:
         inputs = self.pipeline | beam.Create(['a', 'b'])
-        output = inputs | FakeFirebaseBatchOperation(
+        output = self._run_fake_operation(
+            inputs,
             batch_handler=lambda batch: FakeBatchResult(
                 errors=[
                     FakeBatchError(0, 'fail-a'),
                     FakeBatchError(1, 'fail-b'),
                 ],
-            )
+            ),
         )
         self.assert_pcoll_equal(
             output,
             [
                 job_run_result.JobRunResult(
-                    stderr='ERROR: fake_operation at index=[0]: fail-a'
+                    stderr='fake_operation ERROR: with index=[0]: fail-a'
                 ),
                 job_run_result.JobRunResult(
-                    stderr='ERROR: fake_operation at index=[1]: fail-b'
+                    stderr='fake_operation ERROR: with index=[1]: fail-b'
                 ),
             ],
         )
@@ -227,19 +305,21 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
                 raise ValueError('batch-2-error')
 
         inputs = self.pipeline | beam.Create(['a', 'b', 'c'])
-        with self.swap(firebase_transforms, 'FIREBASE_BATCH_LIMIT', 2):
-            output = inputs | FakeFirebaseBatchOperation(
-                batch_handler=per_batch_handler
+        with self.swap(
+            firebase_transforms.FirebaseBatchOperation, 'BATCH_LIMIT', 2
+        ):
+            output = self._run_fake_operation(
+                inputs, batch_handler=per_batch_handler
             )
             self.assert_pcoll_equal(
                 output,
                 [
                     job_run_result.JobRunResult(
-                        stdout='fake_operation success: 2'
+                        stdout='fake_operation SUCCESS: 2'
                     ),
                     job_run_result.JobRunResult(
                         stderr=(
-                            'ERROR: fake_operation at slice=[2:3]: '
+                            'fake_operation ERROR: with slice=[2:3]: '
                             'batch-2-error'
                         )
                     ),

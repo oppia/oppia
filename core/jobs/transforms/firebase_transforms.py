@@ -20,121 +20,102 @@ from __future__ import annotations
 
 import itertools
 
-from core.jobs.types import job_run_result
+from core.platform.auth import firebase_auth_services
 
 import apache_beam as beam
+import firebase_admin
 import firebase_admin.auth as firebase_auth
 import firebase_admin.exceptions as firebase_exceptions
+from apache_beam import pvalue
+from apache_beam.utils import shared
 from typing import Generic, Iterator, TypeVar
 
-FIREBASE_BATCH_LIMIT = 1000
-
-FirebaseBatchInputType = TypeVar(
-    'FirebaseBatchInputType',
+InputType = TypeVar(
+    'InputType',
     bound=(str | firebase_auth.ImportUserRecord),
 )
 
-FirebaseBatchOutputType = TypeVar(
-    'FirebaseBatchOutputType',
+OutputType = TypeVar(
+    'OutputType',
     bound=(firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult),
 )
 
-OK_TAG = 'OK'
-ERROR_TAG = 'ERROR'
-
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class FirebaseBatchOperation(
-    beam.PTransform,  # type: ignore[misc]
-    Generic[FirebaseBatchInputType, FirebaseBatchOutputType],
-):
+class FirebaseBatchOperation(beam.DoFn, Generic[InputType, OutputType]):  # type: ignore[misc]
     """Executes a batch operation against Firebase and returns the results."""
 
-    def __init__(self, operation_name: str, label: str | None = None) -> None:
-        super().__init__(label)
-        self.operation_name = operation_name
+    BATCH_LIMIT = 1000
 
-    def expand(
+    SUCCESS_TAG = 'SUCCESS'
+    ERROR_TAG = 'ERROR'
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.app: firebase_admin.App | None = None
+        self.process_state = shared.Shared()
+
+    def handle_batched_items(self, _: list[InputType]) -> OutputType:
+        """Virtual function to call a specific Firebase Admin SDK operation."""
+        raise NotImplementedError('Subclasses must override this function')
+
+    def setup(self) -> None:
+        """Establishes Firebase Admin SDK connection within a worker process."""
+        firebase_auth_services.establish_firebase_connection()
+
+    def process(
         self,
-        inputs: beam.PCollection[FirebaseBatchInputType],
-    ) -> beam.PCollection[job_run_result.JobRunResult]:
-        batch_operation_results = (
-            inputs
-            | 'Load all inputs into one worker' >> beam.combiners.ToList()
-            | f'Handle inputs in batches with {self.operation_name}'
-            >> beam.FlatMap(self._handle_inputs).with_outputs(OK_TAG, ERROR_TAG)
-        )
-
-        ok_results = (
-            batch_operation_results[OK_TAG]
-            | 'Count OKs' >> beam.CombineGlobally(sum)
-            | 'Omit OKs when zero' >> beam.Filter(lambda oks: oks > 0)
-            | 'Format OKs'
-            >> beam.Map(lambda oks: f'{self.operation_name} success: {oks}')
-            | 'Dump OKs into stdout'
-            >> beam.Map(job_run_result.JobRunResult.as_stdout)
-        )
-
-        error_results = (
-            batch_operation_results[ERROR_TAG]
-            | 'Format errors'
-            >> beam.Map(lambda msg: f'ERROR: {self.operation_name} at {msg}')
-            | 'Dump errors into stderr'
-            >> beam.Map(job_run_result.JobRunResult.as_stderr)
-        )
-
-        return (ok_results, error_results) | beam.Flatten()
-
-    def handle_input_batch(
-        self,
-        batch: list[FirebaseBatchInputType],
-    ) -> FirebaseBatchOutputType:
-        """Calls the batch operation. Subclasses must override this method.
-
-        Args:
-            batch: list[FirebaseBatchInputType]. The batch to process.
-
-        Raises:
-            NotImplementedError. Unless overridden by a subclass.
-        """
-        raise NotImplementedError('Subclasses must override handle_input_batch')
-
-    def _handle_inputs(
-        self,
-        inputs: list[FirebaseBatchInputType],
-    ) -> Iterator[beam.TaggedOutput]:
-        """Processes inputs in batches and yields tagged success/error outputs.
-
-        Args:
-            inputs: list[FirebaseBatchInputType]. All items to process.
-
-        Yields:
-            TaggedOutput. Tagged outputs for success counts and errors.
-        """
+        inputs: list[InputType],
+    ) -> Iterator[pvalue.TaggedOutput]:
+        """Common batch processing logic for Firebase Admin SDK operations."""
         input_iter = iter(inputs)
-        handled_count = 0
-        failure_count = 0
-        failure_messages = []
+        used_count = 0
+        fail_count = 0
+        error_messages = []
 
-        while batch := list(itertools.islice(input_iter, FIREBASE_BATCH_LIMIT)):
+        while batch := list(itertools.islice(input_iter, self.BATCH_LIMIT)):
             try:
-                output = self.handle_input_batch(batch)
+                output: OutputType = self.handle_batched_items(batch)
             except (ValueError, firebase_exceptions.FirebaseError) as e:
-                failure_count += len(batch)
-                failure_messages.append(
-                    f'slice=[{handled_count}:{handled_count + len(batch)}]: {e}'
+                fail_count += len(batch)
+                error_messages.append(
+                    f'with slice=[{used_count}:{used_count + len(batch)}]: {e}'
                 )
             else:
-                failure_count += output.failure_count
-                failure_messages.extend(
-                    f'index=[{handled_count + e.index}]: {e.reason}'
+                fail_count += output.failure_count
+                error_messages.extend(
+                    f'with index=[{used_count + e.index}]: {e.reason}'
                     for e in output.errors
                 )
             finally:
-                handled_count += len(batch)
+                used_count += len(batch)
 
-        if ok_count := handled_count - failure_count:
-            yield beam.TaggedOutput(OK_TAG, ok_count)
+        if success_count := used_count - fail_count:
+            yield beam.TaggedOutput(self.SUCCESS_TAG, success_count)
 
-        for message in failure_messages:
-            yield beam.TaggedOutput(ERROR_TAG, message)
+        for error_message in error_messages:
+            yield beam.TaggedOutput(self.ERROR_TAG, error_message)
+
+
+class DeleteRecords(
+    FirebaseBatchOperation[str, firebase_auth.DeleteUsersResult]
+):
+    """Deletes users from Firebase by their UIDs in batches."""
+
+    def handle_batched_items(
+        self, uids: list[str]
+    ) -> firebase_auth.DeleteUsersResult:
+        return firebase_auth.delete_users(uids)
+
+
+class ImportRecords(
+    FirebaseBatchOperation[
+        firebase_auth.ImportUserRecord, firebase_auth.UserImportResult
+    ]
+):
+    """Imports users into Firebase in batches."""
+
+    def handle_batched_items(
+        self, users: list[firebase_auth.ImportUserRecord]
+    ) -> firebase_auth.UserImportResult:
+        return firebase_auth.import_users(users)
