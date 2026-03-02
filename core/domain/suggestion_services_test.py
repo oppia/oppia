@@ -202,6 +202,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.id = exploration_id
             self.states = states
             self.category = 'Algebra'
+            self.version = 1
 
     # All mock explorations created for testing.
     explorations = [
@@ -1980,6 +1981,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.id = exploration_id
             self.states = states
             self.category = 'Algebra'
+            self.version = 1
 
         def get_content_html(self, state_name: str, content_id: str) -> str:
             """Used to mock the get_content_html method for explorations."""
