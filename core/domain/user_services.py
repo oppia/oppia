@@ -3300,7 +3300,6 @@ def get_translation_rights_from_model(
     return user_domain.TranslationCoordinatorStats(
         translation_coordinator_model.id,
         translation_coordinator_model.coordinator_ids,
-        translation_coordinator_model.coordinators_count,
     )
 
 
@@ -3349,7 +3348,6 @@ def deassign_user_from_all_languages(
 
     for translation_rights in translation_rights_list:
         translation_rights.coordinator_ids.remove(user_id)
-        translation_rights.coordinators_count -= 1
         language_rights = suggestion_models.TranslationCoordinatorsModel(
             id=translation_rights.language_id,
             coordinator_ids=translation_rights.coordinator_ids,

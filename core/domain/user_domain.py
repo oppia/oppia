@@ -1833,11 +1833,39 @@ class TranslationCoordinatorStats:
         self,
         language_id: str,
         coordinator_ids: List[str],
-        coordinators_count: int,
     ) -> None:
         self.language_id = language_id
         self.coordinator_ids = coordinator_ids
-        self.coordinators_count = coordinators_count
+
+    @property
+    def coordinators_count(self) -> int:
+        """Returns the number of coordinators for this language."""
+        return len(self.coordinator_ids)
+
+    def validate(self) -> None:
+        """Validates the TranslationCoordinatorStats domain object.
+
+        Raises:
+            ValidationError. language_id is not a valid ISO 639-1 code.
+            ValidationError. coordinator_ids is not a list.
+            ValidationError. coordinator_ids contains a non-string entry.
+            ValidationError. coordinator_ids contains duplicate user IDs.
+        """
+        if not re.fullmatch('[a-z]{2}', self.language_id):
+            raise utils.ValidationError(
+                'Invalid language_id: %s' % self.language_id
+            )
+        if not isinstance(self.coordinator_ids, list):
+            raise utils.ValidationError('coordinator_ids must be a list.')
+        for coordinator_id in self.coordinator_ids:
+            if not isinstance(coordinator_id, str) or not coordinator_id:
+                raise utils.ValidationError(
+                    'Each coordinator_id must be a non-empty string.'
+                )
+        if len(self.coordinator_ids) != len(set(self.coordinator_ids)):
+            raise utils.ValidationError(
+                'coordinator_ids must not contain duplicate user IDs.'
+            )
 
     def to_dict(self) -> TranslationCoordinatorStatsDict:
         """Returns a dict representaion of TranslationCoordinatorStats.

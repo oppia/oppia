@@ -458,9 +458,7 @@ def get_all_translation_coordinator_stats(
             .fetch()
         )
     return [
-        user_domain.TranslationCoordinatorStats(
-            model.id, model.coordinator_ids, model.coordinators_count
-        )
+        user_domain.TranslationCoordinatorStats(model.id, model.coordinator_ids)
         for model in translation_coordinator_models
     ]
 

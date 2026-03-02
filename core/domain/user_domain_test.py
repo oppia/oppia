@@ -1917,10 +1917,55 @@ class TranslationCoordinatorStatsUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         actual_stats = user_domain.TranslationCoordinatorStats(
-            'en', ['user1', 'user2'], 2
+            'en', ['user1', 'user2']
         )
 
         self.assertDictEqual(actual_stats.to_dict(), self.expected_stats_dict)
+
+    def test_validate_passes_for_valid_object(self) -> None:
+        stats = user_domain.TranslationCoordinatorStats(
+            'en', ['user1', 'user2']
+        )
+        stats.validate()
+
+    def test_validate_raises_for_invalid_language_id(self) -> None:
+        stats = user_domain.TranslationCoordinatorStats('invalid', ['user1'])
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language_id: invalid'
+        ):
+            stats.validate()
+
+    def test_validate_raises_for_non_list_coordinator_ids(self) -> None:
+        stats = user_domain.TranslationCoordinatorStats('en', ['user1'])
+        stats.coordinator_ids = 'not_a_list'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'coordinator_ids must be a list.'
+        ):
+            stats.validate()
+
+    def test_validate_raises_for_empty_coordinator_id(self) -> None:
+        stats = user_domain.TranslationCoordinatorStats('en', [''])
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Each coordinator_id must be a non-empty string.',
+        ):
+            stats.validate()
+
+    def test_validate_raises_for_duplicate_coordinator_id(self) -> None:
+        stats = user_domain.TranslationCoordinatorStats(
+            'en', ['user1', 'user1']
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'coordinator_ids must not contain duplicate user IDs.',
+        ):
+            stats.validate()
+
+    def test_coordinators_count_equals_length_of_coordinator_ids(self) -> None:
+        stats = user_domain.TranslationCoordinatorStats(
+            'en', ['user1', 'user2', 'user3']
+        )
+        self.assertEqual(stats.coordinators_count, len(stats.coordinator_ids))
 
 
 class UserContributionRightsUnitTest(test_utils.GenericTestBase):
