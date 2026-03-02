@@ -380,6 +380,13 @@ describe('Exploration Summary Tile Component', () => {
     component.checkIfMobileCardToBeShown();
 
     expect(component.mobileCardToBeShown).toBe(false);
+
+    component.isWindowLarge = true;
+    urlPathSpy.and.returnValue('/create');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(false);
   });
 
   it('should set the hover state to true', () => {
