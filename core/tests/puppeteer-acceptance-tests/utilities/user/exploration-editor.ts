@@ -4786,11 +4786,12 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
     category: string = 'Mathematics',
-    numberOfCards: number = 2
+    numberOfCards: number = 2,
+    expectedWelcomeModal: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
 
     for (let i = 0; i < numberOfCards - 1; i++) {
       await this.updateCardContent(`Content ${i}`);
