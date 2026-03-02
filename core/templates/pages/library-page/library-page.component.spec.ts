@@ -93,8 +93,13 @@ class MockTranslateService {
   }
 }
 
+// Browser engines report RTL scroll offsets in different modes:
+// - 'default': positive values increase from left to right.
+// - 'negative': values are non-positive and become more negative rightward.
+// - 'reverse': positive values increase from right to left.
 type RtlScrollType = 'default' | 'negative' | 'reverse';
 
+// This interface is used by tests to access private RTL scroll helpers.
 interface LibraryPageComponentPrivateMethods {
   getRtlScrollType: () => RtlScrollType;
   getNormalizedScrollLeft: (carouselElement: HTMLElement) => number;
