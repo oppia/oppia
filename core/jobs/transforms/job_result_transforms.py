@@ -22,7 +22,79 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 import result
+from apache_beam import pvalue
 from typing import Any, Optional, Tuple
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
+    """Builds JobRunResults from PCollections organized into tagged outputs.
+
+    Examples:
+        FromTaggedOutputs('PASS', 'FAIL'):
+            stdout='PASS: 30'
+            stderr='FAIL: 1st error message'
+                   'FAIL: 2nd error message'
+                   'FAIL: 3rd error message'
+        FromTaggedOutputs('OK', 'ERR', 'WARN', prefix='MyJob'):
+            stdout='MyJob OK: 30'
+            stderr='MyJob ERR: 1st error message'
+                   'MyJob ERR: 2nd error message'
+                   'MyJob ERR: 3rd error message'
+                   'MyJob WARN: 1st warning message'
+                   'MyJob WARN: 2nd warning message'
+
+    Attributes:
+        pass_tag: str | None. Tag mapped to a PCollection[int]. Default: 'main'.
+        fail_tags: tuple[str, ...]. Tags each mapped to a PCollection[str].
+        prefix: str. String prepended to every message.
+    """
+
+    def __init__(
+        self,
+        pass_tag: str | None,
+        *fail_tags: str,
+        prefix: str = '',
+        label: str | None = None,
+    ) -> None:
+        if pass_tag in fail_tags:
+            raise ValueError(f'{pass_tag=!r} must not be one of {fail_tags=!r}')
+        super().__init__(label=label)
+        self.pass_tag = pass_tag or 'main'
+        self.fail_tags = frozenset(fail_tags)
+        self.prefix = (prefix.removesuffix(' ') + ' ') if prefix else ''
+
+    def expand(
+        self, out: pvalue.DoOutputsTuple
+    ) -> pvalue.PCollection[job_run_result.JobRunResult]:
+        """Formats pass/fail tagged outputs as stdout/stderr job run results."""
+        stdout = (
+            out[tag := self.pass_tag]
+            | f'Sum of {tag}' >> beam.CombineGlobally(sum).without_defaults()
+            | f'Format {tag}' >> beam.Map(self._format_pass_tag)
+            | f'Output {tag}' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        )
+        stderr_iter = (
+            out[tag]
+            | f'Format {tag}' >> beam.Map(self._format_fail_tag, tag)
+            | f'Output {tag}' >> beam.Map(job_run_result.JobRunResult.as_stderr)
+            for tag in self.fail_tags
+        )
+        return (stdout, *stderr_iter) | 'Flatten outputs' >> beam.Flatten()
+
+    def _extract_input_pvalues(
+        self, out: pvalue.DoOutputsTuple
+    ) -> tuple[pvalue.DoOutputsTuple, dict[str, pvalue.PCollection]]:
+        """Needs to be overriden when input type doesn't inherit from PValue."""
+        return out, {tag: out[tag] for tag in {self.pass_tag, *self.fail_tags}}
+
+    def _format_pass_tag(self, pass_num: int) -> str:
+        """Formats the "pass" number."""
+        return f'{self.prefix}{self.pass_tag}: {pass_num}'
+
+    def _format_fail_tag(self, fail_msg: str, fail_tag: str) -> str:
+        """Formats the "fail" message."""
+        return f'{self.prefix}{fail_tag}: {fail_msg}'
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of

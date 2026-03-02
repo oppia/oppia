@@ -22,6 +22,7 @@ import dataclasses
 
 from core.jobs import base_jobs
 from core.jobs.io import firebase_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import firebase_adapters, job_run_result
 
 import apache_beam as beam
@@ -31,70 +32,52 @@ TAG_ERROR = 'ERROR'
 TAG_WARNING = 'WARNING'
 TAG_OK = 'OK'
 
+KEY_WITH_EMAIL_FN = lambda record: (record.email, record)
+
 
 class FirebaseAuditRecordsJob(base_jobs.JobBase):
     """Audit Firebase records against the records that Oppia claims to exist."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        with_email_keys = lambda record: (record.email, record)
-
         from_oppia = (
             self.pipeline
-            | 'Get Oppia users' >> firebase_io.GetWeakRecords()
-            | 'Key Oppia users by email' >> beam.Map(with_email_keys)
+            | 'Get Oppia Users' >> firebase_io.GetWeakRecords()
+            | 'Key Oppia Users by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
         )
 
         from_firebase = (
             self.pipeline
-            | 'Get Firebase records' >> firebase_io.GetStrongRecords()
-            | 'Key Firebase records by email' >> beam.Map(with_email_keys)
+            | 'Get Firebase Records' >> firebase_io.GetStrongRecords()
+            | 'Key Firebase Records by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
         )
 
-        audited_groups = (
+        return (
             {'from_oppia': from_oppia, 'from_firebase': from_firebase}
-            | 'Group records by email' >> beam.CoGroupByKey()
-            | 'Drop email key' >> beam.Map(lambda key_value: key_value[1])
-            | 'Audit grouped records'
-            >> beam.FlatMap(self._audit_grouped_records).with_outputs(
-                TAG_ERROR, TAG_WARNING, TAG_OK
+            | 'Group Records by Email' >> beam.CoGroupByKey()
+            | 'Drop Email Key' >> beam.Map(lambda key_value: key_value[1])
+            | 'Audit Records'
+            >> beam.ParDo(_AuditRecords()).with_outputs(
+                TAG_OK, TAG_WARNING, TAG_ERROR
+            )
+            | 'Summarize Audit Results'
+            >> job_result_transforms.FromTaggedOutputs(
+                TAG_OK, TAG_WARNING, TAG_ERROR
             )
         )
 
-        error_results = (
-            audited_groups[TAG_ERROR]
-            | 'Format errors' >> beam.Map(lambda msg: f'ERROR: {msg}')
-            | 'Dump errors into stderr'
-            >> beam.Map(job_run_result.JobRunResult.as_stderr)
-        )
 
-        warning_results = (
-            audited_groups[TAG_WARNING]
-            | 'Format warnings' >> beam.Map(lambda msg: f'WARNING: {msg}')
-            | 'Dump warnings into stderr'
-            >> beam.Map(job_run_result.JobRunResult.as_stderr)
-        )
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class _AuditRecords(beam.DoFn):  # type: ignore[misc]
+    """Audits records using tagged outputs to group findings by severity."""
 
-        ok_results = (
-            audited_groups[TAG_OK]
-            | 'Count OKs' >> beam.CombineGlobally(sum)
-            | 'Omit OKs when zero' >> beam.Filter(lambda oks: oks > 0)
-            | 'Format OKs' >> beam.Map(lambda oks: f'OK: {oks}')
-            | 'Dump OKs into stdout'
-            >> beam.Map(job_run_result.JobRunResult.as_stdout)
-        )
-
-        return (ok_results, error_results, warning_results) | beam.Flatten()
-
-    class _RecordsGroupedByEmail(TypedDict):
-        """Typings for the CoGroupByKey() output of joined records."""
+    class GroupedByEmail(TypedDict):
+        """Typings for the CoGroupByKey() output joined by email."""
 
         from_oppia: Iterable[firebase_adapters.WeakRecord]
         from_firebase: Iterable[firebase_adapters.StrongRecord]
 
-    def _audit_grouped_records(
-        self, grouped: _RecordsGroupedByEmail
-    ) -> Iterable[beam.TaggedOutput]:
-        """Audits records using tagged outputs to group messages by severity."""
+    def process(self, grouped: GroupedByEmail) -> Iterable[beam.TaggedOutput]:
+        """Yields tagged outputs which will group audit findings by severity."""
         from_oppia = tuple(grouped['from_oppia'])
         from_firebase = tuple(grouped['from_firebase'])
         collisions_found = False
@@ -140,11 +123,7 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
 
         elif oppia_record != firebase_record:
             oppia_dict = dataclasses.asdict(oppia_record)
-            user_id = oppia_dict['user_id']
-
             firebase_dict = dataclasses.asdict(firebase_record)
-            firebase_id = firebase_dict['auth_id']
-
             inconsistent_fields = ', '.join(
                 f'the field {k!r} is {oppia!r} in Oppia but {firebase!r} in '
                 'Firebase'
@@ -152,6 +131,8 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
                 if (firebase := firebase_dict[k]) != (oppia := oppia_dict[k])
             )
 
+            user_id = oppia_dict['user_id']
+            firebase_id = firebase_dict['auth_id']
             yield beam.TaggedOutput(
                 TAG_WARNING,
                 f'Oppia user ({user_id=!r}) is inconsistent with its '

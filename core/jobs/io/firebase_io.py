@@ -18,13 +18,10 @@
 
 from __future__ import annotations
 
-import hashlib
-
-from core.constants import constants
 from core.jobs.io import ndb_io
-from core.jobs.transforms import firebase_transforms
 from core.jobs.types import firebase_adapters
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 
 import apache_beam as beam
 import firebase_admin.auth as firebase_auth
@@ -39,6 +36,47 @@ auth_models, user_models = models.Registry.import_models(
     [models.Names.AUTH, models.Names.USER]
 )
 
+KEY_WITH_ID_FN = lambda model: (model.id, model)
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
+    """Gets the collection of "weak" records from Oppia's user & auth models.
+
+    These records are considered to be "weak" because they are NOT based on real
+    data. Instead, they are built using Oppia's internal association models,
+    under the assumption that they are consistent with "strong" (real) records.
+    """
+
+    def expand(
+        self, pbegin: pvalue.PBegin
+    ) -> beam.PCollection[firebase_adapters.WeakRecord]:
+        """Returns all of the "weak" records from Oppia's user & auth models."""
+
+        settings_pcoll = (
+            pbegin
+            | 'Get UserSettingsModels'
+            >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all(include_deleted=True)
+            )
+            | 'Key UserSettingsModels by ID' >> beam.Map(KEY_WITH_ID_FN)
+        )
+
+        auth_details_pcoll = (
+            pbegin
+            | 'Get UserAuthDetailsModels'
+            >> ndb_io.GetModels(
+                auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
+            )
+            | 'Key UserAuthDetailsModels by ID' >> beam.Map(KEY_WITH_ID_FN)
+        )
+
+        return (
+            {'settings': settings_pcoll, 'auth_details': auth_details_pcoll}
+            | 'Group Models by ID' >> beam.CoGroupByKey()
+            | 'Zip Into Weak Records' >> beam.ParDo(_ZipIntoWeakRecords())
+        )
+
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
 class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
@@ -52,180 +90,54 @@ class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
     def expand(
         self, pbegin: pvalue.PBegin
     ) -> beam.PCollection[firebase_adapters.StrongRecord]:
-        """Returns all of the records directly from Firebase.
+        """Returns all of the records directly from Firebase."""
 
-        Args:
-            pbegin: PBegin. The beginning of the pipeline.
-
-        Returns:
-            PCollection[StrongRecord]. The records stored in Firebase.
-        """
         return (
             pbegin
             | 'Create singleton PCollection to begin with exactly ONE worker'
             >> beam.Create((None,))
             | 'Load all Firebase records into worker with Firebase Admin SDK'
-            >> beam.ParDo(lambda _: firebase_auth.list_users().iterate_all())
+            >> beam.ParDo(self._list_users)
             | 'Build adapter records'
             >> beam.Map(firebase_adapters.StrongRecord.from_export)
         )
 
+    def _list_users(
+        self, _: None
+    ) -> Iterable[firebase_auth.ExportedUserRecord]:
+        """Yields all records provided from the Firebase Admin SDK."""
+        firebase_auth_services.establish_firebase_connection()
+        yield from firebase_auth.list_users().iterate_all()
+
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
-    """Gets the collection of "weak" records based on Oppia's user auth models.
+class _ZipIntoWeakRecords(beam.DoFn):  # type: ignore[misc]
+    """Zips fields in Oppia's user/auth models into "weak" Firebase records."""
 
-    These records are considered to be "weak" because they are NOT based on real
-    data. Instead, they are built from Oppia's internal association models under
-    the assumption that they are consistent with the "strong" (real) records.
-    """
-
-    def expand(
-        self, pbegin: pvalue.PBegin
-    ) -> beam.PCollection[firebase_adapters.WeakRecord]:
-        """Returns all of the records *assumed* to be in Firebase.
-
-        Args:
-            pbegin: PBegin. The beginning of the pipeline.
-
-        Returns:
-            PCollection[WeakRecord]. The records assumed to exist in Firebase.
-        """
-        settings_models = (
-            pbegin
-            | 'Get UserSettingsModels'
-            >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all(include_deleted=True)
-            )
-            | 'Key UserSettingsModels by id'
-            >> beam.Map(lambda settings: (settings.id, settings))
-        )
-
-        auth_details_models = (
-            pbegin
-            | 'Get UserAuthDetailsModels'
-            >> ndb_io.GetModels(
-                auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
-            )
-            | 'Key UserAuthDetailsModels by id'
-            >> beam.Map(lambda auth_details: (auth_details.id, auth_details))
-        )
-
-        return (
-            {'settings': settings_models, 'auth_details': auth_details_models}
-            | 'Group models by id' >> beam.CoGroupByKey()
-            | 'Build adapter records'
-            >> beam.FlatMapTuple(self._build_adapter_record)
-        )
-
-    class _ModelsGroupedById(TypedDict):
-        """Typings for the CoGroupByKey() output of joined models."""
+    class OppiaUserAuthModels(TypedDict):
+        """Type returned by CoGroupByKey() when grouping models by ID."""
 
         settings: Iterable[user_models.UserSettingsModel]
         auth_details: Iterable[auth_models.UserAuthDetailsModel]
 
-    def _build_adapter_record(
-        self, user_id: str, grouped: _ModelsGroupedById
+    def process(
+        self, id_to_models: tuple[str, OppiaUserAuthModels]
     ) -> Iterable[firebase_adapters.WeakRecord]:
-        """Builds an adapter Firebase record from the models in the given group.
+        """Yields 0-1 weak Firebase records by zipping the input models."""
 
-        Sub-users (`UserAuthDetailsModel.parent_user_id` != None) rely on their
-        "parent" user for signing in, so they are skipped by this function.
-
-        Args:
-            user_id: str. The user ID shared by the models.
-            grouped: OppiaModelsGroupedByUserId. The grouped models.
-
-        Yields:
-            WeakRecord. A record built from the grouped models.
-
-        Raises:
-            ValueError. If the group doesn't hold EXACTLY ONE of each model.
-        """
-        settings_models = tuple(grouped['settings'])
-        auth_details_models = tuple(grouped['auth_details'])
+        user_id = id_to_models[0]
+        settings_list = list(id_to_models[1]['settings'])
+        auth_details_list = list(id_to_models[1]['auth_details'])
         try:
-            [(settings_model, auth_details_model)] = zip(
-                settings_models, auth_details_models, strict=True
-            )
+            strictly_zipped = zip(settings_list, auth_details_list, strict=True)
+            [(settings, auth_details)] = strictly_zipped
         except ValueError as e:
             raise ValueError(
-                f'Oppia user ({user_id=!r}) needs EXACTLY ONE of each model, '
-                f'but {len(settings_models)=} and {len(auth_details_models)=}'
+                f'Oppia users need EXACTLY ONE of each model, but {user_id=!r} '
+                f'has {len(settings_list)} UserSettingsModels and '
+                f'{len(auth_details_list)} UserAuthDetailsModels'
             ) from e
-        if record := firebase_adapters.WeakRecord.from_oppia_models(
-            settings_model, auth_details_model
+        if weak_record := firebase_adapters.WeakRecord.from_oppia_models(
+            settings, auth_details
         ):
-            yield record
-
-
-class DeleteRecords(
-    firebase_transforms.FirebaseBatchOperation[
-        str, firebase_auth.DeleteUsersResult
-    ]
-):
-    """Deletes records from Firebase."""
-
-    def __init__(self, label: str | None = None) -> None:
-        super().__init__('delete_users', label=label)
-
-    def handle_input_batch(
-        self, batch: list[str]
-    ) -> firebase_auth.DeleteUsersResult:
-        return firebase_auth.delete_users(batch)
-
-
-class ImportRecords(
-    firebase_transforms.FirebaseBatchOperation[
-        firebase_auth.ImportUserRecord, firebase_auth.UserImportResult
-    ]
-):
-    """Imports records into Firebase WITHOUT protecting against duplicates."""
-
-    def __init__(self, label: str | None = None) -> None:
-        super().__init__('import_users', label=label)
-
-    def handle_input_batch(
-        self, batch: list[firebase_auth.ImportUserRecord]
-    ) -> firebase_auth.UserImportResult:
-        return (
-            self._handle_input_batch_in_emulator_mode(batch)
-            if constants.EMULATOR_MODE
-            else firebase_auth.import_users(batch)
-        )
-
-    def _handle_input_batch_in_emulator_mode(
-        self, batch: list[firebase_auth.ImportUserRecord]
-    ) -> firebase_auth.UserImportResult:
-        """Creating users needs to be handled differently within EMULATOR_MODE.
-
-        When we migrated to Firebase Authentication we decided that, while Oppia
-        is running locally against the Firebase Authentication Emulator, users
-        should be created using email & password for authentication. This is
-        intentionally inconsistent with production, where we use Single Sign-On
-        (i.e. Google Sign-In) instead. This was done so that developers wouldn't
-        need to keep sensitive auth credentials on their local file system.
-
-        Args:
-            batch: list[ImportUserRecord]. The batch of records to import.
-
-        Returns:
-            UserImportResult. The result of the import operation.
-
-        Raises:
-            AssertionError. Email is required within EMULATOR_MODE.
-        """
-        # `import_users()` DOES NOT accept a raw password field, so we call
-        # `create_user()`, which DOES accept one, in a loop here instead.
-        for record in batch:
-            assert record.email, 'Email is required within EMULATOR_MODE.'
-            firebase_auth.create_user(
-                uid=record.uid,
-                email=record.email,
-                disabled=record.disabled,
-                # HINT: `md5(email)` makes this consistent with the frontend.
-                # See: core/templates/services/auth.service.ts.
-                password=hashlib.md5(record.email.encode()).hexdigest(),
-            )
-        # Manually build & return a result that's consistent with the real API.
-        return firebase_auth.UserImportResult({}, len(batch))
+            yield weak_record
