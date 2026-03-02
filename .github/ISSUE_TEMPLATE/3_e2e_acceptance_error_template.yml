@@ -26,21 +26,23 @@ body:
         3. Navigate to "Actions" tab.
         4. Find and select workflow "Stress Test (Acceptance Test)"
         5. Click on "Run Workflow" (found on middle-right of the screen, below "Actor" button)
-        6. Set number of runs to 20+
-        7. Insert acceptance test suite
+        6. Set the number of runs to 20 or more
+        7. Enter the failing acceptance test suite name
         8. Run the workflow
         9. Wait for the workflow to complete
         10. If the workflow fails, file an issue
-        11. If the workflow passes, try increasing number of runs in step 6 and rerun the workflow.
-  - type: checkboxs
+        11. If the workflow passes, increase the number of runs further and rerun it.
+  - type: checkboxes
     id: read-procedure
     attributes:
       label: I have read the procedure
       description: >
-        I have read the procedure and followed it.
+        You must reproduce the failure on develop via the Stress Test workflow before filing this issue.
     options:
-      - Yes, I have reproduced flake in develop branch.
-      - Yes, but I have seen this flake in develop itself.
+      - label: I reproduced the flake on the develop branch.
+      - label: I observed this flake directly on develop.
+    validations:
+      required: true
   - type: dropdown
     id: ci-test-type
     attributes:
