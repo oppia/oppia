@@ -1042,7 +1042,7 @@ textarea {
   content: "<";
 }
 
-[dir='rtl'] .oppia-navbar-breadcrumb-separator {
+.oppia-navbar-breadcrumb-rtl .oppia-navbar-breadcrumb-separator {
   margin-left: 8px;
   margin-right: 8px;
 }
