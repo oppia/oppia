@@ -49,7 +49,6 @@ tmpcompiledjs*
 uploads/*
 env/
 venv/
-.venv/
 *.db
 .DS_Store
 .idea
@@ -84,9 +83,3 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
-
-# Local development files.
-docs.md
-tmp_unzip.zip
-Pasted image*.png
-*.deb
