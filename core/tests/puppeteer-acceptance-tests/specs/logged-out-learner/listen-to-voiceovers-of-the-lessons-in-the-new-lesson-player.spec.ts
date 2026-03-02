@@ -215,6 +215,7 @@ describe('Logged-Out Learner', function () {
     // Change language to hindi.
     await loggedOutLearner.changeLessonLang('hi');
     await loggedOutLearner.clickOnContinueButton();
+    await loggedOutLearner.page.waitForTimeout(5000);
     if (!isMobileViewPort) {
       expect(await loggedOutLearner.expectTextPresentOnPage('Listen in')).toBe(
         true
@@ -234,6 +235,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.changeLessonLang('hi');
 
     await loggedOutLearner.clickOnContinueButton();
+    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.expectVoiceoverPlayable();
   });
 

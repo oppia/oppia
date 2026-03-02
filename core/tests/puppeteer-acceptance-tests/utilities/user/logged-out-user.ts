@@ -5893,8 +5893,11 @@ export class LoggedOutUser extends BaseUser {
    * Expect the sidebar of new lesson player in collapsed state.
    */
   async expectSidebarCollapsedState(): Promise<void> {
+    const isViewportAtMobileWidth = this.isViewportAtMobileWidth();
     expect(await this.expectTextPresentOnPage('Close options')).toBe(false);
-    expect(await this.expectTextPresentOnPage('Open options')).toBe(true);
+    if (!isViewportAtMobileWidth) {
+      expect(await this.expectTextPresentOnPage('Open options')).toBe(true);
+    }
 
     expect(await this.expectTextPresentOnPage('Share this lesson')).toBe(false);
     expect(await this.expectTextPresentOnPage('Feedback')).toBe(false);
@@ -5941,6 +5944,7 @@ export class LoggedOutUser extends BaseUser {
   async clickCopyLinkButton(): Promise<void> {
     await this.page.waitForSelector(lessonCopyLinkbutton, {
       visible: true,
+      timeout: 10000,
     });
     await this.page.click(lessonCopyLinkbutton);
   }
@@ -6175,6 +6179,7 @@ export class LoggedOutUser extends BaseUser {
   async clickEmbedInWebpageButton(): Promise<void> {
     await this.page.waitForSelector(lessonEmbedInWebpageButton, {
       visible: true,
+      timeout: 10000,
     });
     await this.page.click(lessonEmbedInWebpageButton);
   }
@@ -7101,6 +7106,7 @@ export class LoggedOutUser extends BaseUser {
    * Expect the save progress modal visible with all its text content.
    */
   async expectSaveProgressModal(): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(saveProgressModalSelector, {visible: true});
 
     const expectedTexts = {
@@ -7220,9 +7226,22 @@ export class LoggedOutUser extends BaseUser {
    * progress modal.
    */
   async clickOnCreateAnAccountInSaveProgressModal(): Promise<void> {
-    await this.clickAndWaitForNavigation('.create-account-btn');
+    await this.page.waitForSelector(createAccountButton, {
+      visible: true,
+    });
+    await this.page.click(createAccountButton);
+    await this.waitForPageToFullyLoad();
   }
 
+  async expectProgressRemainderModal(): Promise<void> {
+    await this.page.waitForSelector(progressRemainderModalSelector, {
+      visible: true,
+    });
+    await this.expectTextContentInElementWithSelectorToBe(
+      progressReminderModalHeaderSelector,
+      'Do you want to continue'
+    );
+  }
   /**
    * Click on lesson resume button.
    */

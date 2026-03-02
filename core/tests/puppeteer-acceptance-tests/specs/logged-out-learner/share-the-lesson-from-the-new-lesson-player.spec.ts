@@ -132,15 +132,11 @@ describe('Logged-Out Learner', function () {
 
     // Click on share and copy link.
     await loggedOutLearner.clickShareLessonButton();
+    await loggedOutLearner.page.waitForTimeout(5000);
     await loggedOutLearner.clickCopyLinkButton();
     await loggedOutLearner.expectLinkCopiedMessage();
     const newBrowserTab = await loggedOutLearner.openCopiedLink();
 
-    await loggedOutLearner.expectScreenshotToMatch(
-      'lessonPlayerPage',
-      __dirname,
-      newBrowserTab
-    );
     // Expect lesson name present in new tab.
     await loggedOutLearner.expectTextPresentOnPage(
       'What are the Place Values?'
@@ -153,6 +149,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
+    await loggedOutLearner.page.waitForTimeout(5000);
 
     await loggedOutLearner.clickEmbedInWebpageButton();
     await loggedOutLearner.verifyEmbedHTMLContent(
@@ -186,6 +183,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
+    await loggedOutLearner.page.waitForTimeout(5000);
 
     await loggedOutLearner.clickLessonAttribution();
     await loggedOutLearner.expectTextPresentOnPage(

@@ -313,6 +313,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to go forward by one card', async function () {
     await loggedOutLearner.closeConceptCard();
     await loggedOutLearner.clickOnContinueButton();
+    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.expectCheckpointCelebrationComponentAppears();
     expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
     expect(await loggedOutLearner.isBackButtonPresent()).toBe(true);
@@ -379,6 +380,14 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.closeHintModal();
     // Wait for few minutes to see the solution.
     await loggedOutLearner.page.waitForTimeout(300000);
+    // Submit few wrong answer.
+    await loggedOutLearner.submitFractionInputResponse('4');
+    await loggedOutLearner.page.waitForTimeout(10000);
+    await loggedOutLearner.submitFractionInputResponse('4');
+    await loggedOutLearner.page.waitForTimeout(20000);
+    await loggedOutLearner.submitFractionInputResponse('4');
+    await loggedOutLearner.page.waitForTimeout(20000);
+
     await loggedOutLearner.expectTextPresentOnPage('View Solution');
     await loggedOutLearner.expectConversationContentByButton(
       'View Solution',

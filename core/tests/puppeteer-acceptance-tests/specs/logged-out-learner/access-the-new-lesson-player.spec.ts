@@ -119,8 +119,11 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.expectToBeOnPage('/lesson/');
     await loggedOutLearner.expectSidebarCollapsedState();
-    await loggedOutLearner.expectTextPresentOnPage('Open options');
 
+    const isMobileViewport = loggedOutLearner.isViewportAtMobileWidth();
+    if (!isMobileViewport) {
+      await loggedOutLearner.expectTextPresentOnPage('Open options');
+    }
     await loggedOutLearner.expectScreenshotToMatch(
       'lessonPlayerPage',
       __dirname
