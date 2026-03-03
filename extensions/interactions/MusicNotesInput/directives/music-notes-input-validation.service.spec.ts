@@ -24,9 +24,11 @@ import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
-import {MusicNotesInputCustomizationArgs, ReadableMusicNote} from 'extensions/interactions/customization-args-defs';
+import {
+  MusicNotesInputCustomizationArgs,
+  ReadableMusicNote,
+} from 'extensions/interactions/customization-args-defs';
 import cloneDeep from 'lodash/cloneDeep';
-
 
 describe('MusicNotesInputValidationService', () => {
   let validatorService: MusicNotesInputValidationService;
@@ -61,16 +63,20 @@ describe('MusicNotesInputValidationService', () => {
     // Initialize customizationArgs with valid values.
     customizationArgs = {
       sequenceToGuess: {
-        value: [{
-          readableNoteName: 'C4',
-          noteDuration: { num: 1, den: 4 }
-        }],
+        value: [
+          {
+            readableNoteName: 'C4',
+            noteDuration: {num: 1, den: 4},
+          },
+        ],
       },
       initialSequence: {
-        value: [{
-          readableNoteName: 'C4',
-          noteDuration: { num: 1, den: 4 }
-        }],
+        value: [
+          {
+            readableNoteName: 'C4',
+            noteDuration: {num: 1, den: 4},
+          },
+        ],
       },
     };
   });
@@ -105,16 +111,20 @@ describe('MusicNotesInputValidationService', () => {
       currentState,
       {
         sequenceToGuess: {
-          value: [{
-          readableNoteName: 'C4',
-          noteDuration: { num: 1, den: 4 }
-        }],
+          value: [
+            {
+              readableNoteName: 'C4',
+              noteDuration: {num: 1, den: 4},
+            },
+          ],
         },
         initialSequence: {
-          value: [{
-          readableNoteName: 'C4',
-          noteDuration: { num: 1, den: 4 }
-        }], // Non-empty array with a note.
+          value: [
+            {
+              readableNoteName: 'C4',
+              noteDuration: {num: 1, den: 4},
+            },
+          ], // Non-empty array with a note.
         },
       },
       goodAnswerGroups,

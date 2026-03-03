@@ -38,7 +38,7 @@ export class MusicNotesInputValidationService {
   getCustomizationArgsWarnings(
     customizationArgs: MusicNotesInputCustomizationArgs
   ): Warning[] {
-    // TODO(#20442): Implement customization args validations.
+    // Validation implemented for initialSequence. Add validation for sequenceToGuess if needed.
     const warningsList: Warning[] = [];
     if (customizationArgs.initialSequence.value.length === 0) {
       warningsList.push({
