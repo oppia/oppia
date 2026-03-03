@@ -28,9 +28,9 @@ from core.jobs.types import firebase_adapters, job_run_result
 import apache_beam as beam
 from typing import Iterable, TypedDict
 
-TAG_ERROR = 'ERROR'
-TAG_WARNING = 'WARNING'
-TAG_OK = 'OK'
+TAG_CORRUPT = 'CORRUPT'
+TAG_FIXABLE = 'FIXABLE'
+TAG_CORRECT = 'CORRECT'
 
 KEY_WITH_EMAIL_FN = lambda record: (record.email, record)
 
@@ -39,29 +39,29 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
     """Audit Firebase records against the records that Oppia claims to exist."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        from_oppia = (
+        weak_records = (
             self.pipeline
-            | 'Get Oppia Users' >> firebase_io.GetWeakRecords()
-            | 'Key Oppia Users by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
+            | 'Get Weak Records' >> firebase_io.GetWeakRecords()
+            | 'Key Weak Records by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
         )
 
-        from_firebase = (
+        strong_records = (
             self.pipeline
-            | 'Get Firebase Records' >> firebase_io.GetStrongRecords()
-            | 'Key Firebase Records by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
+            | 'Get Strong Records' >> firebase_io.GetStrongRecords()
+            | 'Key Strong Records by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
         )
 
         return (
-            {'from_oppia': from_oppia, 'from_firebase': from_firebase}
-            | 'Group Records by Email' >> beam.CoGroupByKey()
+            {'from_oppia': weak_records, 'from_firebase': strong_records}
+            | 'Group Records by Email Key' >> beam.CoGroupByKey()
             | 'Drop Email Key' >> beam.Map(lambda key_value: key_value[1])
             | 'Audit Records'
             >> beam.ParDo(_AuditRecords()).with_outputs(
-                TAG_OK, TAG_WARNING, TAG_ERROR
+                TAG_CORRECT, TAG_FIXABLE, TAG_CORRUPT
             )
-            | 'Summarize Audit Results'
+            | 'Summarize Audited Records'
             >> job_result_transforms.FromTaggedOutputs(
-                TAG_OK, TAG_WARNING, TAG_ERROR
+                TAG_CORRECT, TAG_FIXABLE, TAG_CORRUPT
             )
         )
 
@@ -84,7 +84,7 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
 
         if len(user_ids := sorted({r.user_id for r in from_oppia})) > 1:
             yield beam.TaggedOutput(
-                TAG_ERROR,
+                TAG_CORRUPT,
                 f'OPPIA USERS ({user_ids=!r}) ARE USING THE SAME EMAIL! '
                 'A server admin must manually resolve these collisions by '
                 'giving each user a UNIQUE email.',
@@ -93,7 +93,7 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
 
         if len(firebase_ids := sorted({r.auth_id for r in from_firebase})) > 1:
             yield beam.TaggedOutput(
-                TAG_WARNING,
+                TAG_FIXABLE,
                 f'Firebase records share email: {firebase_ids=!r}',
             )
             collisions_found = True
@@ -108,7 +108,7 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
             user_id = oppia_record.user_id
             firebase_id = oppia_record.auth_id
             yield beam.TaggedOutput(
-                TAG_WARNING,
+                TAG_FIXABLE,
                 f'Oppia user ({user_id=!r}) linked to non-existent '
                 f'Firebase record ({firebase_id=!r})',
             )
@@ -116,7 +116,7 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
         elif not oppia_record and firebase_record:
             firebase_id = firebase_record.auth_id
             yield beam.TaggedOutput(
-                TAG_WARNING,
+                TAG_FIXABLE,
                 f'Firebase record ({firebase_id=!r}) linked to non-existent '
                 'Oppia user',
             )
@@ -125,8 +125,7 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
             oppia_dict = dataclasses.asdict(oppia_record)
             firebase_dict = dataclasses.asdict(firebase_record)
             inconsistent_fields = ', '.join(
-                f'the field {k!r} is {oppia!r} in Oppia but {firebase!r} in '
-                'Firebase'
+                f'{k!r} is {oppia!r} in Oppia but {firebase!r} in Firebase'
                 for k in sorted(firebase_dict.keys() & oppia_dict.keys())
                 if (firebase := firebase_dict[k]) != (oppia := oppia_dict[k])
             )
@@ -134,10 +133,10 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
             user_id = oppia_dict['user_id']
             firebase_id = firebase_dict['auth_id']
             yield beam.TaggedOutput(
-                TAG_WARNING,
+                TAG_FIXABLE,
                 f'Oppia user ({user_id=!r}) is inconsistent with its '
                 f'Firebase record ({firebase_id=!r}): {inconsistent_fields}',
             )
 
         else:
-            yield beam.TaggedOutput(TAG_OK, 1)
+            yield beam.TaggedOutput(TAG_CORRECT, 1)

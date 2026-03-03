@@ -120,7 +120,7 @@ class FirebaseSyncRecordsJobTests(
                 [
                     job_run_result.JobRunResult(
                         stderr=(
-                            'Delete Records ERROR: with slice=[0:1]: '
+                            'Delete Records FAILURE: with slice=[0:1]: '
                             'service down'
                         )
                     ),
@@ -148,7 +148,7 @@ class FirebaseSyncRecordsJobTests(
         )
 
         self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='CORRECT: 1')],
+            [job_run_result.JobRunResult(stdout='SKIPPED: 1')],
         )
 
         # Verify the Firebase record was left untouched.
@@ -231,7 +231,7 @@ class FirebaseSyncRecordsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='CORRECT: 1'),
+                job_run_result.JobRunResult(stdout='SKIPPED: 1'),
                 job_run_result.JobRunResult(stdout='Delete Records SUCCESS: 1'),
                 job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1'),
             ],

@@ -27,11 +27,9 @@ from core.jobs.types import firebase_adapters, job_run_result
 import apache_beam as beam
 from typing import Iterable, TypedDict
 
-CORRECT_TAG = 'CORRECT'
+SKIPPED_TAG = 'SKIPPED'
 DELETED_TAG = 'DELETED'
-IMPORTED_TAG = 'IMPORTED'
-
-KEY_WITH_EMAIL_FN = lambda record: (record.email, record)
+CREATED_TAG = 'CREATED'
 
 
 class FirebaseSyncRecordsJob(base_jobs.JobBase):
@@ -45,76 +43,78 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             job_name = self.__class__.__name__
             raise PermissionError(f'{job_name} must never be run in production')
 
-        from_oppia = (
+        key_with_email_fn = lambda record: (record.email, record)
+
+        weak_records = (
             self.pipeline
-            | 'Get Oppia Users' >> firebase_io.GetWeakRecords()
-            | 'Key Oppia Users by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
+            | 'Get Weak Records in Oppia' >> firebase_io.GetWeakRecords()
+            | 'Key Weak Records by Email' >> beam.Map(key_with_email_fn)
         )
 
-        from_firebase = (
+        strong_records = (
             self.pipeline
-            | 'Get Firebase Records' >> firebase_io.GetStrongRecords()
-            | 'Key Firebase Records by Email' >> beam.Map(KEY_WITH_EMAIL_FN)
+            | 'Get Strong Records in Firebase' >> firebase_io.GetStrongRecords()
+            | 'Key Strong Records by Email' >> beam.Map(key_with_email_fn)
         )
 
-        group_outputs = (
-            {'from_oppia': from_oppia, 'from_firebase': from_firebase}
-            | 'Group Records by Email' >> beam.CoGroupByKey()
+        partitioned_outputs = (
+            {'from_oppia': weak_records, 'from_firebase': strong_records}
+            | 'Group Records by Email Key' >> beam.CoGroupByKey()
             | 'Drop Email Key' >> beam.Map(lambda key_value: key_value[1])
             | 'Partition Records'
             >> beam.ParDo(_PartitionRecords()).with_outputs(
-                CORRECT_TAG, DELETED_TAG, IMPORTED_TAG
+                SKIPPED_TAG, DELETED_TAG, CREATED_TAG
             )
         )
 
-        correct_results = (
-            group_outputs
-            | 'Summarize Correct Records'
-            >> job_result_transforms.FromTaggedOutputs(CORRECT_TAG)
+        skipped_results = (
+            partitioned_outputs
+            | 'Summarize Skipped Records'
+            >> job_result_transforms.FromTaggedOutputs(SKIPPED_TAG)
         )
 
         delete_fn = firebase_transforms.DeleteRecords()
-        delete_results = (
-            group_outputs[DELETED_TAG]
-            | 'Gather All Firebase UIDs into One Worker'
+        deleted_results = (
+            partitioned_outputs[DELETED_TAG]
+            | 'Gather All Firebase IDs into a Single Worker'
             >> beam.combiners.ToList()
             | 'Delete Records from Firebase'
             >> beam.ParDo(firebase_transforms.DeleteRecords()).with_outputs(
-                delete_fn.SUCCESS_TAG,
-                delete_fn.ERROR_TAG,
+                delete_fn.PASS_TAG,
+                delete_fn.FAIL_TAG,
             )
-            | 'Summarize Delete Results'
+            | 'Summarize Deleted Records'
             >> job_result_transforms.FromTaggedOutputs(
-                delete_fn.SUCCESS_TAG,
-                delete_fn.ERROR_TAG,
+                delete_fn.PASS_TAG,
+                delete_fn.FAIL_TAG,
                 prefix='Delete Records',
             )
         )
 
-        import_fn = firebase_transforms.ImportRecords()
-        import_results = (
-            group_outputs[IMPORTED_TAG]
-            | 'Gather All Import Records into One Worker'
+        create_fn = firebase_transforms.CreateRecords()
+        created_results = (
+            partitioned_outputs[CREATED_TAG]
+            | 'Gather All Import User Records into a Single Worker'
             >> beam.combiners.ToList()
-            | 'Wait for Delete Records to complete'
-            >> beam.WaitOn(delete_results)
-            | 'Import Records into Firebase'
-            >> beam.ParDo(firebase_transforms.ImportRecords()).with_outputs(
-                import_fn.SUCCESS_TAG,
-                import_fn.ERROR_TAG,
+            | 'Wait for Firebase IDs to be Deleted'
+            >> beam.WaitOn(deleted_results)
+            | 'Create Records in Firebase'
+            >> beam.ParDo(firebase_transforms.CreateRecords()).with_outputs(
+                create_fn.PASS_TAG,
+                create_fn.FAIL_TAG,
             )
-            | 'Summarize Import Results'
+            | 'Summarize Created Records'
             >> job_result_transforms.FromTaggedOutputs(
-                import_fn.SUCCESS_TAG,
-                import_fn.ERROR_TAG,
-                prefix='Import Records',
+                create_fn.PASS_TAG,
+                create_fn.FAIL_TAG,
+                prefix='Create Records',
             )
         )
 
         return (
-            correct_results,
-            delete_results,
-            import_results,
+            skipped_results,
+            deleted_results,
+            created_results,
         ) | 'Flatten Results' >> beam.Flatten()
 
 
@@ -134,10 +134,10 @@ class _PartitionRecords(beam.DoFn):  # type: ignore[misc]
         from_firebase = frozenset(grouped['from_firebase'])
 
         if ok_count := len(from_oppia.intersection(from_firebase)):
-            yield beam.TaggedOutput(CORRECT_TAG, ok_count)
+            yield beam.TaggedOutput(SKIPPED_TAG, ok_count)
 
         for record in from_firebase.difference(from_oppia):
             yield beam.TaggedOutput(DELETED_TAG, record.auth_id)
 
         for record in from_oppia.difference(from_firebase):
-            yield beam.TaggedOutput(IMPORTED_TAG, record.into_import())
+            yield beam.TaggedOutput(CREATED_TAG, record.into_import())

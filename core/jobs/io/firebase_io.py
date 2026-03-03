@@ -36,47 +36,6 @@ auth_models, user_models = models.Registry.import_models(
     [models.Names.AUTH, models.Names.USER]
 )
 
-KEY_WITH_ID_FN = lambda model: (model.id, model)
-
-
-# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
-    """Gets the collection of "weak" records from Oppia's user & auth models.
-
-    These records are considered to be "weak" because they are NOT based on real
-    data. Instead, they are built using Oppia's internal association models,
-    under the assumption that they are consistent with "strong" (real) records.
-    """
-
-    def expand(
-        self, pbegin: pvalue.PBegin
-    ) -> beam.PCollection[firebase_adapters.WeakRecord]:
-        """Returns all of the "weak" records from Oppia's user & auth models."""
-
-        settings_pcoll = (
-            pbegin
-            | 'Get UserSettingsModels'
-            >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all(include_deleted=True)
-            )
-            | 'Key UserSettingsModels by ID' >> beam.Map(KEY_WITH_ID_FN)
-        )
-
-        auth_details_pcoll = (
-            pbegin
-            | 'Get UserAuthDetailsModels'
-            >> ndb_io.GetModels(
-                auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
-            )
-            | 'Key UserAuthDetailsModels by ID' >> beam.Map(KEY_WITH_ID_FN)
-        )
-
-        return (
-            {'settings': settings_pcoll, 'auth_details': auth_details_pcoll}
-            | 'Group Models by ID' >> beam.CoGroupByKey()
-            | 'Zip Into Weak Records' >> beam.ParDo(_ZipIntoWeakRecords())
-        )
-
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
 class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
@@ -108,6 +67,47 @@ class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
         """Yields all records provided from the Firebase Admin SDK."""
         firebase_auth_services.establish_firebase_connection()
         yield from firebase_auth.list_users().iterate_all()
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
+    """Gets the collection of "weak" records from Oppia's user & auth models.
+
+    These records are considered to be "weak" because they are NOT based on real
+    data. Instead, they are built using Oppia's internal association models,
+    under the assumption that they are consistent with "strong" (real) records.
+    """
+
+    def expand(
+        self, pbegin: pvalue.PBegin
+    ) -> beam.PCollection[firebase_adapters.WeakRecord]:
+        """Returns all of the "weak" records from Oppia's user & auth models."""
+
+        key_with_id_fn = lambda model: (model.id, model)
+
+        settings_pcoll = (
+            pbegin
+            | 'Get UserSettingsModels'
+            >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all(include_deleted=True)
+            )
+            | 'Key UserSettingsModels by ID' >> beam.Map(key_with_id_fn)
+        )
+
+        auth_details_pcoll = (
+            pbegin
+            | 'Get UserAuthDetailsModels'
+            >> ndb_io.GetModels(
+                auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
+            )
+            | 'Key UserAuthDetailsModels by ID' >> beam.Map(key_with_id_fn)
+        )
+
+        return (
+            {'settings': settings_pcoll, 'auth_details': auth_details_pcoll}
+            | 'Group Models by ID' >> beam.CoGroupByKey()
+            | 'Zip Into Weak Records' >> beam.ParDo(_ZipIntoWeakRecords())
+        )
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.

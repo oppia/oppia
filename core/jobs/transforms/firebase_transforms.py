@@ -18,8 +18,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import itertools
 
+from core.constants import constants
 from core.platform.auth import firebase_auth_services
 
 import apache_beam as beam
@@ -47,8 +49,8 @@ class FirebaseBatchOperation(beam.DoFn, Generic[InputType, OutputType]):  # type
 
     BATCH_LIMIT = 1000
 
-    SUCCESS_TAG = 'SUCCESS'
-    ERROR_TAG = 'ERROR'
+    PASS_TAG = 'SUCCESS'
+    FAIL_TAG = 'FAILURE'
 
     def __init__(self) -> None:
         super().__init__()
@@ -91,10 +93,10 @@ class FirebaseBatchOperation(beam.DoFn, Generic[InputType, OutputType]):  # type
                 used_count += len(batch)
 
         if success_count := used_count - fail_count:
-            yield beam.TaggedOutput(self.SUCCESS_TAG, success_count)
+            yield beam.TaggedOutput(self.PASS_TAG, success_count)
 
         for error_message in error_messages:
-            yield beam.TaggedOutput(self.ERROR_TAG, error_message)
+            yield beam.TaggedOutput(self.FAIL_TAG, error_message)
 
 
 class DeleteRecords(
@@ -108,7 +110,7 @@ class DeleteRecords(
         return firebase_auth.delete_users(uids)
 
 
-class ImportRecords(
+class CreateRecords(
     FirebaseBatchOperation[
         firebase_auth.ImportUserRecord, firebase_auth.UserImportResult
     ]
@@ -118,4 +120,49 @@ class ImportRecords(
     def handle_batched_items(
         self, users: list[firebase_auth.ImportUserRecord]
     ) -> firebase_auth.UserImportResult:
+        if constants.EMULATOR_MODE:
+            return self._handle_batched_items_within_emulator(users)
         return firebase_auth.import_users(users)
+
+    def _handle_batched_items_within_emulator(
+        self, records: list[firebase_auth.ImportUserRecord]
+    ) -> firebase_auth.UserImportResult:
+        """Creating users needs to be handled differently within EMULATOR_MODE.
+
+        When we migrated to Firebase Authentication we decided that, while Oppia
+        is running locally against the Firebase Authentication Emulator, users
+        should be created using email & password for authentication. This is
+        intentionally inconsistent with production, where we use Single Sign-On
+        (i.e. Google Sign-In) instead. This was done so that developers wouldn't
+        need to keep sensitive auth credentials on their local file system.
+
+        NOTE: Since the `import_users` API doesn't accept a raw password field,
+        we need to call the `create_user` API, which DOES accept one, instead.
+
+        Args:
+            records: list[ImportUserRecord]. The batch of records to create.
+
+        Returns:
+            UserImportResult. The result of the create operation.
+
+        Raises:
+            AssertionError. Email is required within EMULATOR_MODE.
+        """
+        errors = []
+
+        for i, record in enumerate(records):
+            try:
+                user_email = record.email or ''
+                # HINT: `md5(email)` used for consistency with the frontend.
+                # See: core/templates/services/auth.service.ts.
+                user_password = hashlib.md5(user_email.encode()).hexdigest()
+                firebase_auth.create_user(
+                    uid=record.uid,
+                    email=user_email,
+                    disabled=record.disabled,
+                    password=user_password,
+                )
+            except (ValueError, firebase_exceptions.FirebaseError) as e:
+                errors.append({'index': i, 'message': str(e)})
+
+        return firebase_auth.UserImportResult({'error': errors}, len(records))
