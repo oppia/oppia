@@ -29,6 +29,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   NgbActiveModal,
   NgbModal,
@@ -137,7 +138,7 @@ describe('Customize Interaction Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [NgbModalModule, NgbModule],
+      imports: [NgbModalModule, NgbModule, HttpClientTestingModule],
       declarations: [CustomizeInteractionModalComponent],
       providers: [
         NgbActiveModal,
