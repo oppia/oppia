@@ -1,18 +1,24 @@
-- id: install-chrome
-  name: Install Chrome (retries on error)
-  uses: nick-fields/retry@v3
-  env:
-    CHROME_VERSION: "145.0.7632.116-1"
-  with:
-    max_attempts: 3
-    retry_on: error
-    shell: bash
-    timeout_minutes: 10
-    command: |
-      sudo apt-get update
-      sudo apt-get install -y wget gnupg libappindicator3-1
-      wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-      sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
-      sudo apt-get update
-      sudo apt-get install -y google-chrome-stable=${{ env.CHROME_VERSION }}
-      google-chrome --version
+name: 'Install Chrome'
+description: 'Installs Chrome for use in tests'
+
+runs:
+  using: 'composite'
+  steps:
+    - id: install-chrome
+      name: Install Chrome (retries on error)
+      uses: nick-fields/retry@v3
+      env:
+        CHROME_VERSION: "145.0.7632.116-1"
+      with:
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        timeout_minutes: 10
+        command: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg libappindicator3-1
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable=${{ env.CHROME_VERSION }}
+          google-chrome --version
