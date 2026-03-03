@@ -249,6 +249,9 @@ class VoiceoverRegenerationJobTests(test_utils.GenericTestBase):
                 language_accent_to_content_status_map,
             )
         )
+        self.assertFalse(
+            voiceover_regeneration_task_mapping.are_all_voiceovers_attempted()
+        )
 
         voiceover_regeneration_task_mapping.update_final_content_status(
             'en-US', ['content_1']
@@ -265,6 +268,12 @@ class VoiceoverRegenerationJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
             expected_language_accent_to_content_status_map,
+        )
+        self.assertTrue(
+            voiceover_regeneration_task_mapping.are_all_voiceovers_attempted()
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.count_total_failed_contents(), 1
         )
 
     def test_should_add_language_accent_to_content_status_map(self) -> None:
@@ -294,4 +303,204 @@ class VoiceoverRegenerationJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
             expected_language_accent_to_content_status_map,
+        )
+
+    def test_should_successfully_update_status_of_contents(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+        language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'GENERATING',
+                'content_1': 'GENERATING',
+            }
+        }
+
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationJob(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        voiceover_regeneration_task_mapping.update_succeeded_content_status(
+            'en-US', ['content_0']
+        )
+        voiceover_regeneration_task_mapping.update_failed_content_status(
+            'en-US', ['content_1']
+        )
+
+        expected_language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'SUCCEEDED',
+                'content_1': 'FAILED',
+            }
+        }
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
+            expected_language_accent_to_content_status_map,
+        )
+
+
+class VoiceoverRegenerationTaskBatchTests(test_utils.GenericTestBase):
+    """Unit tests for VoiceoverRegenerationTaskBatch domain object."""
+
+    def test_should_create_domain_object_correctly(self) -> None:
+        parent_cloud_task_run_id = 'parent_task_run_id'
+        child_cloud_task_run_id = ['child_task_run_id_1', 'child_task_run_id_2']
+        exploration_id = 'exp_id'
+        exploration_version = 1
+        language_accent_code = 'en-US'
+        content_ids_to_contents_map = {
+            'content_0': 'This is content 0',
+            'content_1': 'This is content 1',
+        }
+
+        voiceover_regeneration_task_batch = (
+            cloud_task_domain.VoiceoverRegenerationTaskBatch(
+                parent_cloud_task_run_id,
+                child_cloud_task_run_id,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+                content_ids_to_contents_map,
+            )
+        )
+
+        self.assertEqual(
+            voiceover_regeneration_task_batch.parent_cloud_task_run_id,
+            parent_cloud_task_run_id,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_batch.child_cloud_task_run_id,
+            child_cloud_task_run_id,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_batch.exploration_id, exploration_id
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_batch.exploration_version,
+            exploration_version,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_batch.language_accent_code,
+            language_accent_code,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_batch.content_ids_to_contents_map,
+            content_ids_to_contents_map,
+        )
+
+    def test_should_create_domain_object_from_dict(self) -> None:
+        parent_cloud_task_run_id = 'parent_task_run_id'
+        child_cloud_task_run_id = ['child_task_run_id_1', 'child_task_run_id_2']
+        exploration_id = 'exp_id'
+        exploration_version = 1
+        language_accent_code = 'en-US'
+        content_ids_to_contents_map = {
+            'content_0': 'This is content 0',
+            'content_1': 'This is content 1',
+        }
+
+        voiceover_regeneration_task_batch_dict = {
+            'parent_cloud_task_run_id': parent_cloud_task_run_id,
+            'child_cloud_task_run_id': child_cloud_task_run_id,
+            'exploration_id': exploration_id,
+            'exploration_version': exploration_version,
+            'language_accent_code': language_accent_code,
+            'content_ids_to_contents_map': content_ids_to_contents_map,
+        }
+
+        voiceover_regeneration_task_batch = (
+            cloud_task_domain.VoiceoverRegenerationTaskBatch.from_dict(
+                voiceover_regeneration_task_batch_dict
+            )
+        )
+
+        self.assertEqual(
+            voiceover_regeneration_task_batch.to_dict(),
+            voiceover_regeneration_task_batch_dict,
+        )
+
+    def test_should_convert_to_dict_correctly(self) -> None:
+        parent_cloud_task_run_id = 'parent_task_run_id'
+        child_cloud_task_run_id = ['child_task_run_id_1']
+        exploration_id = 'exp_id'
+        exploration_version = 2
+        language_accent_code = 'hi-IN'
+        content_ids_to_contents_map = {
+            'content_0': 'Content 0 text',
+        }
+
+        voiceover_regeneration_task_batch = (
+            cloud_task_domain.VoiceoverRegenerationTaskBatch(
+                parent_cloud_task_run_id,
+                child_cloud_task_run_id,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+                content_ids_to_contents_map,
+            )
+        )
+
+        expected_dict = {
+            'parent_cloud_task_run_id': parent_cloud_task_run_id,
+            'child_cloud_task_run_id': child_cloud_task_run_id,
+            'exploration_id': exploration_id,
+            'exploration_version': exploration_version,
+            'language_accent_code': language_accent_code,
+            'content_ids_to_contents_map': content_ids_to_contents_map,
+        }
+
+        self.assertEqual(
+            voiceover_regeneration_task_batch.to_dict(), expected_dict
+        )
+
+    def test_should_handle_empty_child_task_list(self) -> None:
+        parent_cloud_task_run_id = 'parent_task_run_id'
+        child_cloud_task_run_id: list[str] = []
+        exploration_id = 'exp_id'
+        exploration_version = 1
+        language_accent_code = 'en-US'
+        content_ids_to_contents_map = {
+            'content_0': 'Content text',
+        }
+
+        voiceover_regeneration_task_batch = (
+            cloud_task_domain.VoiceoverRegenerationTaskBatch(
+                parent_cloud_task_run_id,
+                child_cloud_task_run_id,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+                content_ids_to_contents_map,
+            )
+        )
+
+        self.assertEqual(
+            voiceover_regeneration_task_batch.child_cloud_task_run_id, []
+        )
+
+    def test_should_handle_empty_content_map(self) -> None:
+        parent_cloud_task_run_id = 'parent_task_run_id'
+        child_cloud_task_run_id = ['child_task_run_id_1']
+        exploration_id = 'exp_id'
+        exploration_version = 1
+        language_accent_code = 'en-US'
+        content_ids_to_contents_map: Dict[str, str] = {}
+
+        voiceover_regeneration_task_batch = (
+            cloud_task_domain.VoiceoverRegenerationTaskBatch(
+                parent_cloud_task_run_id,
+                child_cloud_task_run_id,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+                content_ids_to_contents_map,
+            )
+        )
+
+        self.assertEqual(
+            voiceover_regeneration_task_batch.content_ids_to_contents_map, {}
         )
