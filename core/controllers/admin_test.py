@@ -2458,6 +2458,44 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_generator_works_when_skill_with_same_description_but_different_id_exists(
+        self,
+    ) -> None:
+        """Test that the generator works correctly when another generator
+        has created a skill with description 'Dummy Skill 1' but with a
+        different ID. This simulates the scenario where
+        _load_dummy_new_structures_data() is run first.
+        """
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Create a skill with description 'Dummy Skill 1' but with a different
+        # ID (simulating what _load_dummy_new_structures_data does).
+        different_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            different_skill_id,
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            description='Dummy Skill 1',
+        )
+
+        # The generator should still work because it checks by ID, not
+        # description.
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+
+        # Verify explorations were generated.
+        generated_exps = exp_services.get_all_exploration_summaries()
+        self.assertEqual(len(generated_exps), 2)
+
+        self.logout()
+
 
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""
