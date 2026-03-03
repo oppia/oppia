@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import collections
 import datetime
 import json
 import os
@@ -1146,16 +1147,6 @@ def regenerate_voiceovers_for_batch_contents(
             for content_id in content_ids_to_content_values.keys()
         ]
 
-        raise Exception(
-            'Voiceover regeneration failed for exploration %s, version %s, language accent code %s during processing batch with content ids: %s.'
-            % (
-                exploration_id,
-                exploration_version,
-                language_accent_code,
-                list(content_ids_to_content_values.keys()),
-            )
-        ) from e
-
     error_collections_during_voiceover_regeneration = []
 
     error_collections_during_voiceover_regeneration.append(
@@ -1252,16 +1243,13 @@ def wrap_up_voiceover_regeneration_task(
         'Exploration ID: %s\n'
         % voiceover_regeneration_job_status.exploration_id
     )
-    language_accent_code_to_error = {}
+    language_accent_code_to_error = collections.defaultdict(list)
     for error_collection in error_collections_during_voiceover_regeneration:
         language_accent_code = error_collection['language_accent_code']
         error_messages = error_collection['error_messages']
-        if language_accent_code in language_accent_code_to_error:
-            language_accent_code_to_error[language_accent_code].extend(
-                error_messages
-            )
-        else:
-            language_accent_code_to_error[language_accent_code] = error_messages
+        language_accent_code_to_error[language_accent_code].extend(
+            error_messages
+        )
 
     for (
         language_accent_code,

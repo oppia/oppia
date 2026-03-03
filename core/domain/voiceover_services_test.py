@@ -1465,6 +1465,108 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             updated_cloud_task_run_model.latest_job_state, 'PERMANENTLY_FAILED'
         )
 
+    def test_should_raise_exception_while_regenerating_voiceovers_in_batch(
+        self,
+    ) -> None:
+        exploration_id = 'exp_id_1'
+        exploration_version = 2
+        commit1 = exp_models.ExplorationCommitLogEntryModel.create(
+            exploration_id,
+            2,
+            self.committer_1_id,
+            'msg',
+            'create',
+            [
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'State 1',
+                    'old_value': {
+                        'content_id': 'content_5',
+                        'html': self.old_content_html,
+                    },
+                    'new_value': {
+                        'content_id': 'content_5',
+                        'html': self.new_content_html,
+                    },
+                }
+            ],
+            constants.ACTIVITY_STATUS_PRIVATE,
+            False,
+        )
+
+        commit1.exploration_id = exploration_id
+        commit1.update_timestamps()
+        commit1.put()
+
+        self.voiceover_autogeneration_policy_model.language_codes_mapping = {
+            'en': {'en-US': True}
+        }
+
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
+        self.assertEqual(len(entity_voiceovers_models), 0)
+
+        def mock_regenerate_voiceovers_of_exploration(
+            _exploration_id: str,
+            _exploration_version: int,
+            _content_id_to_content_html: Dict[str, str],
+            _language_accent_code: str,
+        ) -> List[Tuple[str, str]]:
+            raise Exception(
+                'Expected error raised during voiceover regeneration!'
+            )
+
+        parent_cloud_task_model_id = 'cloud_task_model_id'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            'dev-project-id',
+            'us-central',
+            'voiceover-regeneration',
+            uuid.uuid4().hex,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_update'
+        taskqueue_services.create_new_cloud_task_model(
+            parent_cloud_task_model_id, task_name, function_id
+        )
+
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            exploration_id, exploration_version, parent_cloud_task_model_id
+        )
+
+        updated_cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+        language_accent_code = 'en-US'
+        failed_content_ids = ['content_5']
+        error_message = (
+            'Voiceover regeneration failed for exploration %s, version %s, language accent code %s during processing batch with content ids: %s.'
+            % (
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+                failed_content_ids,
+            )
+        )
+        with self.swap(
+            voiceover_regeneration_services,
+            'regenerate_voiceovers_of_exploration',
+            mock_regenerate_voiceovers_of_exploration,
+        ):
+            for cloud_run in updated_cloud_task_runs:
+                if (
+                    cloud_run.function_id
+                    == 'regenerate_voiceovers_for_batch_contents'
+                ):
+                    voiceover_services.regenerate_voiceovers_for_batch_contents(
+                        exploration_id,
+                        parent_cloud_task_model_id,
+                        cloud_run.task_run_id,
+                    )
+
     def _create_exploration_and_arabic_translation(
         self, exploration_id: str, language_code: str
     ) -> None:
