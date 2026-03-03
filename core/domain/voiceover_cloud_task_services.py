@@ -221,7 +221,6 @@ def resolve_multiple_cloud_task_runs_for_exploration(
         )
         return language_accent_to_content_status_map
 
-    # When number of models > 1.
     for index in range(number_of_models - 1):
         earlier_model = voiceover_regeneration_job_models[index]
         later_model = voiceover_regeneration_job_models[index + 1]

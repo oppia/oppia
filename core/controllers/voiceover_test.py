@@ -403,6 +403,7 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(args['function_id'], expected_func_name)
         self.assertEqual(args['queue_name'], 'voiceover-regeneration')
         self.assertEqual(args['exploration_id'], exploration_id)
+        self.assertEqual(args['exploration_version'], exploration_version)
         self.logout()
 
 
