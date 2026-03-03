@@ -87,7 +87,7 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             >> job_result_transforms.FromTaggedOutputs(
                 delete_fn.PASS_TAG,
                 delete_fn.FAIL_TAG,
-                prefix='Delete Records',
+                prefix='DELETE RECORDS',
             )
         )
 
@@ -107,7 +107,7 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             >> job_result_transforms.FromTaggedOutputs(
                 create_fn.PASS_TAG,
                 create_fn.FAIL_TAG,
-                prefix='Create Records',
+                prefix='CREATE RECORDS',
             )
         )
 
@@ -130,6 +130,7 @@ class _PartitionRecords(beam.DoFn):  # type: ignore[misc]
 
     def process(self, grouped: GroupedByUserId) -> Iterable[beam.TaggedOutput]:
         """Categorizes records by yielding tagged outputs."""
+
         from_oppia = frozenset(grouped['from_oppia'])
         from_firebase = frozenset(grouped['from_firebase'])
 

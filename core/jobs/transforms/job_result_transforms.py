@@ -57,6 +57,7 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
         prefix: str = '',
         label: str | None = None,
     ) -> None:
+
         if pass_tag in fail_tags:
             raise ValueError(f'{pass_tag=!r} must not be one of {fail_tags=!r}')
         super().__init__(label=label)
@@ -68,6 +69,7 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
         self, out: pvalue.DoOutputsTuple
     ) -> pvalue.PCollection[job_run_result.JobRunResult]:
         """Formats pass/fail tagged outputs as stdout/stderr job run results."""
+
         stdout = (
             out[tag := self.pass_tag]
             | f'Sum of {tag}' >> beam.CombineGlobally(sum).without_defaults()
@@ -86,14 +88,17 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
         self, out: pvalue.DoOutputsTuple
     ) -> tuple[pvalue.DoOutputsTuple, dict[str, pvalue.PCollection]]:
         """Needs to be overriden when input type doesn't inherit from PValue."""
+
         return out, {tag: out[tag] for tag in {self.pass_tag, *self.fail_tags}}
 
     def _format_pass_tag(self, pass_num: int) -> str:
         """Formats the "pass" number."""
+
         return f'{self.prefix}{self.pass_tag}: {pass_num}'
 
     def _format_fail_tag(self, fail_msg: str, fail_tag: str) -> str:
         """Formats the "fail" message."""
+
         return f'{self.prefix}{fail_tag}: {fail_msg}'
 
 

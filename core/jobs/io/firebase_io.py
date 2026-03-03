@@ -65,6 +65,7 @@ class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
         self, _: None
     ) -> Iterable[firebase_auth.ExportedUserRecord]:
         """Yields all records provided from the Firebase Admin SDK."""
+
         firebase_auth_services.establish_firebase_connection()
         yield from firebase_auth.list_users().iterate_all()
 
@@ -106,28 +107,28 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
         return (
             {'settings': settings_pcoll, 'auth_details': auth_details_pcoll}
             | 'Group Models by ID' >> beam.CoGroupByKey()
-            | 'Zip Into Weak Records' >> beam.ParDo(_ZipIntoWeakRecords())
+            | 'Make Into Weak Records' >> beam.ParDo(_IntoWeakRecords())
         )
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class _ZipIntoWeakRecords(beam.DoFn):  # type: ignore[misc]
+class _IntoWeakRecords(beam.DoFn):  # type: ignore[misc]
     """Zips fields in Oppia's user/auth models into "weak" Firebase records."""
 
-    class OppiaUserAuthModels(TypedDict):
-        """Type returned by CoGroupByKey() when grouping models by ID."""
+    class GroupedById(TypedDict):
+        """Typings for the CoGroupByKey() output joined by ID."""
 
         settings: Iterable[user_models.UserSettingsModel]
         auth_details: Iterable[auth_models.UserAuthDetailsModel]
 
     def process(
-        self, id_to_models: tuple[str, OppiaUserAuthModels]
+        self, id_to_models: tuple[str, GroupedById]
     ) -> Iterable[firebase_adapters.WeakRecord]:
         """Yields 0-1 weak Firebase records by zipping the input models."""
 
-        user_id = id_to_models[0]
-        settings_list = list(id_to_models[1]['settings'])
-        auth_details_list = list(id_to_models[1]['auth_details'])
+        user_id, grouped = id_to_models
+        settings_list = list(grouped['settings'])
+        auth_details_list = list(grouped['auth_details'])
         try:
             strictly_zipped = zip(settings_list, auth_details_list, strict=True)
             [(settings, auth_details)] = strictly_zipped

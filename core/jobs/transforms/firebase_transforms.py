@@ -25,11 +25,9 @@ from core.constants import constants
 from core.platform.auth import firebase_auth_services
 
 import apache_beam as beam
-import firebase_admin
 import firebase_admin.auth as firebase_auth
 import firebase_admin.exceptions as firebase_exceptions
 from apache_beam import pvalue
-from apache_beam.utils import shared
 from typing import Generic, Iterator, TypeVar
 
 InputType = TypeVar(
@@ -52,17 +50,14 @@ class FirebaseBatchOperation(beam.DoFn, Generic[InputType, OutputType]):  # type
     PASS_TAG = 'SUCCESS'
     FAIL_TAG = 'FAILURE'
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.app: firebase_admin.App | None = None
-        self.process_state = shared.Shared()
-
     def handle_batched_items(self, _: list[InputType]) -> OutputType:
         """Virtual function to call a specific Firebase Admin SDK operation."""
+
         raise NotImplementedError('Subclasses must override this function')
 
     def setup(self) -> None:
-        """Establishes Firebase Admin SDK connection within a worker process."""
+        """Establishes a Firebase connection just before running `process`."""
+
         firebase_auth_services.establish_firebase_connection()
 
     def process(
@@ -70,6 +65,7 @@ class FirebaseBatchOperation(beam.DoFn, Generic[InputType, OutputType]):  # type
         inputs: list[InputType],
     ) -> Iterator[pvalue.TaggedOutput]:
         """Common batch processing logic for Firebase Admin SDK operations."""
+
         input_iter = iter(inputs)
         used_count = 0
         fail_count = 0
@@ -81,18 +77,18 @@ class FirebaseBatchOperation(beam.DoFn, Generic[InputType, OutputType]):  # type
             except (ValueError, firebase_exceptions.FirebaseError) as e:
                 fail_count += len(batch)
                 error_messages.append(
-                    f'with slice=[{used_count}:{used_count + len(batch)}]: {e}'
+                    f'at slice=[{used_count}:{used_count + len(batch)}]: {e}'
                 )
             else:
                 fail_count += output.failure_count
                 error_messages.extend(
-                    f'with index=[{used_count + e.index}]: {e.reason}'
+                    f'at index=[{used_count + e.index}]: {e.reason}'
                     for e in output.errors
                 )
             finally:
                 used_count += len(batch)
 
-        if success_count := used_count - fail_count:
+        if success_count := max(used_count - fail_count, 0):
             yield beam.TaggedOutput(self.PASS_TAG, success_count)
 
         for error_message in error_messages:
@@ -148,8 +144,8 @@ class CreateRecords(
         Raises:
             AssertionError. Email is required within EMULATOR_MODE.
         """
-        errors = []
 
+        errors = []
         for i, record in enumerate(records):
             try:
                 user_email = record.email or ''
