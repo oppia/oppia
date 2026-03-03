@@ -614,9 +614,6 @@ export class ConversationFlowService {
     // to an earlier card for revision. After completing it, create a fresh card
     // for the original stuck state so the learner can try again without seeing
     // their old failed attempts.
-    // Handle returning from a stuck state redirect.
-    // If we have an originalStuckStateName, it means the learner was redirected
-    // to an earlier card for revision.
     if (this.originalStuckStateName !== null) {
       const stuckStateName = this.originalStuckStateName;
       // Clear the tracking before navigating.
