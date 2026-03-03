@@ -93,7 +93,7 @@ describe('Exploration editor tab component', () => {
   let pageContextService: PageContextService;
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
-  let mockRefreshStateEditorEventEmitter = null;
+  let mockRefreshStateEditorEventEmitter: EventEmitter<void> | null = null;
   let versionHistoryService: VersionHistoryService;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
@@ -103,7 +103,11 @@ describe('Exploration editor tab component', () => {
   class MockJoyrideService {
     startTour() {
       return {
-        subscribe: (value1, value2, value3) => {
+        subscribe: (
+          value1: (arg: {number: number}) => void,
+          value2: () => void,
+          value3: () => void
+        ) => {
           value1({number: 1});
           value1({number: 2});
           value1({number: 4});
@@ -122,13 +126,13 @@ describe('Exploration editor tab component', () => {
   class MockWindowRef {
     location = {path: '/create/2234'};
     nativeWindow = {
-      scrollTo: (value1, value2) => {},
+      scrollTo: (value1: number, value2: number) => {},
       sessionStorage: {
         promoIsDismissed: null,
-        setItem: (testKey1, testKey2) => {},
-        removeItem: testKey => {},
+        setItem: (testKey1: string, testKey2: string) => {},
+        removeItem: (testKey: string) => {},
       },
-      gtag: (value1, value2, value3) => {},
+      gtag: (value1: string, value2: string, value3: object) => {},
       navigator: {
         onLine: true,
         userAgent: null,
@@ -145,7 +149,7 @@ describe('Exploration editor tab component', () => {
       },
       document: {
         documentElement: {
-          setAttribute: (value1, value2) => {},
+          setAttribute: (value1: string, value2: string) => {},
           clientWidth: null,
           clientHeight: null,
         },
@@ -157,7 +161,7 @@ describe('Exploration editor tab component', () => {
           },
         },
       },
-      addEventListener: (value1, value2) => {},
+      addEventListener: (value1: string, value2: () => void) => {},
     };
   }
 
@@ -293,6 +297,7 @@ describe('Exploration editor tab component', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: [],
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -309,7 +314,7 @@ describe('Exploration editor tab component', () => {
           },
           interaction: {
             id: 'TextInput',
-            confirmed_unclassified_answers: null,
+            confirmed_unclassified_answers: [],
             customization_args: {
               placeholder: {
                 value: {
@@ -325,7 +330,7 @@ describe('Exploration editor tab component', () => {
             answer_groups: [
               {
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   dest: 'unused',
@@ -364,6 +369,7 @@ describe('Exploration editor tab component', () => {
             hints: [],
           },
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           param_changes: [],
           solicit_answer_details: false,
         },
@@ -376,7 +382,7 @@ describe('Exploration editor tab component', () => {
           },
           interaction: {
             id: 'TextInput',
-            confirmed_unclassified_answers: null,
+            confirmed_unclassified_answers: [],
             solution: null,
             customization_args: {
               placeholder: {
@@ -393,7 +399,7 @@ describe('Exploration editor tab component', () => {
             answer_groups: [
               {
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   missing_prerequisite_skill_id: null,
@@ -424,6 +430,7 @@ describe('Exploration editor tab component', () => {
             hints: [],
           },
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           param_changes: [],
           solicit_answer_details: false,
         },
@@ -741,7 +748,7 @@ describe('Exploration editor tab component', () => {
       AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: null,
           outcome: {
             missing_prerequisite_skill_id: null,
@@ -756,7 +763,7 @@ describe('Exploration editor tab component', () => {
             refresher_exploration_id: null,
           },
         },
-        null
+        'TextInput'
       ),
     ]);
 
@@ -776,10 +783,10 @@ describe('Exploration editor tab component', () => {
             param_changes: [],
             refresher_exploration_id: null,
           },
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: '',
         },
-        null
+        'TextInput'
       ),
     ];
     component.saveInteractionAnswerGroups(displayedValue);
@@ -935,12 +942,20 @@ describe('Exploration editor tab component', () => {
         'stateName',
         'id',
         'some',
-        null,
-        new Interaction([], [], null, null, [], 'id', null),
-        null,
-        null,
+        SubtitledHtml.createDefault('', 'content'),
+        new Interaction(
+          [],
+          [],
+          {} as Interaction['customizationArgs'],
+          null,
+          [],
+          'id',
+          null
+        ),
+        [],
+        false,
         true,
-        true
+        null
       );
       component.stateName = 'stateName';
 
@@ -952,7 +967,7 @@ describe('Exploration editor tab component', () => {
       stateEditorService.updateStateEditorDirectiveInitialised();
       spyOn(component, 'initStateEditor').and.stub();
 
-      mockRefreshStateEditorEventEmitter.emit();
+      mockRefreshStateEditorEventEmitter?.emit();
       tick();
       component.initStateEditor();
       tick();
@@ -966,12 +981,20 @@ describe('Exploration editor tab component', () => {
       'stateName',
       'id',
       'some',
-      null,
-      new Interaction([], [], null, null, [], 'id', null),
-      null,
-      null,
+      SubtitledHtml.createDefault('', 'content'),
+      new Interaction(
+        [],
+        [],
+        {} as Interaction['customizationArgs'],
+        null,
+        [],
+        'id',
+        null
+      ),
+      [],
+      false,
       true,
-      true
+      null
     );
     component.stateName = 'stateName';
     spyOn(explorationStatesService, 'getState').and.returnValues(state);
@@ -980,7 +1003,7 @@ describe('Exploration editor tab component', () => {
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
-    mockRefreshStateEditorEventEmitter.emit();
+    mockRefreshStateEditorEventEmitter?.emit();
 
     expect(component.startTutorial).toHaveBeenCalled();
   });
@@ -1074,12 +1097,12 @@ describe('Exploration editor tab component', () => {
       'fetchStateVersionHistoryAsync'
     ).and.resolveTo(null);
 
-    expect(component.validationErrorIsShown).toBeFalse();
+    expect(component.validationErrorIsShown).toBe(false);
 
     component.initStateEditor();
     tick();
     flush();
 
-    expect(component.validationErrorIsShown).toBeTrue();
+    expect(component.validationErrorIsShown).toBe(true);
   }));
 });

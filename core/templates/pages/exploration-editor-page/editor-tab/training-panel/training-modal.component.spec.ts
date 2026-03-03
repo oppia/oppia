@@ -32,6 +32,8 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {Interaction} from 'domain/exploration/interaction.model';
 
 class MockActiveModal {
   close(): void {
@@ -48,13 +50,13 @@ class MockStateInteractionIdService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1, item2) {}
+  saveInteractionAnswerGroups(item1: string, item2: AnswerGroup[]) {}
 
-  saveInteractionDefaultOutcome(item1, item2) {}
+  saveInteractionDefaultOutcome(item1: string, item2: Outcome | null) {}
 
   getState() {
     return {
-      interaction: 'TextInput',
+      interaction: {} as Interaction,
     };
   }
 }
@@ -69,7 +71,7 @@ class MockAnswerClassificationService {
   getMatchingClassificationResult() {
     return {
       answerGroupIndex: 2,
-      outcome: null,
+      outcome: Outcome.createNew('', 'feedback', '', []),
     };
   }
 }
@@ -153,7 +155,15 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 2,
-        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+        newOutcome: new Outcome(
+          'dest',
+          null,
+          SubtitledHtml.createDefault('', 'feedback'),
+          true,
+          [],
+          null,
+          null
+        ),
       };
       component.unhandledAnswer = 'string';
 
@@ -164,7 +174,7 @@ describe('Training Modal Component', () => {
       ] as AnswerGroup[]);
       spyOn(responsesService, 'save').and.callFake(
         (answerGroups, getDefaultOutcome, save) => {
-          save(null, null);
+          save(answerGroups, getDefaultOutcome);
         }
       );
 
@@ -182,7 +192,15 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 1,
-        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+        newOutcome: new Outcome(
+          'dest',
+          null,
+          SubtitledHtml.createDefault('', 'feedback'),
+          true,
+          [],
+          null,
+          null
+        ),
       };
       component.unhandledAnswer = 'string';
 
@@ -200,7 +218,15 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 1,
-        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+        newOutcome: new Outcome(
+          'dest',
+          null,
+          SubtitledHtml.createDefault('', 'feedback'),
+          true,
+          [],
+          null,
+          null
+        ),
       };
       component.unhandledAnswer = 'string';
 

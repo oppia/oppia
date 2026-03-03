@@ -74,82 +74,94 @@ describe('Solution Verification Service', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
 
-    explorationStatesService.init({
-      'First State': {
-        content: {content_id: 'content', html: 'First State Content'},
-        interaction: {
-          id: 'TextInput',
-          answer_groups: [
-            {
-              outcome: {
-                dest: 'End State',
-                dest_if_really_stuck: null,
-                feedback: {content_id: 'feedback_1', html: ''},
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null,
-              },
-              rule_specs: [
-                {
-                  rule_type: 'Contains',
-                  inputs: {
-                    x: {contentId: 'rule_input', normalizedStrSet: ['abc']},
-                  },
+    explorationStatesService.init(
+      {
+        'First State': {
+          classifier_model_id: null,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
+          content: {content_id: 'content', html: 'First State Content'},
+          interaction: {
+            id: 'TextInput',
+            confirmed_unclassified_answers: [],
+            answer_groups: [
+              {
+                training_data: [],
+                tagged_skill_misconception_id: null,
+                outcome: {
+                  dest: 'End State',
+                  dest_if_really_stuck: null,
+                  missing_prerequisite_skill_id: null,
+                  feedback: {content_id: 'feedback_1', html: ''},
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null,
                 },
-              ],
+                rule_specs: [
+                  {
+                    rule_type: 'Contains',
+                    inputs: {
+                      x: {contentId: 'rule_input', normalizedStrSet: ['abc']},
+                    },
+                  },
+                ],
+              },
+            ],
+            customization_args: {
+              placeholder: {
+                value: {content_id: 'ca_placeholder_0', unicode_str: ''},
+              },
+              rows: {value: 1},
+              catchMisspellings: {value: false},
             },
-          ],
-          customization_args: {
-            placeholder: {
-              value: {content_id: 'ca_placeholder_0', unicode_str: ''},
+            default_outcome: {
+              dest: 'First State',
+              dest_if_really_stuck: null,
+              missing_prerequisite_skill_id: null,
+              feedback: {content_id: 'default_outcome', html: ''},
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
             },
-            rows: {value: 1},
-            catchMisspellings: {value: false},
+            hints: [
+              {hint_content: {content_id: 'hint_1', html: 'one'}},
+              {hint_content: {content_id: 'hint_2', html: 'two'}},
+            ],
+            solution: null,
           },
-          default_outcome: {
-            dest: 'First State',
-            dest_if_really_stuck: null,
-            feedback: {content_id: 'default_outcome', html: ''},
-            labelled_as_correct: false,
-            param_changes: [],
-          },
-          hints: [
-            {hint_content: {content_id: 'hint_1', html: 'one'}},
-            {hint_content: {content_id: 'hint_2', html: 'two'}},
-          ],
+          param_changes: [],
+          solicit_answer_details: false,
         },
-        param_changes: [],
-        solicit_answer_details: false,
       },
-    });
+      false
+    );
   });
 
   it('should verify a correct solution', () => {
     const state = explorationStatesService.getState('First State');
-    stateInteractionIdService.init(
-      'First State',
-      state.interaction.id,
-      state.interaction,
-      'widget_id'
-    );
+    stateInteractionIdService.init('First State', state.interaction.id || '');
     stateCustomizationArgsService.init(
       'First State',
-      state.interaction.customizationArgs,
-      state.interaction,
-      'widget_customization_args'
+      state.interaction.customizationArgs
     );
 
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      Solution.createNew(false, 'abc', 'nothing')
+      Solution.createNew(
+        false,
+        'abc',
+        'nothing',
+        'solution'
+      ) as unknown as SubtitledHtml
     );
 
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        explorationStatesService.getState('First State').interaction.solution
+        explorationStatesService.getState('First State').interaction.solution!
           .correctAnswer
       )
     ).toBe(true);
@@ -157,30 +169,28 @@ describe('Solution Verification Service', () => {
 
   it('should verify an incorrect solution', () => {
     const state = explorationStatesService.getState('First State');
-    stateInteractionIdService.init(
-      'First State',
-      state.interaction.id,
-      state.interaction,
-      'widget_id'
-    );
+    stateInteractionIdService.init('First State', state.interaction.id || '');
     stateCustomizationArgsService.init(
       'First State',
-      state.interaction.customizationArgs,
-      state.interaction,
-      'widget_customization_args'
+      state.interaction.customizationArgs
     );
 
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      Solution.createNew(false, 'xyz', 'nothing')
+      Solution.createNew(
+        false,
+        'xyz',
+        'nothing',
+        'solution'
+      ) as unknown as SubtitledHtml
     );
 
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        explorationStatesService.getState('First State').interaction.solution
+        explorationStatesService.getState('First State').interaction.solution!
           .correctAnswer
       )
     ).toBe(false);
@@ -210,30 +220,28 @@ describe('Solution Verification Service', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
 
     const state = explorationStatesService.getState('First State');
-    stateInteractionIdService.init(
-      'First State',
-      state.interaction.id,
-      state.interaction,
-      'widget_id'
-    );
+    stateInteractionIdService.init('First State', state.interaction.id || '');
     stateCustomizationArgsService.init(
       'First State',
-      state.interaction.customizationArgs,
-      state.interaction,
-      'widget_customization_args'
+      state.interaction.customizationArgs
     );
 
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      Solution.createNew(false, 'abc', 'nothing')
+      Solution.createNew(
+        false,
+        'abc',
+        'nothing',
+        'solution'
+      ) as unknown as SubtitledHtml
     );
 
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        explorationStatesService.getState('First State').interaction.solution
+        explorationStatesService.getState('First State').interaction.solution!
           .correctAnswer
       )
     ).toBe(state.interaction.answerGroups[0].outcome.labelledAsCorrect);

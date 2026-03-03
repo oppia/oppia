@@ -35,6 +35,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {InteractionRulesService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {TrainingDataService} from './training-data.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -82,13 +83,16 @@ export class TrainingModalComponent
   extends ConfirmOrCancelModal
   implements OnInit
 {
-  @Input() unhandledAnswer: InteractionAnswer;
+  @Input() unhandledAnswer: InteractionAnswer = '';
   @Output() finishTrainingCallback: EventEmitter<void> = new EventEmitter();
 
   trainingDataAnswer: InteractionAnswer | string = '';
   // See the training panel directive in ExplorationEditorTab for an
   // explanation on the structure of this object.
-  classification: classification;
+  classification: classification = {
+    answerGroupIndex: 0,
+    newOutcome: Outcome.createNew('', '', '', []),
+  };
   addingNewResponse: boolean = false;
 
   constructor(
@@ -110,7 +114,7 @@ export class TrainingModalComponent
   ngOnInit(): void {
     this.classification = {
       answerGroupIndex: 0,
-      newOutcome: null,
+      newOutcome: Outcome.createNew('', '', '', []),
     };
     this.addingNewResponse = false;
 
@@ -125,14 +129,19 @@ export class TrainingModalComponent
       answerGroups,
       this.responsesService.getDefaultOutcome(),
       (newAnswerGroups, newDefaultOutcome) => {
+        const activeStateName = this.stateEditorService.getActiveStateName();
+        if (!activeStateName) {
+          return;
+        }
+
         this.explorationStatesService.saveInteractionAnswerGroups(
-          this.stateEditorService.getActiveStateName(),
+          activeStateName,
           cloneDeep(newAnswerGroups)
         );
 
         this.explorationStatesService.saveInteractionDefaultOutcome(
-          this.stateEditorService.getActiveStateName(),
-          cloneDeep(newDefaultOutcome)
+          activeStateName,
+          cloneDeep(newDefaultOutcome) ?? Outcome.createNew('', '', '', [])
         );
 
         this.graphDataService.recompute();
@@ -177,6 +186,9 @@ export class TrainingModalComponent
 
   init(): void {
     let currentStateName = this.stateEditorService.getActiveStateName();
+    if (!currentStateName) {
+      return;
+    }
     let state = this.explorationStatesService.getState(currentStateName);
 
     // Retrieve the interaction ID.
@@ -184,11 +196,13 @@ export class TrainingModalComponent
 
     let rulesServiceName =
       this.angularNameService.getNameOfInteractionRulesService(interactionId);
+    const rulesServiceKey =
+      rulesServiceName as keyof typeof RULES_SERVICE_MAPPING;
 
     // Inject RulesService dynamically.
     let rulesService = this.injector.get(
-      RULES_SERVICE_MAPPING[rulesServiceName]
-    );
+      RULES_SERVICE_MAPPING[rulesServiceKey]
+    ) as InteractionRulesService;
 
     let classificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
