@@ -84,7 +84,6 @@ jobs:
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
-      max-parallel: 15
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites }}
     name: E2E (${{ matrix.suite.name }})
@@ -181,7 +180,6 @@ jobs:
     strategy:
       # Fast fail only if it's a merge queue.
       fail-fast: ${{ github.event_name == 'merge_group' }}
-      max-parallel: 15
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.suites }}
     name: Acceptance (${{ matrix.suite.name }})
@@ -305,7 +303,6 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
-      max-parallel: 15
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.suites }}
     name: Lighthouse a11y (shard ${{ matrix.suite.name }})
@@ -335,7 +332,6 @@ jobs:
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
-      max-parallel: 15
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.suites }}
     name: Lighthouse perf (shard ${{ matrix.suite.name }})
