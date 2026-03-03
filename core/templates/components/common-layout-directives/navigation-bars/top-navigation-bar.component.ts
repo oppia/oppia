@@ -108,6 +108,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
   userIsLoggedIn: boolean = false;
+  /**
+   * Flag to track whether the auth status has been resolved from the
+   * getUserInfoAsync() call. This prevents the "Sign In" UI from briefly
+   * flashing before the actual auth state is known.
+   */
+  authStatusResolved: boolean = false;
   currentUrl!: string;
   userMenuIsShown: boolean = false;
   inClassroomPage: boolean = false;
@@ -272,61 +278,69 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
     this.i18nService.updateViewToUserPreferredSiteLanguage();
 
-    this.userService.getUserInfoAsync().then(userInfo => {
-      this.isModerator = userInfo.isModerator();
-      this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
-      this.isTranslationAdmin = userInfo.isTranslationAdmin();
-      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
-      this.isQuestionAdmin = userInfo.isQuestionAdmin();
-      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
-      this.isReleaseCoordinator = userInfo.isReleaseCoordinator();
-      this.isTopicManager = userInfo.isTopicManager();
-      this.isSuperAdmin = userInfo.isSuperAdmin();
-      this.isBlogAdmin = userInfo.isBlogAdmin();
-      this.isBlogPostEditor = userInfo.isBlogPostEditor();
-      this.userIsLoggedIn = userInfo.isLoggedIn();
-      let usernameFromUserInfo = userInfo.getUsername();
-      if (this.userIsLoggedIn) {
-        let feedbackUpdatesDataPromise =
-          this.feedbackUpdatesBackendApiService.fetchFeedbackUpdatesDataAsync(
-            this.paginatedThreadsList
-          );
-        feedbackUpdatesDataPromise.then(
-          responseData => {
-            this.unreadThreadsCount = responseData.numberOfUnreadThreads;
-          },
-          errorResponseStatus => {
-            if (
-              AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-            ) {
-              this.alertsService.addWarning(
-                'Failed to get number of unread thread of feedback updates'
-              );
+    this.userService
+      .getUserInfoAsync()
+      .then(userInfo => {
+        this.isModerator = userInfo.isModerator();
+        this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
+        this.isTranslationAdmin = userInfo.isTranslationAdmin();
+        this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+        this.isQuestionAdmin = userInfo.isQuestionAdmin();
+        this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+        this.isReleaseCoordinator = userInfo.isReleaseCoordinator();
+        this.isTopicManager = userInfo.isTopicManager();
+        this.isSuperAdmin = userInfo.isSuperAdmin();
+        this.isBlogAdmin = userInfo.isBlogAdmin();
+        this.isBlogPostEditor = userInfo.isBlogPostEditor();
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+        let usernameFromUserInfo = userInfo.getUsername();
+        if (this.userIsLoggedIn) {
+          let feedbackUpdatesDataPromise =
+            this.feedbackUpdatesBackendApiService.fetchFeedbackUpdatesDataAsync(
+              this.paginatedThreadsList
+            );
+          feedbackUpdatesDataPromise.then(
+            responseData => {
+              this.unreadThreadsCount = responseData.numberOfUnreadThreads;
+            },
+            errorResponseStatus => {
+              if (
+                AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !==
+                -1
+              ) {
+                this.alertsService.addWarning(
+                  'Failed to get number of unread thread of feedback updates'
+                );
+              }
             }
-          }
-        );
-      }
-      if (usernameFromUserInfo) {
-        this.username = usernameFromUserInfo;
-        this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
-          '/profile/<username>',
-          {
-            username: this.username,
-          }
-        );
-        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
-          this.userService.getProfileImageDataUrl(this.username);
-      } else {
-        this.profilePicturePngDataUrl =
-          this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
           );
-        this.profilePictureWebpDataUrl =
-          this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+        }
+        if (usernameFromUserInfo) {
+          this.username = usernameFromUserInfo;
+          this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
+            '/profile/<username>',
+            {
+              username: this.username,
+            }
           );
-      }
-    });
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
+            this.userService.getProfileImageDataUrl(this.username);
+        } else {
+          this.profilePicturePngDataUrl =
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+            );
+          this.profilePictureWebpDataUrl =
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+            );
+        }
+      })
+      .finally(() => {
+        // Set authStatusResolved to true regardless of success/failure
+        // so UI doesn't remain in loading state indefinitely.
+        this.authStatusResolved = true;
+      });
 
     for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
       this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]] = true;

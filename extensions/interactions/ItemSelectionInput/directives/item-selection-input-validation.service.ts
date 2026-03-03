@@ -56,11 +56,36 @@ export class ItemSelectionInputValidationService {
     var handledAnswers = [];
     var numChoices = customizationArgs.choices.value.length;
 
+    const trimHtml = (html: string): string => {
+      const div = document.createElement('div');
+      // eslint-disable-next-line oppia/no-inner-html
+      div.innerHTML = html;
+
+      const trimNode = (node: Node): void => {
+        if (node.nodeType === Node.TEXT_NODE && node.textContent !== null) {
+          node.textContent = node.textContent.trim();
+          return;
+        }
+
+        if (node.firstChild) {
+          trimNode(node.firstChild);
+        }
+        if (node.lastChild) {
+          trimNode(node.lastChild);
+        }
+      };
+
+      trimNode(div);
+      // eslint-disable-next-line oppia/no-inner-html
+      return div.innerHTML;
+    };
+
     for (var i = 0; i < numChoices; i++) {
       var choice = customizationArgs.choices.value[i].html;
       if (this.baseInteractionValidationServiceInstance.isHTMLEmpty(choice)) {
         areAnyChoicesEmpty = true;
       }
+      choice = trimHtml(choice);
       if (seenChoices.indexOf(choice) !== -1) {
         areAnyChoicesDuplicated = true;
       }
