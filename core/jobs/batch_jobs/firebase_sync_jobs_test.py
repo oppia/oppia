@@ -93,7 +93,7 @@ class FirebaseSyncRecordsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(stdout='Delete Records SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='Create Records SUCCESS: 1'),
             ],
         )
 
@@ -180,7 +180,7 @@ class FirebaseSyncRecordsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(stdout='Delete Records SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='Create Records SUCCESS: 1'),
             ],
         )
 
@@ -233,7 +233,7 @@ class FirebaseSyncRecordsJobTests(
             [
                 job_run_result.JobRunResult(stdout='SKIPPED: 1'),
                 job_run_result.JobRunResult(stdout='Delete Records SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='Create Records SUCCESS: 1'),
             ],
         )
 
@@ -265,7 +265,7 @@ class FirebaseSyncRecordsJobTests(
         )
 
         self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='Import Records SUCCESS: 1')],
+            [job_run_result.JobRunResult(stdout='Create Records SUCCESS: 1')],
         )
 
         with self.assertRaisesRegex(
