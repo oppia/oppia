@@ -895,7 +895,7 @@ class ReviewableSuggestionsHandler(
             )
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             if limit is None:
-                raise ValueError(
+                raise self.InvalidInputException(
                     'Limit must be provided for question suggestions.'
                 )
             topic_name = self.normalized_request.get('topic_name')
