@@ -397,6 +397,12 @@ describe('Topic editor page', () => {
     expect(component.getNavbarText()).toBe('');
   });
 
+  it('should return empty string for unknown active tab', () => {
+    spyOn(component, 'getActiveTabName').and.returnValue('random_tab');
+
+    expect(component.getNavbarText()).toBe('');
+  });
+
   it(
     'should load topic based on its id on url when undo or redo action' +
       ' is performed',
