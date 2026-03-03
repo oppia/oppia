@@ -17,7 +17,13 @@
  */
 
 import {AppConstants} from 'app.constants';
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -76,6 +82,7 @@ export class HomeTabComponent {
   loadingMessage: string = 'Loading';
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private windowDimensionService: WindowDimensionsService,
@@ -168,6 +175,10 @@ export class HomeTabComponent {
       this.allCardsLoaded = true;
       this.loadingMessage = '';
       this.loaderService.hideLoadingScreen();
+      // Explicitly trigger change detection so that Angular's
+      // verification pass sees the updated value of allCardsLoaded,
+      // preventing an ExpressionChangedAfterItHasBeenCheckedError.
+      this.changeDetectorRef.detectChanges();
     } else {
       setTimeout(() => {
         if (!this.allCardsLoaded) {
