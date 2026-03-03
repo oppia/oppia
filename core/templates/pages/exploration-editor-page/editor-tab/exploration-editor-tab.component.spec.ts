@@ -555,7 +555,7 @@ describe('Exploration editor tab component', () => {
 
     expect(explorationStatesService.addState).toHaveBeenCalledWith(
       'Fourth State',
-      null
+      jasmine.any(Function)
     );
   });
 
@@ -648,7 +648,7 @@ describe('Exploration editor tab component', () => {
     expect(
       explorationStatesService.getState('First State')
         .inapplicableSkillMisconceptionIds
-    ).toEqual(undefined);
+    ).toEqual([]);
 
     component.saveInapplicableSkillMisconceptionIds(['skill_id1']);
     expect(

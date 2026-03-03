@@ -156,13 +156,17 @@ describe('Solution Verification Service', () => {
         'solution'
       ) as unknown as SubtitledHtml
     );
+    const solution =
+      explorationStatesService.getState('First State').interaction.solution;
+    if (solution === null) {
+      throw new Error('Expected solution to be present.');
+    }
 
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        explorationStatesService.getState('First State').interaction.solution!
-          .correctAnswer
+        solution.correctAnswer
       )
     ).toBe(true);
   });
@@ -185,13 +189,17 @@ describe('Solution Verification Service', () => {
         'solution'
       ) as unknown as SubtitledHtml
     );
+    const solution =
+      explorationStatesService.getState('First State').interaction.solution;
+    if (solution === null) {
+      throw new Error('Expected solution to be present.');
+    }
 
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        explorationStatesService.getState('First State').interaction.solution!
-          .correctAnswer
+        solution.correctAnswer
       )
     ).toBe(false);
   });
@@ -236,13 +244,17 @@ describe('Solution Verification Service', () => {
         'solution'
       ) as unknown as SubtitledHtml
     );
+    const solution =
+      explorationStatesService.getState('First State').interaction.solution;
+    if (solution === null) {
+      throw new Error('Expected solution to be present.');
+    }
 
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        explorationStatesService.getState('First State').interaction.solution!
-          .correctAnswer
+        solution.correctAnswer
       )
     ).toBe(state.interaction.answerGroups[0].outcome.labelledAsCorrect);
   });

@@ -264,8 +264,8 @@ describe('Training Data Service', () => {
         )
       )
     ).toEqual([
-      null,
-      null,
+      Outcome.createNew('', 'feedback_3', '', []),
+      Outcome.createNew('', 'feedback_4', '', []),
       new Outcome(
         'Hola',
         null,

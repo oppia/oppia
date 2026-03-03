@@ -72,48 +72,6 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
-type DefaultCustomizationArg =
-  | DefaultValueHtml[]
-  | DefaultValueHtml
-  | DefaultValueUnicode[]
-  | DefaultValueUnicode
-  | DefaultValueGraph
-  | ImageWithRegions
-  | []
-  | number
-  | string
-  | boolean;
-
-interface DefaultValueHtml {
-  content_id: string;
-  html: string;
-}
-
-interface DefaultValueUnicode {
-  content_id: string;
-  unicode_str: string;
-}
-
-interface VerticesInterface {
-  x: number;
-  y: number;
-  label: string;
-}
-
-interface EdgeInterface {
-  src: number;
-  dst: number;
-  weight: string;
-}
-
-interface DefaultValueGraph {
-  isWeighted: boolean;
-  edges: EdgeInterface[];
-  isDirected: boolean;
-  vertices: VerticesInterface[];
-  isLabeled: boolean;
-}
-
 export interface CustomizationArgSpecsInterface {
   name: string | number;
   default_value: unknown;
