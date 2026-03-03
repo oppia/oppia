@@ -147,15 +147,15 @@ class CreateRecords(
 
         errors = []
         for i, record in enumerate(records):
+            user_email = record.email or ''
+            # HINT: `md5(email)` used for consistency with the frontend.
+            # See: core/templates/services/auth.service.ts.
+            user_password = hashlib.md5(user_email.encode()).hexdigest()
             try:
-                user_email = record.email or ''
-                # HINT: `md5(email)` used for consistency with the frontend.
-                # See: core/templates/services/auth.service.ts.
-                user_password = hashlib.md5(user_email.encode()).hexdigest()
                 firebase_auth.create_user(
                     uid=record.uid,
-                    email=user_email,
                     disabled=record.disabled,
+                    email=user_email,
                     password=user_password,
                 )
             except (ValueError, firebase_exceptions.FirebaseError) as e:
