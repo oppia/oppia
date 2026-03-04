@@ -38,6 +38,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {LoaderService} from 'services/loader.service';
 import {UrlService} from 'services/contextual/url.service';
 import {BlogHomePageConstants} from './blog-home-page.constants';
+import {Router, ActivatedRoute} from '@angular/router';
 
 import './blog-home-page.component.css';
 
@@ -83,13 +84,16 @@ export class BlogHomePageComponent implements OnInit {
     private blogHomePageBackendApiService: BlogHomePageBackendApiService,
     private alertsService: AlertsService,
     private loaderService: LoaderService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    let urlParams = this.urlService.getUrlParams();
+    const urlParams = this.urlService.getUrlParams();
     this.page = urlParams.page ? Number(urlParams.page) : 1;
+
     this.calculateFirstPostOnPageNum(
       this.page,
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
@@ -98,6 +102,7 @@ export class BlogHomePageComponent implements OnInit {
       this.page,
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     );
+
     this.oppiaAvatarImgUrl =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
@@ -106,13 +111,16 @@ export class BlogHomePageComponent implements OnInit {
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH =
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
+
     if (this.urlService.getUrlParams().hasOwnProperty('q')) {
       this.searchPageIsActive = true;
       this.filterWasUsed = true;
-      this.updateSearchFieldsBasedOnUrlQuery();
+
+      this.updateSearchFieldsBasedOnUrlQuery(true);
     } else {
       this.loadInitialBlogHomePageData();
     }
+
     this.searchQueryChanged
       .pipe(debounceTime(1000), distinctUntilChanged())
       .subscribe(model => {
@@ -120,12 +128,8 @@ export class BlogHomePageComponent implements OnInit {
         this.onSearchQueryChangeExec();
       });
 
-    // Notify the function that handles overflow in case the
-    // search elements load after it has already been run.
     this.blogPostSearchService.onSearchBarLoaded.emit();
 
-    // Called when the first batch of search results is retrieved from
-    // the server.
     this.directiveSubscriptions.add(
       this.blogPostSearchService.onInitialSearchResultsLoaded.subscribe(
         (response: SearchResponseData) => {
@@ -205,7 +209,7 @@ export class BlogHomePageComponent implements OnInit {
       );
   }
 
-  loadBlogPostsForPage(offset: number): void {
+  loadMoreBlogPostSummaries(offset: number): void {
     this.blogHomePageBackendApiService
       .fetchBlogHomePageDataAsync(String(offset))
       .then(
@@ -232,26 +236,47 @@ export class BlogHomePageComponent implements OnInit {
 
     if (!this.searchPageIsActive) {
       let offset = this.firstPostOnPageNum - 1;
-      this.loadBlogPostsForPage(offset);
+      this.loadMoreBlogPostSummaries(offset);
     } else {
-      this.blogPostSearchService.loadMoreData(
-        data => {
-          this.loadSearchResultsPageData(data);
-        },
-        _isCurrentlyFetchingResults => {
+      const pageSize = this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH;
+      const offset = (this.page - 1) * pageSize;
+
+      // Construct query params properly
+      const params = new URLSearchParams();
+      if (this.searchQuery) {
+        params.set('q', this.searchQuery);
+      }
+      if (this.selectedTags.length > 0) {
+        params.set('tags', this.selectedTags.join(','));
+      }
+      params.set('offset', offset.toString());
+
+      // Pass the query string to backend
+      this.blogHomePageBackendApiService
+        .fetchBlogPostSearchResultAsync('?' + params.toString())
+        .then(data => {
+          this.blogPostSummaries = data.blogPostSummariesList;
+          this.blogPostSummariesToShow = this.blogPostSummaries;
+          this.totalBlogPosts = data.totalMatchingBlogPosts;
+
+          this.calculateLastPostOnPageNum(this.page, pageSize);
+          this.showBlogPostCardsLoadingScreen = false;
+        })
+        .catch(error => {
           this.alertsService.addWarning(
-            'No more search resutls found. End of search results.'
+            'Unable to fetch search results. Please try again.'
           );
-        }
-      );
+        });
     }
   }
 
   onPageChange(page = this.page): void {
-    let url = new URL(this.windowRef.nativeWindow.location.toString());
-    url.searchParams.set('page', String(page));
-    this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
     this.page = page;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {page: page},
+      queryParamsHandling: 'merge',
+    });
     if (!this.searchPageIsActive) {
       this.calculateFirstPostOnPageNum(
         page,
@@ -300,13 +325,15 @@ export class BlogHomePageComponent implements OnInit {
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
 
-    let url = new URL(this.windowRef.nativeWindow.location.toString());
+    const currentParams = this.route.snapshot.queryParams;
 
-    let currentQuery = url.searchParams.get('q') || '';
-    let currentTags = url.searchParams.get('tags')?.split(',') || [];
-    let currentPage = url.searchParams.get('page') || '1';
+    const currentQuery = currentParams['q'] || '';
+    const currentTags = currentParams['tags']
+      ? currentParams['tags'].split(',')
+      : [];
+    const currentPage = currentParams['page'] || '1';
 
-    let isQueryChanged =
+    const isQueryChanged =
       currentQuery !== this.searchQuery ||
       currentTags.join(',') !== this.selectedTags.join(',');
 
@@ -318,15 +345,7 @@ export class BlogHomePageComponent implements OnInit {
       this.blogPostSummaries = [];
       this.totalBlogPosts = 0;
 
-      let path = '/blog';
-      let finalUrl = `${url.origin}${path}`;
-
-      if (this.windowRef.nativeWindow.location.pathname !== path) {
-        this.windowRef.nativeWindow.location.href = finalUrl;
-      } else {
-        this.windowRef.nativeWindow.history.pushState({}, '', finalUrl);
-        this.loadInitialBlogHomePageData();
-      }
+      this.router.navigate(['/blog']);
       return;
     }
 
@@ -336,26 +355,20 @@ export class BlogHomePageComponent implements OnInit {
       this.searchQuery,
       this.selectedTags,
       () => {
-        let searchUrlQueryString =
+        const searchUrlQueryString =
           this.blogPostSearchService.getSearchUrlQueryString(
             this.searchQuery,
             this.selectedTags
           );
 
-        let pageToUse = isQueryChanged ? '1' : currentPage;
+        const pageToUse = isQueryChanged ? '1' : currentPage;
 
-        let params = new URLSearchParams();
-        params.set('q', searchUrlQueryString);
-        params.set('page', pageToUse);
-
-        let path = '/blog/search/find';
-        let finalUrl = `${url.origin}${path}?${params.toString()}`;
-
-        if (this.windowRef.nativeWindow.location.pathname !== path) {
-          this.windowRef.nativeWindow.location.href = finalUrl;
-        } else {
-          this.windowRef.nativeWindow.history.pushState({}, '', finalUrl);
-        }
+        this.router.navigate(['/blog/search/find'], {
+          queryParams: {
+            q: searchUrlQueryString,
+            page: pageToUse,
+          },
+        });
       },
       errorResponse => {
         this.alertsService.addWarning(
@@ -369,19 +382,18 @@ export class BlogHomePageComponent implements OnInit {
     return this.windowDimensionsService.getWidth() <= 1024;
   }
 
-  updateSearchFieldsBasedOnUrlQuery(): void {
-    let newSearchQuery: UrlSearchQuery;
-    newSearchQuery =
+  updateSearchFieldsBasedOnUrlQuery(loadPageAfterUpdate = false): void {
+    const newSearchQuery: UrlSearchQuery =
       this.blogPostSearchService.updateSearchFieldsBasedOnUrlQuery(
         this.windowRef.nativeWindow.location.search
       );
 
-    if (
-      this.searchQuery !== newSearchQuery.searchQuery ||
-      this.selectedTags !== newSearchQuery.selectedTags
-    ) {
-      this.searchQuery = newSearchQuery.searchQuery;
-      this.selectedTags = newSearchQuery.selectedTags;
+    this.searchQuery = newSearchQuery.searchQuery;
+    this.selectedTags = newSearchQuery.selectedTags;
+
+    if (loadPageAfterUpdate) {
+      this.loadPage();
+    } else {
       this.onSearchQueryChangeExec();
     }
   }
