@@ -293,7 +293,7 @@ describe('Logged-In Learner', function () {
         }
 
         if (!targetHandle) {
-          throw new Error(`Target chapter What are the Place Values not found`);
+          throw new Error('Target chapter What are the Place Values not found');
         }
 
         const s = await sourceHandle.boundingBox();
