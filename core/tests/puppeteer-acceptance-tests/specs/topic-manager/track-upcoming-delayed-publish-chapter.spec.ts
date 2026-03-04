@@ -258,7 +258,7 @@ describe('Logged-In Learner', function () {
           '0'
         );
 
-        //Publish chapter could not be drag and drop
+        // Publish chapter could not be drag and drop.
         await curriculumAdmin.openStoryEditor(
           "Jamie's Adventures in the Arcade",
           'Place Values'
@@ -271,8 +271,9 @@ describe('Logged-In Learner', function () {
         for (const row of rows) {
           const titleEl = await row.$(chapterTitleSelector);
 
-          if (!titleEl) continue;
-
+          if (!titleEl) {
+            continue;
+          }
           const text = await titleEl.evaluate(
             el => el.textContent?.trim() || ''
           );
@@ -287,14 +288,12 @@ describe('Logged-In Learner', function () {
         }
         if (!sourceHandle) {
           throw new Error(
-            `Source chapter "Find the Value of a Number" not found`
+            'Source chapter Find the Value of a Number not found'
           );
         }
 
         if (!targetHandle) {
-          throw new Error(
-            `Target chapter "What are the Place Values" not found`
-          );
+          throw new Error(`Target chapter What are the Place Values not found`);
         }
 
         const s = await sourceHandle.boundingBox();
@@ -336,7 +335,7 @@ describe('Logged-In Learner', function () {
 
       // Drag and drop functionality is not available for mobile view, so the test case for drag and drop is only executed for desktop view.
       if (!curriculumAdmin.isViewportAtMobileWidth()) {
-        //Draft and ready to publish chapter can be drag and dropped to change their order.
+        // Draft and ready to publish chapter can be drag and dropped to change their order.
         await curriculumAdmin.dragChapterByName(
           "Jamie's Adventures in the Arcade",
           'Place Values',

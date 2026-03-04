@@ -4585,8 +4585,9 @@ export class TopicManager extends BaseUser {
     for (const row of rows) {
       const titleEl = await row.$(chapterTitleSelector);
 
-      if (!titleEl) continue;
-
+      if (!titleEl) {
+        continue;
+      }
       const text = await titleEl.evaluate(el => el.textContent?.trim() || '');
 
       if (text.includes(fromChapterName)) {
