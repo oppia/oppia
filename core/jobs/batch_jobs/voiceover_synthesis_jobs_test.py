@@ -59,7 +59,6 @@ class VoiceoverSynthesisBaseClass(
     CURATED_EXPLORATION_ID_1 = 'exploration_id_1'
     CURATED_EXPLORATION_ID_2 = 'exploration_id_2'
     NON_CURATED_EXPLORATION_ID = 'exploration_id_3'
-    CURATED_EXPLORATION_ID_4 = 'exploration_id_4'
 
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
@@ -286,46 +285,6 @@ class VoiceoverSynthesisBaseClass(
             'Changes content.',
         )
 
-        exploration_4 = self.save_new_valid_exploration(
-            self.CURATED_EXPLORATION_ID_4,
-            self.owner_id,
-            title='title4',
-            category=constants.constants.ALL_CATEGORIES[0],
-            end_state_name='End State',
-        )
-
-        self.publish_exploration(self.owner_id, exploration_4.id)
-
-        exp_services.update_exploration(
-            self.owner_id,
-            self.CURATED_EXPLORATION_ID_4,
-            [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'Introduction',
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': '<p>This is the first card of fourth exploration.</p>',
-                        },
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'End State',
-                        'new_value': {
-                            'content_id': 'content_3',
-                            'html': '<p>This is the last card of fourth exploration.</p>',
-                        },
-                    }
-                ),
-            ],
-            'Changes content.',
-        )
-
         story_services.update_story(
             self.owner_id,
             self.STORY_ID_2,
@@ -344,22 +303,6 @@ class VoiceoverSynthesisBaseClass(
                         'node_id': 'node_1',
                         'old_value': None,
                         'new_value': self.CURATED_EXPLORATION_ID_2,
-                    }
-                ),
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'add_story_node',
-                        'node_id': 'node_2',
-                        'title': 'Node2',
-                    }
-                ),
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'update_story_node_property',
-                        'property_name': 'exploration_id',
-                        'node_id': 'node_2',
-                        'old_value': None,
-                        'new_value': self.CURATED_EXPLORATION_ID_4,
                     }
                 ),
             ],

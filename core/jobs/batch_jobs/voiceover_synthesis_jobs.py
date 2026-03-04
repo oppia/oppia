@@ -59,16 +59,6 @@ if MYPY:  # pragma: no cover
 )
 datastore_services = models.Registry.import_datastore_services()
 
-# Voiceover regeneration for all curated explorations significantly increases
-# the workload and makes debugging difficult. Therefore, I’m running the
-# voiceover regeneration on a single exploration for testing purposes.
-exploration_id_to_regenerate_voiceovers = [
-    'umPkwp0L1M0-',
-    # The below two exploration IDs are related to unit tests.
-    'exploration_id_1',
-    'exploration_id_2',
-]
-
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
@@ -125,13 +115,6 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             str. The status string for the voiceover generation process.
         """
         entity_id = combined_models[0]
-
-        if entity_id not in exploration_id_to_regenerate_voiceovers:
-            logging.info(
-                'Voiceover synthesis log: Skipping voiceover generation for exploration ID: %s',
-                entity_id,
-            )
-            return
 
         logging.info(
             'Voiceover synthesis log: Generating voiceovers for exploration ID: %s',
