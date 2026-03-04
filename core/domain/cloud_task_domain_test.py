@@ -348,7 +348,7 @@ class VoiceoverRegenerationTaskBatchTests(test_utils.GenericTestBase):
 
     def test_should_create_domain_object_correctly(self) -> None:
         parent_cloud_task_run_id = 'parent_task_run_id'
-        child_cloud_task_run_id = ['child_task_run_id_1', 'child_task_run_id_2']
+        child_cloud_task_run_id = 'child_task_run_id_1'
         exploration_id = 'exp_id'
         exploration_version = 1
         language_accent_code = 'en-US'
@@ -394,7 +394,7 @@ class VoiceoverRegenerationTaskBatchTests(test_utils.GenericTestBase):
 
     def test_should_create_domain_object_from_dict(self) -> None:
         parent_cloud_task_run_id = 'parent_task_run_id'
-        child_cloud_task_run_id = ['child_task_run_id_1', 'child_task_run_id_2']
+        child_cloud_task_run_id = 'child_task_run_id_1'
         exploration_id = 'exp_id'
         exploration_version = 1
         language_accent_code = 'en-US'
@@ -425,7 +425,7 @@ class VoiceoverRegenerationTaskBatchTests(test_utils.GenericTestBase):
 
     def test_should_convert_to_dict_correctly(self) -> None:
         parent_cloud_task_run_id = 'parent_task_run_id'
-        child_cloud_task_run_id = ['child_task_run_id_1']
+        child_cloud_task_run_id = 'child_task_run_id_1'
         exploration_id = 'exp_id'
         exploration_version = 2
         language_accent_code = 'hi-IN'
@@ -457,34 +457,9 @@ class VoiceoverRegenerationTaskBatchTests(test_utils.GenericTestBase):
             voiceover_regeneration_task_batch.to_dict(), expected_dict
         )
 
-    def test_should_handle_empty_child_task_list(self) -> None:
-        parent_cloud_task_run_id = 'parent_task_run_id'
-        child_cloud_task_run_id: list[str] = []
-        exploration_id = 'exp_id'
-        exploration_version = 1
-        language_accent_code = 'en-US'
-        content_ids_to_contents_map = {
-            'content_0': 'Content text',
-        }
-
-        voiceover_regeneration_task_batch = (
-            cloud_task_domain.VoiceoverRegenerationTaskBatch(
-                parent_cloud_task_run_id,
-                child_cloud_task_run_id,
-                exploration_id,
-                exploration_version,
-                language_accent_code,
-                content_ids_to_contents_map,
-            )
-        )
-
-        self.assertEqual(
-            voiceover_regeneration_task_batch.child_cloud_task_run_id, []
-        )
-
     def test_should_handle_empty_content_map(self) -> None:
         parent_cloud_task_run_id = 'parent_task_run_id'
-        child_cloud_task_run_id = ['child_task_run_id_1']
+        child_cloud_task_run_id = 'child_task_run_id_1'
         exploration_id = 'exp_id'
         exploration_version = 1
         language_accent_code = 'en-US'

@@ -176,13 +176,13 @@ class VoiceoverRegenerationJob:
     @classmethod
     def from_dict(
         cls,
-        voiceover_regeneration_task_mapping_dict: VoiceoverRegenerationJobDict,
+        voiceover_regeneration_job_dict: VoiceoverRegenerationJobDict,
     ) -> VoiceoverRegenerationJob:
         """Returns an instance of VoiceoverRegenerationJob from the
         given dictionary.
 
         Args:
-            voiceover_regeneration_task_mapping_dict: dict. A dictionary
+            voiceover_regeneration_job_dict: dict. A dictionary
                 representation of the VoiceoverRegenerationJob object.
 
         Returns:
@@ -190,12 +190,10 @@ class VoiceoverRegenerationJob:
             domain object created from the given dict representation.
         """
         return cls(
-            exploration_id=voiceover_regeneration_task_mapping_dict[
-                'exploration_id'
-            ],
-            task_run_id=voiceover_regeneration_task_mapping_dict['task_run_id'],
+            exploration_id=voiceover_regeneration_job_dict['exploration_id'],
+            task_run_id=voiceover_regeneration_job_dict['task_run_id'],
             language_accent_to_content_status_map=(
-                voiceover_regeneration_task_mapping_dict[
+                voiceover_regeneration_job_dict[
                     'language_accent_to_content_status_map'
                 ]
             ),
@@ -375,6 +373,17 @@ class VoiceoverRegenerationJob:
         return total_failed_contents
 
 
+class VoiceoverRegenerationTaskBatchDict(TypedDict):
+    """Dictionary representing the VoiceoverRegenerationTaskBatch object."""
+
+    parent_cloud_task_run_id: str
+    child_cloud_task_run_id: str
+    exploration_id: str
+    exploration_version: int
+    language_accent_code: str
+    content_ids_to_contents_map: Dict[str, str]
+
+
 class VoiceoverRegenerationTaskBatch:
     """Voiceover regeneration for a large number of contents within a single
     Cloud Task run (deferred request) significantly increases the workload and
@@ -391,7 +400,7 @@ class VoiceoverRegenerationTaskBatch:
     def __init__(
         self,
         parent_cloud_task_run_id: str,
-        child_cloud_task_run_id: List[str],
+        child_cloud_task_run_id: str,
         exploration_id: str,
         exploration_version: int,
         language_accent_code: str,
@@ -404,7 +413,7 @@ class VoiceoverRegenerationTaskBatch:
         self.language_accent_code = language_accent_code
         self.content_ids_to_contents_map = content_ids_to_contents_map
 
-    def to_dict(self) -> Dict[str, str | List[str] | int | Dict[str, str]]:
+    def to_dict(self) -> VoiceoverRegenerationTaskBatchDict:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -424,9 +433,7 @@ class VoiceoverRegenerationTaskBatch:
     @classmethod
     def from_dict(
         cls,
-        voiceover_regeneration_task_batch_dict: Dict[
-            str, str | List[str] | int | Dict[str, str]
-        ],
+        voiceover_regeneration_task_batch_dict: VoiceoverRegenerationTaskBatchDict,
     ) -> VoiceoverRegenerationTaskBatch:
         """Returns an instance of VoiceoverRegenerationTaskBatch from the
         given dictionary.

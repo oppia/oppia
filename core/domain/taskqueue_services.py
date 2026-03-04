@@ -119,7 +119,7 @@ def defer_voiceover_regeneration_task_in_batches(
     fn_identifier: str,
     queue_name: str,
     parent_cloud_task_run_id: str,
-    new_cloud_task_model_id: str,
+    child_cloud_task_model_id: str,
     *args: Any,
     **kwargs: Any,
 ) -> None:
@@ -133,7 +133,7 @@ def defer_voiceover_regeneration_task_in_batches(
             one of the QUEUE_NAME_* constants listed above.
         parent_cloud_task_run_id: str. The ID of the parent Cloud Task run for
             which the voiceover regeneration task is being deferred.
-        new_cloud_task_model_id: str. The ID for the new CloudTaskRunModel to
+        child_cloud_task_model_id: str. The ID for the new CloudTaskRunModel to
             be created for this deferred task.
         *args: list(*). Positional arguments for fn. Positional arguments
             should be json serializable.
@@ -145,8 +145,8 @@ def defer_voiceover_regeneration_task_in_batches(
     """
     payload = {
         'fn_identifier': fn_identifier,
-        'cloud_task_model_id': new_cloud_task_model_id,
         'parent_cloud_task_run_id': parent_cloud_task_run_id,
+        'cloud_task_model_id': child_cloud_task_model_id,
         'args': (args if args else []),
         'kwargs': (kwargs if kwargs else {}),
     }
@@ -167,7 +167,7 @@ def defer_voiceover_regeneration_task_in_batches(
     )
     assert task.name is not None
     cloud_task_model = create_new_cloud_task_model(
-        new_cloud_task_model_id, task.name, fn_identifier
+        child_cloud_task_model_id, task.name, fn_identifier
     )
     cloud_task_model.update_timestamps()
     cloud_task_model.put()

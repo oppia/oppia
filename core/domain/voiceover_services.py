@@ -1050,7 +1050,7 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
                     batch_content_id_value_pairs
                 )
 
-                new_cloud_task_model_id = (
+                child_cloud_task_model_id = (
                     taskqueue_services.get_new_cloud_task_run_id()
                 )
 
@@ -1061,14 +1061,14 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
                     ],
                     taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                     parent_cloud_task_run_id,
-                    new_cloud_task_model_id,
+                    child_cloud_task_model_id,
                     exploration_id,
                 )
 
                 voiceover_regeneration_task_batch_instance = (
                     cloud_task_domain.VoiceoverRegenerationTaskBatch(
                         parent_cloud_task_run_id,
-                        new_cloud_task_model_id,
+                        child_cloud_task_model_id,
                         exploration_id,
                         exploration_version,
                         language_accent_code,
@@ -1116,7 +1116,7 @@ def regenerate_voiceovers_for_batch_contents(
     # Ruling out the possibility of None for mypy type checking.
     assert voiceover_regeneration_job_status is not None
 
-    voiceover_regeneration_batch_execution_job = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model_by_id(
+    voiceover_regeneration_batch_execution_job = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
         parent_cloud_task_run_id, child_cloud_task_run_id
     )
 

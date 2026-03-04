@@ -99,7 +99,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             language_accent_to_content_status_map,
         )
 
-    def test_should_update_voiceover_regeneration_status(
+    def test_should_update_voiceover_regeneration_job_status(
         self,
     ) -> None:
         task_run_id = 'task_run_id'
@@ -123,7 +123,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}
         }
 
-        voiceover_cloud_task_services.update_voiceover_regeneration_status(
+        voiceover_cloud_task_services.update_voiceover_regeneration_job_status(
             exploration_id, 'en-US', 'content_0', 'SUCCEEDED'
         )
 
@@ -160,7 +160,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             voiceover_regeneration_task_mapping
         )
 
-        voiceover_cloud_task_services.delete_voiceover_regeneration_job_model(
+        voiceover_cloud_task_services.delete_voiceover_regeneration_job(
             exploration_id, task_run_id
         )
 
@@ -386,13 +386,13 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             batch_instances
         )
 
-        retrieved_batch_1 = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model_by_id(
+        retrieved_batch_1 = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
             parent_task_run_id, 'child_task_run_id_1'
         )
         self.assertIsNotNone(retrieved_batch_1)
         self.assertEqual(retrieved_batch_1.language_accent_code, 'en-US')
 
-        retrieved_batch_2 = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model_by_id(
+        retrieved_batch_2 = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
             parent_task_run_id, 'child_task_run_id_2'
         )
         self.assertIsNotNone(retrieved_batch_2)
@@ -445,7 +445,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_instances[1].language_accent_code, 'hi-IN')
         self.assertEqual(retrieved_instances[2].language_accent_code, 'es-ES')
 
-    def test_should_get_voiceover_regeneration_task_batch_model_by_id(
+    def test_should_get_voiceover_regeneration_task_batch_model(
         self,
     ) -> None:
         parent_task_run_id = 'parent_task_run_id'
@@ -473,7 +473,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             voiceover_regeneration_task_batch
         )
 
-        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model_by_id(
+        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
             parent_task_run_id, child_task_run_id
         )
 
@@ -497,7 +497,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         )
 
     def test_should_return_none_for_non_existent_batch_model(self) -> None:
-        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model_by_id(
+        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
             'non_existent_parent', 'non_existent_child'
         )
 
@@ -574,7 +574,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             domain_instance
         )
 
-        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model_by_id(
+        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
             parent_task_run_id, child_task_run_id
         )
 
@@ -631,7 +631,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             updated_domain_instance
         )
 
-        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model_by_id(
+        retrieved_batch = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
             parent_task_run_id, child_task_run_id
         )
 

@@ -133,7 +133,7 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
     }
 
 
-def delete_voiceover_regeneration_job_model(
+def delete_voiceover_regeneration_job(
     exploration_id: str,
     cloud_task_run_id: str,
 ) -> None:
@@ -148,7 +148,7 @@ def delete_voiceover_regeneration_job_model(
     cloud_task_models.VoiceoverRegenerationJobModel.delete_by_id(model_id)
 
 
-def update_voiceover_regeneration_status(
+def update_voiceover_regeneration_job_status(
     exploration_id: str,
     language_accent_code: str,
     content_id: str,
@@ -427,17 +427,17 @@ def create_voiceover_regeneration_task_with_status_generating(
                 for content_id in content_ids_to_content_values.keys()
             }
 
-    voiceover_regeneration_task_map = (
+    voiceover_regeneration_job = (
         cloud_task_domain.VoiceoverRegenerationJob.create_default(
             exploration_id, task_run_id
         )
     )
 
-    voiceover_regeneration_task_map.language_accent_to_content_status_map = (
+    voiceover_regeneration_job.language_accent_to_content_status_map = (
         language_accent_to_content_status_map
     )
 
-    return voiceover_regeneration_task_map
+    return voiceover_regeneration_job
 
 
 def create_voiceover_regeneration_task_batch_model(
@@ -535,7 +535,7 @@ def get_voiceover_regeneration_batch_instances_by_parent_task_run_id(
     return domain_instances
 
 
-def get_voiceover_regeneration_task_batch_model_by_id(
+def get_voiceover_regeneration_task_batch_model(
     parent_cloud_task_run_id: str, child_cloud_task_run_id: str
 ) -> Optional[cloud_task_domain.VoiceoverRegenerationTaskBatch]:
     """Returns the instance of VoiceoverRegenerationBatchExecutionModel corresponding
