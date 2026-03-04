@@ -1302,6 +1302,19 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.signup('tester@org.com', 'tester')
         author_id = self.get_user_id_from_email('tester@org.com')
         date_time = '2025-08-01T08:35:05.864077'
+        cloud_task_run_model_id = (
+            cloud_task_models.CloudTaskRunModel.get_new_id()
+        )
+        cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=cloud_task_run_model_id,
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/'
+                'voiceover-regeneration/tasks/task1'
+            ),
+            latest_job_state='RUNNING',
+            function_id='update_stats',
+            current_retry_attempt=1,
+        )
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id,
@@ -1365,6 +1378,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 exploration_version=exploration_version,
                 author_id=author_id,
                 date_time=date_time,
+                task_run_id=cloud_task_run_model_id,
             )
 
         all_models: Sequence[email_models.SentEmailModel] = (
@@ -1391,6 +1405,14 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 == 'Report on Automatic Voiceovers Generated for Test Exploration'
             ):
                 self.assertEqual(email_model.html_body, expected_html_body)
+
+        updated_cloud_task_run_model = cloud_task_models.CloudTaskRunModel.get(
+            cloud_task_run_model_id
+        )
+        assert updated_cloud_task_run_model is not None
+        self.assertEqual(
+            updated_cloud_task_run_model.latest_job_state, 'PERMANENTLY_FAILED'
+        )
 
     def _create_exploration_and_arabic_translation(
         self, exploration_id: str, language_code: str
