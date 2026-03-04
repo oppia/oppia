@@ -4618,22 +4618,21 @@ export class LoggedInUser extends BaseUser {
    * @param {string} chapterName - The name of the lesson to check.
    */
   async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
-    const lessonSel = learnerDashSelectors.lessonCard;
+    const chapterCards = await this.page.$$('.chapter-title');
 
-    await this.page.waitForSelector(lessonSel.content);
+    for (const card of chapterCards) {
+      const titleHandle = await card.$(chapterSelector);
 
-    const cards = await this.page.$$(lessonSel.content);
+      if (!titleHandle) continue;
 
-    for (const card of cards) {
-      const titleEl = await card.$(lessonSel.heading);
-      const titleText = titleEl
-        ? await titleEl.evaluate(el => el.textContent?.trim())
-        : '';
+      const titleText = await titleHandle.evaluate(
+        el => el.textContent?.trim() || ''
+      );
 
-      if (titleText?.includes(chapterName)) {
-        const newLabel = await card.$(newLabelSelector);
+      if (titleText.includes(chapterName)) {
+        const newLabelHandle = await card.$('.classroom-new-chapter');
 
-        if (!newLabel) {
+        if (!newLabelHandle) {
           throw new Error(
             `Lesson "${chapterName}" found but does NOT have a new label`
           );

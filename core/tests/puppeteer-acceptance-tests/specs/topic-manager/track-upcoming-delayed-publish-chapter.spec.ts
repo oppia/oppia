@@ -250,11 +250,106 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.saveStoryDraft();
       await curriculumAdmin.clickReadyToPublishButton();
 
+      // Drag and drop functionality is not available for mobile view, so the test case for drag and drop is only executed for desktop view.
+      if (!curriculumAdmin.isViewportAtMobileWidth()) {
+        await curriculumAdmin.publishChapter(
+          "Jamie's Adventures in the Arcade",
+          'Place Values',
+          '0'
+        );
+
+        //Publish chapter could not be drag and drop
+        await curriculumAdmin.openStoryEditor(
+          "Jamie's Adventures in the Arcade",
+          'Place Values'
+        );
+        await curriculumAdmin.page.waitForSelector('tr.cdk-drag');
+        const rows = await curriculumAdmin.page.$$('tr.cdk-drag');
+
+        let sourceHandle = null;
+        let targetHandle = null;
+        for (const row of rows) {
+          const titleEl = await row.$(chapterTitleSelector);
+
+          if (!titleEl) continue;
+
+          const text = await titleEl.evaluate(
+            el => el.textContent?.trim() || ''
+          );
+
+          if (text.includes('What are the Place Values')) {
+            targetHandle = await row.$('.drag-handler');
+          }
+
+          if (text.includes('Find the Value of a Number')) {
+            sourceHandle = await row.$('.drag-handler');
+          }
+        }
+        if (!sourceHandle) {
+          throw new Error(
+            `Source chapter "Find the Value of a Number" not found`
+          );
+        }
+
+        if (!targetHandle) {
+          throw new Error(
+            `Target chapter "What are the Place Values" not found`
+          );
+        }
+
+        const s = await sourceHandle.boundingBox();
+        const t = await targetHandle.boundingBox();
+
+        if (!s || !t) {
+          throw new Error('Could not get drag coordinates');
+        }
+
+        await curriculumAdmin.page.mouse.move(
+          s.x + s.width / 2,
+          s.y + s.height / 2
+        );
+
+        await curriculumAdmin.page.mouse.down();
+
+        await curriculumAdmin.page.mouse.move(
+          t.x + t.width / 2,
+          t.y + t.height / 2,
+          {steps: 25}
+        );
+
+        await curriculumAdmin.page.mouse.up();
+        await curriculumAdmin.page.waitForSelector(
+          '.e2e-test-published-chapters-drop-error'
+        );
+
+        await curriculumAdmin.expectElementContentToBe(
+          '.e2e-test-published-chapters-drop-error',
+          'The positions of published chapters cannot be changed.'
+        );
+      }
+
       await curriculumAdmin.readyToPublish(
         'Find the Value of a Number',
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
+
+      // Drag and drop functionality is not available for mobile view, so the test case for drag and drop is only executed for desktop view.
+      if (!curriculumAdmin.isViewportAtMobileWidth()) {
+        //Draft and ready to publish chapter can be drag and dropped to change their order.
+        await curriculumAdmin.dragChapterByName(
+          "Jamie's Adventures in the Arcade",
+          'Place Values',
+          'Find the Value of a Number',
+          'Comparing Numbers'
+        );
+
+        await curriculumAdmin.expectScreenshotToMatch(
+          'Chap3ComparingNumberDraggedWithChap2FindValue',
+          __dirname
+        );
+        await curriculumAdmin.saveStoryDraft();
+      }
       await curriculumAdmin.readyToPublish(
         'Comparing Numbers',
         "Jamie's Adventures in the Arcade",

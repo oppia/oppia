@@ -178,10 +178,10 @@ describe('Logged-In Learner', function () {
         'What are the Place Values'
       );
 
-      // Todo:After Resolving issue #24423
-      // await loggedInLearner1.expectChapterToBeClickable(
-      //   'Find the Value of a Number' , false
-      // );
+      await loggedInLearner1.expectChapterToBeClickable(
+        'Find the Value of a Number',
+        false
+      );
 
       await loggedInLearner1.navigateToLearnerDashboard();
       await loggedInLearner1.expectScreenshotToMatch(
@@ -221,10 +221,10 @@ describe('Logged-In Learner', function () {
         'Find the Value of a Number',
       ]);
 
-      // Todo:After Resolving issue #24423
-      // await loggedInLearner2.expectChapterToBeClickable(
-      //   'Find the Value of a Number' , false
-      // );
+      await loggedInLearner2.expectChapterToBeClickable(
+        'Find the Value of a Number',
+        false
+      );
 
       await loggedInLearner2.expectScreenshotToMatch(
         'Chap1AvailableChap2ComingSoon',
@@ -246,11 +246,10 @@ describe('Logged-In Learner', function () {
       );
       await loggedInLearner2.returnToStoryFromLastState();
 
-      // Story viewer section.
-      // Todo:After Resolving issue #24423
-      // await loggedInLearner2.expectChapterToBeClickable(
-      //   'Find the Value of a Number'
-      // );
+      await loggedInLearner2.expectChapterToBeClickable(
+        'Find the Value of a Number',
+        false
+      );
 
       await loggedInLearner2.expectChapterToBeClickable(
         'What are the Place Values'
@@ -314,10 +313,9 @@ describe('Logged-In Learner', function () {
         'Rounding Numbers part 2',
       ]);
 
-      // Todo:After Resolving issue #24423
-      // await loggedInLearner1.expectLessonCardToHaveNewLabel(
-      //   'Find the Value of a Number'
-      // );
+      await loggedInLearner1.expectLessonCardToHaveNewLabel(
+        'Find the Value of a Number'
+      );
 
       await loggedInLearner1.navigateToLearnerDashboard();
 

@@ -4559,5 +4559,75 @@ export class TopicManager extends BaseUser {
     await this.publishStoryDraftChapterUpto(dropdownValue);
     await this.publishStoryDraftSerialChapter();
   }
+
+  async dragChapterByName(
+    storyName: string,
+    topicName: string,
+    fromChapterName: string,
+    toChapterName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 2) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[1].click();
+    }
+    await this.page.waitForSelector('tr.cdk-drag');
+
+    const rows = await this.page.$$('tr.cdk-drag');
+
+    let sourceHandle = null;
+    let targetHandle = null;
+
+    for (const row of rows) {
+      const titleEl = await row.$(chapterTitleSelector);
+
+      if (!titleEl) continue;
+
+      const text = await titleEl.evaluate(el => el.textContent?.trim() || '');
+
+      if (text.includes(fromChapterName)) {
+        sourceHandle = await row.$('.drag-handler');
+      }
+
+      if (text.includes(toChapterName)) {
+        targetHandle = await row.$('.drag-handler');
+      }
+    }
+
+    if (!sourceHandle) {
+      throw new Error(`Source chapter "${fromChapterName}" not found`);
+    }
+
+    if (!targetHandle) {
+      throw new Error(`Target chapter "${toChapterName}" not found`);
+    }
+
+    const s = await sourceHandle.boundingBox();
+    const t = await targetHandle.boundingBox();
+
+    if (!s || !t) {
+      throw new Error('Could not get drag coordinates');
+    }
+
+    await this.page.mouse.move(s.x + s.width / 2, s.y + s.height / 2);
+
+    await this.page.mouse.down();
+
+    await this.page.mouse.move(t.x + t.width / 2, t.y + t.height / 2, {
+      steps: 25,
+    });
+
+    await this.page.mouse.up();
+
+    await this.page.waitForTimeout(500);
+
+    showMessage(
+      `Dragged chapter "${fromChapterName}" to chapter "${toChapterName}"`
+    );
+  }
 }
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
