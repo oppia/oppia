@@ -91,7 +91,7 @@ export class BlogHomePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    const urlParams = this.urlService.getUrlParams();
+    let urlParams = this.urlService.getUrlParams();
     this.page = urlParams.page ? Number(urlParams.page) : 1;
 
     this.calculateFirstPostOnPageNum(
@@ -264,7 +264,7 @@ export class BlogHomePageComponent implements OnInit {
         })
         .catch(error => {
           this.alertsService.addWarning(
-            'Unable to fetch search results. Please try again.'
+            'No more search resutls found. End of search results.'
           );
         });
     }
@@ -325,7 +325,7 @@ export class BlogHomePageComponent implements OnInit {
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
 
-    const currentParams = this.route.snapshot.queryParams;
+    let currentParams = this.route.snapshot.queryParams;
 
     const currentQuery = currentParams['q'] || '';
     const currentTags = currentParams['tags']
@@ -355,7 +355,7 @@ export class BlogHomePageComponent implements OnInit {
       this.searchQuery,
       this.selectedTags,
       () => {
-        const searchUrlQueryString =
+        let searchUrlQueryString =
           this.blogPostSearchService.getSearchUrlQueryString(
             this.searchQuery,
             this.selectedTags
