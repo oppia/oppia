@@ -433,7 +433,14 @@ const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
-
+const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const statsButtonTab = '.e2e-test-stats-tab';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button';
+const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
+const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
+const explorationStateStatsEnterCountSelector =
+  '.e2e-test-state-stats-card-entered-here-count';
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -7157,6 +7164,146 @@ export class ExplorationEditor extends BaseUser {
       confirmDeleteInteractionButtonSelector,
       false
     );
+  }
+
+  /**
+   * Navigates to creator dashboard using profile dropdown.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(creatorDashboardMenuLink);
+    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
+    await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+  }
+
+  /**
+   * Navigates to the stats tab of the exploration editor.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileStatsTabButton);
+    } else {
+      await this.clickOnElementWithSelector(statsButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    await this.page.waitForSelector(explorationStatsTabContentSelector, {
+      visible: true,
+    });
+  }
+
+  /*Function to click on a specific card in the exploration visualization graph.
+   * @param {string} cardName - The name of the card to navigate to.
+   */
+  async clickStateCard(cardName: string): Promise<void> {
+    const stateNodeGroupSelector = '.e2e-test-node';
+    await this.page.waitForSelector(stateNodeGroupSelector);
+    const elements = await this.page.$$(stateNodeGroupSelector);
+
+    const cardNames = await Promise.all(
+      elements.map(element =>
+        element.$eval(
+          '.e2e-test-node-label',
+          node => node.textContent?.trim() ?? ''
+        )
+      )
+    );
+    showMessage(`${cardNames.length} cards found: ${cardNames.join(', ')}.`);
+
+    const cardIndex = cardNames.indexOf(cardName);
+    if (cardIndex === -1) {
+      throw new Error(`Card name ${cardName} not found in the graph.`);
+    }
+
+    let nodeGroup: ElementHandle<Element> | null = null;
+    const hasDuplicateCards = elements.length > new Set(cardNames).size;
+    if (this.isViewportAtMobileWidth() && hasDuplicateCards) {
+      nodeGroup = elements[cardIndex + elements.length / 2];
+    } else {
+      nodeGroup = elements[cardIndex];
+    }
+
+    if (!nodeGroup) {
+      throw new Error(`Could not find card button for card: ${cardName}`);
+    }
+    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    if (!nodeBackground) {
+      throw new Error(
+        `Could not find clickable background for card: ${cardName}`
+      );
+    }
+    showMessage(`Found element to click for ${cardName}.`);
+    await this.clickOnElement(nodeBackground);
+    await this.waitForNetworkIdle({idleTime: 1000});
+  }
+
+  /**
+   * From the stats tab, open the modal showing the stats of the specified card.
+   */
+  async openCardStats(cardName: string): Promise<void> {
+    await this.clickStateCard(cardName);
+    showMessage(`Waiting for stats modal of card ${cardName} to appear...`);
+    await this.page.waitForSelector(explorationStateStatsModalSelector, {
+      visible: true,
+    });
+    showMessage(`Stats modal of card ${cardName} is now open.`);
+  }
+
+  /**
+   * Function to check how many times a card has been entered.
+   * Requires the card stats modal to be open.
+   */
+  async expectCardEnteredTimesToBe(count: number): Promise<void> {
+    showMessage(`Checking that card entered count is ${count}...`);
+    await this.expectTextContentToContain(
+      explorationStateStatsEnterCountSelector,
+      `Card entered: ${count} times.`
+    );
+    showMessage(`Confirmed that card entered count is ${count}.`);
+  }
+
+  /**
+   * Close the currently-opened state stats modal.
+   */
+  async closeCardStats(): Promise<void> {
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
+    showMessage('Waiting for stats modal to close...');
+    await this.page.waitForSelector(explorationStateStatsModalSelector, {
+      visible: false,
+    });
+    showMessage('Stats modal has been closed.');
+  }
+
+  /**
+   * Expects the number of passers to be a specific value.
+   * @param expected the expected number of passers.
+   */
+  async expectNumberOfPassersToBe(expected: number): Promise<void> {
+    const selector = '.e2e-test-num-passersby';
+
+    await this.page.waitForSelector(selector, {visible: true});
+
+    const text = await this.page.$eval(
+      selector,
+      el => el.textContent?.trim() || ''
+    );
+
+    const match = text.match(/\d+/);
+    const actual = match ? Number(match[0]) : 0;
+
+    if (actual !== expected) {
+      throw new Error(
+        `Expected number of passers to be ${expected}, but found ${actual}.`
+      );
+    }
   }
 }
 
