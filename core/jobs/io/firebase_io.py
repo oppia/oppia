@@ -56,18 +56,8 @@ class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
             | 'Create singleton PCollection to begin with exactly ONE worker'
             >> beam.Create((None,))
             | 'Load all Firebase records into worker with Firebase Admin SDK'
-            >> beam.ParDo(self._list_users)
-            | 'Build adapter records'
-            >> beam.Map(firebase_adapters.StrongRecord.from_export)
+            >> beam.ParDo(_GetStrongRecordsFromFirebase())
         )
-
-    def _list_users(
-        self, _: None
-    ) -> Iterable[firebase_auth.ExportedUserRecord]:
-        """Yields all records provided from the Firebase Admin SDK."""
-
-        firebase_auth_services.establish_firebase_connection()
-        yield from firebase_auth.list_users().iterate_all()
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -107,12 +97,12 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
         return (
             {'settings': settings_pcoll, 'auth_details': auth_details_pcoll}
             | 'Group Models by ID' >> beam.CoGroupByKey()
-            | 'Make Into Weak Records' >> beam.ParDo(_IntoWeakRecords())
+            | 'Make Weak Records from Models' >> beam.ParDo(_MakeWeakRecords())
         )
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class _IntoWeakRecords(beam.DoFn):  # type: ignore[misc]
+class _MakeWeakRecords(beam.DoFn):  # type: ignore[misc]
     """Zips fields in Oppia's user/auth models into "weak" Firebase records."""
 
     class GroupedById(TypedDict):
@@ -122,11 +112,11 @@ class _IntoWeakRecords(beam.DoFn):  # type: ignore[misc]
         auth_details: Iterable[auth_models.UserAuthDetailsModel]
 
     def process(
-        self, id_to_models: tuple[str, GroupedById]
+        self, user_id_to_models: tuple[str, GroupedById]
     ) -> Iterable[firebase_adapters.WeakRecord]:
         """Yields 0-1 weak Firebase records by zipping the input models."""
 
-        user_id, grouped = id_to_models
+        user_id, grouped = user_id_to_models
         settings_list = list(grouped['settings'])
         auth_details_list = list(grouped['auth_details'])
         try:
@@ -142,3 +132,21 @@ class _IntoWeakRecords(beam.DoFn):  # type: ignore[misc]
             settings, auth_details
         ):
             yield weak_record
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class _GetStrongRecordsFromFirebase(beam.DoFn):  # type: ignore[misc]
+    """Loads "strong" records directly from Firebase using the Admin SDK."""
+
+    def setup(self) -> None:
+        """Establishes a Firebase connection just before running `process`."""
+
+        firebase_auth_services.establish_firebase_connection()
+
+    def process(self, _: None) -> Iterable[firebase_adapters.StrongRecord]:
+        """Yields all of the records directly from Firebase."""
+
+        yield from (
+            firebase_adapters.StrongRecord.from_export(user)
+            for user in firebase_auth.list_users().iterate_all()
+        )
