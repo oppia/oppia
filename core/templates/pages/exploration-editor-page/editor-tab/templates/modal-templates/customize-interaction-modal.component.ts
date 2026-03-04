@@ -64,10 +64,7 @@ import {FractionInputValidationService} from 'interactions/FractionInput/directi
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {Warning} from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {
-  ImageWithRegions,
-  InteractionCustomizationArgs,
-} from 'interactions/customization-args-defs';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';

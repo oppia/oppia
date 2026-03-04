@@ -544,25 +544,7 @@ describe('Customize Interaction Modal Component', () => {
     stateInteractionIdService.displayed = 'RatioExpressionInput';
     stateCustomizationArgsService.displayed = {
       placeholder: {
-        value: {
-          _contentId: null,
-          _unicode: '2:3',
-          get contentId(): string | null {
-            return this._contentId;
-          },
-          set contentId(contentId: string | null) {
-            this._contentId = contentId;
-          },
-          get unicode(): string {
-            return this._unicode;
-          },
-          set unicode(unicode: string) {
-            this._unicode = unicode;
-          },
-          isEmpty(): boolean {
-            return !this._unicode;
-          },
-        },
+        value: SubtitledUnicode.createDefault('2:3', null),
       },
     };
 
