@@ -171,7 +171,7 @@ export class FractionInputValidationService {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
-              var fractionDictPlain =
+              const fractionDictPlain =
                 this.normalizeFractionToDict(fractionDict);
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
@@ -231,7 +231,7 @@ export class FractionInputValidationService {
           case 'IsEquivalentTo':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
-              var fractionDictPlain =
+              const fractionDictPlain =
                 this.normalizeFractionToDict(fractionDict);
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
@@ -255,7 +255,7 @@ export class FractionInputValidationService {
           case 'IsEquivalentToAndInSimplestForm':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
-              var fractionDictPlain =
+              const fractionDictPlain =
                 this.normalizeFractionToDict(fractionDict);
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
@@ -281,7 +281,7 @@ export class FractionInputValidationService {
           case 'IsGreaterThan':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
-              var fractionDictPlain =
+              const fractionDictPlain =
                 this.normalizeFractionToDict(fractionDict);
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
@@ -307,7 +307,7 @@ export class FractionInputValidationService {
           case 'IsLessThan':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
-              var fractionDictPlain =
+              const fractionDictPlain =
                 this.normalizeFractionToDict(fractionDict);
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
