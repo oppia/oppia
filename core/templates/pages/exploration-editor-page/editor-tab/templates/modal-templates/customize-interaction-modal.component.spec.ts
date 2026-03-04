@@ -506,6 +506,69 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.getContentIdToContent()).toEqual({contentId: 'html'});
   }));
 
+  it('should skip subtitled html entries without contentId', () => {
+    stateInteractionIdService.displayed = 'DragAndDropSortInput';
+    stateCustomizationArgsService.displayed = {
+      choices: {
+        value: [
+          {
+            _html: 'html',
+            _contentId: null,
+            isEmpty(): boolean {
+              return !this._html;
+            },
+            get contentId(): string | null {
+              return this._contentId;
+            },
+            set contentId(contentId: string | null) {
+              this._contentId = contentId;
+            },
+            get html(): string {
+              return this._html;
+            },
+            set html(html: string) {
+              this._html = html;
+            },
+          },
+        ],
+      },
+      allowMultipleItemsInSamePosition: {
+        value: false,
+      },
+    };
+
+    expect(component.getContentIdToContent()).toEqual({});
+  });
+
+  it('should skip subtitled unicode entries without contentId', () => {
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    stateCustomizationArgsService.displayed = {
+      placeholder: {
+        value: {
+          _contentId: null,
+          _unicode: '2:3',
+          get contentId(): string | null {
+            return this._contentId;
+          },
+          set contentId(contentId: string | null) {
+            this._contentId = contentId;
+          },
+          get unicode(): string {
+            return this._unicode;
+          },
+          set unicode(unicode: string) {
+            this._unicode = unicode;
+          },
+          isEmpty(): boolean {
+            return !this._unicode;
+          },
+        },
+      },
+    };
+
+    expect(component.getContentIdToContent()).toEqual({});
+  });
+
   it(
     'should save and populate null for ContentIds' +
       ' for DragAndDropSortInput intreaction',
@@ -559,5 +622,26 @@ describe('Customize Interaction Modal Component', () => {
     }).toThrowError(
       'Interaction is missing customization argument placeholder'
     );
+  });
+
+  it('should return empty warnings list when no interaction is displayed', () => {
+    stateInteractionIdService.displayed = '';
+
+    expect(component.getCustomizationArgsWarningsList()).toEqual([]);
+  });
+
+  it('should no-op when populating null content ids without interaction id', () => {
+    stateInteractionIdService.displayed = '';
+    spyOn(generateContentIdService, 'getNextStateId');
+
+    component.populateNullContentIds();
+
+    expect(generateContentIdService.getNextStateId).not.toHaveBeenCalled();
+  });
+
+  it('should return empty content map when no interaction is displayed', () => {
+    stateInteractionIdService.displayed = '';
+
+    expect(component.getContentIdToContent()).toEqual({});
   });
 });

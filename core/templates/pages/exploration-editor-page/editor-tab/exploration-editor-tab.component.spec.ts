@@ -657,6 +657,69 @@ describe('Exploration editor tab component', () => {
     ).toEqual(['skill_id1']);
   });
 
+  it('should skip saves if active state name is empty', () => {
+    stateEditorService.setActiveStateName('');
+    const firstStateInteraction =
+      explorationStatesService.getState('First State').interaction;
+
+    spyOn(explorationStatesService, 'saveInteractionId');
+    spyOn(explorationStatesService, 'saveInteractionCustomizationArgs');
+    spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
+    spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
+    spyOn(explorationStatesService, 'saveSolution');
+    spyOn(explorationStatesService, 'saveHints');
+    spyOn(explorationStatesService, 'saveSolicitAnswerDetails');
+    spyOn(explorationStatesService, 'saveCardIsCheckpoint');
+    spyOn(explorationStatesService, 'saveStateContent');
+    spyOn(explorationStatesService, 'saveLinkedSkillId');
+    spyOn(explorationStatesService, 'saveInapplicableSkillMisconceptionIds');
+
+    component.saveInteractionData({
+      interactionId: firstStateInteraction.id || '',
+      customizationArgs: firstStateInteraction.customizationArgs,
+    });
+    component.saveInteractionAnswerGroups([]);
+    component.saveInteractionDefaultOutcome(
+      firstStateInteraction.defaultOutcome as Outcome
+    );
+    component.saveSolution(firstStateInteraction.solution as Solution);
+    component.saveHints([]);
+    component.saveSolicitAnswerDetails(true);
+    component.onChangeCardIsCheckpoint();
+    component.saveStateContent(
+      SubtitledHtml.createFromBackendDict({
+        content_id: 'content',
+        html: 'test',
+      })
+    );
+    component.saveLinkedSkillId('skill_id_1');
+    component.saveInapplicableSkillMisconceptionIds(['skill_id_1']);
+
+    expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionCustomizationArgs
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionAnswerGroups
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionDefaultOutcome
+    ).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveSolution).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveHints).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveSolicitAnswerDetails
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveCardIsCheckpoint
+    ).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveStateContent).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveLinkedSkillId).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInapplicableSkillMisconceptionIds
+    ).not.toHaveBeenCalled();
+  });
+
   it('should populate misconceptions for state', fakeAsync(() => {
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({

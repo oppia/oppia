@@ -84,6 +84,8 @@ describe('Training Modal Component', () => {
   let trainingDataService: TrainingDataService;
   let graphDataService: GraphDataService;
   let explorationWarningsService: ExplorationWarningsService;
+  let explorationStatesService: ExplorationStatesService;
+  let stateEditorService: StateEditorService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -137,6 +139,8 @@ describe('Training Modal Component', () => {
     responsesService = TestBed.inject(ResponsesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
     graphDataService = TestBed.inject(GraphDataService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    stateEditorService = TestBed.inject(StateEditorService);
     spyOn(ngbActiveModal, 'close').and.stub();
     spyOn(explorationWarningsService, 'updateWarnings').and.stub();
     spyOn(graphDataService, 'recompute').and.stub();
@@ -237,4 +241,41 @@ describe('Training Modal Component', () => {
       expect(ngbActiveModal.close).toHaveBeenCalled();
     }
   );
+
+  it('should not save a new answer group if active state is missing', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('');
+    spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
+    spyOn(responsesService, 'save').and.callFake(
+      (answerGroups, defaultOutcome, save) => {
+        save(answerGroups, defaultOutcome);
+      }
+    );
+    spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
+    spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
+
+    component._saveNewAnswerGroup(
+      AnswerGroup.createNew(
+        [],
+        Outcome.createNew('', 'feedback_1', '', []),
+        [],
+        null
+      )
+    );
+
+    expect(
+      explorationStatesService.saveInteractionAnswerGroups
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionDefaultOutcome
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early in init if active state is missing', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('');
+    spyOn(explorationStatesService, 'getState');
+
+    component.init();
+
+    expect(explorationStatesService.getState).not.toHaveBeenCalled();
+  });
 });
