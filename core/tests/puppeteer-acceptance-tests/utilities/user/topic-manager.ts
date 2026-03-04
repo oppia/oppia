@@ -217,6 +217,9 @@ const editOptionsSelector = '.e2e-test-edit-options';
 const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
 const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
+const chapterOutlineEditorContainer =
+  '.e2e-test-chapter-outline-editor-container';
+const nodeOutlineSaveButton = '.e2e-test-node-outline-save-button';
 const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
 const addPrerequisiteSkillMobileButtonSelector =
   '.e2e-test-mobile-add-prerequisite-skill';
@@ -3099,6 +3102,10 @@ export class TopicManager extends BaseUser {
     await this.clickOnElementWithSelector(showDiscardOptionButtonSelector);
     await this.clickOnElementWithSelector(discardStoryChangesButtonSelector);
     await this.waitForPageToFullyLoad();
+
+    // Post-check: The save story button should be disabled after discarding changes.
+    await this.page.waitForSelector(`${saveStoryButton}[disabled]`);
+
     showMessage('Story changes discarded successfully.');
   }
 
@@ -3436,18 +3443,14 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(chapterDescriptionField, description);
 
     // Update outline.
-    await this.page.waitForSelector(
-      '.e2e-test-chapter-outline-editor-container'
-    );
+    await this.page.waitForSelector(chapterOutlineEditorContainer);
     const outlineEditor = await this.page.$(
-      '.e2e-test-chapter-outline-editor-container .e2e-test-rte'
+      `${chapterOutlineEditorContainer} ${rteSelector}`
     );
     if (outlineEditor) {
       await outlineEditor.click();
       await outlineEditor.type(outline);
-      await this.clickOnElementWithSelector(
-        '.e2e-test-node-outline-save-button'
-      );
+      await this.clickOnElementWithSelector(nodeOutlineSaveButton);
     }
 
     await this.clickOnElementWithSelector(chapterPhotoBoxButton);
