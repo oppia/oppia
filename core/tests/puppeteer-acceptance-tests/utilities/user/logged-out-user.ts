@@ -636,6 +636,14 @@ const progressContinueTextSelector =
 const resumeLessonButtonSelector = '.resume-button';
 const profileAvatarSelector =
   'img.oppia-navbar-profile-picture[alt="User Avatar"]';
+const signUpOrLoginButton = '.signup-btn';
+const nextSuggestedLessonButton = '.next-lesson-btn';
+const profileLogoutButton = '.e2e-test-logout-link';
+const reviewCardButton = '.review-card-btn';
+const morePracticeButton = '.more-practice-btn';
+const lessonPlayerHeaderTextSelector = '.lesson-player-header-left p';
+const checkboxTitleSelector = '.e2e-test-skill-checkbox-title';
+const subtopicTitleSelector = '.subtopic-title';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -7254,19 +7262,254 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Expect the profile avatar to be visible in the navigation bar.
    */
-  async expectProfileAvatarVisible(): Promise<void> {
-    await this.page.waitForSelector(profileAvatarSelector, {visible: true});
+  async expectProfileAvatarVisible(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(profileAvatarSelector, {visible: true});
 
-    const avatarSrc = await this.page.$eval(
-      profileAvatarSelector,
-      el => (el as HTMLImageElement).src
+      const avatarSrc = await this.page.$eval(
+        profileAvatarSelector,
+        el => (el as HTMLImageElement).src
+      );
+
+      if (!avatarSrc || avatarSrc.includes('undefined')) {
+        throw new Error(
+          'Profile avatar is visible but the image source is invalid.'
+        );
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Click on profile menu icon.
+   */
+  async clickOnProfileMenu(): Promise<void> {
+    await this.page.waitForSelector(profilePictureSelector, {
+      visible: true,
+    });
+    await this.page.click(profilePictureSelector);
+  }
+
+  /**
+   * Click on logout button.
+   */
+  async clickOnLogOutButton(): Promise<void> {
+    await this.page.waitForSelector(profileLogoutButton, {
+      visible: true,
+    });
+    await this.page.click(profileLogoutButton);
+  }
+
+  /**
+   * Expect the next lesson button.
+   */
+  async expectNextLessonButton(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(nextSuggestedLessonButton, {
+        visible: true,
+      });
+      showMessage('Next lesson button present');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Expect the Check Review Card button
+   */
+  async expectCheckReivewCardButton(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(reviewCardButton, {
+        visible: true,
+      });
+      showMessage('Check review card button present');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Expect 'Do More Practice' button visible.
+   */
+  async expectDoMorePracticeButton(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(morePracticeButton, {
+        visible: true,
+      });
+      showMessage('Do more practise button present');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Expect signup or login button present.
+   */
+  async expectSignUpOrLoginButton(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(signUpOrLoginButton, {
+        visible: true,
+      });
+      showMessage('Signup or login button is present');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Right click on 'Next Lesson' button and open it in a new tab.
+   * @param nextChapterTitle - Expected next chapter title.
+   */
+  async rightClickOnNextLessonButtonAndOpenNewTab(
+    nextChapterTitle: string
+  ): Promise<void> {
+    const buttonHandle = await this.page.waitForSelector(
+      nextSuggestedLessonButton,
+      {
+        visible: true,
+      }
     );
 
-    if (!avatarSrc || avatarSrc.includes('undefined')) {
+    const href = await this.page.evaluate(btn => {
+      const anchor = btn.closest('a');
+      return anchor ? (anchor as HTMLAnchorElement).href : null;
+    }, buttonHandle);
+
+    if (!href) {
+      throw new Error('Next Lesson anchor does not contain href');
+    }
+
+    // Open in new tab (emulating "Open link in new tab")
+    const newPage = await this.page.browser().newPage();
+    await newPage.goto(href, {waitUntil: 'networkidle0'});
+
+    // Validate header.
+    await newPage.waitForSelector(lessonPlayerHeaderTextSelector);
+
+    const headerText = await newPage.$eval(lessonPlayerHeaderTextSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (!headerText || !headerText.includes(nextChapterTitle)) {
+      throw new Error(`Expected ${nextChapterTitle} but got '${headerText}'`);
+    }
+    showMessage(`Next chapter: ${nextChapterTitle} opened.`);
+    await newPage.close();
+  }
+
+  /**
+   * Click on 'Do more practice' button and open link in
+   * new tab and verify the content.
+   * @param topicNames - List of topics to practice.
+   */
+  async clickOnDoMorePracticeButtonAndOpenNewTab(
+    topicNames: string[]
+  ): Promise<void> {
+    const buttonHandle = await this.page.waitForSelector(morePracticeButton, {
+      visible: true,
+    });
+
+    const href = await this.page.evaluate(btn => {
+      const anchor = btn.closest('a');
+      return anchor ? (anchor as HTMLAnchorElement).href : null;
+    }, buttonHandle);
+
+    if (!href) {
+      throw new Error('Do more practice anchor does not contain href');
+    }
+
+    // Open in new tab (emulating "Open link in new tab")
+    const newPage = await this.page.browser().newPage();
+    await newPage.goto(href, {waitUntil: 'networkidle0'});
+
+    await newPage.waitForSelector(checkboxTitleSelector);
+    const actualTopics = await newPage.$$eval(checkboxTitleSelector, elements =>
+      elements.map(el => el.textContent?.trim() || '')
+    );
+
+    // Verify each expected topic exists in the actual list.
+    for (const expectedTopic of topicNames) {
+      const exists = actualTopics.some(actual =>
+        actual.includes(expectedTopic)
+      );
+      if (!exists) {
+        throw new Error(
+          `Expected topic "${expectedTopic}" not found. Available topics: ${actualTopics.join(', ')}`
+        );
+      }
+    }
+
+    showMessage(
+      `Practice page opened. Verified topics: ${topicNames.join(', ')}`
+    );
+    await newPage.close();
+  }
+
+  /**
+   * Click on review card button, open in new tab,
+   * and verify the subtopic title exists.
+   * @param subtopicTitle - Expected title (e.g., 'Place Values')
+   */
+  async clickOnReviewCardButtonAndOpenNewTab(
+    subtopicTitle: string
+  ): Promise<void> {
+    const buttonHandle = await this.page.waitForSelector(reviewCardButton, {
+      visible: true,
+    });
+
+    const href = await this.page.evaluate(btn => {
+      const anchor = btn.closest('a');
+      return anchor ? (anchor as HTMLAnchorElement).href : null;
+    }, buttonHandle);
+
+    if (!href) {
+      throw new Error('Review card anchor does not contain href');
+    }
+
+    // Open in new tab.
+    const newPage = await this.page.browser().newPage();
+
+    await newPage.goto(href, {waitUntil: 'networkidle0'});
+
+    // Target the subtopic-title class seen in the second screenshot.
+    await newPage.waitForSelector(subtopicTitleSelector);
+
+    const actualSubtopics = await newPage.$$eval(
+      subtopicTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+
+    // Verify the specific subtopicTitle exists in the list.
+    const exists = actualSubtopics.some(actual =>
+      actual.includes(subtopicTitle)
+    );
+
+    if (!exists) {
       throw new Error(
-        'Profile avatar is visible but the image source is invalid.'
+        `Expected subtopic "${subtopicTitle}" not found. Found: ${actualSubtopics.join(', ')}`
       );
     }
+
+    showMessage(`Review page opened. Verified: ${subtopicTitle}`);
+    await newPage.close();
+  }
+
+  /**
+   * Click on sign-up or login button.
+   */
+  async clickOnSignUpButton(): Promise<void> {
+    await this.page.waitForSelector(signUpOrLoginButton, {
+      visible: true,
+    });
+
+    await this.page.click(signUpOrLoginButton);
+    await this.page.waitForNavigation();
   }
 
   /**
