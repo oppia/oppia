@@ -81,8 +81,9 @@ def _get_blog_card_summary_dicts_for_homepage(
             summary_dict['author_id'], strict=False
         )
         author_details = blog_services.get_blog_author_details(
-            summary_dict['author_id']
+            summary_dict['author_id'], strict=False
         )
+
         if user_settings:
             card_summary_dict: BlogCardSummaryDict = {
                 'id': summary_dict['id'],
@@ -275,8 +276,9 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         else:
             author_username = 'author account deleted'
         author_details = blog_services.get_blog_author_details(
-            blog_post.author_id
+            blog_post.author_id, strict=False
         )
+
         blog_post_dict = blog_post.to_dict()
         authors_blog_post_dict: AuthorsBlogPostDict = {
             'id': blog_post_dict['id'],
@@ -385,7 +387,7 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 % author_username
             )
 
-        author_details = blog_services.get_blog_author_details(
+        author_details_dict = blog_services.get_blog_author_details(
             user_settings.user_id
         ).to_dict()
         num_of_published_blog_post_summaries = blog_services.get_total_number_of_published_blog_post_summaries_by_author(
@@ -406,7 +408,7 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         self.values.update(
             {
-                'author_details': author_details,
+                'author_details': author_details_dict,
                 'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
                 'summary_dicts': blog_post_summary_dicts,
             }
