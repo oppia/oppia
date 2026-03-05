@@ -2756,14 +2756,9 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
-    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
-  }
-
-  /**
-   * Expects Feedback Page to be visible.
-   */
-  async expectFeedbackPageTobeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+    await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -7316,6 +7311,13 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(feedbackAuthorSelector);
     await this.expectElementToBeVisible(feedbackStatusSelector);
     await this.expectElementToBeVisible(FeedbacktimeElement);
+  }
+
+  /**
+   * Expects Feedback Page to be visible.
+   */
+  async expectFeedbackPageTobeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 }
 
