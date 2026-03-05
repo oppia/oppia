@@ -2756,6 +2756,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
+
     await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
       visible: true,
     });
