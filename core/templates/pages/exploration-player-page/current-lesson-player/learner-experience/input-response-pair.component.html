@@ -36,15 +36,17 @@
   </div>
 </div>
 
-<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== '' && feedbackIsEnabled">
+<div class="conversation-skin-oppia-feedback-container"
+     *ngIf="data.oppiaResponse !== '' && feedbackIsEnabled">
   <img class="conversation-skin-oppia-avatar rounded-circle"
        [src]="oppiaAvatarImageUrl"
        alt="">
   <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
-       class="e2e-test-input-response-loading-dots">
-    <div class="conversation-skin-feedback-dot-one"></div>
-    <div class="conversation-skin-feedback-dot-two"></div>
-    <div class="conversation-skin-feedback-dot-three"></div>
+       class="e2e-test-input-response-loading-dots"
+       dir="auto">
+    <div class="oppia-rte-viewer conversation-skin-oppia-feedback-content">
+      <loading-dots></loading-dots>
+    </div>
   </div>
   <span id="getInputResponsePairId()"></span>
   <div dir="auto">

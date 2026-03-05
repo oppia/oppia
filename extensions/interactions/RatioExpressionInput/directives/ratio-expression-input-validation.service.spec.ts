@@ -46,7 +46,7 @@ describe('RatioExpressionInputValidationService', () => {
       providers: [RatioExpressionInputValidationService],
     });
 
-    validatorService = TestBed.get(RatioExpressionInputValidationService);
+    validatorService = TestBed.inject(RatioExpressionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
