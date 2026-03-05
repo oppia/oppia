@@ -54,8 +54,7 @@
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
                   <div [ngClass]="{
                     'me-auto': !isLanguageRTL(),
-                    'ms-auto': isLanguageRTL(),
-                    'oppia-navbar-breadcrumb-rtl': isLanguageRTL()
+                    'ms-auto oppia-navbar-breadcrumb-rtl': isLanguageRTL()
                   }">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
@@ -76,8 +75,7 @@
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
                   <div [ngClass]="{
                     'mr-auto': !isLanguageRTL(),
-                    'ml-auto': isLanguageRTL(),
-                    'oppia-navbar-breadcrumb-rtl': isLanguageRTL()
+                    'ml-auto oppia-navbar-breadcrumb-rtl': isLanguageRTL()
                   }">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
