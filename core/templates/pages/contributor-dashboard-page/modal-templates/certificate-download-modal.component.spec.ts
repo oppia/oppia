@@ -416,6 +416,75 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(activeModal.close).toHaveBeenCalled();
   });
 
+  it('should show error for invalid date range when fromDate is not set', () => {
+    component.fromDate = '' as unknown as string;
+    component.toDate = '2022/10/31';
+
+    component.validateDate();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual('Invalid date range.');
+  });
+
+  it('should show error for invalid date range when toDate is not set', () => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '' as unknown as string;
+
+    component.validateDate();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual('Invalid date range.');
+  });
+
+  it('should return true for disableDownloadButton when toDate is undefined', () => {
+    component.toDate = undefined as unknown as string;
+    expect(component.disableDownloadButton()).toBeTrue();
+  });
+
+  it('should trigger print flow when createCertificate is called with isPrinting true', () => {
+    const mockBlob = new Blob(['image'], {type: 'image/png'});
+    const mockUrl = 'blob:mock-url';
+    const mockIframe = document.createElement('iframe');
+
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: () => {},
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+      }),
+      toBlob: (cb: (blob: Blob | null) => void) => cb(mockBlob),
+      toDataURL: () => '',
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'iframe') {
+        return mockIframe;
+      }
+      return document.createElement(tag);
+    });
+
+    spyOn(URL, 'createObjectURL').and.returnValue(mockUrl);
+    spyOn(URL, 'revokeObjectURL');
+    spyOn(document.body, 'appendChild');
+    spyOn(document.body, 'removeChild');
+
+    component.createCertificate(certificateData, true);
+
+    const image = new Image();
+    image.dispatchEvent(new Event('load'));
+  });
+
   afterEach(() => {
     httpTestingController.verify();
   });
