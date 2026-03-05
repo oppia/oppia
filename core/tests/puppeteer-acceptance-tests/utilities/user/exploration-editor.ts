@@ -7200,7 +7200,7 @@ export class ExplorationEditor extends BaseUser {
     });
   }
 
-  /*Function to click on a specific card in the exploration visualization graph.
+  /* Function to click on a specific card in the exploration visualization graph.
    * @param {string} cardName - The name of the card to navigate to.
    */
   async clickStateCard(cardName: string): Promise<void> {
