@@ -29,7 +29,7 @@
               {
                 "glob": "**/*",
                 "input": "node_modules/mathjax",
-                "output": "assets/mathjax"
+                "output": "/assets/mathjax"
               },
               {
                 "glob": "**/*",
@@ -111,7 +111,7 @@
               {
                 "glob": "**/*",
                 "input": "node_modules/mathjax",
-                "output": "assets/mathjax"
+                "output": "/assets/mathjax"
               }
             ],
             "styles": [
