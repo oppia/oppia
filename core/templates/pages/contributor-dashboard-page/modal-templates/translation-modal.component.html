@@ -14,8 +14,10 @@
         {{ heading | wrapTextWithEllipsis : 25 }}
       </div>
     </div>
-    <button type="button" class="btn-close oppia-close-button-position e2e-test-close-modal-button" (click)="close()"
-      aria-label="Close">
+    <button type="button"
+            class="btn-close oppia-close-button-position e2e-test-close-modal-button"
+            (click)="close()"
+            aria-label="Close">
     </button>
   </div>
 </div>
@@ -42,7 +44,8 @@
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given {{ activeContentType }} in {{ languageDescription }}:</strong>
       <a class="oppia-skip-button e2e-test-skip-translation-button" *ngIf="moreAvailable"
-        (click)="skipActiveTranslation()">Skip</a>
+         (click)="skipActiveTranslation()">Skip
+      </a>
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container"
       [ngClass]="isContentExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'" #contentContainer>
@@ -60,8 +63,9 @@
         </ul>
       </div>
     </div>
-    <div class="oppia-collapse-content" *ngIf="isContentOverflowing"
-      (click)="toggleExpansionState(expansionTabType.CONTENT)">
+    <div class="oppia-collapse-content"
+         *ngIf="isContentOverflowing"
+         (click)="toggleExpansionState(expansionTabType.CONTENT)">
       {{ isContentExpanded ? textWhenExpanded : textWhenContracted }}
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
@@ -126,13 +130,14 @@
   <button class="btn btn-secondary" (click)="close()">
     Cancel
   </button>
-  <button class="btn btn-success oppia-go-back-button" [disabled]="!hasPreviousTranslations()"
-    (click)="returnToPreviousTranslation()">
+  <button class="btn btn-success oppia-go-back-button"
+          [disabled]="!hasPreviousTranslations()"
+          (click)="returnToPreviousTranslation()">
     Go back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
-    [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
-    (click)="suggestTranslatedText()">
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
+          (click)="suggestTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
     <span [hidden]="uploadingTranslation || moreAvailable">
       Save and close
@@ -147,8 +152,8 @@
     Cancel
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
-    [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
-    (click)="updateTranslatedText()">
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
+          (click)="updateTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
     <span [hidden]="uploadingTranslation">
       Save
