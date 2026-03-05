@@ -657,7 +657,7 @@ describe('Exploration editor tab component', () => {
     ).toEqual(['skill_id1']);
   });
 
-  it('should skip saves if active state name is empty', () => {
+  it('should throw if active state name is empty', () => {
     stateEditorService.setActiveStateName('');
     const firstStateInteraction =
       explorationStatesService.getState('First State').interaction;
@@ -674,28 +674,46 @@ describe('Exploration editor tab component', () => {
     spyOn(explorationStatesService, 'saveLinkedSkillId');
     spyOn(explorationStatesService, 'saveInapplicableSkillMisconceptionIds');
 
-    component.saveInteractionData({
-      interactionId: firstStateInteraction.id || '',
-      customizationArgs: firstStateInteraction.customizationArgs,
-    });
-    component.saveInteractionAnswerGroups([]);
-    component.saveInteractionDefaultOutcome(
-      firstStateInteraction.defaultOutcome as Outcome
-    );
+    expect(() => {
+      component.saveInteractionData({
+        interactionId: firstStateInteraction.id || '',
+        customizationArgs: firstStateInteraction.customizationArgs,
+      });
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveInteractionAnswerGroups([]);
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveInteractionDefaultOutcome(
+        firstStateInteraction.defaultOutcome as Outcome
+      );
+    }).toThrowError('Expected active state name to be non-null.');
     expect(() => {
       component.saveSolution(firstStateInteraction.solution as Solution);
     }).toThrowError('Expected active state name to be non-null.');
-    component.saveHints([]);
-    component.saveSolicitAnswerDetails(true);
-    component.onChangeCardIsCheckpoint();
-    component.saveStateContent(
-      SubtitledHtml.createFromBackendDict({
-        content_id: 'content',
-        html: 'test',
-      })
-    );
-    component.saveLinkedSkillId('skill_id_1');
-    component.saveInapplicableSkillMisconceptionIds(['skill_id_1']);
+    expect(() => {
+      component.saveHints([]);
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveSolicitAnswerDetails(true);
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.onChangeCardIsCheckpoint();
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveStateContent(
+        SubtitledHtml.createFromBackendDict({
+          content_id: 'content',
+          html: 'test',
+        })
+      );
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveLinkedSkillId('skill_id_1');
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveInapplicableSkillMisconceptionIds(['skill_id_1']);
+    }).toThrowError('Expected active state name to be non-null.');
 
     expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
     expect(

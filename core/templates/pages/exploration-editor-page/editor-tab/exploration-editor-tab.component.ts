@@ -270,11 +270,16 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.tutorialInProgress = false;
   }
 
-  saveInteractionData(displayedValue: InteractionData): void {
+  private getValidActiveStateName(): string {
     const activeStateName = this.stateEditorService.getActiveStateName();
     if (!activeStateName) {
-      return;
+      throw new Error('Expected active state name to be non-null.');
     }
+    return activeStateName;
+  }
+
+  saveInteractionData(displayedValue: InteractionData): void {
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveInteractionId(
       activeStateName,
       cloneDeep(displayedValue.interactionId ?? '')
@@ -293,10 +298,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveInteractionAnswerGroups(
       activeStateName,
       cloneDeep(newAnswerGroups)
@@ -309,10 +311,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionDefaultOutcome(newOutcome: Outcome): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveInteractionDefaultOutcome(
       activeStateName,
       cloneDeep(newOutcome)
@@ -327,10 +326,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveSolution(displayedValue: Solution | SubtitledHtml): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      throw new Error('Expected active state name to be non-null.');
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveSolution(
       activeStateName,
       cloneDeep(displayedValue) as SubtitledHtml
@@ -342,10 +338,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveHints(displayedValue: Hint[]): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveHints(
       activeStateName,
       cloneDeep(displayedValue)
@@ -355,10 +348,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveSolicitAnswerDetails(displayedValue: boolean): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveSolicitAnswerDetails(
       activeStateName,
       cloneDeep(displayedValue)
@@ -376,10 +366,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   onChangeCardIsCheckpoint(): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     let displayedValue = this.stateCardIsCheckpointService.displayed;
     this.explorationStatesService.saveCardIsCheckpoint(
       activeStateName,
@@ -541,10 +528,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveStateContent(displayedValue: SubtitledHtml): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveStateContent(
       activeStateName,
       cloneDeep(displayedValue)
@@ -555,10 +539,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveLinkedSkillId(displayedValue: string): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveLinkedSkillId(
       activeStateName,
       cloneDeep(displayedValue)
@@ -574,10 +555,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInapplicableSkillMisconceptionIds(displayedValue: string[]): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
+    const activeStateName = this.getValidActiveStateName();
     this.stateEditorService.setInapplicableSkillMisconceptionIds(
       cloneDeep(displayedValue)
     );

@@ -121,6 +121,14 @@ export class TrainingModalComponent
     this.init();
   }
 
+  private getValidActiveStateName(): string {
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (!activeStateName) {
+      throw new Error('Expected active state name to be non-null.');
+    }
+    return activeStateName;
+  }
+
   _saveNewAnswerGroup(newAnswerGroup: AnswerGroup): void {
     let answerGroups = this.responsesService.getAnswerGroups();
     answerGroups.push(newAnswerGroup);
@@ -129,10 +137,7 @@ export class TrainingModalComponent
       answerGroups,
       this.responsesService.getDefaultOutcome(),
       (newAnswerGroups, newDefaultOutcome) => {
-        const activeStateName = this.stateEditorService.getActiveStateName();
-        if (!activeStateName) {
-          return;
-        }
+        const activeStateName = this.getValidActiveStateName();
 
         this.explorationStatesService.saveInteractionAnswerGroups(
           activeStateName,
@@ -185,10 +190,7 @@ export class TrainingModalComponent
   }
 
   init(): void {
-    let currentStateName = this.stateEditorService.getActiveStateName();
-    if (!currentStateName) {
-      return;
-    }
+    let currentStateName = this.getValidActiveStateName();
     let state = this.explorationStatesService.getState(currentStateName);
 
     // Retrieve the interaction ID.

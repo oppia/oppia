@@ -242,7 +242,7 @@ describe('Training Modal Component', () => {
     }
   );
 
-  it('should not save a new answer group if active state is missing', () => {
+  it('should throw if active state is missing while saving new answer group', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('');
     spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
     spyOn(responsesService, 'save').and.callFake(
@@ -253,14 +253,16 @@ describe('Training Modal Component', () => {
     spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
     spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
 
-    component._saveNewAnswerGroup(
-      AnswerGroup.createNew(
-        [],
-        Outcome.createNew('', 'feedback_1', '', []),
-        [],
-        null
-      )
-    );
+    expect(() => {
+      component._saveNewAnswerGroup(
+        AnswerGroup.createNew(
+          [],
+          Outcome.createNew('', 'feedback_1', '', []),
+          [],
+          null
+        )
+      );
+    }).toThrowError('Expected active state name to be non-null.');
 
     expect(
       explorationStatesService.saveInteractionAnswerGroups
@@ -270,11 +272,13 @@ describe('Training Modal Component', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('should return early in init if active state is missing', () => {
+  it('should throw in init if active state is missing', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('');
     spyOn(explorationStatesService, 'getState');
 
-    component.init();
+    expect(() => {
+      component.init();
+    }).toThrowError('Expected active state name to be non-null.');
 
     expect(explorationStatesService.getState).not.toHaveBeenCalled();
   });
