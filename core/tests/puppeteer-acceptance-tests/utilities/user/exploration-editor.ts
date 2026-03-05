@@ -7308,7 +7308,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Expects the feedback reply details to be visible.
    */
-  async expectFeedbackReplyDetailsToBeVisible() {
+  async expectFeedbackReplyDetailsToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(feedbackAuthorSelector);
     await this.expectElementToBeVisible(feedbackStatusSelector);
     await this.expectElementToBeVisible(FeedbacktimeElement);
