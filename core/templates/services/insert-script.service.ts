@@ -69,7 +69,7 @@ export class InsertScriptService {
           scriptElement.async = true;
           break;
         case KNOWN_SCRIPTS.MATHJAX:
-          scriptElement.src = 'assets/mathjax/MathJax.js?config=TeX-AMS_HTML';
+          scriptElement.src = '/assets/mathjax/MathJax.js?config=TeX-AMS_HTML';
           scriptElement.async = true;
           break;
         case KNOWN_SCRIPTS.PENCILCODE:
