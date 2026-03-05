@@ -165,9 +165,11 @@ export class HomeTabComponent {
     );
 
     if (this.totalLessonCards === 0) {
-      this.allCardsLoaded = true;
-      this.loadingMessage = '';
-      this.loaderService.hideLoadingScreen();
+      setTimeout(() => {
+        this.allCardsLoaded = true;
+        this.loadingMessage = '';
+        this.loaderService.hideLoadingScreen();
+      });
     } else {
       setTimeout(() => {
         if (!this.allCardsLoaded) {
