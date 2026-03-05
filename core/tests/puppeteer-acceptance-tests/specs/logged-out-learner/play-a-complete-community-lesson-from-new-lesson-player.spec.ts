@@ -232,8 +232,7 @@ describe('Logged-Out Learner', function () {
       }
     },
     // Setup takes more time than default.
-    // 1800000.
-    7200000
+    1800000
   );
 
   it('should be able use all the RTE components in a community lesson', async function () {
@@ -268,9 +267,6 @@ describe('Logged-Out Learner', function () {
     expect(await loggedOutLearner.isBackButtonPresent()).toBe(true);
     expect(await loggedOutLearner.isContinueButtonPresent()).toBe(false);
 
-    // Note: All of the RTE components below check for default values,
-    // added by addExplorationDescriptionContainingAllRTEComponents function.
-
     // Concept Card RTE.
     await loggedOutLearner.clickOnConceptCardLinkInQuestionBar();
     await loggedOutLearner.expectConceptCardContent(
@@ -304,6 +300,6 @@ describe('Logged-Out Learner', function () {
   });
 
   afterAll(async function () {
-    // Tawait UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
