@@ -3379,7 +3379,7 @@ export class TopicManager extends BaseUser {
         await this.waitForStaticAssetsToLoad();
       }
 
-      await this.page.waitForSelector(chapterTitleSelector);
+      await this.page.waitForSelector(chapterTitleSelector, {timeout: 60000});
       const chapterTitles = await this.page.$$(chapterTitleSelector);
 
       for (const titleElement of chapterTitles) {
@@ -3616,61 +3616,70 @@ export class TopicManager extends BaseUser {
 
   /**
    * Reorders chapters by dragging one chapter before another.
-   * @param {string} chapterName - The name of the chapter to drag.
-   * @param {string} targetChapterName - The name of the target chapter.
+   * @param chapterName - Name of the chapter to drag.
+   * @param targetChapterName - Name of the chapter to drop before.
    */
   async reorderChapters(
     chapterName: string,
     targetChapterName: string
   ): Promise<void> {
-    await this.page.waitForSelector(chapterTitleSelector);
+    // Wait for all chapters to render.
+    await this.page.waitForSelector(chapterTitleSelector, {visible: true});
     const chapterTitles = await this.page.$$(chapterTitleSelector);
 
-    let fromElement: ElementHandle<Element> | null = null;
-    let toElement: ElementHandle<Element> | null = null;
+    let fromEl: ElementHandle<Element> | null = null;
+    let toEl: ElementHandle<Element> | null = null;
 
+    // Find draggable elements.
     for (const chapterTitle of chapterTitles) {
       const text = await this.page.evaluate(
         el => el.textContent?.trim(),
         chapterTitle
       );
       if (text === chapterName) {
-        fromElement = (await chapterTitle.evaluateHandle(el =>
+        fromEl = (await chapterTitle.evaluateHandle(el =>
           el.closest('[cdkDrag]')
         )) as ElementHandle<Element>;
       }
       if (text === targetChapterName) {
-        toElement = (await chapterTitle.evaluateHandle(el =>
+        toEl = (await chapterTitle.evaluateHandle(el =>
           el.closest('[cdkDrag]')
         )) as ElementHandle<Element>;
       }
     }
 
-    if (!fromElement || !toElement) {
-      throw new Error('Chapter(s) not found for reordering.');
+    if (!fromEl || !toEl) {
+      throw new Error(
+        `Could not find chapter(s) "${chapterName}" or "${targetChapterName}"`
+      );
     }
 
-    const fromBox = await fromElement.boundingBox();
-    const toBox = await toElement.boundingBox();
+    const fromBox = await fromEl.boundingBox();
+    const toBox = await toEl.boundingBox();
 
     if (!fromBox || !toBox) {
-      throw new Error('Could not get bounding box for chapter(s).');
+      throw new Error('Could not get bounding boxes for drag/drop');
     }
 
+    // Drag from the center of the source.
     await this.page.mouse.move(
       fromBox.x + fromBox.width / 2,
       fromBox.y + fromBox.height / 2
     );
     await this.page.mouse.down();
-    await this.page.mouse.move(
-      toBox.x + toBox.width / 2,
-      toBox.y + toBox.height / 2,
-      {steps: 10}
-    );
+    await this.page.mouse.move(toBox.x + toBox.width / 2, toBox.y + 5, {
+      steps: 15,
+    });
     await this.page.mouse.up();
 
+    // Wait for DOM update.
+    await this.page.waitForTimeout(1000);
+
+    showMessage(
+      `Reordered chapters: "${chapterName}" before "${targetChapterName}"`
+    );
+
     await this.waitForPageToFullyLoad();
-    showMessage(`Reordered chapters: ${chapterName} to ${targetChapterName}`);
   }
 
   /**
