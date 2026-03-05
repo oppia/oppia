@@ -241,7 +241,6 @@ export class BlogHomePageComponent implements OnInit {
       const pageSize = this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH;
       const offset = (this.page - 1) * pageSize;
 
-      // Construct query params properly
       const params = new URLSearchParams();
       if (this.searchQuery) {
         params.set('q', this.searchQuery);
@@ -251,7 +250,6 @@ export class BlogHomePageComponent implements OnInit {
       }
       params.set('offset', offset.toString());
 
-      // Pass the query string to backend
       this.blogHomePageBackendApiService
         .fetchBlogPostSearchResultAsync('?' + params.toString())
         .then(data => {
@@ -327,11 +325,9 @@ export class BlogHomePageComponent implements OnInit {
 
     let currentParams = this.route.snapshot.queryParams;
 
-    const currentQuery = currentParams['q'] || '';
-    const currentTags = currentParams['tags']
-      ? currentParams['tags'].split(',')
-      : [];
-    const currentPage = currentParams['page'] || '1';
+    const currentQuery = currentParams.q || '';
+    const currentTags = currentParams.tags ? currentParams.tags.split(',') : [];
+    const currentPage = currentParams.page || '1';
 
     const isQueryChanged =
       currentQuery !== this.searchQuery ||

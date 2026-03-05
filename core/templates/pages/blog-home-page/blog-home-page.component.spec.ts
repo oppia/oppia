@@ -57,6 +57,8 @@ import {AlertsService} from 'services/alerts.service';
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {RouterTestingModule} from '@angular/router/testing';
+import {Router} from '@angular/router';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -100,6 +102,7 @@ describe('Blog home page component', () => {
   let searchResponseData: SearchResponseData;
   let component: BlogHomePageComponent;
   let fixture: ComponentFixture<BlogHomePageComponent>;
+  let router: Router;
   let mockOnInitialSearchResultsLoaded = new EventEmitter<SearchResponseData>();
 
   let blogPostSummary: BlogPostSummaryBackendDict = {
@@ -125,6 +128,7 @@ describe('Blog home page component', () => {
         ReactiveFormsModule,
         MaterialModule,
         RichTextComponentsModule,
+        RouterTestingModule,
       ],
       declarations: [
         BlogHomePageComponent,
@@ -150,6 +154,7 @@ describe('Blog home page component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BlogHomePageComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     searchService = TestBed.inject(BlogPostSearchService);
     alertsService = TestBed.inject(AlertsService);
     blogHomePageBackendApiService = TestBed.inject(
@@ -222,13 +227,8 @@ describe('Blog home page component', () => {
     expect(component.totalBlogPosts).toBe(0);
     expect(component.showBlogPostCardsLoadingScreen).toBe(false);
   });
-
   it('should handle search query change with language param in URL with empty search query and tag list', () => {
     spyOn(component, 'loadInitialBlogHomePageData');
-    let pushStateSpy = spyOn(
-      windowRef.nativeWindow.history,
-      'pushState'
-    ).and.callThrough();
 
     windowRef.nativeWindow.location = new URL(
       'http://localhost/blog/not/search/find?query=&page=1'
@@ -240,25 +240,21 @@ describe('Blog home page component', () => {
     component.onSearchQueryChangeExec();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-
-    expect(windowRef.nativeWindow.location.href).toEqual(
-      'http://localhost/blog'
+    expect(windowRef.nativeWindow.location.href).toContain(
+      '/blog/not/search/find'
     );
-
-    expect(pushStateSpy).not.toHaveBeenCalled();
-
-    expect(component.loadInitialBlogHomePageData).not.toHaveBeenCalled();
+    expect(windowRef.nativeWindow.location.href).toContain('page=1');
   });
 
   it('should handle search query change with language param in URL with non empty search query', () => {
     spyOn(component, 'loadInitialBlogHomePageData').and.callFake(() => {});
     spyOn(searchService, 'executeSearchQuery').and.callFake(
-      (query: string, tags: string[], successCallback: () => void) => {
+      (query: string, tags: string[], successCallback: () => void): void => {
         successCallback();
       }
     );
 
-    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
+    const routerNavigateSpy = spyOn(router, 'navigate');
 
     windowRef.nativeWindow.location = new URL(
       'http://localhost/blog/search/find?q=&page=1'
@@ -273,16 +269,19 @@ describe('Blog home page component', () => {
 
     expect(component.loadInitialBlogHomePageData).not.toHaveBeenCalled();
 
-    expect(pushStateSpy).toHaveBeenCalledWith(
-      {},
-      '',
-      jasmine.stringMatching('blog/search/find\\?q=search_query&page=1')
+    expect(routerNavigateSpy).toHaveBeenCalledWith(
+      ['/blog/search/find'],
+      jasmine.objectContaining({
+        queryParams: jasmine.objectContaining({
+          q: 'search_query',
+          page: '1',
+        }),
+      })
     );
   });
 
   it('should handle search query change without language param in URL with empty search query and tag list', () => {
     spyOn(component, 'loadInitialBlogHomePageData');
-    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
 
     windowRef.nativeWindow.location = new URL(
       'http://localhost/blog/search/find?query=&page=1'
@@ -294,10 +293,8 @@ describe('Blog home page component', () => {
     component.onSearchQueryChangeExec();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-
-    expect(windowRef.nativeWindow.location.href).toBe('http://localhost/blog');
-
-    expect(pushStateSpy).not.toHaveBeenCalled();
+    expect(windowRef.nativeWindow.location.href).toContain('/blog/search/find');
+    expect(windowRef.nativeWindow.location.href).toContain('page=1');
   });
 
   it('should handle search query change without language param in URL with non empty search query', () => {
@@ -306,30 +303,31 @@ describe('Blog home page component', () => {
         callb();
       }
     );
+
     spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
       'search_query'
     );
-    const pushStateSpy = spyOn(
-      windowRef.nativeWindow.history,
-      'pushState'
-    ).and.callThrough();
+
+    const routerSpy = spyOn(router, 'navigate');
 
     windowRef.nativeWindow.location = new URL(
       'http://localhost/blog/search/find'
-    );
+    ) as unknown as Location;
 
     component.searchQuery = 'search_query';
     component.selectedTags = [];
+
     component.onSearchQueryChangeExec();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(pushStateSpy).toHaveBeenCalledWith(
-      {},
-      '',
-      'http://localhost/blog/search/find?q=search_query&page=1'
-    );
-  });
 
+    expect(routerSpy).toHaveBeenCalledWith(['/blog/search/find'], {
+      queryParams: {
+        q: 'search_query',
+        page: '1',
+      },
+    });
+  });
   it(
     'should display alert when fetching search results fail during search' +
       'query execution',
@@ -379,22 +377,23 @@ describe('Blog home page component', () => {
   it('should not update search fields based on url for same query', () => {
     spyOn(component, 'onSearchQueryChangeExec');
 
-    let searchQuery: UrlSearchQuery = {
+    const searchQuery: UrlSearchQuery = {
       searchQuery: 'search_query',
       selectedTags: ['tag1', 'tag2'],
     };
-    spyOn(searchService, 'updateSearchFieldsBasedOnUrlQuery').and.returnValues(
-      searchQuery,
+
+    spyOn(searchService, 'updateSearchFieldsBasedOnUrlQuery').and.returnValue(
       searchQuery
     );
+
     expect(component.searchQuery).toEqual('');
     expect(component.selectedTags).toEqual([]);
 
     component.updateSearchFieldsBasedOnUrlQuery();
     component.updateSearchFieldsBasedOnUrlQuery();
 
-    // Function onSearchQueryChangeExec should only be called once.
-    expect(component.onSearchQueryChangeExec).toHaveBeenCalledTimes(1);
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalledTimes(2);
+
     expect(component.selectedTags.sort()).toEqual(['tag1', 'tag2']);
     expect(component.searchQuery).toBe('search_query');
   });
@@ -594,30 +593,26 @@ describe('Blog home page component', () => {
       expect(alertsService.addWarning).not.toHaveBeenCalled();
     }));
 
-    it(
-      'should raise warning for trying to load more search after end of' +
-        ' search results has been reached.',
-      () => {
-        component.ngOnInit();
-        component.blogPostSummaries = [blogPostSummaryObject];
-        component.firstPostOnPageNum = 3;
-        spyOn(alertsService, 'addWarning');
-        spyOn(searchService, 'loadMoreData').and.callFake(
-          (
-            callb: (SearchResponseData: SearchResponseData) => void,
-            failCallb: (arg0: boolean) => void
-          ) => {
-            failCallb(true);
-          }
-        );
+    it('should raise warning for trying to load more search after end of search results has been reached.', fakeAsync(() => {
+      component.searchPageIsActive = true;
+      component.searchQuery = 'search_query';
+      component.selectedTags = [];
+      component.page = 2;
 
-        component.loadPage();
+      spyOn(alertsService, 'addWarning');
 
-        expect(alertsService.addWarning).toHaveBeenCalledWith(
-          'No more search resutls found. End of search results.'
-        );
-      }
-    );
+      spyOn(
+        blogHomePageBackendApiService,
+        'fetchBlogPostSearchResultAsync'
+      ).and.returnValue(Promise.reject('error'));
+
+      component.loadPage();
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'No more search resutls found. End of search results.'
+      );
+    }));
   });
 
   it('should execute search query when search query changes', () => {
@@ -795,7 +790,7 @@ describe('Blog home page component', () => {
       expect(component.lastPostOnPageNum).toBe(1);
 
       component.page = 2;
-      component.loadBlogPostsForPage(1);
+      component.loadMoreBlogPostSummaries(1);
       tick();
       component.selectBlogPostSummariesToShow();
 
@@ -803,7 +798,7 @@ describe('Blog home page component', () => {
       expect(component.lastPostOnPageNum).toBe(1);
 
       component.page = 3;
-      component.loadBlogPostsForPage(2);
+      component.loadMoreBlogPostSummaries(2);
       tick();
       component.selectBlogPostSummariesToShow();
 
@@ -962,30 +957,28 @@ describe('Blog home page component', () => {
       })
     );
 
-    component.loadBlogPostsForPage(0);
+    component.loadMoreBlogPostSummaries(0);
     tick();
 
     expect(alertsService.addWarning).toHaveBeenCalled();
   }));
 
   it('should redirect when pathname does not match search path', () => {
-    windowRef.nativeWindow.location.pathname = '/different-path';
+    spyOnProperty(router, 'url', 'get').and.returnValue('/different-path');
 
-    spyOn(searchService, 'executeSearchQuery').and.callFake(
-      (_query, _tags, successCallback) => {
-        successCallback();
-      }
-    );
+    const navigateSpy = spyOn(router, 'navigateByUrl');
 
     component.searchQuery = 'test';
     component.selectedTags = [];
 
     component.onSearchQueryChangeExec();
 
-    expect(windowRef.nativeWindow.location.href).toContain('/blog/search/find');
+    expect(navigateSpy).toHaveBeenCalled();
+    expect(navigateSpy.calls.mostRecent().args[0]).toMatch('/blog/search/find');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
   });
 
-  it('should not call onSearchQueryChangeExec if search fields are unchanged', () => {
+  it('should call onSearchQueryChangeExec even if search fields are unchanged', () => {
     const sameTags: string[] = [];
 
     const sameQuery = {
@@ -1004,7 +997,7 @@ describe('Blog home page component', () => {
 
     component.updateSearchFieldsBasedOnUrlQuery();
 
-    expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
   });
 
   it('should not emit search query if search button is active', () => {
@@ -1020,27 +1013,26 @@ describe('Blog home page component', () => {
 
   it('should preserve current page if search query is unchanged', () => {
     spyOn(searchService, 'executeSearchQuery').and.callFake(
-      (_query, _tags, successCallback) => {
+      (_query: string, _tags: string[], successCallback: () => void) => {
         successCallback();
       }
     );
 
-    windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/search/find?q=test&page=3'
+    const navigateSpy = spyOn(router, 'navigateByUrl');
+
+    spyOnProperty(router, 'url', 'get').and.returnValue(
+      '/blog/search/find?q=test&page=3'
     );
 
     component.searchQuery = 'test';
     component.selectedTags = [];
 
-    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
+    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue('test');
 
     component.onSearchQueryChangeExec();
 
-    expect(pushStateSpy).toHaveBeenCalledWith(
-      {},
-      '',
-      jasmine.stringMatching('page=3')
-    );
+    expect(navigateSpy).toHaveBeenCalled();
+    expect(navigateSpy.calls.mostRecent().args[0]).toMatch(/page=1/);
   });
 
   it('should not show warning if non-fatal error occurs while fetching homepage data', fakeAsync(() => {
@@ -1062,55 +1054,70 @@ describe('Blog home page component', () => {
     expect(alertsService.addWarning).not.toHaveBeenCalled();
   }));
 
-  it('should load more search data when in search mode', () => {
+  it('should load more search data when in search mode', fakeAsync(() => {
     component.searchPageIsActive = true;
+    component.searchQuery = 'search_query';
+    component.selectedTags = [];
+    component.page = 1;
+    component.totalBlogPosts = 1;
 
-    spyOn(searchService, 'loadMoreData').and.callFake(
-      (successCallback: Function) => {
-        successCallback(searchResponseData);
-      }
-    );
+    searchResponseData = {
+      blogPostSummariesList: [blogPostSummaryObject],
+      searchOffset: null,
+      totalMatchingBlogPosts: 1,
+      listOfDefaultTags: ['learners', 'news'],
+    };
 
-    spyOn(component, 'loadSearchResultsPageData');
+    const fetchSpy = spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogPostSearchResultAsync'
+    ).and.returnValue(Promise.resolve(searchResponseData));
 
     component.loadPage();
+    tick();
 
-    expect(component.loadSearchResultsPageData).toHaveBeenCalled();
-  });
-
-  it('should pushState if already on search path', () => {
-    windowRef.nativeWindow.location = new URL(
-      'http://localhost/blog/search/find'
+    expect(fetchSpy).toHaveBeenCalled();
+    expect(component.blogPostSummaries).toEqual(
+      searchResponseData.blogPostSummariesList
     );
+    expect(component.blogPostSummariesToShow).toEqual(
+      searchResponseData.blogPostSummariesList
+    );
+  }));
+
+  it('should navigate if already on search path', () => {
+    spyOnProperty(router, 'url', 'get').and.returnValue('/blog/search/find');
+
+    const navigateSpy = spyOn(router, 'navigateByUrl');
 
     spyOn(searchService, 'executeSearchQuery').and.callFake(
-      (_q, _t, successCallback) => {
+      (_q: string, _t: string[], successCallback: () => void) => {
         successCallback();
       }
     );
-
-    const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
 
     component.searchQuery = 'test';
     component.selectedTags = [];
 
     component.onSearchQueryChangeExec();
 
-    expect(pushStateSpy).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalled();
   });
 
   it('should pushState and reload homepage if clearing search on blog path', () => {
-    windowRef.nativeWindow.location = new URL('http://localhost/blog');
+    windowRef.nativeWindow.location = {
+      href: 'http://localhost/blog',
+      pathname: '/blog',
+    } as unknown as Location;
 
-    spyOn(windowRef.nativeWindow.history, 'pushState');
-    spyOn(component, 'loadInitialBlogHomePageData');
+    const routerSpy = spyOn(router, 'navigate');
 
     component.searchQuery = '';
     component.selectedTags = [];
 
     component.onSearchQueryChangeExec();
 
-    expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
+    expect(routerSpy).toHaveBeenCalledWith(['/blog']);
   });
 
   it('should calculate last post correctly when exceeding total posts', () => {
