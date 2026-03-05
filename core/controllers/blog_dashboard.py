@@ -30,6 +30,10 @@ from core.domain import (
 
 from typing import Dict, List, Optional, TypedDict
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    pass
+
 
 class BlogCardSummaryDict(TypedDict):
     """Type for the dict representation of blog_card_summary_dict."""
@@ -114,9 +118,10 @@ class BlogDashboardDataHandler(
     def get(self) -> None:
         """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
-        author_details = blog_services.get_blog_author_details(
-            self.user_id
+        author_details_dict = blog_services.get_blog_author_details(
+            self.user_id, strict=False
         ).to_dict()
+
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
@@ -148,7 +153,7 @@ class BlogDashboardDataHandler(
             )
         self.values.update(
             {
-                'author_details': author_details,
+                'author_details': author_details_dict,
                 'no_of_published_blog_posts': no_of_published_blog_posts,
                 'no_of_draft_blog_posts': no_of_draft_blog_posts,
                 'published_blog_post_summary_dicts': published_post_summary_dicts,
@@ -175,13 +180,13 @@ class BlogDashboardDataHandler(
         blog_services.update_blog_author_details(
             self.user_id, displayed_author_name, author_bio
         )
-        author_details = blog_services.get_blog_author_details(
+        author_details_dict = blog_services.get_blog_author_details(
             self.user_id
         ).to_dict()
 
         self.values.update(
             {
-                'author_details': author_details,
+                'author_details': author_details_dict,
             }
         )
         self.render_json(self.values)

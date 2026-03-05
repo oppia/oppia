@@ -22,6 +22,7 @@ import {Injectable} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {initializeGoogleAnalytics} from 'google-analytics.initializer';
 import {LocalStorageService} from './local-storage.service';
+import {UserService} from './user.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
@@ -39,7 +40,8 @@ export class SiteAnalyticsService {
 
   constructor(
     private windowRef: WindowRef,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private userService: UserService
   ) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
       // This ensures that google analytics is initialized whenever this
@@ -47,13 +49,46 @@ export class SiteAnalyticsService {
       initializeGoogleAnalytics();
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
+
+    this._initializeLoginStatus();
   }
 
-  _sendEventToGoogleAnalytics(
+  private async _initializeLoginStatus(): Promise<void> {
+    await this.userService.getUserInfoAsync();
+    this._pushLoginStatusToDataLayer();
+  }
+
+  private _pushLoginStatusToDataLayer(): void {
+    const loginStatus = this._getLoginStatus();
+
+    this.windowRef.nativeWindow.dataLayer =
+      this.windowRef.nativeWindow.dataLayer || [];
+
+    this.windowRef.nativeWindow.dataLayer.push({
+      login_status: loginStatus,
+    });
+  }
+
+  private _getLoginStatus(): string {
+    return this.userService.isLoggedIn() ? 'logged_in' : 'logged_out';
+  }
+
+  private _sendEventToGoogleAnalytics(
     eventName: string,
-    eventParameters: Object = {}
+    eventParameters: Record<string, string | number | boolean> = {}
   ): void {
-    this.windowRef.nativeWindow.gtag('event', eventName, eventParameters);
+    const loginStatus = this._getLoginStatus();
+
+    const updatedEventParameters = {
+      ...eventParameters,
+      login_status: loginStatus,
+    };
+
+    this.windowRef.nativeWindow.gtag(
+      'event',
+      eventName,
+      updatedEventParameters
+    );
   }
 
   // The srcElement refers to the element on the page that is clicked.
