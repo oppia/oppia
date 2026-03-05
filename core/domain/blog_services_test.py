@@ -748,6 +748,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         ]
         expected_blog_post_tags = all_blog_post_tags[:-1]
 
+        all_blog_post_summaries = ['Hello Blog Post +%s' % i for i in range(5)]
+        expected_blog_post_summaries = all_blog_post_summaries[:-1]
+
         def mock_add_documents_to_index(
             docs: List[Dict[str, str]], index: int
         ) -> List[str]:
@@ -755,9 +758,11 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             ids = [doc['id'] for doc in docs]
             titles = [doc['title'] for doc in docs]
             tags = [doc['tags'] for doc in docs]
+            summaries = [doc['summary'] for doc in docs]
             self.assertEqual(set(ids), set(expected_blog_post_ids))
             self.assertEqual(set(titles), set(expected_blog_post_titles))
             self.assertEqual(tags.sort(), expected_blog_post_tags.sort())
+            self.assertEqual(set(summaries), set(expected_blog_post_summaries))
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
@@ -847,6 +852,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 'rank': rank,
                 'tags': old_blog_post_tag,
                 'title': old_blog_post_title,
+                'summary': 'Hello Blog Post',
             }
             self.assertEqual(actual_docs, [initial_blog_post_doc])
             self.assertEqual(add_docs_counter.times_called, 1)
@@ -873,6 +879,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 'rank': rank,
                 'tags': new_blog_post_tags,
                 'title': new_blog_post_title,
+                'summary': 'Hello Blog Post',
             }
 
             self.process_and_flush_pending_tasks()
@@ -1292,6 +1299,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
                 [
                     self.ids_of_blog_posts_by_user_A[0],
                     self.ids_of_blog_posts_by_user_A[2],
+                    self.ids_of_blog_posts_by_user_B[1],
                 ]
             ),
         )
@@ -1339,6 +1347,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
                 [
                     self.ids_of_blog_posts_by_user_B[0],
                     self.ids_of_blog_posts_by_user_B[1],
+                    self.ids_of_blog_posts_by_user_B[2],
                 ]
             ),
         )
@@ -1354,6 +1363,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             sorted(
                 [
                     self.ids_of_blog_posts_by_user_B[1],
+                    self.ids_of_blog_posts_by_user_B[2],
                 ]
             ),
         )
