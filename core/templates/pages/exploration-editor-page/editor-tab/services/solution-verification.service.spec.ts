@@ -28,6 +28,16 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+
+const getInteractionSpecsKey = (
+  interactionId: string | null
+): InteractionSpecsKey => {
+  if (interactionId === null) {
+    throw new Error('Expected interaction id to be non-null.');
+  }
+  return interactionId as InteractionSpecsKey;
+};
 
 describe('Solution Verification Service', () => {
   let explorationStatesService: ExplorationStatesService;
@@ -140,7 +150,10 @@ describe('Solution Verification Service', () => {
 
   it('should verify a correct solution', () => {
     const state = explorationStatesService.getState('First State');
-    stateInteractionIdService.init('First State', state.interaction.id || '');
+    stateInteractionIdService.init(
+      'First State',
+      getInteractionSpecsKey(state.interaction.id)
+    );
     stateCustomizationArgsService.init(
       'First State',
       state.interaction.customizationArgs
@@ -173,7 +186,10 @@ describe('Solution Verification Service', () => {
 
   it('should verify an incorrect solution', () => {
     const state = explorationStatesService.getState('First State');
-    stateInteractionIdService.init('First State', state.interaction.id || '');
+    stateInteractionIdService.init(
+      'First State',
+      getInteractionSpecsKey(state.interaction.id)
+    );
     stateCustomizationArgsService.init(
       'First State',
       state.interaction.customizationArgs
@@ -228,7 +244,10 @@ describe('Solution Verification Service', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
 
     const state = explorationStatesService.getState('First State');
-    stateInteractionIdService.init('First State', state.interaction.id || '');
+    stateInteractionIdService.init(
+      'First State',
+      getInteractionSpecsKey(state.interaction.id)
+    );
     stateCustomizationArgsService.init(
       'First State',
       state.interaction.customizationArgs

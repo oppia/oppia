@@ -103,6 +103,15 @@ const INTERACTION_SERVICE_MAPPING = {
   RatioExpressionInputValidationService: RatioExpressionInputValidationService,
   SetInputValidationService: SetInputValidationService,
   TextInputValidationService: TextInputValidationService,
+} as const;
+
+type InteractionValidationServiceName =
+  keyof typeof INTERACTION_SERVICE_MAPPING;
+
+const isInteractionValidationServiceName = (
+  serviceName: string
+): serviceName is InteractionValidationServiceName => {
+  return serviceName in INTERACTION_SERVICE_MAPPING;
 };
 
 @Component({
@@ -142,12 +151,12 @@ export class CustomizeInteractionModalComponent
     super(ngbActiveModal);
   }
 
-  getTitle(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId as InteractionSpecsKey].name;
+  getTitle(interactionId: InteractionSpecsKey): string {
+    return INTERACTION_SPECS[interactionId].name;
   }
 
-  getDescription(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId as InteractionSpecsKey].description;
+  getDescription(interactionId: InteractionSpecsKey): string {
+    return INTERACTION_SPECS[interactionId].description;
   }
 
   getSchemaCallback(schema: Schema): () => Schema {
@@ -161,14 +170,15 @@ export class CustomizeInteractionModalComponent
       return [];
     }
     const validationServiceName: string =
-      INTERACTION_SPECS[
-        this.stateInteractionIdService.displayed as InteractionSpecsKey
-      ].id + 'ValidationService';
+      INTERACTION_SPECS[this.stateInteractionIdService.displayed].id +
+      'ValidationService';
+
+    if (!isInteractionValidationServiceName(validationServiceName)) {
+      return [];
+    }
 
     const validationService = this.injector.get(
-      INTERACTION_SERVICE_MAPPING[
-        validationServiceName as keyof typeof INTERACTION_SERVICE_MAPPING
-      ]
+      INTERACTION_SERVICE_MAPPING[validationServiceName]
     ) as {
       getCustomizationArgsWarnings: (
         args: InteractionCustomizationArgs
@@ -189,12 +199,11 @@ export class CustomizeInteractionModalComponent
     return warningMessage;
   }
 
-  onChangeInteractionId(newInteractionId: string): void {
+  onChangeInteractionId(newInteractionId: InteractionSpecsKey): void {
     this.isinteractionOpen = false;
     this.editorFirstTimeEventsService.registerFirstSelectInteractionTypeEvent();
 
-    let interactionSpec =
-      INTERACTION_SPECS[newInteractionId as InteractionSpecsKey];
+    let interactionSpec = INTERACTION_SPECS[newInteractionId];
     this.customizationArgSpecs = interactionSpec.customization_arg_specs;
     this.stateInteractionIdService.displayed = newInteractionId;
     this.stateCustomizationArgsService.displayed = {};
@@ -314,9 +323,10 @@ export class CustomizeInteractionModalComponent
             this.generateContentIdService.getNextStateId(contentIdPrefix);
         }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as unknown[]).length; i++) {
+        const listValue = value as unknown[];
+        for (let i = 0; i < listValue.length; i++) {
           traverseSchemaAndAssignContentIds(
-            (value as unknown[])[i],
+            listValue[i],
             schema.items as Schema,
             `${contentIdPrefix}`
           );
@@ -324,9 +334,7 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    const caSpecs =
-      INTERACTION_SPECS[interactionId as InteractionSpecsKey]
-        .customization_arg_specs;
+    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
     const caValues = this.stateCustomizationArgsService.displayed as Record<
       string,
       {value: unknown}
@@ -382,18 +390,14 @@ export class CustomizeInteractionModalComponent
         contentIdToContent[subtitledUnicodeValue.contentId] =
           subtitledUnicodeValue.unicode;
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as unknown[]).length; i++) {
-          traverseSchemaAndCollectContent(
-            (value as unknown[])[i],
-            schema.items as Schema
-          );
+        const listValue = value as unknown[];
+        for (let i = 0; i < listValue.length; i++) {
+          traverseSchemaAndCollectContent(listValue[i], schema.items as Schema);
         }
       }
     };
 
-    const caSpecs =
-      INTERACTION_SPECS[interactionId as InteractionSpecsKey]
-        .customization_arg_specs;
+    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
     const caValues = this.stateCustomizationArgsService.displayed as Record<
       string,
       {value: unknown}
@@ -481,9 +485,7 @@ export class CustomizeInteractionModalComponent
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
       let interactionSpec =
-        INTERACTION_SPECS[
-          this.stateInteractionIdService.savedMemento as InteractionSpecsKey
-        ];
+        INTERACTION_SPECS[this.stateInteractionIdService.savedMemento];
       this.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
       this.stateInteractionIdService.displayed = cloneDeep(

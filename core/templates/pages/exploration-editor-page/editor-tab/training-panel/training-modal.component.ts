@@ -70,7 +70,7 @@ export const RULES_SERVICE_MAPPING = {
   TextInputRulesService: TextInputRulesService,
 };
 
-interface classification {
+interface Classification {
   answerGroupIndex: number;
   newOutcome: Outcome;
 }
@@ -89,7 +89,7 @@ export class TrainingModalComponent
   trainingDataAnswer: InteractionAnswer | string = '';
   // See the training panel directive in ExplorationEditorTab for an
   // explanation on the structure of this object.
-  classification: classification = {
+  classification: Classification = {
     answerGroupIndex: 0,
     newOutcome: Outcome.createNew('', '', '', []),
   };

@@ -50,6 +50,9 @@ import {AppConstants} from 'app.constants';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+
+const NO_INTERACTION_ID = '' as unknown as InteractionSpecsKey;
 
 class MockStateCustomizationArgsService {
   displayed = {
@@ -373,7 +376,7 @@ describe('Customize Interaction Modal Component', () => {
     );
 
     component.hasCustomizationArgs = true;
-    stateInteractionIdService.displayed = '';
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
     tick();
 
     expect(component.getSaveInteractionButtonTooltip()).toBe(
@@ -455,8 +458,8 @@ describe('Customize Interaction Modal Component', () => {
         false
       );
 
-      stateInteractionIdService.displayed = '';
-      stateInteractionIdService.savedMemento = '';
+      stateInteractionIdService.displayed = NO_INTERACTION_ID;
+      stateInteractionIdService.savedMemento = NO_INTERACTION_ID;
 
       component.ngOnInit();
       tick();
@@ -607,13 +610,13 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should return empty warnings list when no interaction is displayed', () => {
-    stateInteractionIdService.displayed = '';
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
 
     expect(component.getCustomizationArgsWarningsList()).toEqual([]);
   });
 
   it('should no-op when populating null content ids without interaction id', () => {
-    stateInteractionIdService.displayed = '';
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
     spyOn(generateContentIdService, 'getNextStateId');
 
     component.populateNullContentIds();
@@ -622,7 +625,7 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should return empty content map when no interaction is displayed', () => {
-    stateInteractionIdService.displayed = '';
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
 
     expect(component.getContentIdToContent()).toEqual({});
   });

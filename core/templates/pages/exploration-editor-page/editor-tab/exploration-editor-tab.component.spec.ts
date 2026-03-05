@@ -682,7 +682,9 @@ describe('Exploration editor tab component', () => {
     component.saveInteractionDefaultOutcome(
       firstStateInteraction.defaultOutcome as Outcome
     );
-    component.saveSolution(firstStateInteraction.solution as Solution);
+    expect(() => {
+      component.saveSolution(firstStateInteraction.solution as Solution);
+    }).toThrowError('Expected active state name to be non-null.');
     component.saveHints([]);
     component.saveSolicitAnswerDetails(true);
     component.onChangeCardIsCheckpoint();

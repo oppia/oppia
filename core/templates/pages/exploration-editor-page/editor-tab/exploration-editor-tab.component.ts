@@ -329,7 +329,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   saveSolution(displayedValue: Solution | SubtitledHtml): void {
     const activeStateName = this.stateEditorService.getActiveStateName();
     if (!activeStateName) {
-      return;
+      throw new Error('Expected active state name to be non-null.');
     }
     this.explorationStatesService.saveSolution(
       activeStateName,
