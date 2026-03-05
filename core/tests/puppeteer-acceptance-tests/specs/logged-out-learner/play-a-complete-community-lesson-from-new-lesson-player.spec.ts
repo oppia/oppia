@@ -275,9 +275,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.closeConceptCard();
 
     // Video RTE.
-    await loggedOutLearner.playYoutubeVideo();
-    await loggedOutLearner.page.waitForTimeout(10000);
-    await loggedOutLearner.expectYoutubeVideoIsPlaying();
+    await loggedOutLearner.expectVideoRTEToBePresent();
 
     // Link RTE.
     await loggedOutLearner.clickAndVerifyAnchorWithInnerText(

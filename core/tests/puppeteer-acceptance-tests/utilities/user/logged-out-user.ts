@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import puppeteer, {Page} from 'puppeteer';
+import puppeteer, {Page, Frame} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -645,7 +645,6 @@ const lessonPlayerHeaderTextSelector = '.lesson-player-header-left p';
 const checkboxTitleSelector = '.e2e-test-skill-checkbox-title';
 const subtopicTitleSelector = '.subtopic-title';
 const conceptCardLinkSelectorInQuestion = '.concept-card-link';
-const youtubePlayPauseButton = '.ytp-play-button';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -7548,41 +7547,70 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Get YouTube frame safely.
+   */
+  async getYoutubeFrame(): Promise<Frame> {
+    const frames = this.page.frames();
+
+    for (const currentFrame of frames) {
+      const url = currentFrame.url();
+      if (url.includes('youtube.com') || url.includes('youtube-nocookie.com')) {
+        return currentFrame;
+      }
+    }
+
+    throw new Error('YouTube iframe not found');
+  }
+
+  /**
    * Play the youtube video.
    */
   async playYoutubeVideo(): Promise<void> {
-    const largeYTPlayButton = '.ytp-large-play-button';
-    await this.page.waitForSelector(largeYTPlayButton, {
-      visible: true,
-    });
-    await this.page.click(largeYTPlayButton);
+    const frame = await this.getYoutubeFrame();
+
+    const playButton = '.ytp-large-play-button';
+
+    await frame.waitForSelector(playButton, {visible: true});
+    await frame.click(playButton);
+
+    showMessage('Successfully clicked YouTube play button.');
   }
 
   /**
    * Stops the youtube video.
    */
   async stopYoutubeVideo(): Promise<void> {
-    await this.page.waitForSelector(youtubePlayPauseButton, {
-      visible: true,
-    });
-    await this.page.click(youtubePlayPauseButton);
+    const frame = await this.getYoutubeFrame();
+
+    const pauseButton = '.ytp-play-button';
+
+    await frame.waitForSelector(pauseButton, {visible: true});
+    await frame.click(pauseButton);
+
+    showMessage('Youtube video paused.');
   }
 
+  /**
+   * Expect the youtube video is playing.
+   */
   async expectYoutubeVideoIsPlaying(): Promise<void> {
+    const frame = await this.getYoutubeFrame();
+
     const timeSelector = '.ytp-time-current';
-    await this.page.waitForSelector(timeSelector, {
-      visible: true,
-    });
-    await this.stopYoutubeVideo();
-    const currentTime = await this.page.$eval(timeSelector, el =>
-      (el as HTMLElement).innerText.trim()
+
+    await frame.waitForFunction(
+      (selector: string) => {
+        const el = document.querySelector(selector);
+        if (!el) {
+          return false;
+        }
+        const time = el.textContent?.trim();
+        return time && time !== '0:00' && time !== '0:0';
+      },
+      {},
+      timeSelector
     );
 
-    if (currentTime === '0:00' || currentTime === '0:0' || !currentTime) {
-      throw new Error(
-        `YouTube Video is not playing. Current time is: ${currentTime}`
-      );
-    }
     showMessage('Youtube video is successfully playing.');
   }
 
