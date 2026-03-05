@@ -43,43 +43,41 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             job_name = self.__class__.__name__
             raise PermissionError(f'{job_name} must never be run in production')
 
-        key_with_email_fn = lambda record: (record.email, record)
-
+        key_by_email = lambda record: (record.email, record)
         weak_records = (
             self.pipeline
-            | 'Get Weak Records in Oppia' >> firebase_io.GetWeakRecords()
-            | 'Key Weak Records by Email' >> beam.Map(key_with_email_fn)
+            | 'Get Weak Records' >> firebase_io.GetWeakRecords()
+            | 'Key Weak Records by Email' >> beam.Map(key_by_email)
         )
-
         strong_records = (
             self.pipeline
-            | 'Get Strong Records in Firebase' >> firebase_io.GetStrongRecords()
-            | 'Key Strong Records by Email' >> beam.Map(key_with_email_fn)
+            | 'Get Strong Records' >> firebase_io.GetStrongRecords()
+            | 'Key Strong Records by Email' >> beam.Map(key_by_email)
         )
 
-        partitioned_outputs = (
+        tagged_records = (
             {'from_oppia': weak_records, 'from_firebase': strong_records}
             | 'Group Records by Email Key' >> beam.CoGroupByKey()
             | 'Drop Email Key' >> beam.Map(lambda key_value: key_value[1])
-            | 'Partition Records'
-            >> beam.ParDo(_PartitionRecords()).with_outputs(
+            | 'Get Tagged Records'
+            >> beam.ParDo(_GetTaggedRecords()).with_outputs(
                 SKIPPED_TAG, DELETED_TAG, CREATED_TAG
             )
         )
 
         skipped_results = (
-            partitioned_outputs
+            tagged_records
             | 'Summarize Skipped Records'
             >> job_result_transforms.FromTaggedOutputs(SKIPPED_TAG)
         )
-
-        delete_fn = firebase_transforms.DeleteRecords()
         deleted_results = (
-            partitioned_outputs[DELETED_TAG]
+            tagged_records[DELETED_TAG]
             | 'Gather All Firebase IDs into a Single Worker'
             >> beam.combiners.ToList()
             | 'Delete Records from Firebase'
-            >> beam.ParDo(firebase_transforms.DeleteRecords()).with_outputs(
+            >> beam.ParDo(
+                delete_fn := firebase_transforms.DeleteRecords()
+            ).with_outputs(
                 delete_fn.PASS_TAG,
                 delete_fn.FAIL_TAG,
             )
@@ -87,19 +85,19 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             >> job_result_transforms.FromTaggedOutputs(
                 delete_fn.PASS_TAG,
                 delete_fn.FAIL_TAG,
-                prefix='DELETE RECORDS',
+                prefix=DELETED_TAG,
             )
         )
-
-        create_fn = firebase_transforms.CreateRecords()
         created_results = (
-            partitioned_outputs[CREATED_TAG]
-            | 'Gather All Import User Records into a Single Worker'
+            tagged_records[CREATED_TAG]
+            | 'Gather All ImportUserRecords into a Single Worker'
             >> beam.combiners.ToList()
             | 'Wait for Firebase IDs to be Deleted'
             >> beam.WaitOn(deleted_results)
-            | 'Create Records in Firebase'
-            >> beam.ParDo(firebase_transforms.CreateRecords()).with_outputs(
+            | 'Import Records into Firebase'
+            >> beam.ParDo(
+                create_fn := firebase_transforms.CreateRecords()
+            ).with_outputs(
                 create_fn.PASS_TAG,
                 create_fn.FAIL_TAG,
             )
@@ -107,7 +105,7 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             >> job_result_transforms.FromTaggedOutputs(
                 create_fn.PASS_TAG,
                 create_fn.FAIL_TAG,
-                prefix='CREATE RECORDS',
+                prefix=CREATED_TAG,
             )
         )
 
@@ -119,7 +117,7 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class _PartitionRecords(beam.DoFn):  # type: ignore[misc]
+class _GetTaggedRecords(beam.DoFn):  # type: ignore[misc]
     """Partitions records into groups for follow-up syncing actions."""
 
     class GroupedByUserId(TypedDict):

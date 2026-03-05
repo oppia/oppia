@@ -53,9 +53,8 @@ class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
 
         return (
             pbegin
-            | 'Create singleton PCollection to begin with exactly ONE worker'
-            >> beam.Create((None,))
-            | 'Load all Firebase records into worker with Firebase Admin SDK'
+            | 'Use Exactly One Worker' >> beam.Create([None])
+            | 'Get Strong Records from Firebase'
             >> beam.ParDo(_GetStrongRecordsFromFirebase())
         )
 
@@ -74,64 +73,29 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
     ) -> beam.PCollection[firebase_adapters.WeakRecord]:
         """Returns all of the "weak" records from Oppia's user & auth models."""
 
-        key_with_id_fn = lambda model: (model.id, model)
-
+        key_by_id = lambda model: (model.id, model)
         settings_pcoll = (
             pbegin
             | 'Get UserSettingsModels'
             >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=True)
             )
-            | 'Key UserSettingsModels by ID' >> beam.Map(key_with_id_fn)
+            | 'Key UserSettingsModels by ID' >> beam.Map(key_by_id)
         )
-
         auth_details_pcoll = (
             pbegin
             | 'Get UserAuthDetailsModels'
             >> ndb_io.GetModels(
                 auth_models.UserAuthDetailsModel.get_all(include_deleted=True)
             )
-            | 'Key UserAuthDetailsModels by ID' >> beam.Map(key_with_id_fn)
+            | 'Key UserAuthDetailsModels by ID' >> beam.Map(key_by_id)
         )
-
         return (
             {'settings': settings_pcoll, 'auth_details': auth_details_pcoll}
-            | 'Group Models by ID' >> beam.CoGroupByKey()
-            | 'Make Weak Records from Models' >> beam.ParDo(_MakeWeakRecords())
+            | 'Group Oppia Models by ID' >> beam.CoGroupByKey()
+            | 'Get Weak Records from Oppia Models'
+            >> beam.ParDo(_GetWeakRecordsFromOppiaModels())
         )
-
-
-# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class _MakeWeakRecords(beam.DoFn):  # type: ignore[misc]
-    """Zips fields in Oppia's user/auth models into "weak" Firebase records."""
-
-    class GroupedById(TypedDict):
-        """Typings for the CoGroupByKey() output joined by ID."""
-
-        settings: Iterable[user_models.UserSettingsModel]
-        auth_details: Iterable[auth_models.UserAuthDetailsModel]
-
-    def process(
-        self, user_id_to_models: tuple[str, GroupedById]
-    ) -> Iterable[firebase_adapters.WeakRecord]:
-        """Yields 0-1 weak Firebase records by zipping the input models."""
-
-        user_id, grouped = user_id_to_models
-        settings_list = list(grouped['settings'])
-        auth_details_list = list(grouped['auth_details'])
-        try:
-            strictly_zipped = zip(settings_list, auth_details_list, strict=True)
-            [(settings, auth_details)] = strictly_zipped
-        except ValueError as e:
-            raise ValueError(
-                f'Oppia users need EXACTLY ONE of each model, but {user_id=!r} '
-                f'has {len(settings_list)} UserSettingsModels and '
-                f'{len(auth_details_list)} UserAuthDetailsModels'
-            ) from e
-        if weak_record := firebase_adapters.WeakRecord.from_oppia_models(
-            settings, auth_details
-        ):
-            yield weak_record
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -150,3 +114,38 @@ class _GetStrongRecordsFromFirebase(beam.DoFn):  # type: ignore[misc]
             firebase_adapters.StrongRecord.from_export(user)
             for user in firebase_auth.list_users().iterate_all()
         )
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class _GetWeakRecordsFromOppiaModels(beam.DoFn):  # type: ignore[misc]
+    """Zips fields in Oppia's user/auth models into "weak" Firebase records."""
+
+    class GroupedById(TypedDict):
+        """Typings for the CoGroupByKey() output joined by ID."""
+
+        settings: Iterable[user_models.UserSettingsModel]
+        auth_details: Iterable[auth_models.UserAuthDetailsModel]
+
+    def process(
+        self, user_id_group: tuple[str, GroupedById]
+    ) -> Iterable[firebase_adapters.WeakRecord]:
+        """Yields 0-1 weak Firebase records by "zipping" the input models."""
+
+        user_id, grouped = user_id_group
+        settings_list = tuple(grouped['settings'])
+        auth_details_list = tuple(grouped['auth_details'])
+
+        try:
+            strictly_zipped = zip(settings_list, auth_details_list, strict=True)
+            [(settings, auth_details)] = strictly_zipped
+        except ValueError as e:
+            raise ValueError(
+                f'Oppia users need EXACTLY ONE of each model, but {user_id=!r} '
+                f'has {len(settings_list)} UserSettingsModels and '
+                f'{len(auth_details_list)} UserAuthDetailsModels'
+            ) from e
+
+        if weak_record := firebase_adapters.WeakRecord.from_oppia_models(
+            settings, auth_details
+        ):
+            yield weak_record

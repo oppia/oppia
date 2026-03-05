@@ -92,8 +92,8 @@ class FirebaseSyncRecordsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='DELETE RECORDS SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='CREATE RECORDS SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='DELETED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='CREATED SUCCESS: 1'),
             ],
         )
 
@@ -120,8 +120,7 @@ class FirebaseSyncRecordsJobTests(
                 [
                     job_run_result.JobRunResult(
                         stderr=(
-                            'DELETE RECORDS FAILURE: at slice=[0:1]: '
-                            'service down'
+                            'DELETED FAILURE: at slice=[0:1]: ' 'service down'
                         )
                     ),
                 ],
@@ -179,8 +178,8 @@ class FirebaseSyncRecordsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='DELETE RECORDS SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='CREATE RECORDS SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='DELETED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='CREATED SUCCESS: 1'),
             ],
         )
 
@@ -232,8 +231,8 @@ class FirebaseSyncRecordsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(stdout='SKIPPED: 1'),
-                job_run_result.JobRunResult(stdout='DELETE RECORDS SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='CREATE RECORDS SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='DELETED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='CREATED SUCCESS: 1'),
             ],
         )
 
@@ -265,7 +264,7 @@ class FirebaseSyncRecordsJobTests(
         )
 
         self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='CREATE RECORDS SUCCESS: 1')],
+            [job_run_result.JobRunResult(stdout='CREATED SUCCESS: 1')],
         )
 
         with self.assertRaisesRegex(
