@@ -71,11 +71,11 @@ export class UserService {
       this.assetsBackendApiService.profileImagePngUrlTemplate,
       {username: username}
     );
-    let WebpImageUrl = this.urlInterpolationService.interpolateUrl(
+    let webpImageUrl = this.urlInterpolationService.interpolateUrl(
       this.assetsBackendApiService.profileImageWebpUrlTemplate,
       {username: username}
     );
-    return [pngImageUrl + performanceTime, WebpImageUrl + performanceTime];
+    return [pngImageUrl + performanceTime, webpImageUrl + performanceTime];
   }
 
   async setProfileImageDataUrlAsync(
