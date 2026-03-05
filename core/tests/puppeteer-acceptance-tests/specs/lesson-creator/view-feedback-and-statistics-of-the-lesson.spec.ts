@@ -14,7 +14,9 @@
 
 /**
  * @fileoverview Acceptance test from CUJv3 Doc
- * LC.xx. Create feedback thread and verify statistics.
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * LC.6. View Feedback and Statistics of the Lesson
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -102,41 +104,32 @@ describe('Lesson Creator', function () {
       'Testing feedback and stats',
       'Math'
     );
+
+    await learner1.navigateToCommunityLibraryPage();
+    await learner1.searchForLessonInSearchBar(EXPLORATION_TITLE);
+    await learner1.playLessonFromSearchResults(EXPLORATION_TITLE);
+
+    await learner1.submitAnswer('3');
+    await learner1.continueToNextCard();
+
+    await learner1.submitAnswer('110');
+    await learner1.continueToNextCard();
+
+    await learner1.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+    await learner1.rateExploration(3, 'Nice!', false);
+
+    await learner2.navigateToCommunityLibraryPage();
+    await learner2.searchForLessonInSearchBar(EXPLORATION_TITLE);
+    await learner2.playLessonFromSearchResults(EXPLORATION_TITLE);
   }, 600000);
-
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
-
-  it(
-    'should record completion by one learner and exit by another',
-    async function () {
-      await learner1.navigateToCommunityLibraryPage();
-      await learner1.searchForLessonInSearchBar(EXPLORATION_TITLE);
-      await learner1.playLessonFromSearchResults(EXPLORATION_TITLE);
-
-      await learner1.submitAnswer('3');
-      await learner1.continueToNextCard();
-
-      await learner1.submitAnswer('110');
-      await learner1.continueToNextCard();
-
-      await learner1.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
-      await learner1.rateExploration(3, 'Nice!', false);
-
-      await learner2.navigateToCommunityLibraryPage();
-      await learner2.searchForLessonInSearchBar(EXPLORATION_TITLE);
-      await learner2.playLessonFromSearchResults(EXPLORATION_TITLE);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
   it(
     'should create a feedback thread, reply, and update status',
     async function () {
       await lessonCreator.navigateToFeedbackTab();
+      await lessonCreator.expectFeedbackPageTobeVisible();
 
       await lessonCreator.startAFeedbackThread(
         'Feedback Subject',
@@ -151,6 +144,7 @@ describe('Lesson Creator', function () {
       await lessonCreator.replyToSuggestion('Thanks, issue noted.');
 
       await lessonCreator.goBackToTheFeedbackTab();
+      await lessonCreator.expectFeedbackReplyDetailsToBeVisible();
       await lessonCreator.expectFeedbackStatusInList(1, 'Fixed');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -165,4 +159,8 @@ describe('Lesson Creator', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

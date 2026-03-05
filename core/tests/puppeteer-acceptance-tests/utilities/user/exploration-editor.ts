@@ -441,6 +441,11 @@ const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
 const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
 const explorationStateStatsEnterCountSelector =
   '.e2e-test-state-stats-card-entered-here-count';
+const FeedbacktimeElement =
+  '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
+const numberOfPassers = '.e2e-test-num-passersby';
+const stateNodeGroupSelector = '.e2e-test-node';
+
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -2751,10 +2756,14 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
 
-    await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
-      visible: true,
-    });
+  /**
+   * Expects Feedback Page to be visible.
+   */
+  async expectFeedbackPageTobeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
   /**
@@ -7195,17 +7204,14 @@ export class ExplorationEditor extends BaseUser {
       await this.waitForNetworkIdle();
     }
 
-    await this.page.waitForSelector(explorationStatsTabContentSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationStatsTabContentSelector);
   }
 
   /* Function to click on a specific card in the exploration visualization graph.
    * @param {string} cardName - The name of the card to navigate to.
    */
   async clickStateCard(cardName: string): Promise<void> {
-    const stateNodeGroupSelector = '.e2e-test-node';
-    await this.page.waitForSelector(stateNodeGroupSelector);
+    await this.expectElementToBeVisible(stateNodeGroupSelector);
     const elements = await this.page.$$(stateNodeGroupSelector);
 
     const cardNames = await Promise.all(
@@ -7251,9 +7257,7 @@ export class ExplorationEditor extends BaseUser {
   async openCardStats(cardName: string): Promise<void> {
     await this.clickStateCard(cardName);
     showMessage(`Waiting for stats modal of card ${cardName} to appear...`);
-    await this.page.waitForSelector(explorationStateStatsModalSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationStateStatsModalSelector);
     showMessage(`Stats modal of card ${cardName} is now open.`);
   }
 
@@ -7276,9 +7280,10 @@ export class ExplorationEditor extends BaseUser {
   async closeCardStats(): Promise<void> {
     await this.clickOnElementWithSelector(closeModalButtonSelector);
     showMessage('Waiting for stats modal to close...');
-    await this.page.waitForSelector(explorationStateStatsModalSelector, {
-      visible: false,
-    });
+    await this.expectElementToBeVisible(
+      explorationStateStatsModalSelector,
+      false
+    );
     showMessage('Stats modal has been closed.');
   }
 
@@ -7287,12 +7292,10 @@ export class ExplorationEditor extends BaseUser {
    * @param expected the expected number of passers.
    */
   async expectNumberOfPassersToBe(expected: number): Promise<void> {
-    const selector = '.e2e-test-num-passersby';
-
-    await this.page.waitForSelector(selector, {visible: true});
+    await this.expectElementToBeVisible(numberOfPassers);
 
     const text = await this.page.$eval(
-      selector,
+      numberOfPassers,
       el => el.textContent?.trim() || ''
     );
 
@@ -7304,6 +7307,15 @@ export class ExplorationEditor extends BaseUser {
         `Expected number of passers to be ${expected}, but found ${actual}.`
       );
     }
+  }
+
+  /**
+   * Expects the feedback reply details to be visible.
+   */
+  async expectFeedbackReplyDetailsToBeVisible() {
+    await this.expectElementToBeVisible(feedbackAuthorSelector);
+    await this.expectElementToBeVisible(feedbackStatusSelector);
+    await this.expectElementToBeVisible(FeedbacktimeElement);
   }
 }
 
