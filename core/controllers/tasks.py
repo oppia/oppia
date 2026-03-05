@@ -283,6 +283,11 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent
         ),
         fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
+        ]: (
+            voiceover_services.regenerate_voiceovers_after_accepting_suggestion
+        ),
+        fn_ids_to_names[
             'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
         ]: (voiceover_services.regenerate_voiceovers_for_batch_contents),
     }

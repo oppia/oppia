@@ -950,8 +950,16 @@ def regenerate_voiceovers_for_given_contents(
         language_accent_codes = (
             get_supported_autogeneratable_accents_by_language(language_code)
         )
+
         if not language_accent_codes:
             continue
+
+        if specific_language_accent_code:
+            language_code_to_autogeneratable_accent_codes[language_code] = [
+                specific_language_accent_code
+            ]
+            break
+
         language_code_to_autogeneratable_accent_codes[language_code] = (
             language_accent_codes
         )

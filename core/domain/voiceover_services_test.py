@@ -1540,17 +1540,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             taskqueue_services.get_all_cloud_task_runs(),
             key=lambda task_run: task_run.created_on,
         )
-        language_accent_code = 'en-US'
-        failed_content_ids = ['content_5']
-        error_message = (
-            'Voiceover regeneration failed for exploration %s, version %s, language accent code %s during processing batch with content ids: %s.'
-            % (
-                exploration_id,
-                exploration_version,
-                language_accent_code,
-                failed_content_ids,
-            )
-        )
         with self.swap(
             voiceover_regeneration_services,
             'regenerate_voiceovers_of_exploration',
