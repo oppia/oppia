@@ -644,6 +644,8 @@ const morePracticeButton = '.more-practice-btn';
 const lessonPlayerHeaderTextSelector = '.lesson-player-header-left p';
 const checkboxTitleSelector = '.e2e-test-skill-checkbox-title';
 const subtopicTitleSelector = '.subtopic-title';
+const conceptCardLinkSelectorInQuestion = '.concept-card-link';
+const youtubePlayPauseButton = '.ytp-play-button';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -7162,6 +7164,14 @@ export class LoggedOutUser extends BaseUser {
    * Paste copy link in new tab and resume lesson.
    */
   async pasteLinkAndResumeLesson(): Promise<Page> {
+    // Grant clipboard permission for the page origin.
+    const context = this.page.browserContext();
+    const url = new URL(this.page.url());
+
+    await context.overridePermissions(url.origin, [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
     // Get the link from the clipboard.
     const copiedLink = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
@@ -7510,6 +7520,70 @@ export class LoggedOutUser extends BaseUser {
 
     await this.page.click(signUpOrLoginButton);
     await this.page.waitForNavigation();
+  }
+
+  /**
+   * Is fraction input display visible.
+   */
+  async isFractionInputDisplayPresent(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(fractionInputSelector, {
+        visible: true,
+      });
+      showMessage('Fraction input textarea is visible');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Click on concept card link in question content.
+   */
+  async clickOnConceptCardLinkInQuestionBar(): Promise<void> {
+    await this.page.waitForSelector(conceptCardLinkSelectorInQuestion, {
+      visible: true,
+    });
+    await this.page.click(conceptCardLinkSelectorInQuestion);
+  }
+
+  /**
+   * Play the youtube video.
+   */
+  async playYoutubeVideo(): Promise<void> {
+    const largeYTPlayButton = '.ytp-large-play-button';
+    await this.page.waitForSelector(largeYTPlayButton, {
+      visible: true,
+    });
+    await this.page.click(largeYTPlayButton);
+  }
+
+  /**
+   * Stops the youtube video.
+   */
+  async stopYoutubeVideo(): Promise<void> {
+    await this.page.waitForSelector(youtubePlayPauseButton, {
+      visible: true,
+    });
+    await this.page.click(youtubePlayPauseButton);
+  }
+
+  async expectYoutubeVideoIsPlaying(): Promise<void> {
+    const timeSelector = '.ytp-time-current';
+    await this.page.waitForSelector(timeSelector, {
+      visible: true,
+    });
+    await this.stopYoutubeVideo();
+    const currentTime = await this.page.$eval(timeSelector, el =>
+      (el as HTMLElement).innerText.trim()
+    );
+
+    if (currentTime === '0:00' || currentTime === '0:0' || !currentTime) {
+      throw new Error(
+        `YouTube Video is not playing. Current time is: ${currentTime}`
+      );
+    }
+    showMessage('Youtube video is successfully playing.');
   }
 
   /**

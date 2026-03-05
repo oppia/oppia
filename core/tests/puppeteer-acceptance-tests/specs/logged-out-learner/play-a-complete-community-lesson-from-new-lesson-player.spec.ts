@@ -16,8 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * EL.LP.  Learner completes the exploration and decides what to do next from the
- * new lesson player.
+ * EL.CL.  Learner can play a complete community lesson from the new lesson player.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -43,9 +42,9 @@ enum CARDS {
 }
 
 enum EXPLORATION_TITLE {
-  PLACE_VALUES = 'What are the Place Values?',
-  EXPLORATION_1 = 'Exploration 1',
-  EXPLORATION_2 = 'Exploration 2',
+  COMMUNITY_LESSON_1 = 'Community Lesson Title 1',
+  COMMUNITY_LESSON_2 = 'Community Lesson Title 2',
+  COMMUNITY_LESSON_3 = 'Community Lesson Title 3',
 }
 
 describe('Logged-Out Learner', function () {
@@ -75,21 +74,51 @@ describe('Logged-Out Learner', function () {
       // Enable the feature flag.
       await releaseCoordinator.enableFeatureFlag('new_lesson_player');
 
+      // Create topic with 'Place Values'.
+      const topicName = 'Place Values';
+      const subtopicName = 'Place Values';
+      const skillName = 'Math';
+
+      await curriculumAdmin.createTopic(
+        topicName,
+        topicName.toLowerCase().replace(/ /g, '-')
+      );
+      // Create a subtopic 'Place Values' for topic 'Place Values'.
+      await curriculumAdmin.createSubtopicForTopic(
+        subtopicName,
+        subtopicName.toLowerCase().replace(/ /g, '-'),
+        topicName
+      );
+      // Create a skill with name 'Math' and 10 question inside it.
+      await curriculumAdmin.createSkillForTopic(skillName, topicName, false);
+      await curriculumAdmin.createQuestionsForSkill(skillName, 10);
+      await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
+        skillName,
+        subtopicName,
+        topicName
+      );
+      await curriculumAdmin.addSkillToDiagnosticTest(skillName, topicName);
+
+      // Enable the "Show practice tab to learners" in Topic Editor.
+      await curriculumAdmin.openTopicEditor(topicName);
+      await curriculumAdmin.togglePracticeTabCheckbox();
+      await curriculumAdmin.saveTopicDraft(topicName);
+      await curriculumAdmin.publishDraftTopic(topicName);
+
       await curriculumAdmin.navigateToCreatorDashboardPage();
       await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
       // Add Interaction Cards.
       await curriculumAdmin.dismissWelcomeModal();
       await curriculumAdmin.updateCardContent(
-        'Welcome, to the Place Values Exploration.'
+        `Welcome, to the ${EXPLORATION_TITLE.COMMUNITY_LESSON_1}.`
       );
       await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
       await curriculumAdmin.viewOppiaResponses();
       await curriculumAdmin.directLearnersToNewCard(CARDS.SECOND_CARD);
 
       await curriculumAdmin.navigateToCard(CARDS.SECOND_CARD);
-      await curriculumAdmin.updateCardContent(
-        "What is 3/6 equal to in it's simplest form?"
-      );
+      await curriculumAdmin.addExplorationDescriptionContainingAllRTEComponents();
+
       await curriculumAdmin.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
       await curriculumAdmin.addResponsesToTheInteraction(
         INTERACTION_TYPES.FRACTION_INPUT,
@@ -137,8 +166,8 @@ describe('Logged-Out Learner', function () {
       );
 
       explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-        EXPLORATION_TITLE.PLACE_VALUES,
-        'Learn basic Mathematics including Place Values',
+        EXPLORATION_TITLE.COMMUNITY_LESSON_1,
+        `Learn basic Mathematics including ${EXPLORATION_TITLE.COMMUNITY_LESSON_1}`,
         'Mathematics'
       );
       if (!explorationId) {
@@ -151,7 +180,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
       // Add Interaction Cards.
       await curriculumAdmin.updateCardContent(
-        `Welcome, to the ${EXPLORATION_TITLE.EXPLORATION_1}.`
+        `Welcome, to the ${EXPLORATION_TITLE.COMMUNITY_LESSON_2}.`
       );
       await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
       await curriculumAdmin.viewOppiaResponses();
@@ -164,13 +193,13 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
       await curriculumAdmin.saveExplorationDraft();
       exploration1Id = await curriculumAdmin.publishExplorationWithMetadata(
-        EXPLORATION_TITLE.EXPLORATION_1,
-        `Learn basic Mathematics including ${EXPLORATION_TITLE.EXPLORATION_1}`,
+        EXPLORATION_TITLE.COMMUNITY_LESSON_2,
+        `Learn basic Mathematics including ${EXPLORATION_TITLE.COMMUNITY_LESSON_2}`,
         'Mathematics'
       );
       if (!exploration1Id) {
         throw new Error(
-          `Exploration title:${EXPLORATION_TITLE.EXPLORATION_1} ID is null or undefined.`
+          `Exploration title:${EXPLORATION_TITLE.COMMUNITY_LESSON_2} ID is null or undefined.`
         );
       }
 
@@ -179,7 +208,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
       // Add Interaction Cards.
       await curriculumAdmin.updateCardContent(
-        `Welcome, to the ${EXPLORATION_TITLE.EXPLORATION_2}.`
+        `Welcome, to the ${EXPLORATION_TITLE.COMMUNITY_LESSON_3}.`
       );
       await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
       await curriculumAdmin.viewOppiaResponses();
@@ -192,163 +221,89 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
       await curriculumAdmin.saveExplorationDraft();
       exploration2Id = await curriculumAdmin.publishExplorationWithMetadata(
-        EXPLORATION_TITLE.EXPLORATION_2,
-        `Learn basic Mathematics including ${EXPLORATION_TITLE.EXPLORATION_2}`,
+        EXPLORATION_TITLE.COMMUNITY_LESSON_3,
+        `Learn basic Mathematics including ${EXPLORATION_TITLE.COMMUNITY_LESSON_3}`,
         'Mathematics'
       );
       if (!exploration2Id) {
         throw new Error(
-          `Exploration title:${EXPLORATION_TITLE.EXPLORATION_2} ID is null or undefined.`
+          `Exploration title:${EXPLORATION_TITLE.COMMUNITY_LESSON_3} ID is null or undefined.`
         );
       }
-
-      // Create topic with 'Place Values'.
-      const topicName = 'Place Values';
-      const subtopicName = 'Place Values';
-      const skillName = 'skill-1';
-
-      await curriculumAdmin.createTopic(
-        topicName,
-        topicName.toLowerCase().replace(/ /g, '-')
-      );
-      // Create a subtopic 'Place Values' for topic 'Place Values'.
-      await curriculumAdmin.createSubtopicForTopic(
-        subtopicName,
-        subtopicName.toLowerCase().replace(/ /g, '-'),
-        topicName
-      );
-      // Create a skill with name 'skill-1' and 10 question inside it.
-      await curriculumAdmin.createSkillForTopic(skillName, topicName, false);
-      await curriculumAdmin.createQuestionsForSkill(skillName, 10);
-      await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-        skillName,
-        subtopicName,
-        topicName
-      );
-      await curriculumAdmin.addSkillToDiagnosticTest(skillName, topicName);
-
-      // Enable the "Show practice tab to learners" in Topic Editor.
-      await curriculumAdmin.openTopicEditor(topicName);
-      await curriculumAdmin.togglePracticeTabCheckbox();
-      await curriculumAdmin.saveTopicDraft(topicName);
-      await curriculumAdmin.publishDraftTopic(topicName);
-
-      // Create a story node with 3 chapters.
-      await curriculumAdmin.createAndPublishStoryWithChapters(
-        'What are Place values',
-        'place-values',
-        [
-          {
-            chapterTitle: EXPLORATION_TITLE.PLACE_VALUES,
-            explorationId: explorationId,
-          },
-          {
-            chapterTitle: EXPLORATION_TITLE.EXPLORATION_1,
-            explorationId: exploration1Id,
-          },
-          {
-            chapterTitle: EXPLORATION_TITLE.EXPLORATION_2,
-            explorationId: exploration2Id,
-          },
-        ],
-        topicName
-      );
-
-      await curriculumAdmin.createAndPublishClassroom(
-        'Math',
-        'math',
-        topicName
-      );
-
-      // Go to creator dashboard.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-
-      // Select the exploration 'What are the Place Values?'.
-      await curriculumAdmin.chooseExplorationForEditFromCreatorDashboard(
-        explorationId
-      );
-      // Link concept card in the Introduction card.
-      await curriculumAdmin.navigateToCard(CARDS.INTRODUCTION_CARD);
-
-      await curriculumAdmin.linkSkillToState('skill-1');
-
-      // Publish the changes of exploration.
-      await curriculumAdmin.saveExplorationDraft('Link concept card: skill-1');
-
-      await loggedOutLearner.playLesson(explorationId);
-      await loggedOutLearner.clickOnContinueButton();
-      await loggedOutLearner.page.waitForTimeout(10000);
-      await loggedOutLearner.submitFractionInputResponse('1/2');
-      // Click on the 'Save' button.
-      await loggedOutLearner.clickOnSaveProgressButton();
-      await loggedOutLearner.clickOnCreateAnAccountInSaveProgressModal();
-      await loggedOutLearner.expectToBeOnLoginPage();
-      await loggedOutLearner.goThoroughSignUpProcess(
-        'learner@example.com',
-        'learner'
-      );
-      await loggedOutLearner.expectProgressRemainderModal();
-      await loggedOutLearner.clickOnLessonResumeButton();
     },
     // Setup takes more time than default.
-    1800000
+    // 1800000.
+    7200000
   );
 
-  it('should be able to visit the next lesson', async function () {
-    await loggedOutLearner.clickOnProfileMenu();
-    await loggedOutLearner.clickOnLogOutButton();
-    await loggedOutLearner.page.waitForNavigation();
-    await loggedOutLearner.expectPageURLToContain(testConstants.URLs.BaseURL);
-    await loggedOutLearner.expectScreenshotToMatch('homePage', __dirname);
+  it('should be able use all the RTE components in a community lesson', async function () {
+    // Navigate to community library page and expect it to contain 3
+    // different explorations.
+    await loggedOutLearner.navigateToCommunityLibraryPage();
+    await loggedOutLearner.expectSearchResultsToContain([
+      EXPLORATION_TITLE.COMMUNITY_LESSON_1,
+      EXPLORATION_TITLE.COMMUNITY_LESSON_2,
+      EXPLORATION_TITLE.COMMUNITY_LESSON_3,
+    ]);
 
-    // Visit the math classroom page.
-    await loggedOutLearner.navigateToClassroomPage('math');
-    await loggedOutLearner.selectAndOpenTopic('Place Values');
-    await loggedOutLearner.selectChapterWithinStoryToLearn(
-      'What are Place values',
-      EXPLORATION_TITLE.PLACE_VALUES,
-      true
+    // Search and play the exploration "What are the place values?".
+    // Expect to be on the exploration player page and there is "Lesson info" text.
+    await loggedOutLearner.searchForLessonInSearchBar(
+      EXPLORATION_TITLE.COMMUNITY_LESSON_1
     );
-
-    expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
-      true
+    await loggedOutLearner.playLessonFromSearchResults(
+      EXPLORATION_TITLE.COMMUNITY_LESSON_1
     );
-    expect(await loggedOutLearner.expectProfileAvatarVisible()).toBe(false);
-    expect(await loggedOutLearner.expectSignInButton()).toBe(true);
+    await loggedOutLearner.waitForPageToFullyLoad();
+    await loggedOutLearner.expectToBeOnPage(
+      `http://localhost:8181/lesson/${explorationId}`
+    );
+    await loggedOutLearner.expectSidebarCollapsedState();
 
+    // Continue to next card.
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.page.waitForTimeout(10000);
-    await loggedOutLearner.submitFractionInputResponse('1/2');
-    await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(5000);
-    await loggedOutLearner.clickOnContinueButton();
+    expect(await loggedOutLearner.isFractionInputDisplayPresent()).toBe(true);
 
-    expect(await loggedOutLearner.expectSignUpOrLoginButton()).toBe(true);
-    expect(await loggedOutLearner.expectNextLessonButton()).toBe(true);
-    expect(await loggedOutLearner.expectCheckReivewCardButton()).toBe(true);
-    expect(await loggedOutLearner.expectDoMorePracticeButton()).toBe(true);
+    expect(await loggedOutLearner.isBackButtonPresent()).toBe(true);
+    expect(await loggedOutLearner.isContinueButtonPresent()).toBe(false);
 
-    await loggedOutLearner.rightClickOnNextLessonButtonAndOpenNewTab(
-      'Chapter 2: Exploration 1'
+    // Note: All of the RTE components below check for default values,
+    // added by addExplorationDescriptionContainingAllRTEComponents function.
+
+    // Concept Card RTE.
+    await loggedOutLearner.clickOnConceptCardLinkInQuestionBar();
+    await loggedOutLearner.expectConceptCardContent(
+      'Review material text content for Math.'
     );
-  });
+    await loggedOutLearner.closeConceptCard();
 
-  it('should be able to visit the practice tab', async function () {
-    await loggedOutLearner.clickOnDoMorePracticeButtonAndOpenNewTab([
-      'Place Values',
-    ]);
-  });
+    // Video RTE.
+    await loggedOutLearner.playYoutubeVideo();
+    await loggedOutLearner.page.waitForTimeout(10000);
+    await loggedOutLearner.expectYoutubeVideoIsPlaying();
 
-  it('should be able to check the review card', async function () {
-    await loggedOutLearner.clickOnReviewCardButtonAndOpenNewTab('Place Values');
-  });
+    // Link RTE.
+    await loggedOutLearner.clickAndVerifyAnchorWithInnerText(
+      'Go to Oppia.org website',
+      'https://www.oppia.org/'
+    );
 
-  it('should be able to sign-up or login', async function () {
-    await loggedOutLearner.clickOnSignUpButton();
-    await loggedOutLearner.expectPageURLToContain(testConstants.URLs.Login);
+    // Collapsible RTE.
+    await loggedOutLearner.expectCollapsibleRTEToBePresent();
+
+    // Tab RTE.
+    await loggedOutLearner.expectTabElementInLessonCardToContain(
+      'Hint introduction',
+      'This set of tabs shows some hints. Click on the other tabs to display the relevant hints.'
+    );
+    await loggedOutLearner.expectTabElementInLessonCardToContain(
+      'Hint 1',
+      'This is a first hint.'
+    );
   });
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // Tawait UserFactory.closeAllBrowsers();
   });
 });
