@@ -3389,6 +3389,7 @@ export class TopicManager extends BaseUser {
         );
 
         if (title === chapterName) {
+          await this.page.waitForTimeout(500);
           await titleElement.click();
           await this.waitForStaticAssetsToLoad();
           await this.expectElementToBeVisible(chapterEditorContainerSelector);
