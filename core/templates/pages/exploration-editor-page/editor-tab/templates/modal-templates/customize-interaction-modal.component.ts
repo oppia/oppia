@@ -179,11 +179,7 @@ export class CustomizeInteractionModalComponent
 
     const validationService = this.injector.get(
       INTERACTION_SERVICE_MAPPING[validationServiceName]
-    ) as {
-      getCustomizationArgsWarnings: (
-        args: InteractionCustomizationArgs
-      ) => Warning[];
-    };
+    );
     let warningsList = validationService.getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed
     );
