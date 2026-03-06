@@ -435,7 +435,7 @@ class AutomaticVoiceoverRegenerationRecordHandlerTests(
             queue_name,
             task_id,
         )
-        function_id = 'delete_exps_from_user_models'
+        function_id = 'regenerate_voiceovers_on_exploration_update'
 
         taskqueue_services.create_new_cloud_task_model(
             new_model_id, task_name, function_id
