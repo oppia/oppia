@@ -615,6 +615,22 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.getCustomizationArgsWarningsList()).toEqual([]);
   });
 
+  it('should return empty warnings list when validation service is unmapped', () => {
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      InteractionSpecsKey,
+      {id: string}
+    >;
+    const originalId = interactionSpecs.RatioExpressionInput.id;
+    interactionSpecs.RatioExpressionInput.id = 'UnknownValidationService';
+
+    try {
+      expect(component.getCustomizationArgsWarningsList()).toEqual([]);
+    } finally {
+      interactionSpecs.RatioExpressionInput.id = originalId;
+    }
+  });
+
   it('should no-op when populating null content ids without interaction id', () => {
     stateInteractionIdService.displayed = NO_INTERACTION_ID;
     spyOn(generateContentIdService, 'getNextStateId');
