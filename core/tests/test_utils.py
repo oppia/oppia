@@ -58,7 +58,9 @@ from core.domain import (
     param_domain,
     platform_parameter_domain,
     platform_parameter_list,
-    platform_parameter_registry as registry,
+)
+from core.domain import platform_parameter_registry as registry
+from core.domain import (
     platform_parameter_services,
     question_domain,
     question_services,
@@ -502,8 +504,8 @@ def swap_get_platform_parameter_value_function(
         return registry.Registry.get_platform_parameter(
             parameter_name
         ).evaluate(
-            platform_parameter_services._create_evaluation_context_for_server()
-        )  # pylint: disable=protected-access
+            platform_parameter_services._create_evaluation_context_for_server()  # pylint: disable=protected-access
+        )
 
     original_get_platform_parameter_value = getattr(
         platform_parameter_services, 'get_platform_parameter_value'
