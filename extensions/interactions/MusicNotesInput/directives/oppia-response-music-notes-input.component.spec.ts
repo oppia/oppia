@@ -48,15 +48,12 @@ describe('Response music notes input component ', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(ResponseMusicNotesInput);
       component = fixture.componentInstance;
-      component.answer = [
+      component.answer = JSON.stringify([
         {
-          readableNoteName: 'B4',
-          noteDuration: {
-            num: 1,
-            den: 1,
-          },
+          readableNoteName: 'C4',
+          noteDuration: {num: 1, den: 4},
         },
-      ];
+      ]);
     });
 
     it('should initialise the component when submits answer', () => {
@@ -69,7 +66,7 @@ describe('Response music notes input component ', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(ResponseMusicNotesInput);
       component = fixture.componentInstance;
-      component.answer = [];
+      component.answer = JSON.stringify([]);
     });
 
     it('should initialise the component when submits answer', () => {
