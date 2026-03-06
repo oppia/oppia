@@ -852,6 +852,7 @@ TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
     '%s/email/contributordashboardachievementnotificationemailhandler'
     % (TASKQUEUE_URL_PREFIX)
 )
+TASK_URL_RETRY_EMAIL = '%s/email/retryemailhandler' % TASKQUEUE_URL_PREFIX
 TASK_URL_DEFERRED = '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX
 
 # TODO(sll): Add all other URLs here.

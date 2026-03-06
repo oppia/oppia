@@ -233,6 +233,36 @@ class FlagExplorationEmailHandler(
         self.render_json({})
 
 
+class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler task for retrying unsuccessfully sent emails."""
+
+    @acl_decorators.can_perform_tasks_in_taskqueue
+    def post(self) -> None:
+        """Attempts to resend an email.
+
+        If it fails, raises an error to trigger an automatic retry via Cloud Tasks.
+        """
+        payload = json.loads(self.request.body)
+
+        sender_email = payload.get('sender_email')
+        recipient_id = payload.get('recipient_id')
+        subject = payload.get('subject')
+        html_body = payload.get('html_body')
+        text_body = payload.get('text_body')
+
+        try:
+            platform_email_services.send_mail(
+                sender_email, recipient_id, subject, html_body, text_body
+            )
+        except Exception as e:
+            logging.error(
+                'Email retry failed for recipient %s: %s', recipient_id, e
+            )
+            raise Exception('Failed to resend email: %s' % e)
+
+        self.render_json({})
+
+
 class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """This task handler handles special tasks that make single asynchronous
     function calls. For more complex tasks that require a large number of
