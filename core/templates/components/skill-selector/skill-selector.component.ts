@@ -63,14 +63,16 @@ export class SkillSelectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.currCategorizedSkills = this.categorizedSkills;
-    for (let topicName in this.currCategorizedSkills) {
+    // Initialize currCategorizedSkills with a deep clone to avoid
+    // reference issues and ensure search works even with no filters.
+    this.currCategorizedSkills = cloneDeep(this.categorizedSkills);
+    for (let topicName in this.categorizedSkills) {
       let topicNameDict = {
         topicName: topicName,
         checked: false,
       };
       this.topicFilterList.push(topicNameDict);
-      let subTopics = this.currCategorizedSkills[topicName];
+      let subTopics = this.categorizedSkills[topicName];
       this.subTopicFilterDict[topicName] = [];
       for (let subTopic in subTopics) {
         let subTopicNameDict = {
