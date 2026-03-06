@@ -527,24 +527,13 @@ export class CustomizeInteractionModalComponent
 
     if (this.stateEditorService.isInQuestionMode()) {
       this.allowedInteractionCategories =
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES.flat();
+        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES.flat() as AllowedInteractionCategories[];
     } else if (this.pageContextService.isExplorationLinkedToStory()) {
       this.allowedInteractionCategories =
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES.flat();
+        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES.flat() as AllowedInteractionCategories[];
     } else {
       this.allowedInteractionCategories =
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES.flat();
-    }
-
-    if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories =
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES.flat();
-    } else if (this.pageContextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories =
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES.flat();
-    } else {
-      this.allowedInteractionCategories =
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES.flat();
+        AppConstants.ALLOWED_INTERACTION_CATEGORIES.flat() as AllowedInteractionCategories[];
     }
 
     if (this.stateInteractionIdService.savedMemento) {

@@ -40,6 +40,7 @@ import {
   SimpleChanges,
   ViewContainerRef,
   ComponentRef,
+  Type,
 } from '@angular/core';
 
 import {
@@ -326,7 +327,10 @@ export class ObjectEditorComponent
                   }
                 }
                 if (this.form) {
-                  this.form.$setValidity(errorKey, errorsMap[errorKey]);
+                  (this.form as any).$setValidity(
+                    errorKey,
+                    errorsMap[errorKey]
+                  );
                   this.validityChange.emit();
                 }
               }
