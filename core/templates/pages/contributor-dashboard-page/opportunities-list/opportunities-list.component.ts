@@ -262,12 +262,12 @@ export class OpportunitiesListComponent {
         this.opportunities = opportunitiesDicts;
         this.more = more;
         const filteredOpportunities = this.getFilteredOpportunities();
-        this.visibleOpportunities = filtered.slice(
+        this.visibleOpportunities = filteredOpportunities.slice(
           0,
           this.OPPORTUNITIES_PAGE_SIZE
         );
         this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-          filtered,
+          filteredOpportunities,
           this.OPPORTUNITIES_PAGE_SIZE,
           this.activePageNumber,
           this.more
@@ -290,10 +290,10 @@ export class OpportunitiesListComponent {
         this.more = more;
         this.opportunities = this.opportunities.concat(opportunitiesDicts);
         const updatedFilteredOpportunities = this.getFilteredOpportunities();
-        this.visibleOpportunities = updatedFiltered.slice(startIndex, endIndex);
+        this.visibleOpportunities = updatedFilteredOpportunities.slice(startIndex, endIndex);
         this.loadingOpportunityData = false;
         this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-          updatedFiltered,
+          updatedFilteredOpportunities,
           this.OPPORTUNITIES_PAGE_SIZE,
           pageNumber,
           this.more
