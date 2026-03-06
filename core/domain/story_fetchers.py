@@ -26,6 +26,7 @@ import copy
 import itertools
 
 from core import feconf
+from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
@@ -36,7 +37,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, overload
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -231,6 +232,30 @@ def get_story_by_id(
             return story
         else:
             return None
+
+
+def get_multiple_stories_by_ids_and_version(
+    story_ids_and_versions: List[Tuple[str, Optional[int]]],
+) -> List[Optional[story_domain.Story]]:
+    """Returns a list of stories matching the IDs and versions provided.
+
+    Args:
+        story_ids_and_versions: list(tuple(str, int|None)). List of tuples of
+            story ID and version number. If version number is None, the latest
+            version will be returned.
+
+    Returns:
+        list(Story|None). The list of stories corresponding to the given IDs
+        and versions. If a story does not exist, the corresponding entry will
+        be None.
+    """
+    story_model_list = story_models.StoryModel.get_version_multi(
+        story_ids_and_versions
+    )
+    return [
+        get_story_from_model(story_model) if story_model is not None else None
+        for story_model in story_model_list
+    ]
 
 
 def get_story_by_url_fragment(
@@ -501,10 +526,13 @@ def get_user_progress_in_story_chapters(
         list(StoryChapterProgressSummaryDict). The list of the progress
         summaries of the user corresponding to all stories chapters.
     """
+    all_valid_stories = [
+        story for story in get_stories_by_ids(story_ids) if story is not None
+    ]
     all_valid_story_nodes: List[story_domain.StoryNode] = []
-    for story in get_stories_by_ids(story_ids):
-        if story is not None:
-            all_valid_story_nodes.extend(story.story_contents.nodes)
+    for story in all_valid_stories:
+        all_valid_story_nodes.extend(story.story_contents.nodes)
+
     exp_ids = [
         node.exploration_id
         for node in all_valid_story_nodes
@@ -515,6 +543,12 @@ def get_user_progress_in_story_chapters(
     exp_user_data_models = user_models.ExplorationUserDataModel.get_multi(
         user_id_exp_id_combinations
     )
+
+    completed_node_ids_by_story = {}
+    for story_id in story_ids:
+        completed_node_ids_by_story[story_id] = get_completed_node_ids(
+            user_id, story_id
+        )
 
     all_chapters_progress: List[
         story_domain.StoryChapterProgressSummaryDict
@@ -535,11 +569,29 @@ def get_user_progress_in_story_chapters(
                 visited_checkpoints = (
                     all_checkpoints.index(most_recently_visited_checkpoint) + 1
                 )
+        found_story_id: Optional[str] = None
+        found_node_id: Optional[str] = None
+        for story in all_valid_stories:
+            for node in story.story_contents.nodes:
+                if node.exploration_id == exp_id:
+                    found_story_id = story.id
+                    found_node_id = node.id
+                    break
+            if found_story_id:
+                break
+
+        is_completed = (
+            found_story_id is not None
+            and found_node_id
+            in completed_node_ids_by_story.get(found_story_id, [])
+        )
+
         all_chapters_progress.append(
             {
                 'exploration_id': exp_id,
                 'visited_checkpoints_count': visited_checkpoints,
                 'total_checkpoints_count': len(all_checkpoints),
+                'is_chapter_complete': is_completed,
             }
         )
 
@@ -657,9 +709,13 @@ def get_pending_and_all_nodes_in_story(
     for node in story.story_contents.nodes:
         if node.id not in completed_node_ids:
             pending_nodes.append(node)
+    all_nodes = []
 
+    for node in story.story_contents.nodes:
+        if node.status != constants.STORY_NODE_STATUS_DRAFT:
+            all_nodes.append(node)
     return {
-        'all_nodes': story.story_contents.nodes,
+        'all_nodes': all_nodes,
         'pending_nodes': pending_nodes,
     }
 

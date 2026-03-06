@@ -58,7 +58,7 @@
   </div>
 
   <div *ngIf="!getCanAskLearnerForAnswerInfo()" class="new-progress-nav-bar-container">
-    <oppia-card-navigation-control (submit)="submitAnswerFromProgressNav()"
+    <oppia-card-navigation-control [ngClass]="{'expanded-sidebar': getSidebarIsExpanded(),'question-player-footer': !isInLessonPlayer()}" (submit)="submitAnswerFromProgressNav()"
                         [isLearnAgainButton]="isLearnAgainButton()"
                         [displayedCard]="getDisplayedCard()"
                         [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
@@ -73,16 +73,5 @@
   <div class="new-conversation-skin-correctness-footer-container">
     <oppia-new-correctness-footer *ngIf="isCorrectnessFooterEnabled()"></oppia-new-correctness-footer>
     <oppia-checkpoint-celebration-footer *ngIf="isCheckpointCelebrationFooterEnabled()"></oppia-checkpoint-celebration-footer>
-  </div>
-</div>
-
-<!-- Blue modal which shows at the end of the lesson to tell that next time lesson will start from the starting -->
-<div *ngIf="isProgressClearanceMessageShown()" class="oppia-exploration-checkpoints-message">
-  <div id="toast-container" class="toast-top-center toast-container">
-    <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
-      <div aria-live="polite" role="alertdialog" class="toast-message">
-        {{ 'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate }}
-      </div>
-    </div>
   </div>
 </div>

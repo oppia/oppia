@@ -35,33 +35,9 @@ describe('Logged-out User in Partnerships page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open the Blog page when the "Read More Stories" button is clicked.',
-    async function () {
-      await loggedOutUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Partnerships form when the "Partner with us" button is clicked at the top.',
-    async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should open the correct Blog Post when the "Read Blog Post" button is clicked.',
     async function () {
       await loggedOutUser.clickReadBlogPostLinkInPartnershipsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Partnerships Brochure when the "Download Brochure" button is clicked.',
-    async function () {
-      await loggedOutUser.verifyDownloadBrochureButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

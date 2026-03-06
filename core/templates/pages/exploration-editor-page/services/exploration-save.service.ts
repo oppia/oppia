@@ -49,6 +49,16 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ParamChange} from 'domain/exploration/param-change.model';
 import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PageContextService} from 'services/page-context.service';
+import {VoiceoverRegenerationTaskMappingService} from 'services/voiceover-regeneration-task-mapping-service';
+import {
+  ExplorationChange,
+  ExplorationChangeEditStateProperty,
+  ExplorationChangeEditTranslation,
+} from 'domain/exploration/exploration-draft.model';
+import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 
 @Injectable({
   providedIn: 'root',
@@ -85,11 +95,15 @@ export class ExplorationSaveService {
     private explorationTitleService: ExplorationTitleService,
     private explorationWarningsService: ExplorationWarningsService,
     private externalSaveService: ExternalSaveService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
     private logger: LoggerService,
     private ngbModal: NgbModal,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService,
+    private pageContextService: PageContextService,
+    private voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService
   ) {}
 
   showCongratulatorySharingModal(): void {
@@ -174,6 +188,9 @@ export class ExplorationSaveService {
             'Changes to this exploration were saved successfully.'
           );
 
+          let changeListAffectsAutoVoiceovers =
+            this.changeListService.doesChangeListAffectAutoVoiceovers();
+
           this.changeListService.discardAllChanges().then(
             () => {
               this._initExplorationPageEventEmitter.emit();
@@ -184,6 +201,36 @@ export class ExplorationSaveService {
               this.saveIsInProgress = false;
               this.editabilityService.markEditable();
               resolve();
+
+              let voiceoverRegenerationInBackgroundIsEnabled =
+                this.platformFeatureService.status
+                  .EnableBackgroundVoiceoverSynthesis.isEnabled;
+              let isExplorationLinkedToStory =
+                this.pageContextService.isExplorationLinkedToStory();
+
+              if (
+                isExplorationLinkedToStory &&
+                voiceoverRegenerationInBackgroundIsEnabled &&
+                changeListAffectsAutoVoiceovers
+              ) {
+                this.voiceoverBackendApiService.regenerateVoiceoverOnExplorationUpdateAsync(
+                  this.explorationDataService.explorationId as string,
+                  this.explorationDataService.data.version as number,
+                  this.explorationTitleService.displayed as string
+                );
+                this.alertsService.addSuccessMessage(
+                  'Voiceovers will be regenerated automatically in the ' +
+                    'background, please reload the page after a few minutes to ' +
+                    'see the changes.',
+                  10000
+                );
+
+                const updatedContentIds =
+                  this.getChangeListContentIds(changeList);
+                this.voiceoverRegenerationTaskMappingService.updateNewlyAddedRegenerationTasks(
+                  updatedContentIds
+                );
+              }
             },
             () => {
               this.editabilityService.markEditable();
@@ -205,6 +252,23 @@ export class ExplorationSaveService {
         }
       );
     });
+  }
+
+  getChangeListContentIds(changeList: ExplorationChange[]): string[] {
+    let contentIds: string[] = [];
+    for (let change of changeList) {
+      if (change.hasOwnProperty('content_id')) {
+        let contentId = (change as ExplorationChangeEditTranslation)
+          .content_id as string;
+        contentIds.push(contentId);
+      }
+      if (change.hasOwnProperty('new_value')) {
+        let newValue = (change as ExplorationChangeEditStateProperty)
+          .new_value as SubtitledHtmlBackendDict;
+        contentIds.push(newValue.content_id as string);
+      }
+    }
+    return contentIds;
   }
 
   isAdditionalMetadataNeeded(): boolean {

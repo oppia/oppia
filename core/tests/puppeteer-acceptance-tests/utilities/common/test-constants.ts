@@ -71,6 +71,8 @@ export default {
       'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
     ImpactReport2023Url:
       'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
+    ImpactReport2024Url:
+      'https://drive.google.com/file/d/1NMc0VYDCRwNuteYQovTZ38pxgxBqYOHR/view?usp=drive_link',
     LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
@@ -78,7 +80,7 @@ export default {
     ModeratorPage: 'http://localhost:8181/moderator',
     Partnerships: 'http://localhost:8181/partnerships',
     PartnershipsBrochure:
-      'https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing',
+      'https://drive.google.com/file/d/1H3YzHmUDS62qgP-V1BzVkvoVotp3h9ua/view?usp=drive_link',
     PartnershipsForm:
       'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform',
     PartnershipsFormInPortuguese:
@@ -264,6 +266,8 @@ export default {
     '../oppia_full_stack_test_failure_screenshots/acceptance'
   ),
   TEST_DOWNLOAD_DIR: path.resolve('../oppia_acceptance_test_downloads'),
+  TEST_SNAPSHOTS_DIR:
+    '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests',
 };
 
 export const FILEPATHS = {

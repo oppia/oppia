@@ -1811,25 +1811,11 @@ export class TopicManager extends BaseUser {
         await this.waitForElementToBeClickable(deleteButton);
         await deleteButton.click();
 
-        await this.page.waitForSelector(
+        await this.page.waitForSelector(modalDiv, {visible: true});
+        await this.clickOnElementWithSelector(
           removeQuestionConfirmationButtonSelector
         );
-        const removeQuestionConfirmationButtonElement = await this.page.$(
-          removeQuestionConfirmationButtonSelector
-        );
-        if (!removeQuestionConfirmationButtonElement) {
-          throw new Error('Remove question confirmation button not found');
-        }
-
-        await this.waitForElementToBeClickable(
-          removeQuestionConfirmationButtonElement
-        );
-        await removeQuestionConfirmationButtonElement.click();
-
-        await this.expectElementToBeVisible(
-          removeQuestionConfirmationButtonSelector,
-          false
-        );
+        await this.page.waitForSelector(modalDiv, {hidden: true});
         return;
       }
 
@@ -3516,6 +3502,7 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async addAcquiredSkill(skillName: string): Promise<void> {
+    await this.scrollToBottomOfPage();
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(addAcquiredSkillButton);
     const elements = await this.page.$$(addAcquiredSkillButton);

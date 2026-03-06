@@ -24,7 +24,6 @@ import html
 import io
 import json
 import logging
-import time
 import uuid
 
 from core import feconf, utils
@@ -35,6 +34,7 @@ from core.domain import (
     rte_component_registry,
     state_domain,
     translation_fetchers,
+    voiceover_cloud_task_services,
     voiceover_services,
 )
 from core.platform import models
@@ -51,8 +51,6 @@ if MYPY:  # pragma: no cover
 (voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 
 speech_synthesis_services = models.Registry.import_speech_synthesis_services()
-
-WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
 def _extract_text_from_link_tag(element: bs4.Tag) -> str:
@@ -86,6 +84,33 @@ def _extract_text_from_skillreview_tag(element: bs4.Tag) -> str:
     text = html.unescape(escaped_text)
     output_str: str = json.loads(text) if escaped_text else ''
     return output_str
+
+
+def _extract_text_from_workedexample_tag(element: bs4.Tag) -> str:
+    """Extracts and returns the text from an oppia-noninteractive-workedexample
+    tag.
+
+    Args:
+        element: Tag. The oppia-noninteractive-workedexample tag from which to
+            extract text.
+
+    Returns:
+        str. The extracted text.
+    """
+    escaped_text_question = element.get('question-with-value')
+    question_text = html.unescape(escaped_text_question)
+    output_str_question: str = (
+        json.loads(question_text) if escaped_text_question else ''
+    )
+
+    escaped_text_answer = element.get('answer-with-value')
+    answer_text = html.unescape(escaped_text_answer)
+    output_str_answer: str = (
+        json.loads(answer_text) if escaped_text_answer else ''
+    )
+    return (
+        f'Example:\n\n{output_str_question}\n\nSolution:\n\n{output_str_answer}'
+    )
 
 
 def _extract_text_from_math_tag(element: bs4.Tag) -> str:
@@ -132,7 +157,7 @@ CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES = {
     'oppia-noninteractive-image': _return_empty_string,
     'oppia-noninteractive-video': _return_empty_string,
     'oppia-noninteractive-tabs': _return_empty_string,
-    'oppia-noninteractive-workedexample': _return_empty_string,
+    'oppia-noninteractive-workedexample': _extract_text_from_workedexample_tag,
 }
 
 
@@ -492,6 +517,10 @@ def regenerate_voiceover_for_exploration_content(
 
     voiceover = fetch_voiceover_by_filename(exploration_id, voiceover_filename)
 
+    voiceover_cloud_task_services.update_voiceover_regeneration_task_run_mapping_for_content(
+        exploration_id, language_accent_code, content_id, 'SUCCEEDED'
+    )
+
     entity_voiceovers = (
         voiceover_services.get_voiceovers_for_given_language_accent_code(
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -568,9 +597,6 @@ def regenerate_voiceovers_of_exploration(
         voiceover_filename = generate_new_voiceover_filename(
             content_id, language_accent_code
         )
-
-        # Pause for 3 seconds to prevent sudden spikes in workload.
-        time.sleep(WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS)
 
         try:
             # Generates a voiceover for the provided HTML content in the

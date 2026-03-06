@@ -6,7 +6,7 @@
            [ngClass]="{'col-8': !isSmallScreenViewActive()}">
         <div *ngIf="!searchPageIsActive">
           <div class="d-flex align-items-baseline">
-            <h3 class="my-0 pl-3 blog-home-page-posts-number-display"
+            <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
                 [innerHTML]="'I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
             </h3>
             <ngb-pagination [collectionSize]="totalBlogPosts"
@@ -15,7 +15,7 @@
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                             [rotate]="true"
                             (pageChange)="onPageChange($event)"
-                            class="ml-auto e2e-test-pagination">
+                            class="ms-auto e2e-test-pagination">
               <ng-template ngbPaginationPrevious >
                 <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button align-middle"
                    aria-hidden="true">
@@ -31,17 +31,17 @@
               </ng-template>
             </ngb-pagination>
           </div>
-          <div class="pl-3 posts-display-heading">
+          <div class="ps-3 posts-display-heading">
             {{ 'I18N_BLOG_HOME_PAGE_POSTS_HEADING' | translate }}
           </div>
         </div>
         <div *ngIf="searchPageIsActive">
           <div class="d-flex align-items-baseline">
-            <h3 class="my-0 pl-3 blog-home-page-posts-number-display"
+            <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
                 *ngIf="searchOffset"
                 [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum}">
             </h3>
-            <h3 class="my-0 pl-3 blog-home-page-posts-number-display"
+            <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
                 *ngIf="!searchOffset"
                 [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
             </h3>
@@ -50,7 +50,7 @@
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH"
                             (pageChange)="onPageChange($event)"
-                            class="ml-auto text-center">
+                            class="ms-auto text-center">
               <ng-template ngbPaginationPrevious>
                 <i class="fa fa-angle-left  align-middle"
                    aria-hidden="true">
@@ -63,7 +63,7 @@
               </ng-template>
             </ngb-pagination>
           </div>
-          <div class="pl-3 posts-display-heading">
+          <div class="ps-3 posts-display-heading">
             {{ 'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING' | translate }}
           </div>
         </div>
@@ -93,12 +93,12 @@
       </div>
       <div [ngClass]="{'col-4': !isSmallScreenViewActive()}">
         <div class="blog-home-page-search-column pt-4 mt-2 d-inline-block"
-             [ngClass]="{'pl-5': !isSmallScreenViewActive(), 'mobile-view-columns-separator': isSmallScreenViewActive()}">
+             [ngClass]="{'ps-5': !isSmallScreenViewActive(), 'mobile-view-columns-separator': isSmallScreenViewActive()}">
           <span [ngClass]="{'d-inline-flex': isSmallScreenViewActive()}">
             <img [src]="oppiaAvatarImgUrl" alt="image of Oppia Avatar"
-                 class="mr-auto ml-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1 e2e-test-oppia-avatar-image">
+                 class="me-auto ms-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1 e2e-test-oppia-avatar-image">
             <h1 class="d-flex flex-grow-1 blog-home-page-welcome e2e-test-blog-welcome-heading"
-                [ngClass]="{'mx-auto my-2': !isSmallScreenViewActive(), 'ml-5 my-auto': isSmallScreenViewActive()}">
+                [ngClass]="{'mx-auto my-2': !isSmallScreenViewActive(), 'ms-5 my-auto': isSmallScreenViewActive()}">
               {{ 'I18N_BLOG_HOME_PAGE_WELCOME_HEADING' | translate }}
             </h1>
           </span>
@@ -108,8 +108,8 @@
           <h4 class="d-flex flex-grow-1 search-heading">
             {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
           </h4>
-          <form class="navbar-form oppia-search-bar-form pl-0 e2e-test-search-field" role="search">
-            <div class="form-group d-flex">
+          <form class="navbar-form oppia-search-bar-form ps-0 e2e-test-search-field" role="search">
+            <div class="mb-3 d-flex">
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
@@ -117,7 +117,7 @@
                      aria-label="Search bar"
                      (keydown.enter)="onSearchQueryChangeExec()">
               <div class="input-group oppia-input-group">
-                <div class="input-group-addon oppia-search-bar-icon" [ngClass]="{'d-block': isSmallScreenViewActive()}">
+                <div class="input-group-text oppia-search-bar-icon" [ngClass]="{'d-block': isSmallScreenViewActive()}">
                   <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">
                   </i>
                   <span *ngIf="isSearchInProgress()">
@@ -148,7 +148,7 @@
                       [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                       [rotate]="true"
                       (pageChange)="onPageChange($event)"
-                      class="ml-auto mr-auto">
+                      class="ms-auto me-auto">
         <ng-template ngbPaginationPrevious >
           <i class="fa fa-angle-left text-center w-100" aria-hidden="true"></i>
         </ng-template>
@@ -165,7 +165,7 @@
                       [maxSize]="2"
                       [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH"
                       (pageChange)="onPageChange($event)"
-                      class="ml-auto mr-auto text-center">
+                      class="ms-auto me-auto text-center">
         <ng-template ngbPaginationPrevious>
           <i class="fa fa-angle-left align-middle" aria-hidden="true"></i>
         </ng-template>

@@ -46,7 +46,6 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {PlatformFeatureService} from '../../../../services/platform-feature.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from '../../../../domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
@@ -94,19 +93,6 @@ class MockWindowRef {
   };
 }
 
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
-    };
-  }
-}
-
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
@@ -145,10 +131,6 @@ describe('Content language selector component', () => {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
     })
       .overrideModule(BrowserDynamicTestingModule, {
@@ -157,10 +139,10 @@ describe('Content language selector component', () => {
         },
       })
       .compileComponents();
-    contentTranslationLanguageService = TestBed.get(
+    contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService
     );
-    playerTranscriptService = TestBed.get(PlayerTranscriptService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);

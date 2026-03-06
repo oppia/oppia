@@ -22,7 +22,7 @@
           {{ getObjective | truncateAndCapitalize: 95 }}
           <span *ngIf="!getObjective">No objective specified.</span>
         </div>
-        <ul class="metrics layout-align-space-between-center layout-row">
+        <ul class="metrics layout-row">
           <li>
             <span>
               {{ 'I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION' | translate }} ({{ getNodeCount }})
@@ -104,7 +104,13 @@
     position: absolute;
     width: 36px;
   }
-
+  .oppia-activity-summary-tile .layout-row {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    max-width: 100%;
+  }
   .mobile-activity-summary-card {
     box-shadow: slategrey 2px 4px 4px 0;
     padding: 0 0 0 0;

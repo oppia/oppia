@@ -17,6 +17,7 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {AppConstants} from 'app.constants';
 
 import './learner-group-details.component.css';
 
@@ -32,6 +33,9 @@ export class LearnerGroupDetailsComponent {
   @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
   @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
 
+  MAX_CHARS_IN_GROUP_TITLE = AppConstants.MAX_CHARS_IN_LEARNER_GROUP_TITLE;
+  MAX_CHARS_IN_GROUP_DESCRIPTION =
+    AppConstants.MAX_CHARS_IN_LEARNER_GROUP_DESCRIPTION;
   constructor() {}
 
   updateGroupTitle(title: string): void {

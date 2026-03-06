@@ -22,14 +22,14 @@ import datetime
 import json
 import os
 
-from core import feconf, schema_utils, utils
+from core import feconf, schema_utils
 from core.constants import constants
-from core.domain import exp_domain
+from core.domain import exp_domain, exp_services
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
     state_domain,
     translation_domain,
-    user_services,
+    translation_fetchers,
     voiceover_domain,
     voiceover_regeneration_services,
     voiceover_services,
@@ -41,10 +41,28 @@ from typing import Dict, List, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import email_models, exp_models, voiceover_models
+    from mypy_imports import (
+        cloud_task_models,
+        email_models,
+        exp_models,
+        translation_models,
+        voiceover_models,
+    )
 
-(exp_models, email_models, voiceover_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.EMAIL, models.Names.VOICEOVER]
+(
+    cloud_task_models,
+    exp_models,
+    email_models,
+    voiceover_models,
+    translation_models,
+) = models.Registry.import_models(
+    [
+        models.Names.CLOUD_TASK,
+        models.Names.EXPLORATION,
+        models.Names.EMAIL,
+        models.Names.VOICEOVER,
+        models.Names.TRANSLATION,
+    ]
 )
 
 
@@ -471,7 +489,14 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'content_id': 'content_0',
                 }
-            )
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': 'mark_voiceovers_needs_update',
+                    'language_code': 'hi',
+                    'content_id': 'content_0',
+                }
+            ),
         ]
 
         entity_voiceovers_models = (
@@ -507,7 +532,7 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
         assert auto_voiceover is not None
 
         self.assertTrue(manual_voiceover.needs_update)
-        self.assertFalse(auto_voiceover.needs_update)
+        self.assertTrue(auto_voiceover.needs_update)
 
     def test_should_remove_entity_voiceovers(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -559,7 +584,14 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'content_id': 'content_0',
                 }
-            )
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': 'remove_voiceovers',
+                    'language_code': 'hi',
+                    'content_id': 'content_0',
+                }
+            ),
         ]
 
         entity_voiceovers_models = (
@@ -581,11 +613,8 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                 'exploration', 'exp_id_1', 2, 'en-US'
             )
         )
-
-        self.assertIsNone(
-            retrieved_entity_voiceovers.voiceovers_mapping['content_0'][
-                'manual'
-            ]
+        self.assertNotIn(
+            'content_0', retrieved_entity_voiceovers.voiceovers_mapping
         )
 
     def test_should_get_entity_voiceovers_for_reverted_version(self) -> None:
@@ -762,7 +791,7 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         file_path = os.path.join(
             feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
         )
-        with utils.open_file(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
                 f.read()
             )
@@ -782,7 +811,7 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
             feconf.VOICEOVERS_DATA_DIR,
             'autogeneratable_language_accent_list.json',
         )
-        with utils.open_file(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
                 json.loads(f.read())
             )
@@ -873,13 +902,13 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         ) in voiceover_services.get_language_accent_master_list().values():
             for lang_accent_code in accent_code_to_description.keys():
                 language_accent_master_list.append(lang_accent_code)
-        autogeneratable_langauge_accent_codes = list(
+        autogeneratable_language_accent_codes = list(
             voiceover_services.get_autogeneratable_language_accent_list().keys()
         )
 
         self.assertTrue(
             set(language_accent_master_list).issuperset(
-                set(autogeneratable_langauge_accent_codes)
+                set(autogeneratable_language_accent_codes)
             )
         )
 
@@ -903,335 +932,6 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
             ),
             expected_language_code,
         )
-
-
-class VoiceArtistMetadataTests(test_utils.GenericTestBase):
-    """Unit test to validate voice artists metadata informations."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.voice_artist_id = 'voice_artist_id'
-        self.language_code_to_accent = {'en': 'en-US', 'hi': 'hi-IN'}
-
-    def test_should_create_and_put_new_voice_artist_model(self) -> None:
-        initial_retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
-            self.voice_artist_id, strict=False
-        )
-        self.assertIsNone(initial_retrieved_model)
-
-        voiceover_services.update_voice_artist_metadata(
-            self.voice_artist_id, self.language_code_to_accent
-        )
-
-        final_retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
-            self.voice_artist_id, strict=False
-        )
-        self.assertIsNotNone(final_retrieved_model)
-
-    def test_should_update_and_put_existing_voice_artist_model(self) -> None:
-        voiceover_services.update_voice_artist_metadata(
-            self.voice_artist_id, {}
-        )
-        retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
-            self.voice_artist_id, strict=False
-        )
-        assert retrieved_model is not None
-
-        self.assertDictEqual(retrieved_model.language_code_to_accent, {})
-
-        voiceover_services.update_voice_artist_metadata(
-            self.voice_artist_id, self.language_code_to_accent
-        )
-
-        retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
-            self.voice_artist_id, strict=False
-        )
-        assert retrieved_model is not None
-
-        self.assertDictEqual(
-            retrieved_model.language_code_to_accent,
-            self.language_code_to_accent,
-        )
-
-    def test_update_voice_artist_language_mapping(self) -> None:
-        language_code = 'en'
-        initial_language_accent_code = 'en-US'
-        final_language_accent_code = 'en-IN'
-        voiceover_services.update_voice_artist_metadata(
-            self.voice_artist_id, self.language_code_to_accent
-        )
-
-        voice_artist_metadata_model = (
-            voiceover_models.VoiceArtistMetadataModel.get(
-                self.voice_artist_id, strict=False
-            )
-        )
-        assert voice_artist_metadata_model is not None
-
-        self.assertEqual(
-            voice_artist_metadata_model.language_code_to_accent[language_code],
-            initial_language_accent_code,
-        )
-
-        voiceover_services.update_voice_artist_language_mapping(
-            self.voice_artist_id, language_code, final_language_accent_code
-        )
-
-        voice_artist_metadata_model = (
-            voiceover_models.VoiceArtistMetadataModel.get(
-                self.voice_artist_id, strict=False
-            )
-        )
-        assert voice_artist_metadata_model is not None
-
-        self.assertEqual(
-            voice_artist_metadata_model.language_code_to_accent[language_code],
-            final_language_accent_code,
-        )
-
-    def test_should_create_and_update_voice_artist_language_mapping(
-        self,
-    ) -> None:
-        language_code = 'en'
-        language_accent_code = 'en-US'
-
-        voice_artist_metadata_model = (
-            voiceover_models.VoiceArtistMetadataModel.get(
-                self.voice_artist_id, strict=False
-            )
-        )
-
-        self.assertIsNone(voice_artist_metadata_model)
-
-        voiceover_services.update_voice_artist_language_mapping(
-            self.voice_artist_id, language_code, language_accent_code
-        )
-
-        voice_artist_metadata_model = (
-            voiceover_models.VoiceArtistMetadataModel.get(
-                self.voice_artist_id, strict=False
-            )
-        )
-        assert voice_artist_metadata_model is not None
-
-        self.assertEqual(
-            voice_artist_metadata_model.language_code_to_accent[language_code],
-            language_accent_code,
-        )
-
-    def test_should_create_voice_artist_metadata_model_successfully(
-        self,
-    ) -> None:
-        voice_artist_metadata_model = (
-            voiceover_services.create_voice_artist_metadata_model_instance(
-                self.voice_artist_id, self.language_code_to_accent
-            )
-        )
-
-        self.assertEqual(voice_artist_metadata_model.id, self.voice_artist_id)
-        self.assertDictEqual(
-            voice_artist_metadata_model.language_code_to_accent,
-            self.language_code_to_accent,
-        )
-
-
-class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
-    """Unit test to validate exploration voice artists link informations."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.voiceover1: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1,
-        }
-        self.voiceover2: state_domain.VoiceoverDict = {
-            'filename': 'filename2.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.9,
-        }
-        self.voiceover3: state_domain.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0,
-        }
-        self.voiceover4: state_domain.VoiceoverDict = {
-            'filename': 'filename4.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 3.0,
-        }
-        self.voiceover5: state_domain.VoiceoverDict = {
-            'filename': 'filename5.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 7.0,
-        }
-        self.voiceover6: state_domain.VoiceoverDict = {
-            'filename': 'filename6.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0,
-        }
-        self.voiceover7: state_domain.VoiceoverDict = {
-            'filename': 'filename7.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0,
-        }
-        self.voiceover8: state_domain.VoiceoverDict = {
-            'filename': 'filename8.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0,
-        }
-        self.exploration_id = 'exploration_id'
-        self.content_id_to_voiceovers_mapping = {
-            'content_0': {'en': ('voice_artist_0', self.voiceover1)},
-            'content_1': {'hi': ('voice_artist_1', self.voiceover2)},
-        }
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def test_should_create_exploration_voice_artists_link_model_successfully(
-        self,
-    ) -> None:
-        exploration_voice_artists_link_model = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            self.exploration_id, self.content_id_to_voiceovers_mapping
-        )
-
-        self.assertEqual(
-            exploration_voice_artists_link_model.id, self.exploration_id
-        )
-        self.assertDictEqual(
-            exploration_voice_artists_link_model.content_id_to_voiceovers_mapping,
-            self.content_id_to_voiceovers_mapping,
-        )
-
-    def test_should_get_all_voice_artist_language_accent_mapping(self) -> None:
-
-        voiceover_services.update_voice_artist_metadata(
-            voice_artist_id='voice_artist_1',
-            language_code_to_accent={'en': 'en-US', 'hi': 'hi-IN'},
-        )
-
-        exploration_voice_artists_link_model1 = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            exploration_id='exploration_id_1',
-            content_id_to_voiceovers_mapping={
-                'content_0': {
-                    'en': ('voice_artist_1', self.voiceover1),
-                },
-                'content_1': {'ar': ('voice_artist_2', self.voiceover3)},
-            },
-        )
-        exploration_voice_artists_link_model1.put()
-
-        exploration_voice_artists_link_model2 = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            exploration_id='exploration_id_2',
-            content_id_to_voiceovers_mapping={
-                'content_0': {'hi': ('voice_artist_1', self.voiceover2)}
-            },
-        )
-        exploration_voice_artists_link_model2.put()
-
-        expected_voice_artist_to_language_mapping = {
-            'voice_artist_1': {'en': 'en-US', 'hi': 'hi-IN'},
-            'voice_artist_2': {'ar': ''},
-        }
-
-        retrieved_voice_artist_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping()
-        )
-
-        self.assertDictEqual(
-            expected_voice_artist_to_language_mapping,
-            retrieved_voice_artist_to_language_mapping,
-        )
-
-    def test_get_all_voice_artist_id_to_username(self) -> None:
-        auth_id = 'someUser'
-        username = 'username'
-        user_settings = user_services.create_new_user(
-            auth_id, 'user@example.com'
-        )
-        voice_artist_id = user_settings.user_id
-        user_services.set_username(voice_artist_id, username)
-
-        expected_voice_artist_id_to_username = {voice_artist_id: username}
-
-        exploration_voice_artists_link_model2 = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            exploration_id='exploration_id_2',
-            content_id_to_voiceovers_mapping={
-                'content_0': {'hi': (voice_artist_id, self.voiceover1)},
-                'content_1': {'en': (voice_artist_id, self.voiceover2)},
-            },
-        )
-        exploration_voice_artists_link_model2.put()
-
-        self.assertDictEqual(
-            voiceover_services.get_voice_artist_ids_to_voice_artist_names(),
-            expected_voice_artist_id_to_username,
-        )
-
-    def test_should_get_exploration_id_to_filenames(self) -> None:
-        exploration_voice_artists_link_model1 = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            exploration_id='exploration_id_1',
-            content_id_to_voiceovers_mapping={
-                'content_0': {
-                    'en': ('voice_artist_1', self.voiceover1),
-                },
-                'content_1': {
-                    'ar': ('voice_artist_2', self.voiceover3),
-                    'en': ('voice_artist_1', self.voiceover4),
-                },
-                'content_2': {
-                    'en': ('voice_artist_1', self.voiceover6),
-                },
-                'content_3': {'en': ('voice_artist_1', self.voiceover5)},
-            },
-        )
-        exploration_voice_artists_link_model1.put()
-
-        exploration_voice_artists_link_model2 = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            exploration_id='exploration_id_2',
-            content_id_to_voiceovers_mapping={
-                'content_0': {
-                    'en': ('voice_artist_1', self.voiceover2),
-                },
-                'content_1': {
-                    'en': ('voice_artist_1', self.voiceover7),
-                    'ar': ('voice_artist_1', self.voiceover8),
-                },
-            },
-        )
-        exploration_voice_artists_link_model2.put()
-
-        exploration_id_to_filenames = (
-            voiceover_services.get_voiceover_filenames(
-                voice_artist_id='voice_artist_1', language_code='en'
-            )
-        )
-
-        total_files = 0
-        for filnames in exploration_id_to_filenames.values():
-            total_files += len(filnames)
-
-        self.assertEqual(total_files, 5)
-
-        exploration_id_to_filenames = (
-            voiceover_services.get_voiceover_filenames(
-                voice_artist_id='voice_artist_2', language_code='ar'
-            )
-        )
-
-        total_files = 0
-        for filnames in exploration_id_to_filenames.values():
-            total_files += len(filnames)
-
-        self.assertEqual(total_files, 1)
 
 
 class VoiceoverRegenerationTests(test_utils.GenericTestBase):
@@ -1335,7 +1035,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1403,7 +1103,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1437,7 +1137,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(Exception, error):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1500,7 +1200,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1602,6 +1302,19 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.signup('tester@org.com', 'tester')
         author_id = self.get_user_id_from_email('tester@org.com')
         date_time = '2025-08-01T08:35:05.864077'
+        cloud_task_run_model_id = (
+            cloud_task_models.CloudTaskRunModel.get_new_id()
+        )
+        cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=cloud_task_run_model_id,
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/'
+                'voiceover-regeneration/tasks/task1'
+            ),
+            latest_job_state='RUNNING',
+            function_id='update_stats',
+            current_retry_attempt=1,
+        )
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id,
@@ -1659,12 +1372,13 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'regenerate_voiceovers_of_exploration',
             mock_regenerate_voiceovers_of_exploration,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
                 author_id=author_id,
                 date_time=date_time,
+                task_run_id=cloud_task_run_model_id,
             )
 
         all_models: Sequence[email_models.SentEmailModel] = (
@@ -1691,3 +1405,416 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 == 'Report on Automatic Voiceovers Generated for Test Exploration'
             ):
                 self.assertEqual(email_model.html_body, expected_html_body)
+
+        updated_cloud_task_run_model = cloud_task_models.CloudTaskRunModel.get(
+            cloud_task_run_model_id
+        )
+        assert updated_cloud_task_run_model is not None
+        self.assertEqual(
+            updated_cloud_task_run_model.latest_job_state, 'PERMANENTLY_FAILED'
+        )
+
+    def _create_exploration_and_arabic_translation(
+        self, exploration_id: str, language_code: str
+    ) -> None:
+        """Creates a new exploration with a translation in Arabic.
+
+        Args:
+            exploration_id: str. The ID of the exploration to create.
+            language_code: str. The language code for the translation.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id,
+            title='A Title',
+            category='A Category',
+            objective='An Objective',
+        )
+        exploration.states['Introduction'].content.html = 'First Card!'
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            exploration.states['Introduction'],
+            'TextInput',
+            content_id_generator,
+        )
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Second',
+                    None,
+                    state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'
+                    ),
+                    False,
+                    [],
+                    None,
+                    None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': {
+                                'contentId': 'rule_input_Equals',
+                                'normalizedStrSet': ['Test'],
+                            }
+                        },
+                    )
+                ],
+                [],
+                None,
+            )
+        ]
+        exploration.add_state('Second', 'content_2', 'content-3')
+
+        exp_services.save_new_exploration(exploration_id, exploration)
+
+        arabic_translation = 'المحتوى المترجم'
+        translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
+            'content_0': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False,
+            },
+            'content_1': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': True,
+            },
+            'rule_input_Equals': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False,
+            },
+            'feedback_1': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False,
+            },
+        }
+
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            exploration_id,
+            exploration.version,
+            language_code,
+            translations_mapping,
+        ).put()
+
+    def test_should_regenerate_voiceover_for_arabic_language(self) -> None:
+        language_accent_code = 'ar-AE'
+        language_code = 'ar'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        self._create_exploration_and_arabic_translation(
+            exploration_id, language_code
+        )
+
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration_id,
+            exploration_version,
+            language_code,
+        )
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+
+        self.assertEqual(entity_translation.language_code, language_code)
+        self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+                    exploration_id, language_accent_code, author_id, date_time
+                )
+            )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+
+        self.assertEqual(
+            entity_voiceovers.language_accent_code, language_accent_code
+        )
+        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
+        self.assertDictEqual(
+            entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
+            {
+                'content_0': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+                'feedback_1': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+            },
+        )
+
+    def test_should_raise_exception_when_language_accent_code_is_not_supported(
+        self,
+    ) -> None:
+        language_accent_code = 'ar-non-existent'
+        exploration_id = 'exp_id_1'
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        with self.assertRaisesRegex(
+            Exception, 'Invalid language accent code: %s' % language_accent_code
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+                    exploration_id, language_accent_code, author_id, date_time
+                )
+            )
+
+    def test_should_regenerate_voiceover_for_english_language(self) -> None:
+        language_accent_code = 'en-US'
+        language_code = 'en'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        self._create_exploration_and_arabic_translation(
+            exploration_id, language_code
+        )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+        self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+                    exploration_id, language_accent_code, author_id, date_time
+                )
+            )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+
+        self.assertEqual(
+            entity_voiceovers.language_accent_code, language_accent_code
+        )
+        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
+        self.assertEqual(
+            entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
+            {
+                'content_0': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+                'feedback_1': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+            },
+        )
+
+    def test_should_regenerate_voiceover_when_exploration_is_curated(
+        self,
+    ) -> None:
+        language_code = 'ar'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        self._create_exploration_and_arabic_translation(
+            exploration_id, language_code
+        )
+        entity_voiceovers_list = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_version,
+            )
+        )
+
+        self.assertEqual(len(entity_voiceovers_list), 0)
+        cloud_task_run_model_id = (
+            cloud_task_models.CloudTaskRunModel.get_new_id()
+        )
+        cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=cloud_task_run_model_id,
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/'
+                'voiceover-regeneration/tasks/task1'
+            ),
+            latest_job_state='RUNNING',
+            function_id='update_stats',
+            current_retry_attempt=1,
+        )
+
+        voiceover_regeneration_task_mapping_model_id = '%s:%s' % (
+            exploration_id,
+            cloud_task_run_model_id,
+        )
+        voiceover_regeneration_task_mapping_model = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                voiceover_regeneration_task_mapping_model_id, strict=False
+            )
+        )
+
+        self.assertIsNone(voiceover_regeneration_task_mapping_model)
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+                    exploration_id,
+                    date_time,
+                    author_id,
+                    cloud_task_run_model_id,
+                )
+            )
+
+        entity_voiceovers_list = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_version,
+            )
+        )
+        # The entity_voiceovers_list should have a length of 3 because the setup
+        # method supports three language accents for Oppia's voiceover
+        # autogeneration: 'en-US', 'en-IN', and 'ar-AE'.
+        self.assertEqual(len(entity_voiceovers_list), 3)
+
+        voiceover_regeneration_task_mapping_model = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                voiceover_regeneration_task_mapping_model_id, strict=False
+            )
+        )
+        expected_language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'SUCCEEDED', 'feedback_1': 'SUCCEEDED'},
+            'en-IN': {'content_0': 'SUCCEEDED', 'feedback_1': 'SUCCEEDED'},
+            'ar-AE': {'content_0': 'SUCCEEDED', 'feedback_1': 'SUCCEEDED'},
+        }
+
+        self.assertIsNotNone(voiceover_regeneration_task_mapping_model)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover_regeneration_task_mapping_model is not None
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping_model.language_accent_to_content_status_map,
+            expected_language_accent_to_content_status_map,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping_model.exploration_id,
+            exploration_id,
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping_model.cloud_task_run_id,
+            cloud_task_run_model_id,
+        )
+
+    def test_should_generate_voiceover_for_translated_content(self) -> None:
+        language_code = 'ar'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        language_accent_code = 'ar-AE'
+        translation_content = 'المحتوى المترجم'
+        content_id = 'content_id_0'
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id,
+            title='A Title',
+            category='A Category',
+            objective='An Objective',
+        )
+        exploration.states['Introduction'].content.html = 'First Card!'
+        exp_services.save_new_exploration(exploration_id, exploration)
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+        self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.generate_voiceover_from_translated_content(
+                    exploration_id,
+                    exploration_version,
+                    translation_content,
+                    content_id,
+                    language_code,
+                )
+            )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})

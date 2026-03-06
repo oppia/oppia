@@ -32,8 +32,8 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ModifyTranslationsModalComponent} from './exploration-modify-translations-modal.component';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ChangeListService} from '../services/change-list.service';
 import {PageContextService} from 'services/page-context.service';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';

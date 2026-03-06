@@ -23,6 +23,7 @@ import {Input} from '@angular/core';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {AppConstants} from 'app.constants';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {
@@ -77,6 +78,7 @@ export class StorySummaryTileComponent implements OnInit {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService,
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private platformFeatureService: PlatformFeatureService
   ) {}
 
@@ -84,9 +86,9 @@ export class StorySummaryTileComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 768;
   }
 
-  isSerialChapterFeatureFlagEnabled(): boolean {
-    return this.platformFeatureService.status
-      .SerialChapterLaunchCurriculumAdminView.isEnabled;
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
   }
 
   getStoryLink(): string {
@@ -280,6 +282,22 @@ export class StorySummaryTileComponent implements OnInit {
       this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey);
     }
     this.getStoryStatus();
+  }
+
+  isNewChapterLabelVisible(node: StoryNode): boolean {
+    const firstPublicationTimestampMsecs = node.getFirstPublicationDateMsecs();
+    if (!firstPublicationTimestampMsecs) {
+      return false;
+    }
+    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+    const daysSinceFirstPublication =
+      (Date.now() - Number(firstPublicationTimestampMsecs)) /
+      millisecondsPerDay;
+
+    return (
+      daysSinceFirstPublication <= 28 &&
+      !this.storySummary.isNodeCompleted(node.getTitle())
+    );
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {

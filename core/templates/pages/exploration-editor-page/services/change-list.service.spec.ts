@@ -26,7 +26,7 @@ import {ExplorationDataService} from './exploration-data.service';
 import {AutosaveInfoModalsService} from './autosave-info-modals.service';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 
 class MockWindowRef {
@@ -450,6 +450,47 @@ describe('Change List Service when changes are mergable', () => {
 
     expect(changeListService.isOnlyVoiceoverChangeListPresent()).toBe(false);
     expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should correctly identify if change list affects automatic voiceovers', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.editStateProperty(
+      'state',
+      'solution',
+      'oldValue',
+      'newValue'
+    );
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.doesChangeListAffectAutoVoiceovers()).toBe(true);
+
+    changeListService.explorationChangeList = [];
+
+    let voiceover: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 100000,
+      needs_update: false,
+      duration_secs: 12.0,
+    };
+    let voiceoverTypeToVoiceovers = {
+      manual: voiceover,
+    };
+
+    changeListService.editVoiceovers(
+      'content_id_1',
+      'en-US',
+      voiceoverTypeToVoiceovers
+    );
+
+    flush();
+    expect(changeListService.doesChangeListAffectAutoVoiceovers()).toBe(false);
   }));
 
   it('should mark voiceovers as needing update', fakeAsync(() => {

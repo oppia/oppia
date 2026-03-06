@@ -20,6 +20,7 @@ import contextlib
 import errno
 import getpass
 import io
+import json
 import os
 import platform
 import re
@@ -33,18 +34,15 @@ from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from core import feconf
-from scripts import servers
+from typing import Dict, Final, Generator, List, Literal, Optional, Tuple, Union
 
-import certifi
-from typing import Dict, Final, Generator, List, Optional, Tuple, Union
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
-
-from core import utils  # pylint: disable=wrong-import-position
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -72,7 +70,7 @@ YARN_VERSION = '1.22.15'
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '7.17.27'
+ELASTICSEARCH_VERSION = '8.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -80,12 +78,8 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
-GOOGLE_CLOUD_SDK_HOME = (
-    '/app/vm_deps/google-cloud-sdk'
-    if feconf.OPPIA_IS_DOCKERIZED
-    else os.path.join(
-        OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-500.0.0', 'google-cloud-sdk'
-    )
+GOOGLE_CLOUD_SDK_HOME = os.path.join(
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-500.0.0', 'google-cloud-sdk'
 )
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine'
@@ -97,11 +91,7 @@ WEBPACK_BIN_PATH = os.path.join(
 NG_BIN_PATH = os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng')
 DEV_APPSERVER_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py')
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
-NODE_PATH = (
-    '/usr'
-    if feconf.OPPIA_IS_DOCKERIZED
-    else os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
-)
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
@@ -194,6 +184,7 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
 )
 WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join('core', 'tests', 'wdio.conf.js')
 NODEMODULES_WDIO_BIN_PATH = os.path.join(NODE_MODULES_PATH, '.bin', 'wdio')
+HASHES_JSON_FILEPATH = os.path.join('assets', 'hashes.json')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
@@ -398,7 +389,9 @@ def get_current_branch_name() -> str:
     )
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
-    assert git_status_first_line.startswith(branch_message_prefix)
+    assert git_status_first_line.startswith(
+        branch_message_prefix
+    ), git_status_first_line
     # Standard output is in bytes, we need to decode the line to print it.
     return git_status_first_line[len(branch_message_prefix) :]
 
@@ -493,6 +486,22 @@ def is_port_in_use(port: int) -> bool:
         socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ) as s:
         return bool(not s.connect_ex(('localhost', port)))
+
+
+def get_ports_in_use(ports: list[int]) -> list[int]:
+    """Checks which ports from a list are currently in use.
+
+    Args:
+        ports: list[int]. List of port numbers.
+
+    Returns:
+        list[int]. List of port numbers that are currently in use.
+    """
+    in_use = []
+    for port in ports:
+        if is_port_in_use(port):
+            in_use.append(port)
+    return in_use
 
 
 def recursive_chown(path: str, uid: int, gid: int) -> None:
@@ -603,7 +612,7 @@ def create_readme(dir_path: str, readme_content: str) -> None:
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+    with open(os.path.join(dir_path, 'README.md'), 'w', encoding='utf-8') as f:
         f.write(readme_content)
 
 
@@ -638,7 +647,7 @@ def inplace_replace_file(
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with utils.open_file(filename, 'r') as old_file:
+        with open(filename, 'r', encoding='utf-8') as old_file:
             for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line
@@ -646,7 +655,7 @@ def inplace_replace_file(
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with utils.open_file(new_filename, 'w') as new_file:
+        with open(new_filename, 'w', encoding='utf-8') as new_file:
             for line in new_contents:
                 new_file.write(line)
 
@@ -695,6 +704,50 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
             'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram'
         )
         sys.exit(1)
+
+
+def wait_for_firebase_emulator_to_be_ready(
+    port_number: int, timeout_secs: int = MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+) -> None:
+    """Wait until the Firebase Auth emulator is ready to accept requests.
+
+    This function performs an HTTP health check to verify that the emulator
+    is actually responding, not just that the port is open. This is more
+    robust than just checking if the port is in use, as the emulator might
+    bind the port but crash during initialization.
+
+    Args:
+        port_number: int. The port number where the emulator is running.
+        timeout_secs: int. Maximum time to wait for the emulator to be ready.
+
+    Raises:
+        Exception. If the emulator fails to become ready within the timeout.
+    """
+    emulator_url = 'http://localhost:%d/' % port_number
+    waited_seconds = 0
+
+    while waited_seconds < timeout_secs:
+        try:
+            # The Firebase Auth emulator responds to GET requests at the root
+            # URL when it's ready.
+            response = urlrequest.urlopen(emulator_url, timeout=5)
+            if response.status == 200:
+                print(
+                    'Firebase Auth emulator is ready on port %d.' % port_number
+                )
+                return
+        except (urlerror.URLError, client.HTTPException, socket.timeout):
+            # The emulator is not yet ready, keep waiting.
+            pass
+
+        time.sleep(1)
+        waited_seconds += 1
+
+    raise Exception(
+        'Firebase Auth emulator failed to become ready on port %d '
+        'within %d seconds. This may indicate the emulator crashed during '
+        'initialization.' % (port_number, timeout_secs)
+    )
 
 
 def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
@@ -800,7 +853,7 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
-    context = ssl.create_default_context(cafile=certifi.where())
+    context = ssl.create_default_context()
     return urlrequest.urlopen(source_url, context=context)
 
 
@@ -861,7 +914,7 @@ def url_retrieve(
             with urlrequest.urlopen(
                 url, context=ssl.create_default_context()
             ) as response:
-                with open(output_path, 'wb') as output_file:
+                with open(output_path, 'wb', encoding=None) as output_file:
                     output_file.write(response.read())
         except (
             urlerror.URLError,
@@ -897,24 +950,6 @@ def setup_chrome_bin_env_variable() -> None:
     else:
         print('Chrome is not found, stopping...')
         raise Exception('Chrome not found.')
-
-
-def run_ng_compilation() -> None:
-    """Runs angular compilation."""
-    max_tries = 2
-    ng_bundles_dir_name = 'dist/oppia-angular'
-    for _ in range(max_tries):
-        try:
-            with servers.managed_ng_build() as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-        if os.path.isdir(ng_bundles_dir_name):
-            break
-    if not os.path.isdir(ng_bundles_dir_name):
-        print('Failed to complete ng build compilation, exiting...')
-        sys.exit(1)
 
 
 def set_constants_to_default() -> None:
@@ -968,9 +1003,6 @@ def modify_constants(
         enable_maintenance_mode_variable,
         expected_number_of_replacements=1,
     )
-
-    if feconf.OPPIA_IS_DOCKERIZED:
-        return
 
     if prod_env or version_info_must_be_set is False:
         branch_name_variable = '"BRANCH_NAME": "%s"' % (
@@ -1029,3 +1061,22 @@ def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
+
+
+def write_hashes_json_file(file_hashes: Dict[str, str]) -> None:
+    """Writes asset hashes to the hashes.json file.
+
+    This file is imported by TypeScript code and must exist for compilation
+    to succeed. During development/testing, an empty dict is typically passed
+    to create an empty but valid JSON file. During production builds, actual
+    hash mappings are provided for cache invalidation.
+
+    Args:
+        file_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values. Pass an empty dict to create
+            an empty hashes file.
+    """
+    ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
+    with open(HASHES_JSON_FILEPATH, 'w+', encoding='utf-8') as hashes_json_file:
+        hashes_json_file.write(str(json.dumps(file_hashes, ensure_ascii=False)))
+        hashes_json_file.write('\n')

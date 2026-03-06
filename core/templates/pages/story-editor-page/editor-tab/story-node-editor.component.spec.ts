@@ -447,7 +447,7 @@ describe('Story node editor component', () => {
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdate service to finalize story node outline', () => {
+  it('should call StoryUpdate service to unfinalize story node outline', () => {
     let storySpy = spyOn(storyUpdateService, 'unfinalizeStoryNodeOutline');
     let currentNodeIsPublishableSpy = spyOn(
       component,
@@ -460,17 +460,46 @@ describe('Story node editor component', () => {
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
   });
 
-  it('should call StoryUpdate service to finalize story node outline', () => {
+  it('should call StoryUpdate service to finalize story node outline when editableOutline has some content', () => {
     let storySpy = spyOn(storyUpdateService, 'finalizeStoryNodeOutline');
     let currentNodeIsPublishableSpy = spyOn(
       component,
       'updateCurrentNodeIsPublishable'
     );
-
+    component.editableOutline = 'Some outline text';
     component.finalizeOutline();
 
     expect(storySpy).toHaveBeenCalled();
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+  });
+
+  it('should call StoryUpdate service to unfinalize story node outline when editableOutline has no content', () => {
+    let unfinalizeSpy = spyOn(storyUpdateService, 'unfinalizeStoryNodeOutline');
+    let finalizeSpy = spyOn(storyUpdateService, 'finalizeStoryNodeOutline');
+    let currentNodeIsPublishableSpy = spyOn(
+      component,
+      'updateCurrentNodeIsPublishable'
+    );
+
+    component.editableOutline = '';
+    component.finalizeOutline();
+
+    expect(unfinalizeSpy).toHaveBeenCalled();
+    expect(finalizeSpy).not.toHaveBeenCalled();
+    expect(component.outlineIsFinalized).toBeFalse();
+    expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
+  });
+
+  it('should return true from canFinalize if editableOutline has content', () => {
+    component.editableOutline = 'Some outline text';
+
+    expect(component.canFinalize()).toBeTrue();
+  });
+
+  it('should return false from canFinalize if editableOutline has no content', () => {
+    component.editableOutline = '';
+
+    expect(component.canFinalize()).toBeFalse();
   });
 
   it('should call StoryUpdate service to update outline', () => {
@@ -560,6 +589,7 @@ describe('Story node editor component', () => {
       component.currentTitle = 'title';
       component.currentDescription = 'desc';
       component.plannedPublicationDate = new Date();
+      component.acquiredSkillIds = ['skill_1'];
       component.updateCurrentNodeIsPublishable();
 
       expect(currentNodeIsPublishableSpy).toHaveBeenCalledWith(true);

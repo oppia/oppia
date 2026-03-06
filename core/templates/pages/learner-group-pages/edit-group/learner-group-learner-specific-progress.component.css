@@ -118,6 +118,10 @@
   width: max-content;
 }
 
+.oppia-learner-group-learner-specific-progress .learner-info-card picture img {
+  max-width: 15%;
+}
+
 .oppia-learner-group-learner-specific-progress .progress-dropdown {
   border: solid 1px #9e9e9e;
   display: flex;

@@ -52,7 +52,7 @@ import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {LostChange} from 'domain/exploration/lost-change.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -338,6 +338,14 @@ export class ChangeListService {
     return this.explorationChangeList.every(
       change => change.cmd === 'update_voiceovers'
     );
+  }
+
+  doesChangeListAffectAutoVoiceovers(): boolean {
+    // The following commands affect auto generated voiceovers.
+    let changeCmds = ['edit_state_property', 'edit_translation'];
+    return this.explorationChangeList.some(change => {
+      return changeCmds.includes(change.cmd);
+    });
   }
 
   getTranslationChangeList(): ExplorationChange[] {

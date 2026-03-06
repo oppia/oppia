@@ -30,12 +30,12 @@ import {
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {ShareLessonModalComponent} from './share-lesson-modal.component';
-import {AlertsService} from '../../../../services/alerts.service';
-import {UrlService} from '../../../../services/contextual/url.service';
-import {AttributionService} from '../../../../services/attribution.service';
-import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {PageContextService} from '../../../../services/page-context.service';
-import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {AttributionService} from 'services/attribution.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PageContextService} from 'services/page-context.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe implements PipeTransform {
@@ -83,6 +83,8 @@ describe('ShareLessonModalComponent', () => {
 
     mockLocation = {
       href: 'https://oppia.org/explore/test-exploration',
+      origin: 'https://oppia.org',
+      pathname: '/explore/test-exploration',
       protocol: 'https:',
       host: 'oppia.org',
     };
@@ -213,7 +215,7 @@ describe('ShareLessonModalComponent', () => {
     expect(testComponent.explorationTitle).toBe('Test Exploration');
   });
 
-  it('should not set explorationTitle when data is not provided', () => {
+  it('should initialize with undefined data when data is null', () => {
     spyOn(component, 'generateAttributionText');
     spyOn(component, 'generateEmbedCode');
 
@@ -222,6 +224,15 @@ describe('ShareLessonModalComponent', () => {
     expect(component.explorationTitle).toBeUndefined();
     expect(component.generateAttributionText).toHaveBeenCalled();
     expect(component.generateEmbedCode).toHaveBeenCalled();
+  });
+
+  it('should initialize with default values', () => {
+    expect(component.backBtnIsVisible).toBe(false);
+    expect(component.successMessageIsVisible).toBe(false);
+    expect(component.successMessage).toBe('');
+    expect(component.ccAttributionText).toBe('');
+    expect(component.embedCode).toBe('');
+    expect(component.modalState).toBe('copy');
   });
 
   it('should dismiss bottomSheetRef when closeModal is called and bottomSheetRef exists', () => {
@@ -472,5 +483,27 @@ describe('ShareLessonModalComponent', () => {
     const result = component.isWindowNarrow();
 
     expect(result).toBe(false);
+  });
+
+  it('should handle edge case where getAuthors returns empty array', () => {
+    attributionService.getAuthors.and.returnValue([]);
+
+    const result = component.getAuthors();
+
+    expect(result).toBe('');
+  });
+
+  it('should handle edge case where getAuthors returns single author', () => {
+    attributionService.getAuthors.and.returnValue(['Single Author']);
+
+    const result = component.getAuthors();
+
+    expect(result).toBe('Single Author');
+  });
+
+  it('should test modalStates enum values', () => {
+    expect(component.modalStates.COPY).toBe('copy');
+    expect(component.modalStates.EMBED).toBe('embed');
+    expect(component.modalStates.ATTRIBUTION).toBe('attribution');
   });
 });

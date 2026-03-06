@@ -45,6 +45,7 @@ export class GetStartedPageRootComponent implements OnDestroy {
   }
 
   ngOnInit(): void {
+    this.setPageTitleAndMetaTags();
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitleAndMetaTags();

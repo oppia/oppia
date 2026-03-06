@@ -22,7 +22,7 @@ import {
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 describe('Exploration opportunity summary model', () => {
-  describe('ExplorationOpportunitySummaryObjectFactory', () => {
+  describe('ExplorationOpportunitySummary', () => {
     let backendDict: ExplorationOpportunitySummaryBackendDict;
     let explorationOpportunitySummary: ExplorationOpportunitySummary;
 

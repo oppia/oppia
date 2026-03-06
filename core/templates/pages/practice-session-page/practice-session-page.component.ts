@@ -16,7 +16,7 @@
  * @fileoverview Component for the practice session.
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
@@ -51,6 +51,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private platformFeatureService: PlatformFeatureService,
     private translateService: TranslateService,
+    private cdRef: ChangeDetectorRef,
     private practiceSessionsBackendApiService: PracticeSessionsBackendApiService
   ) {}
 
@@ -142,6 +143,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.loaderService.onLoadingMessageChange.subscribe((msg: string) => {
         this.loadingMessage = msg;
+        this.cdRef.detectChanges();
       })
     );
 

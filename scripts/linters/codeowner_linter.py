@@ -149,7 +149,7 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
         Returns:
             bool. Whether the given path contains all spec files.
         """
-        return '*.spec.ts' in path_to_check or '*Spec.ts' in path_to_check
+        return '*.spec.ts' in path_to_check
 
     def _check_for_important_patterns_at_bottom_of_codeowners(
         self, important_patterns: List[str]

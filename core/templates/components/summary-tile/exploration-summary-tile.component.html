@@ -64,7 +64,7 @@
           <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">
           </span>
         </div>
-        <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-align-space-between-center layout-row">
+        <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-row">
           <li>
             <span class="e2e-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !avgRating}">
               <span class="fas fa-star" [ngbTooltip]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate" placement="top" container="body">

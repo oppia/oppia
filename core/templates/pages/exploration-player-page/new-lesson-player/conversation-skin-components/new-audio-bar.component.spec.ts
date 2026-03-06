@@ -38,6 +38,7 @@ import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voi
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 
 describe('NewAudioBarComponent', () => {
   let component: NewAudioBarComponent;
@@ -50,6 +51,7 @@ describe('NewAudioBarComponent', () => {
   let pageContextService: PageContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let voiceoverPlayerService: VoiceoverPlayerService;
+  let mobileMenuService: MobileMenuService;
   let entityVoiceoversService: EntityVoiceoversService;
   let stateEditorService: StateEditorService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -81,6 +83,7 @@ describe('NewAudioBarComponent', () => {
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     stateEditorService = TestBed.inject(StateEditorService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    mobileMenuService = TestBed.inject(MobileMenuService);
 
     mockOnTranslationLanguageChanged = new EventEmitter<void>();
     mockOnActiveVoiceoverChanged = new EventEmitter<void>();
@@ -149,6 +152,16 @@ describe('NewAudioBarComponent', () => {
     expect(
       component.updateDisplayableLanguageAccentDescription
     ).toHaveBeenCalled();
+  });
+
+  it('should return sidebar expanded state from mobileMenuService', () => {
+    spyOn(mobileMenuService, 'getSidebarIsExpanded').and.returnValue(true);
+    expect(component.getSidebarIsExpanded()).toBe(true);
+
+    (mobileMenuService.getSidebarIsExpanded as jasmine.Spy).and.returnValue(
+      false
+    );
+    expect(component.getSidebarIsExpanded()).toBe(false);
   });
 
   it('should handle active voiceover changed event', () => {

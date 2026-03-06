@@ -81,31 +81,12 @@ export class CardAnimationService {
    */
   scrollToBottom(): void {
     setTimeout(() => {
-      const cardNavigationControl = document.querySelector(
-        '.card-navigation-control'
+      const targetScrollY = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
       );
 
-      if (!cardNavigationControl) {
-        return;
-      }
-
-      const cardNavigationControlRect =
-        cardNavigationControl.getBoundingClientRect();
-      const cardNavigationControlBottom =
-        cardNavigationControlRect.top +
-        window.scrollY +
-        cardNavigationControlRect.height;
-      const windowBottom = window.scrollY + window.innerHeight;
-
-      if (windowBottom < cardNavigationControlBottom) {
-        const targetScrollY =
-          cardNavigationControlBottom - window.innerHeight + 12;
-        this.smoothScrollTo(
-          targetScrollY,
-          ExplorationPlayerConstants.TIME_SCROLL_MSEC,
-          'easeOutQuad'
-        );
-      }
+      this.smoothScrollTo(targetScrollY, 3000, 'easeOutQuad');
     }, 100);
   }
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SuggestionThreadObjectFactory.
+ * @fileoverview Unit tests for SuggestionThread.
  */
 
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
@@ -21,7 +21,7 @@ import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {FeedbackThreadBackendDict} from 'domain/feedback_thread/feedback-thread.model';
 import {SuggestionBackendDict} from './suggestion.model';
 
-describe('SuggestionThreadObjectFactory', () => {
+describe('SuggestionThread', () => {
   let suggestionThreadBackendDict: FeedbackThreadBackendDict;
   let suggestionBackendDict: SuggestionBackendDict;
 

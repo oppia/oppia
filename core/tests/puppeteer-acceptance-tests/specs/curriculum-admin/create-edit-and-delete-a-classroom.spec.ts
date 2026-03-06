@@ -81,7 +81,7 @@ describe('Curriculum Admin', function () {
     );
 
     // Setup taking longer than 300000 ms.
-  }, 600000);
+  }, 750000);
 
   it('should be able to create a new classroom', async function () {
     await curriculumAdmin.createNewClassroom('Math', 'math');

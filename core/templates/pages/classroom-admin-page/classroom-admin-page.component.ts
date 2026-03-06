@@ -584,6 +584,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       .getTopicIdToTopicNameAsync(topicIds)
       .then(topicIdsToTopicName => {
         this.topicNameToPrerequisiteTopicNames = {};
+        this.topicNames = [];
 
         for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
           let currentTopicName = topicIdsToTopicName[currentTopicId];

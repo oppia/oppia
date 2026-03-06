@@ -27,6 +27,8 @@ from core.domain import (
     learner_group_services,
     skill_services,
     study_guide_domain,
+    subtopic_page_services,
+    topic_domain,
     topic_fetchers,
 )
 from core.platform import models
@@ -380,6 +382,150 @@ def does_study_guide_model_exist(topic_id: str, subtopic_id: int) -> bool:
         return study_guide_model is not None
     except Exception:
         return False
+
+
+def generate_study_guide_models(
+    topic_id: str, subtopics: List[topic_domain.Subtopic]
+) -> None:
+    """Generates study guide models corresponding to all subtopic page models in the given topic.
+
+    Args:
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        subtopics: list(Subtopic). The subtopics in the topic.
+    """
+    for subtopic in subtopics:
+        if not does_study_guide_model_exist(topic_id, subtopic.id):
+            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+                topic_id, subtopic.id
+            )
+            study_guide = study_guide_domain.StudyGuide.create_study_guide(
+                subtopic.id,
+                topic_id,
+                subtopic.title,
+                subtopic_page.page_contents.subtitled_html.html,
+            )
+            save_study_guide(
+                feconf.SYSTEM_COMMITTER_ID,
+                study_guide,
+                'Generated Study Guide model corresponding to Subtopic Page Model with id: %s'
+                % (subtopic_page.id),
+                [
+                    study_guide_domain.StudyGuideChange(
+                        {
+                            'cmd': 'create_new',
+                            'topic_id': topic_id,
+                            'subtopic_id': subtopic.id,
+                        }
+                    )
+                ],
+            )
+
+
+def delete_study_guide_models(
+    topic_id: str, subtopics: List[topic_domain.Subtopic]
+) -> None:
+    """Deletes all study guide models corresponding to the given topic id.
+
+    Args:
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        subtopics: list(Subtopic). The subtopics in the topic.
+    """
+    for subtopic in subtopics:
+        if does_study_guide_model_exist(topic_id, subtopic.id):
+            delete_study_guide(
+                feconf.SYSTEM_COMMITTER_ID,
+                topic_id,
+                subtopic.id,
+                force_deletion=True,
+            )
+
+
+def verify_study_guide_models(
+    topic_id: str, subtopics: List[topic_domain.Subtopic]
+) -> List[str]:
+    """Verifies all study guide models corresponding to the given topic id.
+
+    Args:
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        subtopics: list(Subtopic). The subtopics in the topic.
+
+    Returns:
+        list(str). A list of issues found with the study guide models. If no issues
+        are found, an empty list is returned.
+    """
+    study_guide_snapshot_metadata_ids = []
+    study_guide_snapshot_content_ids = []
+    study_guide_commit_log_entry_ids = []
+
+    for subtopic in subtopics:
+        if does_study_guide_model_exist(topic_id, subtopic.id):
+            study_guide = get_study_guide_by_id(topic_id, subtopic.id)
+            study_guide_id = study_guide.id
+            model_version = study_guide.version
+
+            for version in range(1, model_version + 1):
+                snapshot_id = '%s-%d' % (study_guide_id, version)
+                study_guide_snapshot_content_ids.append(snapshot_id)
+                study_guide_snapshot_metadata_ids.append(snapshot_id)
+
+                commit_log_id = 'studyguide-%s-%d' % (study_guide_id, version)
+                study_guide_commit_log_entry_ids.append(commit_log_id)
+
+    snapshot_content_models = (
+        subtopic_models.StudyGuideSnapshotContentModel.get_multi(
+            study_guide_snapshot_content_ids
+        )
+    )
+    snapshot_metadata_models = (
+        subtopic_models.StudyGuideSnapshotMetadataModel.get_multi(
+            study_guide_snapshot_metadata_ids
+        )
+    )
+    commit_log_entry_models = (
+        subtopic_models.StudyGuideCommitLogEntryModel.get_multi(
+            study_guide_commit_log_entry_ids
+        )
+    )
+
+    issues = []
+
+    # Check for missing snapshot content models.
+    missing_snapshot_content_ids = [
+        study_guide_snapshot_content_ids[i]
+        for i, model in enumerate(snapshot_content_models)
+        if model is None
+    ]
+    if missing_snapshot_content_ids:
+        issues.append(
+            'Missing snapshot content models: %s'
+            % ', '.join(missing_snapshot_content_ids)
+        )
+
+    # Check for missing snapshot metadata models.
+    missing_snapshot_metadata_ids = [
+        study_guide_snapshot_metadata_ids[i]
+        for i, model in enumerate(snapshot_metadata_models)
+        if model is None
+    ]
+    if missing_snapshot_metadata_ids:
+        issues.append(
+            'Missing snapshot metadata models: %s'
+            % ', '.join(missing_snapshot_metadata_ids)
+        )
+
+    # Check for missing commit log entry models.
+    missing_commit_log_entry_ids = [
+        study_guide_commit_log_entry_ids[i]
+        for i, model in enumerate(commit_log_entry_models)
+        if model is None
+    ]
+    if missing_commit_log_entry_ids:
+        issues.append(
+            'Missing commit log entry models: %s'
+            % ', '.join(missing_commit_log_entry_ids)
+        )
+
+    return issues
 
 
 def get_topic_ids_from_study_guide_ids(study_guide_ids: List[str]) -> List[str]:

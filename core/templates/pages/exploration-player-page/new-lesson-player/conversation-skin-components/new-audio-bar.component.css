@@ -8,10 +8,11 @@
   background-color: #fff8e5;
   display: flex;
   height: 44px;
+  margin-top: 40px;
   padding: 10px 8px;
   padding-right: 48px;
-  position: relative;
-  width: 100%;
+  position: fixed;
+  width: calc(100vw - 83px);
 }
 
 .oppia-new-audio-bar i {
@@ -44,7 +45,7 @@
   color: #205d86;
   font-weight: 500;
   height: 28px;
-  width: 89px;
+  width: 145px;
 }
 
 .oppia-new-audio-header-control-buttons {
@@ -80,7 +81,22 @@ oppia-new-audio-bar .mobile-mode {
   display: none;
 }
 
+.expanded-sidebar {
+  width: calc(100vw - 243px);
+}
+
+@media(max-width: 767px) {
+  .oppia-new-audio-bar,
+  .expanded-sidebar {
+    width: 100vw;
+  }
+}
+
 @media (max-width: 480px) {
+  .oppia-new-audio-header-select select {
+    width: 120px;
+  }
+
   oppia-new-audio-bar .desktop-mode {
     display: none;
   }

@@ -34,8 +34,8 @@ import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-bac
 import {AlertsService} from 'services/alerts.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
@@ -63,9 +63,9 @@ describe('OppiaFooterComponent', () => {
   let fixture: ComponentFixture<OppiaFooterComponent>;
   let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
-  let siteAnalyticsService: SiteAnalyticsService;
   let mockWindowRef: MockWindowRef;
   let ngbModal: MockNgbModal;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -95,8 +95,8 @@ describe('OppiaFooterComponent', () => {
     alertsService = TestBed.inject(AlertsService);
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     ngbModal = TestBed.inject(NgbModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should get the siteFeedbackFormURL', () => {
@@ -121,6 +121,11 @@ describe('OppiaFooterComponent', () => {
 
     component.emailAddress = 'validEmail@example.com';
     expect(component.validateEmailAddress()).toBeTrue();
+  });
+
+  it('should return false when email address is null', () => {
+    component.emailAddress = null;
+    expect(component.validateEmailAddress()).toBeFalse();
   });
 
   it('should return true if not processing subscription and email address is invalid', () => {
@@ -170,6 +175,43 @@ describe('OppiaFooterComponent', () => {
     fixture.detectChanges();
 
     expect(component.emailDuplicated).toBeFalse();
+  }));
+
+  it('should not subscribe when email is invalid', () => {
+    component.emailAddress = 'invalidEmail';
+    spyOn(mailingListBackendApiService, 'subscribeUserToMailingList');
+
+    component.subscribeToMailingList();
+
+    expect(component.newsletterTouched).toBeTrue();
+    expect(
+      mailingListBackendApiService.subscribeUserToMailingList
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should subscribe with null name when name is not provided', fakeAsync(() => {
+    component.emailAddress = 'valid@example.com';
+    component.name = null;
+    spyOn(alertsService, 'addInfoMessage');
+    spyOn(
+      mailingListBackendApiService,
+      'subscribeUserToMailingList'
+    ).and.returnValue(Promise.resolve(true));
+
+    component.subscribeToMailingList();
+
+    expect(component.subscriptionProcessing).toBeTrue();
+
+    flushMicrotasks();
+
+    expect(
+      mailingListBackendApiService.subscribeUserToMailingList
+    ).toHaveBeenCalledWith(
+      'valid@example.com',
+      null,
+      AppConstants.MAILING_LIST_WEB_TAG
+    );
+    expect(component.subscriptionProcessing).toBeFalse();
   }));
 
   it('should add user to mailing list and return status', fakeAsync(() => {
@@ -283,30 +325,23 @@ describe('OppiaFooterComponent', () => {
     expect(component.subscriptionProcessing).toBeFalse();
     expect(component.emailDuplicated).toBeTrue();
   }));
-
   it('should register About footer link click event', () => {
     spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-    component.navigateToAboutPage();
+    component.onAboutLinkClick();
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
-
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   });
 
   it('should register Teach footer link click event', () => {
     spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-    component.navigateToTeachPage();
+    component.onTeachLinkClick();
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
-
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });
 });

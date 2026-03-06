@@ -1004,6 +1004,11 @@ var ExplorationEditorMainTab = function () {
   // fail.
   this.moveToState = async function (targetName) {
     await action.waitForAutosave();
+    // Browser.pause() is needed here because scrollToBottom Animation takes 3 seconds to
+    // complete after user answers the question the state graph is not visible,
+    // as the page is still scrolling to bottom.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(3000);
     await general.scrollToTop();
     var stateNodes = explorationGraph.$$('.e2e-test-node');
     var listOfNames = await stateNodes.map(async function (stateElement) {

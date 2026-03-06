@@ -30,7 +30,13 @@ describe('Interested Donor', function () {
   });
 
   it('should be able to find the donate page', async function () {
+    await interestedDonor.clickDonateButtonInGetInvolvedMenuOnNavbar();
+    await interestedDonor.isDonorBoxVisbleOnDonatePage();
+    await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);
+
+    await interestedDonor.navigateToSplashPage();
     await interestedDonor.clickDonateButtonOnNavbar();
+    await interestedDonor.isDonorBoxVisbleOnDonatePage();
     await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);
 
     await interestedDonor.expectDonationPageHeadingToBe(' Our Impact ');
@@ -40,6 +46,12 @@ describe('Interested Donor', function () {
     await interestedDonor.expectReadyToMakeAnImpactToBePresent();
 
     await interestedDonor.isDonorBoxVisbleOnDonatePage();
+
+    // Here we assume that the user has successfully donated. Successful donation
+    // redirects the user to the "Thanks for donating" page in the Oppia website.
+    await interestedDonor.navigateToDonationThanksModalOnDonatePage();
+    // Dismissing the "Thanks for donating" page by clicking on the dismiss button.
+    await interestedDonor.dismissDonationThanksModalOnDonatePage();
   });
 
   afterAll(async function () {

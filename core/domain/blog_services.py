@@ -509,6 +509,11 @@ def publish_blog_post(blog_post_id: str) -> None:
     blog_post.validate(strict=True)
     blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
     blog_post_summary.validate(strict=True)
+    author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+        blog_post.author_id
+    )
+    if author_model is None:
+        create_blog_author_details_model(blog_post.author_id)
 
     if not blog_post_rights.blog_post_is_published:
         blog_post_rights.blog_post_is_published = True
@@ -806,6 +811,10 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
     Returns:
         BlogPost. A newly created blog post domain object .
     """
+    author_model = blog_models.BlogAuthorDetailsModel.get_by_author(author_id)
+    if author_model is None:
+        create_blog_author_details_model(author_id)
+
     blog_post_id = get_new_blog_post_id()
     new_blog_post_model = blog_models.BlogPostModel.create(
         blog_post_id, author_id
@@ -925,15 +934,26 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
         blog_post_ids: list(str). List of ids of the blog post summaries to be
             indexed.
     """
+
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
-    if len(blog_post_summaries) > 0:
-        search_services.index_blog_post_summaries(
-            [
-                blog_post_summary
-                for blog_post_summary in blog_post_summaries
-                if blog_post_summary is not None
-            ]
-        )
+    blog_post_models = blog_models.BlogPostModel.get_multi(blog_post_ids)
+    blog_post_content_id_to_content_map = {}
+    for model in blog_post_models:
+        if model:
+            blog_post_content_id_to_content_map[model.id] = (
+                html_cleaner.strip_html_tags(model.content)
+            )
+    valid_summaries = []
+    for summary in blog_post_summaries:
+        if summary is not None:
+            if summary.id in blog_post_content_id_to_content_map:
+                summary.summary = blog_post_content_id_to_content_map[
+                    summary.id
+                ]
+
+            valid_summaries.append(summary)
+    if len(valid_summaries) > 0:
+        search_services.index_blog_post_summaries(valid_summaries)
 
 
 def get_blog_post_ids_matching_query(
@@ -1019,37 +1039,56 @@ def create_blog_author_details_model(user_id: str) -> None:
 
     Args:
         user_id: str. The user ID of the blog author.
+
+    Raises:
+        Exception. Unable to fetch user details for the given user ID.
     """
     user_settings = user_services.get_user_settings(user_id, strict=True)
-    # Adding an if statement for mypy type checks to pass.
-    if user_settings.username:
-        blog_models.BlogAuthorDetailsModel.create(
-            user_id, user_settings.username, user_settings.user_bio
-        )
+
+    if user_settings is None or user_settings.username is None:
+        raise Exception('Unable to fetch user details for the given user')
+
+    blog_models.BlogAuthorDetailsModel.create(
+        user_id, user_settings.username, user_settings.user_bio
+    )
 
 
-def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
-    """Returns the blog author details for the given user id. If
-    blogAuthorDetailsModel is not present, a new model with default values is
-    created.
+def get_blog_author_details(
+    user_id: str, strict: bool = True
+) -> blog_domain.BlogAuthorDetails:
+    """Returns the blog author details for the given user id.
+
+    This is a pure getter function that does not create missing models.
+    BlogAuthorDetailsModel should be created when a blog post is first
+    created or when author details are updated.
 
     Args:
         user_id: str. The user id of the blog author.
+        strict: bool. Whether to raise an exception if the author details
+            are not found. When False, returns a default BlogAuthorDetails
+            with placeholder values instead.
 
     Returns:
         BlogAuthorDetails. The blog author details for the given user ID.
+        When strict is False and no model is found, a default
+        BlogAuthorDetails with placeholder values is returned.
 
     Raises:
-        Exception. Unable to fetch blog author details for the given user ID.
+        Exception. No BlogAuthorDetailsModel found for the given user ID
+            (only when strict is True).
     """
     author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
 
     if author_model is None:
-        create_blog_author_details_model(user_id)
-        author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
-
-    if author_model is None:
-        raise Exception('Unable to fetch author details for the given user.')
+        if strict:
+            raise Exception(
+                'No BlogAuthorDetailsModel found for user_id=%s. '
+                'This may indicate the author\'s account was deleted '
+                'or the model was never created.' % user_id
+            )
+        return blog_domain.BlogAuthorDetails.create_default_author_details_for_user(
+            user_id
+        )
 
     return blog_domain.BlogAuthorDetails(
         author_model.id,
@@ -1069,6 +1108,9 @@ def update_blog_author_details(
         user_id: str. The user id of the blog author.
         displayed_author_name: str. The publicly viewable name of the author.
         author_bio: str. The bio of the blog author.
+
+    Raises:
+        Exception. Unable to fetch blog author details for the given user ID.
     """
     blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
         user_id
@@ -1077,9 +1119,17 @@ def update_blog_author_details(
         displayed_author_name
     )
 
-    # Adding an if statement for mypy type checks to pass.
-    if blog_author_model:
-        blog_author_model.displayed_author_name = displayed_author_name
-        blog_author_model.author_bio = author_bio
-        blog_author_model.update_timestamps()
-        blog_author_model.put()
+    if blog_author_model is None:
+        create_blog_author_details_model(user_id)
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            user_id
+        )
+        if blog_author_model is None:
+            raise Exception(
+                'Unable to fetch author details for the given user.'
+            )
+
+    blog_author_model.displayed_author_name = displayed_author_name
+    blog_author_model.author_bio = author_bio
+    blog_author_model.update_timestamps()
+    blog_author_model.put()

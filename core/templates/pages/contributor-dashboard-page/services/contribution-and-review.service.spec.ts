@@ -966,6 +966,8 @@ describe('Contribution and review service', () => {
     const payload = {
       skill_difficulty: 'easy',
       question_state_data: questionStateData,
+      next_content_id_index: 10,
+      inapplicable_skill_misconception_ids: ['skillid-1'],
     };
 
     const imagesData = [
@@ -1004,6 +1006,7 @@ describe('Contribution and review service', () => {
           2,
           questionStateData,
           10,
+          ['skillid-1'],
           imagesData,
           onSuccess,
           onFailure
@@ -1032,6 +1035,7 @@ describe('Contribution and review service', () => {
           2,
           questionStateData,
           10,
+          ['skillid-1'],
           imagesData,
           onSuccess,
           onFailure

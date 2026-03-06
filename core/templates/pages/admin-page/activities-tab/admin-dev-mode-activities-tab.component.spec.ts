@@ -85,10 +85,10 @@ describe('Admin dev mode activities tab', () => {
   beforeEach(async(() => {
     fixture = TestBed.createComponent(AdminDevModeActivitiesTabComponent);
     component = fixture.componentInstance;
-    adminBackendApiService = TestBed.get(AdminBackendApiService);
-    adminDataService = TestBed.get(AdminDataService);
-    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
-    windowRef = TestBed.get(WindowRef);
+    adminBackendApiService = TestBed.inject(AdminBackendApiService);
+    adminDataService = TestBed.inject(AdminDataService);
+    adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
+    windowRef = TestBed.inject(WindowRef);
 
     spyOn(adminDataService, 'getDataAsync').and.resolveTo(adminDataObject);
 

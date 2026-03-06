@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right oppia-collection-editor-navbar">
+<ul class="nav navbar-nav oppia-navbar-nav float-end oppia-collection-editor-navbar">
   <!-- Editor -->
   <li [ngClass]="{'active': getActiveTabName() === 'edit', 'open': editButtonHovering && getWarningsCount()}"
       ngbDropdown
@@ -76,7 +76,7 @@
   </li>
 </ul>
 
-<ul class="nav navbar-nav oppia-navbar-nav float-right" *ngIf="!isLoadingCollection()">
+<ul class="nav navbar-nav oppia-navbar-nav float-end" *ngIf="!isLoadingCollection()">
   <li class="oppia-button-container">
     <button class="btn btn-secondary oppia-save-draft-button e2e-test-save-draft-button"
             [ngClass]="{'btn-success': isCollectionSaveable()}"
@@ -88,7 +88,7 @@
              alt="Save Collection">
           </i>
           <span class="oppia-save-publish-button-label">Save Draft</span>
-          <span class="d-none d-md-block float-left oppia-change-count"
+          <span class="d-none d-md-block float-start oppia-change-count"
                 *ngIf="getChangeListCount() > 0">
             ({{ getChangeListCount() }})
           </span>

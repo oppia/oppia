@@ -2008,12 +2008,13 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
         topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.owner_id, topic)
 
-        # Unpublished topics should not be returned.
+        # Unpublished topics should be translatable.
         response = self.get_json('/gettranslatabletopicnames')
-        self.assertEqual(len(response['topic_names']), 0)
+        self.assertEqual(response, {'topic_names': ['topic']})
 
         topic_services.publish_topic(topic_id, self.admin_id)
 
+        # Published topics should be translatable.
         response = self.get_json('/gettranslatabletopicnames')
         self.assertEqual(response, {'topic_names': ['topic']})
 
@@ -2037,7 +2038,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
         self.assertEqual(response, {'topic_names_per_classroom': []})
 
-    def test_no_topic_name_should_be_returned_when_topic_is_not_published(
+    def test_topic_name_should_be_returned_when_topic_is_not_published(
         self,
     ) -> None:
         # Create a topic.
@@ -2074,7 +2075,14 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
         )
 
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
-        self.assertEqual(response, {'topic_names_per_classroom': []})
+        self.assertEqual(
+            response,
+            {
+                'topic_names_per_classroom': [
+                    {'classroom': 'Class 1', 'topics': ['topic 1']}
+                ]
+            },
+        )
 
     def test_topic_name_should_be_returned_when_topic_is_published(
         self,

@@ -868,11 +868,15 @@ class AdminHandler(
 
         blog_post = blog_services.create_new_blog_post(self.user_id)
         fs = fs_services.GcsFileSystem('blog_post', blog_post.id)
-        with open('./assets/images/general/learner1.png', 'rb') as thumbnail:
+        with open(
+            './assets/images/general/learner1.png', 'rb', encoding=None
+        ) as thumbnail:
             fs.commit(
                 'thumbnail/blog_thumbnail.png', thumbnail.read(), 'image/png'
             )
-        with open('./assets/images/subjects/Art.svg', 'rb') as image:
+        with open(
+            './assets/images/subjects/Art.svg', 'rb', encoding=None
+        ) as image:
             fs.commit(
                 'image/blog_post_image_height_326_width_490.svg',
                 image.read(),
@@ -1336,16 +1340,16 @@ class AdminHandler(
             question_id_2 = 'dummyQuestionId2'
             question_id_3 = 'dummyQuestionId3'
 
-            initial_dummy_opportunites_generation = (
-                skill_services.does_skill_with_description_exist(
-                    'Dummy Skill 1'
-                )
-                is False
+            existing_skill = skill_fetchers.get_skill_by_id(
+                skill_id, strict=False
             )
+            initial_dummy_opportunites_generation = existing_skill is None
 
             if initial_dummy_opportunites_generation:
                 skill = self._create_dummy_skill(
-                    skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>'
+                    skill_id,
+                    'Translation Opportunities Dummy Skill',
+                    '<p>Dummy Explanation for Translation Opportunities</p>',
                 )
                 question_1 = self._create_dummy_question(
                     question_id_1, 'Question 1', [skill_id]
@@ -1358,10 +1362,10 @@ class AdminHandler(
                 )
                 story = story_domain.Story.create_default_story(
                     story_id,
-                    'Dummy Story',
-                    'Description',
+                    'Translation Opportunities Dummy Story',
+                    'Dummy story for translation opportunities',
                     topic_id,
-                    'dummy-story',
+                    'translation-dummy-story',
                 )
 
                 question_services.add_question(self.user_id, question_1)
@@ -1379,9 +1383,9 @@ class AdminHandler(
                 )
                 topic = topic_domain.Topic.create_default_topic(
                     topic_id,
-                    'Dummy Topic 1',
-                    'dummy-topic-one',
-                    'description',
+                    'Translation Opportunities Dummy Topic',
+                    'trans-dummy-topic',
+                    'Dummy topic for translation opportunities',
                     'fragm',
                 )
                 topic.update_meta_tag_content('dummy-meta')
@@ -1911,7 +1915,9 @@ class AdminHandler(
             )
 
             banner_image = b''
-            with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+            with open(
+                'core/tests/data/classroom-banner.png', 'rb', encoding=None
+            ) as png_file:
                 banner_image = png_file.read()
             fs_services.save_original_and_compressed_versions_of_image(
                 'banner.png',
@@ -2225,14 +2231,14 @@ class AdminHandler(
                 'thumbnail',
                 False,
             )
-
+            new_node_ids = []
             for i, exp_id in enumerate(exp_ids_to_publish):
                 suffix = i + 1
                 node_index = int(story.story_contents.next_node_id[5:]) + i
                 suffix = node_index
                 node_id = f'{story_domain.NODE_ID_PREFIX}{node_index}'
                 chapter_title = f'dummy chapter {suffix}'
-
+                new_node_ids.append(node_id)
                 story_change_list = [
                     story_domain.StoryChange(
                         {
@@ -2282,6 +2288,63 @@ class AdminHandler(
                     'add node',
                     story.corresponding_topic_id,
                 )
+
+            # Link the generated nodes and old nodes if they exist.
+            graph_change_list = []
+            old_dest_ids: List[str] = []
+            updated_story = story_fetchers.get_story_by_id('story_id')
+            existing_node_ids = [
+                node.id
+                for node in updated_story.story_contents.nodes
+                if node.id not in new_node_ids
+            ]
+            existing_node_ids.sort(key=lambda x: int(x.replace('node_', '')))
+
+            last_existing_node_id = None
+            if existing_node_ids:
+                last_existing_node_id = existing_node_ids[-1]
+            if last_existing_node_id and new_node_ids:
+                graph_change_list.append(
+                    story_domain.StoryChange(
+                        {
+                            'cmd': 'update_story_node_property',
+                            'property_name': story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
+                            'new_value': [new_node_ids[0]],
+                            'node_id': last_existing_node_id,
+                            'old_value': old_dest_ids,
+                        }
+                    )
+                )
+            # Link the new nodes among themselves.
+            for i, node_id in enumerate(new_node_ids):
+                if i < len(new_node_ids) - 1:
+                    next_node_id = new_node_ids[i + 1]
+                    graph_change_list.append(
+                        story_domain.StoryChange(
+                            {
+                                'cmd': 'update_story_node_property',
+                                'property_name': story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
+                                'new_value': [next_node_id],
+                                'node_id': node_id,
+                                'old_value': old_dest_ids,
+                            }
+                        )
+                    )
+
+            if graph_change_list:
+                topic_services.update_story_and_topic_summary(
+                    self.user_id,
+                    story_id,
+                    graph_change_list,
+                    'add node links',
+                    story.corresponding_topic_id,
+                )
+
+            # Ensure the story is published at the end of chapter generation.
+            story = story_fetchers.get_story_by_id(story_id)
+            topic_services.publish_story(
+                story.corresponding_topic_id, story_id, str(self.user_id)
+            )
         else:
             raise Exception('Cannot generate dummy chapters in production.')
 
@@ -2947,16 +3010,8 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        server_can_send_emails = (
-            parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if server_can_send_emails:
-            email_manager.send_dummy_mail_to_admin(username)
-            self.render_json({})
-        else:
-            raise self.InvalidInputException('This app cannot send emails.')
+        email_manager.send_dummy_mail_to_admin(username)
+        self.render_json({})
 
 
 class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):
@@ -3258,6 +3313,91 @@ class RegenerateTopicSummariesHandler(
             topic_services.generate_topic_summary(topic.id)
 
         self.render_json({})
+
+
+class GenerateStudyGuideModelsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to generate study guide models for all subtopic pages."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+    @acl_decorators.can_access_admin_page
+    def post(self) -> None:
+        """Generates study guide models for all subtopic pages."""
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'),
+        )
+
+        for topic in topics:
+            study_guide_services.generate_study_guide_models(
+                topic.id, topic.subtopics
+            )
+
+        self.render_json({})
+
+
+class DeleteStudyGuideModelsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to delete all study guide models."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
+
+    @acl_decorators.can_access_admin_page
+    def delete(self) -> None:
+        """Deletes all study guide models."""
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'),
+        )
+
+        for topic in topics:
+            study_guide_services.delete_study_guide_models(
+                topic.id, topic.subtopics
+            )
+
+        self.render_json({})
+
+
+class VerifyStudyGuideModelsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to verify all study guide models have the correct
+    corresponding snapshot and commitlog models."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_admin_page
+    def get(self) -> None:
+        """Verifies all study guide models have the correct snapshot and
+        commitlog models.
+        """
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'),
+        )
+
+        issues = []
+        for topic in topics:
+            issues.append(
+                study_guide_services.verify_study_guide_models(
+                    topic.id, topic.subtopics
+                )
+            )
+
+        self.render_json({'issues': issues})
 
 
 class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):

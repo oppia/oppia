@@ -571,6 +571,12 @@ li.oppia-volunteer-page-description-list-item {
   }
 }
 
+@media screen and (max-width: 600px) {
+  .oppia-volunteer-banner-content {
+    display: block;
+  }
+}
+
 @media screen and (max-width: 440px) {
   .oppia-volunteer-banner {
     padding: 56px 0;

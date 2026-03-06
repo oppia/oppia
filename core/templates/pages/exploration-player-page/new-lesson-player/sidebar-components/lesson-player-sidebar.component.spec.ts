@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
@@ -40,15 +40,11 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {PageContextService} from '../../../../services/page-context.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {LearnerLocalNavBackendApiService} from '../../../../pages/exploration-player-page/services/learner-local-nav-backend-api.service';
-import {AlertsService} from '../../../../services/alerts.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {ShareLessonModalComponent} from './share-lesson-modal.component';
 import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
-import {CustomizableThankYouModalComponent} from './customizable-thank-you-modal.component';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
-import {of} from 'rxjs';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -68,8 +64,6 @@ describe('LessonPlayerSidebarComponent', () => {
   let mockNgbModal: jasmine.SpyObj<NgbModal>;
   let mockBottomSheet: jasmine.SpyObj<MatBottomSheet>;
   let conversationFlowService: ConversationFlowService;
-  let mockLearnerLocalNavBackendApiService: jasmine.SpyObj<LearnerLocalNavBackendApiService>;
-  let mockAlertsService: jasmine.SpyObj<AlertsService>;
   let mockWindowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
   let visibilitySubject: BehaviorSubject<boolean>;
 
@@ -78,17 +72,14 @@ describe('LessonPlayerSidebarComponent', () => {
     mockMobileMenuService = {
       getMenuVisibility: () => visibilitySubject.asObservable(),
       toggleMenuVisibility: jasmine.createSpy('toggleMenuVisibility'),
+      toggleSidebar: jasmine.createSpy('toggleSidebar'),
+      getSidebarIsExpanded: jasmine
+        .createSpy('getSidebarIsExpanded')
+        .and.returnValue(true),
     };
 
     const ngbModalSpy = jasmine.createSpyObj('NgbModal', ['open']);
     const bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
-    const learnerLocalNavSpy = jasmine.createSpyObj(
-      'LearnerLocalNavBackendApiService',
-      ['postReportAsync']
-    );
-    const alertsServiceSpy = jasmine.createSpyObj('AlertsService', [
-      'addWarning',
-    ]);
     const windowDimensionsServiceSpy = jasmine.createSpyObj(
       'WindowDimensionsService',
       ['getWidth']
@@ -124,14 +115,6 @@ describe('LessonPlayerSidebarComponent', () => {
           useValue: bottomSheetSpy,
         },
         {
-          provide: LearnerLocalNavBackendApiService,
-          useValue: learnerLocalNavSpy,
-        },
-        {
-          provide: AlertsService,
-          useValue: alertsServiceSpy,
-        },
-        {
           provide: WindowDimensionsService,
           useValue: windowDimensionsServiceSpy,
         },
@@ -154,12 +137,6 @@ describe('LessonPlayerSidebarComponent', () => {
     mockBottomSheet = TestBed.inject(
       MatBottomSheet
     ) as jasmine.SpyObj<MatBottomSheet>;
-    mockLearnerLocalNavBackendApiService = TestBed.inject(
-      LearnerLocalNavBackendApiService
-    ) as jasmine.SpyObj<LearnerLocalNavBackendApiService>;
-    mockAlertsService = TestBed.inject(
-      AlertsService
-    ) as jasmine.SpyObj<AlertsService>;
     mockWindowDimensionsService = TestBed.inject(
       WindowDimensionsService
     ) as jasmine.SpyObj<WindowDimensionsService>;
@@ -204,6 +181,16 @@ describe('LessonPlayerSidebarComponent', () => {
     expect(component.explorationTitle).toBe(explorationTitle);
   }));
 
+  it('should toggle sidebar and update sidebarIsExpanded', () => {
+    expect(component.sidebarIsExpanded).toBe(false);
+    component.toggleSidebar();
+
+    expect(mockMobileMenuService.toggleSidebar).toHaveBeenCalled();
+    expect(mockMobileMenuService.getSidebarIsExpanded).toHaveBeenCalled();
+
+    expect(component.sidebarIsExpanded).toBe(true);
+  });
+
   it('should handle mobile menu visibility changes', () => {
     component.ngOnInit();
     expect(component.mobileMenuVisible).toBe(false);
@@ -213,14 +200,6 @@ describe('LessonPlayerSidebarComponent', () => {
 
     visibilitySubject.next(false);
     expect(component.mobileMenuVisible).toBe(false);
-  });
-
-  it('should toggle sidebar', () => {
-    component.sidebarIsExpanded = false;
-    component.toggleSidebar();
-    expect(component.sidebarIsExpanded).toBe(true);
-    component.toggleSidebar();
-    expect(component.sidebarIsExpanded).toBe(false);
   });
 
   it('should check if hacky exp desc translation is displayed', () => {
@@ -293,89 +272,27 @@ describe('LessonPlayerSidebarComponent', () => {
     expect(result).toBe(mockModalRef);
   });
 
-  it('should show flag exploration modal on mobile with successful report', fakeAsync(() => {
+  it('should show flag exploration modal on mobile', () => {
     mockWindowDimensionsService.getWidth.and.returnValue(400);
     const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
       'afterDismissed',
     ]);
-    const mockResult = {reportType: 'spam'};
-    mockBottomSheetRef.afterDismissed.and.returnValue(of(mockResult));
     mockBottomSheet.open.and.returnValue(mockBottomSheetRef);
-    mockLearnerLocalNavBackendApiService.postReportAsync.and.returnValue(
-      Promise.resolve()
-    );
-    spyOn(component, 'showThankYouModal');
-    component.explorationId = 'testId';
 
     const result = component.showFlagExplorationModal();
-    tick();
 
     expect(mockBottomSheet.open).toHaveBeenCalledWith(
       NewFlagExplorationModalComponent
     );
-    expect(
-      mockLearnerLocalNavBackendApiService.postReportAsync
-    ).toHaveBeenCalledWith('testId', mockResult);
-    expect(component.showThankYouModal).toHaveBeenCalledWith(
-      'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY'
-    );
     expect(result).toBe(mockBottomSheetRef);
-  }));
-
-  it('should show flag exploration modal on mobile with error', fakeAsync(() => {
-    mockWindowDimensionsService.getWidth.and.returnValue(400);
-    const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
-      'afterDismissed',
-    ]);
-    const mockResult = {reportType: 'spam'};
-    const errorMessage = 'Error occurred';
-    mockBottomSheetRef.afterDismissed.and.returnValue(of(mockResult));
-    mockBottomSheet.open.and.returnValue(mockBottomSheetRef);
-    mockLearnerLocalNavBackendApiService.postReportAsync.and.returnValue(
-      Promise.reject(errorMessage)
-    );
-    component.explorationId = 'testId';
-
-    component.showFlagExplorationModal();
-    tick();
-
-    expect(mockAlertsService.addWarning).toHaveBeenCalledWith(errorMessage);
-  }));
-
-  it('should get is user logged in', () => {
-    spyOn(conversationFlowService, 'getIsLoggedIn').and.returnValue(true);
-    expect(component.isUserLoggedIn()).toBeTrue();
   });
 
-  it('should show flag exploration modal on mobile with no result', () => {
-    mockWindowDimensionsService.getWidth.and.returnValue(400);
-    const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
-      'afterDismissed',
-    ]);
-    mockBottomSheetRef.afterDismissed.and.returnValue(of(null));
-    mockBottomSheet.open.and.returnValue(mockBottomSheetRef);
-
-    component.showFlagExplorationModal();
-
-    expect(
-      mockLearnerLocalNavBackendApiService.postReportAsync
-    ).not.toHaveBeenCalled();
-  });
-
-  it('should show flag exploration modal on desktop with successful report', fakeAsync(() => {
+  it('should show flag exploration modal on desktop', () => {
     mockWindowDimensionsService.getWidth.and.returnValue(800);
     const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['result']);
-    const mockResult = {reportType: 'spam'};
-    mockModalRef.result = Promise.resolve(mockResult);
     mockNgbModal.open.and.returnValue(mockModalRef);
-    mockLearnerLocalNavBackendApiService.postReportAsync.and.returnValue(
-      Promise.resolve()
-    );
-    spyOn(component, 'showThankYouModal');
-    component.explorationId = 'testId';
 
     const result = component.showFlagExplorationModal();
-    tick();
 
     expect(mockNgbModal.open).toHaveBeenCalledWith(
       NewFlagExplorationModalComponent,
@@ -383,158 +300,36 @@ describe('LessonPlayerSidebarComponent', () => {
         backdrop: 'static',
       }
     );
-    expect(
-      mockLearnerLocalNavBackendApiService.postReportAsync
-    ).toHaveBeenCalledWith('testId', mockResult);
-    expect(component.showThankYouModal).toHaveBeenCalledWith(
-      'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY'
-    );
     expect(result).toBe(mockModalRef);
-  }));
-
-  it('should show flag exploration modal on desktop with error', fakeAsync(() => {
-    mockWindowDimensionsService.getWidth.and.returnValue(800);
-    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['result']);
-    const mockResult = {reportType: 'spam'};
-    const errorMessage = 'Error occurred';
-    mockModalRef.result = Promise.resolve(mockResult);
-    mockNgbModal.open.and.returnValue(mockModalRef);
-    mockLearnerLocalNavBackendApiService.postReportAsync.and.returnValue(
-      Promise.reject(errorMessage)
-    );
-    spyOn(component, 'showThankYouModal');
-    component.explorationId = 'testId';
-
-    component.showFlagExplorationModal();
-    tick();
-
-    expect(mockAlertsService.addWarning).toHaveBeenCalledWith(errorMessage);
-    expect(component.showThankYouModal).toHaveBeenCalledWith(
-      'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY'
-    );
-  }));
-
-  it('should show flag exploration modal on desktop with rejection', fakeAsync(() => {
-    mockWindowDimensionsService.getWidth.and.returnValue(800);
-    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['result']);
-    mockModalRef.result = Promise.reject('dismissed');
-    mockNgbModal.open.and.returnValue(mockModalRef);
-
-    component.showFlagExplorationModal();
-    tick();
-
-    expect(
-      mockLearnerLocalNavBackendApiService.postReportAsync
-    ).not.toHaveBeenCalled();
-  }));
+  });
 
   it('should show feedback modal on mobile', () => {
     mockWindowDimensionsService.getWidth.and.returnValue(400);
     const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
       'afterDismissed',
     ]);
-    mockBottomSheetRef.afterDismissed.and.returnValue(of('success'));
     mockBottomSheet.open.and.returnValue(mockBottomSheetRef);
-    spyOn(component, 'showThankYouModal');
 
     const result = component.showFeedbackModal();
 
     expect(mockBottomSheet.open).toHaveBeenCalledWith(
       LessonFeedbackModalComponent
     );
-    expect(component.showThankYouModal).toHaveBeenCalledWith(
-      'I18N_PLAYER_THANK_FEEDBACK'
-    );
     expect(result).toBe(mockBottomSheetRef);
   });
 
-  it('should show feedback modal on mobile with cancel', () => {
-    mockWindowDimensionsService.getWidth.and.returnValue(400);
-    const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
-      'afterDismissed',
-    ]);
-    mockBottomSheetRef.afterDismissed.and.returnValue(of('cancel'));
-    mockBottomSheet.open.and.returnValue(mockBottomSheetRef);
-    spyOn(component, 'showThankYouModal');
-
-    component.showFeedbackModal();
-
-    expect(component.showThankYouModal).not.toHaveBeenCalled();
-  });
-
-  it('should show feedback modal on desktop', fakeAsync(() => {
+  it('should show feedback modal on desktop', () => {
     mockWindowDimensionsService.getWidth.and.returnValue(800);
     const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['result']);
-    mockModalRef.result = Promise.resolve('success');
     mockNgbModal.open.and.returnValue(mockModalRef);
-    spyOn(component, 'showThankYouModal');
 
     const result = component.showFeedbackModal();
-    tick();
 
     expect(mockNgbModal.open).toHaveBeenCalledWith(
       LessonFeedbackModalComponent,
       {
         backdrop: 'static',
       }
-    );
-    expect(component.showThankYouModal).toHaveBeenCalledWith(
-      'I18N_PLAYER_THANK_FEEDBACK'
-    );
-    expect(result).toBe(mockModalRef);
-  }));
-
-  it('should show feedback modal on desktop with rejection', fakeAsync(() => {
-    mockWindowDimensionsService.getWidth.and.returnValue(800);
-    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['result']);
-    mockModalRef.result = Promise.reject('dismissed');
-    mockNgbModal.open.and.returnValue(mockModalRef);
-    spyOn(component, 'showThankYouModal');
-
-    component.showFeedbackModal();
-    tick();
-
-    expect(component.showThankYouModal).not.toHaveBeenCalled();
-  }));
-
-  it('should show thank you modal on mobile', () => {
-    mockWindowDimensionsService.getWidth.and.returnValue(400);
-    const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
-      'afterDismissed',
-    ]);
-    mockBottomSheet.open.and.returnValue(mockBottomSheetRef);
-
-    const result = component.showThankYouModal('TEST_I18N_KEY');
-
-    expect(mockBottomSheet.open).toHaveBeenCalledWith(
-      CustomizableThankYouModalComponent,
-      {
-        data: {
-          modalMessageI18nKey: 'TEST_I18N_KEY',
-        },
-      }
-    );
-    expect(result).toBe(mockBottomSheetRef);
-  });
-
-  it('should show thank you modal on desktop', () => {
-    mockWindowDimensionsService.getWidth.and.returnValue(800);
-    const mockModalRef = jasmine.createSpyObj('NgbModalRef', [
-      'componentInstance',
-    ]);
-    mockModalRef.componentInstance = {};
-    mockNgbModal.open.and.returnValue(mockModalRef);
-
-    const result = component.showThankYouModal('TEST_I18N_KEY');
-
-    expect(mockNgbModal.open).toHaveBeenCalledWith(
-      CustomizableThankYouModalComponent,
-      {
-        backdrop: true,
-      }
-    );
-    expect(mockModalRef.componentInstance.modalMessageI18nKey).toBe(
-      'TEST_I18N_KEY'
     );
     expect(result).toBe(mockModalRef);
   });
@@ -551,5 +346,10 @@ describe('LessonPlayerSidebarComponent', () => {
 
     mockWindowDimensionsService.getWidth.and.returnValue(479);
     expect(component.isMobileScreenSize()).toBe(true);
+  });
+
+  it('should get is user logged in', () => {
+    spyOn(conversationFlowService, 'getIsLoggedIn').and.returnValue(true);
+    expect(component.isUserLoggedIn()).toBeTrue();
   });
 });

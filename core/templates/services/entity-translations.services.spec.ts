@@ -21,10 +21,10 @@ import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 import {
   EntityTranslation,
   EntityTranslationBackendDict,
-} from 'domain/translation/EntityTranslationObjectFactory';
+} from 'domain/translation/entity-translation.model';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslationsService} from './entity-translations.services';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 
 describe('Entity translations service', () => {
   let entityTranslationsService: EntityTranslationsService;

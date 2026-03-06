@@ -37,7 +37,10 @@
 }
 
 .inner-container-alignment {
-  margin-bottom: 25px;
+  bottom: 60px;
+  left: 50%;
+  position: fixed;
+  transform: translateX(-50%);
 }
 .tick-symbol {
   font-size: 42px;

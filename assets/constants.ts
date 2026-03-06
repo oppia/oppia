@@ -96,6 +96,7 @@ export default {
   "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE": "subtopic_with_study_guide",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
+  "ACTIVITY_TYPE_QUESTIONS": "questions",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -130,6 +131,8 @@ export default {
     "DecreasingUpcomingLaunches": "Most Upcoming Launches",
     "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
   },
+
+  "MAX_QUESTIONS_FETCHABLE": 800,
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {
@@ -6265,6 +6268,7 @@ export default {
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
   "MAX_CHARS_IN_LEARNER_GROUP_TITLE": 36,
+  "MAX_CHARS_IN_LEARNER_GROUP_DESCRIPTION": 250,
   "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.

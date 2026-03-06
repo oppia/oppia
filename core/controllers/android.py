@@ -27,6 +27,8 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
+    question_domain,
+    question_fetchers,
     skill_domain,
     skill_fetchers,
     story_domain,
@@ -42,7 +44,11 @@ from core.domain import (
     voiceover_services,
 )
 
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, TypedDict, Union
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import translation_models
 
 
 class InitializeAndroidTestDataHandler(
@@ -88,7 +94,7 @@ class ActivityDataRequestDict(TypedDict):
 
     id: str
     version: Optional[int]
-    language_code: Optional[str]
+    language_code: str
 
 
 class _ActivityDataResponseDictRequiredFields(TypedDict):
@@ -108,7 +114,9 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
         study_guide_domain.StudyGuideDict,
         classroom_config_domain.ClassroomDict,
         topic_domain.TopicDict,
+        question_domain.QuestionDict,
         Dict[str, feconf.TranslatedContentDict],
+        Dict[str, List[str]],
         Dict[str, voiceover_domain.EntityVoiceoversDict],
         classroom_domain.ClassroomDict,
         None,
@@ -121,7 +129,7 @@ class ActivityDataResponseDict(
     """Dict representation of items returned in the activities response list."""
 
     version: Optional[int]
-    language_code: str
+    language_code: Optional[str]
 
 
 class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
@@ -131,6 +139,7 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
 
     activity_type: str
     activities_data: List[ActivityDataRequestDict]
+    offset: Optional[int]
 
 
 class AndroidActivityHandler(
@@ -159,11 +168,19 @@ class AndroidActivityHandler(
                         constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE,
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM,
+                        constants.ACTIVITY_TYPE_QUESTIONS,
                     ],
                 },
             },
             'activities_data': {
                 'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+            },
+            'offset': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
+                },
+                'default_value': None,
             },
         }
     }
@@ -178,7 +195,16 @@ class AndroidActivityHandler(
         assert self.normalized_request is not None
         activities_data = self.normalized_request['activities_data']
         activity_type = self.normalized_request['activity_type']
+        offset = self.normalized_request.get('offset')
         activities: List[ActivityDataResponseDict] = []
+
+        if (
+            activity_type != constants.ACTIVITY_TYPE_QUESTIONS
+            and offset is not None
+        ):
+            raise self.InvalidInputException(
+                'Offset should only be provided for fetching questions'
+            )
 
         hashed_activities_data = [
             tuple(sorted((k, v) for k, v in activity_data.items()))
@@ -190,22 +216,25 @@ class AndroidActivityHandler(
             )
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            for activity_data in activities_data:
-                exploration = exp_fetchers.get_exploration_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'),
+            ids_and_versions = [
+                (activity_data['id'], activity_data.get('version'))
+                for activity_data in activities_data
+            ]
+            fetched_explorations: Sequence[Optional[exp_domain.Exploration]] = (
+                exp_fetchers.get_multiple_explorations_by_ids_and_version(
+                    ids_and_versions
                 )
-
+            )
+            for activity_data, exploration in zip(
+                activities_data, fetched_explorations
+            ):
                 exploration_dict_for_android: Optional[
                     exp_domain.ExplorationDictForAndroid
-                ] = None
-                if exploration is not None:
-                    exploration_dict_for_android = (
-                        exp_services.to_exploration_dict_for_android(
-                            exploration
-                        )
-                    )
+                ] = (
+                    exp_services.to_exploration_dict_for_android(exploration)
+                    if exploration is not None
+                    else None
+                )
                 activities.append(
                     {
                         'id': activity_data['id'],
@@ -213,48 +242,33 @@ class AndroidActivityHandler(
                         'payload': exploration_dict_for_android,
                     }
                 )
-        elif activity_type == constants.ACTIVITY_TYPE_STORY:
-            for activity_data in activities_data:
-                story = story_fetchers.get_story_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'),
-                )
-                activities.append(
-                    {
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'payload': (
-                            story.to_dict() if story is not None else None
-                        ),
-                    }
-                )
-        elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-            for activity_data in activities_data:
-                skill = skill_fetchers.get_skill_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'),
-                )
-                activities.append(
-                    {
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'payload': (
-                            skill.to_dict() if skill is not None else None
-                        ),
-                    }
-                )
+
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-            for activity_data in activities_data:
-                topic_id, subtopic_page_id = activity_data['id'].split('-')
-                subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            # Subtopic pages require special handling because their IDs are
+            # compound keys (topic_id-subtopic_id) that need to be split and
+            # processed separately.
+            split_ids_and_versions = [
+                (activity_data['id'].split('-'), activity_data.get('version'))
+                for activity_data in activities_data
+            ]
+            topic_subtopic_version_tuples = [
+                (
                     topic_id,
-                    int(subtopic_page_id),
-                    strict=False,
-                    version=activity_data.get('version'),
+                    int(stringified_subtopic_index),
+                    subtopic_page_version,
                 )
-                activities.append(
+                for (
+                    (topic_id, stringified_subtopic_index),
+                    subtopic_page_version,
+                ) in split_ids_and_versions
+            ]
+            subtopic_pages = (
+                subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
+                    topic_subtopic_version_tuples
+                )
+            )
+            activities.extend(
+                [
                     {
                         'id': activity_data['id'],
                         'version': activity_data.get('version'),
@@ -264,7 +278,36 @@ class AndroidActivityHandler(
                             else None
                         ),
                     }
+                    for (activity_data, subtopic_page) in zip(
+                        activities_data, subtopic_pages
+                    )
+                ]
+            )
+
+        elif activity_type == constants.ACTIVITY_TYPE_QUESTIONS:
+            # Questions require special handling as they are fetched in bulk.
+            # With a fixed limit of questions per request,
+            # and an offset to paginate through the entire question set.
+            for activity_data in activities_data:
+                if activity_data.get('version') is not None:
+                    raise self.InvalidInputException(
+                        'Version cannot be specified when fetching questions'
+                    )
+
+            if offset is None:
+                raise self.InvalidInputException(
+                    'Offset required when fetching questions'
                 )
+
+            questions = question_fetchers.get_all_questions(offset=offset)
+
+            activities.extend(
+                [
+                    {'id': question.id, 'payload': question.to_dict()}
+                    for question in questions
+                ]
+            )
+
         elif activity_type == (
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
         ):
@@ -330,10 +373,16 @@ class AndroidActivityHandler(
                         ),
                     }
                 )
+
         elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
+            # Translations require both version and language code, and use a
+            # different payload structure than other activities.
             entity_type = feconf.TranslatableEntityType(
                 feconf.ENTITY_TYPE_EXPLORATION
             )
+            translation_references: List[
+                translation_models.EntityTranslationReferenceDict
+            ] = []
             for activity_data in activities_data:
                 version = activity_data.get('version')
                 language_code = activity_data.get('language_code')
@@ -342,21 +391,42 @@ class AndroidActivityHandler(
                         'Version and language code must be specified '
                         'for translation'
                     )
-                translation = translation_fetchers.get_entity_translation(
-                    entity_type, activity_data['id'], version, language_code
+
+                translation_references.append(
+                    {
+                        'entity_type': entity_type,
+                        'entity_id': activity_data['id'],
+                        'entity_version': version,
+                        'language_code': language_code,
+                    }
                 )
-                activities.append(
+
+            translations = (
+                translation_fetchers.get_multiple_entity_translations(
+                    translation_references
+                )
+            )
+
+            activities.extend(
+                [
                     {
                         'id': activity_data['id'],
-                        'version': version,
-                        'language_code': language_code,
+                        'version': activity_data.get('version'),
+                        'language_code': activity_data.get('language_code'),
                         'payload': (
                             translation.to_dict()['translations']
                             if translation is not None
-                            else None
+                            else {}
                         ),
                     }
-                )
+                    for activity_data, translation in zip(
+                        activities_data, translations
+                    )
+                ]
+            )
+            self.render_json(activities)
+            return
+
         elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS:
             for activity_data in activities_data:
                 version = activity_data.get('version')
@@ -390,20 +460,151 @@ class AndroidActivityHandler(
                     }
                 )
         else:
-            for activity_data in activities_data:
-                topic = topic_fetchers.get_topic_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'),
+            # All other activities are standard versioned models
+            # that can be fetched in bulk using their
+            # respective get_multiple_*_by_ids_and_version
+            # methods.
+            ids_and_versions = [
+                (activity_data['id'], activity_data.get('version'))
+                for activity_data in activities_data
+            ]
+
+            fetched_entities: Sequence[
+                Optional[
+                    Union[
+                        story_domain.Story,
+                        skill_domain.Skill,
+                        question_domain.Question,
+                        topic_domain.Topic,
+                    ]
+                ]
+            ] = []
+
+            if activity_type == constants.ACTIVITY_TYPE_STORY:
+                fetched_entities = (
+                    story_fetchers.get_multiple_stories_by_ids_and_version(
+                        ids_and_versions
+                    )
                 )
-                activities.append(
-                    {
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'payload': (
-                            topic.to_dict() if topic is not None else None
-                        ),
-                    }
+            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+                fetched_entities = (
+                    skill_fetchers.get_multiple_skills_by_ids_and_version(
+                        ids_and_versions
+                    )
+                )
+            else:
+                fetched_entities = (
+                    topic_fetchers.get_multiple_topics_by_ids_and_version(
+                        ids_and_versions
+                    )
                 )
 
+            for activity_data, entity in zip(activities_data, fetched_entities):
+                response_dict: ActivityDataResponseDict = {
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'payload': entity.to_dict() if entity is not None else None,
+                }
+                activities.append(response_dict)
+
         self.render_json(activities)
+
+
+class AndroidPlatformParametersHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler that returns Android platform parameters for testing."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'android_min_version_code_for_recommending_app_update': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_version_code': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_api_level': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns platform parameters as a JSON array of objects.
+
+        This is a temporary implementation that allows query parameters to override
+        defaults. Schema validation ensures that invalid parameter values result in
+        a 400 error response.
+
+        Each list item has:
+            - name (str): the parameter name.
+            - value (int): the resolved parameter value.
+
+        Query parameters may override defaults.
+        """
+        assert self.normalized_request is not None
+
+        defaults = {
+            'android_min_version_code_for_recommending_app_update': 0,
+            'android_min_supported_version_code': 0,
+            'android_min_supported_api_level': 21,
+        }
+
+        result = []
+        for name, default_value in defaults.items():
+            override = self.normalized_request.get(name)
+            value = override if override is not None else default_value
+            result.append({'name': name, 'value': value})
+
+        self.render_json(result)
+
+
+class AndroidFeatureFlagsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler that returns Android feature flags for testing."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'android_enable_fast_language_switching_in_lesson': {
+                'schema': {'type': 'bool'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns Android feature flags as a JSON list of objects.
+
+        Each item in the returned list has the structure:
+            {
+                'name': str,       # The name of the feature flag.
+                'enabled': bool    # Whether the flag is enabled.
+            }
+
+        Query parameters may override the default values. Schema validation
+        ensures that each override is a valid boolean; invalid values result in
+        a 400 error.
+        """
+        assert self.normalized_request is not None
+
+        defaults = {
+            'android_enable_fast_language_switching_in_lesson': False,
+        }
+
+        result = []
+        for name, default_enabled in defaults.items():
+            override = self.normalized_request.get(name)
+            enabled = override if override is not None else default_enabled
+            result.append({'name': name, 'enabled': enabled})
+
+        self.render_json(result)
