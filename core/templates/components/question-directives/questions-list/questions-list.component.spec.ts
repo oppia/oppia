@@ -52,11 +52,11 @@ import {QuestionsListComponent} from './questions-list.component';
 
 class MockNgbModalRef {
   componentInstance = {
-    skillSummaries: null,
-    skillsInSameTopicCount: null,
-    categorizedSkills: null,
-    allowSkillsFromOtherTopics: null,
-    untriagedSkillSummaries: null,
+    skillSummaries: [],
+    skillsInSameTopicCount: 0,
+    categorizedSkills: {},
+    allowSkillsFromOtherTopics: false,
+    untriagedSkillSummaries: [],
   };
 }
 
@@ -161,7 +161,7 @@ describe('Questions List Component', () => {
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [],
-              training_data: null,
+              training_data: [],
               tagged_skill_misconception_id: null,
             },
           ],
@@ -179,8 +179,8 @@ describe('Questions List Component', () => {
             },
           },
           default_outcome: {
-            dest: null,
-            dest_if_really_stuck: null,
+            dest: '',
+            dest_if_really_stuck: '',
             feedback: {
               html: 'Correct Answer',
               content_id: 'content_2',
@@ -213,11 +213,12 @@ describe('Questions List Component', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
       },
-      inapplicable_skill_misconception_ids: null,
       language_code: 'en',
       linked_skill_ids: [],
       next_content_id_index: 5,
+      inapplicable_skill_misconception_ids: [],
       question_state_data_schema_version: 44,
       version: 45,
     });
@@ -249,9 +250,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null,
-      next_misconception_id: null,
-      superseding_skill_id: null,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
 
     component.selectedSkillId = 'skillId1';
@@ -327,8 +328,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.misconceptionIdsForSelectedSkill).toEqual(undefined);
-
+      expect(component.misconceptionIdsForSelectedSkill).toBeUndefined();
       component.ngOnInit();
       tick();
 
@@ -362,9 +362,9 @@ describe('Questions List Component', () => {
         language_code: 'en',
         version: 3,
         prerequisite_skill_ids: [],
-        all_questions_merged: null,
-        next_misconception_id: null,
-        superseding_skill_id: null,
+        all_questions_merged: false,
+        next_misconception_id: 0,
+        superseding_skill_id: '',
       });
 
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
@@ -375,7 +375,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.difficultyCount).toEqual(undefined);
+      expect(component.difficultyCount).toBeUndefined();
 
       component.ngOnInit();
       tick();
@@ -449,9 +449,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null,
-      next_misconception_id: null,
-      superseding_skill_id: null,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
     spyOn(skillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
       Promise.resolve([skill])
@@ -567,6 +567,10 @@ describe('Questions List Component', () => {
     'should not save and publish question if there are' + ' validation errors',
     () => {
       component.question = question;
+      if (!component.question) {
+        throw new Error('Question should be initialized in test.');
+      }
+
       spyOn(alertsService, 'addWarning');
       spyOn(
         questionValidationService,
@@ -588,6 +592,10 @@ describe('Questions List Component', () => {
       ' errors from question backend api service',
     fakeAsync(() => {
       component.question = question;
+      if (!component.question) {
+        throw new Error('Question should be initialized in test.');
+      }
+
       component.questionIsBeingUpdated = false;
       spyOn(
         editableQuestionBackendApiService,
@@ -612,21 +620,25 @@ describe('Questions List Component', () => {
       ' being updated',
     fakeAsync(() => {
       component.question = question;
+      if (!component.question) {
+        throw new Error('Question should be initialized in test.');
+      }
+
       component.questionIsBeingUpdated = false;
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null,
+          task: '',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
       ];
@@ -657,17 +669,17 @@ describe('Questions List Component', () => {
       ).toHaveBeenCalledWith('qId', [
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null,
+          task: '',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
       ]);
@@ -676,6 +688,10 @@ describe('Questions List Component', () => {
 
   it('should save question when another question is being updated', fakeAsync(() => {
     component.question = question;
+    if (!component.question) {
+      throw new Error('Question should be initialized in test.');
+    }
+
     component.questionIsBeingUpdated = true;
 
     spyOn(
@@ -710,6 +726,10 @@ describe('Questions List Component', () => {
       ' is being updated',
     fakeAsync(() => {
       component.question = question;
+      if (!component.question) {
+        throw new Error('Question should be initialized in test.');
+      }
+
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -747,6 +767,10 @@ describe('Questions List Component', () => {
       ' a question',
     fakeAsync(() => {
       component.question = question;
+      if (!component.question) {
+        throw new Error('Question should be initialized in test.');
+      }
+
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -772,7 +796,7 @@ describe('Questions List Component', () => {
     "should show 'confirm question modal exit' modal when user " +
       'clicks cancel',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt?: unknown) => {
         return {
           result: Promise.resolve(),
         } as NgbModalRef;
@@ -817,7 +841,7 @@ describe('Questions List Component', () => {
     "should close 'confirm question modal exit' modal when user clicks" +
       ' cancel',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt?: unknown) => {
         return {
           result: Promise.reject(),
         } as NgbModalRef;
@@ -874,12 +898,14 @@ describe('Questions List Component', () => {
       question_content: '',
     });
     let skillDescription = 'Skill Description';
-    let difficulty: 0.9;
+    let difficulty = 0.9;
 
     it('should return null if editor is already opened', () => {
       component.editorIsOpen = true;
 
-      expect(component.editQuestion(null, null, null)).toBe(undefined);
+      expect(component.editQuestion(questionSummaryForOneSkill, '', 0)).toBe(
+        undefined
+      );
     });
 
     it(
@@ -888,7 +914,7 @@ describe('Questions List Component', () => {
         component.canEditQuestion = false;
         spyOn(alertsService, 'addWarning');
 
-        component.editQuestion(null, null, null);
+        component.editQuestion(questionSummaryForOneSkill, '', 0);
 
         expect(alertsService.addWarning).toHaveBeenCalledWith(
           'User does not have enough rights to edit the question'
@@ -1005,7 +1031,7 @@ describe('Questions List Component', () => {
         'editQuestionSkillLinksAsync'
       ).and.returnValue(Promise.resolve());
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 0);
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
@@ -1037,7 +1063,7 @@ describe('Questions List Component', () => {
         'editQuestionSkillLinksAsync'
       ).and.returnValue(Promise.resolve());
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 0);
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
@@ -1069,7 +1095,7 @@ describe('Questions List Component', () => {
       ).and.returnValue(Promise.resolve());
       spyOn(component, 'removeQuestionSkillLinkAsync');
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 0);
       tick();
       expect(ngbModal.open).toHaveBeenCalled();
       expect(component.removeQuestionSkillLinkAsync).not.toHaveBeenCalled();
@@ -1085,7 +1111,7 @@ describe('Questions List Component', () => {
     ];
     spyOn(alertsService, 'addInfoMessage');
 
-    component.removeSkill(null);
+    component.removeSkill('1');
 
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'A question should be linked to at least one skill.'
@@ -1149,6 +1175,9 @@ describe('Questions List Component', () => {
 
   it('should show solution if interaction can have solution', () => {
     component.question = question;
+    if (!component.question) {
+      throw new Error('Question should be initialized in test.');
+    }
     spyOn(component.question, 'getStateData').and.returnValue({
       interaction: {
         id: 'TextInput',
@@ -1340,7 +1369,7 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
       ];
@@ -1383,12 +1412,12 @@ describe('Questions List Component', () => {
     component.skillLinkageModificationsArray = [
       {
         id: '1',
-        task: null,
+        task: '',
         difficulty: 1,
       },
       {
         id: '2',
-        task: null,
+        task: '',
         difficulty: 2,
       },
     ];

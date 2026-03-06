@@ -36,6 +36,7 @@ import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/servic
 import {PageContextService} from 'services/page-context.service';
 import {Schema} from 'services/schema-default-value.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+type InteractionId = keyof typeof INTERACTION_SPECS;
 import {ConfirmLeaveModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
 import {InteractionDetailsCacheService} from '../../services/interaction-details-cache.service';
 import {Interaction} from 'domain/exploration/interaction.model';
@@ -81,12 +82,12 @@ type DefaultCustomizationArg =
   | boolean;
 
 interface DefaultValueHtml {
-  content_id: string;
+  content_id: string | null;
   html: string;
 }
 
 interface DefaultValueUnicode {
-  content_id: string;
+  content_id: string | null;
   unicode_str: string;
 }
 
@@ -99,7 +100,7 @@ interface VerticesInterface {
 interface EdgeInterface {
   src: number;
   dst: number;
-  weight: string;
+  weight: number;
 }
 
 interface DefaultValueGraph {
@@ -183,11 +184,21 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].name;
+    if (!(interactionId in INTERACTION_SPECS)) {
+      return '';
+    }
+
+    const typedId = interactionId as InteractionId;
+    return INTERACTION_SPECS[typedId].name;
   }
 
   getDescription(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].description;
+    if (!(interactionId in INTERACTION_SPECS)) {
+      return '';
+    }
+
+    const typedId = interactionId as InteractionId;
+    return INTERACTION_SPECS[typedId].description;
   }
 
   getSchemaCallback(schema: Schema): () => Schema {
@@ -197,9 +208,16 @@ export class CustomizeInteractionModalComponent
   }
 
   getCustomizationArgsWarningsList(): Warning[] {
-    const validationServiceName: string =
-      INTERACTION_SPECS[this.stateInteractionIdService.displayed].id +
-      'ValidationService';
+    const displayed = this.stateInteractionIdService.displayed;
+
+    if (!(displayed in INTERACTION_SPECS)) {
+      return [];
+    }
+
+    const typedDisplayed = displayed as InteractionId;
+
+    const validationServiceName = (INTERACTION_SPECS[typedDisplayed].id +
+      'ValidationService') as keyof typeof INTERACTION_SERVICE_MAPPING;
 
     let validationService = this.injector.get(
       INTERACTION_SERVICE_MAPPING[validationServiceName]
@@ -223,25 +241,36 @@ export class CustomizeInteractionModalComponent
     this.isinteractionOpen = false;
     this.editorFirstTimeEventsService.registerFirstSelectInteractionTypeEvent();
 
-    let interactionSpec = INTERACTION_SPECS[newInteractionId];
+    if (!(newInteractionId in INTERACTION_SPECS)) {
+      return;
+    }
+
+    const typedInteractionId = newInteractionId as InteractionId;
+
+    let interactionSpec = INTERACTION_SPECS[typedInteractionId];
     this.customizationArgSpecs = interactionSpec.customization_arg_specs;
     this.stateInteractionIdService.displayed = newInteractionId;
     this.stateCustomizationArgsService.displayed = {};
     if (this.interactionDetailsCacheService.contains(newInteractionId)) {
-      this.stateCustomizationArgsService.displayed =
+      const cachedArgs =
         this.interactionDetailsCacheService.get(newInteractionId);
+
+      if (cachedArgs === null) {
+        throw new Error(
+          'Invariant violation: interactionDetailsCacheService.contains returned true but get returned null.'
+        );
+      }
+
+      this.stateCustomizationArgsService.displayed = cachedArgs;
     } else {
-      const customizationArgsBackendDict = {};
-      this.customizationArgSpecs.forEach(
-        (caSpec: {
-          name: string | number;
-          default_value: DefaultCustomizationArg;
-        }) => {
-          customizationArgsBackendDict[caSpec.name] = {
-            value: caSpec.default_value,
-          };
-        }
-      );
+      const customizationArgsBackendDict: {
+        [key: string]: {value: DefaultCustomizationArg};
+      } = {};
+      this.customizationArgSpecs.forEach(caSpec => {
+        customizationArgsBackendDict[caSpec.name] = {
+          value: caSpec.default_value,
+        };
+      });
 
       this.stateCustomizationArgsService.displayed =
         Interaction.convertFromCustomizationArgsBackendDict(
@@ -342,7 +371,13 @@ export class CustomizeInteractionModalComponent
             this.generateContentIdService.getNextStateId(contentIdPrefix);
         }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as Object[]).length; i++) {
+        if (!Array.isArray(value)) {
+          throw new Error(
+            'Invariant violation: Expected value to be an array for list schema.'
+          );
+        }
+
+        for (let i = 0; i < value.length; i++) {
           traverseSchemaAndAssignContentIds(
             value[i],
             schema.items as Schema,
@@ -352,14 +387,26 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
-    const caValues = this.stateCustomizationArgsService.displayed;
+    if (!(interactionId in INTERACTION_SPECS)) {
+      throw new Error(`Invalid interaction id: ${interactionId}`);
+    }
+
+    const typedInteractionId = interactionId as InteractionId;
+
+    const caSpecs =
+      INTERACTION_SPECS[typedInteractionId].customization_arg_specs;
+    const caValues = this.stateCustomizationArgsService.displayed as Record<
+      string,
+      {value: DefaultCustomizationArg}
+    >;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
-      if (caValues.hasOwnProperty(name)) {
+      if (name in caValues) {
+        const typedName = name as keyof typeof caValues;
+
         traverseSchemaAndAssignContentIds(
-          caValues[name].value,
-          caSpec.schema,
+          caValues[typedName].value,
+          caSpec.schema as Schema,
           `${AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS}_${name}`
         );
       }
@@ -374,7 +421,14 @@ export class CustomizeInteractionModalComponent
 
   getContentIdToContent(): object {
     const interactionId = this.stateInteractionIdService.displayed;
-    const contentIdToContent = {};
+
+    if (!(interactionId in INTERACTION_SPECS)) {
+      throw new Error(`Invalid interaction id: ${interactionId}`);
+    }
+
+    const typedInteractionId = interactionId as InteractionId;
+
+    const contentIdToContent: Record<string, string> = {};
 
     let traverseSchemaAndCollectContent = (
       value: Object | Object[],
@@ -389,25 +443,43 @@ export class CustomizeInteractionModalComponent
 
       if (schemaIsSubtitledHtml) {
         const subtitledHtmlValue = value as SubtitledHtml;
-        contentIdToContent[subtitledHtmlValue.contentId] =
-          subtitledHtmlValue.html;
+        const contentId = subtitledHtmlValue.contentId;
+
+        if (contentId !== null) {
+          contentIdToContent[contentId] = subtitledHtmlValue.html;
+        }
       } else if (schemaIsSubtitledUnicode) {
         const subtitledUnicodeValue = value as SubtitledUnicode;
-        contentIdToContent[subtitledUnicodeValue.contentId] =
-          subtitledUnicodeValue.unicode;
+        const contentId = subtitledUnicodeValue.contentId;
+
+        if (contentId !== null) {
+          contentIdToContent[contentId] = subtitledUnicodeValue.unicode;
+        }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as Object[]).length; i++) {
+        if (!Array.isArray(value)) {
+          throw new Error(
+            'Invariant violation: Expected value to be an array for list schema.'
+          );
+        }
+        for (let i = 0; i < value.length; i++) {
           traverseSchemaAndCollectContent(value[i], schema.items as Schema);
         }
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
-    const caValues = this.stateCustomizationArgsService.displayed;
+    const caSpecs =
+      INTERACTION_SPECS[typedInteractionId].customization_arg_specs;
+    const caValues = this.stateCustomizationArgsService.displayed as Record<
+      string,
+      {value: DefaultCustomizationArg}
+    >;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
       if (caValues.hasOwnProperty(name)) {
-        traverseSchemaAndCollectContent(caValues[name].value, caSpec.schema);
+        traverseSchemaAndCollectContent(
+          caValues[name].value,
+          caSpec.schema as Schema
+        );
       }
     }
 
@@ -454,37 +526,25 @@ export class CustomizeInteractionModalComponent
     this.editorFirstTimeEventsService.registerFirstClickAddInteractionEvent();
 
     if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
-      );
+      this.allowedInteractionCategories =
+        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES.flat();
     } else if (this.pageContextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
-      );
+      this.allowedInteractionCategories =
+        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES.flat();
     } else {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES
-      );
+      this.allowedInteractionCategories =
+        AppConstants.ALLOWED_INTERACTION_CATEGORIES.flat();
     }
 
     if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
-      );
+      this.allowedInteractionCategories =
+        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES.flat();
     } else if (this.pageContextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
-      );
+      this.allowedInteractionCategories =
+        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES.flat();
     } else {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES
-      );
+      this.allowedInteractionCategories =
+        AppConstants.ALLOWED_INTERACTION_CATEGORIES.flat();
     }
 
     if (this.stateInteractionIdService.savedMemento) {

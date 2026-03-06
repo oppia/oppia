@@ -106,7 +106,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned.hasLengthAtMost).toBeDefined();
+        expect(errorsReturned!.hasLengthAtMost).toBeDefined();
       });
     });
 

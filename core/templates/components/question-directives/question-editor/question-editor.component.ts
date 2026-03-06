@@ -97,9 +97,10 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
   saveInteractionData(displayedValue: InteractionData): void {
     this._updateQuestion(() => {
-      this.stateEditorService.setInteractionId(
-        cloneDeep(displayedValue.interactionId)
-      );
+      const interactionId = displayedValue.interactionId;
+      if (interactionId !== null) {
+        this.stateEditorService.setInteractionId(cloneDeep(interactionId));
+      }
       this.stateEditorService.setInteractionCustomizationArgs(
         cloneDeep(displayedValue.customizationArgs)
       );
@@ -188,7 +189,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     const stateData = this.questionStateData;
     const outcome = stateData.interaction.defaultOutcome;
     if (outcome) {
-      outcome.setDestination(null);
+      outcome.setDestination('question');
     }
     if (stateData) {
       this.stateEditorService.onStateEditorInitialized.emit(stateData);
@@ -224,14 +225,16 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     } else {
       this.editabilityService.markNotEditable();
     }
-    this.stateEditorService.setActiveStateName('question');
-    this.stateEditorService.setMisconceptionsBySkill(
-      this.misconceptionsBySkill
-    );
+    this.stateEditorService.setActiveStateName('question' as string);
+    if (this.misconceptionsBySkill) {
+      this.stateEditorService.setMisconceptionsBySkill(
+        this.misconceptionsBySkill
+      );
+    }
     this.oppiaBlackImgUrl =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
-      );
+      ) as string;
 
     this.interactionIsShown = false;
     this.stateEditorIsInitialized = false;

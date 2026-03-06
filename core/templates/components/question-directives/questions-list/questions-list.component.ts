@@ -56,6 +56,7 @@ import {QuestionEditorSaveModalComponent} from '../modal-templates/question-edit
 import {PageContextService} from 'services/page-context.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageData} from 'domain/question/editable-question-backend-api.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {QuestionValidationService} from 'services/question-validation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
@@ -99,8 +100,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   newQuestionIsBeingCreated!: boolean;
   newQuestionSkillDifficulties!: number[];
   newQuestionSkillIds!: string[];
-  question!: Question;
-  questionId!: string;
+  question: Question | null = null;
+  questionId: string | null = null;
   questionIsBeingSaved!: boolean;
   questionIsBeingUpdated!: boolean;
   questionStateData!: State;
@@ -164,10 +165,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.imageLocalStorageService.flushStoredImagesData();
     this.pageContextService.setImageSaveDestinationToLocalStorage();
 
-    this.question = Question.createDefaultQuestion(this.newQuestionSkillIds);
+    const question = Question.createDefaultQuestion(this.newQuestionSkillIds);
+    this.question = question;
+
     this.questionUndoRedoService.clearChanges();
-    this.questionId = this.question.getId();
-    this.questionStateData = this.question.getStateData();
+    this.questionId = question.getId();
+    this.questionStateData = question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
     this.topicEditorStateService.toggleQuestionEditor(
@@ -410,7 +413,18 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     const interactionId = this.question.getStateData().interaction.id;
-    return interactionId && INTERACTION_SPECS[interactionId].can_have_solution;
+
+    if (!interactionId) {
+      return false;
+    }
+
+    if (!(interactionId in INTERACTION_SPECS)) {
+      return false;
+    }
+
+    const typedInteractionId = interactionId as keyof typeof INTERACTION_SPECS;
+
+    return INTERACTION_SPECS[typedInteractionId].can_have_solution;
   }
 
   addSkill(): void {
@@ -507,12 +521,18 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   saveAndPublishQuestion(commitMessage: string | null): void {
+    if (!this.question) {
+      return;
+    }
+
+    const question = this.question;
+
     let validationErrors =
-      this.questionValidationService.getValidationErrorMessage(this.question);
-    let unaddressedMisconceptions =
-      this.question.getUnaddressedMisconceptionNames(
-        this.misconceptionsBySkill
-      );
+      this.questionValidationService.getValidationErrorMessage(question);
+
+    let unaddressedMisconceptions = question.getUnaddressedMisconceptionNames(
+      this.misconceptionsBySkill
+    );
     let unaddressedMisconceptionsErrorString = `Remaining misconceptions that need to be addressed: ${unaddressedMisconceptions.join(
       ', '
     )}`;
@@ -525,7 +545,14 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     if (!this.questionIsBeingUpdated) {
-      let imagesData = this.imageLocalStorageService.getStoredImagesData();
+      const rawImagesData = this.imageLocalStorageService.getStoredImagesData();
+
+      const imagesData: ImageData[] = rawImagesData
+        .filter(img => img.imageBlob !== null)
+        .map(img => ({
+          filename: img.filename,
+          imageBlob: img.imageBlob as Blob,
+        }));
       this.imageLocalStorageService.flushStoredImagesData();
       this.editableQuestionBackendApiService
         .createQuestionAsync(
@@ -569,10 +596,17 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     } else {
       if (this.questionUndoRedoService.hasChanges()) {
         if (commitMessage) {
+          if (!this.questionId || !this.question) {
+            return;
+          }
+
+          const questionId = this.questionId;
+          const question = this.question;
+
           this.editableQuestionBackendApiService
             .updateQuestionAsync(
-              this.questionId,
-              String(this.question.getVersion()),
+              questionId,
+              String(question.getVersion()),
               commitMessage,
               this.questionUndoRedoService.getCommittableChangeList()
             )
@@ -625,7 +659,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.pageContextService.resetImageSaveDestination();
           this.editorIsOpen = false;
           this.topicEditorStateService.toggleQuestionEditor(false);
-          this.windowRef.nativeWindow.location.hash = null;
+          this.windowRef.nativeWindow.location.hash = '';
           this.skillEditorRoutingService.questionIsBeingCreated = false;
         },
         () => {
@@ -637,9 +671,15 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   updateSkillLinkageAndQuestions(commitMsg: string): void {
+    if (!this.questionId) {
+      return;
+    }
+
+    const questionId = this.questionId;
+
     this.editableQuestionBackendApiService
       .editQuestionSkillLinksAsync(
-        this.questionId,
+        questionId,
         this.skillLinkageModificationsArray
       )
       .then(data => {
@@ -658,6 +698,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   updateSkillLinkage(): void {
+    if (!this.questionId) {
+      return;
+    }
+
+    const questionId = this.questionId;
     this.editableQuestionBackendApiService
       .editQuestionSkillLinksAsync(
         this.questionId,
@@ -671,7 +716,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   saveQuestion(): void {
     this.questionIsBeingSaved = true;
     this.pageContextService.resetImageSaveDestination();
-    this.windowRef.nativeWindow.location.hash = null;
+    this.windowRef.nativeWindow.location.hash = '';
     if (this.questionIsBeingUpdated) {
       this.ngbModal
         .open(QuestionEditorSaveModalComponent, {
