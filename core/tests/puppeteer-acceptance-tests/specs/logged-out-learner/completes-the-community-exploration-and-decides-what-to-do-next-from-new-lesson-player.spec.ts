@@ -1,0 +1,279 @@
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * EL.NL.  Learner completes the community exploration and decides what to
+ * do next.
+ */
+
+import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+
+const ROLES = testConstants.Roles;
+
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = 'Continue Button',
+  FRACTION_INPUT = 'Fraction Input',
+  END_EXPLORATION = 'End Exploration',
+}
+
+enum CARDS {
+  INTRODUCTION_CARD = 'Introduction',
+  SECOND_CARD = 'Second Card',
+  THIRD_CARD = 'Third Card',
+  FINAL_CARD = 'Final',
+}
+
+enum EXPLORATION_TITLE {
+  COMMUNITY_LESSON_1 = 'Community Lesson Title 1',
+  COMMUNITY_LESSON_2 = 'Community Lesson Title 2',
+  COMMUNITY_LESSON_3 = 'Community Lesson Title 3',
+}
+
+describe('Logged-Out Learner', function () {
+  let explorationId: string;
+  let exploration1Id: string;
+  let exploration2Id: string;
+  let loggedOutLearner: LoggedOutUser;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let releaseCoordinator: ReleaseCoordinator;
+
+  beforeAll(
+    async function () {
+      loggedOutLearner = await UserFactory.createLoggedOutUser();
+
+      curriculumAdmin = await UserFactory.createNewUser(
+        'curriculumAdm',
+        'curriculumAdm@example.com',
+        [ROLES.CURRICULUM_ADMIN]
+      );
+
+      releaseCoordinator = await UserFactory.createNewUser(
+        'releaseCoordinator1',
+        'releaseCoordinator1@example.com',
+        [ROLES.RELEASE_COORDINATOR]
+      );
+
+      // Enable the feature flag.
+      await releaseCoordinator.enableFeatureFlag('new_lesson_player');
+
+      // Create topic with 'Place Values'.
+      const topicName = 'Place Values';
+      const subtopicName = 'Place Values';
+      const skillName = 'Math';
+
+      await curriculumAdmin.createTopic(
+        topicName,
+        topicName.toLowerCase().replace(/ /g, '-')
+      );
+      // Create a subtopic 'Place Values' for topic 'Place Values'.
+      await curriculumAdmin.createSubtopicForTopic(
+        subtopicName,
+        subtopicName.toLowerCase().replace(/ /g, '-'),
+        topicName
+      );
+      // Create a skill with name 'Math' and 10 question inside it.
+      await curriculumAdmin.createSkillForTopic(skillName, topicName, false);
+      await curriculumAdmin.createQuestionsForSkill(skillName, 10);
+      await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
+        skillName,
+        subtopicName,
+        topicName
+      );
+      await curriculumAdmin.addSkillToDiagnosticTest(skillName, topicName);
+
+      // Enable the "Show practice tab to learners" in Topic Editor.
+      await curriculumAdmin.openTopicEditor(topicName);
+      await curriculumAdmin.togglePracticeTabCheckbox();
+      await curriculumAdmin.saveTopicDraft(topicName);
+      await curriculumAdmin.publishDraftTopic(topicName);
+
+      // Add two dummy exploration.
+      // Add first dummy exploration.
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+      await curriculumAdmin.dismissWelcomeModal();
+      // Add Interaction Cards.
+      await curriculumAdmin.updateCardContent(
+        `Welcome, to the ${EXPLORATION_TITLE.COMMUNITY_LESSON_2}.`
+      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await curriculumAdmin.viewOppiaResponses();
+      await curriculumAdmin.directLearnersToNewCard(CARDS.FINAL_CARD);
+
+      await curriculumAdmin.navigateToCard(CARDS.FINAL_CARD);
+      await curriculumAdmin.updateCardContent(
+        'You have successfully completed the lesson!'
+      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+      await curriculumAdmin.saveExplorationDraft();
+      exploration1Id = await curriculumAdmin.publishExplorationWithMetadata(
+        EXPLORATION_TITLE.COMMUNITY_LESSON_2,
+        `Learn basic Mathematics including ${EXPLORATION_TITLE.COMMUNITY_LESSON_2}`,
+        'Mathematics'
+      );
+      if (!exploration1Id) {
+        throw new Error(
+          `Exploration title:${EXPLORATION_TITLE.COMMUNITY_LESSON_2} ID is null or undefined.`
+        );
+      }
+
+      // Add second dummy exploration.
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+      // Add Interaction Cards.
+      await curriculumAdmin.updateCardContent(
+        `Welcome, to the ${EXPLORATION_TITLE.COMMUNITY_LESSON_3}.`
+      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await curriculumAdmin.viewOppiaResponses();
+      await curriculumAdmin.directLearnersToNewCard(CARDS.FINAL_CARD);
+
+      await curriculumAdmin.navigateToCard(CARDS.FINAL_CARD);
+      await curriculumAdmin.updateCardContent(
+        'You have successfully completed the lesson!'
+      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+      await curriculumAdmin.saveExplorationDraft();
+      exploration2Id = await curriculumAdmin.publishExplorationWithMetadata(
+        EXPLORATION_TITLE.COMMUNITY_LESSON_3,
+        `Learn basic Mathematics including ${EXPLORATION_TITLE.COMMUNITY_LESSON_3}`,
+        'Mathematics'
+      );
+      if (!exploration2Id) {
+        throw new Error(
+          `Exploration title:${EXPLORATION_TITLE.COMMUNITY_LESSON_3} ID is null or undefined.`
+        );
+      }
+
+      // Add exploration with all RTE components in question.
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+      // Add Interaction Cards.
+      await curriculumAdmin.updateCardContent(
+        `Welcome, to the ${EXPLORATION_TITLE.COMMUNITY_LESSON_1}.`
+      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await curriculumAdmin.viewOppiaResponses();
+      await curriculumAdmin.directLearnersToNewCard(CARDS.SECOND_CARD);
+
+      await curriculumAdmin.navigateToCard(CARDS.SECOND_CARD);
+      await curriculumAdmin.addExplorationDescriptionContainingAllRTEComponents();
+
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+      await curriculumAdmin.addResponsesToTheInteraction(
+        INTERACTION_TYPES.FRACTION_INPUT,
+        '2',
+        'Correct!',
+        CARDS.THIRD_CARD,
+        true
+      );
+      await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Incorrect, try again!'
+      );
+
+      // Add 2 hints.
+      await curriculumAdmin.addHintToState(
+        'This hint 1 to help to answer the question.'
+      );
+      await curriculumAdmin.addHintToState(
+        'This hint 2 to help to answer the question'
+      );
+      // Add answer with explanation.
+      await curriculumAdmin.addSolutionToState('1/2', 'Answer is 1/2.', true);
+
+      await curriculumAdmin.navigateToCard(CARDS.THIRD_CARD);
+      await curriculumAdmin.updateCardContent('Good continue learning!!');
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await curriculumAdmin.viewOppiaResponses();
+      await curriculumAdmin.directLearnersToNewCard(CARDS.FINAL_CARD);
+
+      await curriculumAdmin.navigateToCard(CARDS.FINAL_CARD);
+      await curriculumAdmin.updateCardContent(
+        'You have successfully completed the lesson!'
+      );
+      await curriculumAdmin.addInteraction(
+        INTERACTION_TYPES.END_EXPLORATION,
+        false
+      );
+      await curriculumAdmin.customizeEndExplorationInteraction([
+        exploration1Id,
+        exploration2Id,
+      ]);
+      await curriculumAdmin.saveExplorationDraft();
+
+      // Mark second card as a checkpoint.
+      await curriculumAdmin.navigateToCard(CARDS.SECOND_CARD);
+      await curriculumAdmin.setTheStateAsCheckpoint();
+      // Mark third Card as a checkpoint.
+      await curriculumAdmin.navigateToCard(CARDS.THIRD_CARD);
+      await curriculumAdmin.setTheStateAsCheckpoint();
+
+      await curriculumAdmin.saveExplorationDraft(
+        'Add checkpoint as second and third card'
+      );
+
+      explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+        EXPLORATION_TITLE.COMMUNITY_LESSON_1,
+        `Learn basic Mathematics including ${EXPLORATION_TITLE.COMMUNITY_LESSON_1}`,
+        'Mathematics'
+      );
+      if (!explorationId) {
+        throw new Error('Exploration ID is null or undefined.');
+      }
+    },
+    // Setup takes more time than default.
+    1800000
+  );
+
+  it('should be able visit the community library', async function () {
+    await loggedOutLearner.playLesson(explorationId);
+    // Play a complete lesson.
+    await loggedOutLearner.clickOnContinueButton();
+    await loggedOutLearner.page.waitForTimeout(10000);
+    await loggedOutLearner.submitFractionInputResponse('1/2');
+    await loggedOutLearner.clickOnContinueButton();
+    await loggedOutLearner.page.waitForTimeout(10000);
+    await loggedOutLearner.clickOnContinueButton();
+
+    await loggedOutLearner.expectGoToLibraryButton();
+    expect(await loggedOutLearner.isRatingStarsVisible()).toBe(false);
+    await loggedOutLearner.expectSuggestedLesson([
+      EXPLORATION_TITLE.COMMUNITY_LESSON_2,
+      EXPLORATION_TITLE.COMMUNITY_LESSON_3,
+    ]);
+    expect(await loggedOutLearner.expectSignInButton()).toBe(true);
+
+    await loggedOutLearner.clickOnGoToLibraryButtonAndVerifyPage();
+  });
+
+  it('should be able visit the next community lesson', async function () {
+    // Starts from here.
+    await loggedOutLearner.openNextLessonInNewTabAndVerifyContent(
+      EXPLORATION_TITLE.COMMUNITY_LESSON_2,
+      'Welcome, to the Community Lesson Title 2'
+    );
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
+});

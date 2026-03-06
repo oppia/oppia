@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * EL.LP.  Learner completes the exploration and decides what to do next from the
+ * EL.CE.  Learner completes the exploration and decides what to do next from the
  * new lesson player.
  */
 

@@ -381,6 +381,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson-from-new-lesson-player.spec.ts"
     },
     {
+      "name": "logged-out-learner/completes-the-community-exploration-and-decides-what-to-do-next-from-new-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/completes-the-community-exploration-and-decides-what-to-do-next-from-new-lesson-player.spec.ts"
+    },
+    {
       "name": "logged-out-learner/complete-the-embedded-lesson",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts"
     },

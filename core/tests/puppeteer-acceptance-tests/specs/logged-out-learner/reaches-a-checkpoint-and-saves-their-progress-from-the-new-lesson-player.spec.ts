@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * EL.LP.  Learner reaches a checkpoint and saves their progress from the new lesson
+ * EL.CP.  Learner reaches a checkpoint and saves their progress from the new lesson
  * player.
  */
 

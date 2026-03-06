@@ -645,6 +645,9 @@ const lessonPlayerHeaderTextSelector = '.lesson-player-header-left p';
 const checkboxTitleSelector = '.e2e-test-skill-checkbox-title';
 const subtopicTitleSelector = '.subtopic-title';
 const conceptCardLinkSelectorInQuestion = '.concept-card-link';
+const gotoLibraryButton = '.community-library-btn';
+const ratingStarsSelector = '.conversation-skin-final-ratings-display';
+const suggestedLessonTitleSelector = '.exploration-summary-btn p';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6853,14 +6856,18 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Expect the learner card top heading content.
    * @param heading - Expected heading of the card content.
+   * @param page - Optional. Page to check content.
    */
-  async expectLearnerCardHeading(heading: string): Promise<void> {
-    await this.page.waitForSelector(cardTopContentSelector, {
+  async expectLearnerCardHeading(
+    heading: string,
+    page: Page = this.page
+  ): Promise<void> {
+    await page.waitForSelector(cardTopContentSelector, {
       visible: true,
       timeout: 5000,
     });
 
-    const actualHeading = await this.page.$eval(cardTopContentSelector, el =>
+    const actualHeading = await page.$eval(cardTopContentSelector, el =>
       el.textContent?.trim()
     );
 
@@ -7233,7 +7240,6 @@ export class LoggedOutUser extends BaseUser {
       });
       return true;
     } catch (error) {
-      showMessage(`Error: ${error}`);
       return false;
     }
   }
@@ -7612,6 +7618,157 @@ export class LoggedOutUser extends BaseUser {
     );
 
     showMessage('Youtube video is successfully playing.');
+  }
+
+  /**
+   * Expect the 'Go to library' button.
+   */
+  async expectGoToLibraryButton(): Promise<void> {
+    await this.page.waitForSelector(gotoLibraryButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Whether rating stars visible.
+   */
+  async isRatingStarsVisible(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(ratingStarsSelector, {
+        visible: true,
+      });
+      showMessage('Rating stars is visible');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Expect the next suggested lesson
+   * @param lessonNames[] - Name of lessons to play next.
+   */
+  async expectSuggestedLesson(lessonNames: string[]): Promise<void> {
+    await this.page.waitForSelector(suggestedLessonTitleSelector, {
+      visible: true,
+    });
+
+    const actualLessonTitles = await this.page.$$eval(
+      suggestedLessonTitleSelector,
+      elements =>
+        elements.map(el => {
+          const titleNode = el.childNodes[0];
+          return titleNode && titleNode.textContent
+            ? titleNode.textContent.trim()
+            : '';
+        })
+    );
+    for (const expectedName of lessonNames) {
+      if (!actualLessonTitles.includes(expectedName)) {
+        throw new Error(
+          `Expected lesson "${expectedName}" was not found in the suggested lessons. ` +
+            `Found: [${actualLessonTitles.join(', ')}]`
+        );
+      }
+    }
+
+    showMessage(
+      `Successfully verified suggested lessons: ${lessonNames.join(', ')}`
+    );
+  }
+
+  /**
+   * Click on 'Go to library' button and open it in
+   * new tab and verify the page.
+   */
+  async clickOnGoToLibraryButtonAndVerifyPage(): Promise<void> {
+    await this.page.waitForSelector(gotoLibraryButton, {
+      visible: true,
+    });
+    const newTargetPromise = new Promise<puppeteer.Target>(resolve =>
+      this.page.browser().once('targetcreated', resolve)
+    );
+    // Simulate Ctrl + Click
+    // Use 'Control' for Windows/Linux or 'Meta' for Mac.
+    const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
+
+    await this.page.keyboard.down(modifier);
+    await this.page.click(gotoLibraryButton);
+    await this.page.keyboard.up(modifier);
+
+    const target = await newTargetPromise;
+    const newTabPage = await target.page();
+
+    if (!newTabPage) {
+      throw new Error('New tab page was not created successfully');
+    }
+
+    await newTabPage.bringToFront();
+    await newTabPage.waitForNavigation({
+      waitUntil: 'networkidle0',
+    });
+
+    await this.expectPageURLToContain(
+      testConstants.URLs.CommunityLibrary,
+      newTabPage
+    );
+    await newTabPage.close();
+  }
+
+  /**
+   * Open next lesson in new tab and verify heading
+   * of the opened lesson.
+   * @param lessonName - Name of lesson to open.
+   * @param lessonHeading - Expected heading of the opened lesson.
+   */
+  async openNextLessonInNewTabAndVerifyContent(
+    lessonName: string,
+    lessonHeading: string
+  ): Promise<void> {
+    const lessonAnchorHandle = await this.page
+      .waitForFunction(
+        (selector: string, name: string) => {
+          const anchors = Array.from(document.querySelectorAll(selector));
+          return anchors.find(a =>
+            a
+              .querySelector('.exploration-summary-btn p')
+              ?.textContent?.includes(name)
+          );
+        },
+        {timeout: 10000},
+        'a',
+        lessonName
+      )
+      .then(handle => handle.asElement());
+
+    if (!lessonAnchorHandle) {
+      throw new Error(`Could not find the anchor for lesson: ${lessonName}`);
+    }
+
+    const newTargetPromise = new Promise<puppeteer.Target>(resolve =>
+      this.page.browser().once('targetcreated', resolve)
+    );
+
+    // Perform Ctrl + Click.
+    const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
+
+    await this.page.keyboard.down(modifier);
+    await lessonAnchorHandle.click();
+    await this.page.keyboard.up(modifier);
+
+    const target = await newTargetPromise;
+    const newTabPage = await target.page();
+
+    if (!newTabPage) {
+      throw new Error('New tab page was not created.');
+    }
+
+    await newTabPage.bringToFront();
+    await newTabPage.waitForNavigation({
+      waitUntil: 'networkidle0',
+    });
+
+    await this.expectLearnerCardHeading(lessonHeading, newTabPage);
   }
 
   /**
