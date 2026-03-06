@@ -1,3 +1,4 @@
+
 *~
 *.pyc
 *.swp
@@ -80,6 +81,11 @@ firebase-debug.log
 debug.log
 # development logs and status entries
 .dev
-
 # Puppeteer acceptance tests.
 jest-runtime-config.json
+
+oppia_env/
+*.log
+changed_files.txt
+files_with_errors.txt
+strict_errors.txt

@@ -702,7 +702,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const questionId = this.questionId;
     this.editableQuestionBackendApiService
       .editQuestionSkillLinksAsync(
         this.questionId,

@@ -63,7 +63,10 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned!.hasLengthAtLeast).toBeDefined();
+        if (!errorsReturned) {
+          fail('Expected validation error');
+        }
+        expect(errorsReturned.hasLengthAtLeast).toBeDefined();
       });
     });
     it('should throw an error when the value is not a string', () => {
@@ -106,7 +109,10 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned!.hasLengthAtMost).toBeDefined();
+        if (!errorsReturned) {
+          fail('Expected validation error');
+        }
+        expect(errorsReturned.hasLengthAtMost).toBeDefined();
       });
     });
 
@@ -150,7 +156,10 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned!.isAtLeast).toBeDefined();
+        if (!errorsReturned) {
+          fail('Expected validation error');
+        }
+        expect(errorsReturned.isAtLeast).toBeDefined();
       });
     });
   });
@@ -180,7 +189,10 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned!.isAtMost).toBeDefined();
+        if (!errorsReturned) {
+          fail('Expected validation error');
+        }
+        expect(errorsReturned.isAtMost).toBeDefined();
       });
     });
   });
@@ -231,7 +243,10 @@ describe('Schema validators', () => {
         if (errorsReturned === null) {
           throw new Error(testCase.controlValue);
         }
-        expect(errorsReturned!.isFloat).toBeDefined();
+        if (!errorsReturned) {
+          fail('Expected validation error');
+        }
+        expect(errorsReturned.isFloat).toBeDefined();
       });
     });
   });
@@ -256,7 +271,10 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned!.isInteger).toBeDefined();
+        if (!errorsReturned) {
+          fail('Expected validation error');
+        }
+        expect(errorsReturned.isInteger).toBeDefined();
       });
     });
   });
@@ -279,7 +297,10 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null);
           return;
         }
-        expect(errorsReturned!.isNonempty).toBeDefined();
+        if (!errorsReturned) {
+          fail('Expected validation error');
+        }
+        expect(errorsReturned.isNonempty).toBeDefined();
       });
     });
   });

@@ -185,7 +185,7 @@ export class ObjectEditorComponent
   @Input() modalId!: symbol;
   @Input() objType!: string;
   @Input() schema!: SchemaDefaultValue;
-  @Input() form!: any;
+  @Input() form!: AbstractControl;
   @Output() validityChange: EventEmitter<void> = new EventEmitter();
   get value(): SchemaDefaultValue {
     return this._value;
@@ -267,7 +267,7 @@ export class ObjectEditorComponent
       }
       const componentFactory =
         this.componentFactoryResolver.resolveComponentFactory(
-          EDITORS[editorName as keyof typeof EDITORS] as any
+          EDITORS[editorName as keyof typeof EDITORS] as Type<unknown>
         );
       this.viewContainerRef.clear();
       // Unknown is type is used because it is default property of

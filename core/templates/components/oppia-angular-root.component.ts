@@ -83,21 +83,34 @@ import {ServicesConstants} from 'services/services.constants';
 // build to not complain.
 // TODO(#16309): Fix relative imports.
 import '../third-party-imports/ckeditor.import';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveLink} from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
-//import {CkEditorInitializerService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import {
   CkEditorInitializerService,
   RteHelperService,
@@ -108,7 +121,8 @@ import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {I18nService} from 'i18n/i18n.service';
-//import {RteHelperService} from 'services/rte-helper.service';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
 // @ts-ignore
 import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
