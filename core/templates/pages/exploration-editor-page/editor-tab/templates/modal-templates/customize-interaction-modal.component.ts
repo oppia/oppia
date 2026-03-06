@@ -538,8 +538,10 @@ export class CustomizeInteractionModalComponent
 
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
-      let interactionSpec =
-        INTERACTION_SPECS[this.stateInteractionIdService.savedMemento];
+      const typedInteractionId = this.stateInteractionIdService
+        .savedMemento as InteractionId;
+
+      let interactionSpec = INTERACTION_SPECS[typedInteractionId];
       this.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
       this.stateInteractionIdService.displayed = cloneDeep(

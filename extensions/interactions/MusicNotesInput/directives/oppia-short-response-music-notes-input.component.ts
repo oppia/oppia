@@ -33,8 +33,13 @@ export class ShortResponseMusicNotesInput implements OnInit {
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    let _answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
-    let _notes = [];
+    const _answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as Array<{
+      readableNoteName: string;
+      noteDuration: {num: number; den: number};
+    }>;
+    const _notes: string[] = [];
     for (let i = 0; i < Object.keys(_answer).length; i++) {
       if (_answer[i].readableNoteName) {
         _notes.push(_answer[i].readableNoteName);
