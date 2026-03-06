@@ -335,7 +335,6 @@
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/lace-frontend-reviewers
 /core/templates/css/oppia-material.css @oppia/lace-frontend-reviewers
-/core/templates/css/guppy-custom.css @oppia/lace-frontend-reviewers
 
 
 # Interaction project.
