@@ -327,10 +327,11 @@ export class ObjectEditorComponent
                   }
                 }
                 if (this.form) {
-                  (this.form as any).$setValidity(
-                    errorKey,
-                    errorsMap[errorKey]
-                  );
+                  (
+                    this.form as unknown as {
+                      $setValidity: (key: string, value: boolean) => void;
+                    }
+                  ).$setValidity(errorKey, errorsMap[errorKey]);
                   this.validityChange.emit();
                 }
               }
