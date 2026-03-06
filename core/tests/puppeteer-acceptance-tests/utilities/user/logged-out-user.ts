@@ -123,6 +123,7 @@ const footerTermsLink = 'a.e2e-test-terms-link';
 const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
 const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
 const footerContactUsLink = 'a.e2e-test-contact-link';
+const footerVersionInfoSelector = '.e2e-test-footer-version-info';
 
 const oppiaYouTubeLinkIcon = '.e2e-test-oppia-youtube-follow';
 const oppiaFacebookLinkIcon = '.e2e-test-oppia-facebook-follow';
@@ -2151,6 +2152,26 @@ export class LoggedOutUser extends BaseUser {
       testConstants.OppiaSocials.GooglePlay.Domain,
       testConstants.OppiaSocials.GooglePlay.Id
     );
+  }
+
+  /**
+   * Verifies that the footer version info matches the expected pattern.
+   * @param {RegExp} pattern - The regular expression pattern to match against the version text.
+   */
+  async expectFooterVersionToMatchPattern(pattern: RegExp): Promise<void> {
+    await this.page.waitForSelector(footerVersionInfoSelector);
+    const versionText = await this.page.$eval(
+      footerVersionInfoSelector,
+      el => el.textContent?.trim() || ''
+    );
+
+    if (!pattern.test(versionText)) {
+      throw new Error(
+        `Footer version text "${versionText}" does not match expected pattern ${pattern}`
+      );
+    }
+
+    showMessage(`Footer version verified: ${versionText}`);
   }
 
   /**

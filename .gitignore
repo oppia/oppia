@@ -83,3 +83,7 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
+
+
+.venv
+requirements_dev.txt
