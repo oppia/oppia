@@ -80,16 +80,13 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
         ]
     )
     def test_set_platform_parameters_decorator(self) -> None:
         """Tests if platform parameters are set."""
         self.assertEqual(
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            ),
+            platform_parameter_services.get_platform_parameter_value(),
             True,
         )
         self.assertEqual(
@@ -99,9 +96,7 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
             'admin',
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters()
     def test_set_platform_parameters_decorator_with_invalid_param(self) -> None:
         """Tests if invalid platform parameter raises an error."""
         with self.assertRaisesRegex(
