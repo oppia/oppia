@@ -5986,6 +5986,16 @@ export class LoggedOutUser extends BaseUser {
    * Open new browser tab and paste clipboard text.
    */
   async openCopiedLink(): Promise<Page> {
+    // Get the origin of the current page to apply permissions correctly.
+    const origin = new URL(this.page.url()).origin;
+
+    // Grant clipboard permissions to the browser context.
+    const context = this.page.browser().browserContexts()[0];
+    await context.overridePermissions(origin, [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+
     const clipboardText = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });
@@ -6169,6 +6179,15 @@ export class LoggedOutUser extends BaseUser {
 
     await this.verifyText(copiedMessageSelector, 'Attribution Copied');
 
+    // Get the origin of the current page to apply permissions correctly.
+    const origin = new URL(this.page.url()).origin;
+
+    // Grant clipboard permissions to the browser context.
+    const context = this.page.browser().browserContexts()[0];
+    await context.overridePermissions(origin, [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
     const clipboardText = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });
@@ -6219,6 +6238,15 @@ export class LoggedOutUser extends BaseUser {
       'HTML Code Copied check_circle'
     );
 
+    // Get the origin of the current page to apply permissions correctly.
+    const origin = new URL(this.page.url()).origin;
+
+    // Grant clipboard permissions to the browser context.
+    const context = this.page.browser().browserContexts()[0];
+    await context.overridePermissions(origin, [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
     const clipboardText = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });

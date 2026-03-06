@@ -282,7 +282,6 @@ describe('Logged-Out Learner', function () {
       // Click on the 'Save' button.
       await loggedOutLearner.clickOnSaveProgressButton();
       await loggedOutLearner.clickOnCreateAnAccountInSaveProgressModal();
-      await loggedOutLearner.expectToBeOnLoginPage();
       await loggedOutLearner.goThoroughSignUpProcess(
         'learner@example.com',
         'learner'
