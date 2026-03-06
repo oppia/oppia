@@ -425,6 +425,10 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     @test_utils.set_platform_parameters(
         [
             (
+                platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+                False,
+            ),  # pylint: disable=line-too-long
+            (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 False,
             ),  # pylint: disable=line-too-long
@@ -651,6 +655,10 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
+            (
+                platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+                False,
+            ),  # pylint: disable=line-too-long
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 False,
@@ -969,11 +977,11 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         [
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
-                True,
+                False,
             ),  # pylint: disable=line-too-long
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
-                True,
+                False,
             ),  # pylint: disable=line-too-long
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,

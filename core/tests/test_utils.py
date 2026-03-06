@@ -495,14 +495,14 @@ def swap_get_platform_parameter_value_function(
         platform_parameter_name_value_dict = dict(
             (x.value, y) for x, y in platform_parameter_name_value_tuples
         )
-        if parameter_name not in platform_parameter_name_value_dict:
-            raise Exception(
-                'The value for the platform parameter %s was needed in this '
-                'test, but not specified in the set_platform_parameters '
-                'decorator. Please use this information in the decorator.'
-                % parameter_name
-            )
-        return platform_parameter_name_value_dict[parameter_name]
+        if parameter_name in platform_parameter_name_value_dict:
+            return platform_parameter_name_value_dict[parameter_name]
+
+        return registry.Registry.get_platform_parameter(
+            parameter_name
+        ).evaluate(
+            platform_parameter_services._create_evaluation_context_for_server()
+        )
 
     original_get_platform_parameter_value = getattr(
         platform_parameter_services, 'get_platform_parameter_value'
