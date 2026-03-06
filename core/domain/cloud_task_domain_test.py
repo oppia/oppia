@@ -403,7 +403,9 @@ class VoiceoverRegenerationTaskBatchTests(test_utils.GenericTestBase):
             'content_1': 'This is content 1',
         }
 
-        voiceover_regeneration_task_batch_dict = {
+        voiceover_regeneration_task_batch_dict: (
+            cloud_task_domain.VoiceoverRegenerationTaskBatchDict
+        ) = {
             'parent_cloud_task_run_id': parent_cloud_task_run_id,
             'child_cloud_task_run_id': child_cloud_task_run_id,
             'exploration_id': exploration_id,

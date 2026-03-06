@@ -591,7 +591,7 @@ def convert_voiceover_regeneration_task_batch_model_to_domain_instance(
 
 def create_or_update_voiceover_regeneration_task_batch_model(
     domain_instance: cloud_task_domain.VoiceoverRegenerationTaskBatch,
-) -> cloud_task_models.VoiceoverRegenerationBatchExecutionModel:
+) -> None:
     """Creates or updates the instance of VoiceoverRegenerationBatchExecutionModel
     corresponding to the given domain object.
 

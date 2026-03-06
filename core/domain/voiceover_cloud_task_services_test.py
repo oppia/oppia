@@ -390,12 +390,14 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             parent_task_run_id, 'child_task_run_id_1'
         )
         self.assertIsNotNone(retrieved_batch_1)
+        assert retrieved_batch_1 is not None
         self.assertEqual(retrieved_batch_1.language_accent_code, 'en-US')
 
         retrieved_batch_2 = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
             parent_task_run_id, 'child_task_run_id_2'
         )
         self.assertIsNotNone(retrieved_batch_2)
+        assert retrieved_batch_2 is not None
         self.assertEqual(retrieved_batch_2.language_accent_code, 'hi-IN')
 
     def test_should_get_voiceover_regeneration_batch_instances_by_parent_task_run_id(
@@ -478,6 +480,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(retrieved_batch)
+        assert retrieved_batch is not None
         self.assertEqual(
             retrieved_batch.parent_cloud_task_run_id, parent_task_run_id
         )
@@ -579,6 +582,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(retrieved_batch)
+        assert retrieved_batch is not None
         self.assertEqual(
             retrieved_batch.language_accent_code, language_accent_code
         )
@@ -636,6 +640,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(retrieved_batch)
+        assert retrieved_batch is not None
         self.assertEqual(
             retrieved_batch.exploration_version, updated_exploration_version
         )

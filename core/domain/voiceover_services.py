@@ -1158,16 +1158,21 @@ def regenerate_voiceovers_for_batch_contents(
     error_collections_during_voiceover_regeneration = []
 
     error_collections_during_voiceover_regeneration.append(
-        {
-            'exploration_id': exploration_id,
-            'language_accent_code': language_accent_code,
-            'error_messages': errors_while_voiceover_regeneration,
-        }
+        json.dumps(
+            {
+                'exploration_id': exploration_id,
+                'language_accent_code': language_accent_code,
+                'error_messages': errors_while_voiceover_regeneration,
+            }
+        )
     )
 
     child_cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
         child_cloud_task_run_id
     )
+    # Ruling out the possibility of None for mypy type checking.
+    assert child_cloud_task_run is not None
+
     child_cloud_task_run.exception_messages_for_failed_runs.extend(
         error_collections_during_voiceover_regeneration
     )
@@ -1240,21 +1245,36 @@ def wrap_up_voiceover_regeneration_task(
     parent_cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
         parent_cloud_task_run_id
     )
+    # Ruling out the possibility of None for mypy type checking.
+    assert parent_cloud_task_run is not None
 
-    error_collections_during_voiceover_regeneration = []
+    error_collections_during_voiceover_regeneration: List[
+        Dict[str, str | List[Tuple[str, str]]]
+    ] = []
     for cloud_task_run in child_cloud_task_runs:
-        error_collections_during_voiceover_regeneration.extend(
-            cloud_task_run.exception_messages_for_failed_runs
-        )
+        for error_details in cloud_task_run.exception_messages_for_failed_runs:
+            error_collections_during_voiceover_regeneration.append(
+                json.loads(error_details)
+            )
 
     error_string = (
         'Exploration ID: %s\n'
         % voiceover_regeneration_job_status.exploration_id
     )
-    language_accent_code_to_error = collections.defaultdict(list)
+    language_accent_code_to_error: Dict[str, List[Tuple[str, str]]] = (
+        collections.defaultdict(list)
+    )
     for error_collection in error_collections_during_voiceover_regeneration:
-        language_accent_code = error_collection['language_accent_code']
-        error_messages = error_collection['error_messages']
+        # Here we use cast because we are narrowing down the type of
+        # 'language_accent_code' from Union of str and List to a str.
+        language_accent_code: str = cast(
+            str, error_collection['language_accent_code']
+        )
+        # Here we use cast because we are narrowing down the type of
+        # 'error_messages' from Union of str and List to a List of Tuples.
+        error_messages = cast(
+            List[Tuple[str, str]], error_collection['error_messages']
+        )
         language_accent_code_to_error[language_accent_code].extend(
             error_messages
         )

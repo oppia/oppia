@@ -487,7 +487,7 @@ class VoiceoverRegenerationBatchExecutionModel(base_models.BaseModel):
         exploration_id: str,
         exploration_version: int,
         language_accent_code: str,
-        content_ids_to_contents_map: Dict[str, Dict[str, str]],
+        content_ids_to_contents_map: Dict[str, str],
     ) -> VoiceoverRegenerationBatchExecutionModel:
         """Creates a new instance of VoiceoverRegenerationBatchExecutionModel.
 
@@ -501,9 +501,9 @@ class VoiceoverRegenerationBatchExecutionModel(base_models.BaseModel):
                 the regeneration is being done.
             language_accent_code: str. The language accent code for which the
                 regeneration is being done.
-            content_ids_to_contents_map: dict(str, dict(str, str)). A dictionary
-                mapping content IDs to their corresponding content details
-                associated with the regeneration process.
+            content_ids_to_contents_map: dict(str, str). A dictionary mapping
+                content IDs to their corresponding content text associated
+                with the regeneration process.
 
         Returns:
             VoiceoverRegenerationBatchExecutionModel. The newly created instance of
