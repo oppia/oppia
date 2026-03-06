@@ -714,6 +714,12 @@ describe('Exploration editor tab component', () => {
     expect(() => {
       component.saveInapplicableSkillMisconceptionIds(['skill_id_1']);
     }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.getStateContentPlaceholder();
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.initStateEditor();
+    }).toThrowError('Expected active state name to be non-null.');
 
     expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
     expect(
@@ -1083,6 +1089,7 @@ describe('Exploration editor tab component', () => {
     spyOn(explorationStatesService, 'getState').and.returnValues(state);
     spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
     spyOn(component, 'startTutorial');
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
@@ -1098,6 +1105,7 @@ describe('Exploration editor tab component', () => {
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
     spyOn(component, 'startTutorial');
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onEndTutorial();
 
     component.initStateEditor();
@@ -1111,6 +1119,7 @@ describe('Exploration editor tab component', () => {
       'registerFinishTutorialEvent'
     );
     spyOn(editabilityService, 'onEndTutorial');
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
@@ -1135,6 +1144,7 @@ describe('Exploration editor tab component', () => {
         canEdit: false,
       } as ExplorationPermissions)
     );
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();

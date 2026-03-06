@@ -381,10 +381,8 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   getStateContentPlaceholder(): string {
-    if (
-      this.stateEditorService.getActiveStateName() ===
-      this.explorationInitStateNameService.savedMemento
-    ) {
+    const activeStateName = this.getValidActiveStateName();
+    if (activeStateName === this.explorationInitStateNameService.savedMemento) {
       return (
         'This is the first card of your exploration. Use this space ' +
         'to introduce your topic and engage the learner, then ask ' +
@@ -433,7 +431,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   initStateEditor(): void {
-    this.stateName = this.stateEditorService.getActiveStateName() ?? '';
+    this.stateName = this.getValidActiveStateName();
     this.stateEditorService.setStateNames(
       this.explorationStatesService.getStateNames()
     );
