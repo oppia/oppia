@@ -24,8 +24,6 @@ from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
-    platform_parameter_list,
-    platform_parameter_services,
     skill_services,
     story_fetchers,
     topic_fetchers,

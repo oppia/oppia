@@ -29,8 +29,6 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     fs_services,
-    platform_parameter_list,
-    platform_parameter_services,
     rights_domain,
     rights_manager,
     taskqueue_services,

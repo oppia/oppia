@@ -103,7 +103,6 @@ describe('Sign up page component', () => {
   });
 
   it('should intialize', fakeAsync(() => {
-    const canSendEmails = true;
     const hasAgreedToLatestTerms = true;
     const hasEverRegistered = true;
     const username = 'test_user';

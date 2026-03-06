@@ -25,8 +25,6 @@ from core import feconf
 from core.domain import (
     email_manager,
     feedback_domain,
-    platform_parameter_list,
-    platform_parameter_services,
     rights_manager,
     subscription_services,
     taskqueue_services,
@@ -411,7 +409,7 @@ def create_messages(
         suggestion_models_to_update
     )
 
-    # thread emails for contributor dashboard suggestions.
+    # Thread emails for contributor dashboard suggestions.
     message_changed = (
         len(text) > 0 or old_statuses[index] != new_statuses[index]
     )

@@ -28,8 +28,6 @@ from core.domain import (
     email_manager,
     fs_services,
     image_validation_services,
-    platform_parameter_list,
-    platform_parameter_services,
     question_services,
     role_services,
     skill_services,
