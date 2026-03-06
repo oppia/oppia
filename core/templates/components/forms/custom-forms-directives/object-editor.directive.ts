@@ -54,7 +54,7 @@ import {
 
 import {Subscription} from 'rxjs';
 
-import {AlgebraicExpressionEditorComponent} from 'extensions/objects/templates/algebraic-expression-editor.component';
+import {AlgebraicExpressionEditorComponent} from '../../../../extensions/objects/templates/algebraic-expression-editor.component';
 import {BooleanEditorComponent} from 'extensions/objects/templates/boolean-editor.component';
 import {CodeStringEditorComponent} from 'extensions/objects/templates/code-string-editor.component';
 import {CoordTwoDimEditorComponent} from 'extensions/objects/templates/coord-two-dim-editor.component';
