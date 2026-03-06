@@ -365,11 +365,12 @@ export class VoiceoverSubmitter extends BaseUser {
     // Open the accent dropdown.
     await this.clickOnElementWithSelector(voiceoverLanguageAccentSelector);
 
-    // Click the accent option using visible text.
-    await this.clickOnElementWithText(accentDescription);
-
-    // Wait for accent selection to fully apply.
-    await this.waitForNetworkIdle();
+    // Select accent and wait for the options panel to close.
+    await this.selectMatOption(accentDescription);
+    await this.expectTextContentToContain(
+      voiceoverLanguageAccentSelector,
+      accentDescription
+    );
   }
 
   /**
