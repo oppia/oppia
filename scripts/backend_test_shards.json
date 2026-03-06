@@ -1,5 +1,6 @@
 {
     "1": [
+        "scripts.check_unused_i18n_keys_test",
         "core.jobs.transforms.job_result_transforms_test",
         "scripts.linters.run_lint_checks_test",
         "core.controllers.base_test",
