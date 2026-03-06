@@ -228,7 +228,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
         );
         this.stateInteractionIdService.init(
           this.stateName,
-          stateData.interaction.id
+          stateData.interaction.id as InteractionSpecsKey
         );
         this.stateCustomizationArgsService.init(
           this.stateName,
