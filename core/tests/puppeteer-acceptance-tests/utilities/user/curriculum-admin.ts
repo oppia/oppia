@@ -1212,7 +1212,9 @@ export class CurriculumAdmin extends TopicManager {
       const newError = new Error(
         `Failed to verify sections of study guide: ${error}`
       );
-      newError.stack = error.stack;
+      if (error instanceof Error) {
+        newError.stack = error.stack;
+      }
       throw newError;
     }
   }
@@ -1720,7 +1722,9 @@ export class CurriculumAdmin extends TopicManager {
       });
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
-      showMessage(`welcome modal not found: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      showMessage(`welcome modal not found: ${errorMessage}`);
     }
   }
 
@@ -2233,7 +2237,9 @@ export class CurriculumAdmin extends TopicManager {
           );
           await this.page.waitForSelector(modalDiv, {hidden: true});
         } catch (error) {
-          console.error('Failed to remove question', error.stack);
+          const errorStack =
+            error instanceof Error ? error.stack : String(error);
+          console.error('Failed to remove question', errorStack);
           throw error;
         }
 
@@ -2244,9 +2250,10 @@ export class CurriculumAdmin extends TopicManager {
         `All questions have been successfully removed from the skill "${skillName}".`
       );
     } catch (error) {
+      const errorStack = error instanceof Error ? error.stack : String(error);
       throw new Error(
         `Failed to remove all questions from the skill "${skillName}"` +
-          error.stack
+          errorStack
       );
     }
   }
@@ -2898,7 +2905,9 @@ export class CurriculumAdmin extends TopicManager {
         const newError = new Error(
           `Failed to verify WorkedExamples of skill: ${error}`
         );
-        newError.stack = error.stack;
+        if (error instanceof Error) {
+          newError.stack = error.stack;
+        }
         throw newError;
       }
     }
@@ -2991,7 +3000,8 @@ export class CurriculumAdmin extends TopicManager {
         practiceTabToggle
       );
     } catch (error) {
-      console.error(error.stack);
+      const errorStack = error instanceof Error ? error.stack : String(error);
+      console.error(errorStack);
       throw error;
     }
   }
