@@ -277,6 +277,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts"
     },
     {
+      "name": "logged-out-learner/view-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/view-a-collection.spec.ts"
+    },
+    {
       "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts"
     },
