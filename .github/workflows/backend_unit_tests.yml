@@ -42,6 +42,7 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
     strategy:
+      fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
         shard: [1, 2, 3, 4, 5]
     steps:
