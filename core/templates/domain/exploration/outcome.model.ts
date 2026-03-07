@@ -43,7 +43,7 @@ export class Outcome extends BaseTranslatableObject {
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   constructor(
-    dest: string,
+    dest: string | null,
     destIfReallyStuck: string | null,
     feedback: SubtitledHtml,
     labelledAsCorrect: boolean,
@@ -53,7 +53,7 @@ export class Outcome extends BaseTranslatableObject {
   ) {
     super();
 
-    this.dest = dest;
+    this.dest = dest as string;
     this.destIfReallyStuck = destIfReallyStuck;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
@@ -112,7 +112,7 @@ export class Outcome extends BaseTranslatableObject {
     paramChanges: readonly ParamChangeBackendDict[]
   ): Outcome {
     return new Outcome(
-      dest as string,
+      dest,
       null,
       SubtitledHtml.createDefault(feedbackText, feedbackTextId),
       false,
@@ -124,7 +124,7 @@ export class Outcome extends BaseTranslatableObject {
 
   static createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
-      outcomeDict.dest as string,
+      outcomeDict.dest,
       outcomeDict.dest_if_really_stuck,
       SubtitledHtml.createFromBackendDict(outcomeDict.feedback),
       outcomeDict.labelled_as_correct,
