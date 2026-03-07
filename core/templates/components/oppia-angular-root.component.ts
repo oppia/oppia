@@ -83,22 +83,47 @@ import {ServicesConstants} from 'services/services.constants';
 // build to not complain.
 // TODO(#16309): Fix relative imports.
 import '../third-party-imports/ckeditor.import';
-
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveLink} from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
-import {CkEditorInitializerService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
+import {
+  CkEditorInitializerService,
+  RteHelperService,
+} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {I18nService} from 'i18n/i18n.service';
-import {RteHelperService} from 'services/rte-helper.service';
+// This throws "Cannot find module during Angular compilation".
+// We need to suppress this error because these components are loaded dynamically.
+// @ts-ignore
 import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const componentMap = {
@@ -131,7 +156,7 @@ const componentMap = {
 export const registerCustomElements = (injector: Injector): void => {
   for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
     const rteElement = createCustomElement(
-      componentMap[rteKey].component_class,
+      componentMap[rteKey as keyof typeof componentMap].component_class,
       {injector}
     );
     // Check if the custom elements have been previously defined. We can't
@@ -142,14 +167,18 @@ export const registerCustomElements = (injector: Injector): void => {
     if (
       customElements.get(
         'oppia-noninteractive-ckeditor-' +
-          ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id
+          ServicesConstants.RTE_COMPONENT_SPECS[
+            rteKey as keyof typeof ServicesConstants.RTE_COMPONENT_SPECS
+          ].frontend_id
       ) !== undefined
     ) {
       continue;
     }
     customElements.define(
       'oppia-noninteractive-ckeditor-' +
-        ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
+        ServicesConstants.RTE_COMPONENT_SPECS[
+          rteKey as keyof typeof ServicesConstants.RTE_COMPONENT_SPECS
+        ].frontend_id,
       rteElement
     );
   }
@@ -170,11 +199,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
-  static rteHelperService;
+  static rteHelperService: RteHelperService;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static ajsValueProvider: (string, unknown) => void;
+  static ajsValueProvider: (key: string, value: unknown) => void;
   static injector: Injector;
 
   constructor(

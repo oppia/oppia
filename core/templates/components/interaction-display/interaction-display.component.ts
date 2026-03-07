@@ -66,10 +66,16 @@ export class InteractionDisplayComponent {
 
       if (
         dom.body.firstElementChild &&
-        TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName]
+        TAG_TO_INTERACTION_MAPPING[
+          dom.body.firstElementChild
+            .tagName as keyof typeof TAG_TO_INTERACTION_MAPPING
+        ]
       ) {
         let interaction =
-          TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName];
+          TAG_TO_INTERACTION_MAPPING[
+            dom.body.firstElementChild
+              .tagName as keyof typeof TAG_TO_INTERACTION_MAPPING
+          ];
 
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);
@@ -92,9 +98,13 @@ export class InteractionDisplayComponent {
           // is irrelevant for this usecase).
           if (/[\])}[{(]/g.test(attribute.name)) {
             if (this.parentScope) {
-              attributeValue = this.parentScope[attributeNameInCamelCase];
+              const valueFromScope = (
+                this.parentScope as Record<string, unknown>
+              )[attributeNameInCamelCase];
+
+              attributeValue = (valueFromScope as string) ?? '';
             } else {
-              attributeValue = null;
+              attributeValue = '';
             }
           } else {
             componentRef.location.nativeElement.setAttribute(
@@ -103,7 +113,9 @@ export class InteractionDisplayComponent {
             );
           }
 
-          componentRef.instance[attributeNameInCamelCase] = attributeValue;
+          (componentRef.instance as Record<string, unknown>)[
+            attributeNameInCamelCase
+          ] = attributeValue;
         });
 
         componentRef.changeDetectorRef.detectChanges();
