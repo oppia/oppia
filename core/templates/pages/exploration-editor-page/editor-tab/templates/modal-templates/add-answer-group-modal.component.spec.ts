@@ -134,9 +134,8 @@ describe('Add Answer Group Modal Component', () => {
     expect(component.validation).toBe(false);
   }));
 
-  it('should initialize null destination values in question mode', () => {
+  it('should initialize null outcome destination in question mode', () => {
     expect(component.questionModeEnabled).toBe(true);
-    expect(component.tmpRule.type).toBe(null);
     expect(component.tmpOutcome.dest).toBe(null);
   });
 

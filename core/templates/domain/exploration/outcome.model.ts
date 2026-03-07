@@ -25,7 +25,7 @@ import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
 export interface OutcomeBackendDict {
-  dest: string;
+  dest: string | null;
   dest_if_really_stuck: string | null;
   feedback: SubtitledHtmlBackendDict;
   labelled_as_correct: boolean;
@@ -74,8 +74,8 @@ export class Outcome extends BaseTranslatableObject {
     return outcomeContentIdToHtml;
   }
 
-  setDestination(newValue: string): void {
-    this.dest = newValue;
+  setDestination(newValue: string | null): void {
+    this.dest = newValue as string;
   }
 
   toBackendDict(): OutcomeBackendDict {
@@ -106,13 +106,13 @@ export class Outcome extends BaseTranslatableObject {
     );
   }
   static createNew(
-    dest: string,
+    dest: string | null,
     feedbackTextId: string,
     feedbackText: string,
     paramChanges: readonly ParamChangeBackendDict[]
   ): Outcome {
     return new Outcome(
-      dest,
+      dest as string,
       null,
       SubtitledHtml.createDefault(feedbackText, feedbackTextId),
       false,
@@ -124,7 +124,7 @@ export class Outcome extends BaseTranslatableObject {
 
   static createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
-      outcomeDict.dest,
+      outcomeDict.dest as string,
       outcomeDict.dest_if_really_stuck,
       SubtitledHtml.createFromBackendDict(outcomeDict.feedback),
       outcomeDict.labelled_as_correct,
