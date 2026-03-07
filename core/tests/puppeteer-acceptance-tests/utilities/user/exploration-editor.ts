@@ -95,7 +95,8 @@ const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
 const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const currentCardNameContainerSelector = '.e2e-test-state-name-container';
-
+const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
 const previewTabButton = '.e2e-test-preview-tab';
 const previewTabContainer = '.e2e-test-preview-tab-container';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
@@ -434,6 +435,12 @@ const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
 const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
+const explorationGridSelector = '.e2e-test-exploration-dashboard-card';
+const explorationListSelector = '.oppia-dashboard-table';
+const explorationGridRatingSelector = '.e2e-test-exp-summary-tile-rating';
+const explorationGridFeedbackSelector =
+  '.e2e-test-exp-summary-tile-open-feedback';
+const explorationGridViewsSelector = '.e2e-test-exp-summary-tile-num-views';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -497,6 +504,7 @@ export class ExplorationEditor extends BaseUser {
       `Interaction ( ${name} )`
     );
   }
+
   /**
    * Remove feedback response in preview tab.
    */
@@ -507,6 +515,154 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
+
+  /**
+   * Check whether a text present or not.
+   */
+  async expectTextToBePresent(text: string): Promise<void> {
+    await this.page.waitForFunction(
+      (t: string) => document.body.innerText.includes(t),
+      {},
+      text
+    );
+  }
+  /**
+   * @param expectedTitles Checks the expected array of exploration in grid in order or not.
+   */
+  async expectExplorationsInGridInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    // Wait until dashboard cards are rendered.
+    await this.page.waitForSelector(explorationGridSelector);
+    const titles = await this.page.$$eval(
+      '.e2e-test-exploration-dashboard-card .e2e-test-exp-summary-tile-title',
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Function to check whether the explorations in list view.
+   */
+  async expectExplorationsInListInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationListSelector);
+    const titles = await this.page.$$eval(
+      '.e2e-test-exp-summary-row-title',
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * @param index index of the exploration.
+   * @param expectedRating expected rating on exploration.
+   * @param expectedOpenFeedback expected feedback on exploration.
+   * @param expectedViews expected views on exploration.
+   */
+  async expectListDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenThreads: string,
+    expectedPlays: string
+  ): Promise<void> {
+    const rows = await this.page.$$('.exploration-list-item');
+    const row = rows[index];
+    if (!row) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+    const rating = await row.$eval('td:nth-child(2)', el =>
+      (el as HTMLElement).innerText.trim()
+    );
+    if (rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${rating}".`
+      );
+    }
+    const plays = await row.$eval('td:nth-child(3)', el =>
+      (el as HTMLElement).innerText.trim()
+    );
+    if (plays !== expectedPlays) {
+      throw new Error(
+        `Expected plays "${expectedPlays}" but found "${plays}".`
+      );
+    }
+    const openThreads = await row.$eval('td:nth-child(4)', el =>
+      (el as HTMLElement).innerText.trim()
+    );
+    if (openThreads !== expectedOpenThreads) {
+      throw new Error(
+        `Expected open threads "${expectedOpenThreads}" but found "${openThreads}".`
+      );
+    }
+  }
+
+  /**
+   * @param index - index of the exploration.
+   * @param expectedRating - expected rating on exploration.
+   * @param expectedOpenFeedback - expected feedback on exploration.
+   * @param expectedViews - expected views on exploration.
+   */
+  async expectGridCardDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenFeedback: string,
+    expectedViews: string
+  ): Promise<void> {
+    const cards = await this.page.$$(explorationGridSelector);
+    const card = cards[index];
+    const rating = await card.$eval(explorationGridRatingSelector, el =>
+      (el as HTMLElement).innerText.trim()
+    );
+    if (rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${rating}".`
+      );
+    }
+    const feedback = await card.$eval(explorationGridFeedbackSelector, el =>
+      (el as HTMLElement).innerText.trim()
+    );
+    if (feedback !== expectedOpenFeedback) {
+      throw new Error(
+        `Expected open feedback "${expectedOpenFeedback}" but found "${feedback}".`
+      );
+    }
+    const views = await card.$eval(explorationGridViewsSelector, el =>
+      (el as HTMLElement).innerText.trim()
+    );
+    if (views !== expectedViews) {
+      throw new Error(
+        `Expected views "${expectedViews}" but found "${views}".`
+      );
+    }
+  }
+
   /**
    * Enables the list view of the exploration.
    */
@@ -514,13 +670,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(listViewButtonSelector, {
       visible: true,
     });
-
     await this.clickOnElementWithSelector(listViewButtonSelector);
-
-    // Optional safety check: ensure list view is applied.
-    await this.page.waitForFunction(() => {
-      return document.querySelector('.e2e-test-oppia-list-view-btn') !== null;
-    });
+    // Safety check:ensure list view is applied.
+    await this.page.waitForSelector(explorationListSelector);
   }
 
   /**
@@ -2480,6 +2632,25 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.page.waitForSelector(creatorDashboardMenuLink, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
+
+    await this.page.waitForSelector(creatorDashboardContainerSelector, {
+      visible: true,
+    });
+  }
+
+  /**
    * Function to navigate to exploration editor from Creator Dashboard.
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
@@ -2516,6 +2687,36 @@ export class ExplorationEditor extends BaseUser {
     await this.updateCardContent(content);
     await this.addInteraction(interaction);
     showMessage('A simple exploration is created.');
+  }
+
+  /**
+   * Function to create and publish minimal exploration.
+   * @param content - content of the exploration
+   * @param interaction - the interaction to be added to the exploration
+   * @param title - title of the exploration
+   * @param goal - goal of the exploration
+   * @param category - category of the exploration
+   */
+  async createAndPublishMinimalExploration(
+    content: string,
+    interaction: string,
+    title: string,
+    goal: string,
+    category: string
+  ): Promise<string> {
+    await this.navigateToExplorationEditorFromCreatorDashboard();
+    await this.dismissWelcomeModal();
+    await this.createMinimalExploration(content, interaction);
+    await this.saveExplorationDraft();
+    const explorationId = await this.publishExplorationWithMetadata(
+      title,
+      goal,
+      category
+    );
+
+    await this.waitForPageToFullyLoad();
+    await this.navigateToCreatorDashboardUsingProfileDropdown();
+    return explorationId;
   }
 
   /**
@@ -5498,31 +5699,37 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedUsers - The expected count of users who submitted ratings.
    */
   async expectAverageRatingAndUsersToBe(
-    expectedRating: number,
+    expectedRating: number | string,
     expectedUsers: number
   ): Promise<void> {
-    await this.page.waitForSelector(avarageRatingSelector, {
-      visible: true,
-    });
-    const avarageRating = await this.page.$eval(
-      avarageRatingSelector,
-      element => parseFloat((element as HTMLElement).innerText.trim())
+    await this.page.waitForSelector(avarageRatingSelector);
+    const ratingText = await this.page.$eval(avarageRatingSelector, element =>
+      (element as HTMLElement).innerText.trim()
     );
-    if (avarageRating !== expectedRating) {
-      throw new Error(
-        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
-      );
+    // Handle "N/A" case.
+    if (expectedRating === 'N/A') {
+      if (ratingText !== 'N/A') {
+        throw new Error(
+          `Expected average rating to be "N/A", but found "${ratingText}".`
+        );
+      }
+    } else {
+      const ratingValue = parseFloat(ratingText);
+      if (ratingValue !== expectedRating) {
+        throw new Error(
+          `Expected average rating to be ${expectedRating}, but found ${ratingValue}.`
+        );
+      }
     }
     const totalUsersText = await this.page.$eval(
       usersCountInRatingSelector,
       el => (el as HTMLElement).innerText.trim() || ''
     );
-    // Extract number from text (e.g., "by 3 users" → 3).
     const totalUsersMatch = totalUsersText.match(/\d+/);
     const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
     if (totalUsers !== expectedUsers) {
       throw new Error(
-        `Expected ${expectedUsers} users to have submitted ratings, but found only ${totalUsers} instead.`
+        `Expected ${expectedUsers} users to have submitted ratings, but found ${totalUsers}.`
       );
     }
   }
@@ -5532,9 +5739,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of open feedback entries.
    */
   async expectOpenFeedbacksToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
-      visible: true,
-    });
+    await this.page.waitForSelector(numberOfOpenFeedbacksSelector);
     const numberOfOpenFeedbacks = await this.page.$eval(
       numberOfOpenFeedbacksSelector,
       el => parseInt((el as HTMLElement).innerText.trim(), 10)
@@ -5551,9 +5756,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected total play count.
    */
   async expectTotalPlaysToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(totalPlaysSelector, {
-      visible: true,
-    });
+    await this.page.waitForSelector(totalPlaysSelector);
     const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
       parseInt((el as HTMLElement).innerText.trim(), 10)
     );

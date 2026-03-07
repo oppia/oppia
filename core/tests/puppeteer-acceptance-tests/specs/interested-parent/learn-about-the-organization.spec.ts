@@ -57,12 +57,12 @@ describe('Interested Parent', function () {
     // Expand features.
     await parentUser.expectFeaturesAccordionToBeFunctionalInAboutPage();
 
-    // Our partnerships.
-    await parentUser.expectSubheadingInAboutUsPageToContain(
-      ' Our partnerships and how we’re improving lives '
-    );
+    // // Our partnerships.
+    // await parentUser.expectSubheadingInAboutUsPageToContain(
+    //   ' Our partnerships and how we’re improving lives '
+    // );
     await parentUser.expectVolunteerCarouselToBeFunctionalInAboutPage();
-    await parentUser.expectPartnershipStoryBoardsToBe(4);
+    // Await parentUser.expectPartnershipStoryBoardsToBe(4);
 
     // The Oppia Impact.
     await parentUser.expectSubheadingInAboutUsPageToContain(

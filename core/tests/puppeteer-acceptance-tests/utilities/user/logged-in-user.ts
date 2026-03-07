@@ -20,6 +20,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
+import {string} from 'yargs';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -366,6 +367,10 @@ const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 const usernameSelector = '.e2e-test-username';
 const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
+const feedbackTextArea = '.e2e-test-exploration-feedback-textarea';
+const feedbackSubmitButton = '.e2e-test-exploration-feedback-submit-btn';
+const feedbackCloseButton = '.e2e-test-exploration-feedback-close-button';
+const feedbackPopup = '.oppia-feedback-popup-container';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -373,9 +378,9 @@ export class LoggedInUser extends BaseUser {
    */
   async starRateExploration(stars: number): Promise<void> {
     // Wait until rating stars are rendered.
-    await this.page.waitForSelector('.e2e-test-rating-star', {visible: true});
+    await this.page.waitForSelector(ratingStarSelector, {visible: true});
 
-    const ratingStars = await this.page.$$('.e2e-test-rating-star');
+    const ratingStars = await this.page.$$(ratingStarSelector);
 
     if (ratingStars.length < stars) {
       throw new Error(`Only ${ratingStars.length} stars found`);
@@ -402,6 +407,32 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(removeModalContainerSelector, {
       hidden: true,
     });
+  }
+
+  /**
+   * Giving feedback after rating an exploration.
+   */
+  async giveFeedbackAfterRating(feedback: string): Promise<void> {
+    await this.page.waitForSelector(feedbackTextArea, {visible: true});
+    await this.typeInInputField(feedbackTextArea, feedback);
+    await this.page.waitForSelector(feedbackSubmitButton);
+    await this.page.waitForFunction(
+      (selector: string) =>
+        !document.querySelector(selector)?.hasAttribute('disabled'),
+      {},
+      feedbackSubmitButton
+    );
+    await this.clickOnElementWithSelector(feedbackSubmitButton);
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * closing feedback textarea withput submiting.
+   */
+  async closeFeedbackPopup(): Promise<void> {
+    await this.page.waitForSelector(feedbackCloseButton, {visible: true});
+    await this.clickOnElementWithSelector(feedbackCloseButton);
+    await this.page.waitForSelector(feedbackPopup, {hidden: true});
   }
 
   /**
