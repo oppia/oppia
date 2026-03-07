@@ -1850,3 +1850,32 @@ class TranslationCoordinatorStats:
             'coordinator_ids': self.coordinator_ids,
             'coordinators_count': self.coordinators_count,
         }
+
+
+class DeletedUsername:
+    """Domain object for DeletedUsernameModel."""
+
+    def __init__(self, username_hash: str) -> None:
+        self.username_hash = username_hash
+
+    def validate(self) -> None:
+        """Validates the username_hash."""
+
+        if not isinstance(self.username_hash, str):
+            raise utils.ValidationError(
+                'Expected username_hash to be a string, received %s'
+                % self.username_hash
+            )
+
+        if not self.username_hash:
+            raise utils.ValidationError('username_hash cannot be empty.')
+
+        if len(self.username_hash) != 32:
+            raise utils.ValidationError(
+                'username_hash must be 32 characters long.'
+            )
+
+        if not re.match(r'^[a-f0-9]{32}$', self.username_hash):
+            raise utils.ValidationError(
+                'username_hash must be a valid hexadecimal string.'
+            )

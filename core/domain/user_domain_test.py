@@ -1956,3 +1956,26 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_contribution_rights.can_submit_at_least_one_item()
         )
+
+
+class DeletedUsernameTests(test_utils.GenericTestBase):
+    """Tests for DeletedUsername domain object."""
+
+    def test_validate_with_valid_hash(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='a' * 32)
+        deleted_username.validate()
+
+    def test_validate_with_empty_hash(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='')
+        with self.assertRaisesRegex(utils.ValidationError, 'empty'):
+            deleted_username.validate()
+
+    def test_validate_with_invalid_length(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='abc123')
+        with self.assertRaisesRegex(utils.ValidationError, '32'):
+            deleted_username.validate()
+
+    def test_validate_with_invalid_characters(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='z' * 32)
+        with self.assertRaisesRegex(utils.ValidationError, 'hexadecimal'):
+            deleted_username.validate()
