@@ -2163,6 +2163,23 @@ export class BaseUser {
     await this.clickOnElementWithSelector(hideOSKButtonSelector);
     await this.expectElementToBeVisible(hideOSKButtonSelector, false);
   }
+  /**
+   * Function to ensure the page has no translation ids.
+   */
+  async ensurePageHasNoTranslationIds(): Promise<void> {
+    const translationIds = await this.page.$$eval('[translate]', elements =>
+      elements
+        .map(el => el.getAttribute('translate'))
+        .filter(val => val && val.startsWith('I18N'))
+    );
+
+    if (translationIds.length > 0) {
+      throw new Error(
+        `Page has untranslated strings: ${translationIds.join(', ')}`
+      );
+    }
+    showMessage('Success: Page has no translation ids.');
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

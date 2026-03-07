@@ -118,6 +118,17 @@ describe('Logged-Out Learner', function () {
     // Navigate to community library page and expect it to contain 3
     // different explorations.
     await loggedOutLearner.navigateToCommunityLibraryPage();
+    await loggedOutLearner.expectCommunityLibraryHeadingToBePresent(
+      'Imagine what you could learn today...'
+    );
+    // Ensure page has no translation ids.
+    await loggedOutLearner.ensurePageHasNoTranslationIds();
+
+    // Select language and verify no translation ids.
+    await loggedOutLearner.selectLanguages(['français']);
+    await loggedOutLearner.ensurePageHasNoTranslationIds();
+
+    // Expect the community library to contain the 3 published explorations.
     await loggedOutLearner.expectSearchResultsToContain([
       'What are the place values?',
       'Dummy Exploration 1',
