@@ -30,9 +30,12 @@ import {
 } from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
-// Interface for the sample exploration data used in tests. This represents
-// the raw HTTP response body flushed in HttpTestingController.
-interface SampleExplorationData {
+// Test-specific type that extends Partial of both backend response types
+// (excluding 'states' since mock data uses simplified state objects) so that
+// direct type assertions from service return types work without 'as unknown'.
+type SampleExplorationData = Partial<
+  Omit<ExplorationBackendDict, 'states'> & FetchExplorationBackendResponse
+> & {
   exploration_id: string;
   init_state_name: string;
   language_code: string;
@@ -41,8 +44,7 @@ interface SampleExplorationData {
   user_email: string;
   version: number;
   title?: string;
-  [key: string]: unknown;
-}
+};
 
 describe('EditableExplorationBackendApiService', () => {
   let editableExplorationBackendApiService!: EditableExplorationBackendApiService;
@@ -183,7 +185,7 @@ describe('EditableExplorationBackendApiService', () => {
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
       .then((data: ExplorationBackendDict) => {
-        exploration = data as unknown as SampleExplorationData;
+        exploration = data as SampleExplorationData;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
@@ -222,7 +224,7 @@ describe('EditableExplorationBackendApiService', () => {
     readOnlyExplorationBackendApiService
       .loadLatestExplorationAsync('0')
       .then((data: FetchExplorationBackendResponse) => {
-        exploration = data as unknown as SampleExplorationData;
+        exploration = data as SampleExplorationData;
       });
 
     const req = httpTestingController.expectOne('/explorehandler/init/0');
@@ -264,7 +266,7 @@ describe('EditableExplorationBackendApiService', () => {
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
       .then((data: ExplorationBackendDict) => {
-        exploration = data as unknown as SampleExplorationData;
+        exploration = data as SampleExplorationData;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
@@ -505,7 +507,7 @@ describe('EditableExplorationBackendApiService', () => {
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
       .then((data: ExplorationBackendDict) => {
-        exploration = data as unknown as SampleExplorationData;
+        exploration = data as SampleExplorationData;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');

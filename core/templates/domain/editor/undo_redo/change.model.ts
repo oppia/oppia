@@ -451,27 +451,27 @@ interface TopicAbbreviatedNameChange {
   cmd: 'update_topic_property';
   property_name: 'abbreviated_name';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
 }
 interface TopicPracticeTabChange {
   cmd: 'update_topic_property';
   property_name: 'practice_tab_is_displayed';
   new_value: boolean;
-  old_value: boolean;
+  old_value: boolean | null;
 }
 
 interface TopicThumbnailFilenameChange {
   cmd: 'update_topic_property';
   property_name: 'thumbnail_filename';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
 }
 
 interface TopicThumbnailBgColorChange {
   cmd: 'update_topic_property';
   property_name: 'thumbnail_bg_color';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
 }
 
 interface TopicDescriptionChange {
@@ -485,14 +485,14 @@ interface TopicUrlFragmentChange {
   cmd: 'update_topic_property';
   property_name: 'url_fragment';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
 }
 
 interface TopicMetaTagContentChange {
   cmd: 'update_topic_property';
   property_name: 'meta_tag_content';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
 }
 
 interface TopicLanguageCodeChange {
@@ -506,7 +506,7 @@ interface TopicPageTitleFragmentForWebChange {
   cmd: 'update_topic_property';
   property_name: 'page_title_fragment_for_web';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
 }
 
 interface TopicSkillForDiagnosticTestChange {
@@ -533,7 +533,7 @@ interface TopicSubtopicThumbnailFilenameChange {
   cmd: 'update_subtopic_property';
   property_name: 'thumbnail_filename';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
   subtopic_id: number;
 }
 
@@ -541,7 +541,7 @@ interface TopicSubtopicThumbnailBgColorChange {
   cmd: 'update_subtopic_property';
   property_name: 'thumbnail_bg_color';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
   subtopic_id: number;
 }
 
@@ -557,7 +557,7 @@ interface TopicSubtopicUrlFragmentChange {
   cmd: 'update_subtopic_property';
   property_name: 'url_fragment';
   new_value: string;
-  old_value: string;
+  old_value: string | null;
   subtopic_id: number;
 }
 

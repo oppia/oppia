@@ -90,9 +90,9 @@ export class QuestionUpdateService {
     changeDict: BackendChangeObject,
     paramName: string
   ): string | string[] {
-    return (changeDict as unknown as Record<string, string | string[]>)[
-      paramName
-    ];
+    return (changeDict as ApplyParams)[
+      paramName as keyof ApplyParams
+    ] as string | string[];
   }
 
   _getNewPropertyValueFromChangeDict(
@@ -164,12 +164,12 @@ export class QuestionUpdateService {
       newValue,
       oldValue,
       (changeDict: BackendChangeObject, question: Question) => {
-        var newValue = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setNextContentIdIndex(newValue as unknown as number);
+        var newValue = (changeDict as ApplyParams).new_value;
+        question.setNextContentIdIndex(newValue as number);
       },
       (changeDict: BackendChangeObject, question: Question) => {
         question.setNextContentIdIndex(
-          (changeDict as unknown as ApplyParams).old_value as number
+          (changeDict as ApplyParams).old_value as number
         );
       }
     );

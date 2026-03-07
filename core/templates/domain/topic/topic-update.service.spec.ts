@@ -29,6 +29,32 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 
+// Test-specific type: a subset of TopicBackendDict where properties that are
+// intentionally left unset in tests (to verify their initial/undefined state)
+// are made optional.
+type TestTopicBackendDict = Omit<
+  TopicBackendDict,
+  | 'abbreviated_name'
+  | 'thumbnail_filename'
+  | 'thumbnail_bg_color'
+  | 'url_fragment'
+  | 'practice_tab_is_displayed'
+  | 'meta_tag_content'
+  | 'page_title_fragment_for_web'
+> &
+  Partial<
+    Pick<
+      TopicBackendDict,
+      | 'abbreviated_name'
+      | 'thumbnail_filename'
+      | 'thumbnail_bg_color'
+      | 'url_fragment'
+      | 'practice_tab_is_displayed'
+      | 'meta_tag_content'
+      | 'page_title_fragment_for_web'
+    >
+  >;
+
 describe('Topic update service', function () {
   let topicUpdateService!: TopicUpdateService;
   let undoRedoService!: UndoRedoService;
@@ -39,7 +65,10 @@ describe('Topic update service', function () {
   let _sampleSubtopicPage!: SubtopicPage;
   let _sampleStudyGuide!: StudyGuide;
 
-  let sampleTopicBackendObject = {
+  let sampleTopicBackendObject: {
+    topicDict: TestTopicBackendDict;
+    skillIdToDescriptionDict: Record<string, string>;
+  } = {
     topicDict: {
       id: 'sample_topic_id',
       name: 'Topic name',
@@ -71,6 +100,9 @@ describe('Topic update service', function () {
           id: 1,
           title: 'Title',
           skill_ids: ['skill_2'],
+          thumbnail_filename: null,
+          thumbnail_bg_color: null,
+          url_fragment: null,
         },
       ],
       next_subtopic_id: 2,
@@ -139,7 +171,7 @@ describe('Topic update service', function () {
       sampleStudyGuideObject
     );
     _sampleTopic = Topic.create(
-      sampleTopicBackendObject.topicDict as unknown as TopicBackendDict,
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
   });
@@ -368,7 +400,7 @@ describe('Topic update service', function () {
           new_value: 'new unique value',
           old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -397,7 +429,7 @@ describe('Topic update service', function () {
           new_value: 'new meta tag content',
           old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -428,7 +460,7 @@ describe('Topic update service', function () {
           new_value: 'new page title',
           old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -458,7 +490,7 @@ describe('Topic update service', function () {
           new_value: true,
           old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -484,7 +516,7 @@ describe('Topic update service', function () {
           new_value: 'new-unique-value',
           old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -516,7 +548,7 @@ describe('Topic update service', function () {
           new_value: 'new unique value',
           old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -545,7 +577,7 @@ describe('Topic update service', function () {
           new_value: 'new unique value',
           old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -631,7 +663,7 @@ describe('Topic update service', function () {
 
   it("should set/unset changes to a subtopic's thumbnail" + 'filename', () => {
     expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      undefined
+      null
     );
 
     topicUpdateService.setSubtopicThumbnailFilename(
@@ -645,7 +677,7 @@ describe('Topic update service', function () {
 
     undoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      undefined
+      null
     );
   });
 
@@ -664,9 +696,9 @@ describe('Topic update service', function () {
           subtopic_id: 1,
           property_name: 'thumbnail_filename',
           new_value: 'filename',
-          old_value: undefined,
+          old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -700,9 +732,9 @@ describe('Topic update service', function () {
           subtopic_id: 1,
           property_name: 'url_fragment',
           new_value: 'subtopic-url',
-          old_value: undefined,
+          old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -718,18 +750,18 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a subtopic's url fragment", () => {
-    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(null);
 
     topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 1, 'test-url');
     expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual('test-url');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(null);
   });
 
   it("should set/unset changes to a subtopic's thumbnail bg " + 'color', () => {
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      undefined
+      null
     );
 
     topicUpdateService.setSubtopicThumbnailBgColor(_sampleTopic, 1, '#ffffff');
@@ -739,7 +771,7 @@ describe('Topic update service', function () {
 
     undoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      undefined
+      null
     );
   });
 
@@ -758,9 +790,9 @@ describe('Topic update service', function () {
           subtopic_id: 1,
           property_name: 'thumbnail_bg_color',
           new_value: '#ffffff',
-          old_value: undefined,
+          old_value: null,
         },
-      ] as unknown as BackendChangeObject[]);
+      ] as BackendChangeObject[]);
     }
   );
 
@@ -822,7 +854,7 @@ describe('Topic update service', function () {
       'skill_id_3',
     ];
     _sampleTopic = Topic.create(
-      sampleTopicBackendObject.topicDict as unknown as TopicBackendDict,
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
     let skills = (
@@ -861,13 +893,27 @@ describe('Topic update service', function () {
 
   it('should rearrange a subtopic', () => {
     var subtopicsDict = [
-      {id: 2, title: 'Title2', skill_ids: []},
-      {id: 3, title: 'Title3', skill_ids: []},
+      {
+        id: 2,
+        title: 'Title2',
+        skill_ids: [] as string[],
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null,
+      },
+      {
+        id: 3,
+        title: 'Title3',
+        skill_ids: [] as string[],
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null,
+      },
     ];
     sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
 
     _sampleTopic = Topic.create(
-      sampleTopicBackendObject.topicDict as unknown as TopicBackendDict,
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
     var subtopics = _sampleTopic.getSubtopics();
@@ -904,6 +950,9 @@ describe('Topic update service', function () {
         id: 1,
         title: 'Title',
         skill_ids: ['skill_2'],
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null,
       },
     ];
   });
