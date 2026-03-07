@@ -64,7 +64,8 @@ describe('Logged-Out Learner', function () {
       {visible: true, timeout: 30000}
     );
 
-    await superAdmin.clickOnElementWithText(COLLECTION_NAME);
+    // Click on the collection and wait for navigation to complete.
+    await superAdmin.clickAndWaitForNavigation(COLLECTION_NAME);
 
     // Extract collection ID from URL.
     const url = superAdmin.page.url();

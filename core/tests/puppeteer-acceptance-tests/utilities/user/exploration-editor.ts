@@ -3673,6 +3673,37 @@ export class ExplorationEditor extends BaseUser {
     });
     // Wait for the graph to update after creating a new card.
     await this.waitForNetworkIdle();
+
+    // Open state graph modal on mobile to view the graph.
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    // First ensure at least one node exists in the graph.
+    await this.page.waitForSelector(stateNodeSelector, {visible: true});
+
+    // Wait for the new card to appear in the graph.
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const elements = document.querySelectorAll(selector);
+        const cardValues = Array.from(elements).map(element =>
+          element.textContent?.trim()
+        );
+        return cardValues.includes(value);
+      },
+      {timeout: 10000},
+      stateNodeSelector,
+      cardName
+    );
+
+    // Close the state graph modal on mobile after verification.
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
   }
 
   /**
@@ -6104,6 +6135,9 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.openExplorationStateGraphInMobileView();
     }
+
+    // First ensure at least one node exists in the graph.
+    await this.page.waitForSelector(stateNodeSelector, {visible: true});
 
     await this.page.waitForFunction(
       (selector: string, value: string) => {
