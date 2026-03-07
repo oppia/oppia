@@ -118,6 +118,10 @@ const modifyTranslationModalSelector =
   '.e2e-test-modify-translations-modal-body';
 
 const stateNodeSelector = '.e2e-test-node-label';
+// Maximum length for node labels in the exploration graph.
+// This matches the MAX_NODE_LABEL_LENGTH constant from app.constants.ts.
+const MAX_NODE_LABEL_LENGTH = 15;
+
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
@@ -486,6 +490,22 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Truncates a card name the same way the frontend graph visualization does.
+   * Matches the behavior of TruncatePipe with MAX_NODE_LABEL_LENGTH.
+   * @param cardName The card name to potentially truncate.
+   * @returns The truncated card name if it exceeds MAX_NODE_LABEL_LENGTH, otherwise the original name.
+   */
+  private truncateCardName(cardName: string): string {
+    if (!cardName || cardName.length <= MAX_NODE_LABEL_LENGTH) {
+      return cardName;
+    }
+    const suffix = '...';
+    return (
+      cardName.substring(0, MAX_NODE_LABEL_LENGTH - suffix.length) + suffix
+    );
+  }
+
   /**
    * Checks if the interaction name is as expected.
    * @param name The name of the interaction.
@@ -3683,17 +3703,23 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(stateNodeSelector, {visible: true});
 
     // Wait for the new card to appear in the graph.
+    // Note: Card names may be truncated in the graph if they exceed MAX_NODE_LABEL_LENGTH.
+    const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
-      (selector: string, value: string) => {
+      (selector: string, fullName: string, truncatedName: string) => {
         const elements = document.querySelectorAll(selector);
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        return cardValues.includes(value);
+        // Check for either the full name or the truncated name.
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
       },
       {timeout: 10000},
       stateNodeSelector,
-      cardName
+      cardName,
+      truncatedCardName
     );
 
     // Close the state graph modal on mobile after verification.
@@ -6139,17 +6165,23 @@ export class ExplorationEditor extends BaseUser {
     // First ensure at least one node exists in the graph.
     await this.page.waitForSelector(stateNodeSelector, {visible: true});
 
+    // Note: Card names may be truncated in the graph if they exceed MAX_NODE_LABEL_LENGTH.
+    const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
-      (selector: string, value: string) => {
+      (selector: string, fullName: string, truncatedName: string) => {
         const elements = document.querySelectorAll(selector);
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        return cardValues.includes(value);
+        // Check for either the full name or the truncated name.
+        return (
+          cardValues.includes(fullName) || cardValues.includes(truncatedName)
+        );
       },
       {timeout: 60000},
       stateNodeSelector,
-      cardName
+      cardName,
+      truncatedCardName
     );
 
     if (this.isViewportAtMobileWidth()) {
