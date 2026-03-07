@@ -72,6 +72,11 @@
             "reason": "Library groups keys are constructed using I18N_LIBRARY_${prefix}_${name} with prefix='GROUPS'."
         },
         {
+            "pattern": "I18N_LIBRARY_N_*",
+            "code_reference": "core/templates/pages/library-page/search-bar/search-bar.component.ts :: updateSelectionDetails()",
+            "reason": "Library count keys are constructed using 'I18N_LIBRARY_N_' + itemsName.toUpperCase() (e.g. I18N_LIBRARY_N_CATEGORIES, I18N_LIBRARY_N_LANGUAGES)."
+        },
+        {
             "pattern": "I18N_LIBRARY_ALL_*_SELECTED",
             "code_reference": "core/templates/pages/library-page/search-bar/search-bar.component.ts :: updateSelectionDetails()",
             "reason": "Library selection keys are constructed using 'I18N_LIBRARY_ALL_' + itemsName + '_SELECTED'."
