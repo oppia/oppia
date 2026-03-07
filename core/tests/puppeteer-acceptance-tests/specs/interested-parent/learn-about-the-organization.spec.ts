@@ -73,6 +73,11 @@ describe('Interested Parent', function () {
 
     // View Report Button should be visible.
     await parentUser.expectViewReportButtonInAboutPageToBeVisible();
+
+    // Verify footer version matches expected pattern.
+    await parentUser.expectFooterVersionToMatchPattern(
+      /Version: [^\s]+ \(\w+\)/
+    );
   });
 
   it('should visit for parents / teachers page', async function () {
