@@ -56,6 +56,14 @@ describe('Logged-Out Learner', function () {
       '.e2e-test-search-input',
       COLLECTION_NAME
     );
+
+    // Wait for search results to load.
+    await superAdmin.waitForNetworkIdle();
+    await superAdmin.page.waitForSelector(
+      `h3.activity-title.e2e-test-collection-summary-tile-title`,
+      {visible: true, timeout: 30000}
+    );
+
     await superAdmin.clickOnElementWithText(COLLECTION_NAME);
 
     // Extract collection ID from URL.

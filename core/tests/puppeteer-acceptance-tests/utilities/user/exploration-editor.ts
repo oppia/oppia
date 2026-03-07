@@ -3671,6 +3671,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
+    // Wait for the graph to update after creating a new card.
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -6111,7 +6113,7 @@ export class ExplorationEditor extends BaseUser {
         );
         return cardValues.includes(value);
       },
-      {},
+      {timeout: 60000},
       stateNodeSelector,
       cardName
     );
