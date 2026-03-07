@@ -268,6 +268,7 @@
         "core.jobs.batch_jobs.suggestion_stats_computation_jobs_test",
         "core.jobs.batch_jobs.user_stats_computation_jobs_test",
         "core.jobs.batch_jobs.math_interactions_audit_jobs_test",
+        "core.jobs.batch_jobs.number_with_units_audit_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
         "core.jobs.batch_jobs.collection_info_jobs_test",
         "core.domain.image_validation_services_test",
@@ -413,6 +414,8 @@
         "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test",
         "core.jobs.batch_jobs.audit_topics_with_hanging_stories_job_test",
         "conftest_test",
-        "core.jobs.batch_jobs.remove_hanging_story_references_job_test"
+        "core.jobs.batch_jobs.audit_threads_with_missing_suggestions_jobs_test",
+        "core.jobs.batch_jobs.remove_hanging_story_references_job_test",
+        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test"
     ]
 }
