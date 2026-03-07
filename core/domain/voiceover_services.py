@@ -989,7 +989,6 @@ def regenerate_voiceovers_for_given_contents(
         exploration_id,
         exploration_version,
         task_run_id,
-        specific_language_accent_code,
     )
 
 
@@ -999,7 +998,6 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
     exploration_id: str,
     exploration_version: int,
     parent_cloud_task_run_id: str,
-    specific_language_accent_code: Optional[str],
 ) -> None:
     """It divides the voiceover regeneration process for an exploration into
     smaller batches and enqueues a separate task for each batch in the
@@ -1020,10 +1018,6 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
         parent_cloud_task_run_id: str. The unique identifier for the parent
             cloud task run, which is responsible for regenerating voiceovers
             for all the contents of the exploration in batches.
-        specific_language_accent_code: Optional[str]. The specific language
-            accent code to use for voiceover regeneration, if provided. If not
-            provided, voiceovers will be regenerated for all language accents
-            corresponding to the language codes in the input mapping.
     """
     # Based on testing data, regenerating a voiceover for each state content
     # takes approximately 6 seconds. Therefore, to avoid hitting the timeout
@@ -1042,12 +1036,6 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
             language_code_to_autogeneratable_accent_codes.get(language_code, [])
         )
         for language_accent_code in language_accent_codes:
-            if (
-                specific_language_accent_code is not None
-                and language_accent_code != specific_language_accent_code
-            ):
-                continue
-
             content_id_value_pairs = list(content_ids_to_content_values.items())
 
             for i in range(0, len(content_id_value_pairs), batch_size):
