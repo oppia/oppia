@@ -337,7 +337,11 @@ export class CustomizeInteractionModalComponent
     >;
     for (const caSpec of caSpecs) {
       const name = String(caSpec.name);
-      if (Object.prototype.hasOwnProperty.call(caValues, name)) {
+      if (
+        typeof caValues === 'object' &&
+        caValues !== null &&
+        name in caValues
+      ) {
         traverseSchemaAndAssignContentIds(
           caValues[name].value,
           caSpec.schema as Schema,
@@ -400,7 +404,11 @@ export class CustomizeInteractionModalComponent
     >;
     for (const caSpec of caSpecs) {
       const name = String(caSpec.name);
-      if (Object.prototype.hasOwnProperty.call(caValues, name)) {
+      if (
+        typeof caValues === 'object' &&
+        caValues !== null &&
+        name in caValues
+      ) {
         traverseSchemaAndCollectContent(
           caValues[name].value,
           caSpec.schema as Schema

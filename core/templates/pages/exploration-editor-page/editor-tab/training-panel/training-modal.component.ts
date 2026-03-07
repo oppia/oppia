@@ -68,6 +68,14 @@ export const RULES_SERVICE_MAPPING = {
   GraphInputRulesService: GraphInputRulesService,
   SetInputRulesService: SetInputRulesService,
   TextInputRulesService: TextInputRulesService,
+} as const;
+
+type InteractionRulesServiceName = keyof typeof RULES_SERVICE_MAPPING;
+
+const isInteractionRulesServiceName = (
+  serviceName: string
+): serviceName is InteractionRulesServiceName => {
+  return serviceName in RULES_SERVICE_MAPPING;
 };
 
 interface Classification {
@@ -198,12 +206,15 @@ export class TrainingModalComponent
 
     let rulesServiceName =
       this.angularNameService.getNameOfInteractionRulesService(interactionId);
-    const rulesServiceKey =
-      rulesServiceName as keyof typeof RULES_SERVICE_MAPPING;
+    if (!isInteractionRulesServiceName(rulesServiceName)) {
+      throw new Error(
+        `Unrecognized interaction rules service: ${rulesServiceName}`
+      );
+    }
 
     // Inject RulesService dynamically.
     let rulesService = this.injector.get(
-      RULES_SERVICE_MAPPING[rulesServiceKey]
+      RULES_SERVICE_MAPPING[rulesServiceName]
     ) as InteractionRulesService;
 
     let classificationResult =
