@@ -3798,7 +3798,15 @@ export class ExplorationEditor extends BaseUser {
         )
       )
     );
-    const cardIndex = cardNames.indexOf(cardName);
+
+    // Card names may be truncated in the graph if they exceed MAX_NODE_LABEL_LENGTH.
+    const truncatedCardName = this.truncateCardName(cardName);
+    let cardIndex = cardNames.indexOf(cardName);
+
+    // If full name not found, try the truncated name.
+    if (cardIndex === -1) {
+      cardIndex = cardNames.indexOf(truncatedCardName);
+    }
 
     if (cardIndex === -1) {
       throw new Error(`Card name ${cardName} not found in the graph.`);
