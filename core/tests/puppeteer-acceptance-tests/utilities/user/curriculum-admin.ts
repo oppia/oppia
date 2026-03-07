@@ -1098,6 +1098,11 @@ export class CurriculumAdmin extends TopicManager {
     WorkedExampleQuestion: string,
     WorkedExampleAnswer: string
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(showSubtopicsList);
+      await this.clickOnElementWithSelector(firstSubtopicTile);
+      await this.clickOnElementWithSelector(showSectionsList);
+    }
     await this.expectElementToBeVisible(addStudyGuideSectionButton);
     await this.clickOnElementWithSelector(addStudyGuideSectionButton);
     await this.typeInInputField(
