@@ -257,6 +257,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
     },
     {
+      "name": "exploration-creator/create-exploration-with-interactions-hints-and-language-change",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/create-exploration-with-interactions-hints-and-language-change.spec.ts"
+    },
+    {
       "name": "logged-out-learner/complete-some-practice-question",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts"
     },
