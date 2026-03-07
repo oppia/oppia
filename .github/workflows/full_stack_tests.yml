@@ -315,7 +315,10 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-chrome
       - name: Set Puppeteer Chrome path
-        run: echo "CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")" >> $GITHUB_ENV
+        run: echo "CHROME_PATH=$(node -e 'console.log(require('puppeteer').executablePath())')" >> $GITHUB_ENV
+      - name: Display Puppeteer Chrome executable path
+        run: |
+         echo "Puppeteer Chrome path: $CHROME_PATH"
       - name: Run Lighthouse accessibility checks shard ${{ matrix.suite.name }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
@@ -348,7 +351,10 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-chrome
       - name: Set Puppeteer Chrome path
-        run: echo "CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")" >> $GITHUB_ENV
+        run: echo "CHROME_PATH=$(node -e 'console.log(require('puppeteer').executablePath())')" >> $GITHUB_ENV
+      - name: Display Puppeteer Chrome executable path
+        run: |
+          echo "Puppeteer Chrome path: $CHROME_PATH"
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
