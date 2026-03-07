@@ -174,11 +174,11 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.returnToStoryFromLastState();
 
-      await loggedInLearner1.expectChapterToBeClickable(
+      await loggedInLearner1.expectChapterToBeNavigable(
         'What are the Place Values'
       );
 
-      await loggedInLearner1.expectChapterToBeClickable(
+      await loggedInLearner1.expectChapterToBeNavigable(
         'Find the Value of a Number',
         false
       );
@@ -221,7 +221,7 @@ describe('Logged-In Learner', function () {
         'Find the Value of a Number',
       ]);
 
-      await loggedInLearner2.expectChapterToBeClickable(
+      await loggedInLearner2.expectChapterToBeNavigable(
         'Find the Value of a Number',
         false
       );
@@ -246,12 +246,12 @@ describe('Logged-In Learner', function () {
       );
       await loggedInLearner2.returnToStoryFromLastState();
 
-      await loggedInLearner2.expectChapterToBeClickable(
+      await loggedInLearner2.expectChapterToBeNavigable(
         'Find the Value of a Number',
         false
       );
 
-      await loggedInLearner2.expectChapterToBeClickable(
+      await loggedInLearner2.expectChapterToBeNavigable(
         'What are the Place Values'
       );
       await loggedInLearner2.expectScreenshotToMatch(

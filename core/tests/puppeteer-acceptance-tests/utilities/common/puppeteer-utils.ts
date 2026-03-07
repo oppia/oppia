@@ -1619,17 +1619,38 @@ export class BaseUser {
   /**
    * Verifies whether a chapter is clickable or not.
    * @param {string} chapterName - The name of the chapter.
-   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
+   * @param {boolean} [shouldBeNavigable=true] - Expected navigable state.
    */
-  async expectChapterToBeClickable(
+  async expectChapterToBeNavigable(
     chapterName: string,
-    shouldBeClickable: boolean = true
+    shouldBeNavigable: boolean = true
   ): Promise<void> {
     const chapterElement = await this.getChapterByName(chapterName);
 
-    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
-  }
+    const currentUrl = this.page.url();
 
+    await chapterElement.click();
+    //Added for debugging purposes to ensure the page has enough time to navigate before we check the URL. This can be removed if we find a more reliable way to check for navigation.
+    // await this.page.waitForTimeout(1500);
+    const newUrl = this.page.url();
+    const didNavigate = newUrl !== currentUrl;
+
+    if (shouldBeNavigable && !didNavigate) {
+      throw new Error(
+        `Chapter "${chapterName}" did not navigate but expected to.`
+      );
+    }
+
+    if (!shouldBeNavigable && didNavigate) {
+      throw new Error(
+        `Chapter "${chapterName}" navigated but expected not to.`
+      );
+    }
+
+    if (didNavigate) {
+      await this.page.goBack({waitUntil: 'networkidle0'});
+    }
+  }
   /**
    * Helper method to wait for a action progress message to disappear
    * @param {string} progressMessage - The processing message to wait for completion
