@@ -73,6 +73,9 @@ describe('Exploration Creator', function () {
     await explorationEditor.expectCurrentOutcomeDestinationToBe(
       CARD_NAMES.SECOND
     );
+    await explorationEditor.expectExplorationGraphToContainCard(
+      CARD_NAMES.SECOND
+    );
 
     await explorationEditor.saveExplorationDraft();
 
@@ -113,6 +116,9 @@ describe('Exploration Creator', function () {
       true,
       true
     );
+    await explorationEditor.expectExplorationGraphToContainCard(
+      CARD_NAMES.THIRD
+    );
 
     // Add default response.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -132,7 +138,7 @@ describe('Exploration Creator', function () {
     // Preview the second card.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAMES.FIRST,
+      CARD_NAMES.SECOND,
       'What is the capital of France?'
     );
     await explorationEditor.navigateToEditorTab();
@@ -163,6 +169,9 @@ describe('Exploration Creator', function () {
       CARD_NAMES.FOURTH,
       true
     );
+    await explorationEditor.expectExplorationGraphToContainCard(
+      CARD_NAMES.FOURTH
+    );
 
     // Add default response.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -184,7 +193,7 @@ describe('Exploration Creator', function () {
     // Preview the third card.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAMES.FIRST,
+      CARD_NAMES.THIRD,
       'Name a programming language.'
     );
     await explorationEditor.navigateToEditorTab();
@@ -212,6 +221,9 @@ describe('Exploration Creator', function () {
       CARD_NAMES.FINAL,
       true
     );
+    await explorationEditor.expectExplorationGraphToContainCard(
+      CARD_NAMES.FINAL
+    );
 
     // Add hint.
     await explorationEditor.addHintToState(
@@ -223,7 +235,7 @@ describe('Exploration Creator', function () {
     // Preview the fourth card.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAMES.FIRST,
+      CARD_NAMES.FOURTH,
       'Enter the number 42.'
     );
     await explorationEditor.navigateToEditorTab();
@@ -248,7 +260,7 @@ describe('Exploration Creator', function () {
     // Preview the final card.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAMES.FIRST,
+      CARD_NAMES.FINAL,
       'Congratulations! You have completed this exploration.'
     );
     await explorationEditor.navigateToEditorTab();

@@ -27,6 +27,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 
+const COLLECTION_FILENAME = 'welcome_to_collections.yaml';
 const COLLECTION_NAME = 'Introduction to Collections in Oppia';
 const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
 const EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
@@ -44,7 +45,7 @@ describe('Logged-Out Learner', function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
 
     // Load the collection data from the yaml file.
-    await superAdmin.reloadCollections(COLLECTION_NAME);
+    await superAdmin.reloadCollections(COLLECTION_FILENAME);
 
     // Navigate to community library and get the collection ID from the URL.
     await superAdmin.navigateToCommunityLibrary();
