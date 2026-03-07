@@ -1630,7 +1630,7 @@ export class BaseUser {
     const currentUrl = this.page.url();
 
     await chapterElement.click();
-    //Added for debugging purposes to ensure the page has enough time to navigate before we check the URL. This can be removed if we find a more reliable way to check for navigation.
+    // Added for debugging purposes to ensure the page has enough time to navigate before we check the URL. This can be removed if we find a more reliable way to check for navigation.
     // await this.page.waitForTimeout(1500);
     const newUrl = this.page.url();
     const didNavigate = newUrl !== currentUrl;
