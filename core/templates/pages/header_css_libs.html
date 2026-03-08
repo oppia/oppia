@@ -31,10 +31,14 @@
         onload="this.onload=null;this.rel='stylesheet'">
 <% } %>
 
-<link rel="stylesheet" type="text/css" media="screen"
-      href="/templates/css/oppia.css">
+<link rel="preload"
+      href="/templates/css/oppia.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'">
 
 <% if (!htmlWebpackPlugin.options.lightweight) { %>
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/templates/css/oppia-material.css">
+  <link rel="preload"
+        href="/templates/css/oppia-material.css"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
 <% } %>

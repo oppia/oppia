@@ -4,10 +4,22 @@
     @load('base-components/header.template.html', {"title": "Loading | Oppia"})
   </head>
   <body>
+    <style>
+      html{background-color:#e8e7e3;font-size:62.5%;height:100%}
+      body{background-color:#e8e7e3;color:rgba(0,0,0,0.87);font-family:"Roboto",Arial,sans-serif;font-size:1.6em;height:100%;margin:0 auto;padding:0}
+      @-webkit-keyframes dot{0%{opacity:0}100%{opacity:1}}
+      @-moz-keyframes dot{0%{opacity:0}100%{opacity:1}}
+      @keyframes dot{0%{opacity:0}100%{opacity:1}}
+      .oppia-loading-fullpage{border:1px;border-radius:5px;font-size:2em;height:100%;position:fixed;top:35%;width:100%;z-index:1000}
+      .oppia-align-center{float:none;margin:0 auto;text-align:center}
+      .oppia-loading-dot-one{-webkit-animation:dot 1.5s infinite;-moz-animation:dot 1.5s infinite;animation:dot 1.5s infinite;-webkit-animation-delay:0.0s;-moz-animation-delay:0.0s;animation-delay:0.0s;opacity:0}
+      .oppia-loading-dot-two{-webkit-animation:dot 1.5s infinite;-moz-animation:dot 1.5s infinite;animation:dot 1.5s infinite;-webkit-animation-delay:0.3s;-moz-animation-delay:0.3s;animation-delay:0.3s;opacity:0}
+      .oppia-loading-dot-three{-webkit-animation:dot 1.5s infinite;-moz-animation:dot 1.5s infinite;animation:dot 1.5s infinite;-webkit-animation-delay:0.6s;-moz-animation-delay:0.6s;animation-delay:0.6s;opacity:0}
+    </style>
     <oppia-root>
       <!-- Static loader shown before Angular bootstraps. Angular replaces
            this content once it finishes initialising. After that,
-           PageNavigationLoadingService takes over for route transitions. -->
+           LoaderService takes over for route transitions. -->
       <div class="oppia-loading-fullpage e2e-test-loading-fullpage"
            role="status"
            aria-live="polite"

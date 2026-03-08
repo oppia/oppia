@@ -16,32 +16,49 @@
  * @fileoverview Oppia root component.
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
-import {PageNavigationLoadingService} from 'services/page-navigation-loading.service';
+import {LoaderService} from 'services/loader.service';
 
 @Component({
   selector: 'oppia-root',
   templateUrl: './oppia-root.component.html',
 })
 export class OppiaRootComponent implements OnInit, OnDestroy {
-  isNavigationLoading = false;
-  private loadingSubscription: Subscription | null = null;
+  loadingMessage: string = '';
+  private directiveSubscriptions = new Subscription();
 
   constructor(
-    private pageNavigationLoadingService: PageNavigationLoadingService
+    private loaderService: LoaderService,
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.loadingSubscription =
-      this.pageNavigationLoadingService.isLoading$.subscribe(isLoading => {
-        this.isNavigationLoading = isLoading;
-      });
+    // Show loader during route transitions to prevent blank screen
+    // while lazy-loaded modules are loading (see issue #24279).
+    this.directiveSubscriptions.add(
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationStart) {
+          this.loaderService.showLoadingScreen('Loading');
+        } else if (event instanceof NavigationEnd) {
+          this.loaderService.hideLoadingScreen();
+        }
+      })
+    );
+
+    // Subscribe to LoaderService so the root-level loader stays visible
+    // when page components call showLoadingScreen for data fetching.
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe((message: string) => {
+        this.loadingMessage = message;
+        this.changeDetectorRef.detectChanges();
+      })
+    );
   }
 
   ngOnDestroy(): void {
-    if (this.loadingSubscription) {
-      this.loadingSubscription.unsubscribe();
-    }
+    this.directiveSubscriptions.unsubscribe();
   }
 }
