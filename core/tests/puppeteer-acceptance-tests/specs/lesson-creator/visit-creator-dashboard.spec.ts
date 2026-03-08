@@ -103,7 +103,11 @@ describe('Exploration Learner Flow', function () {
       await lessonCreator.navigateToCreatorDashboardUsingProfileDropdown();
       await lessonCreator.waitForNetworkIdle();
       await lessonCreator.waitForPageToFullyLoad();
+
       await lessonCreator.page.waitForTimeout(3000);
+      await lessonCreator.page.reload();
+      await lessonCreator.waitForNetworkIdle();
+      await lessonCreator.waitForPageToFullyLoad();
       await lessonCreator.expectAverageRatingAndUsersToBe(4, 2);
       await lessonCreator.expectTotalPlaysToBe(2);
       await lessonCreator.expectOpenFeedbacksToBe(1);
