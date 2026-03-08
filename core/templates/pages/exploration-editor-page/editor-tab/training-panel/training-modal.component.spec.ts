@@ -34,6 +34,7 @@ import {GraphDataService} from 'pages/exploration-editor-page/services/graph-dat
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Interaction} from 'domain/exploration/interaction.model';
+import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 
 class MockActiveModal {
   close(): void {
@@ -86,6 +87,7 @@ describe('Training Modal Component', () => {
   let explorationWarningsService: ExplorationWarningsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
+  let angularNameService: AngularNameService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -141,6 +143,7 @@ describe('Training Modal Component', () => {
     graphDataService = TestBed.inject(GraphDataService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateEditorService = TestBed.inject(StateEditorService);
+    angularNameService = TestBed.inject(AngularNameService);
     spyOn(ngbActiveModal, 'close').and.stub();
     spyOn(explorationWarningsService, 'updateWarnings').and.stub();
     spyOn(graphDataService, 'recompute').and.stub();
@@ -281,5 +284,19 @@ describe('Training Modal Component', () => {
     }).toThrowError('Expected active state name to be non-null.');
 
     expect(explorationStatesService.getState).not.toHaveBeenCalled();
+  });
+
+  it('should throw in init if interaction rules service is unmapped', () => {
+    const unknownRulesServiceName = 'UnknownRulesService';
+    spyOn(
+      angularNameService,
+      'getNameOfInteractionRulesService'
+    ).and.returnValue(unknownRulesServiceName);
+
+    expect(() => {
+      component.init();
+    }).toThrowError(
+      `Unrecognized interaction rules service: ${unknownRulesServiceName}`
+    );
   });
 });
