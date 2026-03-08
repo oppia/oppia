@@ -163,7 +163,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       .filter(topicSummary => {
         return (
           recommendedTopicIds.indexOf(topicSummary.getId()) !== -1 &&
-          topicSummary.getUrlFragment()
+          !!topicSummary.getUrlFragment()
         );
       });
     this.diagnosticTestIsFinished = true;
@@ -182,6 +182,11 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     );
   }
 
+  /**
+   * Returns the topic URL from the provided URL fragment.
+   * @param {string | null} urlFragment - The URL fragment of the topic.
+   * @returns {string} The interpolated topic URL.
+   */
   getTopicUrlFromUrlFragment(urlFragment: string | null): string {
     if (!urlFragment || !this.classroomUrlFragment) {
       return '';
