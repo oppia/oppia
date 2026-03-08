@@ -662,9 +662,7 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a subtopic's thumbnail" + 'filename', () => {
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(null);
 
     topicUpdateService.setSubtopicThumbnailFilename(
       _sampleTopic,
@@ -676,9 +674,7 @@ describe('Topic update service', function () {
     );
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(null);
   });
 
   it(
@@ -760,9 +756,7 @@ describe('Topic update service', function () {
   });
 
   it("should set/unset changes to a subtopic's thumbnail bg " + 'color', () => {
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(null);
 
     topicUpdateService.setSubtopicThumbnailBgColor(_sampleTopic, 1, '#ffffff');
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
@@ -770,9 +764,7 @@ describe('Topic update service', function () {
     );
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(null);
   });
 
   it(
