@@ -72,6 +72,8 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
         ) -> MockFile:
             if path == './file1.ts':
                 return MockFile('This has I18N_KEY_1 and I18N_KEY_2')
+            if path == './node_modules/file2.ts':
+                return MockFile('This has I18N_NODE_KEY')
             if path == './valid_dir/file3.html':
                 return MockFile(
                     'This has I18N_KEY_3 and I18N_KEY_4-with&symbol'
@@ -88,6 +90,8 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
         self.assertIn('I18N_KEY_2', tokens)
         self.assertIn('I18N_KEY_3', tokens)
         self.assertIn('I18N_KEY_4-with&symbol', tokens)
+        # Verify that tokens from node_modules files are excluded.
+        self.assertNotIn('I18N_NODE_KEY', tokens)
 
     def test_get_all_code_tokens_logs_error_on_read_failure(self) -> None:
         def mock_walk(
