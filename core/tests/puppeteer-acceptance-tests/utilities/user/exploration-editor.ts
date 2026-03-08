@@ -444,7 +444,6 @@ const explorationStateStatsEnterCountSelector =
 const FeedbacktimeElement =
   '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
 const numberOfPassers = '.e2e-test-num-passersby';
-const stateNodeGroupSelector = '.e2e-test-node';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
