@@ -151,14 +151,9 @@ describe('Logged-In Learner', function () {
       await loggedInLearner1.navigateToLearnerDashboard();
 
       await loggedInLearner1.navigateToGoalsSection();
-      await loggedInLearner1.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
-
-      await loggedInLearner1.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-        'Place Values',
-        true
+      await loggedInLearner1.addGoalInRedesignedLearnerDashboard(
+        'Place Values'
       );
-
-      await loggedInLearner1.submitGoalInRedesignedLearnerDashboard();
 
       await loggedInLearner1.clickOnGoalCard('Place Values');
 
@@ -194,6 +189,8 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.navigateToGoalsSection();
       await loggedInLearner1.clickOnGoalCard('Place Values');
+      // Need deugging here as the test is failing due to the goal card not being found. The test is expected to click on the goal card and then check for the lesson card button label and lesson progress. But it seems that the goal card is not being found and hence the test is failing. We need to check if the goal card is being added to the redesigned learner dashboard and if it is being displayed correctly.
+      // await loggedInLearner1.addGoalInRedesignedLearnerDashboard('Place Values');
 
       await loggedInLearner1.expectLessonCardButtonLabel(
         'Find the Value of a Number',
@@ -314,7 +311,10 @@ describe('Logged-In Learner', function () {
       ]);
 
       await loggedInLearner1.expectLessonCardToHaveNewLabel(
-        'Find the Value of a Number'
+        'Rounding Numbers part 1'
+      );
+      await loggedInLearner1.expectLessonCardToHaveNewLabel(
+        'Rounding Numbers part 2'
       );
 
       await loggedInLearner1.navigateToLearnerDashboard();
