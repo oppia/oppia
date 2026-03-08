@@ -31,9 +31,8 @@ if MYPY:  # pragma: no cover
     from mypy_imports import transaction_services, user_models
 
 (
-    exp_models,
     user_models,
-) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.USER])
+) = models.Registry.import_models([models.Names.USER])
 transaction_services = models.Registry.import_transaction_services()
 
 ALLOWED_RATINGS = [1, 2, 3, 4, 5]
@@ -45,7 +44,7 @@ def assign_rating_to_exploration(
     """Records the rating awarded by the user to the exploration in both the
     user-specific data and exploration summary.
 
-    This function validates the exploration id but not the user id.
+    This function validates both the exploration id and the user id.
 
     Args:
         user_id: str. The id of the user assigning the rating.
@@ -55,10 +54,17 @@ def assign_rating_to_exploration(
             1 and 5 inclusive.
 
     Raises:
+        ValueError. The user_id is not a non-empty string.
         ValueError. The assigned rating is not of type int.
         ValueError. The assigned rating is lower than 1 or higher than 5.
         ValueError. The exploration does not exist.
     """
+
+    if not isinstance(user_id, str) or not user_id:
+        raise ValueError(
+            'Expected the user_id to be a non-empty string, received %s'
+            % user_id
+        )
 
     if not isinstance(new_rating, int):
         raise ValueError(
@@ -142,8 +148,6 @@ def get_when_exploration_rated(
 ) -> Optional[datetime.datetime]:
     """Fetches the datetime the exploration was last rated by this user, or
     None if no rating has been awarded.
-
-    Currently this function is only used for testing purposes.
 
     Args:
         user_id: str. The id of the user.
