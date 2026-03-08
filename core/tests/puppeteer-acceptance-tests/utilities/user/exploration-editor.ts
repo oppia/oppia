@@ -3697,26 +3697,20 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOnElementWithSelector(openOutcomeDestButton);
     await this.waitForElementToBeClickable(destinationCardSelector);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.typeInInputField(addStateInput, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
-    // Wait for the graph to update after creating a new card.
     await this.waitForNetworkIdle();
 
-    // Open state graph modal on mobile to view the graph.
     if (this.isViewportAtMobileWidth()) {
       await this.openExplorationStateGraphInMobileView();
     }
 
-    // First ensure at least one node exists in the graph.
     await this.page.waitForSelector(stateNodeSelector, {visible: true});
 
-    // Wait for the new card to appear in the graph.
-    // Note: Card names may be truncated in the graph if they exceed MAX_NODE_LABEL_LENGTH.
     const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
       (selector: string, fullName: string, truncatedName: string) => {
@@ -3724,7 +3718,6 @@ export class ExplorationEditor extends BaseUser {
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        // Check for either the full name or the truncated name.
         return (
           cardValues.includes(fullName) || cardValues.includes(truncatedName)
         );
@@ -3735,7 +3728,6 @@ export class ExplorationEditor extends BaseUser {
       truncatedCardName
     );
 
-    // Close the state graph modal on mobile after verification.
     if (this.isViewportAtMobileWidth()) {
       await this.page.click(closeModalButtonSelector);
       await this.expectElementToBeVisible(
@@ -3747,7 +3739,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates direct learners option when changing cards.
-   * @param cardName - The ard name where learners should be directed.
+   * @param cardName - Card name
    */
   async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
     await this.page.waitForSelector(openOutcomeDestButton, {
@@ -3778,14 +3770,10 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
     if (this.isViewportAtMobileWidth()) {
-      // Check if the state graph modal is already open before clicking the
-      // resize button.
       const stateGraphModalIsOpen = await this.page.$(
         explorationStateGraphModalSelector
       );
       if (!stateGraphModalIsOpen) {
-        // Wait for any blocking modal to close first before clicking the
-        // resize button.
         const blockingModal = await this.page.$('div.modal-content');
         if (blockingModal) {
           await this.page.waitForSelector('div.modal-content', {hidden: true});
@@ -3797,8 +3785,6 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    // Get all state node groups (not just labels) since we need to click the
-    // background rect which has the click handler.
     const stateNodeGroupSelector = '.e2e-test-node';
     await this.page.waitForSelector(stateNodeGroupSelector);
     elements = await this.page.$$(stateNodeGroupSelector);
@@ -3812,11 +3798,9 @@ export class ExplorationEditor extends BaseUser {
       )
     );
 
-    // Card names may be truncated in the graph if they exceed MAX_NODE_LABEL_LENGTH.
     const truncatedCardName = this.truncateCardName(cardName);
     let cardIndex = cardNames.indexOf(cardName);
 
-    // If full name not found, try the truncated name.
     if (cardIndex === -1) {
       cardIndex = cardNames.indexOf(truncatedCardName);
     }
@@ -3836,7 +3820,6 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
-    // Click on the node background rect which has the click handler.
     const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
     if (!nodeBackground) {
       throw new Error(
@@ -6183,10 +6166,8 @@ export class ExplorationEditor extends BaseUser {
       await this.openExplorationStateGraphInMobileView();
     }
 
-    // First ensure at least one node exists in the graph.
     await this.page.waitForSelector(stateNodeSelector, {visible: true});
 
-    // Note: Card names may be truncated in the graph if they exceed MAX_NODE_LABEL_LENGTH.
     const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
       (selector: string, fullName: string, truncatedName: string) => {
@@ -6194,7 +6175,6 @@ export class ExplorationEditor extends BaseUser {
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        // Check for either the full name or the truncated name.
         return (
           cardValues.includes(fullName) || cardValues.includes(truncatedName)
         );
