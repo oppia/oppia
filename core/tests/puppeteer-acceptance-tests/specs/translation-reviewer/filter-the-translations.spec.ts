@@ -62,7 +62,7 @@ describe('Translation Reviewer', function () {
     const explorationId =
       await curriculumAdm.createAndPublishAMinimalExplorationWithTitle(
         'Exploration 1',
-        'Algrbra',
+        'Algebra',
         true
       );
     const explorationId2 =
