@@ -20,7 +20,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
-import {string} from 'yargs';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -427,7 +426,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * closing feedback textarea withput submiting.
+   * Closing feedback textarea withput submiting.
    */
   async closeFeedbackPopup(): Promise<void> {
     await this.page.waitForSelector(feedbackCloseButton, {visible: true});
