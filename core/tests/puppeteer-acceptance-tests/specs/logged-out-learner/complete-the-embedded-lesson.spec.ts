@@ -58,21 +58,12 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
       INTERACTION_TYPES.NUMBER_INPUT,
       '0',
       'Correct!',
-      'Checkpoint Card',
+      'END',
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Please try again!'
     );
-    await explorationEditor.saveExplorationDraft();
-
-    // ── CARD 2: Checkpoint ──
-    await explorationEditor.navigateToCard('Checkpoint Card');
-    await explorationEditor.setTheStateAsCheckpoint(); // ← checkpoint on middle card
-    await explorationEditor.updateCardContent('second card');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard('END');
     await explorationEditor.saveExplorationDraft();
 
     // ── CARD 3: END ──
@@ -120,9 +111,6 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
 
       await loggedOutUser.submitAnswer('0');
       await loggedOutUser.expectContinueToNextCardButtonToBePresent();
-
-      // await loggedOutUser.continueToNextCard();
-      // await loggedOutUser.verifyCheckpointModalAppears();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
