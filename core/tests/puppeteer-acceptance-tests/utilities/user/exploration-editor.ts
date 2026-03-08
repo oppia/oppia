@@ -441,7 +441,7 @@ const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
 const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
 const explorationStateStatsEnterCountSelector =
   '.e2e-test-state-stats-card-entered-here-count';
-const FeedbacktimeElement =
+const feedbackTimeElement =
   '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
 const numberOfPassers = '.e2e-test-num-passersby';
 
@@ -7266,7 +7266,7 @@ export class ExplorationEditor extends BaseUser {
   async expectFeedbackReplyDetailsToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(feedbackAuthorSelector);
     await this.expectElementToBeVisible(feedbackStatusSelector);
-    await this.expectElementToBeVisible(FeedbacktimeElement);
+    await this.expectElementToBeVisible(feedbackTimeElement);
   }
 
   /**
