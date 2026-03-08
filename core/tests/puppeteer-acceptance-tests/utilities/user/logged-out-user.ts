@@ -448,6 +448,8 @@ const topicPageRevisionTabContentSelector =
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
+const progressBarSelector = '.oppia-progress-bar';
+const suggestionSection = '.suggested-for-you-section';
 
 const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = '.e2e-test-collapsible-heading';
@@ -6149,6 +6151,68 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if suggestion section is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectSuggestionSectionToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    let isVisible = true;
+
+    try {
+      await this.page.waitForSelector(suggestionSection);
+    } catch (error) {
+      isVisible = false;
+    }
+
+    if (!visible === isVisible) {
+      throw new Error(
+        `Expected progress bar to be ${
+          visible ? 'visible' : 'hidden'
+        }, but it was ${isVisible ? 'visible' : 'hidden'}`
+      );
+    }
+  }
+
+  /**
+   * Checks if progress bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectProgressBarToBePresent(visible: boolean = true): Promise<void> {
+    let isVisible = true;
+
+    try {
+      await this.page.waitForSelector(progressBarSelector);
+    } catch (error) {
+      isVisible = false;
+    }
+
+    if (!visible === isVisible) {
+      throw new Error(
+        `Expected progress bar to be ${
+          visible ? 'visible' : 'hidden'
+        }, but it was ${isVisible ? 'visible' : 'hidden'}`
+      );
+    }
+  }
+  /**
+   * Check if the number input placeholder matches the expected text.
+   */
+  async expectNumberInputPlaceholderToMatch(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    await this.page.waitForSelector(floatFormInput, {visible: true});
+    const placeholder = await this.page.$eval(floatFormInput, (el: Element) =>
+      el.getAttribute('placeholder')
+    );
+    if (placeholder !== expectedPlaceholder) {
+      throw new Error(
+        `Expected placeholder to be "${expectedPlaceholder}" but got "${placeholder}".`
+      );
+    }
+    showMessage(`Input placeholder is "${expectedPlaceholder}" as expected.`);
+  }
   /**
    * Checks if the text content of an element matches the expected value.
    * @param selector - The CSS selector to find the element.

@@ -20,7 +20,10 @@
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -36,42 +39,90 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
   let explorationId: string;
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor2',
-      'exploration_editor2@example.com'
+      'explorationEditor',
+      'exploration_editor@example.com'
     );
 
-    explorationId =
-      await explorationEditor.createAndPublishExplorationWithCards(
-        'A Quick Exploration',
-        'Algorithms'
-      );
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+    await explorationEditor.dismissWelcomeModal();
 
+    // ── CARD 1: Numeric Input ──
+    await explorationEditor.updateCardContent('Exploración de pruebas');
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      false
+    );
+    await explorationEditor.customizeNumberInputInteraction(true);
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      '0',
+      'Correct!',
+      'Checkpoint Card',
+      true
+    );
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Please try again!'
+    );
+    await explorationEditor.saveExplorationDraft();
+
+    // ── CARD 2: Checkpoint ──
+    await explorationEditor.navigateToCard('Checkpoint Card');
+    await explorationEditor.setTheStateAsCheckpoint(); // ← checkpoint on middle card
+    await explorationEditor.updateCardContent('second card');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard('END');
+    await explorationEditor.saveExplorationDraft();
+
+    // ── CARD 3: END ──
+    await explorationEditor.navigateToCard('END');
+    await explorationEditor.updateCardContent('You have completed!');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.saveExplorationDraft();
+
+    // ── SET SPANISH LANGUAGE ──
+    // Must be in settings tab
+    // This makes placeholder show "Ingresa un número"
+    await explorationEditor.navigateToSettingsTab();
+    await explorationEditor.selectLanguage('español (Spanish)');
+    await explorationEditor.saveExplorationDraft();
+
+    // ── PUBLISH ──
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
+      'Exploración de pruebas',
+      'Learn basic counting',
+      'Algebra'
+    );
+
+    // Create logged out user AFTER publishing
     loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to start an embedded lesson',
+    'should be able to play an embedded lesson',
     async function () {
-      // Visit the embedded lesson URL, and expect exploration to be present.
       await loggedOutUser.goto(
         `http://localhost:8181/embed/exploration/${explorationId}`
       );
-      await loggedOutUser.expectCardContentToMatch('Content 0');
 
-      // Verify continue button, and language dropdown are present.
-      await loggedOutUser.expectContinueToNextCardButtonToBePresent();
+      await loggedOutUser.expectCardContentToMatch('Exploración de pruebas');
       await loggedOutUser.expectLanguageDropdownToBePresent();
-
-      // Verify lesson info text, and audio bar are not present.
       await loggedOutUser.expectLessonInfoTextToBePresent(false);
       await loggedOutUser.expectVoiceoverBarToBePresent(false);
       await loggedOutUser.expectSignInButtonToBePresent(false);
+      await loggedOutUser.expectProgressBarToBePresent(false);
 
-      // Compare screenshot of the embedded lesson player.
       await loggedOutUser.expectScreenshotToMatch(
         'lessonPlayerEmbedded',
         __dirname
       );
+
+      await loggedOutUser.submitAnswer('0');
+      await loggedOutUser.expectContinueToNextCardButtonToBePresent();
+
+      // await loggedOutUser.continueToNextCard();
+      // await loggedOutUser.verifyCheckpointModalAppears();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -85,8 +136,23 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
         'Congratulations for completing this lesson!'
       );
 
-      // Expect rate options to not be available.
+      // Expect rate options and suuggestion section to be not available.
       await loggedOutUser.expectRateOptionsNotAvailable();
+      await loggedOutUser.expectSuggestionSectionToBePresent(false);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should use URL language as site language',
+    async function () {
+      await loggedOutUser.goto(
+        `http://localhost:8181/embed/exploration/${explorationId}?lang=es`
+      );
+      // Spanish exploration — placeholder should be in Spanish
+      await loggedOutUser.expectNumberInputPlaceholderToMatch(
+        'Ingresa un número'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

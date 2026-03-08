@@ -403,6 +403,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
@@ -4575,6 +4576,76 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(previousCardButton, {
       visible: true,
     });
+  }
+
+  /**
+   * Function to navigate to the improvements tab.
+   */
+  async navigateToImprovementsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // Handle mobile navigation.
+      const element = await this.page.$(mobileNavbarOptions);
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      // Note: Mobile improvements tab button would go here if needed.
+      // For now, fall through to desktop logic.
+    }
+
+    // Desktop navigation.
+    await this.page.waitForSelector(improvementsTabButton, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(improvementsTabButton);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Function to verify that the improvements tab is hidden.
+   */
+  async expectImprovementsTabToBeHidden(): Promise<void> {
+    const improvementsTabs = await this.page.$$(improvementsTabButton);
+    if (improvementsTabs.length !== 0) {
+      throw new Error(
+        'Expected the improvements tab to be hidden, but it is visible.'
+      );
+    }
+  }
+
+  /**
+   * Function to verify that the improvements tab is visible.
+   */
+  async expectImprovementsTabToBeVisible(): Promise<void> {
+    // Wait a bit for the page to fully render after reload.
+    await this.page.waitForTimeout(2000);
+
+    // Check with retry logic.
+    let isVisible = false;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (!isVisible && attempts < maxAttempts) {
+      const improvementsTabs = await this.page.$$(improvementsTabButton);
+      if (improvementsTabs.length > 0) {
+        isVisible = true;
+        break;
+      }
+      attempts++;
+      if (attempts < maxAttempts) {
+        await this.page.waitForTimeout(1000);
+      }
+    }
+
+    if (!isVisible) {
+      throw new Error(
+        'Expected the improvements tab to be visible, but it is hidden.'
+      );
+    }
   }
 
   /**
