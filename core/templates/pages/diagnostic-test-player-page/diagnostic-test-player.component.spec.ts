@@ -181,6 +181,7 @@ describe('Diagnostic test player component', () => {
       declarations: [DiagnosticTestPlayerComponent, MockTranslatePipe],
       providers: [
         PreventPageUnloadEventService,
+        ClassroomBackendApiService,
         {provide: WindowRef, useValue: windowRef},
         {
           provide: TranslateService,
@@ -336,6 +337,11 @@ describe('Diagnostic test player component', () => {
     );
   });
 
+  it('should return empty string if urlFragment is null', () => {
+    component.classroomUrlFragment = 'math';
+    expect(component.getTopicUrlFromUrlFragment(null)).toEqual('');
+  });
+
   it('should be able to get topic recommendations', fakeAsync(() => {
     windowRef.nativeWindow.location.search = '?classroom=math';
 
@@ -427,4 +433,55 @@ describe('Diagnostic test player component', () => {
       siteAnalyticsService.registerDiagnosticTestRecommendationAcceptedEvent
     ).toHaveBeenCalledWith('math', 'dummy2');
   }));
+
+  it('should filter out recommended topics with missing URL fragments', () => {
+    const topicDataWithNullUrlFragment = new CreatorTopicSummary(
+      'topicIdWithNullUrlFragment',
+      'name',
+      3,
+      3,
+      3,
+      3,
+      1,
+      'en',
+      'description',
+      1,
+      1,
+      1,
+      1,
+      true,
+      true,
+      'math',
+      'img.svg',
+      'red',
+      null,
+      1,
+      1,
+      [1],
+      [1]
+    );
+
+    const dummyClassroomDataWithNullUrl = new ClassroomData(
+      'id',
+      'math',
+      'math',
+      [topicData1, topicDataWithNullUrlFragment],
+      'dummy',
+      'dummy',
+      'dummy',
+      true,
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+    component.classroomData = dummyClassroomDataWithNullUrl;
+
+    component.getRecommendedTopicSummaries([
+      'dummy',
+      'topicIdWithNullUrlFragment',
+    ]);
+
+    expect(component.recommendedTopicSummaries).toEqual([topicData1]);
+  });
 });

@@ -161,7 +161,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     this.recommendedTopicSummaries = this.classroomData
       .getTopicSummaries()
       .filter(topicSummary => {
-        return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
+        return (
+          recommendedTopicIds.indexOf(topicSummary.getId()) !== -1 &&
+          topicSummary.getUrlFragment()
+        );
       });
     this.diagnosticTestIsFinished = true;
 
@@ -179,7 +182,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     );
   }
 
-  getTopicUrlFromUrlFragment(urlFragment: string): string {
+  getTopicUrlFromUrlFragment(urlFragment: string | null): string {
+    if (!urlFragment || !this.classroomUrlFragment) {
+      return '';
+    }
     return this.urlInterpolationService.interpolateUrl(
       `/learn/${this.classroomUrlFragment}/<topicUrlFragment>`,
       {
