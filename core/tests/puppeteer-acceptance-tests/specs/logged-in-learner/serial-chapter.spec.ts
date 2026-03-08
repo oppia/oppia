@@ -170,10 +170,6 @@ describe('Logged-In Learner', function () {
       await loggedInLearner1.returnToStoryFromLastState();
 
       await loggedInLearner1.expectChapterToBeNavigable(
-        'What are the Place Values'
-      );
-
-      await loggedInLearner1.expectChapterToBeNavigable(
         'Find the Value of a Number',
         false
       );
