@@ -7203,55 +7203,11 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(explorationStatsTabContentSelector);
   }
 
-  /* Function to click on a specific card in the exploration visualization graph.
-   * @param {string} cardName - The name of the card to navigate to.
-   */
-  async clickStateCard(cardName: string): Promise<void> {
-    await this.expectElementToBeVisible(stateNodeGroupSelector);
-    const elements = await this.page.$$(stateNodeGroupSelector);
-
-    const cardNames = await Promise.all(
-      elements.map(element =>
-        element.$eval(
-          '.e2e-test-node-label',
-          node => node.textContent?.trim() ?? ''
-        )
-      )
-    );
-    showMessage(`${cardNames.length} cards found: ${cardNames.join(', ')}.`);
-
-    const cardIndex = cardNames.indexOf(cardName);
-    if (cardIndex === -1) {
-      throw new Error(`Card name ${cardName} not found in the graph.`);
-    }
-
-    let nodeGroup: ElementHandle<Element> | null = null;
-    const hasDuplicateCards = elements.length > new Set(cardNames).size;
-    if (this.isViewportAtMobileWidth() && hasDuplicateCards) {
-      nodeGroup = elements[cardIndex + elements.length / 2];
-    } else {
-      nodeGroup = elements[cardIndex];
-    }
-
-    if (!nodeGroup) {
-      throw new Error(`Could not find card button for card: ${cardName}`);
-    }
-    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
-    if (!nodeBackground) {
-      throw new Error(
-        `Could not find clickable background for card: ${cardName}`
-      );
-    }
-    showMessage(`Found element to click for ${cardName}.`);
-    await this.clickOnElement(nodeBackground);
-    await this.waitForNetworkIdle({idleTime: 1000});
-  }
-
   /**
    * From the stats tab, open the modal showing the stats of the specified card.
    */
   async openCardStats(cardName: string): Promise<void> {
-    await this.clickStateCard(cardName);
+    await this.navigateToCard(cardName);
     showMessage(`Waiting for stats modal of card ${cardName} to appear...`);
     await this.expectElementToBeVisible(explorationStateStatsModalSelector);
     showMessage(`Stats modal of card ${cardName} is now open.`);
