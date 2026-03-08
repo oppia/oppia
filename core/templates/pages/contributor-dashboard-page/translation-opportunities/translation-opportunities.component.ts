@@ -46,7 +46,6 @@ export class TranslationOpportunitiesComponent {
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
-  private userInfoPromise!: Promise<void>;
   opportunityType = 'translation';
   languageSelected = false;
   constructor(
@@ -107,8 +106,7 @@ export class TranslationOpportunitiesComponent {
     return {opportunitiesDicts, more};
   }
 
-  async onClickButton(expId: string): Promise<void> {
-    await this.userInfoPromise;
+  onClickButton(expId: string): void {
     if (!this.userIsLoggedIn) {
       this.contributionOpportunitiesService.showRequiresLoginModal();
       return;
@@ -132,7 +130,7 @@ export class TranslationOpportunitiesComponent {
   }
 
   ngOnInit(): void {
-    this.userInfoPromise = this.userService.getUserInfoAsync().then(userInfo => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
