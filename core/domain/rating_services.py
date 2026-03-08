@@ -103,7 +103,7 @@ def assign_rating_to_exploration(
     if not exploration_summary.ratings:
         exploration_summary.ratings = feconf.get_empty_ratings()
     exploration_summary.ratings[str(new_rating)] += 1
-    if old_rating:
+    if old_rating is not None:
         exploration_summary.ratings[str(old_rating)] -= 1
 
     event_services.RateExplorationEventHandler.record(
