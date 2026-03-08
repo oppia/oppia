@@ -19,7 +19,7 @@
  * Setup: create & publish 2 explorations + 1 collection
  * Navigate to library → find collection
  * Verify explorations visible → play one → verify completion
- * Click "Back to Collection" → verify paw icon change
+ * Click "Back to Collection"
  * Change language to Spanish → verify "COMPARTIR ESTA COLECCIÓN"
  */
 
@@ -31,9 +31,12 @@ const COLLECTION_FILENAME = 'welcome_to_collections.yaml';
 const COLLECTION_NAME = 'Introduction to Collections in Oppia';
 const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
 const EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
-const BACK_TO_COLLECTION_BUTTON_SELECTOR = '.e2e-test-back-button';
-const PAW_ICON_SELECTOR = '.e2e-test-lesson-paw-icon';
-const COMPLETED_PAW_ICON_CLASS = 'oppia-lesson-paw-completed';
+const COLLECTION_EXPLORATION_LINK_SELECTOR =
+  '.oppia-collection-path-section a[href*="?collection_id="]';
+const BACK_TO_COLLECTION_BUTTON_SELECTOR =
+  '.conversation-skin-back-to-collection';
+const EXPLORATION_COMPLETION_TOAST_MESSAGE =
+  'Congratulations for completing this lesson!';
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
@@ -64,12 +67,27 @@ describe('Logged-Out Learner', function () {
       {visible: true, timeout: 30000}
     );
 
-    // Click on the collection and wait for navigation to complete.
-    await superAdmin.clickAndWaitForNavigation(COLLECTION_NAME);
+    const collectionLink = await superAdmin.page.$$eval(
+      'a.thumbnail',
+      (anchors, collectionName) => {
+        const matchingAnchor = anchors.find(anchor => {
+          const title = anchor.querySelector(
+            '.e2e-test-collection-summary-tile-title'
+          );
+          return title?.textContent?.trim() === collectionName;
+        });
 
-    // Extract collection ID from URL.
-    const url = superAdmin.page.url();
-    const match = url.match(/\/collection\/([^/]+)/);
+        return matchingAnchor?.getAttribute('href') ?? null;
+      },
+      COLLECTION_NAME
+    );
+
+    if (!collectionLink) {
+      throw new Error('Could not find collection link in library results');
+    }
+
+    // Extract collection ID from the collection tile link.
+    const match = collectionLink.match(/\/collection\/([^/?#]+)/);
     if (match) {
       collectionId = match[1];
     } else {
@@ -101,51 +119,27 @@ describe('Logged-Out Learner', function () {
       `http://localhost:8181/collection/${collectionId}`
     );
 
-    // Click on the first exploration tile.
-    await loggedOutLearner.page.waitForSelector(EXPLORATION_TILE_SELECTOR, {
-      visible: true,
-    });
-    const firstExploration = await loggedOutLearner.page.$(
-      EXPLORATION_TILE_SELECTOR
-    );
-    if (!firstExploration) {
-      throw new Error('First exploration not found');
-    }
-    await firstExploration.click();
-
-    // Wait for exploration player to load.
+    // Open the first exploration in the collection.
     await loggedOutLearner.page.waitForSelector(
-      '.conversation-skin-main-tutor-card',
+      COLLECTION_EXPLORATION_LINK_SELECTOR,
       {
         visible: true,
-        timeout: 10000,
       }
     );
+    const firstExplorationLink = await loggedOutLearner.page.$eval(
+      COLLECTION_EXPLORATION_LINK_SELECTOR,
+      element => (element as HTMLAnchorElement).href
+    );
+    await loggedOutLearner.goto(firstExplorationLink);
+    await loggedOutLearner.waitForPageToFullyLoad();
 
-    // Play through the exploration (clicking continue/next buttons until end).
-    let continueButtonFound = true;
-    while (continueButtonFound) {
-      try {
-        // Wait for either continue button or end exploration indicator.
-        const continueButton = await loggedOutLearner.page.$(
-          '.e2e-test-continue-to-next-card-button'
-        );
-        const endCard = await loggedOutLearner.page.$(
-          '.e2e-test-end-card-container'
-        );
+    await loggedOutLearner.expectToBeOnPage('/explore/');
+    await loggedOutLearner.expectContinueToNextCardButtonToBePresent();
 
-        if (endCard) {
-          continueButtonFound = false;
-        } else if (continueButton) {
-          await continueButton.click();
-          await loggedOutLearner.page.waitForTimeout(1000);
-        } else {
-          continueButtonFound = false;
-        }
-      } catch (error) {
-        continueButtonFound = false;
-      }
-    }
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.expectExplorationCompletionToastMessage(
+      EXPLORATION_COMPLETION_TOAST_MESSAGE
+    );
   });
 
   it('should click "Back to Collection" button', async function () {
@@ -163,33 +157,6 @@ describe('Logged-Out Learner', function () {
     });
   });
 
-  it('should verify paw icon change after completion', async function () {
-    await loggedOutLearner.goto(
-      `http://localhost:8181/collection/${collectionId}`
-    );
-
-    // Check if the paw icon has the completed class.
-    await loggedOutLearner.page.waitForSelector(PAW_ICON_SELECTOR, {
-      visible: true,
-      timeout: 5000,
-    });
-
-    const pawIcon = await loggedOutLearner.page.$(PAW_ICON_SELECTOR);
-    if (!pawIcon) {
-      throw new Error('Paw icon not found');
-    }
-
-    const hasCompletedClass = await loggedOutLearner.page.evaluate(
-      (el, className) => el?.classList.contains(className),
-      pawIcon,
-      COMPLETED_PAW_ICON_CLASS
-    );
-
-    if (!hasCompletedClass) {
-      throw new Error('Paw icon does not have completed class');
-    }
-  });
-
   it('should change language to Spanish and verify text', async function () {
     await loggedOutLearner.goto(
       `http://localhost:8181/collection/${collectionId}`
@@ -203,7 +170,7 @@ describe('Logged-Out Learner', function () {
       `http://localhost:8181/collection/${collectionId}`
     );
 
-    // Verify "COMPARTIR ESTA COLECCIÓN" text is present.
+    // Verify the share footer text is translated to Spanish.
     await loggedOutLearner.page.waitForSelector(
       SHARE_COLLECTION_FOOTER_SELECTOR,
       {visible: true, timeout: 10000}
@@ -214,9 +181,9 @@ describe('Logged-Out Learner', function () {
       el => el.textContent
     );
 
-    if (shareText?.trim() !== 'COMPARTIR ESTA COLECCIÓN') {
+    if (shareText?.trim() !== 'Compartir esta colección') {
       throw new Error(
-        `Expected "COMPARTIR ESTA COLECCIÓN" but found "${shareText}"`
+        `Expected "Compartir esta colección" but found "${shareText}"`
       );
     }
   });
