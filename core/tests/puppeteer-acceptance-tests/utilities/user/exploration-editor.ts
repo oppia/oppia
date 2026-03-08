@@ -2957,7 +2957,20 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithText(interactionToAdd);
+    const [interactionTile] = await this.page.$x(
+      `//div[contains(@class, "e2e-test-customize-interaction-body")]` +
+        `//div[contains(@class, "oppia-interaction-tile-name") and ` +
+        `normalize-space(.)="${interactionToAdd}"]` +
+        `/ancestor::div[contains(@class, "e2e-test-interaction-tile-")]`
+    );
+
+    if (!interactionTile) {
+      throw new Error(
+        `Could not find interaction tile for ${interactionToAdd}.`
+      );
+    }
+
+    await this.clickOnElement(interactionTile);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`

@@ -20,7 +20,7 @@
  * Rename card, add content, add interactions (Continue, Multiple Choice, Text Input, EndExploration)
  * Add hints & solutions
  * Preview at each stage
- * Final: change language to Spanish → verify Numeric Input placeholder is "Ingresa un número"
+ * Final: change site language to Spanish → verify Numeric Input placeholder is "Ingresa un número"
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -182,7 +182,7 @@ describe('Exploration Creator', function () {
     await explorationEditor.addSolutionToState(
       'Python',
       'Python is a popular programming language.',
-      true
+      false
     );
     await explorationEditor.expectSolutionsToContain(
       'One solution is "Python". Python is a popular programming language..'
@@ -266,12 +266,14 @@ describe('Exploration Creator', function () {
     await explorationEditor.navigateToEditorTab();
   });
 
-  it('should change language to Spanish and verify Number Input placeholder', async function () {
-    // Navigate to settings tab.
-    await explorationEditor.navigateToSettingsTab();
+  it('should change site language to Spanish and verify Number Input placeholder', async function () {
+    const editorUrl = explorationEditor.page.url();
 
-    // Change language to Spanish.
-    await explorationEditor.selectLanguage('español (Spanish)');
+    // Change the site language to Spanish.
+    await explorationEditor.navigateToPreferencesPage();
+    await explorationEditor.updatePreferredSiteLanguage('Español');
+    await explorationEditor.saveChangesInPreferencesPage();
+    await explorationEditor.goto(editorUrl);
 
     // Navigate back to the Number Input card.
     await explorationEditor.navigateToEditorTab();
@@ -281,8 +283,11 @@ describe('Exploration Creator', function () {
     await explorationEditor.navigateToPreviewTab();
 
     // Verify the placeholder text in Spanish.
+    await explorationEditor.page.waitForSelector('.e2e-test-float-form-input', {
+      visible: true,
+    });
     const placeholderText = await explorationEditor.page.$eval(
-      '.e2e-test-interaction input[type="number"]',
+      '.e2e-test-float-form-input',
       el => (el as HTMLInputElement).placeholder
     );
 
