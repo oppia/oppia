@@ -78,7 +78,7 @@ describe('Logged-out User', function () {
       await blogPostWriter.saveTheDraftBlogPost();
 
       // As interestedPartnerOrg: Refresh the page.
-      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.reloadPage();
 
       await interestedPartnerOrg.expectNumberOfBlogPostsOnPageToBe(1);
       await interestedPartnerOrg.expectBlogPostWithTitleToBePresent(
