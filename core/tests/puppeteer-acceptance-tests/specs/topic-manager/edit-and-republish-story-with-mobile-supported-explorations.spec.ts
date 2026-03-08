@@ -43,7 +43,9 @@ describe('Topic Manager', function () {
     // Create two simple explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Exploring Quadratic Equations'
+        'Exploring Quadratic Equations',
+        'Algebra',
+        true
       );
 
     explorationId2 =

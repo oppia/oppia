@@ -4700,13 +4700,11 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
     category: string = 'Algebra',
-    flag: boolean = true
+    flag: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    if (flag) {
-      await this.dismissWelcomeModal();
-    }
+    await this.dismissWelcomeModal(flag);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
