@@ -2403,21 +2403,33 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   *
+   * TODO(#22539): This function has a duplicates in other files.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in topic-manager.ts.
    */
-  async dismissWelcomeModal(): Promise<void> {
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     try {
-      await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 10000,
+        // If we know the modal should appear, we can wait longer.
+        timeout: failIfMissing ? 20000 : 5000,
       });
       await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
+      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
-      showMessage(`welcome modal not found: ${(error as Error).message}`);
+      if (!failIfMissing) {
+        showMessage(
+          'Welcome Modal not found, but test can be continued.\n' +
+            `Error: ${error.message}`
+        );
+      } else {
+        throw new Error(
+          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
+        );
+      }
     }
   }
 
@@ -2684,11 +2696,12 @@ export class LoggedInUser extends BaseUser {
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra'
+    category: string = 'Algebra',
+    expectedWelcomeModal: boolean = false
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPageFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'

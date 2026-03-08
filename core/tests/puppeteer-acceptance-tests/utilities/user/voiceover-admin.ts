@@ -133,18 +133,35 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to dismiss welcome modal.
+   * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   *
+   * TODO(#22539): This function has a duplicates in other files.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in topic-manager.ts.
    */
-  async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-
-    showMessage('Tutorial pop-up is closed.');
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        // If we know the modal should appear, we can wait longer.
+        timeout: failIfMissing ? 20000 : 5000,
+      });
+      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
+      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      if (!failIfMissing) {
+        showMessage(
+          'Welcome Modal not found, but test can be continued.\n' +
+            `Error: ${error.message}`
+        );
+      } else {
+        throw new Error(
+          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
+        );
+      }
+    }
   }
 
   /**
@@ -153,22 +170,10 @@ export class VoiceoverAdmin extends BaseUser {
    * already been dismissed earlier in the test flow.
    */
   async dismissWelcomeModalIfPresent(): Promise<void> {
-    const MODAL_CHECK_TIMEOUT_MS = 2000;
-    try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: MODAL_CHECK_TIMEOUT_MS,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up was present and has been closed.');
-    } catch {
-      // Modal is not present, which is fine - it may have already been
-      // dismissed or not appeared yet.
-      showMessage('Tutorial pop-up was not present, continuing.');
-    }
+    // The existing dismissWelcomeModal() in this class already handles the
+    // case where the modal is not present (via try/catch), so we just
+    // delegate to it.
+    await this.dismissWelcomeModal(false);
   }
 
   /**
@@ -300,7 +305,7 @@ export class VoiceoverAdmin extends BaseUser {
     voiceArtistUsername: string
   ): Promise<void> {
     await this.navigateToExplorationEditor(explorationId);
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(false);
     await this.navigateToExplorationSettingsTab();
     await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);
   }

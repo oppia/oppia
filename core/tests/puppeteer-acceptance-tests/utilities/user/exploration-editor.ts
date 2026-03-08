@@ -2769,8 +2769,12 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   *
+   * TODO(#22539): This function has a duplicates in other files.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in topic-manager.ts.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     try {
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
@@ -2803,7 +2807,7 @@ export class ExplorationEditor extends BaseUser {
     // The existing dismissWelcomeModal() in this class already handles the
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(false);
   }
 
   /**
@@ -2854,9 +2858,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -6586,9 +6587,6 @@ export class ExplorationEditor extends BaseUser {
     imageDescription: string,
     imageCaption: string | null
   ): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
@@ -6602,9 +6600,6 @@ export class ExplorationEditor extends BaseUser {
    * Block Quote, Image, Math Formula, and Concept Card.
    */
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
@@ -6690,9 +6685,6 @@ export class ExplorationEditor extends BaseUser {
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
