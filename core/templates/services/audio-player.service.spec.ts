@@ -63,6 +63,7 @@ describe('AudioPlayerService', () => {
 
   describe('when audio loads successfully', () => {
     beforeEach(() => {
+      spyOn(assetsBackendApiService, 'isCached').and.returnValue(true);
       spyOn(howler, 'Howl').and.returnValue({
         on: (evt: string, func: () => void) => {
           if (evt === 'load') {
@@ -325,6 +326,7 @@ describe('AudioPlayerService', () => {
 
   describe('when track is not loaded', () => {
     beforeEach(() => {
+      spyOn(assetsBackendApiService, 'isCached').and.returnValue(true);
       spyOn(howler, 'Howl').and.returnValue({
         on: (evt: string, func: () => void) => {
           if (evt === 'load') {
@@ -439,9 +441,77 @@ describe('AudioPlayerService', () => {
     }));
   });
 
+  describe('when audio is not cached', () => {
+    beforeEach(() => {
+      spyOn(assetsBackendApiService, 'isCached').and.returnValue(false);
+      spyOn(assetsBackendApiService, 'getAudioDownloadUrl').and.returnValue(
+        'https://audio-url'
+      );
+      spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
+        Promise.resolve({
+          data: new Blob(),
+          filename: 'test.mp3',
+        })
+      );
+      spyOn(howler, 'Howl').and.returnValue({
+        on: (evt: string, func: () => void) => {
+          if (evt === 'load') {
+            func();
+          }
+        },
+      } as Howl);
+    });
+
+    it('should stream audio directly using html5 mode', fakeAsync(() => {
+      audioPlayerService.loadAsync('test.mp3');
+      flushMicrotasks();
+
+      expect(assetsBackendApiService.loadAudio).not.toHaveBeenCalled();
+      expect(assetsBackendApiService.getAudioDownloadUrl).toHaveBeenCalledWith(
+        'exploration',
+        '1',
+        'test.mp3'
+      );
+      expect(howler.Howl).toHaveBeenCalledWith({
+        src: ['https://audio-url'],
+        format: ['mp3'],
+        html5: true,
+      });
+    }));
+
+    it('should not reload streamed track when already loaded', fakeAsync(() => {
+      audioPlayerService.loadAsync('test.mp3');
+      flushMicrotasks();
+
+      audioPlayerService.loadAsync('test.mp3');
+      flushMicrotasks();
+
+      expect(assetsBackendApiService.getAudioDownloadUrl).toHaveBeenCalledTimes(
+        1
+      );
+    }));
+
+    it('should resolve streaming load without waiting for load event', fakeAsync(() => {
+      (howler.Howl as jasmine.Spy).and.returnValue({
+        on: (_evt: string, _func: () => void) => {
+          // Simulates load event not firing yet.
+        },
+      } as Howl);
+
+      audioPlayerService
+        .loadAsync('test.mp3')
+        .then(successHandler, failHandler);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+  });
+
   it(
     'should clear secondary audio translations when audio ' + 'ends',
     fakeAsync(async () => {
+      spyOn(assetsBackendApiService, 'isCached').and.returnValue(true);
       spyOn(howler, 'Howl').and.returnValue({
         on: (evt: string, func: () => void) => {
           if (evt === 'end') {
@@ -462,6 +532,7 @@ describe('AudioPlayerService', () => {
   );
 
   it('should display error when audio fails to load', fakeAsync(() => {
+    spyOn(assetsBackendApiService, 'isCached').and.returnValue(true);
     spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
       Promise.reject('Error')
     );

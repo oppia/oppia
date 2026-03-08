@@ -338,18 +338,21 @@ export class AudioBarComponent {
       );
       if (this.isCached(audioTranslation)) {
         this.playCachedAudioTranslation(audioTranslation.filename);
-      } else if (
-        !this.audioPreloaderService.isLoadingAudioFile(
-          audioTranslation.filename
-        )
-      ) {
-        let contentIdsToVoiceovers =
-          this.entityVoiceoversService.getAllContentIdsToVoiceovers();
-        this.audioPreloaderService.contentIdsToVoiceovers =
-          contentIdsToVoiceovers;
-        this.audioPreloaderService.restartAudioPreloader(
-          this.playerPositionService.getCurrentStateName()
-        );
+      } else {
+        this.playCachedAudioTranslation(audioTranslation.filename);
+        if (
+          !this.audioPreloaderService.isLoadingAudioFile(
+            audioTranslation.filename
+          )
+        ) {
+          let contentIdsToVoiceovers =
+            this.entityVoiceoversService.getAllContentIdsToVoiceovers();
+          this.audioPreloaderService.contentIdsToVoiceovers =
+            contentIdsToVoiceovers;
+          this.audioPreloaderService.restartAudioPreloader(
+            this.playerPositionService.getCurrentStateName()
+          );
+        }
       }
     }
   }

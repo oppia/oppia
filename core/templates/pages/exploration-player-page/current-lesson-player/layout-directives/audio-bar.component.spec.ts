@@ -547,7 +547,7 @@ describe('Audio Bar Component', () => {
     }));
 
     it(
-      'should restart audio track if audio is not' + 'stored in cache',
+      'should play audio track even when audio is not' + 'stored in cache',
       fakeAsync(() => {
         component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
           filename: 'audio-en.mp3',
@@ -561,18 +561,36 @@ describe('Audio Bar Component', () => {
         ).and.callThrough();
         // Setting cached value to be true.
         spyOn(assetsBackendApiService, 'isCached').and.returnValue(false);
+        spyOn(audioPreloaderService, 'isLoadingAudioFile').and.returnValue(
+          false
+        );
+        spyOn(
+          entityVoiceoversService,
+          'getAllContentIdsToVoiceovers'
+        ).and.returnValue({});
         spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
           'Start'
         );
         let restartAudioSpy = spyOn(
           audioPreloaderService,
           'restartAudioPreloader'
-        ).and.returnValue();
+        );
+        let playCacheAudioSpy = spyOn(
+          component,
+          'playCachedAudioTranslation'
+        ).and.callThrough();
+        let playSpy = spyOn(audioPlayerService, 'play').and.callThrough();
+        spyOn(audioPlayerService, 'loadAsync').and.returnValue(
+          Promise.resolve()
+        );
 
         component.loadAndPlayAudioTranslation();
         tick();
+        discardPeriodicTasks();
 
-        expect(restartAudioSpy).toHaveBeenCalled();
+        expect(playCacheAudioSpy).toHaveBeenCalledWith('audio-en.mp3');
+        expect(playSpy).toHaveBeenCalled();
+        expect(restartAudioSpy).toHaveBeenCalledWith('Start');
       })
     );
   });
