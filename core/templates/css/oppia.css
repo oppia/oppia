@@ -1132,67 +1132,6 @@ textarea {
   outline: 0;
 }
 
-/* Page navigation loading overlay - shown during route transitions.
-   This overlay is rendered at the root level (oppia-root) to persist
-   across lazy-loaded module transitions where BaseContentComponent
-   would be destroyed. */
-.oppia-navigation-loading-overlay {
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.97);
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  z-index: 9999;
-}
-
-.oppia-navigation-loading-spinner {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  text-align: center;
-}
-
-.oppia-loading-spinner-circle {
-  animation: oppia-spinner-rotate 1s linear infinite;
-  border: 4px solid #e0e0e0;
-  border-radius: 50%;
-  border-top-color: #00645c;
-  box-sizing: border-box;
-  display: block;
-  height: 48px;
-  width: 48px;
-}
-
-@keyframes oppia-spinner-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.oppia-loading-spinner-text {
-  color: #333;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1.25em;
-  font-weight: 500;
-}
-
-/* Accessibility: respect reduced motion preference. */
-@media (prefers-reduced-motion: reduce) {
-  .oppia-loading-spinner-circle {
-    animation: none;
-    border-color: #00645c;
-    border-style: dashed;
-  }
-}
-
 .oppia-align-center {
   float: none;
   margin: 0 auto;
