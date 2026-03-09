@@ -618,12 +618,12 @@ def main(args: Optional[List[str]] = None) -> None:
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if not parsed_args.skip_install:
-        if not _dependencies_already_installed():
+        if _dependencies_already_installed():
+            print('Dependencies unchanged. Skipping installation.')
+        else:
             print('Installing third-party libraries...')
             install_third_party_libs.main()
-            _write_hash(_compute_dependency_hash())
-        else:
-            print('Dependencies unchanged. Skipping installation.')
+        _write_hash(_compute_dependency_hash())
 
     # If --use_pytest flag is set, delegate to pytest and return early.
     if parsed_args.use_pytest:
