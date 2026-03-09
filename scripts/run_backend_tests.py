@@ -45,6 +45,8 @@ might mean that you have introduced a circular dependency (e.g. module A
 imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
+"""Runs backend tests."""
+
 from __future__ import annotations
 
 import argparse
@@ -58,6 +60,7 @@ import subprocess
 import sys
 import threading
 import time
+
 import pytest
 from typing import Dict, Final, List, Optional, Tuple, cast
 
