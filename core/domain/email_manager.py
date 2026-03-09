@@ -699,7 +699,7 @@ def _send_email(
             }
 
             taskqueue_services.enqueue_task(
-                feconf.TASK_URL_RETRY_EMAIL, payload, 0
+                feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
             )
 
         email_models.SentEmailModel.create(
@@ -799,7 +799,7 @@ def _send_bulk_mail(
                     'text_body': cleaned_plaintext_body,
                 }
                 taskqueue_services.enqueue_task(
-                    feconf.TASK_URL_RETRY_EMAIL, payload, 0
+                    feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
                 )
 
         email_models.BulkEmailModel.create(

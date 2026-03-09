@@ -20,6 +20,7 @@ import uuid
 
 from core import feconf
 from core.domain import (
+    email_services,
     exp_fetchers,
     exp_services,
     feedback_services,
@@ -832,30 +833,35 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
             'html_body': '<html>Test Body</html>',
             'text_body': 'Test Body',
         }
-        self.url = feconf.TASK_URL_RETRY_EMAIL
+        self.url = feconf.TASK_URL_RETRY_FAILED_EMAIL
         self.csrf_token = self.get_new_csrf_token()
 
+        self.headers = {
+            'X-Appengine-QueueName': 'emails',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1',
+        }
+
     def test_successful_retry_returns_200(self) -> None:
-        def mock_send_mail(*args: str, **kwargs: str) -> None:
+        def mock_send_mail(*_args: str, **_kwargs: str) -> None:
             pass
 
         send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
 
         with send_mail_swap:
-            response = self.post_task(
+            self.post_task(
                 self.url,
                 self.payload,
+                self.headers,
                 csrf_token=self.csrf_token,
                 expect_errors=False,
                 expected_status_int=200,
             )
 
-        self.assertEqual(response.status_int, 200)
-
     def test_failed_retry_raises_exception_to_trigger_cloud_task_retry(
         self,
     ) -> None:
-        def mock_send_mail_that_fails(*args: str, **kwargs: str) -> None:
+        def mock_send_mail_that_fails(*_args: str, **_kwargs: str) -> None:
             raise Exception('Mock email failure')
 
         send_mail_swap = self.swap(
@@ -869,6 +875,7 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
                 self.post_task(
                     self.url,
                     self.payload,
+                    self.headers,
                     csrf_token=self.csrf_token,
                     expect_errors=True,
                     expected_status_int=500,
