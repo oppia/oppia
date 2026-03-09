@@ -648,6 +648,7 @@ const conceptCardLinkSelectorInQuestion = '.concept-card-link';
 const gotoLibraryButton = '.community-library-btn';
 const ratingStarsSelector = '.conversation-skin-final-ratings-display';
 const suggestedLessonTitleSelector = '.exploration-summary-btn p';
+const showSolutionButton = '.oppia-learner-got-it-button';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -7016,6 +7017,18 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Click on 'SHOW SOLUTION' button in warning solution
+   * modal.
+   */
+  async clickOnShowSolutionButton(): Promise<void> {
+    await this.page.waitForSelector(showSolutionButton, {
+      visible: true,
+    });
+    await this.page.click(showSolutionButton);
+    showMessage('SHOW SOLUTION button clicked');
+  }
+
+  /**
    * Expect solution modal visible.
    */
   async expectSolutionModelVisible(): Promise<void> {
@@ -7561,58 +7574,6 @@ export class LoggedOutUser extends BaseUser {
     }
 
     throw new Error('YouTube iframe not found');
-  }
-
-  /**
-   * Play the youtube video.
-   */
-  async playYoutubeVideo(): Promise<void> {
-    const frame = await this.getYoutubeFrame();
-
-    const playButton = '.ytp-large-play-button';
-
-    await frame.waitForSelector(playButton, {visible: true});
-    await frame.click(playButton);
-
-    showMessage('Successfully clicked YouTube play button.');
-  }
-
-  /**
-   * Stops the youtube video.
-   */
-  async stopYoutubeVideo(): Promise<void> {
-    const frame = await this.getYoutubeFrame();
-
-    const pauseButton = '.ytp-play-button';
-
-    await frame.waitForSelector(pauseButton, {visible: true});
-    await frame.click(pauseButton);
-
-    showMessage('Youtube video paused.');
-  }
-
-  /**
-   * Expect the youtube video is playing.
-   */
-  async expectYoutubeVideoIsPlaying(): Promise<void> {
-    const frame = await this.getYoutubeFrame();
-
-    const timeSelector = '.ytp-time-current';
-
-    await frame.waitForFunction(
-      (selector: string) => {
-        const el = document.querySelector(selector);
-        if (!el) {
-          return false;
-        }
-        const time = el.textContent?.trim();
-        return time && time !== '0:00' && time !== '0:0';
-      },
-      {},
-      timeSelector
-    );
-
-    showMessage('Youtube video is successfully playing.');
   }
 
   /**

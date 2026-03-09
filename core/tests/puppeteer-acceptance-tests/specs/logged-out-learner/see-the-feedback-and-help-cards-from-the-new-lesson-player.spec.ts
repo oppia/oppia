@@ -313,7 +313,6 @@ describe('Logged-Out Learner', function () {
   it('should be able to go forward by one card', async function () {
     await loggedOutLearner.closeConceptCard();
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.expectCheckpointCelebrationComponentAppears();
     expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
     expect(await loggedOutLearner.isBackButtonPresent()).toBe(true);
@@ -399,7 +398,7 @@ describe('Logged-Out Learner', function () {
     expect(
       await loggedOutLearner.expectTextPresentOnPage('SHOW SOLUTION')
     ).toBe(true);
-    await loggedOutLearner.clickOnElementWithText('SHOW SOLUTION');
+    await loggedOutLearner.clickOnShowSolutionButton();
 
     await loggedOutLearner.expectSolutionModelVisible();
     await loggedOutLearner.expectSolution('1/2>');
