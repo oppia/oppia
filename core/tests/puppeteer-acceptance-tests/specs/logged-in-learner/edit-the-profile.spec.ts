@@ -35,6 +35,8 @@ describe('Logged-In Learner', function () {
       'learner@example.com'
     );
 
+    await loggedInLearner.goto('http://localhost:8181/login');
+
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'

@@ -7133,6 +7133,53 @@ export class LoggedOutUser extends BaseUser {
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
   }
+
+  /**
+   * Function to verify meta tags on the current page.
+   */
+
+  async verifyMetaTags(): Promise<void> {
+    await this.page.waitForSelector('meta[itemprop="name"]');
+
+    const itempropName = await this.page.$eval('meta[itemprop="name"]', el =>
+      el.getAttribute('content')
+    );
+    expect(itempropName).toBe('Personalized Online Learning from Oppia');
+
+    const ogTitle = await this.page.$eval('meta[property="og:title"]', el =>
+      el.getAttribute('content')
+    );
+    expect(ogTitle).toBe('Personalized Online Learning from Oppia');
+
+    const ogDescription = await this.page.$eval(
+      'meta[property="og:description"]',
+      el => el.getAttribute('content')
+    );
+    expect(ogDescription).not.toBeNull();
+    expect(ogDescription!.length).toBeGreaterThan(0);
+
+    const appName = await this.page.$eval('meta[name="application-name"]', el =>
+      el.getAttribute('content')
+    );
+    expect(appName).toBe('Oppia.org');
+  }
+
+  /**
+   * Function to crawl main Oppia pages and verify meta tags.
+   */
+  async crawlMainOppiaPages(): Promise<void> {
+    const pages = [
+      testConstants.URLs.GetStarted,
+      testConstants.URLs.Donate,
+      testConstants.URLs.Partnerships,
+      testConstants.URLs.Volunteer,
+      testConstants.URLs.Teach,
+    ];
+    for (const url of pages) {
+      await this.page.goto(url, {waitUntil: 'domcontentloaded'});
+      await this.verifyMetaTags();
+    }
+  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
