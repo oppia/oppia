@@ -19,7 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -4617,20 +4617,22 @@ export class LoggedInUser extends BaseUser {
    * @param {string} chapterName - The name of the lesson to check.
    */
   async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
-    const chapterCards = await this.page.$$('.chapter-title');
+    const chapterCards = await this.page.$$('.e2e-test-chapter-title');
 
-    for (const card of chapterCards) {
-      const titleHandle = await card.$(chapterSelector);
-
-      if (!titleHandle) {
-        continue;
-      }
-      const titleText = await titleHandle.evaluate(
-        el => el.textContent?.trim() || ''
+    for (const titleHandle of chapterCards) {
+      const titleText = await titleHandle.evaluate(el =>
+        (el.textContent || '').replace(/\s+/g, ' ').trim()
       );
 
       if (titleText.includes(chapterName)) {
-        const newLabelHandle = await card.$('.classroom-new-chapter');
+        const container = (await titleHandle.evaluateHandle(
+          el =>
+            el.closest('.chapter-title') ||
+            el.closest('.chapter-text') ||
+            el.parentElement
+        )) as ElementHandle;
+
+        const newLabelHandle = await container.$('.classroom-new-chapter');
 
         if (!newLabelHandle) {
           throw new Error(
