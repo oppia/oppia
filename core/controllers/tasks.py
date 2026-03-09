@@ -241,11 +241,26 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'sender_email': {'schema': {'type': 'basestring'}},
-            'recipient_id': {'schema': {'type': 'basestring'}},
-            'subject': {'schema': {'type': 'basestring'}},
-            'html_body': {'schema': {'type': 'basestring'}},
-            'text_body': {'schema': {'type': 'basestring'}},
+            'sender_email': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'recipient_id': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'subject': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'html_body': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'text_body': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
