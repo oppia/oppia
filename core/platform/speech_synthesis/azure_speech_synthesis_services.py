@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 import re
 import time
+import xml.sax.saxutils as saxutils
 
 from core import constants, feconf
 from core.domain import voiceover_services
@@ -260,6 +261,10 @@ def convert_plaintext_to_ssml_content(
 
     main_ssml_content = ''
     for content in content_list:
+        # Escaping special characters in the content to ensure they are
+        # pronounced correctly by the Azure Text-to-Speech service.
+        # This includes characters like <, >, &, etc.
+        content = saxutils.escape(content)
         # Updates the content to pronounce `-` correctly in the given language.
         if ' - ' in content:
             pattern = re.compile(r'(\d+)\s*-\s*(\d+)')

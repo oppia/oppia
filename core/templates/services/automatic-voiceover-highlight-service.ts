@@ -157,6 +157,7 @@ export class AutomaticVoiceoverHighlightService {
   }
 
   transformMathSentenceContainingAudioSpecficWords(sentence: string): string {
+    sentence = this.escapeXml(sentence);
     let mathSymbolPronunciations: {[key: string]: string} = {};
     if (
       AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.hasOwnProperty(
@@ -225,6 +226,13 @@ export class AutomaticVoiceoverHighlightService {
     sentence = sentence.replace(/_{2,}/g, ' dash ');
 
     return sentence;
+  }
+
+  escapeXml(text: string): string {
+    return text
+      .replace(/&(?!amp;|lt;|gt;|quot;|apos;)/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   getSentencesToHighlightForTimeRanges(): void {
