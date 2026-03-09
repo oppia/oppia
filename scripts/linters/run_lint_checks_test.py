@@ -30,6 +30,8 @@ from typing import List, Optional
 from .. import concurrent_task_utils, install_third_party_libs
 from . import run_lint_checks
 
+os.environ['GRPC_ENABLE_FORK_SUPPORT'] = '1'
+
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 PYLINTRC_FILEPATH = os.path.join(os.getcwd(), '.pylintrc')
 
