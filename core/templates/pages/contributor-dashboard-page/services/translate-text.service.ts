@@ -62,8 +62,8 @@ export class StateAndContent {
 })
 export class TranslateTextService {
   STARTING_INDEX = -1;
-  PENDING = 'pending';
-  SUBMITTED = 'submitted';
+  PENDING: Status = 'pending';
+  SUBMITTED: Status = 'submitted';
   stateWiseContents: StateNamesToContentIdMapping = {};
   stateWiseContentIds: {[stateName: string]: string[]} = {};
   stateNamesList: string[] = [];
