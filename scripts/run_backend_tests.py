@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import json
 import multiprocessing
 import os
@@ -59,9 +60,8 @@ import sys
 import threading
 import time
 
-import pytest
 from typing import Dict, Final, List, Optional, Tuple, cast
-import hashlib
+import pytest
 
 DEPENDENCY_HASH_FILE = '.oppia_dependency_hash'
 
