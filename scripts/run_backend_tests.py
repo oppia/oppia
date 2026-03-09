@@ -45,6 +45,7 @@ might mean that you have introduced a circular dependency (e.g. module A
 imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
+
 """Runs backend tests."""
 
 from __future__ import annotations
@@ -72,7 +73,7 @@ from . import (
     servers,
 )
 
-DEPENDENCY_HASH_FILE = '.oppia_dependency_hash'
+DEPENDENCY_HASH_FILE: Final = '.oppia_dependency_hash'
 
 
 def _compute_dependency_hash() -> str:
