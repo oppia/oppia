@@ -210,6 +210,11 @@ describe('Logged-In Learner', function () {
       await loggedInLearner2.expectChaptersInAvailableChapterList([
         'What are the Place Values',
       ]);
+
+      await loggedInLearner2.expectLessonCardToHaveNewLabel(
+        'What are the Place Values'
+      );
+
       await loggedInLearner2.comingSoonLessonListHasChapters([
         'Find the Value of a Number',
       ]);
@@ -306,11 +311,11 @@ describe('Logged-In Learner', function () {
         'Rounding Numbers part 2',
       ]);
 
-      await loggedInLearner1.expectLessonCardToHaveNewLabel(
-        'Rounding Numbers part 1'
+      await loggedInLearner2.expectLessonCardToHaveNewLabel(
+        'Comparing Numbers'
       );
-      await loggedInLearner1.expectLessonCardToHaveNewLabel(
-        'Rounding Numbers part 2'
+      await loggedInLearner2.expectLessonCardToHaveNewLabel(
+        'Find the Value of a Number'
       );
 
       await loggedInLearner1.navigateToLearnerDashboard();
