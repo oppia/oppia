@@ -720,7 +720,7 @@ describe('Exploration editor tab component', () => {
     );
     expect(() => {
       component.initStateEditor();
-    }).not.toThrow();
+    }).not.toThrowError();
 
     expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
     expect(
