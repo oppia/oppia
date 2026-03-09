@@ -1,1 +1,13 @@
+<div *ngIf="loadingMessage"
+		 class="oppia-loading-fullpage e2e-test-loading-fullpage">
+	<div class="oppia-align-center">
+		<span>{{ (loadingMessage | translate) || loadingMessage }}</span>
+		<ng-container *ngIf="loadingMessage !== 'Failed to load. Try reloading.'">
+			<span class="oppia-loading-dot-one">.</span>
+			<span class="oppia-loading-dot-two">.</span>
+			<span class="oppia-loading-dot-three">.</span>
+		</ng-container>
+	</div>
+</div>
+
 <router-outlet custom="light"></router-outlet>

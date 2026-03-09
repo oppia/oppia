@@ -2,8 +2,10 @@
      class="oppia-loading-fullpage e2e-test-loading-fullpage">
   <div class="oppia-align-center">
     <span>{{ (message | translate) || message }}</span>
-    <span class="oppia-loading-dot-one">.</span>
-    <span class="oppia-loading-dot-two">.</span>
-    <span class="oppia-loading-dot-three">.</span>
+    <ng-container *ngIf="message !== 'Failed to load. Try reloading.'">
+      <span class="oppia-loading-dot-one">.</span>
+      <span class="oppia-loading-dot-two">.</span>
+      <span class="oppia-loading-dot-three">.</span>
+    </ng-container>
   </div>
 </div>

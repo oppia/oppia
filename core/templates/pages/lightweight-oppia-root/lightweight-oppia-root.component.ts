@@ -16,10 +16,58 @@
  * @fileoverview Oppia root component.
  */
 
-import {Component} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationStart,
+  Router,
+} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {LoaderService} from 'services/loader.service';
 
 @Component({
   selector: 'lightweight-oppia-root',
   templateUrl: './lightweight-oppia-root.component.html',
 })
-export class LightweightOppiaRootComponent {}
+export class LightweightOppiaRootComponent implements OnInit, OnDestroy {
+  loadingMessage: string = '';
+  private directiveSubscriptions = new Subscription();
+
+  constructor(
+    private loaderService: LoaderService,
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationStart) {
+          this.loaderService.showLoadingScreen('Loading');
+        } else if (event instanceof NavigationError) {
+          this.loaderService.showLoadingScreen(
+            'Failed to load. Try reloading.'
+          );
+        } else if (
+          event instanceof NavigationEnd ||
+          event instanceof NavigationCancel
+        ) {
+          this.loaderService.hideLoadingScreen();
+        }
+      })
+    );
+
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe((message: string) => {
+        this.loadingMessage = message;
+        this.changeDetectorRef.detectChanges();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}

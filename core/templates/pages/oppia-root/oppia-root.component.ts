@@ -17,7 +17,13 @@
  */
 
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import {NavigationEnd, NavigationStart, Router} from '@angular/router';
+import {
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationStart,
+  Router,
+} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {LoaderService} from 'services/loader.service';
 
@@ -42,7 +48,14 @@ export class OppiaRootComponent implements OnInit, OnDestroy {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationStart) {
           this.loaderService.showLoadingScreen('Loading');
-        } else if (event instanceof NavigationEnd) {
+        } else if (event instanceof NavigationError) {
+          this.loaderService.showLoadingScreen(
+            'Failed to load. Try reloading.'
+          );
+        } else if (
+          event instanceof NavigationEnd ||
+          event instanceof NavigationCancel
+        ) {
           this.loaderService.hideLoadingScreen();
         }
       })
