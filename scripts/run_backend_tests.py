@@ -60,8 +60,17 @@ import sys
 import threading
 import time
 
-from typing import Dict, Final, List, Optional, Tuple, cast
 import pytest
+
+from typing import Dict, Final, List, Optional, Tuple, cast
+
+from . import (
+    common,
+    concurrent_task_utils,
+    git_changes_utils,
+    install_third_party_libs,
+    servers,
+)
 
 DEPENDENCY_HASH_FILE = '.oppia_dependency_hash'
 
@@ -102,14 +111,6 @@ def _dependencies_already_installed() -> bool:
         return False
     return current_hash == stored_hash
 
-
-from . import (
-    common,
-    concurrent_task_utils,
-    git_changes_utils,
-    install_third_party_libs,
-    servers,
-)
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
