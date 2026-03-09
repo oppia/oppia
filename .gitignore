@@ -84,4 +84,5 @@ debug.log
 # Puppeteer acceptance tests.
 jest-runtime-config.json
 
-.oppia_dependency_hashoppia-env/
+.oppia_dependency_hash
+oppia-env/
