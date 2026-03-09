@@ -203,17 +203,26 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   addSkillForDiagnosticTest(): void {
-    let skillToAdd = this.skillForDiagnosticTestFormControl.value;
+    const skillToAdd = this.skillForDiagnosticTestFormControl.value;
+
+    // Guard clause: Do not proceed if no valid skill is selected.
+    if (!skillToAdd || typeof skillToAdd.getId !== 'function') {
+      this.skillForDiagnosticTestFormControl.setValue(null);
+      return;
+    }
+
     this.skillForDiagnosticTestFormControl.setValue(null);
     this.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
-    let skillSummary = this.availableSkillSummariesForDiagnosticTest.find(
+    const skillSummary = this.availableSkillSummariesForDiagnosticTest.find(
       skill => skill.getId() === skillToAdd.getId()
     );
+
     if (skillSummary) {
-      let index =
-        this.availableSkillSummariesForDiagnosticTest.indexOf(skillSummary);
-      this.availableSkillSummariesForDiagnosticTest.splice(index, 1);
+      this.availableSkillSummariesForDiagnosticTest =
+        this.availableSkillSummariesForDiagnosticTest.filter(
+          skill => skill.getId() !== skillSummary.getId()
+        );
     }
 
     this.topicUpdateService.updateDiagnosticTestSkills(
@@ -224,14 +233,15 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   removeSkillFromDiagnosticTest(skillToRemove: ShortSkillSummary): void {
-    let skillSummary = this.selectedSkillSummariesForDiagnosticTest.find(
-      skill => skill.getId() === skillToRemove.getId()
-    );
-    if (skillSummary) {
-      let index =
-        this.selectedSkillSummariesForDiagnosticTest.indexOf(skillSummary);
-      this.selectedSkillSummariesForDiagnosticTest.splice(index, 1);
+    // Guard clause: Do not proceed if no valid skill is provided.
+    if (!skillToRemove || typeof skillToRemove.getId !== 'function') {
+      return;
     }
+
+    this.selectedSkillSummariesForDiagnosticTest =
+      this.selectedSkillSummariesForDiagnosticTest.filter(
+        skill => skill.getId() !== skillToRemove.getId()
+      );
 
     this.availableSkillSummariesForDiagnosticTest.push(skillToRemove);
 

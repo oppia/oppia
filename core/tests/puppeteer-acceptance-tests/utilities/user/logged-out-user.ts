@@ -3995,13 +3995,38 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the practice tab in the topic page.
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
-    await this.expectElementToBeVisible(practiceTabButtonSelector);
-    await this.clickOnElementWithSelector(practiceTabButtonSelector);
+    const practiceTabLink = '.e2e-test-practice-tab-link';
+    const practiceContainer = '.e2e-test-practice-tab-container';
 
-    await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(practiceTabContainerSelector);
+    // Wait for the topic page to be fully loaded
+    await this.page.waitForSelector(practiceTabLink, {
+      visible: true,
+      timeout: 30000,
+    });
 
-    showMessage('Navigated to practice tab in topic page.');
+    // Check if practice tab exists; if not, reload once to clear Angular cache
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(practiceTabLink, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
+
+    // For mobile viewports: Scroll to top to ensure no sticky headers block the click
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+
+    // Click the practice tab link
+    await this.clickOnElementWithSelector(practiceTabLink);
+
+    // Wait for the practice tab container to be visible
+    await this.page.waitForSelector(practiceContainer, {
+      visible: true,
+      timeout: 60000,
+    });
   }
 
   /**

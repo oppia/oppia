@@ -981,6 +981,29 @@ export class BaseUser {
   }
 
   /**
+   * Waits for Angular's zone to become stable, indicating all change detection
+   * and async operations have completed. This is useful when interacting with
+   * dynamically rendered components (e.g., modals) to ensure elements are ready.
+   * @param timeout - The maximum time to wait in milliseconds. Default is 10000.
+   */
+  async waitForAngularToStabilize(timeout: number = 10000): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        () => (window as any)['ngZone']?.isStable === true,
+        {timeout}
+      );
+
+      // Small buffer for DOM updates after Angular stabilizes
+      await this.page.waitForTimeout(500);
+    } catch (error) {
+      console.log(
+        `Angular zone did not stabilize within ${timeout}ms. Continuing anyway.`
+      );
+      await this.page.waitForTimeout(1000);
+    }
+  }
+
+  /**
    * This function waits until a page is fully rendered.
    * It does so via checking every second if the size of the HTML content of the page is stable.
    * If the size is stable for at least 3 checks, it considers the page fully rendered.

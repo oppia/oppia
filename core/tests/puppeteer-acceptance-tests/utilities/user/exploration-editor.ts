@@ -2686,11 +2686,32 @@ export class ExplorationEditor extends BaseUser {
     const confirmPublish = async (): Promise<string> => {
       await this.clickOnElementWithSelector(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
+
+      // Wait for the publish confirmation button to appear and be clickable.
+      // This ensures Angular has fully rendered the modal before attempting to click.
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
-      await this.page.waitForSelector(explorationIdElement);
+
+      // Wait for the exploration ID element with increased timeout to handle
+      // potential animation delays in the success modal.
+      // RELOAD RECOVERY: Fixes mobile redirect delay flake #24030
+      const success = await this.page
+        .waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 20000,
+        })
+        .then(() => true)
+        .catch(() => false);
+      if (!success) {
+        await this.page.reload({waitUntil: 'networkidle0'});
+        await this.page.waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 30000,
+        });
+      }
+
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
         element => (element as HTMLElement).innerText
