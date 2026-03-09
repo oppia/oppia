@@ -33,7 +33,7 @@ import {
 export interface TranslatableItem {
   translation: string | string[];
   status: Status;
-  text: string | string[];
+  text: string | string[] | null;
   more: boolean;
   dataFormat?: string;
   contentType?: string;
@@ -69,18 +69,18 @@ export class TranslateTextService {
   stateNamesList: string[] = [];
   stateAndContent: StateAndContent[] = [];
   activeIndex = this.STARTING_INDEX;
-  activeExpId;
-  activeExpVersion;
-  activeContentId;
-  activeStateName: string;
-  activeContentText: string | string[];
-  activeContentStatus: Status;
+  activeExpId: string | null = null;
+  activeExpVersion: string | null = null;
+  activeContentId: string | null = null;
+  activeStateName: string | null = null;
+  activeContentText: string | string[] | null = null;
+  activeContentStatus: Status = 'pending';
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
   ) {}
 
-  private _getNextText(): string | string[] {
+  private _getNextText(): string | string[] | null {
     if (this.stateAndContent.length === 0) {
       return null;
     }
@@ -91,7 +91,7 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] {
+  private _getPreviousText(): string | string[] | null {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
       return null;
     }
@@ -121,7 +121,7 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-    text: string | string[],
+    text: string | string[] | null,
     more: boolean,
     status: Status,
     translation: string | string[]
@@ -240,6 +240,15 @@ export class TranslateTextService {
     const activeIndexAtSubmission = this.activeIndex;
     const activeStateNameAtSubmission = this.activeStateName;
     const activeContentIdAtSubmission = this.activeContentId;
+
+    if (
+      activeStateNameAtSubmission === null ||
+      activeContentIdAtSubmission === null ||
+      this.activeExpId === null ||
+      this.activeExpVersion === null
+    ) {
+      return;
+    }
 
     const contentToTranslateAtSubmission =
       this.stateWiseContents[activeStateNameAtSubmission]?.[
