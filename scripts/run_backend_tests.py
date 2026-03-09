@@ -61,6 +61,47 @@ import time
 
 import pytest
 from typing import Dict, Final, List, Optional, Tuple, cast
+import hashlib
+
+DEPENDENCY_HASH_FILE = '.oppia_dependency_hash'
+
+
+def _compute_dependency_hash() -> str:
+    """Compute hash of dependency files."""
+    dependency_files = ['requirements.txt', 'package.json', 'package-lock.json']
+
+    sha = hashlib.sha256()
+
+    for file_path in dependency_files:
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as f:
+                sha.update(f.read())
+    return sha.hexdigest()
+
+
+def _read_stored_hash() -> Optional[str]:
+    """Read stored dependency hash."""
+    if os.path.exists(DEPENDENCY_HASH_FILE):
+        with open(DEPENDENCY_HASH_FILE, 'r', encoding='utf-8') as f:
+            return f.read().strip()
+    return None
+
+
+def _write_hash(hash_value: str) -> None:
+    """Store dependency hash."""
+    with open(DEPENDENCY_HASH_FILE, 'w', encoding='utf-8') as f:
+        f.write(hash_value)
+
+
+def _dependencies_already_installed() -> bool:
+    """Check whether dependencies changed using hash comparison."""
+    current_hash = _compute_dependency_hash()
+    stored_hash = _read_stored_hash()
+
+    if stored_hash is None:
+        return False
+    return current_hash == stored_hash
+
 
 from . import (
     common,
@@ -577,7 +618,12 @@ def main(args: Optional[List[str]] = None) -> None:
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if not parsed_args.skip_install:
-        install_third_party_libs.main()
+        if not _dependencies_already_installed():
+            print('Installing third-party libraries...')
+            install_third_party_libs.main()
+            _write_hash(_compute_dependency_hash())
+        else:
+            print('Dependencies unchanged. Skipping installation.')
 
     # If --use_pytest flag is set, delegate to pytest and return early.
     if parsed_args.use_pytest:
