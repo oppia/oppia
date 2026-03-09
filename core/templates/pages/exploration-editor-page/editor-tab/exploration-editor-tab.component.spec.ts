@@ -714,12 +714,13 @@ describe('Exploration editor tab component', () => {
     expect(() => {
       component.saveInapplicableSkillMisconceptionIds(['skill_id_1']);
     }).toThrowError('Expected active state name to be non-null.');
-    expect(() => {
-      component.getStateContentPlaceholder();
-    }).toThrowError('Expected active state name to be non-null.');
+
+    expect(component.getStateContentPlaceholder()).toBe(
+      'You can speak to the learner here, then ask them a question.'
+    );
     expect(() => {
       component.initStateEditor();
-    }).toThrowError('Expected active state name to be non-null.');
+    }).not.toThrow();
 
     expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
     expect(
