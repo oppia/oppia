@@ -442,6 +442,8 @@ describe('AudioPlayerService', () => {
   });
 
   describe('when audio is not cached', () => {
+    let howlConstructorSpy: jasmine.Spy;
+
     beforeEach(() => {
       spyOn(assetsBackendApiService, 'isCached').and.returnValue(false);
       spyOn(assetsBackendApiService, 'getAudioDownloadUrl').and.returnValue(
@@ -453,7 +455,7 @@ describe('AudioPlayerService', () => {
           filename: 'test.mp3',
         })
       );
-      spyOn(howler, 'Howl').and.returnValue({
+      howlConstructorSpy = spyOn(howler, 'Howl').and.returnValue({
         on: (evt: string, func: () => void) => {
           if (evt === 'load') {
             func();
@@ -492,7 +494,7 @@ describe('AudioPlayerService', () => {
     }));
 
     it('should resolve streaming load without waiting for load event', fakeAsync(() => {
-      (howler.Howl as jasmine.Spy).and.returnValue({
+      howlConstructorSpy.and.returnValue({
         on: (_evt: string, _func: () => void) => {
           // Simulates load event not firing yet.
         },
@@ -505,6 +507,32 @@ describe('AudioPlayerService', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should clear streamed track state when stream ends', fakeAsync(() => {
+      const callbacks: {endListener: (() => void) | null} = {
+        endListener: null,
+      };
+      howlConstructorSpy.and.returnValue({
+        on: (evt: string, func: () => void) => {
+          if (evt === 'end') {
+            callbacks.endListener = func;
+          }
+        },
+      } as Howl);
+
+      audioPlayerService.loadAsync('test.mp3');
+      flushMicrotasks();
+
+      expect(audioPlayerService.isTrackLoaded()).toBe(true);
+
+      expect(callbacks.endListener).not.toBeNull();
+      if (callbacks.endListener !== null) {
+        callbacks.endListener();
+      }
+
+      expect(audioPlayerService.isTrackLoaded()).toBe(false);
+      expect(audioPlayerService.getAudioDuration()).toBe(0);
     }));
   });
 

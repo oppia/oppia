@@ -417,4 +417,17 @@ describe('Audio preloader service', () => {
       'State 1'
     );
   });
+
+  it('should return whether an audio file is currently downloading', () => {
+    const currentlyDownloading =
+      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading();
+    currentlyDownloading.push('downloading-file.mp3');
+
+    expect(
+      audioPreloaderService.isLoadingAudioFile('downloading-file.mp3')
+    ).toBe(true);
+    expect(audioPreloaderService.isLoadingAudioFile('missing-file.mp3')).toBe(
+      false
+    );
+  });
 });
