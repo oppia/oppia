@@ -46,8 +46,6 @@ imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
 
-"""Runs backend tests."""
-
 from __future__ import annotations
 
 import argparse
