@@ -59,9 +59,7 @@ import subprocess
 import sys
 import threading
 import time
-
 import pytest
-
 from typing import Dict, Final, List, Optional, Tuple, cast
 
 from . import (
