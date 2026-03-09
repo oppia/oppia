@@ -93,7 +93,10 @@ export class TranslationOpportunitiesComponent {
 
       let progressPercentage = 0;
       if (totalCount > 0) {
-        progressPercentage = (translationsCount / totalCount) * 100;
+        progressPercentage = Math.min(
+          (translationsCount / totalCount) * 100,
+          100
+        );
       }
 
       const opportunityDict: TranslationOpportunity = {
@@ -182,18 +185,9 @@ export class TranslationOpportunitiesComponent {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
-    const activeLanguageCode =
-      this.translationLanguageService.getActiveLanguageCode();
-    const rights = await this.userService.getUserContributionRightsDataAsync();
-    if (rights) {
-      this.userIsReviewer =
-        rights.can_review_translation_for_language_codes.includes(
-          activeLanguageCode
-        );
-    }
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
-        activeLanguageCode,
+        this.translationLanguageService.getActiveLanguageCode(),
         this.translationTopicService.getActiveTopicName()
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
@@ -203,18 +197,9 @@ export class TranslationOpportunitiesComponent {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
-    const activeLanguageCode =
-      this.translationLanguageService.getActiveLanguageCode();
-    const rights = await this.userService.getUserContributionRightsDataAsync();
-    if (rights) {
-      this.userIsReviewer =
-        rights.can_review_translation_for_language_codes.includes(
-          activeLanguageCode
-        );
-    }
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
-        activeLanguageCode,
+        this.translationLanguageService.getActiveLanguageCode(),
         this.translationTopicService.getActiveTopicName()
       )
       .then(this.getPresentableOpportunitiesData.bind(this));

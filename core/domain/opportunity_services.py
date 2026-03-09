@@ -124,6 +124,7 @@ def get_exploration_opportunity_summary_from_model(
         model.language_codes_needing_voice_artists,
         model.language_codes_with_assigned_voice_artists,
         {},
+        0,
         False,
     )
 
