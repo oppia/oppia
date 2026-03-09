@@ -263,10 +263,9 @@ export class TranslationSubmitter extends BaseUser {
     i: number = 0
   ): Promise<void> {
     const baseSelector = inputType === 'rte' ? '.e2e-test-rte' : inputType;
-    const context =
-      inputType === 'rte'
-        ? await this.page.waitForSelector(rteHelperModalContainerSelector)
-        : this.page;
+    const context = await this.page.waitForSelector(
+      rteHelperModalContainerSelector
+    );
 
     if (!context) {
       throw new Error('Context not found.');
