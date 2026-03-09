@@ -35,6 +35,7 @@ from core.domain import (
     story_domain,
     subscription_services,
     suggestion_registry,
+    taskqueue_services,
     user_services,
 )
 from core.platform import models

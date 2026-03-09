@@ -1594,7 +1594,7 @@ URLS.extend(
         ),
         get_redirect_route(
             r'%s' % feconf.TASK_URL_RETRY_FAILED_EMAIL,
-            tasks.RetryFailedEmailHandler,
+            tasks.RetryEmailHandler,
         ),
         get_redirect_route(
             r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler

@@ -17,12 +17,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import traceback
 
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
+    email_services,
     exp_fetchers,
     exp_services,
     feedback_services,
@@ -236,6 +238,17 @@ class FlagExplorationEmailHandler(
 class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler task for retrying unsuccessfully sent emails."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'sender_email': {'schema': {'type': 'basestring'}},
+            'recipient_id': {'schema': {'type': 'basestring'}},
+            'subject': {'schema': {'type': 'basestring'}},
+            'html_body': {'schema': {'type': 'basestring'}},
+            'text_body': {'schema': {'type': 'basestring'}},
+        }
+    }
+
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
         """Attempts to resend an email.
@@ -251,14 +264,14 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         text_body = payload.get('text_body')
 
         try:
-            platform_email_services.send_mail(
-                sender_email, recipient_id, subject, html_body, text_body
+            email_services.send_mail(
+                sender_email, recipient_id, subject, text_body, html_body
             )
         except Exception as e:
             logging.error(
                 'Email retry failed for recipient %s: %s', recipient_id, e
             )
-            raise Exception('Failed to resend email: %s' % e)
+            raise Exception('Failed to resend email: %s' % e) from e
 
         self.render_json({})
 
