@@ -80,6 +80,7 @@ export class BlogPostEditor extends BaseUser {
     // It is used here to avoid filling the user bio each time. We fill it only once when
     // the user is accessing the blog dashboard for the first time.
     if (inputBar) {
+      await this.typeInInputField(usernameInputSelector, 'blogPostWriter');
       await this.typeInInputField(blogAuthorBioField, 'Dummy-User-Bio');
       await this.page.waitForSelector(`${authorBioSaveButton}:not([disabled])`);
       await this.page.click(authorBioSaveButton);
