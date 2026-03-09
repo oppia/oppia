@@ -125,6 +125,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       });
   }
 
+  /**
+   * Returns the progress text for current diagnostic test.
+   * @returns {string} The progress text.
+   */
   getProgressText(): string {
     return this.translateService.instant(
       'I18N_DIAGNOSTIC_TEST_CURRENT_PROGRESS',
@@ -134,6 +138,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     );
   }
 
+  /**
+   * Starts the diagnostic test by fetching the necessary metadata.
+   */
   startDiagnosticTest(): void {
     this.classroomBackendApiService
       .getClassroomDataAsync(this.classroomData.getClassroomId())
@@ -153,6 +160,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       });
   }
 
+  /**
+   * Sets the recommended topic summaries based on the provided IDs.
+   * @param {string[]} recommendedTopicIds - The IDs of the recommended topics.
+   */
   getRecommendedTopicSummaries(recommendedTopicIds: string[]): void {
     if (!this.classroomData) {
       this.recommendedTopicSummaries = [];
@@ -173,6 +184,11 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     );
   }
 
+  /**
+   * Returns the button text for the recommended topic.
+   * @param {string} topicName - The name of the topic.
+   * @returns {string} The translated button text.
+   */
   getTopicButtonText(topicName: string): string {
     return this.translateService.instant(
       'I18N_DIAGNOSTIC_TEST_RESULT_START_TOPIC',
@@ -198,6 +214,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       }
     );
   }
+  /**
+   * Registers a site analytics event for recommended topic acceptance.
+   * @param {string} topicName - The name of the topic.
+   */
   getRecommendationAcceptanceEvent(topicName: string): void {
     if (this.classroomData) {
       const topicSummary = this.recommendedTopicSummaries.find(
@@ -213,6 +233,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     }
   }
 
+  /**
+   * Returns whether the new lesson player is enabled.
+   * @returns {boolean} Whether the feature flag is enabled.
+   */
   isNewLessonPlayerEnabled(): boolean {
     return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
