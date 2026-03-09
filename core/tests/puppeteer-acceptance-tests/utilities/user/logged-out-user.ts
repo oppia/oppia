@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import puppeteer, {Page, Frame} from 'puppeteer';
+import puppeteer, {Page} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -7558,22 +7558,6 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
     await this.page.click(conceptCardLinkSelectorInQuestion);
-  }
-
-  /**
-   * Get YouTube frame safely.
-   */
-  async getYoutubeFrame(): Promise<Frame> {
-    const frames = this.page.frames();
-
-    for (const currentFrame of frames) {
-      const url = currentFrame.url();
-      if (url.includes('youtube.com') || url.includes('youtube-nocookie.com')) {
-        return currentFrame;
-      }
-    }
-
-    throw new Error('YouTube iframe not found');
   }
 
   /**
