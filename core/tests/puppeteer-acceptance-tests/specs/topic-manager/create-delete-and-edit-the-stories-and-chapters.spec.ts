@@ -230,6 +230,7 @@ describe('Topic Manager', function () {
     // Add prerequisite skill.
     await topicManager.addPrerequisiteSkill('Addition');
     await topicManager.expectPrerequisiteSkillToBeVisible('Addition');
+    await topicManager.saveStoryDraft();
 
     // Add a prerequisite skill that is already a prerequisite skill and expect warning.
     await topicManager.addPrerequisiteSkill('Addition');
@@ -240,7 +241,7 @@ describe('Topic Manager', function () {
 
     // Re-open chapter editor.
     await topicManager.openChapterEditor(
-      'Simple Exploration',
+      'New Title',
       'The Broken Calculator',
       'Arithmetic Operations'
     );
@@ -248,6 +249,7 @@ describe('Topic Manager', function () {
     // Add aquired skill.
     await topicManager.addAcquiredSkill('Subtraction');
     await topicManager.expectAquiredSkillToBeVisible('Subtraction');
+    await topicManager.saveStoryDraft();
 
     // Add a prerequisite skill that is already an acquired skill and expect warning.
     await topicManager.addPrerequisiteSkill('Subtraction');
@@ -273,7 +275,7 @@ describe('Topic Manager', function () {
     await topicManager.expectAquiredSkillToBeVisible('Addition', false);
 
     await topicManager.openChapterEditor(
-      'Simple Exploration',
+      'New Title',
       'The Broken Calculator',
       'Arithmetic Operations'
     );

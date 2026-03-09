@@ -215,6 +215,8 @@ const deleteStoryButtonSelector = '.e2e-test-delete-story-button';
 const confirmStoryDeletionButton = '.e2e-test-confirm-story-deletion-button';
 const editOptionsSelector = '.e2e-test-edit-options';
 const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
+const moveChapterUpButtonSelector = '.e2e-test-move-chapter-up-button';
+const moveChapterDownButtonSelector = '.e2e-test-move-chapter-down-button';
 const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
 const chapterOutlineEditorContainer =
@@ -3383,23 +3385,19 @@ export class TopicManager extends BaseUser {
       if (storyName) {
         await this.openStoryEditor(storyName, topicName);
       }
-      const addChapterButtonElement = await this.page.$(addChapterButton);
-      if (!addChapterButtonElement) {
-        const mobileChapterCollapsibleCardElement = await this.page.$(
-          mobileChapterCollapsibleCard
-        );
-        mobileChapterCollapsibleCardElement?.click();
-        await this.waitForStaticAssetsToLoad();
-      }
+
+      await this.ensureChapterListIsVisible();
 
       await this.page.waitForSelector(chapterTitleSelector, {timeout: 60000});
       const chapterTitles = await this.page.$$(chapterTitleSelector);
+      const availableChapterNames: string[] = [];
 
       for (const titleElement of chapterTitles) {
         const title = await this.page.evaluate(
           el => el.textContent.trim(),
           titleElement
         );
+        availableChapterNames.push(title);
 
         if (title === chapterName) {
           await this.page.waitForTimeout(500);
@@ -3429,7 +3427,7 @@ export class TopicManager extends BaseUser {
       }
 
       throw new Error(
-        `Chapter with name ${chapterName} not found in story ${storyName} and topic ${topicName}.`
+        `Chapter with name ${chapterName} not found in story ${storyName} and topic ${topicName}. Available chapters: ${availableChapterNames.join(', ')}`
       );
     } catch (error) {
       const newError = new Error(
@@ -3637,62 +3635,73 @@ export class TopicManager extends BaseUser {
     chapterName: string,
     targetChapterName: string
   ): Promise<void> {
-    // Wait for all chapters to render.
-    await this.page.waitForSelector(chapterTitleSelector, {visible: true});
-    const chapterTitles = await this.page.$$(chapterTitleSelector);
+    await this.ensureChapterListIsVisible();
 
-    let fromEl: ElementHandle<Element> | null = null;
-    let toEl: ElementHandle<Element> | null = null;
-
-    // Find draggable elements.
-    for (const chapterTitle of chapterTitles) {
-      const text = await this.page.evaluate(
-        el => el.textContent?.trim(),
-        chapterTitle
-      );
-      if (text === chapterName) {
-        fromEl = (await chapterTitle.evaluateHandle(el =>
-          el.closest('[cdkDrag]')
-        )) as ElementHandle<Element>;
-      }
-      if (text === targetChapterName) {
-        toEl = (await chapterTitle.evaluateHandle(el =>
-          el.closest('[cdkDrag]')
-        )) as ElementHandle<Element>;
-      }
-    }
-
-    if (!fromEl || !toEl) {
+    const chapterTitles = await this.getCurrentChapterTitles();
+    const chapterIndex = chapterTitles.indexOf(chapterName);
+    const targetChapterIndex = chapterTitles.indexOf(targetChapterName);
+    if (chapterIndex === -1 || targetChapterIndex === -1) {
       throw new Error(
-        `Could not find chapter(s) "${chapterName}" or "${targetChapterName}"`
+        `Could not find chapter(s) "${chapterName}" or "${targetChapterName}". Current chapters: ${chapterTitles.join(', ')}`
       );
     }
 
-    const fromBox = await fromEl.boundingBox();
-    const toBox = await toEl.boundingBox();
+    const destinationIndex =
+      chapterIndex < targetChapterIndex
+        ? targetChapterIndex - 1
+        : targetChapterIndex;
+    if (chapterIndex !== destinationIndex) {
+      const moveDirection: 'up' | 'down' =
+        chapterIndex > destinationIndex ? 'up' : 'down';
+      const movesNeeded = Math.abs(chapterIndex - destinationIndex);
 
-    if (!fromBox || !toBox) {
-      throw new Error('Could not get bounding boxes for drag/drop');
+      let movedWithActionButtons = true;
+      for (let i = 0; i < movesNeeded; i++) {
+        const moved = await this.moveChapterWithActionButton(
+          chapterName,
+          moveDirection
+        );
+        if (!moved) {
+          movedWithActionButtons = false;
+          break;
+        }
+      }
+
+      if (!movedWithActionButtons) {
+        await this.reorderChapterUsingDragAndDrop(
+          chapterName,
+          targetChapterName
+        );
+      }
     }
 
-    // Drag from the center of the source.
-    await this.page.mouse.move(
-      fromBox.x + fromBox.width / 2,
-      fromBox.y + fromBox.height / 2
+    await this.page.waitForFunction(
+      (
+        selector: string,
+        chapterToMove: string,
+        targetChapter: string
+      ): boolean => {
+        const titles = Array.from(document.querySelectorAll(selector)).map(
+          element => element.textContent?.trim() ?? ''
+        );
+        const movedChapterIndex = titles.indexOf(chapterToMove);
+        const targetChapterIndex = titles.indexOf(targetChapter);
+        return (
+          movedChapterIndex !== -1 &&
+          targetChapterIndex !== -1 &&
+          movedChapterIndex < targetChapterIndex
+        );
+      },
+      {timeout: 10000},
+      chapterTitleSelector,
+      chapterName,
+      targetChapterName
     );
-    await this.page.mouse.down();
-    await this.page.mouse.move(toBox.x + toBox.width / 2, toBox.y + 5, {
-      steps: 15,
-    });
-    await this.page.mouse.up();
 
-    // Wait for DOM update.
-    await this.page.waitForTimeout(1000);
-
+    const reorderedChapterTitles = await this.getCurrentChapterTitles();
     showMessage(
-      `Reordered chapters: "${chapterName}" before "${targetChapterName}"`
+      `Reordered chapters: "${chapterName}" before "${targetChapterName}". Current order: ${reorderedChapterTitles.join(', ')}`
     );
-
     await this.waitForPageToFullyLoad();
   }
 
@@ -3754,26 +3763,186 @@ export class TopicManager extends BaseUser {
    * @param {string[]} expectedOrder - The expected order of chapter titles.
    */
   async expectChaptersOrderToBe(expectedOrder: string[]): Promise<void> {
-    await this.page.waitForSelector(chapterTitleSelector);
-    const chapterTitles = await this.page.$$(chapterTitleSelector);
+    await this.ensureChapterListIsVisible();
+    const chapterTitles = await this.getCurrentChapterTitles();
 
     if (chapterTitles.length !== expectedOrder.length) {
       throw new Error(
-        `Expected ${expectedOrder.length} chapters, but found ${chapterTitles.length}`
+        `Expected ${expectedOrder.length} chapters, but found ${chapterTitles.length}. Current chapters: ${chapterTitles.join(', ')}`
       );
     }
 
     for (let i = 0; i < chapterTitles.length; i++) {
-      const actualTitle = await this.page.evaluate(
-        el => el.textContent?.trim(),
-        chapterTitles[i]
-      );
-      if (actualTitle !== expectedOrder[i]) {
+      if (chapterTitles[i] !== expectedOrder[i]) {
         throw new Error(
-          `Expected chapter at index ${i} to be "${expectedOrder[i]}", but got "${actualTitle}"`
+          `Expected chapter at index ${i} to be "${expectedOrder[i]}", but got "${chapterTitles[i]}"`
         );
       }
     }
+  }
+
+  /**
+   * Ensures the chapter list is visible in story editor.
+   */
+  async ensureChapterListIsVisible(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileChapterCollapsibleCard, {
+        visible: true,
+      });
+      const chapterListVisible = await this.isElementVisible(
+        chapterTitleSelector,
+        true,
+        2000
+      );
+      if (!chapterListVisible) {
+        await this.clickOnElementWithSelector(mobileChapterCollapsibleCard);
+      }
+    }
+    await this.page.waitForSelector(chapterTitleSelector, {
+      visible: true,
+      timeout: 60000,
+    });
+  }
+
+  /**
+   * Gets chapter titles in their current order.
+   */
+  async getCurrentChapterTitles(): Promise<string[]> {
+    await this.page.waitForSelector(chapterTitleSelector, {
+      visible: true,
+    });
+    return await this.page.$$eval(chapterTitleSelector, elements =>
+      elements
+        .map(element => element.textContent?.trim() || '')
+        .filter(title => title.length > 0)
+    );
+  }
+
+  /**
+   * Moves a chapter in story editor using chapter action buttons.
+   * Returns false when move controls are not available and caller should
+   * fall back to drag and drop.
+   */
+  async moveChapterWithActionButton(
+    chapterName: string,
+    direction: 'up' | 'down'
+  ): Promise<boolean> {
+    await this.page.waitForSelector(chapterTitleSelector, {
+      visible: true,
+    });
+    const chapterTitleElements = await this.page.$$(chapterTitleSelector);
+
+    for (const chapterTitleElement of chapterTitleElements) {
+      const title = await this.page.evaluate(
+        element => element.textContent?.trim() ?? '',
+        chapterTitleElement
+      );
+      if (title !== chapterName) {
+        continue;
+      }
+
+      const chapterContainerHandle = await chapterTitleElement.evaluateHandle(
+        el =>
+          el.closest('.story-node') ||
+          el.closest('.story-editor-node') ||
+          el.closest('[cdkDrag]')
+      );
+      const chapterContainer = chapterContainerHandle.asElement();
+      if (!chapterContainer) {
+        return false;
+      }
+      const editOptionsButton = await chapterContainer.$(editOptionsSelector);
+      if (!editOptionsButton) {
+        return false;
+      }
+      await this.clickOnElement(editOptionsButton);
+
+      const moveButtonSelector =
+        direction === 'up'
+          ? moveChapterUpButtonSelector
+          : moveChapterDownButtonSelector;
+      const moveButton = await chapterContainer
+        .waitForSelector(moveButtonSelector, {timeout: 2000})
+        .catch(() => null);
+      if (!moveButton) {
+        await this.page.keyboard.press('Escape');
+        return false;
+      }
+
+      await this.clickOnElement(moveButton);
+      await this.waitForPageToFullyLoad();
+      return true;
+    }
+
+    throw new Error(
+      `Chapter "${chapterName}" was not found while attempting to reorder chapters.`
+    );
+  }
+
+  /**
+   * Reorders chapters using drag and drop.
+   */
+  async reorderChapterUsingDragAndDrop(
+    chapterName: string,
+    targetChapterName: string
+  ): Promise<void> {
+    const chapterTitleElements = await this.page.$$(chapterTitleSelector);
+
+    let sourceChapterElement: ElementHandle<Element> | null = null;
+    let targetChapterElement: ElementHandle<Element> | null = null;
+    for (const chapterTitleElement of chapterTitleElements) {
+      const title = await this.page.evaluate(
+        element => element.textContent?.trim() ?? '',
+        chapterTitleElement
+      );
+      if (title === chapterName) {
+        const sourceChapterElementHandle =
+          await chapterTitleElement.evaluateHandle(el =>
+            el.closest('[cdkDrag]')
+          );
+        sourceChapterElement = sourceChapterElementHandle.asElement();
+      }
+      if (title === targetChapterName) {
+        const targetChapterElementHandle =
+          await chapterTitleElement.evaluateHandle(el =>
+            el.closest('[cdkDrag]')
+          );
+        targetChapterElement = targetChapterElementHandle.asElement();
+      }
+    }
+
+    if (!sourceChapterElement || !targetChapterElement) {
+      throw new Error(
+        `Could not find chapter(s) "${chapterName}" or "${targetChapterName}" for drag and drop.`
+      );
+    }
+
+    await sourceChapterElement.evaluate(element =>
+      element.scrollIntoView({block: 'center'})
+    );
+    await targetChapterElement.evaluate(element =>
+      element.scrollIntoView({block: 'center'})
+    );
+
+    const sourceBoundingBox = await sourceChapterElement.boundingBox();
+    const targetBoundingBox = await targetChapterElement.boundingBox();
+    if (!sourceBoundingBox || !targetBoundingBox) {
+      throw new Error(
+        'Could not get bounding boxes for chapter drag and drop.'
+      );
+    }
+
+    const sourceX = sourceBoundingBox.x + sourceBoundingBox.width / 2;
+    const sourceY = sourceBoundingBox.y + sourceBoundingBox.height / 2;
+    const targetX = targetBoundingBox.x + targetBoundingBox.width / 2;
+    const targetY = targetBoundingBox.y + targetBoundingBox.height / 4;
+
+    await this.page.mouse.move(sourceX, sourceY);
+    await this.page.mouse.down();
+    await this.page.mouse.move(sourceX, sourceY - 30, {steps: 8});
+    await this.page.mouse.move(targetX, targetY, {steps: 30});
+    await this.page.mouse.up();
+    await this.page.waitForTimeout(1000);
   }
 
   /**
