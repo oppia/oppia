@@ -21,7 +21,10 @@ import {Injectable} from '@angular/core';
 import {ImagesData} from 'services/image-local-storage.service';
 
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
-import {TranslatableTexts} from 'domain/opportunity/translatable-texts.model';
+import {
+  StateNamesToContentIdMapping,
+  TranslatableTexts,
+} from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
@@ -32,10 +35,10 @@ export interface TranslatableItem {
   status: Status;
   text: string | string[];
   more: boolean;
-  dataFormat: string;
-  contentType: string;
-  interactionId?: string;
-  ruleType?: string;
+  dataFormat?: string;
+  contentType?: string;
+  interactionId?: string | null;
+  ruleType?: string | null;
 }
 
 export type Status = 'pending' | 'submitted';
@@ -49,8 +52,8 @@ export class StateAndContent {
     public translation: string | string[],
     public dataFormat: string,
     public contentType: string,
-    public interactionId?: string,
-    public ruleType?: string
+    public interactionId?: string | null,
+    public ruleType?: string | null
   ) {}
 }
 
@@ -61,16 +64,16 @@ export class TranslateTextService {
   STARTING_INDEX = -1;
   PENDING = 'pending';
   SUBMITTED = 'submitted';
-  stateWiseContents = {};
-  stateWiseContentIds = {};
-  stateNamesList = [];
-  stateAndContent = [];
+  stateWiseContents: StateNamesToContentIdMapping = {};
+  stateWiseContentIds: {[stateName: string]: string[]} = {};
+  stateNamesList: string[] = [];
+  stateAndContent: StateAndContent[] = [];
   activeIndex = this.STARTING_INDEX;
   activeExpId;
   activeExpVersion;
   activeContentId;
   activeStateName: string;
-  activeContentText: string;
+  activeContentText: string | string[];
   activeContentStatus: Status;
 
   constructor(
@@ -121,7 +124,7 @@ export class TranslateTextService {
     text: string | string[],
     more: boolean,
     status: Status,
-    translation: string
+    translation: string | string[]
   ): TranslatableItem {
     const {
       dataFormat,
@@ -131,14 +134,14 @@ export class TranslateTextService {
     }: {
       dataFormat?: string;
       contentType?: string;
-      interactionId?: string;
-      ruleType?: string;
+      interactionId?: string | null;
+      ruleType?: string | null;
     } = this.stateAndContent[this.activeIndex] || {};
     return {
       text: text,
       more: more,
       status: status,
-      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
+      translation: this._isSetDataFormat(dataFormat || '') ? [] : translation,
       dataFormat: dataFormat,
       contentType: contentType,
       interactionId: interactionId,
@@ -163,7 +166,7 @@ export class TranslateTextService {
         this.activeExpVersion = translatableTexts.explorationVersion;
         for (const stateName in this.stateWiseContents) {
           let stateHasText: boolean = false;
-          const contentIds = [];
+          const contentIds: string[] = [];
           const contentIdToContentMapping = this.stateWiseContents[stateName];
           for (const contentId in contentIdToContentMapping) {
             const translatableItem = contentIdToContentMapping[contentId];
@@ -237,6 +240,7 @@ export class TranslateTextService {
     const activeIndexAtSubmission = this.activeIndex;
     const activeStateNameAtSubmission = this.activeStateName;
     const activeContentIdAtSubmission = this.activeContentId;
+
     const contentToTranslateAtSubmission =
       this.stateWiseContents[activeStateNameAtSubmission]?.[
         activeContentIdAtSubmission
