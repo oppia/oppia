@@ -362,7 +362,20 @@ const activeTabClass = 'e2e-test-active-tab';
 const previewQuestionSelector = '.e2e-test-preview-question';
 const toggleSkillEditOptionsButton =
   'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
-
+const outlineEditorInput = '.e2e-test-rte';
+const saveOutlineButton = '.e2e-test-node-outline-save-button';
+const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
+const publishUptoChaptersDropdownSelector =
+  'select.e2e-test-publish-up-to-chapter-dropdown';
+const mobileReadyToPublishButton = '.ready-to-publish-mobile-option';
+const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
+const mobileSaveStoryChangesDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
+const mobilePublishStoryButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
+const storyNodeSelector = 'tr.story-node';
+const publishChapterButton = '.e2e-test-publish-chapters-button';
+const chapterStatusSelector = '.e2e-test-chapter-status';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -3386,9 +3399,10 @@ export class TopicManager extends BaseUser {
             if (elements.length < 5) {
               throw new Error('Not enough elements collapsible headers found,');
             }
-            await elements[2].click();
-            await elements[3].click();
             await elements[4].click();
+            await elements[3].click();
+            await elements[2].click();
+            await elements[1].click();
           }
           return;
         }
@@ -4361,6 +4375,189 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
   }
-}
 
+  /**
+   * Function to click on the ready to publish button.
+   */
+  async clickReadyToPublishButton(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+
+      await this.expectElementToBeVisible(mobileReadyToPublishButton);
+      await this.clickOnElementWithSelector(mobileReadyToPublishButton);
+    } else {
+      await this.page.waitForSelector(markAsReadyToPublishButton);
+      await this.clickOnElementWithSelector(markAsReadyToPublishButton);
+
+      await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
+    }
+  }
+
+  /**
+   * Opens the story editor and marks the specified chapter as ready to publish.
+   *
+   * @param chapterName - The name of the chapter to be marked as ready to publish.
+   * @param storyName - The name of the story containing the chapter.
+   * @param topicName - The name of the topic under which the story exists.
+   */
+  async readyToPublish(
+    chapterName: string,
+    storyName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+    await this.waitForPageToFullyLoad();
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 2) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[1].click();
+    }
+    await this.page.waitForSelector(chapterTitleSelector);
+    const chapterTitles = await this.page.$$(chapterTitleSelector);
+
+    for (const titleElement of chapterTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        titleElement
+      );
+
+      if (title === chapterName) {
+        await titleElement.click();
+        await this.waitForStaticAssetsToLoad();
+        await this.expectElementToBeVisible(chapterEditorContainerSelector);
+        showMessage(`Chapter ${chapterName} opened in chapter editor.`);
+
+        if (this.isViewportAtMobileWidth()) {
+          await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+          const elements = await this.page.$$(
+            mobileCollapsibleCardHeaderSelector
+          );
+          if (elements.length < 5) {
+            throw new Error('Not enough elements collapsible headers found,');
+          }
+          await elements[4].click();
+          await elements[3].click();
+          await elements[2].click();
+          await elements[1].click();
+        }
+      }
+    }
+    await this.typeInInputField(
+      chapterDescriptionField,
+      'This is a chapter description.'
+    );
+
+    await this.setNodePlannedPublicationDate();
+
+    await this.typeInInputField(outlineEditorInput, 'This is an outline.');
+    await this.clickOnElementWithSelector(saveOutlineButton);
+    await this.clickOnElementWithSelector(finalizeOutlineCheckbox);
+    await this.addAcquiredSkill('Place Values skills');
+
+    await this.saveStoryDraft();
+    await this.clickReadyToPublishButton();
+    showMessage(`Chapter ${chapterName} marked as ready to publish.`);
+  }
+
+  /**
+   * Publishes story draft chapters up to the specified chapter selection.
+   * Selects the given value from the "Publish up to chapters" dropdown.
+   * @param dropdownValue - The value to select from the publish-up-to dropdown.
+   */
+  async publishStoryDraftChapterUpto(dropdownValue: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 2) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[1].click();
+    }
+    await this.clickOnElementWithSelector(publishUptoChaptersDropdownSelector);
+    await this.select(publishUptoChaptersDropdownSelector, dropdownValue);
+  }
+
+  /**
+   * Verifies that all specified chapters are listed and have the expected status.
+   * Fails if any chapter is missing or if its status does not match the expected value.
+   * @param chapterNames - The list of chapter titles to verify.
+   * @param chapStatus - The expected status of each chapter (defaults to 'Published').
+   */
+  async expectAllListedChaptersStatus(
+    chapterNames: string[],
+    chapStatus: string = 'Published'
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 2) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[1].click();
+    }
+    await this.page.waitForSelector(storyNodeSelector);
+
+    const rows = await this.page.$$(storyNodeSelector);
+    const found = new Set<string>();
+
+    for (const row of rows) {
+      const title = await row.$eval(chapterTitleSelector, el =>
+        el.textContent?.trim()
+      );
+      if (!title) {
+        throw new Error(`${title} is Missing`);
+      }
+      if (chapterNames.includes(title)) {
+        const status = await row.$eval(chapterStatusSelector, el =>
+          el.textContent?.trim()
+        );
+        if (!status) {
+          throw new Error(`Chapter status missing for: ${title}`);
+        }
+        expect(status).toBe(chapStatus);
+        found.add(title);
+      }
+    }
+
+    const missing = chapterNames.filter(c => !found.has(c));
+    if (missing.length) {
+      throw new Error(`Chapters not found: ${missing.join(', ')}`);
+    }
+  }
+
+  /**
+   * Publishes the draft of a serial chapter.
+   */
+  async publishStoryDraftSerialChapter(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOnElementWithSelector(mobilePublishStoryButton);
+    } else {
+      await this.clickOnElementWithSelector(publishChapterButton);
+    }
+  }
+
+  async publishChapter(
+    storyName: string,
+    topicName: string,
+    dropdownValue: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+    await this.publishStoryDraftChapterUpto(dropdownValue);
+    await this.publishStoryDraftSerialChapter();
+  }
+}
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
