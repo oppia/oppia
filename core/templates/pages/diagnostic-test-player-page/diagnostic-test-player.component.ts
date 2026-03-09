@@ -16,7 +16,7 @@
  * @fileoverview Diagnostic test player component.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -38,7 +38,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
   selector: 'oppia-diagnostic-test-player',
   templateUrl: './diagnostic-test-player.component.html',
 })
-export class DiagnosticTestPlayerComponent implements OnInit {
+export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL!: string;
   diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   diagnosticTestIsStarted: boolean = false;
@@ -65,6 +65,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
+  /**
+   * Initializes the component and fetches classroom data.
+   */
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
 
@@ -123,6 +126,13 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       .finally(() => {
         this.loaderService.hideLoadingScreen();
       });
+  }
+
+  /**
+   * Unsubscribes from all subscriptions when the component is destroyed.
+   */
+  ngOnDestroy(): void {
+    this.componentSubscription.unsubscribe();
   }
 
   /**

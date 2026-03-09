@@ -43,7 +43,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from '../../services/platform-feature.service';
 
 class MockTranslateService {
-  instant(key: string, interpolateParams?: Object): string {
+  instant(key: string, interpolateParams?: object): string {
     return key;
   }
 }
@@ -483,5 +483,13 @@ describe('Diagnostic test player component', () => {
     ]);
 
     expect(component.recommendedTopicSummaries).toEqual([topicData1]);
+  });
+
+  it('should unsubscribe from subscriptions on destroying the component', () => {
+    spyOn(component.componentSubscription, 'unsubscribe').and.callThrough();
+
+    component.ngOnDestroy();
+
+    expect(component.componentSubscription.unsubscribe).toHaveBeenCalled();
   });
 });
