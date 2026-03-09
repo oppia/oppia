@@ -246,4 +246,117 @@ describe('TranslateTextService', () => {
     stateContent.translation = 'newTranslation';
     expect(stateContent.translation).toBe('newTranslation');
   });
+
+  describe('suggestTranslatedText', () => {
+    it('should not submit when active content is unavailable', () => {
+      const successCallback = jasmine.createSpy('successCallback');
+      const errorCallback = jasmine.createSpy('errorCallback');
+
+      translateTextService.suggestTranslatedText(
+        'translated text',
+        'hi',
+        [],
+        'html',
+        successCallback,
+        errorCallback
+      );
+
+      httpTestingController.expectNone('/suggestionhandler/');
+      expect(successCallback).not.toHaveBeenCalled();
+      expect(errorCallback).not.toHaveBeenCalled();
+    });
+
+    it('should update status and translation on successful submission', fakeAsync(() => {
+      const sampleStateWiseContentMapping = {
+        stateName1: {
+          contentId1: getTranslatableItem('text1'),
+        },
+      };
+
+      translateTextService.init('1', 'en', () => {});
+      let req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1,
+      });
+      flushMicrotasks();
+
+      translateTextService.getTextToTranslate();
+
+      const successCallback = jasmine.createSpy('successCallback');
+      const errorCallback = jasmine.createSpy('errorCallback');
+      translateTextService.suggestTranslatedText(
+        'translated text',
+        'hi',
+        [],
+        'html',
+        successCallback,
+        errorCallback
+      );
+      flushMicrotasks();
+
+      req = httpTestingController.expectOne('/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      req.flush({});
+      flushMicrotasks();
+
+      expect(translateTextService.stateAndContent[0].status).toBe('submitted');
+      expect(translateTextService.stateAndContent[0].translation).toBe(
+        'translated text'
+      );
+      expect(successCallback).toHaveBeenCalled();
+      expect(errorCallback).not.toHaveBeenCalled();
+    }));
+
+    it('should not throw when active translation item is reset before api success response', fakeAsync(() => {
+      const sampleStateWiseContentMapping = {
+        stateName1: {
+          contentId1: getTranslatableItem('text1'),
+        },
+      };
+
+      translateTextService.init('1', 'en', () => {});
+      let req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1,
+      });
+      flushMicrotasks();
+
+      translateTextService.getTextToTranslate();
+
+      const successCallback = jasmine.createSpy('successCallback');
+      const errorCallback = jasmine.createSpy('errorCallback');
+      translateTextService.suggestTranslatedText(
+        'translated text',
+        'hi',
+        [],
+        'html',
+        successCallback,
+        errorCallback
+      );
+      flushMicrotasks();
+
+      req = httpTestingController.expectOne('/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+
+      // Simulate state reset before the pending submission callback resolves.
+      translateTextService.activeIndex = -1;
+      translateTextService.stateAndContent = [];
+      translateTextService.activeStateName = '';
+      translateTextService.activeContentId = null;
+
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successCallback).toHaveBeenCalled();
+      expect(errorCallback).not.toHaveBeenCalled();
+    }));
+  });
 });

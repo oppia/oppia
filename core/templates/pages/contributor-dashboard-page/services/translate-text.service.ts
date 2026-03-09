@@ -234,23 +234,43 @@ export class TranslateTextService {
     successCallback: () => void,
     errorCallback: (reason: string) => void
   ): void {
+    const activeIndexAtSubmission = this.activeIndex;
+    const activeStateNameAtSubmission = this.activeStateName;
+    const activeContentIdAtSubmission = this.activeContentId;
+    const contentToTranslateAtSubmission =
+      this.stateWiseContents[activeStateNameAtSubmission]?.[
+        activeContentIdAtSubmission
+      ]?.content;
+
+    if (contentToTranslateAtSubmission === undefined) {
+      return;
+    }
+
     this.translateTextBackendApiService
       .suggestTranslatedTextAsync(
         this.activeExpId,
         this.activeExpVersion,
-        this.activeContentId,
-        this.activeStateName,
+        activeContentIdAtSubmission,
+        activeStateNameAtSubmission,
         languageCode,
-        this.stateWiseContents[this.activeStateName][this.activeContentId]
-          .content,
+        contentToTranslateAtSubmission,
         translation,
         imagesData,
         dataFormat
       )
       .then(
         () => {
-          this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
-          this.stateAndContent[this.activeIndex].translation = translation;
+          const submittedStateAndContent =
+            this.stateAndContent[activeIndexAtSubmission];
+          if (
+            submittedStateAndContent &&
+            submittedStateAndContent.stateName ===
+              activeStateNameAtSubmission &&
+            submittedStateAndContent.contentID === activeContentIdAtSubmission
+          ) {
+            submittedStateAndContent.status = this.SUBMITTED;
+            submittedStateAndContent.translation = translation;
+          }
           successCallback();
         },
         errorResponse => {
