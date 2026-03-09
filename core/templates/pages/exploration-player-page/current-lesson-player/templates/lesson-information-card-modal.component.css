@@ -173,6 +173,7 @@
 .oppia-lesson-exploration-progress-info .oppia-contributors-icon {
   cursor: default;
   margin-right: 0.3125rem;
+  width: 24px;
 }
 
 .oppia-lesson-info-card .row.center {

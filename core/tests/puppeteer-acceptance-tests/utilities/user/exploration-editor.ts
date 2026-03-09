@@ -3613,6 +3613,9 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.page.waitForSelector(
+        `${mobileDiscardButtonSelector}:not(.disabled)`
+      );
       await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
     } else {
       await this.page.waitForSelector(discardDraftDropdownSelector, {
@@ -3622,6 +3625,9 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(desktopDiscardDraftButton, {
         visible: true,
       });
+      await this.page.waitForSelector(
+        `${desktopDiscardDraftButton}:not(.disabled)`
+      );
       await this.clickOnElementWithSelector(desktopDiscardDraftButton);
     }
     await this.page.waitForSelector(confirmDiscardButton, {
