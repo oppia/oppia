@@ -37,18 +37,30 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-diagnostic-test-player',
   templateUrl: './diagnostic-test-player.component.html',
+  styleUrls: ['./diagnostic-test-player.component.css'],
 })
 export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
+  /** @type {string} */
   OPPIA_AVATAR_IMAGE_URL!: string;
+  /** @type {DiagnosticTestTopicTrackerModel} */
   diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
+  /** @type {boolean} */
   diagnosticTestIsStarted: boolean = false;
-  diagnosticTestIsFinished = false;
+  /** @type {boolean} */
+  diagnosticTestIsFinished: boolean = false;
+  /** @type {ClassroomData} */
   classroomData!: ClassroomData;
+  /** @type {string} */
   classroomUrlFragment!: string;
+  /** @type {CreatorTopicSummary[]} */
   recommendedTopicSummaries: CreatorTopicSummary[] = [];
+  /** @type {string[]} */
   recommendedTopicIds: string[] = [];
+  /** @type {number} */
   progressPercentage: number = 0;
+  /** @type {Subscription} */
   componentSubscription = new Subscription();
+  /** @type {boolean} */
   isStartTestButtonDisabled: boolean = false;
 
   constructor(
@@ -120,7 +132,8 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
       .catch(() => {
         this.isStartTestButtonDisabled = true;
         this.alertsService.addWarning(
-          'Failed to get classroom data. The URL fragment is invalid, or the classroom does not exist.'
+          'Failed to get classroom data. The URL fragment is invalid, or ' +
+            'the classroom does not exist.'
         );
       })
       .finally(() => {

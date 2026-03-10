@@ -16,39 +16,53 @@
  * @fileoverview Tests for the diagnostic test player component.
  */
 
+import {HttpErrorResponse} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {ClassroomData} from 'domain/classroom/classroom-data.model';
-import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
-import {TranslateService} from '@ngx-translate/core';
-import {EventEmitter} from '@angular/core';
 import {Router} from '@angular/router';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {HttpErrorResponse} from '@angular/common/http';
-import {AlertsService} from 'services/alerts.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {PlatformFeatureService} from '../../services/platform-feature.service';
+import {TranslateService} from '@ngx-translate/core';
 
+import {AppConstants} from 'app.constants';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {AlertsService} from 'services/alerts.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+
+import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
+import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
+import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
+
+/**
+ * Mocking TranslateService for testing.
+ */
 class MockTranslateService {
+  /**
+   * Mocking the instant method of TranslateService.
+   * @param {string} key - The key to translate.
+   * @param {object} interpolateParams - The parameters to interpolate.
+   * @returns {string} The translated string.
+   */
   instant(key: string, interpolateParams?: object): string {
     return key;
   }
 }
 
+/**
+ * Mocking PlatformFeatureService for testing.
+ */
 class MockPlatformFeatureService {
+  /** @type {object} */
   status = {
     NewLessonPlayer: {
       isEnabled: false,
@@ -56,21 +70,36 @@ class MockPlatformFeatureService {
   };
 }
 
+/**
+ * Mocking WindowRef for testing.
+ */
 class MockWindowRef {
+  /** @type {object} */
   _window = {
     location: {
       _href: '',
       search: '',
+      /** @returns {string} */
       get href() {
         return this._href;
       },
+      /** @param {string} val */
       set href(val) {
         this._href = val;
       },
+      /** @param {string} val */
       replace: (val: string) => {},
     },
+    /** @returns {void} */
     gtag: () => {},
+    /** @returns {void} */
     onhashchange: () => {},
+    /**
+     * Mocking the addEventListener method of WindowRef.
+     * @param {string} type - The type of event to listen for.
+     * @param {EventListenerOrEventListenerObject} listener - The listener function.
+     * @param {boolean | AddEventListenerOptions} options - The options for adding the listener.
+     */
     addEventListener: (
       type: string,
       listener: EventListenerOrEventListenerObject,
@@ -78,12 +107,21 @@ class MockWindowRef {
     ) => {},
   };
 
+  /** @returns {object} */
   get nativeWindow() {
     return this._window;
   }
 }
 
+/**
+ * Mocking Router for testing.
+ */
 class MockRouter {
+  /**
+   * Mocking the navigate method of Router.
+   * @param {string[]} commands - The commands to navigate to.
+   * @returns {Promise<boolean>} A promise that resolves to true.
+   */
   navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
   }
@@ -155,21 +193,38 @@ const dummyClassroomData = new ClassroomData(
 );
 
 describe('Diagnostic test player component', () => {
+  /** @type {DiagnosticTestPlayerComponent} */
   let component: DiagnosticTestPlayerComponent;
+  /** @type {ComponentFixture<DiagnosticTestPlayerComponent>} */
   let fixture: ComponentFixture<DiagnosticTestPlayerComponent>;
+  /** @type {PreventPageUnloadEventService} */
   let preventPageUnloadEventService: PreventPageUnloadEventService;
+  /** @type {ClassroomBackendApiService} */
   let classroomBackendApiService: ClassroomBackendApiService;
+  /** @type {TranslateService} */
   let translateService: TranslateService;
+  /** @type {MockPlatformFeatureService} */
   let mockPlatformFeatureService = new MockPlatformFeatureService();
+  /** @type {EventEmitter<string[]>} */
   let sessionCompleteEmitter = new EventEmitter<string[]>();
+  /** @type {EventEmitter<number>} */
   let progressEmitter = new EventEmitter<number>();
+  /** @type {Router} */
   let router: Router;
+  /** @type {MockWindowRef} */
   let windowRef: MockWindowRef;
+  /** @type {AlertsService} */
   let alertsService: AlertsService;
+  /** @type {SiteAnalyticsService} */
   let siteAnalyticsService: SiteAnalyticsService;
 
+  /**
+   * Mocking DiagnosticTestPlayerStatusService for testing.
+   */
   class MockDiagnosticTestPlayerStatusService {
+    /** @type {EventEmitter<string[]>} */
     onDiagnosticTestSessionCompleted = sessionCompleteEmitter;
+    /** @type {EventEmitter<number>} */
     onDiagnosticTestSessionProgressChange = progressEmitter;
   }
 
@@ -248,18 +303,22 @@ describe('Diagnostic test player component', () => {
     expect(component.isNewLessonPlayerEnabled()).toBe(true);
   });
 
-  it('should redirect to the 404 page if the classroom url fragment is not present', fakeAsync(() => {
-    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
-      Promise.resolve(true)
-    );
+  it(
+    'should redirect to the 404 page if the classroom url fragment is ' +
+      'not present',
+    fakeAsync(() => {
+      const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+        Promise.resolve(true)
+      );
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    expect(navigateSpy).toHaveBeenCalledWith([
-      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
-    ]);
-  }));
+      expect(navigateSpy).toHaveBeenCalledWith([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+      ]);
+    })
+  );
 
   it('should show an alert if the classroom url fragment is invalid', fakeAsync(() => {
     windowRef.nativeWindow.location.search = '?classroom=mathtwo';
@@ -280,7 +339,8 @@ describe('Diagnostic test player component', () => {
     tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to get classroom data. The URL fragment is invalid, or the classroom does not exist.'
+      'Failed to get classroom data. The URL fragment is invalid, or ' +
+        'the classroom does not exist.'
     );
   }));
 
@@ -308,11 +368,15 @@ describe('Diagnostic test player component', () => {
     expect(component.getProgressText).toHaveBeenCalled();
   }));
 
-  it('should not get recommended topics if classroomData is not initialized', () => {
-    component.classroomData = undefined;
-    component.getRecommendedTopicSummaries(['test']);
-    expect(component.recommendedTopicSummaries).toEqual([]);
-  });
+  it(
+    'should not get recommended topics if classroomData is not ' +
+      'initialized',
+    () => {
+      component.classroomData = undefined;
+      component.getRecommendedTopicSummaries(['test']);
+      expect(component.recommendedTopicSummaries).toEqual([]);
+    }
+  );
 
   it('should be able to get the topic button text', () => {
     windowRef.nativeWindow.location.search = '?classroom=math';
@@ -361,62 +425,71 @@ describe('Diagnostic test player component', () => {
     expect(component.recommendedTopicSummaries).toEqual([topicData1]);
   }));
 
-  it('should be able to set topic tracker model after starting diagnostic test', fakeAsync(() => {
-    windowRef.nativeWindow.location.search = '?classroom=math';
-    // A linear graph with 3 nodes.
-    const topicIdToPrerequisiteTopicIds = {
-      topicId1: [],
-      topicId2: ['topicId1'],
-      topicId3: ['topicId2'],
-    };
+  it(
+    'should be able to set topic tracker model after starting ' +
+      'diagnostic test',
+    fakeAsync(() => {
+      windowRef.nativeWindow.location.search = '?classroom=math';
+      // A linear graph with 3 nodes.
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2'],
+      };
 
-    component.classroomData = dummyClassroomData;
+      component.classroomData = dummyClassroomData;
 
-    const diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
-      topicIdToPrerequisiteTopicIds
-    );
+      const diagnosticTestTopicTrackerModel =
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds);
 
-    let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: topicIdToPrerequisiteTopicIds,
-      },
-    };
+      let response = {
+        classroomDict: {
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: topicIdToPrerequisiteTopicIds,
+        },
+      };
 
-    expect(component.diagnosticTestTopicTrackerModel).toEqual(undefined);
+      expect(component.diagnosticTestTopicTrackerModel).toEqual(undefined);
 
-    spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
-      Promise.resolve(response)
-    );
+      spyOn(
+        classroomBackendApiService,
+        'getClassroomDataAsync'
+      ).and.returnValue(Promise.resolve(response));
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    component.startDiagnosticTest();
-    tick();
+      component.startDiagnosticTest();
+      tick();
 
-    expect(component.diagnosticTestTopicTrackerModel).toEqual(
-      diagnosticTestTopicTrackerModel
-    );
-  }));
+      expect(component.diagnosticTestTopicTrackerModel).toEqual(
+        diagnosticTestTopicTrackerModel
+      );
+    })
+  );
 
-  it('should not start diagnostic test if there is error while fetching classroom data', fakeAsync(() => {
-    expect(component.isStartTestButtonDisabled).toBeFalse();
-    component.classroomData = dummyClassroomData;
+  it(
+    'should not start diagnostic test if there is error while ' +
+      'fetching classroom data',
+    fakeAsync(() => {
+      expect(component.isStartTestButtonDisabled).toBeFalse();
+      component.classroomData = dummyClassroomData;
 
-    spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
-      Promise.reject({status: 400})
-    );
+      spyOn(
+        classroomBackendApiService,
+        'getClassroomDataAsync'
+      ).and.returnValue(Promise.reject({status: 400}));
 
-    component.startDiagnosticTest();
-    tick();
+      component.startDiagnosticTest();
+      tick();
 
-    expect(component.isStartTestButtonDisabled).toBeTrue();
-  }));
+      expect(component.isStartTestButtonDisabled).toBeTrue();
+    })
+  );
 
   it('should register recommendation acceptance event', fakeAsync(() => {
     spyOn(
@@ -470,7 +543,6 @@ describe('Diagnostic test player component', () => {
       'dummy',
       'dummy',
       true,
-      true,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1
@@ -485,11 +557,14 @@ describe('Diagnostic test player component', () => {
     expect(component.recommendedTopicSummaries).toEqual([topicData1]);
   });
 
-  it('should unsubscribe from subscriptions on destroying the component', () => {
-    spyOn(component.componentSubscription, 'unsubscribe').and.callThrough();
+  it(
+    'should unsubscribe from subscriptions on destroying the ' + 'component',
+    () => {
+      spyOn(component.componentSubscription, 'unsubscribe').and.callThrough();
 
-    component.ngOnDestroy();
+      component.ngOnDestroy();
 
-    expect(component.componentSubscription.unsubscribe).toHaveBeenCalled();
-  });
+      expect(component.componentSubscription.unsubscribe).toHaveBeenCalled();
+    }
+  );
 });
