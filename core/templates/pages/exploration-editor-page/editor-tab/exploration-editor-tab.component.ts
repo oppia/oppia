@@ -65,7 +65,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
   tutorialInProgress = false;
   explorationId = '';
-  stateName = '';
+  stateName: string | null = null;
   index: number = 0;
   validationErrorIsShown: boolean = false;
   joyRideSteps: string[] = [
@@ -434,13 +434,15 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   initStateEditor(): void {
-    this.stateName = this.stateEditorService.getActiveStateName() ?? '';
+    this.stateName = this.stateEditorService.getActiveStateName();
     this.stateEditorService.setStateNames(
       this.explorationStatesService.getStateNames()
     );
     this.stateEditorService.setInQuestionMode(false);
 
-    let stateData = this.explorationStatesService.getState(this.stateName);
+    let stateData = this.stateName
+      ? this.explorationStatesService.getState(this.stateName)
+      : null;
     if (stateData && stateData.linkedSkillId) {
       this.populateMisconceptionsForState(stateData.linkedSkillId);
     }
