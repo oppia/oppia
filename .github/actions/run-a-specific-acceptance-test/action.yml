@@ -109,3 +109,14 @@ runs:
       with:
         name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
         path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}-*
+ 
+    - name: Cleanup leftover Oppia processes 
+      if: ${{ always() }}
+      shell: bash
+      run: | 
+        echo "Cleaning up leftover processes..."
+        pkill -f dev_appserver || true
+        pkill -f redis-server || true
+        pkill -f elasticsearch || true
+        pkill -f firebase || true
+        pkill -f node || true
