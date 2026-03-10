@@ -434,11 +434,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   initStateEditor(): void {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      return;
-    }
-    this.stateName = activeStateName;
+    this.stateName = this.stateEditorService.getActiveStateName() ?? '';
     this.stateEditorService.setStateNames(
       this.explorationStatesService.getStateNames()
     );
