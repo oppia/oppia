@@ -869,14 +869,16 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
         )
 
         with send_mail_swap:
-            with self.assertRaisesRegex(
-                Exception, 'Failed to resend email: Mock email failure'
-            ):
-                self.post_task(
-                    self.url,
-                    self.payload,
-                    self.headers,
-                    csrf_token=self.csrf_token,
-                    expect_errors=True,
-                    expected_status_int=500,
-                )
+            response = self.post_task(
+                self.url,
+                self.payload,
+                self.headers,
+                csrf_token=self.csrf_token,
+                expect_errors=True,
+                expected_status_int=500,
+            )
+
+        self.assertEqual(response.status_int, 500)
+        self.assertIn(
+            b'Failed to resend email: Mock email failure', response.body
+        )
