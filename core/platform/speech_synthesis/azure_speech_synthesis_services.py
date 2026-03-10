@@ -24,7 +24,7 @@ from __future__ import annotations
 import logging
 import re
 import time
-import xml.sax.saxutils as saxutils
+from xml.sax import saxutils
 
 from core import constants, feconf
 from core.domain import voiceover_services
