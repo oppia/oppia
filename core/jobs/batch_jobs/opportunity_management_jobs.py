@@ -377,6 +377,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                     language_codes_with_assigned_voice_artists=(
                         opportunity.language_codes_with_assigned_voice_artists
                     ),
+                    data_format_list_count=(opportunity.data_format_list_count),
                 )
                 model.update_timestamps()
                 exploration_opportunity_summary_model_list.append(model)

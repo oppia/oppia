@@ -59,6 +59,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     language_codes_needing_voice_artists = datastore_services.StringProperty(
         repeated=True, indexed=True
     )
+    data_format_list_count = datastore_services.IntegerProperty(
+        default=0, indexed=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -88,6 +91,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_with_assigned_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_codes_needing_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'data_format_list_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
