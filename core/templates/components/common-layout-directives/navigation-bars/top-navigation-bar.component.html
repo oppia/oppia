@@ -345,8 +345,8 @@
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
                 [ngClass]="{'oppia-language-dropdown-button-embedded': pageIsIframed}">
           <i class="fas fa-globe language-icon langi"></i>
-          <span class="mobile-view-language-code lngcd" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
-          <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
+          <span class="mobile-view-language-code e2e-test-mobile-view-language-code lngcd" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
+          <span class="desktop-view-language-code e2e-test-desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
       <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown language-dropdown"

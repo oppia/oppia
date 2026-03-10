@@ -8,7 +8,7 @@
         <button mat-raised-button
                 aria-label="Previous Card"
                 (click)="moveBackByOneCard()"
-                class="oppia-back-button oppia-nav-button oppia-nav-left-button">
+                class="oppia-back-button e2e-test-oppia-back-button oppia-nav-button oppia-nav-left-button">
           <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
         </button>
       </ng-container>
@@ -18,7 +18,7 @@
       <button mat-raised-button
               (click)="moveForwardByOneCard()"
               aria-label="Next Card"
-              class="oppia-nav-right-button oppia-next-button oppia-nav-button">
+              class="oppia-nav-right-button oppia-next-button e2e-test-oppia-next-button oppia-nav-button">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
       </button>
     </div>
@@ -34,14 +34,14 @@
         <button mat-button
                 *ngIf="interactionId === 'Continue'"
                 (click)="submit.emit()"
-                class="oppia-learner-confirm-button oppia-autofocus"
+                class="oppia-learner-confirm-button e2e-test-oppia-learner-confirm-button oppia-autofocus"
                 oppiaFocusOn="continue-btn">
           {{ interactionCustomizationArgs.buttonText.value.unicode }}
           <i class="fas fa-arrow-right oppia-arrow"></i>
         </button>
         <button mat-button
                 *ngIf="doesInteractionHaveNavSubmitButton()"
-                class="oppia-learner-submit-answer-button"
+                class="oppia-learner-submit-answer-button e2e-test-oppia-learner-submit-answer-button"
                 (click)="submit.emit()"
                 [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
           {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}

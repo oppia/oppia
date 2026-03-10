@@ -4,7 +4,7 @@
     <oppia-rating-display [ratingValue]="userRating"
                           [isEditable]="true"
                           (edit)="submitUserRating($event)"
-                          class="conversation-skin-final-ratings-display"
+                          class="conversation-skin-final-ratings-display e2e-test-conversation-skin-final-ratings-display"
                           (click)="showFeedbackModal()">
     </oppia-rating-display>
   </div>
@@ -39,7 +39,7 @@
   </div>
 
   <a href="/community-library" *ngIf="!inStoryMode">
-    <button class="community-library-btn" tabindex="0">
+    <button class="community-library-btn e2e-test-community-library-btn" tabindex="0">
       <i class="fa-solid fa-arrow-right-to-bracket"></i>
       <p>Go To Library</p>
     </button>

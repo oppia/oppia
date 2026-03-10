@@ -2,7 +2,7 @@
   <i class="fas fa-headphones desktop-mode"></i>
   <p class=" desktop-mode">Listen in <span *ngIf="languageAccentDescriptions.length === 1">{{selectedLanguageAccentDescription}}</span></p>
 
-  <div class="oppia-new-audio-header-control-buttons" #audioControls>
+  <div class="oppia-new-audio-header-control-buttons e2e-test-oppia-new-audio-header-control-buttons" #audioControls>
     <div class="oppia-new-audio-header-select desktop-mode" *ngIf="languageAccentDescriptions.length > 1">
       <select class="audio-language-select e2e-test-audio-lang-select"
               [(ngModel)]="selectedLanguageAccentDescription"
@@ -13,7 +13,7 @@
 
     <div class="audio-new-header-control-icons">
       <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()" [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''" placement="right">
-        <i class="fas voiceover-play-pause-button" tabindex="0" aria-label="Press enter to Listen to the Lesson"
+        <i class="fas e2e-test-voiceover-play-pause-button" tabindex="0" aria-label="Press enter to Listen to the Lesson"
             [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying()}">
         </i>
       </a>

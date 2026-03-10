@@ -591,64 +591,65 @@ const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
 // New lesson player page.
-const lessonPlayerSideBarToggleButton = '.player-sidebar-toggle';
-const mobileOpenOptionsButton = '.mobile-open-options-button';
-const lessonCopyLinkbutton = '.lesson-copy-link-button';
-const lessonLinkCopiedMessageSelector = '.success-message';
+const lessonPlayerSideBarToggleButton = '.e2e-test-player-sidebar-toggle';
+const mobileOpenOptionsButton = '.e2e-test-mobile-open-options-button';
+const lessonCopyLinkbutton = '.e2e-test-lesson-copy-link-button';
+const lessonLinkCopiedMessageSelector = '.e2e-test-success-message';
 const LINK_COPIED_MESSAGE = 'Link Copied';
-const lessonEmbedInWebpageButton = '.embed-lesson-in-webpage-button';
-const shareGoogleClassroomSelector = '.lesson-share-link-classroom';
-const shareFacebookSelector = '.lesson-share-link-facebook';
-const shareModalCloseButton = '.share-modal-close-button';
-const generateLessonAttributionSelector = '.lesson-attribution-text';
-const attributionTextSelector = '.cc-attribution-input';
-const ccButtonSelector = '.copy-cc-btn';
-const copiedMessageSelector = '.success-message';
-const mobileLanguageSelector = '.mobile-view-language-code';
-const desktopLanguageSelector = '.desktop-view-language-code';
-const newAudioControlButton = '.oppia-new-audio-header-control-buttons';
-const voiceoverPlayPauseButton = '.voiceover-play-pause-button';
-const continueButtonSelector = '.oppia-learner-confirm-button';
+const lessonEmbedInWebpageButton = '.e2e-test-embed-lesson-in-webpage-button';
+const shareGoogleClassroomSelector = '.e2e-test-lesson-share-link-classroom';
+const shareFacebookSelector = '.e2e-test-lesson-share-link-facebook';
+const shareModalCloseButton = '.e2e-test-share-modal-close-button';
+const generateLessonAttributionSelector = '.e2e-test-lesson-attribution-text';
+const attributionTextSelector = '.e2e-test-cc-attribution-input';
+const ccButtonSelector = '.e2e-test-copy-cc-btn';
+const copiedMessageSelector = '.e2e-test-success-message';
+const mobileLanguageSelector = '.e2e-test-mobile-view-language-code';
+const desktopLanguageSelector = '.e2e-test-desktop-view-language-code';
+const newAudioControlButton =
+  '.e2e-test-oppia-new-audio-header-control-buttons';
+const voiceoverPlayPauseButton = '.e2e-test-voiceover-play-pause-button';
+const continueButtonSelector = '.e2e-test-oppia-learner-confirm-button';
 const voiceoverAudioSliderSelector = 'oppia-audio-slider mat-slider';
-const lessonReportButtonSelector = '.lesson-report-button';
-const conceptCardButton = '.concept-card-button';
+const lessonReportButtonSelector = '.e2e-test-lesson-report-button';
+const conceptCardButton = '.e2e-test-concept-card-button';
 const checkpointSelector = '.progress-bar-container > div.mat-tooltip-trigger';
 const conceptCardContentSelector = '.e2e-test-concept-card-explanation';
 const conceptCardCloseButton = '.e2e-test-close-concept-card';
 const celebrationSelector = '.e2e-test-correct-feedback';
-const cardBackButton = '.oppia-back-button';
-const responseSubmitButton = '.oppia-learner-submit-answer-button';
+const cardBackButton = '.e2e-test-oppia-back-button';
 const cardTopContentSelector =
   '.oppia-learner-view-card-top-content oppia-rte-output-display';
-const nextCardNavigationButton = '.oppia-next-button';
+const nextCardNavigationButton = '.e2e-test-oppia-next-button';
 const latestFeedbackSelector = '.e2e-test-conversation-feedback-latest';
-const submitResponseButton = '.oppia-learner-submit-answer-button';
-const hintModalBodySelector = '.oppia-learner-hint-and-solution-modal-body';
+const submitResponseButton = '.e2e-test-oppia-learner-submit-answer-button';
+const hintModalBodySelector =
+  '.e2e-test-oppia-learner-hint-and-solution-modal-body';
 const warningModalContainer = 'oppia-display-new-interstitial-modal';
 const warningModalTitleSelector =
-  '.oppia-learner-solution-interstitial-modal-title';
+  '.e2e-test-oppia-learner-solution-interstitial-modal-title';
 const warningModalBodySelector =
-  '.oppia-learner-solution-interstitial-modal-body';
+  '.e2e-test-oppia-learner-solution-interstitial-modal-body';
 const saveProgressModalSelector = 'oppia-save-progress-modal';
 const newProgressRemainderModalSelector = 'oppia-new-progress-reminder-modal';
 const progressContinueTextSelector =
   '.e2e-test-progress-reminder-continue-text';
-const resumeLessonButtonSelector = '.resume-button';
+const resumeLessonButtonSelector = '.e2e-test-resume-button';
 const profileAvatarSelector =
   'img.oppia-navbar-profile-picture[alt="User Avatar"]';
-const signUpOrLoginButton = '.signup-btn';
-const nextSuggestedLessonButton = '.next-lesson-btn';
+const signUpOrLoginButton = '.e2e-test-signup-btn';
+const nextSuggestedLessonButton = '.e2e-test-next-lesson-btn';
 const profileLogoutButton = '.e2e-test-logout-link';
-const reviewCardButton = '.review-card-btn';
-const morePracticeButton = '.more-practice-btn';
+const reviewCardButton = '.e2e-test-review-card-btn';
+const morePracticeButton = '.e2e-test-more-practice-btn';
 const lessonPlayerHeaderTextSelector = '.lesson-player-header-left p';
 const checkboxTitleSelector = '.e2e-test-skill-checkbox-title';
 const subtopicTitleSelector = '.subtopic-title';
-const conceptCardLinkSelectorInQuestion = '.concept-card-link';
-const gotoLibraryButton = '.community-library-btn';
-const ratingStarsSelector = '.conversation-skin-final-ratings-display';
+const conceptCardLinkSelectorInQuestion = '.e2e-test-concept-card-link';
+const gotoLibraryButton = '.e2e-test-community-library-btn';
+const ratingStarsSelector = '.e2e-test-conversation-skin-final-ratings-display';
 const suggestedLessonTitleSelector = '.exploration-summary-btn p';
-const showSolutionButton = '.oppia-learner-got-it-button';
+const showSolutionButton = '.e2e-test-learner-got-it-button';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6800,7 +6801,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async isResponseSubmitButtonPresent(): Promise<boolean> {
     try {
-      await this.page.waitForSelector(responseSubmitButton, {
+      await this.page.waitForSelector(submitResponseButton, {
         visible: true,
         timeout: 50000,
       });

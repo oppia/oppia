@@ -84,7 +84,7 @@
     {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
   </p>
   <div class="new-post-chapter-recommendation-cards-container" [ngClass]="{'three-buttons-container': !nextStoryNodeTitle}">
-    <button *ngIf="!userIsLoggedIn" class="post-chapter-recommendations-btn signup-btn" tabindex="0" (click)="signIn()">
+    <button *ngIf="!userIsLoggedIn" class="post-chapter-recommendations-btn signup-btn e2e-test-signup-btn" tabindex="0" (click)="signIn()">
       <i class="fa-solid fa-arrow-right-to-bracket"></i>
       <p>Sign up or Login <br><span>And save your lesson progress</span></p>
     </button>
@@ -95,19 +95,19 @@
       </button>
     </a>
     <a [href]="nextStoryNodeLink" *ngIf="nextStoryNodeTitle">
-      <button class="post-chapter-recommendations-btn next-lesson-btn" tabindex="0">
+      <button class="post-chapter-recommendations-btn next-lesson-btn e2e-test-next-lesson-btn" tabindex="0">
         <i class="fa-solid fa-arrow-right"></i>
         <p>Next Lesson <br><span>{{ nextStoryNodeTitle }}</span></p>
       </button>
     </a>
     <a [href]="getStudyTabUrl()" *ngIf="practiceQuestionsAreEnabled">
-      <button class="post-chapter-recommendations-btn review-card-btn" tabindex="0">
+      <button class="post-chapter-recommendations-btn review-card-btn e2e-test-review-card-btn" tabindex="0">
         <i class="fa-solid fa-eye"></i>
         <p>Check Review Card <br><span>And save your lesson progress</span></p>
       </button>
     </a>
     <a [href]="getPracticeTabUrl()" *ngIf="practiceQuestionsAreEnabled">
-      <button class="post-chapter-recommendations-btn more-practice-btn" tabindex="0">
+      <button class="post-chapter-recommendations-btn more-practice-btn e2e-test-more-practice-btn" tabindex="0">
         <i class="fa-solid fa-pen-to-square"></i>
         <p>Do More Practice <br><span>Practice learned skills</span></p>
       </button>

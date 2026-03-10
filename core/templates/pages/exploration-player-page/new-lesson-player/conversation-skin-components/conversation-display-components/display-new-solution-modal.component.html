@@ -5,7 +5,7 @@
 <div class="modal-body">
   <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
   <span>
-    <oppia-interaction-display classStr="oppia-learner-hint-and-solution-modal-body"
+    <oppia-interaction-display classStr="oppia-learner-hint-and-solution-modal-body e2e-test-oppia-learner-hint-and-solution-modal-body"
                                [htmlData]="shortAnswerHtml.answer">
     </oppia-interaction-display>
   </span>
@@ -13,7 +13,7 @@
   <br>
   <label><span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span></label>
   <span>
-    <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
+    <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body e2e-test-oppia-learner-hint-and-solution-modal-body"
                               [rteString]="solutionExplanationHtml">
     </oppia-rte-output-display>
   </span>
