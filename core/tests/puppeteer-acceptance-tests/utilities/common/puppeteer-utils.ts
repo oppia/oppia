@@ -993,7 +993,7 @@ export class BaseUser {
         {timeout}
       );
 
-      // Small buffer for DOM updates after Angular stabilizes
+      // Small buffer for DOM updates after Angular stabilizes.
       await this.page.waitForTimeout(500);
     } catch (error) {
       console.log(

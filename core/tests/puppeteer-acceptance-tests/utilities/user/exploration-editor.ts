@@ -2696,7 +2696,7 @@ export class ExplorationEditor extends BaseUser {
 
       // Wait for the exploration ID element with increased timeout to handle
       // potential animation delays in the success modal.
-      // RELOAD RECOVERY: Fixes mobile redirect delay flake #24030
+      // RELOAD RECOVERY: Fixes mobile redirect delay flake #24030.
       const success = await this.page
         .waitForSelector(explorationIdElement, {
           visible: true,
