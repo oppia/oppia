@@ -989,16 +989,15 @@ export class BaseUser {
   async waitForAngularToStabilize(timeout: number = 10000): Promise<void> {
     try {
       await this.page.waitForFunction(
-        () => (window as any)['ngZone']?.isStable === true,
+        () =>
+          (window as unknown as {ngZone: {isStable: boolean}}).ngZone
+            ?.isStable === true,
         {timeout}
       );
 
       // Small buffer for DOM updates after Angular stabilizes.
       await this.page.waitForTimeout(500);
     } catch (error) {
-      console.log(
-        `Angular zone did not stabilize within ${timeout}ms. Continuing anyway.`
-      );
       await this.page.waitForTimeout(1000);
     }
   }

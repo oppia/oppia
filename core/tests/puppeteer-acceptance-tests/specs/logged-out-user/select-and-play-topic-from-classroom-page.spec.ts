@@ -46,11 +46,7 @@ describe('Logged-out User', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
-    console.log('STEP 1: create logged out user');
-
     loggedOutUser = await UserFactory.createLoggedOutUser();
-
-    console.log('STEP 2: create curriculum admin user');
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
@@ -58,14 +54,10 @@ describe('Logged-out User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    console.log('STEP 3: create minimal exploration');
-
     explorationId =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers'
       );
-
-    console.log('STEP 4: create and publish topic');
 
     await curriculumAdmin.createAndPublishTopic(
       'Algebra I',
@@ -73,15 +65,11 @@ describe('Logged-out User', function () {
       'Negative Numbers'
     );
 
-    console.log('STEP 5: create and publish classroom');
-
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
       'Algebra I'
     );
-
-    console.log('STEP 6: create and publish story');
 
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Algebra Story',
@@ -90,8 +78,6 @@ describe('Logged-out User', function () {
       explorationId as string,
       'Algebra I'
     );
-
-    console.log('STEP 7: beforeAll finished successfully');
   }, 900000);
 
   it(
