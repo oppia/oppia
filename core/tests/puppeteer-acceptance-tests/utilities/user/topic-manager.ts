@@ -3795,7 +3795,10 @@ export class TopicManager extends BaseUser {
         2000
       );
       if (!chapterListVisible) {
-        await this.clickOnElementWithSelector(mobileChapterCollapsibleCard);
+        await this.page.$eval(mobileChapterCollapsibleCard, element => {
+          element.scrollIntoView({block: 'center'});
+          (element as HTMLElement).click();
+        });
       }
     }
     await this.page.waitForSelector(chapterTitleSelector, {

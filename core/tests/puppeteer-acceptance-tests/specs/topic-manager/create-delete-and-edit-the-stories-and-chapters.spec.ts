@@ -179,6 +179,7 @@ describe('Topic Manager', function () {
     await topicManager.clickOnElementWithText('Create Chapter');
     await topicManager.expectExplorationIdAlreadyExistWarning();
     await topicManager.clickOnElementWithText('Cancel');
+    await topicManager.discardStoryChanges();
 
     // Verify initial order.
     await topicManager.expectChaptersOrderToBe([
