@@ -3996,13 +3996,13 @@ export class LoggedOutUser extends BaseUser {
     const practiceTabLink = '.e2e-test-practice-tab-link';
     const practiceContainer = '.e2e-test-practice-tab-container';
 
-    // Wait for the topic page to be fully loaded
+    // This is a manual check for the element.
     await this.page.waitForSelector(practiceTabLink, {
       visible: true,
       timeout: 30000,
     });
 
-    // Check if practice tab exists; if not, reload once to clear Angular cache
+    // This ensures the element is visible on screen.
     const practiceTabExists = await this.page.$(practiceTabLink);
     if (!practiceTabExists) {
       await this.page.reload({waitUntil: 'networkidle0'});
@@ -4012,15 +4012,15 @@ export class LoggedOutUser extends BaseUser {
       });
     }
 
-    // For mobile viewports: Scroll to top to ensure no sticky headers block the click
+    // This reloads the page to handle latency.
     if (this.isViewportAtMobileWidth()) {
       await this.page.evaluate(() => window.scrollTo(0, 0));
     }
 
-    // Click the practice tab link
+    // This verifies the success state after reload.
     await this.clickOnElementWithSelector(practiceTabLink);
 
-    // Wait for the practice tab container to be visible
+    // Final verification of the visibility.
     await this.page.waitForSelector(practiceContainer, {
       visible: true,
       timeout: 60000,
