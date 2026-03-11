@@ -27,6 +27,7 @@ import {HintBackendDict, Hint} from 'domain/exploration/hint-object.model';
 import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {SolutionBackendDict, Solution} from 'domain/exploration/solution.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {
   AlgebraicExpressionInputCustomizationArgs,
   CodeReplCustomizationArgs,
@@ -74,7 +75,7 @@ export interface InteractionBackendDict {
   customization_args: InteractionCustomizationArgsBackendDict;
   hints: readonly HintBackendDict[];
   // Id is null until populated from the backend,
-  id: string | null;
+  id: InteractionSpecsKey | null;
   // A null 'solution' indicates that this Interaction does not have a hint
   // or there is a hint, but no solution. A new interaction is initialised with
   // null 'solution' and stays null until the first hint with solution is added.
@@ -87,7 +88,7 @@ export class Interaction extends BaseTranslatableObject {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome | null;
   hints: Hint[];
-  id: string | null;
+  id: InteractionSpecsKey | null;
   solution: Solution | null;
   currentAnswer: InteractionAnswer | null = null;
   submitClicked = false;
@@ -98,7 +99,7 @@ export class Interaction extends BaseTranslatableObject {
     customizationArgs: InteractionCustomizationArgs,
     defaultOutcome: Outcome | null,
     hints: Hint[],
-    id: string | null,
+    id: InteractionSpecsKey | null,
     solution: Solution | null
   ) {
     super();
@@ -196,7 +197,7 @@ export class Interaction extends BaseTranslatableObject {
     return undefined;
   }
 
-  setId(newValue: string): void {
+  setId(newValue: InteractionSpecsKey): void {
     this.id = newValue;
   }
 
