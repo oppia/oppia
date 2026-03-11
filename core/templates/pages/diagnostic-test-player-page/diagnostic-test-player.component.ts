@@ -17,22 +17,25 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
-import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
-import {ClassroomData} from 'domain/classroom/classroom-data.model';
-import {Subscription} from 'rxjs';
-import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {TranslateService} from '@ngx-translate/core';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {AppConstants} from 'app.constants';
 import {Router} from '@angular/router';
-import {LoaderService} from 'services/loader.service';
+
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
+
+import {AppConstants} from 'app.constants';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+
+import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
+import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
@@ -40,41 +43,30 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
   styleUrls: ['./diagnostic-test-player.component.css'],
 })
 export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
-  /** @type {string} */
   OPPIA_AVATAR_IMAGE_URL!: string;
-  /** @type {DiagnosticTestTopicTrackerModel} */
   diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
-  /** @type {boolean} */
   diagnosticTestIsStarted: boolean = false;
-  /** @type {boolean} */
   diagnosticTestIsFinished: boolean = false;
-  /** @type {ClassroomData} */
   classroomData!: ClassroomData;
-  /** @type {string} */
   classroomUrlFragment!: string;
-  /** @type {CreatorTopicSummary[]} */
   recommendedTopicSummaries: CreatorTopicSummary[] = [];
-  /** @type {string[]} */
   recommendedTopicIds: string[] = [];
-  /** @type {number} */
   progressPercentage: number = 0;
-  /** @type {Subscription} */
-  componentSubscription = new Subscription();
-  /** @type {boolean} */
+  readonly componentSubscription = new Subscription();
   isStartTestButtonDisabled: boolean = false;
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private preventPageUnloadEventService: PreventPageUnloadEventService,
-    private classroomBackendApiService: ClassroomBackendApiService,
-    private translateService: TranslateService,
-    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService,
-    private windowRef: WindowRef,
-    private router: Router,
-    private platformFeatureService: PlatformFeatureService,
-    private loaderService: LoaderService,
-    private alertsService: AlertsService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private readonly urlInterpolationService: UrlInterpolationService,
+    private readonly preventPageUnloadEventService: PreventPageUnloadEventService,
+    private readonly classroomBackendApiService: ClassroomBackendApiService,
+    private readonly translateService: TranslateService,
+    private readonly diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService,
+    private readonly windowRef: WindowRef,
+    private readonly router: Router,
+    private readonly platformFeatureService: PlatformFeatureService,
+    private readonly loaderService: LoaderService,
+    private readonly alertsService: AlertsService,
+    private readonly siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   /**
@@ -237,6 +229,7 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
       }
     );
   }
+
   /**
    * Registers a site analytics event for recommended topic acceptance.
    * @param {string} topicName - The name of the topic.

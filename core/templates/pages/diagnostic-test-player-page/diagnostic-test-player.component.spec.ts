@@ -62,7 +62,6 @@ class MockTranslateService {
  * Mocking PlatformFeatureService for testing.
  */
 class MockPlatformFeatureService {
-  /** @type {object} */
   status = {
     NewLessonPlayer: {
       isEnabled: false,
@@ -74,7 +73,6 @@ class MockPlatformFeatureService {
  * Mocking WindowRef for testing.
  */
 class MockWindowRef {
-  /** @type {object} */
   _window = {
     location: {
       _href: '',
@@ -193,42 +191,31 @@ const dummyClassroomData = new ClassroomData(
 );
 
 describe('Diagnostic test player component', () => {
-  /** @type {DiagnosticTestPlayerComponent} */
-  let component: DiagnosticTestPlayerComponent;
-  /** @type {ComponentFixture<DiagnosticTestPlayerComponent>} */
-  let fixture: ComponentFixture<DiagnosticTestPlayerComponent>;
-  /** @type {PreventPageUnloadEventService} */
-  let preventPageUnloadEventService: PreventPageUnloadEventService;
-  /** @type {ClassroomBackendApiService} */
-  let classroomBackendApiService: ClassroomBackendApiService;
-  /** @type {TranslateService} */
-  let translateService: TranslateService;
-  /** @type {MockPlatformFeatureService} */
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
-  /** @type {EventEmitter<string[]>} */
-  let sessionCompleteEmitter = new EventEmitter<string[]>();
-  /** @type {EventEmitter<number>} */
-  let progressEmitter = new EventEmitter<number>();
-  /** @type {Router} */
-  let router: Router;
-  /** @type {MockWindowRef} */
-  let windowRef: MockWindowRef;
-  /** @type {AlertsService} */
   let alertsService: AlertsService;
-  /** @type {SiteAnalyticsService} */
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let component: DiagnosticTestPlayerComponent;
+  let fixture: ComponentFixture<DiagnosticTestPlayerComponent>;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let router: Router;
   let siteAnalyticsService: SiteAnalyticsService;
+  let translateService: TranslateService;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
+  let progressEmitter: EventEmitter<number>;
+  let sessionCompleteEmitter: EventEmitter<string[]>;
+  let windowRef: MockWindowRef;
 
   /**
    * Mocking DiagnosticTestPlayerStatusService for testing.
    */
   class MockDiagnosticTestPlayerStatusService {
-    /** @type {EventEmitter<string[]>} */
     onDiagnosticTestSessionCompleted = sessionCompleteEmitter;
-    /** @type {EventEmitter<number>} */
     onDiagnosticTestSessionProgressChange = progressEmitter;
   }
 
   beforeEach(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
+    progressEmitter = new EventEmitter<number>();
+    sessionCompleteEmitter = new EventEmitter<string[]>();
     windowRef = new MockWindowRef();
 
     TestBed.configureTestingModule({
@@ -394,7 +381,7 @@ describe('Diagnostic test player component', () => {
   it('should be able to get the topic URL from the URL fragment', () => {
     windowRef.nativeWindow.location.search = '?classroom=math';
     component.classroomUrlFragment = 'math';
-    let topicUrlFragment = 'subtraction';
+    const topicUrlFragment = 'subtraction';
 
     expect(component.getTopicUrlFromUrlFragment(topicUrlFragment)).toEqual(
       '/learn/math/' + topicUrlFragment
@@ -442,7 +429,7 @@ describe('Diagnostic test player component', () => {
       const diagnosticTestTopicTrackerModel =
         new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds);
 
-      let response = {
+      const response = {
         classroomDict: {
           classroomId: 'classroomId',
           name: 'math',

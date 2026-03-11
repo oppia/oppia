@@ -54,7 +54,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(user_models, topic_models, story_models) = models.Registry.import_models(
+user_models, topic_models, story_models = models.Registry.import_models(
     [models.Names.USER, models.Names.TOPIC, models.Names.STORY]
 )
 datastore_services = models.Registry.import_datastore_services()
@@ -687,7 +687,7 @@ def add_collection_to_learner_playlist(
         and collection_id not in incomplete_collection_ids
     ):
 
-        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
+        playlist_limit_exceeded, belongs_to_subscribed_activities = (
             learner_playlist_services.mark_collection_to_be_played_later(
                 user_id,
                 collection_id,
@@ -742,7 +742,7 @@ def add_exp_to_learner_playlist(
         and exploration_id not in incomplete_exploration_ids
     ):
 
-        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
+        playlist_limit_exceeded, belongs_to_subscribed_activities = (
             learner_playlist_services.mark_exploration_to_be_played_later(
                 user_id,
                 exploration_id,
@@ -1159,9 +1159,10 @@ def _get_filtered_completed_story_summaries(
             # So, we are sure that the story cannot be None here and that's why
             # we used assert here.
             assert story is not None
-            if len(
-                story_fetchers.get_completed_node_ids(user_id, story_id)
-            ) != len(story_summary.node_titles):
+            if (
+                len(story_fetchers.get_completed_node_ids(user_id, story_id))
+                != story.story_contents.get_published_node_count()
+            ):
                 remove_story_from_completed_list(user_id, story_id)
                 record_story_started(user_id, story_id)
                 completed_to_incomplete_story_summaries.append(story_summary)
@@ -1256,9 +1257,7 @@ def _get_filtered_learnt_topic_summaries(
             topic_right = topic_rights[index]
             # Ruling out the possibility of None for mypy type checking.
             assert topic_right is not None
-            if not set(story_ids_in_topic).intersection(
-                set(completed_story_ids)
-            ):
+            if not set(story_ids_in_topic).issubset(set(completed_story_ids)):
                 remove_topic_from_learnt_list(user_id, topic_id)
                 record_topic_started(user_id, topic_id)
                 learnt_to_partially_learnt_topics.append(topic_summary)
