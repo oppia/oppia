@@ -1,11 +1,11 @@
 <div class="oppia-opportunities-list">
   <div class="oppia-search-bar-container">
-    <span class="material-icons oppia-search-icon">search</span>
+    <span class="material-icons oppia-search-icon" aria-hidden="true">search</span>
     <input type="text" class="oppia-search-input e2e-test-search-input" placeholder="Search for a skill..."
       [(ngModel)]="searchText" (input)="onSearchTextChange()" aria-label="Search for a skill">
     <button *ngIf="searchText" class="oppia-search-clear-button e2e-test-search-clear-button"
             (click)="searchText = ''; onSearchTextChange()" aria-label="Clear search">
-      <span class="material-icons">close</span>
+      <span class="material-icons" aria-hidden="true">close</span>
     </button>
   </div>
   <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
