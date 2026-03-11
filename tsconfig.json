@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "noImplicitUseStrict": true,
     "skipLibCheck": true,
     "downlevelIteration": true,
     "lib": ["es2017", "dom", "dom.iterable", "webworker"],
