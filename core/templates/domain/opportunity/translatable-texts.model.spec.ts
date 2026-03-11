@@ -46,7 +46,6 @@ describe('Translatable Texts model', () => {
         },
       },
       version: '1',
-      has_data_format_list_content: false,
     };
     sampleTranslatableTexts =
       TranslatableTexts.createFromBackendDict(sampleBackendDict);

@@ -60,7 +60,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         repeated=True, indexed=True
     )
     data_format_list_count = datastore_services.IntegerProperty(
-        default=0, indexed=False
+        required=True, default=0, indexed=False
     )
 
     @staticmethod

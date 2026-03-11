@@ -77,6 +77,7 @@ export interface TranslationOpportunity {
   inReviewCount: number;
   totalCount: number;
   translationsCount: number;
+  dataFormatListCount: number;
 }
 export interface ModifyTranslationOpportunity {
   id: string;
@@ -220,7 +221,7 @@ export class TranslationModalComponent {
           this.updateActiveState(translatableItem);
           ({more: this.moreAvailable} = translatableItem);
           this.hasDataFormatListContent =
-            this.translateTextService.hasDataFormatListContent;
+            this.opportunity.dataFormatListCount > 0;
           this.loadingData = false;
         }
       );

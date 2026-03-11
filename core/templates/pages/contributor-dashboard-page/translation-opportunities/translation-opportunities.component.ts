@@ -108,6 +108,7 @@ export class TranslationOpportunitiesComponent {
         inReviewCount: inReviewCount,
         totalCount: totalCount,
         translationsCount: translationsCount,
+        dataFormatListCount: dataFormatListCount,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
@@ -155,21 +156,23 @@ export class TranslationOpportunitiesComponent {
       const activeLanguageCode =
         this.translationLanguageService.getActiveLanguageCode();
       if (activeLanguageCode) {
-        const rights =
+        const userContributionRights =
           await this.userService.getUserContributionRightsDataAsync();
-        if (rights) {
+        if (userContributionRights) {
           this.userIsReviewer =
-            rights.can_review_translation_for_language_codes.includes(
+            userContributionRights.can_review_translation_for_language_codes.includes(
               activeLanguageCode
             );
         }
       }
     };
 
-    this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
-      this.languageSelected = true;
-      updateReviewerStatus();
-    });
+    this.translationLanguageService.onActiveLanguageChanged.subscribe(
+      async () => {
+        await updateReviewerStatus();
+        this.languageSelected = true;
+      }
+    );
     if (this.translationLanguageService.getActiveLanguageCode()) {
       this.languageSelected = true;
       updateReviewerStatus();
