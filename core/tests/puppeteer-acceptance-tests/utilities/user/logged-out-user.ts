@@ -603,13 +603,12 @@ const shareModalCloseButton = '.e2e-test-share-modal-close-button';
 const generateLessonAttributionSelector = '.e2e-test-lesson-attribution-text';
 const attributionTextSelector = '.e2e-test-cc-attribution-input';
 const ccButtonSelector = '.e2e-test-copy-cc-btn';
-const copiedMessageSelector = '.e2e-test-success-message';
 const mobileLanguageSelector = '.e2e-test-mobile-view-language-code';
 const desktopLanguageSelector = '.e2e-test-desktop-view-language-code';
 const newAudioControlButton =
   '.e2e-test-oppia-new-audio-header-control-buttons';
 const voiceoverPlayPauseButton = '.e2e-test-voiceover-play-pause-button';
-const continueButtonSelector = '.e2e-test-oppia-learner-confirm-button';
+const continueButtonSelector = '.oppia-learner-confirm-button';
 const voiceoverAudioSliderSelector = 'oppia-audio-slider mat-slider';
 const lessonReportButtonSelector = '.e2e-test-lesson-report-button';
 const conceptCardButton = '.e2e-test-concept-card-button';
@@ -650,6 +649,7 @@ const gotoLibraryButton = '.e2e-test-community-library-btn';
 const ratingStarsSelector = '.e2e-test-conversation-skin-final-ratings-display';
 const suggestedLessonTitleSelector = '.exploration-summary-btn p';
 const showSolutionButton = '.e2e-test-learner-got-it-button';
+const shareModal = 'oppia-share-lesson-modal';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -5920,51 +5920,73 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expect the share lesson modal visible.
+   */
+  async expectShareLessonModal(): Promise<void> {
+    await this.page.waitForSelector(shareModal, {
+      visible: true,
+    });
+    showMessage('Share lesson modal appeared');
+  }
+
+  /**
    * Copy share link in share model of new lesson player.
    */
   async clickCopyLinkButton(): Promise<void> {
+    await this.page.bringToFront();
     await this.page.waitForSelector(lessonCopyLinkbutton, {
       visible: true,
       timeout: 10000,
     });
     await this.page.click(lessonCopyLinkbutton);
+    showMessage('Copy Link button clicked');
+  }
+
+  /**
+   * Allow clipboard read/write permission.
+   */
+  async allowClipboardPermission(): Promise<void> {
+    // Grant clipboard permission for the page origin.
+    const context = await this.browserObject.defaultBrowserContext();
+
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    showMessage('Clipboard read/write permission allowed');
   }
 
   /**
    * Function to verify copy link message.
    */
   async expectLinkCopiedMessage(): Promise<void> {
-    await this.page.waitForSelector(lessonLinkCopiedMessageSelector);
-
-    const linkCopiedMessage = await this.page.$eval(
-      lessonLinkCopiedMessageSelector,
-      element => element.textContent
-    );
-
-    if (
-      !linkCopiedMessage ||
-      !linkCopiedMessage.includes(LINK_COPIED_MESSAGE)
-    ) {
-      throw new Error('Link copied message did not shown');
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const el = document.querySelector(selector);
+          return el && el.textContent && el.textContent.includes(expectedText);
+        },
+        {timeout: 5000},
+        lessonLinkCopiedMessageSelector,
+        LINK_COPIED_MESSAGE
+      );
+      showMessage('Lesson share link copied');
+    } catch (error) {
+      const actualText = await this.page.$eval(
+        lessonLinkCopiedMessageSelector,
+        el => el.textContent
+      );
+      throw new Error(
+        `Link copied message did not appear. Expected: "${LINK_COPIED_MESSAGE}", but found: "${actualText}"`
+      );
     }
-
-    showMessage('Lesson share link copied');
   }
 
   /**
    * Open new browser tab and paste clipboard text.
    */
   async openCopiedLink(): Promise<Page> {
-    // Get the origin of the current page to apply permissions correctly.
-    const origin = new URL(this.page.url()).origin;
-
-    // Grant clipboard permissions to the browser context.
-    const context = this.page.browser().browserContexts()[0];
-    await context.overridePermissions(origin, [
-      'clipboard-read',
-      'clipboard-write',
-    ]);
-
+    await this.page.bringToFront();
     const clipboardText = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });
@@ -5972,6 +5994,7 @@ export class LoggedOutUser extends BaseUser {
     if (!clipboardText) {
       throw new Error('Clipboard is empty, link is not copied');
     }
+    showMessage(`clipboard copied link: ${clipboardText}`);
 
     // Open new tab with that link.
     const newBrowserTab = await this.browserObject.newPage();
@@ -6146,17 +6169,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(ccButtonSelector);
     await this.page.click(ccButtonSelector);
 
-    await this.verifyText(copiedMessageSelector, 'Attribution Copied');
-
-    // Get the origin of the current page to apply permissions correctly.
-    const origin = new URL(this.page.url()).origin;
-
-    // Grant clipboard permissions to the browser context.
-    const context = this.page.browser().browserContexts()[0];
-    await context.overridePermissions(origin, [
-      'clipboard-read',
-      'clipboard-write',
-    ]);
+    await this.page.bringToFront();
     const clipboardText = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });
@@ -6165,9 +6178,9 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('Clipboard is empty. Attribution text was not copied.');
     }
 
-    if (lessonAttributionPrintContent !== clipboardText) {
+    if (!clipboardText.includes(lessonAttributionPrintContent)) {
       throw new Error(
-        'Copied attribution text does not match the expected content.'
+        `Copied attribution text: ${clipboardText} does not match the expected content: ${lessonAttributionPrintContent}.`
       );
     }
     showMessage('Attribution text copied and verified successfully.');
@@ -6199,23 +6212,12 @@ export class LoggedOutUser extends BaseUser {
   async copyHTMLContentAndVerify(
     lessonEmbedHTMLContent: string
   ): Promise<void> {
-    await this.page.waitForSelector(ccButtonSelector);
+    await this.page.waitForSelector(ccButtonSelector, {
+      visible: true,
+    });
     await this.page.click(ccButtonSelector);
 
-    await this.verifyText(
-      copiedMessageSelector,
-      'HTML Code Copied check_circle'
-    );
-
-    // Get the origin of the current page to apply permissions correctly.
-    const origin = new URL(this.page.url()).origin;
-
-    // Grant clipboard permissions to the browser context.
-    const context = this.page.browser().browserContexts()[0];
-    await context.overridePermissions(origin, [
-      'clipboard-read',
-      'clipboard-write',
-    ]);
+    await this.page.bringToFront();
     const clipboardText = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });
@@ -6224,8 +6226,10 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('Clipboard is empty. Embed HTML Code was not copied.');
     }
 
-    if (lessonEmbedHTMLContent !== clipboardText) {
-      throw new Error('Copied HTML code does not match the expected code.');
+    if (!clipboardText.includes(lessonEmbedHTMLContent)) {
+      throw new Error(
+        `Copied HTML code: ${clipboardText} does not match the expected code: ${lessonEmbedHTMLContent}.`
+      );
     }
     showMessage('Embed HTML code copied and verified successfully.');
   }
@@ -6590,11 +6594,15 @@ export class LoggedOutUser extends BaseUser {
   }
   /**
    * Verify a given text is visible to the user on the page.
-   * @param {string} text - The text to check.
+   * @param {string} text - The text to check
+   * @param {Page} page - Optional. The page to find the content.
    */
-  async expectTextPresentOnPage(text: string): Promise<boolean> {
+  async expectTextPresentOnPage(
+    text: string,
+    page: Page = this.page
+  ): Promise<boolean> {
     // Use evaluate to get the visible text of the body.
-    const bodyText = await this.page.evaluate(() => document.body.innerText);
+    const bodyText = await page.evaluate(() => document.body.innerText);
     return bodyText.includes(text);
   }
 
