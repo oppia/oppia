@@ -511,6 +511,9 @@ describe('Translation opportunities component', () => {
     expect(component.languageSelected).toBe(false);
 
     activeLanguageChangedEmitter.emit();
+    // The subscribe callback is async and sets languageSelected after
+    // awaiting updateReviewerStatus(). Tick to flush the microtask queue.
+    tick();
 
     expect(component.languageSelected).toBe(true);
   }));
