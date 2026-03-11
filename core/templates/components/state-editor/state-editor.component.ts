@@ -162,16 +162,17 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveStateContent.emit($event);
   }
 
-  updateInteractionVisibility(newInteractionId: string): void {
+  updateInteractionVisibility(
+    newInteractionId: InteractionSpecsKey | null
+  ): void {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
-      this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
-          .can_have_solution
+      newInteractionId &&
+        INTERACTION_SPECS[newInteractionId].can_have_solution
     );
     this.currentStateIsTerminal = Boolean(
-      this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey].is_terminal
+      newInteractionId &&
+        INTERACTION_SPECS[newInteractionId].is_terminal
     );
   }
 
