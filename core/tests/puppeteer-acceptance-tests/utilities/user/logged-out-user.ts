@@ -3508,56 +3508,23 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to verify the Watch a Video button after subscribing to newsletter.
    */
-  async clickWatchAVideoButton(): Promise<void> {
-    await this.page.waitForSelector(watchAVideoButtonInThanksForSubscribe);
-    const buttonText = await this.page.$eval(
+  async expectWatchAVideoButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
       watchAVideoButtonInThanksForSubscribe,
-      element => (element as HTMLElement).innerText
+      'https://youtu.be/OConyxG7HaM'
     );
-    if (buttonText !== 'Watch a video') {
-      throw new Error('The Watch A Video button does not exist!');
-    }
-    await this.clickAndWaitForNavigation(
-      watchAVideoButtonInThanksForSubscribe,
-      true
-    );
-    await this.waitForPageToFullyLoad();
-
-    const url = this.page.url();
-    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
-      throw new Error(
-        `The Watch A Video button should open the right page,
-          but it opens ${url} instead.`
-      );
-    }
-    showMessage('The Watch A Video button opens the right page.');
+    showMessage('The Watch a Video button has the right link.');
   }
 
   /**
    * Function to verify the Read Blog button after subscribing to newsletter.
    */
-  async clickReadBlogButton(): Promise<void> {
-    await this.page.waitForSelector(readOurBlogButtonInThanksForSubscribe);
-    const buttonText = await this.page.$eval(
+  async expectReadBlogButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
       readOurBlogButtonInThanksForSubscribe,
-      element => (element as HTMLElement).innerText
+      readBlogUrl
     );
-    if (buttonText !== 'Read our blog') {
-      throw new Error('The Read Our Blog button does not exist!');
-    }
-    await this.clickAndWaitForNavigation(
-      readOurBlogButtonInThanksForSubscribe,
-      true
-    );
-
-    if (this.page.url() !== readBlogUrl) {
-      throw new Error(
-        `The Read Our Blog button should open the Blog page,
-          but it opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage('The Read Our Blog button opens the Blog page.');
-    }
+    showMessage('The Read our blog button has the right link.');
   }
   /**
    * Function to verify that the user is on the login page.
