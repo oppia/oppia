@@ -202,7 +202,7 @@ describe('Translation opportunities component', () => {
 
     component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBeFalse();
+      expect(more).toBe(false);
     });
   });
 
@@ -219,7 +219,7 @@ describe('Translation opportunities component', () => {
     });
     component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBeTrue();
+      expect(more).toBe(true);
     });
 
     spyOn(
@@ -234,7 +234,7 @@ describe('Translation opportunities component', () => {
       .loadMoreOpportunitiesAsync()
       .then(({opportunitiesDicts, more}) => {
         expect(opportunitiesDicts.length).toBe(2);
-        expect(more).toBeFalse();
+        expect(more).toBe(false);
       });
   });
 
@@ -257,7 +257,7 @@ describe('Translation opportunities component', () => {
         opportunitiesDicts[opportunitiesDicts.length - 1].translationsCount +
           opportunitiesDicts[opportunitiesDicts.length - 1].inReviewCount ===
           opportunitiesDicts[opportunitiesDicts.length - 1].totalCount
-      ).toBeTrue();
+      ).toBe(true);
       expect(opportunitiesDicts).toEqual([
         {
           id: '2',
@@ -268,6 +268,7 @@ describe('Translation opportunities component', () => {
           inReviewCount: 4,
           totalCount: 10,
           translationsCount: 4,
+          dataFormatListCount: 0,
         },
         {
           id: '1',
@@ -278,6 +279,7 @@ describe('Translation opportunities component', () => {
           inReviewCount: 2,
           totalCount: 4,
           translationsCount: 2,
+          dataFormatListCount: 0,
         },
       ]);
     }
@@ -309,6 +311,7 @@ describe('Translation opportunities component', () => {
         inReviewCount: 2,
         totalCount: 4,
         translationsCount: 2,
+        dataFormatListCount: 0,
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -319,6 +322,7 @@ describe('Translation opportunities component', () => {
         inReviewCount: 4,
         totalCount: 10,
         translationsCount: 4,
+        dataFormatListCount: 0,
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -336,6 +340,7 @@ describe('Translation opportunities component', () => {
           inReviewCount: 2,
           totalCount: 4,
           translationsCount: 2,
+          dataFormatListCount: 0,
         },
         {
           id: '2',
@@ -346,6 +351,7 @@ describe('Translation opportunities component', () => {
           inReviewCount: 4,
           totalCount: 10,
           translationsCount: 4,
+          dataFormatListCount: 0,
         },
       ]);
     }

@@ -21,7 +21,10 @@ import {Injectable} from '@angular/core';
 import {ImagesData} from 'services/image-local-storage.service';
 
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
-import {TranslatableTexts} from 'domain/opportunity/translatable-texts.model';
+import {
+  TranslatableTexts,
+  StateNamesToContentIdMapping,
+} from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
@@ -61,17 +64,17 @@ export class TranslateTextService {
   STARTING_INDEX = -1;
   PENDING = 'pending';
   SUBMITTED = 'submitted';
-  stateWiseContents = {};
-  stateWiseContentIds = {};
-  stateNamesList = [];
-  stateAndContent = [];
+  stateWiseContents: StateNamesToContentIdMapping = {};
+  stateWiseContentIds: {[stateName: string]: string[]} = {};
+  stateNamesList: string[] = [];
+  stateAndContent: StateAndContent[] = [];
   activeIndex = this.STARTING_INDEX;
-  activeExpId;
-  activeExpVersion;
-  activeContentId;
-  activeStateName: string;
-  activeContentText: string;
-  activeContentStatus: Status;
+  activeExpId: string = '';
+  activeExpVersion: string = '';
+  activeContentId: string = '';
+  activeStateName: string = '';
+  activeContentText: string | string[] = '';
+  activeContentStatus: Status = 'pending';
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
@@ -121,7 +124,7 @@ export class TranslateTextService {
     text: string | string[],
     more: boolean,
     status: Status,
-    translation: string
+    translation: string | string[]
   ): TranslatableItem {
     const {
       dataFormat,
@@ -151,9 +154,9 @@ export class TranslateTextService {
     this.stateNamesList = [];
     this.stateAndContent = [];
     this.activeIndex = this.STARTING_INDEX;
-    this.activeContentId = null;
-    this.activeStateName = null;
-    this.activeContentText = null;
+    this.activeContentId = '';
+    this.activeStateName = '';
+    this.activeContentText = '';
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.translateTextBackendApiService
@@ -202,7 +205,7 @@ export class TranslateTextService {
 
   getTextToTranslate(): TranslatableItem {
     const text = this._getNextText();
-    const {status = this.PENDING, translation = ''} = {
+    const {status = this.PENDING as Status, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
     return this._getUpdatedTextToTranslate(
@@ -249,7 +252,8 @@ export class TranslateTextService {
       )
       .then(
         () => {
-          this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
+          this.stateAndContent[this.activeIndex].status = this
+            .SUBMITTED as Status;
           this.stateAndContent[this.activeIndex].translation = translation;
           successCallback();
         },
