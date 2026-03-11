@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import importlib
 import os
 import pathlib
 import shutil
@@ -54,6 +55,41 @@ TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
 _PARSER: Final = argparse.ArgumentParser(
     description='Installation script for Oppia third-party libraries.'
 )
+
+_REQUIRED_RUNTIME_MODULES: Final = [
+    'psutil',
+    'certifi',
+    'packaging',
+    'rcssmin',
+    'xmltodict',
+    'yaml',
+]
+
+
+def install_missing_runtime_python_modules() -> None:
+    """Checks if required runtime Python modules are installed and installs
+    them if they are missing.
+    """
+    missing_modules = []
+    for module in _REQUIRED_RUNTIME_MODULES:
+        try:
+            importlib.import_module(module)
+        except ImportError:
+            if module == 'yaml':
+                missing_modules.append('pyyaml')
+            else:
+                missing_modules.append(module)
+
+    if not missing_modules:
+        return
+
+    print(
+        'Installing missing runtime Python modules: %s'
+        % ', '.join(missing_modules)
+    )
+    subprocess.check_call(
+        [sys.executable, '-m', 'pip', 'install', *missing_modules]
+    )
 
 
 def make_google_module_importable_by_python(google_module_path: str) -> None:
@@ -384,6 +420,20 @@ def install_redis_cli() -> None:
             # It will build the redis-cli and redis-server files so that we can
             # run the server from inside the oppia folder by executing the
             # script src/redis-cli and src/redis-server.
+
+            # Patch config.h on macOS to fix stat64/fstat64 errors.
+            if common.is_mac_os():
+                config_h_path = os.path.join('src', 'config.h')
+                with open(config_h_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                if '#define _DARWIN_C_SOURCE' not in content:
+                    content = content.replace(
+                        '#ifdef __APPLE__',
+                        '#ifdef __APPLE__\n#define _DARWIN_C_SOURCE',
+                    )
+                    with open(config_h_path, 'w', encoding='utf-8') as f:
+                        f.write(content)
+
             subprocess.call(['make'])
 
         # Make the scripts executable.
@@ -429,6 +479,8 @@ def install_elasticsearch_dev_server() -> None:
 
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
+    install_missing_runtime_python_modules()
+
     print('Running install_third_party_libs script...')
 
     # This ensures dev dependencies are present and compiled before we

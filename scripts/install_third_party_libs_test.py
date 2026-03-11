@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import builtins
 import collections
+import importlib
 import os
 import shutil
 import subprocess
@@ -281,6 +282,51 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertEqual(check_file_removals, expected_check_file_removals)
 
 
+class InstallMissingRuntimePythonModulesTests(test_utils.GenericTestBase):
+    """Test the methods for installing missing runtime Python modules."""
+
+    def test_install_missing_runtime_python_modules_when_all_installed(
+        self,
+    ) -> None:
+        def mock_import_module(unused_module: str) -> None:
+            """Mock import_module."""
+            pass
+
+        import_module_swap = self.swap(
+            importlib, 'import_module', mock_import_module
+        )
+
+        with import_module_swap:
+            install_third_party_libs.install_missing_runtime_python_modules()
+
+    def test_install_missing_runtime_python_modules_when_some_missing(
+        self,
+    ) -> None:
+        check_function_calls = {
+            'check_call_is_called': False,
+        }
+
+        def mock_import_module(module: str) -> None:
+            """Mock import_module."""
+            if module == 'psutil':
+                raise ImportError('No module named psutil')
+
+        def mock_check_call(cmd_tokens: List[str], **unused_kwargs: str) -> int:
+            check_function_calls['check_call_is_called'] = True
+            self.assertIn('psutil', cmd_tokens)
+            return 0
+
+        import_module_swap = self.swap(
+            importlib, 'import_module', mock_import_module
+        )
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
+        with import_module_swap, check_call_swap:
+            install_third_party_libs.install_missing_runtime_python_modules()
+
+        self.assertTrue(check_function_calls['check_call_is_called'])
+
+
 class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
     """Test the methods for installing Redis and Elasticsearch."""
 
@@ -320,10 +366,77 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
             'download_and_untar_files',
             mock_download_and_untar_files,
         )
-        with swap_call, untar_files_swap:
+        cd_swap = self.swap(common, 'CD', MockCD)
+
+        with swap_call, untar_files_swap, cd_swap:
             install_third_party_libs.install_redis_cli()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_install_redis_cli_on_mac_os_patches_config_h(self) -> None:
+        check_function_calls = {
+            'subprocess_call_is_called': False,
+            'download_and_untar_files_is_called': False,
+            'open_is_called': False,
+            'write_is_called': False,
+        }
+
+        def mock_is_mac_os() -> bool:
+            return True
+
+        def mock_download_and_untar_files(
+            *unused_args: str, **unused_kwargs: str
+        ) -> None:
+            check_function_calls['download_and_untar_files_is_called'] = True
+
+        def mock_call(
+            unused_cmd_tokens: List[str], **unused_kwargs: str
+        ) -> Ret:
+            check_function_calls['subprocess_call_is_called'] = True
+            if unused_cmd_tokens == [common.REDIS_SERVER_PATH, '--version']:
+                raise OSError('redis-server: command not found')
+            return Ret()
+
+        class MockFile:
+            def __init__(
+                self, unused_path: str, mode: str, **unused_kwargs: str
+            ) -> None:
+                """Mock init."""
+                self.mode = mode
+
+            def read(self) -> str:
+                """Mock read."""
+                return '#ifdef __APPLE__'
+
+            def write(self, content: str) -> None:
+                """Mock write."""
+                check_function_calls['write_is_called'] = True
+                assert '#define _DARWIN_C_SOURCE' in content
+
+            def __enter__(self) -> 'MockFile':
+                """Mock enter."""
+                check_function_calls['open_is_called'] = True
+                return self
+
+            def __exit__(self, *unused_args: str) -> None:
+                """Mock exit."""
+                pass
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        untar_files_swap = self.swap(
+            install_third_party_libs,
+            'download_and_untar_files',
+            mock_download_and_untar_files,
+        )
+        mac_os_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
+        open_swap = self.swap(builtins, 'open', MockFile)
+        cd_swap = self.swap(common, 'CD', MockCD)
+
+        with swap_call, untar_files_swap, mac_os_swap, open_swap, cd_swap:
+            install_third_party_libs.install_redis_cli()
+
+        self.assertTrue(check_function_calls['open_is_called'])
+        self.assertTrue(check_function_calls['write_is_called'])
 
     def test_install_elasticsearch_dev_server_unix(self) -> None:
         check_function_calls = {
