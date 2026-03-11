@@ -47,20 +47,16 @@ describe('Logged-Out Learner', function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
 
-    // Load the collection data from the yaml file.
     await superAdmin.reloadCollections(COLLECTION_FILENAME);
 
-    // Navigate to community library and get the collection ID from the URL.
     await superAdmin.navigateToCommunityLibrary();
 
-    // Search for the collection in the library.
     await superAdmin.page.waitForSelector('.e2e-test-search-input');
     await superAdmin.typeInInputField(
       '.e2e-test-search-input',
       COLLECTION_NAME
     );
 
-    // Wait for search results to load.
     await superAdmin.waitForNetworkIdle();
     await superAdmin.page.waitForSelector(
       `h3.activity-title.e2e-test-collection-summary-tile-title`,
@@ -86,7 +82,6 @@ describe('Logged-Out Learner', function () {
       throw new Error('Could not find collection link in library results');
     }
 
-    // Extract collection ID from the collection tile link.
     const match = collectionLink.match(/\/collection\/([^/?#]+)/);
     if (match) {
       collectionId = match[1];
@@ -96,7 +91,6 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should navigate to collection and view explorations', async function () {
-    // Navigate to the collection.
     await loggedOutLearner.goto(
       `http://localhost:8181/collection/${collectionId}`
     );
@@ -105,7 +99,6 @@ describe('Logged-Out Learner', function () {
       timeout: 10000,
     });
 
-    // Verify that explorations are visible.
     const explorationTiles = await loggedOutLearner.page.$$(
       EXPLORATION_TILE_SELECTOR
     );
@@ -119,7 +112,6 @@ describe('Logged-Out Learner', function () {
       `http://localhost:8181/collection/${collectionId}`
     );
 
-    // Open the first exploration in the collection.
     await loggedOutLearner.page.waitForSelector(
       COLLECTION_EXPLORATION_LINK_SELECTOR,
       {
@@ -151,7 +143,6 @@ describe('Logged-Out Learner', function () {
       BACK_TO_COLLECTION_BUTTON_SELECTOR
     );
 
-    // Verify we're back at the collection page.
     await loggedOutLearner.page.waitForSelector(EXPLORATION_TILE_SELECTOR, {
       visible: true,
     });
@@ -162,15 +153,12 @@ describe('Logged-Out Learner', function () {
       `http://localhost:8181/collection/${collectionId}`
     );
 
-    // Change site language to Spanish.
     await loggedOutLearner.changeSiteLanguage('es');
 
-    // Navigate back to collection.
     await loggedOutLearner.goto(
       `http://localhost:8181/collection/${collectionId}`
     );
 
-    // Verify the share footer text is translated to Spanish.
     await loggedOutLearner.page.waitForSelector(
       SHARE_COLLECTION_FOOTER_SELECTOR,
       {visible: true, timeout: 10000}

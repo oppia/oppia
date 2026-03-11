@@ -118,8 +118,8 @@ const modifyTranslationModalSelector =
   '.e2e-test-modify-translations-modal-body';
 
 const stateNodeSelector = '.e2e-test-node-label';
-// Maximum length for node labels in the exploration graph.
-// This matches the MAX_NODE_LABEL_LENGTH constant from app.constants.ts.
+
+// To match MAX_NODE_LABEL_LENGTH constant from app.constants.ts
 const MAX_NODE_LABEL_LENGTH = 15;
 
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
@@ -3697,6 +3697,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOnElementWithSelector(openOutcomeDestButton);
     await this.waitForElementToBeClickable(destinationCardSelector);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.typeInInputField(addStateInput, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
@@ -3739,7 +3740,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates direct learners option when changing cards.
-   * @param cardName - Card name
+   * @param cardName - Card name where learners should be directed
    */
   async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
     await this.page.waitForSelector(openOutcomeDestButton, {
@@ -3770,10 +3771,14 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
     if (this.isViewportAtMobileWidth()) {
+      // Check if the state graph modal is already open before clicking the
+      // resize button.
       const stateGraphModalIsOpen = await this.page.$(
         explorationStateGraphModalSelector
       );
       if (!stateGraphModalIsOpen) {
+        // Wait for any blocking modal to close first before clicking the
+        // resize button.
         const blockingModal = await this.page.$('div.modal-content');
         if (blockingModal) {
           await this.page.waitForSelector('div.modal-content', {hidden: true});
@@ -3785,6 +3790,8 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
+    // Get all state node groups (not just labels) since we need to click the
+    // background rect which has the click handler.
     const stateNodeGroupSelector = '.e2e-test-node';
     await this.page.waitForSelector(stateNodeGroupSelector);
     elements = await this.page.$$(stateNodeGroupSelector);
@@ -3820,6 +3827,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
+    // Click on the node background rect which has the click handler.
     const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
     if (!nodeBackground) {
       throw new Error(
