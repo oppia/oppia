@@ -132,13 +132,13 @@ describe('Topic Manager', function () {
     const simpleExplorationId =
       await topicManager.createAndPublishAMinimalExplorationWithTitle(
         'Simple Exploration',
-        'Algebra'
+        'Mathematics'
       );
 
     await topicManager.navigateToCreatorDashboardPage();
     await topicManager.navigateToExplorationEditorFromCreatorDashboard();
     const programmingExplorationId =
-      await topicManager.createSimpleProgrammingExploration();
+      await topicManager.createSimpleProgrammingExploration('Mathematics');
 
     // Add simple chapter.
     await topicManager.openStoryEditor(
