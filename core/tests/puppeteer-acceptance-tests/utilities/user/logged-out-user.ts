@@ -648,7 +648,7 @@ const conceptCardLinkSelectorInQuestion = '.e2e-test-concept-card-link';
 const gotoLibraryButton = '.e2e-test-community-library-btn';
 const ratingStarsSelector = '.e2e-test-conversation-skin-final-ratings-display';
 const suggestedLessonTitleSelector = '.exploration-summary-btn p';
-const showSolutionButton = '.e2e-test-learner-got-it-button';
+const showSolutionButton = '.oppia-learner-got-it-button';
 const shareModal = 'oppia-share-lesson-modal';
 
 /**
@@ -7081,8 +7081,7 @@ export class LoggedOutUser extends BaseUser {
    * @param solution - Expected solution text.
    */
   async expectSolution(solution: string): Promise<void> {
-    const solutionValueSelector =
-      'oppia-displaynew-solution-modal .modal-body > span:first-of-type';
+    const solutionValueSelector = '.e2e-test-oppia-learner-solution-body';
 
     await this.page.waitForSelector(solutionValueSelector, {visible: true});
 
@@ -7103,7 +7102,8 @@ export class LoggedOutUser extends BaseUser {
    * @param explanation - Expected explanation of solution.
    */
   async expectSolutionExplanation(explanation: string): Promise<void> {
-    const explanationSelector = '.oppia-learner-hint-and-solution-modal-body';
+    const explanationSelector =
+      '.e2e-test-oppia-learner-solution-explanation-body';
 
     await this.page.waitForSelector(explanationSelector, {visible: true});
 

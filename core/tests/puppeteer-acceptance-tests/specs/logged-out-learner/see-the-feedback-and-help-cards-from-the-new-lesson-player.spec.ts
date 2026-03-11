@@ -377,15 +377,16 @@ describe('Logged-Out Learner', function () {
       'This hint 2 to help to answer the question'
     );
     await loggedOutLearner.closeHintModal();
-    // Wait for few minutes to see the solution.
-    await loggedOutLearner.page.waitForTimeout(300000);
+
     // Submit few wrong answer.
     await loggedOutLearner.submitFractionInputResponse('4');
     await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.submitFractionInputResponse('4');
     await loggedOutLearner.page.waitForTimeout(20000);
     await loggedOutLearner.submitFractionInputResponse('4');
-    await loggedOutLearner.page.waitForTimeout(20000);
+
+    // Wait for few minutes to see the solution.
+    await loggedOutLearner.page.waitForTimeout(180000);
 
     await loggedOutLearner.expectTextPresentOnPage('View Solution');
     await loggedOutLearner.expectConversationContentByButton(
