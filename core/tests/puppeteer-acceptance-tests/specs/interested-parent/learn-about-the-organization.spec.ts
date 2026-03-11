@@ -30,40 +30,43 @@ describe('Interested Parent', function () {
   });
 
   it('should be able to learn about the organization', async function () {
+    // Visit splash page.
     await parentUser.navigateToSplashPage();
     await parentUser.expectScreenshotToMatch('homePage', __dirname);
 
+    // Visit the About Page.
     await parentUser.navigateToAboutPage();
     await parentUser.expectAboutUsPageHeadingToBe(
       ' Empowering learners around the globe '
     );
-
+    // Oppia Foundation and its products.
     await parentUser.expectSubheadingInAboutUsPageToContain(
       ' The Oppia Foundation and its products '
     );
     await parentUser.expectSectionGoalsInAboutPageToContain(' Mission ');
     await parentUser.expectSectionGoalsInAboutPageToContain(' Vision ');
-
+    // More on the Oppia platform.
     await parentUser.expectSubheadingInAboutUsPageToContain(
       ' More on the Oppia platform '
     );
     await parentUser.expectExploreLessonsButtonInAboutPageToBePresent();
     await parentUser.expectAndroidAppButtonInAboutPageToBePresent();
 
+    // Expand features.
     await parentUser.expectFeaturesAccordionToBeFunctionalInAboutPage();
-
+    // Our partnerships.
     await parentUser.expectSubheadingInAboutUsPageToContain(
       ' Our partnerships and how we’re improving lives '
     );
     await parentUser.expectVolunteerCarouselToBeFunctionalInAboutPage();
     await parentUser.expectPartnershipStoryBoardsToBe(4);
-
+    // The Oppia Impact.
     await parentUser.expectSubheadingInAboutUsPageToContain(
       ' The Oppia Impact '
     );
     await parentUser.expectImpactStatsTitlesToBe(4);
     await parentUser.expectImpactChartsToBe(2);
-
+    // View Report Button should be visible.
     await parentUser.expectViewReportButtonInAboutPageToBeVisible();
 
     // Verify footer version matches expected pattern.
