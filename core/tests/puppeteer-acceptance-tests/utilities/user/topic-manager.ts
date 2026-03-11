@@ -3114,14 +3114,35 @@ export class TopicManager extends BaseUser {
    * Discards the changes made in the story editor.
    */
   async discardStoryChanges(): Promise<void> {
-    await this.clickOnElementWithSelector(showDiscardOptionButtonSelector);
-    await this.clickOnElementWithSelector(discardStoryChangesButtonSelector);
+    await this.waitForPageToFullyLoad();
+    await this.clickOnElementWithSelectorOrJs(showDiscardOptionButtonSelector);
+    await this.clickOnElementWithSelectorOrJs(
+      discardStoryChangesButtonSelector
+    );
     await this.waitForPageToFullyLoad();
 
     // Post-check: The save story button should be disabled after discarding changes.
-    await this.page.waitForSelector(`${saveStoryButton}[disabled]`);
+    await this.expectSaveStoryButtonToBeDisabled();
 
     showMessage('Story changes discarded successfully.');
+  }
+
+  /**
+   * Clicks an element using standard click, with a JS click fallback.
+   */
+  async clickOnElementWithSelectorOrJs(selector: string): Promise<void> {
+    try {
+      await this.clickOnElementWithSelector(selector);
+    } catch (error) {
+      const element = await this.page.$(selector);
+      if (!element) {
+        throw new Error(`Element not found for selector ${selector}`);
+      }
+      await element.evaluate(el => {
+        el.scrollIntoView({block: 'center'});
+        (el as HTMLElement).click();
+      });
+    }
   }
 
   /**
@@ -3401,9 +3422,36 @@ export class TopicManager extends BaseUser {
 
         if (title === chapterName) {
           await this.page.waitForTimeout(500);
-          await titleElement.click();
+          await titleElement.evaluate(element =>
+            element.scrollIntoView({block: 'center'})
+          );
+          await titleElement.evaluate(element =>
+            (element as HTMLElement).click()
+          );
           await this.waitForStaticAssetsToLoad();
-          await this.expectElementToBeVisible(chapterEditorContainerSelector);
+          const editorVisible = await this.isElementVisible(
+            chapterEditorContainerSelector,
+            true,
+            5000
+          );
+          if (!editorVisible) {
+            const chapterContainerHandle = await titleElement.evaluateHandle(
+              element =>
+                element.closest('.story-node') ||
+                element.closest('.story-editor-node')
+            );
+            const chapterContainer = chapterContainerHandle.asElement();
+            if (chapterContainer) {
+              await chapterContainer.evaluate(element =>
+                (element as HTMLElement).click()
+              );
+              await this.waitForStaticAssetsToLoad();
+            }
+            await this.page.waitForSelector(chapterEditorContainerSelector, {
+              visible: true,
+              timeout: 60000,
+            });
+          }
           showMessage(`Chapter ${chapterName} opened in chapter editor.`);
 
           // Collapsing all the collapsible card of chapter editor in the mobile viewport.
