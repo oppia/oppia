@@ -218,7 +218,7 @@ export class TranslateTextService {
 
   getPreviousTextToTranslate(): TranslatableItem {
     const text = this._getPreviousText();
-    const {status = this.PENDING, translation = ''} = {
+    const {status = this.PENDING as Status, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
     return this._getUpdatedTextToTranslate(
