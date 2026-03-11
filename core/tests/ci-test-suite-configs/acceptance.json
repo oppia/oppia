@@ -1,6 +1,14 @@
 {
   "suites": [
     {
+      "name": "logged-in-learner/serial-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/serial-chapter.spec.ts"
+    },
+    {
+      "name": "topic-manager/track-upcoming-delayed-publish-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/track-upcoming-delayed-publish-chapter.spec.ts"
+    },
+    {
       "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts"
     },
