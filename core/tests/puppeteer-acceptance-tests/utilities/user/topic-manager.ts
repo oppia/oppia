@@ -3097,16 +3097,42 @@ export class TopicManager extends BaseUser {
       if (!isMobileSaveButtonVisible) {
         await this.clickOnElementWithSelector(mobileOptionsSelector);
       }
-      await this.clickOnElementWithSelector(mobileSaveStoryChangesButton);
+      await this.waitForSaveStoryButtonToBeEnabled(
+        mobileSaveStoryChangesButton
+      );
+      await this.clickOnElementWithSelectorOrJs(mobileSaveStoryChangesButton);
     } else {
-      await this.clickOnElementWithSelector(saveStoryButton);
+      await this.waitForSaveStoryButtonToBeEnabled(saveStoryButton);
+      await this.clickOnElementWithSelectorOrJs(saveStoryButton);
+    }
+    const saveModalVisible = await this.isElementVisible(
+      saveChangesMessageInput,
+      true,
+      5000
+    );
+    if (!saveModalVisible) {
+      if (this.isViewportAtMobileWidth()) {
+        const isMobileSaveButtonVisible = await this.isElementVisible(
+          mobileSaveStoryChangesButton
+        );
+        if (!isMobileSaveButtonVisible) {
+          await this.clickOnElementWithSelector(mobileOptionsSelector);
+        }
+        await this.clickOnElementWithSelectorOrJs(mobileSaveStoryChangesButton);
+      } else {
+        await this.clickOnElementWithSelectorOrJs(saveStoryButton);
+      }
+      await this.page.waitForSelector(saveChangesMessageInput, {
+        visible: true,
+        timeout: 15000,
+      });
     }
     await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await this.clickOnElementWithSelector(closeSaveModalButton);
+    await this.clickOnElementWithSelectorOrJs(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
@@ -3115,6 +3141,17 @@ export class TopicManager extends BaseUser {
    */
   async discardStoryChanges(): Promise<void> {
     await this.waitForPageToFullyLoad();
+    const discardToggle = await this.page.$(showDiscardOptionButtonSelector);
+    if (!discardToggle) {
+      throw new Error('Discard option button not found.');
+    }
+    const discardToggleDisabled = await discardToggle.evaluate(
+      element => (element as HTMLButtonElement).disabled
+    );
+    if (discardToggleDisabled) {
+      showMessage('Discard option disabled; no changes to discard.');
+      return;
+    }
     await this.clickOnElementWithSelectorOrJs(showDiscardOptionButtonSelector);
     await this.clickOnElementWithSelectorOrJs(
       discardStoryChangesButtonSelector
@@ -3142,6 +3179,34 @@ export class TopicManager extends BaseUser {
         el.scrollIntoView({block: 'center'});
         (el as HTMLElement).click();
       });
+    }
+  }
+
+  /**
+   * Waits for the save story button to become enabled.
+   */
+  async waitForSaveStoryButtonToBeEnabled(selector: string): Promise<void> {
+    await this.page.waitForSelector(selector, {visible: true});
+    try {
+      await this.page.waitForFunction(
+        sel => {
+          const element = document.querySelector(
+            sel
+          ) as HTMLButtonElement | null;
+          return element !== null && element.disabled === false;
+        },
+        {timeout: 15000},
+        selector
+      );
+    } catch (error) {
+      const disabledState = await this.page
+        .$eval(selector, element => (element as HTMLButtonElement).disabled)
+        .catch(() => null);
+      throw new Error(
+        `Save story button did not become enabled. Selector: ${selector}. Disabled: ${String(
+          disabledState
+        )}`
+      );
     }
   }
 
@@ -3763,9 +3828,50 @@ export class TopicManager extends BaseUser {
     const warningIndicatorSelector = '.e2e-test-warning-indicator';
     const warningTextSelector = '.e2e-test-warnings-text';
 
-    await this.page.waitForSelector(warningIndicatorSelector);
-    await this.page.hover(warningIndicatorSelector);
-    await this.page.waitForSelector(warningTextSelector);
+    const warningIndicator = await this.page.waitForSelector(
+      warningIndicatorSelector,
+      {visible: true}
+    );
+    if (!warningIndicator) {
+      throw new Error('Warning indicator not found.');
+    }
+    const warningContainerHandle = await warningIndicator.evaluateHandle(el =>
+      el.closest('.oppia-editor-warnings-indicator')
+    );
+    const warningContainer = warningContainerHandle.asElement();
+    if (warningContainer) {
+      await warningContainer.evaluate(element => {
+        element.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+      });
+    } else {
+      await this.page.hover(warningIndicatorSelector);
+    }
+
+    let warningVisible = await this.isElementVisible(
+      warningTextSelector,
+      true,
+      2000
+    );
+    if (!warningVisible) {
+      await this.clickOnElementWithSelectorOrJs(warningIndicatorSelector);
+      warningVisible = await this.isElementVisible(
+        warningTextSelector,
+        true,
+        2000
+      );
+    }
+    if (!warningVisible) {
+      const warnings = await this.page.$$eval(warningTextSelector, elements =>
+        elements
+          .map(element => element.textContent?.trim() || '')
+          .filter(text => text.length > 0)
+      );
+      throw new Error(
+        `Warning text did not appear. Found warnings: ${
+          warnings.length ? warnings.join(' | ') : 'none'
+        }`
+      );
+    }
 
     const actualWarning = await this.page.$eval(warningTextSelector, el =>
       el.textContent?.trim()
