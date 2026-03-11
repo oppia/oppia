@@ -16,7 +16,9 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TODO(#24785): This has to set this after adding the CUJs in v3 docs.
+ * LI.2. Set goals on the Learner Dashboard
+ * LI.3. Track progress and get recommendations for next steps on the Learner Dashboard.
+ * L1.10  Start Lessons from the Home tab in redesigned Learner Dashboard.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
