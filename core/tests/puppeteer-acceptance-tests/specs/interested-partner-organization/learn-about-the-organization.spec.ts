@@ -30,67 +30,55 @@ describe('Interested Partner Organization', function () {
   });
 
   it('should be able to learn about the organization', async function () {
-    // Visit splash page and verify it loads.
     await partnerUser.navigateToSplashPage();
     await partnerUser.expectScreenshotToMatch('splashPage', __dirname);
 
-    // Click About > About Oppia and verify all sections.
     await partnerUser.clickAboutButtonInAboutMenuOnNavbar();
     await partnerUser.expectAboutUsPageHeadingToBe(
       ' Empowering learners around the globe '
     );
 
-    // Verify Oppia Foundation and its products section.
     await partnerUser.expectSubheadingInAboutUsPageToContain(
       ' The Oppia Foundation and its products '
     );
 
-    // Verify Mission and Vision.
     await partnerUser.expectSectionGoalsInAboutPageToContain(' Mission ');
     await partnerUser.expectSectionGoalsInAboutPageToContain(' Vision ');
 
-    // Verify More on the Oppia platform section with buttons.
     await partnerUser.expectSubheadingInAboutUsPageToContain(
       ' More on the Oppia platform '
     );
     await partnerUser.expectExploreLessonsButtonInAboutPageToBePresent();
     await partnerUser.expectAndroidAppButtonInAboutPageToBePresent();
 
-    // Verify features accordion is functional.
     await partnerUser.expectFeaturesAccordionToBeFunctionalInAboutPage();
 
-    // Verify partnerships and carousel.
     await partnerUser.expectSubheadingInAboutUsPageToContain(
       " Our partnerships and how we're improving lives "
     );
     await partnerUser.expectVolunteerCarouselToBeFunctionalInAboutPage();
     await partnerUser.expectPartnershipStoryBoardsToBe(4);
 
-    // Verify The Oppia Impact section with impact stats.
     await partnerUser.expectSubheadingInAboutUsPageToContain(
       ' The Oppia Impact '
     );
     await partnerUser.expectImpactStatsTitlesToBe(4);
     await partnerUser.expectImpactChartsToBe(2);
 
-    // Verify View Report Button.
     await partnerUser.expectViewReportButtonInAboutPageToBeVisible();
 
-    // Verify version footer matches regex pattern.
     await partnerUser.expectFooterVersionToMatchPattern(
       /Version: [^\s]+ \(\w+\)/
     );
   });
 
   it('should be able to view For Parents/Teachers page', async function () {
-    // Click About > For Parents/Teachers and verify content loads.
     await partnerUser.clickTeachButtonInAboutMenuOnNavbar();
     await partnerUser.expectScreenshotToMatch(
       'parentsOrTeachersPage',
       __dirname
     );
 
-    // Verify content is present.
     await partnerUser.subheadingInParentsAndTeachersPageToContain(
       ' Looking for tips on how to use Oppia lessons? '
     );
