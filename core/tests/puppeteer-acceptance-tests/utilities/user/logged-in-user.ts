@@ -1677,26 +1677,16 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(saveChangesButtonSelector, {
       visible: true,
     });
-    const navigationPromise = this.page
-      .waitForNavigation({
-        waitUntil: ['networkidle2', 'load'],
-        timeout: 5000,
-      })
-      .catch(() => null);
-
     await this.clickOnElementWithSelector(saveChangesButtonSelector);
 
-    await Promise.race([
-      navigationPromise,
-      this.page.waitForFunction(
-        (selector: string) => {
-          const button = document.querySelector(selector);
-          return Boolean(button) && (button as HTMLButtonElement).disabled;
-        },
-        {},
-        saveChangesButtonSelector
-      ),
-    ]);
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const button = document.querySelector(selector);
+        return Boolean(button) && (button as HTMLButtonElement).disabled;
+      },
+      {},
+      saveChangesButtonSelector
+    );
 
     const isDisabled = await this.page.$eval(
       saveChangesButtonSelector,
