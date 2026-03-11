@@ -21,6 +21,7 @@ from __future__ import annotations
 import collections
 import datetime
 import json
+import logging
 import os
 
 from core import feconf
@@ -1019,6 +1020,15 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
             cloud task run, which is responsible for regenerating voiceovers
             for all the contents of the exploration in batches.
     """
+    logging.info(
+        'Voiceover regeneration logs: Starting to divide and enqueue voiceover '
+        'regeneration tasks in smaller batches for exploration_id: %s, '
+        'parent_cloud_task_run_id: %s'
+        % (
+            exploration_id,
+            parent_cloud_task_run_id,
+        )
+    )
     # Based on testing data, regenerating a voiceover for each state content
     # takes approximately 6 seconds. Therefore, to avoid hitting the timeout
     # limit, we can process about 8 contents per batch. This would take roughly
@@ -1027,7 +1037,7 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
     batch_size = 8
 
     voiceover_regeneration_task_batch_instances = []
-
+    batch_counter = 0
     for (
         language_code,
         content_ids_to_content_values,
@@ -1045,9 +1055,22 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
                 batch_content_ids_to_content_values = dict(
                     batch_content_id_value_pairs
                 )
+                batch_counter += 1
 
                 child_cloud_task_model_id = (
                     taskqueue_services.get_new_cloud_task_run_id()
+                )
+
+                logging.info(
+                    'Voiceover regeneration logs: Enqueuing batch %d for '
+                    'exploration_id: %s, parent_cloud_task_run_id: %s, '
+                    'child_cloud_task_run_id: %s'
+                    % (
+                        batch_counter,
+                        exploration_id,
+                        parent_cloud_task_run_id,
+                        child_cloud_task_model_id,
+                    )
                 )
 
                 # Enqueue to Google cloud task queue.
@@ -1104,6 +1127,12 @@ def regenerate_voiceovers_for_batch_contents(
         Exception. Raised when there is an error during the voiceover
             regeneration process for the batch of contents.
     """
+    logging.info(
+        'Voiceover regeneration logs: Starting to regenerate voiceovers for '
+        'batch contents for exploration_id: %s, parent_cloud_task_run_id: %s, '
+        'child_cloud_task_run_id: %s'
+        % (exploration_id, parent_cloud_task_run_id, child_cloud_task_run_id)
+    )
     voiceover_regeneration_job_status = (
         voiceover_cloud_task_services.get_voiceover_regeneration_job(
             exploration_id, parent_cloud_task_run_id
@@ -1190,6 +1219,15 @@ def regenerate_voiceovers_for_batch_contents(
     )
 
     if voiceover_regeneration_job_status.are_all_voiceovers_attempted():
+        logging.info(
+            'Voiceover regeneration logs: All voiceover regeneration attempts '
+            'are completed for exploration_id: %s, parent_cloud_task_run_id: %s. '
+            'Wrapping up the voiceover regeneration task.'
+            % (
+                exploration_id,
+                parent_cloud_task_run_id,
+            )
+        )
         wrap_up_voiceover_regeneration_task(
             parent_cloud_task_run_id, voiceover_regeneration_job_status
         )
@@ -1303,7 +1341,11 @@ def wrap_up_voiceover_regeneration_task(
         language_accents_used_for_voiceover_regeneration.append(
             language_accent_description
         )
-
+    logging.info(
+        'Voiceover regeneration logs: Finished regenerating voiceovers for '
+        'all batches for exploration_id: %s, now sending summary email to '
+        'voiceover admins and tech leads.' % exploration_id
+    )
     send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
         exploration_id,
         exploration_title,
@@ -1340,6 +1382,12 @@ def regenerate_voiceovers_on_exploration_update(
         Exception. If the voiceover regeneration fails for any of the content
             IDs or language-accent codes.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers for '
+        'exploration with ID: %s and version: %s on exploration update.'
+        % (exploration_id, exploration_version)
+    )
+
     # Fetches the exploration change diff for the given exploration ID and
     # exploration version from the ExplorationCommitLogEntryModel.
     exploration_commit_log_entry_model_id = 'exploration-%s-%s' % (
@@ -1411,6 +1459,10 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
         task_run_id: str. The unique identifier for the voiceover
             regeneration task.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers for '
+        'exploration with ID: %s when it is added to topic.' % exploration_id
+    )
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
@@ -1470,6 +1522,14 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     Raises:
         Exception. If the provided language accent code is invalid.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers for '
+        'exploration with ID: %s and language accent code: %s.'
+        % (
+            exploration_id,
+            language_accent_code,
+        )
+    )
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
@@ -1529,6 +1589,10 @@ def regenerate_voiceovers_after_accepting_suggestion(
         suggestion_id: str. The ID of the suggestion.
         task_run_id: str. The ID of the task run.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers after '
+        'accepting suggestion with ID: %s.' % suggestion_id,
+    )
     suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
     translated_html_content = suggestion.change_cmd.translation_html
     content_id = suggestion.change_cmd.content_id
