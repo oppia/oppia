@@ -19,11 +19,10 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const baseURL = testConstants.URLs.BaseURL;
 const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
-
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
@@ -135,33 +134,10 @@ export class VoiceoverAdmin extends BaseUser {
   /**
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
-   *
-   * TODO(#22539): This function has a duplicates in other files.
-   * To avoid unexpected behavior, ensure that any modifications here are also
-   * made in topic-manager.ts.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        // If we know the modal should appear, we can wait longer.
-        timeout: failIfMissing ? 20000 : 5000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      if (!failIfMissing) {
-        showMessage(
-          'Welcome Modal not found, but test can be continued.\n' +
-            `Error: ${error.message}`
-        );
-      } else {
-        throw new Error(
-          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
-        );
-      }
-    }
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**

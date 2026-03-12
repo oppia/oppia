@@ -27,6 +27,7 @@ import path from 'path';
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -34,7 +35,6 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -2769,33 +2769,10 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
-   *
-   * TODO(#22539): This function has a duplicates in other files.
-   * To avoid unexpected behavior, ensure that any modifications here are also
-   * made in topic-manager.ts.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        // If we know the modal should appear, we can wait longer.
-        timeout: failIfMissing ? 20000 : 5000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      if (!failIfMissing) {
-        showMessage(
-          'Welcome Modal not found, but test can be continued.\n' +
-            `Error: ${error.message}`
-        );
-      } else {
-        throw new Error(
-          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
-        );
-      }
-    }
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
