@@ -13,6 +13,11 @@ on:
     branches:
       - develop
       - release-*
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{
@@ -23,7 +28,11 @@ jobs:
   e2e_and_acceptance_coverage:
     name: Verify all e2e/acceptance tests are included
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -40,7 +49,11 @@ jobs:
   check_test_suites_to_run:
     name: Compute which tests to run
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     outputs:
       TEST_SUITES_TO_RUN: ${{ steps.compute_test_suites.outputs.TEST_SUITES_TO_RUN }}
     steps:
