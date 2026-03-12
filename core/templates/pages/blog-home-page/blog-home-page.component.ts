@@ -91,35 +91,43 @@ export class BlogHomePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    let urlParams = this.urlService.getUrlParams();
-    this.page = urlParams.page ? Number(urlParams.page) : 1;
-
-    this.calculateFirstPostOnPageNum(
-      this.page,
-      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-    );
-    this.calculateLastPostOnPageNum(
-      this.page,
-      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-    );
 
     this.oppiaAvatarImgUrl =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
+
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE =
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
+
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH =
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
 
-    if (this.urlService.getUrlParams().hasOwnProperty('q')) {
-      this.searchPageIsActive = true;
-      this.filterWasUsed = true;
+    this.route.queryParams.subscribe(params => {
+      this.page = params['page'] ? Number(params['page']) : 1;
 
-      this.updateSearchFieldsBasedOnUrlQuery(true);
-    } else {
-      this.loadInitialBlogHomePageData();
-    }
+      this.calculateFirstPostOnPageNum(
+        this.page,
+        BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+      );
+
+      this.calculateLastPostOnPageNum(
+        this.page,
+        BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+      );
+
+      if (params['q'] || params['tags']) {
+        this.searchPageIsActive = true;
+        this.filterWasUsed = true;
+
+        this.searchQuery = params['q'] || '';
+        this.selectedTags = params['tags'] ? params['tags'].split(',') : [];
+
+        this.loadPage();
+      } else {
+        this.loadInitialBlogHomePageData();
+      }
+    });
 
     this.searchQueryChanged
       .pipe(debounceTime(1000), distinctUntilChanged())
@@ -134,6 +142,7 @@ export class BlogHomePageComponent implements OnInit {
       this.blogPostSearchService.onInitialSearchResultsLoaded.subscribe(
         (response: SearchResponseData) => {
           this.blogPostSummaries = [];
+
           if (response.blogPostSummariesList.length > 0) {
             this.noResultsFound = false;
             this.totalBlogPosts = response.totalMatchingBlogPosts;
@@ -141,6 +150,7 @@ export class BlogHomePageComponent implements OnInit {
           } else {
             this.noResultsFound = true;
           }
+
           this.listOfDefaultTags = response.listOfDefaultTags;
           this.loaderService.hideLoadingScreen();
         }
@@ -246,24 +256,41 @@ export class BlogHomePageComponent implements OnInit {
         params.set('q', this.searchQuery);
       }
       if (this.selectedTags.length > 0) {
-        params.set('tags', this.selectedTags.join(','));
+        params.set(
+          'tags',
+          '(' + this.selectedTags.map(tag => `"${tag}"`).join(',') + ')'
+        );
       }
       params.set('offset', offset.toString());
 
       this.blogHomePageBackendApiService
         .fetchBlogPostSearchResultAsync('?' + params.toString())
         .then(data => {
+          if (data.blogPostSummariesList.length === 0) {
+            this.disableNextPageButton = true;
+            this.showBlogPostCardsLoadingScreen = false;
+            this.noResultsFound = true;
+            return;
+          }
+
           this.blogPostSummaries = data.blogPostSummariesList;
           this.blogPostSummariesToShow = this.blogPostSummaries;
           this.totalBlogPosts = data.totalMatchingBlogPosts;
+          this.listOfDefaultTags = data.listOfDefaultTags;
 
           this.calculateLastPostOnPageNum(this.page, pageSize);
           this.showBlogPostCardsLoadingScreen = false;
+          this.noResultsFound = false;
         })
         .catch(error => {
-          this.alertsService.addWarning(
-            'No more search resutls found. End of search results.'
-          );
+          if (this.blogPostSummaries.length === 0) {
+            this.alertsService.addWarning(
+              'Unable to fetch search results. Please try again.'
+            );
+          }
+
+          this.showBlogPostCardsLoadingScreen = false;
+          this.loaderService.hideLoadingScreen();
         });
     }
   }
@@ -351,17 +378,17 @@ export class BlogHomePageComponent implements OnInit {
       this.searchQuery,
       this.selectedTags,
       () => {
-        let searchUrlQueryString =
-          this.blogPostSearchService.getSearchUrlQueryString(
-            this.searchQuery,
-            this.selectedTags
-          );
-
         const pageToUse = isQueryChanged ? '1' : currentPage;
+
+        if (isQueryChanged) {
+          this.page = 1;
+          this.firstPostOnPageNum = 1;
+        }
 
         this.router.navigate(['/blog/search/find'], {
           queryParams: {
-            q: searchUrlQueryString,
+            q: this.searchQuery,
+            tags: this.selectedTags.join(','),
             page: pageToUse,
           },
         });
