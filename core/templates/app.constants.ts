@@ -423,6 +423,14 @@ export const AppConstants = {
   },
   ONE_WEEK_IN_MILLIS: 7 * 24 * 60 * 60 * 1000,
   ONE_MONTH_IN_MILLIS: 30 * 24 * 60 * 60 * 1000,
+
+  CAMPAIGN_CONFIG: {
+    name: 'financial-literacy',
+    bannerImageRelativePath: '/donate/financial-literacy-campaign.png',
+    startDate: new Date('2026-03-01'),
+    endDate: new Date('2026-04-30'),
+    bannerReRenderIntervalMs: 30 * 1000,
+  },
 } as const;
 
 export enum NavbarAndFooterGATrackingPages {

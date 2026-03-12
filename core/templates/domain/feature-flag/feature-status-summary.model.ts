@@ -46,6 +46,7 @@ export enum FeatureNames {
   ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
   EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
   EnableReadyForReviewTest = 'enable_ready_for_review_test',
+  EnableCampaignBanner = 'enable_campaign_banner',
 }
 
 export interface FeatureStatusSummaryBackendDict {

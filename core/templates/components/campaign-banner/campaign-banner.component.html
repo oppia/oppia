@@ -1,0 +1,187 @@
+<div class="oppia-campaign-overlay" *ngIf="shouldShowBanner">
+
+  <div class="oppia-campaign-modal">
+
+    <button class="oppia-campaign-close" aria-label="Close" (click)="closeBanner()">
+      ×
+    </button>
+
+    <div class="oppia-campaign-content">
+
+      <div class="oppia-campaign-left">
+        <div class="oppia-campaign-left-containt">
+          <h2 class="oppia-campaign-title">
+            Most children graduate school without ever learning
+            <span class="highlight">how money works.</span>
+          </h2>
+
+          <div class="oppia-campaign-description">
+            <p class="font-roboto">
+              This {{ campaignEndMonth }} , Oppia is launching free, interactive financial literacy
+              lessons for learners who need them most. Your donation helps us
+              reach more of them.
+            </p>
+
+            <div class="oppia-campaign-impact">
+              <i class="fas fa-arrow-trend-up oppia-impact-icon"></i>
+              <div class="my-2 ms-5">
+                <strong class="fs-4">50%+</strong>
+                <div class="fs-6">Improvement in Learning Outcome</div>
+              </div>
+            </div>
+
+            <p class="oppia-campaign-subtext">
+              Your donation helps us reach more learners and empower the next
+              generation with essential financial skills.
+            </p>
+          </div>
+        <div class="align-items-center d-flex flex-column">
+          <a class="oppia-donate-btn fs-3" href="/donate" (click)="closeBanner()">
+            Donate Now <i class="fas fa-arrow-right oppia-arrow"></i>
+          </a>
+
+          <div class="oppia-campaign-end">
+            Campaign ends {{ campaignEndMonth }} {{ campaignEndDay }}
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="oppia-campaign-right">
+        <img [src]="getStaticImageUrl(campaignBannerImagePath)" alt="Campaign image"
+          class="oppia-campaign-image" />
+      </div>
+    </div>
+  </div>
+
+  <!-- <style>
+    .oppia-campaign-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'capriola';
+      z-index: 5000;
+    }
+
+    .oppia-campaign-modal {
+      border-radius: 10px;
+      max-height: 450px;
+      background: white;
+      position: relative;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .oppia-campaign-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 22px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .oppia-campaign-content {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .oppia-campaign-left {
+      width: 650px;
+      padding: 30px;
+      flex: 1;
+    }
+
+    .oppia-campaign-left-containt {
+      width: 565px;
+      height: 414px;
+      top: 18px;
+      left: 43px;
+    }
+
+    .oppia-campaign-right {
+      width: 350px;
+      overflow: hidden;
+    }
+
+    .oppia-campaign-image {
+      width: 100%;
+      max-height: 450px;
+      object-fit: cover;
+
+      border-top-left-radius: 100px;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      border-bottom-left-radius: 0;
+    }
+
+    .oppia-campaign-title {
+      font-size: 28px;
+      font-style: 'normal';
+      margin: 0px;
+    }
+
+    .highlight {
+      color: #009688;
+    }
+
+    .oppia-campaign-description {
+      font-size: 16px;
+      padding: 25px 32px;
+    }
+
+    .oppia-campaign-description>p {
+      font-family: 'Roboto';
+    }
+
+    .oppia-campaign-impact {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #12978c0D;
+      width: 323px;
+      height: 50px;
+      border-radius: 10px;
+      box-shadow: -8px -3px 10px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      margin: 15px auto;
+    }
+
+    .oppia-impact-icon {
+      font-size: 28px;
+      color: #AD8E1DCC;
+      transform: rotate(-12deg);
+
+    }
+
+    .oppia-campaign-subtext {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .oppia-donate-btn {
+      background: #00645C;
+      color: white;
+      width:262px;
+      height: 48px;
+      padding: 10px 18px;
+      text-align: center;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+
+    .oppia-donate-btn:hover {
+      background: #00544D;;
+    }
+
+    .oppia-campaign-end {
+      font-size: 12px;
+      margin-top: 8px;
+      color: #F4A33B;
+    }
+  </style> -->

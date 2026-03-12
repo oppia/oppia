@@ -83,6 +83,7 @@ class FeatureNames(enum.Enum):
         'enable_background_voiceover_synthesis'
     )
     ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
+    ENABLE_CAMPAIGN_BANNER = 'enable_campaign_banner'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -110,6 +111,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
+    FeatureNames.ENABLE_CAMPAIGN_BANNER,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -309,6 +311,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
         (
             'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.ENABLE_CAMPAIGN_BANNER.value: (
+        (
+            'This flag enables the campaign banner for the fundraising campaign.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
