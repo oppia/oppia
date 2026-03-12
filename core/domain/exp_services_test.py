@@ -10106,6 +10106,33 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
+    def test_discard_draft_clears_the_draft_successfully(self) -> None:
+        """Test that discard_draft properly clears the draft fields."""
+        exp_user_data_before = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1)
+        )
+        self.assertIsNotNone(exp_user_data_before.draft_change_list)
+
+        exp_services.discard_draft(self.EXP_ID1, self.USER_ID)
+
+        exp_user_data_after = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1)
+        )
+        self.assertIsNone(exp_user_data_after.draft_change_list)
+        self.assertIsNone(exp_user_data_after.draft_change_list_last_updated)
+        self.assertIsNone(exp_user_data_after.draft_change_list_exp_version)
+
+    def test_discard_draft_with_non_existent_model_does_not_fail(self) -> None:
+        """Test that discard_draft gracefully handles non-existent models."""
+        exp_services.discard_draft('invalid_exp_id', 'invalid_user_id')
+
+    def test_get_exp_user_data_model_with_draft_discarded_returns_none(self) -> None:
+        """Test that the function returns None when the user data model is missing."""
+        user_data_model = exp_services.get_exp_user_data_model_with_draft_discarded(
+            'invalid_exp_id', 'invalid_user_id'
+        )
+        self.assertIsNone(user_data_model)
+
     def test_create_or_update_draft_with_exploration_model_not_created(
         self,
     ) -> None:
