@@ -53,6 +53,7 @@ describe('LessonCardComponent', () => {
     category: 'Algebra',
     title: 'Test Title',
     node_count: 0,
+    completed_node_count: 0,
   };
 
   const sampleExploration = {
@@ -709,5 +710,49 @@ describe('LessonCardComponent', () => {
 
     expect(component.title).toBe('Chapter 2: Title 2');
     expect(component.progress).toBe(50);
+  }));
+
+  it('should set collection progress to 100 when community lesson is complete', fakeAsync(() => {
+    component.isCommunityLessonComplete = true;
+    component.story = CollectionSummary.createFromBackendDict({
+      ...sampleCollection,
+      node_count: 5,
+      completed_node_count: 2,
+    });
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(100);
+    expect(component.lessonTopic).toEqual('Collections');
+  }));
+
+  it('should calculate collection progress based on completed node count', fakeAsync(() => {
+    component.story = CollectionSummary.createFromBackendDict({
+      ...sampleCollection,
+      node_count: 5,
+      completed_node_count: 2,
+    });
+
+    fixture.detectChanges();
+    tick();
+
+    // Progress = floor(2 / 5 * 100) = 40.
+    expect(component.progress).toEqual(40);
+    expect(component.lessonTopic).toEqual('Collections');
+  }));
+
+  it('should set collection progress to 0 when node count is 0', fakeAsync(() => {
+    component.story = CollectionSummary.createFromBackendDict({
+      ...sampleCollection,
+      node_count: 0,
+      completed_node_count: 0,
+    });
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(0);
+    expect(component.lessonTopic).toEqual('Collections');
   }));
 });
