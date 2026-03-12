@@ -235,7 +235,7 @@ describe('Topic Manager', function () {
 
     // Add a prerequisite skill that is already a prerequisite skill and expect warning.
     await topicManager.addPrerequisiteSkill('Addition');
-    await topicManager.expectWarningInIndicator(
+    await topicManager.expectToastMessageToBe(
       'The given skill id is already a prerequisite skill.'
     );
     await topicManager.discardStoryChanges();

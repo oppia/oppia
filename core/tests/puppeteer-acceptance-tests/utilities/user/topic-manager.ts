@@ -3168,14 +3168,44 @@ export class TopicManager extends BaseUser {
    * Clicks an element using standard click, with a JS click fallback.
    */
   async clickOnElementWithSelectorOrJs(selector: string): Promise<void> {
-    try {
-      await this.clickOnElementWithSelector(selector);
-    } catch (error) {
-      const element = await this.page.$(selector);
-      if (!element) {
-        throw new Error(`Element not found for selector ${selector}`);
+    const elements = await this.page.$$(selector);
+    if (!elements.length) {
+      throw new Error(`Element not found for selector ${selector}`);
+    }
+
+    let targetElement: ElementHandle<Element> | null = null;
+    for (const element of elements) {
+      const box = await element.boundingBox();
+      if (!box) {
+        continue;
       }
-      await element.evaluate(el => {
+      const isDisabled = await element.evaluate(el =>
+        Boolean((el as HTMLButtonElement).disabled)
+      );
+      if (isDisabled) {
+        continue;
+      }
+      targetElement = element;
+      break;
+    }
+
+    if (!targetElement) {
+      // Fall back to first visible element (if any), otherwise first match.
+      for (const element of elements) {
+        const box = await element.boundingBox();
+        if (box) {
+          targetElement = element;
+          break;
+        }
+      }
+    }
+
+    targetElement = targetElement ?? elements[0];
+
+    try {
+      await this.clickOnElement(targetElement);
+    } catch (error) {
+      await targetElement.evaluate(el => {
         el.scrollIntoView({block: 'center'});
         (el as HTMLElement).click();
       });
@@ -3186,25 +3216,44 @@ export class TopicManager extends BaseUser {
    * Waits for the save story button to become enabled.
    */
   async waitForSaveStoryButtonToBeEnabled(selector: string): Promise<void> {
-    await this.page.waitForSelector(selector, {visible: true});
+    await this.page.waitForSelector(selector, {timeout: 15000});
     try {
       await this.page.waitForFunction(
         sel => {
-          const element = document.querySelector(
-            sel
-          ) as HTMLButtonElement | null;
-          return element !== null && element.disabled === false;
+          const elements = Array.from(
+            document.querySelectorAll(sel)
+          ) as HTMLButtonElement[];
+          return elements.some(element => {
+            const style = window.getComputedStyle(element);
+            const isVisible =
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
+              element.getClientRects().length > 0;
+            return isVisible && element.disabled === false;
+          });
         },
         {timeout: 15000},
         selector
       );
     } catch (error) {
-      const disabledState = await this.page
-        .$eval(selector, element => (element as HTMLButtonElement).disabled)
+      const debugState = await this.page
+        .evaluate(sel => {
+          return Array.from(document.querySelectorAll(sel)).map(element => {
+            const el = element as HTMLButtonElement;
+            const style = window.getComputedStyle(el);
+            return {
+              text: el.textContent?.trim() || '',
+              disabled: el.disabled ?? null,
+              display: style.display,
+              visibility: style.visibility,
+              rects: el.getClientRects().length,
+            };
+          });
+        }, selector)
         .catch(() => null);
       throw new Error(
-        `Save story button did not become enabled. Selector: ${selector}. Disabled: ${String(
-          disabledState
+        `Save story button did not become enabled. Selector: ${selector}. Details: ${JSON.stringify(
+          debugState
         )}`
       );
     }
