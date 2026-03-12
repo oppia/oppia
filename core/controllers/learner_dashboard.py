@@ -19,6 +19,7 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
+    collection_services,
     learner_progress_services,
     story_fetchers,
     subscription_services,
@@ -223,6 +224,25 @@ class LearnerDashboardCollectionsProgressHandler(
                 learner_progress.collection_playlist_summaries
             )
         )
+
+        # Completed collections have all nodes done.
+        for summary_dict in completed_collection_summary_dicts:
+            summary_dict['completed_node_count'] = summary_dict['node_count']
+
+        # Fetch completed node counts for incomplete collections.
+        incomplete_collection_ids = [
+            d['id'] for d in incomplete_collection_summary_dicts
+        ]
+        completed_exps_per_collection = (
+            collection_services.get_explorations_completed_in_collections(
+                self.user_id, incomplete_collection_ids
+            )
+        )
+        for summary_dict, completed_exps in zip(
+            incomplete_collection_summary_dicts,
+            completed_exps_per_collection,
+        ):
+            summary_dict['completed_node_count'] = len(completed_exps)
 
         self.values.update(
             {

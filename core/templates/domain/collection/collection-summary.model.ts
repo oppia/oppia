@@ -29,6 +29,7 @@ export interface CollectionSummaryBackendDict {
   thumbnail_icon_url: string;
   title: string;
   node_count: number;
+  completed_node_count?: number;
 }
 
 export class CollectionSummary {
@@ -44,7 +45,8 @@ export class CollectionSummary {
     public thumbnailBgColor: string,
     public thumbnailIconUrl: string,
     public title: string,
-    public nodeCount: number
+    public nodeCount: number,
+    public completedNodeCount: number
   ) {}
 
   static createFromBackendDict(
@@ -62,7 +64,8 @@ export class CollectionSummary {
       collectionSummaryDict.thumbnail_bg_color,
       collectionSummaryDict.thumbnail_icon_url,
       collectionSummaryDict.title,
-      collectionSummaryDict.node_count
+      collectionSummaryDict.node_count,
+      collectionSummaryDict.completed_node_count ?? 0
     );
   }
 }
