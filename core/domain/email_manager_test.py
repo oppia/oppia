@@ -7910,6 +7910,14 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         d_text = email_manager.get_moderator_unpublish_exploration_email()
         self.assertEqual(d_text, expected_draft_text_body)
 
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
+                '',
+            ),
+        ]
+    )
     def test_blank_draft_received_exploration_unpublish_exception_raised(
         self,
     ) -> None:
@@ -7975,6 +7983,10 @@ class CDUserEmailTest(test_utils.EmailTestBase):
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
         self,
     ) -> None:
+        # Opt the user out of email updates so that no email is sent.
+        user_services.update_email_preferences(
+            self.translation_reviewer_id, False, False, False, False
+        )
         email_manager.send_email_to_new_cd_user(
             self.translation_reviewer_id,
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
@@ -8220,10 +8232,12 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             language_code='hi',
         )
 
+        # Translation reviewer has opted in (can_receive_email_updates=True),
+        # so the removal email is sent.
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL
         )
-        self.assertEqual(len(messages), 0)
+        self.assertEqual(len(messages), 1)
 
     def test_remove_translation_reviewer_email_for_invalid_category(
         self,
