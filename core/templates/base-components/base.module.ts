@@ -56,7 +56,6 @@ import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {PrimaryButtonComponent} from 'components/button-directives/primary-button.component';
 import {RouterModule} from '@angular/router';
-import {CampaignBannerComponent} from 'components/campaign-banner/campaign-banner.component';
 
 @NgModule({
   imports: [
@@ -93,7 +92,6 @@ import {CampaignBannerComponent} from 'components/campaign-banner/campaign-banne
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
     LanguageBannerComponent,
-    CampaignBannerComponent,
   ],
 
   entryComponents: [

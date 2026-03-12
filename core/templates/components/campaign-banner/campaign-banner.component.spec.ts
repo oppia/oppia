@@ -69,6 +69,13 @@ describe('CampaignBannerComponent', () => {
     component.campaignConfig.endDate = new Date(Date.now() + 100000);
     component.campaignConfig.bannerReRenderIntervalMs = 100000;
 
+    spyOn(localStorage, 'getItem').and.callFake((key: string) => {
+      if (key === 'lang') {
+        return 'en';
+      }
+      return null;
+    });
+
     fixture.detectChanges();
   });
 
@@ -76,62 +83,128 @@ describe('CampaignBannerComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should check if language is English correctly', () => {
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      return key === 'lang' ? 'en' : null;
+    });
+    expect(component.isLanguageEnglish()).toBeTrue();
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      return key === 'lang' ? 'hi' : null;
+    });
+    expect(component.isLanguageEnglish()).toBeFalse();
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      return null;
+    });
+    expect(component.isLanguageEnglish()).toBeFalse();
+  });
+
   it('should return static image url correctly', () => {
     const url = component.getStaticImageUrl('test.png');
-
     expect(url).toBe('/assets/test.png');
   });
 
   it('should set campaign end text correctly', () => {
     component.setCampaignEndText();
-
     expect(component.campaignEndMonth).toBeDefined();
     expect(component.campaignEndDay).toBeDefined();
   });
 
-  it('should show banner when campaign active and feature enabled', () => {
-    spyOn(localStorage, 'getItem').and.returnValue(null);
-
+  it('should show banner when campaign active, feature enabled and lang is English', () => {
     platformFeatureService.status.EnableCampaignBanner.isEnabled = true;
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      if (key === 'lang') {
+        return 'en';
+      }
+      return null;
+    });
 
     component.computeBannerVisibility();
-
     expect(component.shouldShowBanner).toBeTrue();
   });
 
-  it('should hide banner if recently closed', () => {
+  it('should hide banner if language is not English', () => {
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      if (key === 'lang') {
+        return 'pt';
+      }
+      return null;
+    });
+
+    component.computeBannerVisibility();
+    expect(component.shouldShowBanner).toBeFalse();
+  });
+
+  it('should hide banner if recently closed even if lang is English', () => {
     const now = Date.now();
-    spyOn(localStorage, 'getItem').and.returnValue(now.toString());
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      if (key === 'lang') {
+        return 'en';
+      }
+      if (key === 'campaignBannerClosedAt') {
+        return now.toString();
+      }
+      return null;
+    });
 
     component.bannerReRenderInterval = 100000;
-
     component.computeBannerVisibility();
 
     expect(component.shouldShowBanner).toBeFalse();
   });
 
-  it('should show banner if closed long ago', () => {
+  it('should show banner if closed long ago and lang is English', () => {
     const oldTime = Date.now() - 99999999;
-    spyOn(localStorage, 'getItem').and.returnValue(oldTime.toString());
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      if (key === 'lang') {
+        return 'en';
+      }
+      if (key === 'campaignBannerClosedAt') {
+        return oldTime.toString();
+      }
+      return null;
+    });
 
     component.bannerReRenderInterval = 1000;
-
     component.computeBannerVisibility();
 
     expect(component.shouldShowBanner).toBeTrue();
   });
 
+  it('should hide banner if feature flag is disabled', () => {
+    platformFeatureService.status.EnableCampaignBanner.isEnabled = false;
+
+    component.computeBannerVisibility();
+    expect(component.shouldShowBanner).toBeFalse();
+  });
+
+  it('should hide banner if campaign is not active (past end date)', () => {
+    component.campaignConfig.startDate = new Date(Date.now() - 200000);
+    component.campaignConfig.endDate = new Date(Date.now() - 100000);
+
+    component.computeBannerVisibility();
+    expect(component.shouldShowBanner).toBeFalse();
+  });
+
   it('should close banner and store timestamp', () => {
     const setItemSpy = spyOn(localStorage, 'setItem');
+    const computeVisibilitySpy = spyOn(component, 'computeBannerVisibility');
 
     component.closeBanner();
 
-    expect(setItemSpy).toHaveBeenCalled();
+    expect(setItemSpy).toHaveBeenCalledWith(
+      'campaignBannerClosedAt',
+      jasmine.any(String)
+    );
+    expect(computeVisibilitySpy).toHaveBeenCalled();
   });
 
   it('should initialize campaign config on init', () => {
+    component.campaignConfig.bannerImageRelativePath = 'test_path.png';
+    component.campaignConfig.bannerReRenderIntervalMs = 5000;
+
     component.ngOnInit();
 
-    expect(component.campaignBannerImagePath).toBeDefined();
+    expect(component.campaignBannerImagePath).toBe('test_path.png');
+    expect(component.bannerReRenderInterval).toBe(5000);
   });
 });

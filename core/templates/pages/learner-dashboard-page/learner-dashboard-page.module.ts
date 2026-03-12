@@ -48,6 +48,7 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgCircleProgressModule} from 'ng-circle-progress';
+import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 @NgModule({
   imports: [
     CommonModule,
@@ -74,6 +75,7 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
       titleFontSize: '11',
       titleColor: '#00645c',
     }),
+    CampaignBannerModule,
   ],
   declarations: [
     AddGoalsModalComponent,

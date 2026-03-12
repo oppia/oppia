@@ -37,6 +37,7 @@ export class CampaignBannerComponent implements OnInit {
   shouldShowBanner = false;
 
   STORAGE_KEY = 'campaignBannerClosedAt';
+  LANGUAGE_CODE_KEY = 'lang';
 
   campaignEndMonth!: string;
   campaignEndDay!: string;
@@ -70,7 +71,8 @@ export class CampaignBannerComponent implements OnInit {
       recentlyClosed = timeSinceClosed < this.bannerReRenderInterval;
     }
 
-    this.shouldShowBanner = featureEnabled && active && !recentlyClosed;
+    this.shouldShowBanner =
+      featureEnabled && this.isLanguageEnglish() && active && !recentlyClosed;
   }
 
   isCampaignActive(): boolean {
@@ -98,5 +100,10 @@ export class CampaignBannerComponent implements OnInit {
   closeBanner(): void {
     localStorage.setItem(this.STORAGE_KEY, Date.now().toString());
     this.computeBannerVisibility();
+  }
+
+  isLanguageEnglish(): boolean {
+    const languageCode = localStorage.getItem(this.LANGUAGE_CODE_KEY);
+    return languageCode === 'en';
   }
 }
