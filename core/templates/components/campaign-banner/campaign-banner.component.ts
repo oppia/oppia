@@ -63,7 +63,6 @@ export class CampaignBannerComponent implements OnInit {
 
     const active = this.isCampaignActive();
 
-    // Check if user recently closed the banner
     const closedAt = localStorage.getItem(this.STORAGE_KEY);
     let recentlyClosed = false;
     if (closedAt) {

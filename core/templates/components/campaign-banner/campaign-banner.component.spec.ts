@@ -43,7 +43,6 @@ describe('CampaignBannerComponent', () => {
   let component: CampaignBannerComponent;
   let fixture: ComponentFixture<CampaignBannerComponent>;
   let platformFeatureService: PlatformFeatureService;
-  let urlInterpolationService: UrlInterpolationService;
 
   const mockCampaignConfig = {
     startDate: new Date(Date.now() - 1000 * 60 * 60),
@@ -71,7 +70,6 @@ describe('CampaignBannerComponent', () => {
     fixture = TestBed.createComponent(CampaignBannerComponent);
     component = fixture.componentInstance;
     platformFeatureService = TestBed.inject(PlatformFeatureService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     localStorage.clear();
   });
@@ -114,6 +112,7 @@ describe('CampaignBannerComponent', () => {
       startDate: new Date(Date.now() - 1000 * 60 * 60 * 24),
       endDate: new Date(Date.now() - 1000 * 60 * 60),
     };
+
     spyOnProperty(AppConstants, 'CAMPAIGN_CONFIG', 'get').and.returnValue(
       pastConfig
     );
@@ -123,23 +122,25 @@ describe('CampaignBannerComponent', () => {
   });
 
   it('should hide banner if recently closed', () => {
-    localStorage.setItem(component['STORAGE_KEY'], Date.now().toString());
+    localStorage.setItem((component as any).STORAGE_KEY, Date.now().toString());
     component.ngOnInit();
     expect(component.shouldShowBanner).toBeFalse();
   });
 
   it('should compute banner as active correctly', () => {
-    expect(component['isCampaignActive']()).toBeTrue();
+    expect((component as any).isCampaignActive()).toBeTrue();
 
     const oldConfig = {
       ...mockCampaignConfig,
       startDate: new Date(Date.now() - 1000 * 60 * 60 * 24),
       endDate: new Date(Date.now() - 1000 * 60 * 60 * 12),
     };
+
     spyOnProperty(AppConstants, 'CAMPAIGN_CONFIG', 'get').and.returnValue(
       oldConfig
     );
-    expect(component['isCampaignActive']()).toBeFalse();
+
+    expect((component as any).isCampaignActive()).toBeFalse();
   });
 
   it('should return static image url correctly', () => {
@@ -154,7 +155,10 @@ describe('CampaignBannerComponent', () => {
     component.closeBanner();
     tick();
 
-    const storedTime = Number(localStorage.getItem(component['STORAGE_KEY']));
+    const storedTime = Number(
+      localStorage.getItem((component as any).STORAGE_KEY)
+    );
+
     expect(storedTime).toBeGreaterThan(0);
     expect(component.shouldShowBanner).toBeFalse();
   }));

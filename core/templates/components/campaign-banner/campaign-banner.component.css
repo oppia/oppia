@@ -2,7 +2,7 @@
   align-items: center;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
-  font-family: 'capriola';
+  font-family: 'capriola', sans-serif;;
   height: 100%;
   justify-content: center;
   left: 0;
@@ -66,7 +66,7 @@
 .oppia-campaign-title {
   font-size: 28px;
   font-style: 'normal';
-  margin: 0px;
+  margin: 0;
 }
 
 .highlight {
@@ -79,12 +79,12 @@
 }
 
 .oppia-campaign-description > p {
-  font-family: 'Roboto';
+  font-family: 'Roboto', sans-serif;;
 }
 
 .oppia-campaign-impact {
   align-items: center;
-  background: #12978c0D;
+  background: #12978c0d;
   border-radius: 10px;
   box-shadow: -8px -3px 10px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -96,7 +96,7 @@
 }
 
 .oppia-impact-icon {
-  color: #AD8E1DCC;
+  color: #ad8e1dcc;
   font-size: 28px;
   transform: rotate(-12deg);
 }
@@ -118,12 +118,12 @@
 }
 
 .oppia-donate-btn:hover {
+  background: #00544d;
   color: white;
-  background: #00544D;
 }
 
 .oppia-campaign-end {
-  color: #F4A33B;
+  color: #f4a33b;
   font-size: 12px;
   margin-top: 8px;
 }
