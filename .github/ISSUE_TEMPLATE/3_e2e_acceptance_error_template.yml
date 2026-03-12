@@ -14,33 +14,17 @@ body:
         [this wiki page](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR)
         and are filing this issue as part of the process described there.
         Thanks!
-  - type: markdown
-    attributes:
-      value: >
-        > [!IMPORTANT]
-        > If the CI failure is happening on your PR, please ensure that you have followed the following procedure:
-        
-        **All of the following steps must be performed in your fork.**
-        1. Navigate to your repo fork (https://github.com/<your-username>/oppia)
-        2. Sync your fork with upstream develop branch
-        3. Navigate to "Actions" tab.
-        4. Find and select workflow "Stress Test (Acceptance Test)"
-        5. Click on "Run Workflow" (found on middle-right of the screen, below "Actor" button)
-        6. Set the number of runs to 20 or more
-        7. Enter the failing acceptance test suite name
-        8. Run the workflow
-        9. Wait for the workflow to complete
-        10. If the workflow fails, file an issue
-        11. If the workflow passes, increase the number of runs further and rerun it.
   - type: checkboxes
     id: read-procedure
     attributes:
       label: I have read the procedure
       description: >
-        You must reproduce the failure on develop via the Stress Test workflow before filing this issue.
-    options:
-      - label: I reproduced the flake on the develop branch.
-      - label: I observed this flake directly on develop.
+        Please confirm that you have read the note above by selecting the option
+        that best describes your situation.
+      options:
+        - label: I reproduced the flake on the develop branch.
+        - label: I observed this flake directly on the develop branch.
+        - label: The changes in my PR are unrelated to the failure.
     validations:
       required: true
   - type: dropdown
