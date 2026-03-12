@@ -31,6 +31,8 @@ describe('Topic Manager', function () {
   let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string;
+  let simpleExplorationId: string;
+  let programmingExplorationId: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -43,6 +45,15 @@ describe('Topic Manager', function () {
       'Solving problems without a calculator',
       'Mathematics'
     );
+    simpleExplorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Simple Exploration',
+        'Mathematics'
+      );
+    await curriculumAdmin.navigateToCreatorDashboardPage();
+    await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+    programmingExplorationId =
+      await curriculumAdmin.createSimpleProgrammingExploration('Mathematics');
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition',
@@ -118,7 +129,6 @@ describe('Topic Manager', function () {
   });
 
   it('should be able to save chapters with mobile supported explorations', async function () {
-    jest.setTimeout(420000);
     // Revert the story name.
     await topicManager.editStoryDetails(
       'The Broken Calculator',
@@ -128,18 +138,6 @@ describe('Topic Manager', function () {
     );
     await topicManager.addChapter('Solving problems', explorationId);
     await topicManager.saveStoryDraft();
-
-    // Create and publish a new explorations.
-    const simpleExplorationId =
-      await topicManager.createAndPublishAMinimalExplorationWithTitle(
-        'Simple Exploration',
-        'Mathematics'
-      );
-
-    await topicManager.navigateToCreatorDashboardPage();
-    await topicManager.navigateToExplorationEditorFromCreatorDashboard();
-    const programmingExplorationId =
-      await topicManager.createSimpleProgrammingExploration('Mathematics');
 
     // Add simple chapter.
     await topicManager.openStoryEditor(

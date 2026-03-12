@@ -3720,7 +3720,10 @@ export class TopicManager extends BaseUser {
           {timeout: 10000}
         );
         if (acquiredHeader) {
-          await this.clickOnElement(acquiredHeader);
+          await acquiredHeader.evaluate(element => {
+            element.scrollIntoView({block: 'center'});
+            (element as HTMLElement).click();
+          });
         }
       }
     }
@@ -3769,6 +3772,18 @@ export class TopicManager extends BaseUser {
         );
         if (removeButton) {
           await removeButton.click();
+          await this.page.waitForFunction(
+            (selector: string, targetSkill: string) => {
+              const cards = Array.from(document.querySelectorAll(selector));
+              return !cards.some(card => {
+                const link = card.querySelector('a');
+                return link?.textContent?.trim() === targetSkill;
+              });
+            },
+            {timeout: 10000},
+            cardSelector,
+            skillName
+          );
           await this.waitForPageToFullyLoad();
           showMessage(`Removed acquired skill: ${skillName}`);
           return;
@@ -3801,6 +3816,18 @@ export class TopicManager extends BaseUser {
         );
         if (removeButton) {
           await removeButton.click();
+          await this.page.waitForFunction(
+            (selector: string, targetSkill: string) => {
+              const cards = Array.from(document.querySelectorAll(selector));
+              return !cards.some(card => {
+                const link = card.querySelector('a');
+                return link?.textContent?.trim() === targetSkill;
+              });
+            },
+            {timeout: 10000},
+            cardSelector,
+            skillName
+          );
           await this.waitForPageToFullyLoad();
           showMessage(`Removed prerequisite skill: ${skillName}`);
           return;
