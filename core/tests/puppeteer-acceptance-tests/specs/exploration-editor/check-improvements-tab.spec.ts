@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
- *
- * LC.13. Check Improvements Tab
- */
-
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
@@ -42,7 +35,6 @@ describe('Check Improvements Tab', function () {
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
 
-    // Create explorationEditor (no special roles needed per CUJ).
     explorationEditor = await UserFactory.createNewUser(
       'explorationCreator',
       'exploration_creator@example.com'

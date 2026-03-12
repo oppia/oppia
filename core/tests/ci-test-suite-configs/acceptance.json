@@ -269,10 +269,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts"
     },
     {
-      "name": "logged-out-learner/play-an-embedded-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-an-embedded-exploration.spec.ts"
-    },
-    {
       "name": "logged-out-learner/discover-the-website-and-navigate-to-math-classroom",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/discover-the-website-and-navigate-to-math-classroom.spec.ts"
     },
