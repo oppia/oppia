@@ -3868,6 +3868,46 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Ensures the given chapter is the initial node by moving the current
+   * first chapter down until the target chapter is first.
+   * This is required because the initial node only updates when the node at
+   * index 0 is moved.
+   */
+  async ensureChapterIsInitial(chapterName: string): Promise<void> {
+    await this.ensureChapterListIsVisible();
+    let chapterTitles = await this.getCurrentChapterTitles();
+    if (!chapterTitles.includes(chapterName)) {
+      throw new Error(
+        `Chapter "${chapterName}" not found. Current chapters: ${chapterTitles.join(', ')}`
+      );
+    }
+
+    let safetyCounter = chapterTitles.length + 1;
+    while (chapterTitles[0] !== chapterName && safetyCounter > 0) {
+      const currentFirst = chapterTitles[0];
+      const moved = await this.moveChapterWithActionButton(
+        currentFirst,
+        'down'
+      );
+      if (!moved) {
+        throw new Error(
+          `Unable to set "${chapterName}" as initial chapter. Move controls not available for "${currentFirst}".`
+        );
+      }
+      await this.waitForPageToFullyLoad();
+      chapterTitles = await this.getCurrentChapterTitles();
+      safetyCounter--;
+    }
+
+    if (chapterTitles[0] !== chapterName) {
+      throw new Error(
+        `Failed to set "${chapterName}" as initial chapter. Current order: ${chapterTitles.join(', ')}`
+      );
+    }
+    showMessage(`Initial chapter set to "${chapterName}".`);
+  }
+
+  /**
    * Expects a warning message to appear in the chapter editor.
    * @param {string|RegExp} expectedWarning - The expected warning message or regex.
    */

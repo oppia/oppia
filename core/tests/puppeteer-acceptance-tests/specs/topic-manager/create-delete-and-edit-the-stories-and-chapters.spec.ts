@@ -192,16 +192,22 @@ describe('Topic Manager', function () {
       'Simple Exploration',
       'Solving problems'
     );
-    await topicManager.saveStoryDraft();
 
     // Verify new order.
     await topicManager.expectChaptersOrderToBe([
       'Simple Exploration',
       'Solving problems',
     ]);
+    await topicManager.discardStoryChanges();
   });
 
   it('should be able to edit and preview the chapter', async function () {
+    await topicManager.openStoryEditor(
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.ensureChapterIsInitial('Solving problems');
+
     await topicManager.openChapterEditor(
       'Solving problems',
       'The Broken Calculator',
@@ -231,7 +237,6 @@ describe('Topic Manager', function () {
     // Add prerequisite skill.
     await topicManager.addPrerequisiteSkill('Addition');
     await topicManager.expectPrerequisiteSkillToBeVisible('Addition');
-    await topicManager.saveStoryDraft();
 
     // Add a prerequisite skill that is already a prerequisite skill and expect warning.
     await topicManager.addPrerequisiteSkill('Addition');
@@ -272,9 +277,6 @@ describe('Topic Manager', function () {
 
     // Delete prerequisite and acquired skills.
     await topicManager.removeAcquiredSkill('Addition');
-    await topicManager.saveStoryDraft();
-    await topicManager.expectAquiredSkillToBeVisible('Addition', false);
-
     await topicManager.openChapterEditor(
       'New Title',
       'The Broken Calculator',
@@ -283,6 +285,18 @@ describe('Topic Manager', function () {
     await topicManager.removePrerequisiteSkillFromChapter('Addition');
     await topicManager.removeAcquiredSkill('Subtraction');
     await topicManager.saveStoryDraft();
+
+    await topicManager.openChapterEditor(
+      'Solving problems',
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.expectAquiredSkillToBeVisible('Addition', false);
+    await topicManager.openChapterEditor(
+      'New Title',
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
     await topicManager.expectPrerequisiteSkillToBeVisible('Addition', false);
     await topicManager.expectAquiredSkillToBeVisible('Subtraction', false);
   });
