@@ -3705,22 +3705,44 @@ export class TopicManager extends BaseUser {
   async addAcquiredSkill(skillName: string): Promise<void> {
     await this.scrollToBottomOfPage();
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(addAcquiredSkillButton);
+    if (this.isViewportAtMobileWidth()) {
+      const visibleButtons = await this.page.$$(addAcquiredSkillButton);
+      const hasVisibleButton = await Promise.all(
+        visibleButtons.map(async button => {
+          const box = await button.boundingBox();
+          return Boolean(box);
+        })
+      ).then(results => results.some(Boolean));
+
+      if (!hasVisibleButton) {
+        const acquiredHeader = await this.page.waitForXPath(
+          '//div[contains(@class,"story-node-header")][.//span[contains(normalize-space(.),"Acquired Skills")]]',
+          {timeout: 10000}
+        );
+        if (acquiredHeader) {
+          await this.clickOnElement(acquiredHeader);
+        }
+      }
+    }
+
+    await this.page.waitForSelector(addAcquiredSkillButton, {visible: true});
     const elements = await this.page.$$(addAcquiredSkillButton);
-    if (elements.length < 2) {
+    const visibleElements: ElementHandle<Element>[] = [];
+    for (const element of elements) {
+      const box = await element.boundingBox();
+      if (box) {
+        visibleElements.push(element);
+      }
+    }
+    if (!visibleElements.length) {
       throw new Error('Add Acquired skill button not found.');
     }
 
-    if (this.isViewportAtMobileWidth()) {
-      if (elements.length < 2) {
-        throw new Error('Did not find 2 "Add Acquired Skill" buttons');
-      }
-      await this.waitForElementToBeClickable(elements[1]);
-      await elements[1].click();
-    } else {
-      await this.waitForElementToBeClickable(elements[0]);
-      await elements[0].click();
-    }
+    const targetElement = this.isViewportAtMobileWidth()
+      ? visibleElements[visibleElements.length - 1]
+      : visibleElements[0];
+    await this.waitForElementToBeClickable(targetElement);
+    await targetElement.click();
     await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 

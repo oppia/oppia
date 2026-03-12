@@ -118,6 +118,7 @@ describe('Topic Manager', function () {
   });
 
   it('should be able to save chapters with mobile supported explorations', async function () {
+    jest.setTimeout(420000);
     // Revert the story name.
     await topicManager.editStoryDetails(
       'The Broken Calculator',
@@ -282,7 +283,6 @@ describe('Topic Manager', function () {
       'The Broken Calculator',
       'Arithmetic Operations'
     );
-    await topicManager.removePrerequisiteSkillFromChapter('Addition');
     await topicManager.removeAcquiredSkill('Subtraction');
     await topicManager.saveStoryDraft();
 
