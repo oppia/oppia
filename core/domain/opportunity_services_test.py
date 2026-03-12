@@ -41,6 +41,7 @@ from core.domain import (
     topic_domain,
     topic_services,
     translation_domain,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -637,6 +638,91 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
         self.assertEqual(translation_opportunities[0].content_count, 4)
 
+    def test_update_opportunity_with_duplicate_suggestion_does_not_double_count(
+        self,
+    ) -> None:
+        """Test to verify that accepting a duplicate translation suggestion does
+        not incorrectly increase the translation count.
+        """
+        self.add_exploration_0_to_story()
+
+        exp = exp_fetchers.get_exploration_by_id('0')
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': 'content',
+                    'new_value': {
+                        'html': '<p>Content</p>',
+                        'content_id': 'content_0',
+                    },
+                }
+            )
+        ]
+        exp_services.update_exploration(
+            self.owner_id, '0', change_list, 'Setup content'
+        )
+
+        # Reload exploration to get the new version number.
+        exp = exp_fetchers.get_exploration_by_id('0')
+
+        translated_content = translation_domain.TranslatedContent(
+            '<p>Translated Content</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            '0',
+            exp.version,
+            'hi',
+            'content_0',
+            translated_content,
+        )
+
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            '0', 'hi'
+        )
+
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get('0')
+        self.assertEqual(model.translation_counts['hi'], 1)
+
+        # Simulate accepting a second translation for the same content (e.g. an
+        # edit). The count should remain 1.
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            '0',
+            exp.version,
+            'hi',
+            'content_0',
+            translated_content,
+        )
+
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            '0', 'hi'
+        )
+
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get('0')
+        self.assertEqual(model.translation_counts['hi'], 1)
+
+    def test_update_opportunity_with_no_translation_sets_count_to_zero(
+        self,
+    ) -> None:
+        """Test to verify that accepting a suggestion when no translation exists
+        in the datastore sets the translation count to 0.
+        """
+        self.add_exploration_0_to_story()
+
+        # No translation has been added for exploration '0' in language 'hi'.
+        # Simulate the acceptance of a suggestion.
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            '0', 'hi'
+        )
+
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get('0')
+        self.assertEqual(model.translation_counts['hi'], 0)
+
     def test_completing_translation_removes_language_from_incomplete_language_codes(  # pylint: disable=line-too-long
         self,
     ) -> None:
@@ -687,6 +773,20 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.owner_id, '0', change_list, 'commit message'
         )
 
+        exp = exp_fetchers.get_exploration_by_id('0')
+        translated_content = translation_domain.TranslatedContent(
+            '<p><strong>Test content</strong></p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            '0',
+            exp.version,
+            'hi',
+            'content_0',
+            translated_content,
+        )
         (
             opportunity_services.update_translation_opportunity_with_accepted_suggestion(
                 '0', 'hi'
@@ -1387,7 +1487,7 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
                 story_id='story_id',
                 story_title='story_title',
                 chapter_title='chapter_title',
-                content_count=2,
+                content_count=1,
                 incomplete_translation_language_codes=(
                     self.new_incomplete_translation_language_codes
                 ),
@@ -1397,10 +1497,31 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
             )
         )
         self.opportunity_model.put()
+        self.save_new_valid_exploration(
+            'exp_1',
+            'owner_id',
+            title='title',
+            category='category',
+            content_html='<p>Content</p>',
+        )
 
     def test_update_translation_opportunity_with_accepted_suggestion(
         self,
     ) -> None:
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        translated_content = translation_domain.TranslatedContent(
+            '<p>Translated Content</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            'exp_1',
+            exp.version,
+            'hi',
+            'content_0',
+            translated_content,
+        )
         (
             opportunity_services.update_translation_opportunity_with_accepted_suggestion(
                 'exp_1', 'hi'
@@ -1419,6 +1540,22 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
     def test_fully_translated_content_in_language_updated_in_opportunity(
         self,
     ) -> None:
+        # With content_count=1, after adding 1 translation the language should
+        # be removed from incomplete_translation_language_codes.
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        translated_content = translation_domain.TranslatedContent(
+            '<p>Translated Content</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            'exp_1',
+            exp.version,
+            'hi',
+            'content_0',
+            translated_content,
+        )
         (
             opportunity_services.update_translation_opportunity_with_accepted_suggestion(
                 'exp_1', 'hi'
@@ -1432,25 +1569,9 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         )
         assert opportunity['exp_1'] is not None
 
+        # With content_count=1 and translation_count=1, 'hi' should be removed
+        # from incomplete_translation_language_codes.
         self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
-        self.assertTrue(
-            'hi' in opportunity['exp_1'].incomplete_translation_language_codes
-        )
-
-        (
-            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
-                'exp_1', 'hi'
-            )
-        )
-
-        opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
-            )
-        )
-        assert opportunity['exp_1'] is not None
-
-        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 2})
         self.assertFalse(
             'hi' in opportunity['exp_1'].incomplete_translation_language_codes
         )
