@@ -445,18 +445,31 @@ def update_translation_opportunity_with_accepted_suggestion(
         model
     )
 
-    if language_code in exp_opportunity_summary.translation_counts:
-        exp_opportunity_summary.translation_counts[language_code] += 1
+    # Recount the translations to ensure that the counts are accurate and to
+    # prevent any double counting of translations.
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    current_translation_counts = translation_services.get_translation_counts(
+        feconf.TranslatableEntityType.EXPLORATION, exploration
+    )
+
+    if language_code in current_translation_counts:
+        exp_opportunity_summary.translation_counts[language_code] = (
+            current_translation_counts[language_code]
+        )
     else:
-        exp_opportunity_summary.translation_counts[language_code] = 1
+        exp_opportunity_summary.translation_counts[language_code] = 0
 
     if (
         exp_opportunity_summary.content_count
         == exp_opportunity_summary.translation_counts[language_code]
     ):
-        exp_opportunity_summary.incomplete_translation_language_codes.remove(
+        if (
             language_code
-        )
+            in exp_opportunity_summary.incomplete_translation_language_codes
+        ):
+            exp_opportunity_summary.incomplete_translation_language_codes.remove(
+                language_code
+            )
         exp_opportunity_summary.language_codes_needing_voice_artists.append(
             language_code
         )
