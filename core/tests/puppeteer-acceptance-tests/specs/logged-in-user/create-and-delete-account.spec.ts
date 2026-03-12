@@ -81,12 +81,12 @@ describe('Logged-in User', function () {
       await loggedInUser2.expectToBeOnPage('pending account deletion');
       // Calling closeBrowser since we didn't call createNewUser for loggedInUser2, so loggedInUser2 is not in the array activeUsers.
       // UserFactory.closeAllBrowsers closes all browsers based on activeUsers. Therefore, closeBrowser is called to close loggedInUser2's browser.
-      await loggedInUser2.closeBrowser();
+      // await loggedInUser2.closeBrowser();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // await UserFactory.closeAllBrowsers();
   });
 });
