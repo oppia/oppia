@@ -48,6 +48,11 @@ export class TopicsAndSkillsDashboardAuthGuard implements CanActivate {
       return true;
     }
 
+    // Store error message in sessionStorage since location.replaceState will clear router state.
+    window.sessionStorage.setItem(
+      'oppia_401_error_message',
+      'You must be a curriculum admin or topic manager to access this page.'
+    );
     this.router
       .navigate([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
