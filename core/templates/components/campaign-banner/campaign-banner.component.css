@@ -2,7 +2,7 @@
   align-items: center;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
-  font-family: 'capriola', sans-serif;;
+  font-family: 'capriola', sans-serif;
   height: 100%;
   justify-content: center;
   left: 0;
@@ -79,7 +79,7 @@
 }
 
 .oppia-campaign-description > p {
-  font-family: 'Roboto', sans-serif;;
+  font-family: 'Roboto', sans-serif;
 }
 
 .oppia-campaign-impact {
@@ -107,7 +107,7 @@
 }
 
 .oppia-donate-btn {
-  background: #00645C;
+  background: #00645c;
   border-radius: 6px;
   color: white;
   height: 48px;

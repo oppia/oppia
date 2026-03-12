@@ -36,14 +36,14 @@ export class CampaignBannerComponent implements OnInit {
   showBanner = false;
   shouldShowBanner = false;
 
-  private readonly STORAGE_KEY = 'campaignBannerClosedAt';
+  STORAGE_KEY = 'campaignBannerClosedAt';
 
   campaignEndMonth!: string;
   campaignEndDay!: string;
   campaignBannerImagePath!: string;
   bannerReRenderInterval!: number;
 
-  private readonly campaignConfig = AppConstants.CAMPAIGN_CONFIG;
+  campaignConfig = AppConstants.CAMPAIGN_CONFIG;
 
   ngOnInit(): void {
     this.initializeCampaignConfig();
@@ -57,7 +57,7 @@ export class CampaignBannerComponent implements OnInit {
     this.campaignBannerImagePath = this.campaignConfig.bannerImageRelativePath;
   }
 
-  private computeBannerVisibility(): void {
+  computeBannerVisibility(): void {
     const featureEnabled =
       this.platformFeaturesService.status.EnableCampaignBanner.isEnabled;
 
@@ -73,7 +73,7 @@ export class CampaignBannerComponent implements OnInit {
     this.shouldShowBanner = featureEnabled && active && !recentlyClosed;
   }
 
-  private isCampaignActive(): boolean {
+  isCampaignActive(): boolean {
     const now = new Date();
 
     return (
@@ -81,7 +81,7 @@ export class CampaignBannerComponent implements OnInit {
     );
   }
 
-  private setCampaignEndText(): void {
+  setCampaignEndText(): void {
     const endDate = this.campaignConfig.endDate;
 
     this.campaignEndMonth = endDate.toLocaleDateString('en-US', {

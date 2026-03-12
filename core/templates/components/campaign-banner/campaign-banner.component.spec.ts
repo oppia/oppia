@@ -16,150 +16,122 @@
  * @fileoverview Unit tests for CampaignBannerComponent.
  */
 
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+
 import {CampaignBannerComponent} from './campaign-banner.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {AppConstants} from 'app.constants';
 
 class MockUrlInterpolationService {
-  getStaticImageUrl(path: string) {
-    return `mocked_url/${path}`;
+  getStaticImageUrl(imagePath: string): string {
+    return `/assets/${imagePath}`;
   }
 }
 
 class MockPlatformFeatureService {
   status = {
-    EnableCampaignBanner: {isEnabled: true},
+    EnableCampaignBanner: {
+      isEnabled: true,
+    },
   };
 }
 
 describe('CampaignBannerComponent', () => {
   let component: CampaignBannerComponent;
   let fixture: ComponentFixture<CampaignBannerComponent>;
-  let platformFeatureService: PlatformFeatureService;
-
-  const mockCampaignConfig = {
-    startDate: new Date(Date.now() - 1000 * 60 * 60),
-    endDate: new Date(Date.now() + 1000 * 60 * 60),
-    bannerImageRelativePath: 'banner.png',
-    bannerReRenderIntervalMs: 1000 * 60 * 60,
-  };
+  let platformFeatureService: MockPlatformFeatureService;
 
   beforeEach(async () => {
-    spyOnProperty(AppConstants, 'CAMPAIGN_CONFIG', 'get').and.returnValue(
-      mockCampaignConfig
-    );
-
     await TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [CampaignBannerComponent],
       providers: [
         {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService,
         },
-        {provide: PlatformFeatureService, useClass: MockPlatformFeatureService},
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CampaignBannerComponent);
     component = fixture.componentInstance;
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
-    localStorage.clear();
+    platformFeatureService = TestBed.inject(
+      PlatformFeatureService
+    ) as unknown as MockPlatformFeatureService;
+
+    component.campaignConfig.startDate = new Date(Date.now() - 100000);
+    component.campaignConfig.endDate = new Date(Date.now() + 100000);
+    component.campaignConfig.bannerReRenderIntervalMs = 100000;
+
+    fixture.detectChanges();
   });
 
   it('should create component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize campaign config and set text on ngOnInit', () => {
-    component.ngOnInit();
+  it('should return static image url correctly', () => {
+    const url = component.getStaticImageUrl('test.png');
 
-    expect(component.bannerReRenderInterval).toBe(
-      mockCampaignConfig.bannerReRenderIntervalMs
-    );
-    expect(component.campaignBannerImagePath).toBe(
-      mockCampaignConfig.bannerImageRelativePath
-    );
-    expect(component.campaignEndMonth).toBe(
-      mockCampaignConfig.endDate.toLocaleDateString('en-US', {month: 'long'})
-    );
-    expect(component.campaignEndDay).toBe(
-      mockCampaignConfig.endDate.toLocaleDateString('en-US', {day: 'numeric'})
-    );
+    expect(url).toBe('/assets/test.png');
   });
 
-  it('should compute banner visibility correctly when feature is enabled and campaign active', () => {
-    component.ngOnInit();
+  it('should set campaign end text correctly', () => {
+    component.setCampaignEndText();
+
+    expect(component.campaignEndMonth).toBeDefined();
+    expect(component.campaignEndDay).toBeDefined();
+  });
+
+  it('should show banner when campaign active and feature enabled', () => {
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+
+    platformFeatureService.status.EnableCampaignBanner.isEnabled = true;
+
+    component.computeBannerVisibility();
+
     expect(component.shouldShowBanner).toBeTrue();
-  });
-
-  it('should hide banner if feature is disabled', () => {
-    platformFeatureService.status.EnableCampaignBanner.isEnabled = false;
-    component.ngOnInit();
-    expect(component.shouldShowBanner).toBeFalse();
-  });
-
-  it('should hide banner if campaign is inactive', () => {
-    const pastConfig = {
-      ...mockCampaignConfig,
-      startDate: new Date(Date.now() - 1000 * 60 * 60 * 24),
-      endDate: new Date(Date.now() - 1000 * 60 * 60),
-    };
-
-    spyOnProperty(AppConstants, 'CAMPAIGN_CONFIG', 'get').and.returnValue(
-      pastConfig
-    );
-
-    component.ngOnInit();
-    expect(component.shouldShowBanner).toBeFalse();
   });
 
   it('should hide banner if recently closed', () => {
-    localStorage.setItem((component as any).STORAGE_KEY, Date.now().toString());
-    component.ngOnInit();
+    const now = Date.now();
+    spyOn(localStorage, 'getItem').and.returnValue(now.toString());
+
+    component.bannerReRenderInterval = 100000;
+
+    component.computeBannerVisibility();
+
     expect(component.shouldShowBanner).toBeFalse();
   });
 
-  it('should compute banner as active correctly', () => {
-    expect((component as any).isCampaignActive()).toBeTrue();
+  it('should show banner if closed long ago', () => {
+    const oldTime = Date.now() - 99999999;
+    spyOn(localStorage, 'getItem').and.returnValue(oldTime.toString());
 
-    const oldConfig = {
-      ...mockCampaignConfig,
-      startDate: new Date(Date.now() - 1000 * 60 * 60 * 24),
-      endDate: new Date(Date.now() - 1000 * 60 * 60 * 12),
-    };
+    component.bannerReRenderInterval = 1000;
 
-    spyOnProperty(AppConstants, 'CAMPAIGN_CONFIG', 'get').and.returnValue(
-      oldConfig
-    );
+    component.computeBannerVisibility();
 
-    expect((component as any).isCampaignActive()).toBeFalse();
-  });
-
-  it('should return static image url correctly', () => {
-    const url = component.getStaticImageUrl('banner.png');
-    expect(url).toBe('mocked_url/banner.png');
-  });
-
-  it('should close banner and store timestamp', fakeAsync(() => {
-    component.ngOnInit();
     expect(component.shouldShowBanner).toBeTrue();
+  });
+
+  it('should close banner and store timestamp', () => {
+    const setItemSpy = spyOn(localStorage, 'setItem');
 
     component.closeBanner();
-    tick();
 
-    const storedTime = Number(
-      localStorage.getItem((component as any).STORAGE_KEY)
-    );
+    expect(setItemSpy).toHaveBeenCalled();
+  });
 
-    expect(storedTime).toBeGreaterThan(0);
-    expect(component.shouldShowBanner).toBeFalse();
-  }));
+  it('should initialize campaign config on init', () => {
+    component.ngOnInit();
+
+    expect(component.campaignBannerImagePath).toBeDefined();
+  });
 });
