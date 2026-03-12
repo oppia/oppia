@@ -2448,6 +2448,32 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Changes the site language for an embedded exploration without reloading
+   * the page, since reloading resets the language in the embedded player.
+   * @param langCode - The language code to change to. Example: 'es', 'pt-br'
+   */
+  async changeSiteLanguageForEmbeddedExploration(
+    langCode: string
+  ): Promise<void> {
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+    }
+    await this.page.waitForSelector(languageDropdown);
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
+    }
+    await languageDropdownElement.click();
+    await this.clickOnElementWithSelector(languageOption);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Checks if the the language dropdown is available or not.
    * @param status - Status of language dropdown.
    */
@@ -6163,23 +6189,27 @@ export class LoggedOutUser extends BaseUser {
       );
     }
   }
+
   /**
    * Check if the number input placeholder matches the expected text.
    */
   async expectNumberInputPlaceholderToMatch(
     expectedPlaceholder: string
   ): Promise<void> {
-    await this.page.waitForSelector(floatFormInput, {visible: true});
-    const placeholder = await this.page.$eval(floatFormInput, (el: Element) =>
-      el.getAttribute('placeholder')
+    // Wait until the placeholder attribute updates to the expected value.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {timeout: 30000},
+      floatFormInput,
+      expectedPlaceholder
     );
-    if (placeholder !== expectedPlaceholder) {
-      throw new Error(
-        `Expected placeholder to be "${expectedPlaceholder}" but got "${placeholder}".`
-      );
-    }
+
     showMessage(`Input placeholder is "${expectedPlaceholder}" as expected.`);
   }
+
   /**
    * Checks if the text content of an element matches the expected value.
    * @param selector - The CSS selector to find the element.
