@@ -96,7 +96,7 @@ const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const currentCardNameContainerSelector = '.e2e-test-state-name-container';
 
-const previewTabButton = '.e2e-test-preview-tab';
+const previewTabButton = '.e2e-test-preview-tab a';
 const previewTabContainer = '.e2e-test-preview-tab-container';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const mainTabButton = '.e2e-test-main-tab';
@@ -141,7 +141,7 @@ const oppiaFeebackEditorContainerSelector = '.e2e-test-response-body-default';
 
 const dismissTranslationWelcomeModalSelector =
   'button.e2e-test-translation-tab-dismiss-welcome-modal';
-const translationTabButton = '.e2e-test-translation-tab';
+const translationTabButton = '.e2e-test-translation-tab a';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 
 const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
@@ -230,7 +230,7 @@ const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
-const feedBackButtonTab = '.e2e-test-feedback-tab';
+const feedBackButtonTab = '.e2e-test-feedback-tab a';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
@@ -239,7 +239,7 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
-const historyTabButton = '.e2e-test-history-tab';
+const historyTabButton = '.e2e-test-history-tab a';
 const historyListContent = '.e2e-test-history-list-item';
 const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
 const totalPlaysSelector = '.e2e-test-oppia-total-plays';
@@ -250,7 +250,7 @@ const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
 const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
-
+const stayInEditorButtonSelector = '.e2e-test-stay-in-editor-button';
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
@@ -4582,10 +4582,10 @@ export class ExplorationEditor extends BaseUser {
         await this.page.click(dropdownToggleIcon);
       }
     } else {
-      await this.page.waitForSelector(mainTabButton, {
+      await this.page.waitForSelector(`${mainTabButton}`, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mainTabButton);
+      await this.clickOnElementWithSelector(`${mainTabButton}`);
     }
 
     await this.expectElementToBeVisible(mainTabContainerSelector);
@@ -4978,10 +4978,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to play.
    */
   async playExploration(explorationId: string): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.goto(`${baseUrl}/explore/${explorationId}`),
-    ]);
+    await this.goto(`${baseUrl}/explore/${explorationId}`);
   }
 
   /**
@@ -5208,7 +5205,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOnElementWithSelector(contentType);
+      await this.clickOnElementWithText(contentType);
     }
 
     await this.clickOnElementWithSelector(editTranslationSelector);

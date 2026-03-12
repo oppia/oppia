@@ -1,0 +1,35 @@
+<div class="oppia-feedback-prompt-modal">
+  <div class="modal-header">
+    <h3 class="modal-title oppia-feedback-prompt-title">
+      Open Feedback Available
+    </h3>
+  </div>
+
+  <div class="modal-body oppia-long-text">
+    <p class="oppia-feedback-prompt-message">
+      Your exploration has
+      <strong>{{ openThreadsCount }}</strong>
+      open feedback
+      <span *ngIf="openThreadsCount === 1"> thread</span>
+      <span *ngIf="openThreadsCount !== 1"> threads</span>.
+    </p>
+
+    <p>
+      Would you like to review the feedback now, or continue editing?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button"
+            class="btn oppia-white-button e2e-test-stay-in-editor-button"
+            (click)="cancel()">
+      Stay in editor
+    </button>
+
+    <button type="button"
+            class="btn btn-success e2e-test-go-to-feedback-button"
+            (click)="accept()">
+      Go to feedback
+    </button>
+  </div>
+</div>

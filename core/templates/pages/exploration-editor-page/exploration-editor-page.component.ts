@@ -78,6 +78,8 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
+
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
@@ -233,228 +235,223 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       ),
       this.threadDataBackendApiService.getFeedbackThreadsAsync(),
       this.userService.getUserInfoAsync(),
-    ]).then(async ([explorationData, featuresData, _, userInfo]) => {
-      if ((explorationData as ExplorationData).exploration_is_linked_to_story) {
-        this.explorationIsLinkedToStory = true;
-        this.pageContextService.setExplorationIsLinkedToStory();
-      }
-
-      this.explorationFeaturesService.init(explorationData, featuresData);
-
-      this.explorationStatesService.init(
-        explorationData.states,
-        (explorationData as ExplorationData).exploration_is_linked_to_story
-      );
-      this.entityTranslationsService.init(
-        this.explorationId,
-        'exploration',
-        explorationData.version
-      );
-      this.pageContextService.setExplorationVersion(explorationData.version);
-
-      const languageCode =
-        this.entityVoiceoversService.languageCode ||
-        explorationData.language_code;
-      this.entityVoiceoversService.init(
-        this.explorationId,
-        'exploration',
-        explorationData.version,
-        languageCode
-      );
-      this.entityVoiceoversService.fetchEntityVoiceovers();
-
-      this.explorationTitleService.init(explorationData.title);
-      this.explorationCategoryService.init(
-        (explorationData as ExplorationData).category
-      );
-      this.explorationObjectiveService.init(
-        (explorationData as ExplorationData).objective
-      );
-      this.explorationLanguageCodeService.init(explorationData.language_code);
-      this.explorationInitStateNameService.init(
-        explorationData.init_state_name
-      );
-      this.explorationTagsService.init(
-        (explorationData as ExplorationData).tags
-      );
-      this.explorationParamSpecsService.init(
-        ParamSpecs.createFromBackendDict(
-          explorationData.param_specs as ParamSpecsBackendDict
-        )
-      );
-      this.explorationParamChangesService.init(
-        ParamChanges.createFromBackendList(explorationData.param_changes)
-      );
-      this.explorationAutomaticTextToSpeechService.init(
-        explorationData.auto_tts_enabled
-      );
-      this.explorationNextContentIdIndexService.init(
-        explorationData.next_content_id_index
-      );
-      if (explorationData.edits_allowed) {
-        this.editabilityService.lockExploration(false);
-      }
-
-      this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
-      this.currentUserIsModerator = userInfo.isModerator();
-      this.currentUser = (explorationData as ExplorationData).user;
-      this.currentVersion = explorationData.version;
-
-      this.explorationRightsService.init(
-        (explorationData as ExplorationData).rights.owner_names,
-        (explorationData as ExplorationData).rights.editor_names,
-        (explorationData as ExplorationData).rights.voice_artist_names,
-        (explorationData as ExplorationData).rights.viewer_names,
-        (explorationData as ExplorationData).rights.status,
-        (explorationData as ExplorationData).rights.cloned_from,
-        (explorationData as ExplorationData).rights.community_owned,
-        (explorationData as ExplorationData).rights.viewable_if_private
-      );
-      this.userEmailPreferencesService.init(
-        (explorationData as ExplorationData).email_preferences
-          .mute_feedback_notifications,
-        (explorationData as ExplorationData).email_preferences
-          .mute_suggestion_notifications
-      );
-
-      this.userExplorationPermissionsService
-        .getPermissionsAsync()
-        .then(permissions => {
-          if (permissions.canEdit) {
-            this.editabilityService.markEditable();
-          }
-          if (permissions.canVoiceover || permissions.canEdit) {
-            this.editabilityService.markTranslatable();
-          }
-        });
-
-      this.versionHistoryService.init(explorationData.version);
-
-      this.graphDataService.recompute();
-
-      if (
-        !this.stateEditorService.getActiveStateName() ||
-        !this.explorationStatesService.getState(
-          this.stateEditorService.getActiveStateName()
-        )
-      ) {
-        this.stateEditorService.setActiveStateName(
-          this.explorationInitStateNameService.displayed as string
-        );
-      }
-
-      if (
-        !this.routerService.isLocationSetToNonStateEditorTab() &&
-        !explorationData.states.hasOwnProperty(
-          this.routerService.getCurrentStateFromLocationPath()
-        )
-      ) {
-        if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
-          this.routerService.navigateToFeedbackTab();
+    ]).then(
+      async ([explorationData, featuresData, feedbackThreads, userInfo]) => {
+        this.maybeShowFeedbackPromptModal();
+        if (
+          (explorationData as ExplorationData).exploration_is_linked_to_story
+        ) {
+          this.explorationIsLinkedToStory = true;
+          this.pageContextService.setExplorationIsLinkedToStory();
         }
-      }
 
-      if (this.modifyTranslationsFeatureFlagIsEnabled) {
-        this.entityBulkTranslationsBackendApiService
-          .fetchEntityBulkTranslationsAsync(
-            this.explorationId,
-            'exploration',
-            this.currentVersion
-          )
-          .then(response => {
-            for (let language in response) {
-              // Initialize the entity translation objects with the last published translations
-              // in order to compare translation changes made.
-              let languageTranslations =
-                response[language].translationMappingToBackendDict();
-              this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
-                language
-              ] = EntityTranslation.createFromBackendDict({
-                entity_id: this.explorationId,
-                entity_type: 'exploration',
-                entity_version: response[language].entityVersion,
-                language_code: language,
-                translations: languageTranslations,
-              });
+        this.explorationFeaturesService.init(explorationData, featuresData);
 
-              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-                language
-              ] = EntityTranslation.createFromBackendDict({
-                entity_id: this.explorationId,
-                entity_type: 'exploration',
-                entity_version: response[language].entityVersion,
-                language_code: language,
-                translations: languageTranslations,
-              });
-            }
-            // Populate the entity translations with draft changes
-            // if they exist.
-            this.populateEntityTranslationsWithDraftChanges(
-              explorationData.draft_changes,
-              explorationData.version
-            );
-          });
-      } else {
-        // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
-        this.populateEntityTranslationsWithDraftChanges(
-          explorationData.draft_changes,
+        this.explorationStatesService.init(
+          explorationData.states,
+          (explorationData as ExplorationData).exploration_is_linked_to_story
+        );
+        this.entityTranslationsService.init(
+          this.explorationId,
+          'exploration',
           explorationData.version
         );
-      }
+        this.pageContextService.setExplorationVersion(explorationData.version);
 
-      // Initialize changeList by draft changes if they exist.
-      if (explorationData.draft_changes !== null) {
-        this.changeListService.loadAutosavedChangeList(
-          explorationData.draft_changes
+        const languageCode =
+          this.entityVoiceoversService.languageCode ||
+          explorationData.language_code;
+        this.entityVoiceoversService.init(
+          this.explorationId,
+          'exploration',
+          explorationData.version,
+          languageCode
         );
-      }
+        this.entityVoiceoversService.fetchEntityVoiceovers();
 
-      if (
-        explorationData.is_version_of_draft_valid === false &&
-        explorationData.draft_changes !== null &&
-        explorationData.draft_changes.length > 0
-      ) {
-        // Show modal displaying lost changes if the version of draft
-        // changes is invalid, and draft_changes is not `null`.
-        this.autosaveInfoModalsService.showVersionMismatchModal(
-          this.changeListService.getChangeList()
+        this.explorationTitleService.init(explorationData.title);
+        this.explorationCategoryService.init(
+          (explorationData as ExplorationData).category
         );
-      }
-      this.routerService.onRefreshStatisticsTab.emit();
+        this.explorationObjectiveService.init(
+          (explorationData as ExplorationData).objective
+        );
+        this.explorationLanguageCodeService.init(explorationData.language_code);
+        this.explorationInitStateNameService.init(
+          explorationData.init_state_name
+        );
+        this.explorationTagsService.init(
+          (explorationData as ExplorationData).tags
+        );
+        this.explorationParamSpecsService.init(
+          ParamSpecs.createFromBackendDict(
+            explorationData.param_specs as ParamSpecsBackendDict
+          )
+        );
+        this.explorationParamChangesService.init(
+          ParamChanges.createFromBackendList(explorationData.param_changes)
+        );
+        this.explorationAutomaticTextToSpeechService.init(
+          explorationData.auto_tts_enabled
+        );
+        this.explorationNextContentIdIndexService.init(
+          explorationData.next_content_id_index
+        );
+        if (explorationData.edits_allowed) {
+          this.editabilityService.lockExploration(false);
+        }
 
-      this.routerService.onRefreshVersionHistory.emit({
-        forceRefresh: true,
-      });
+        this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
+        this.currentUserIsModerator = userInfo.isModerator();
+        this.currentUser = (explorationData as ExplorationData).user;
+        this.currentVersion = explorationData.version;
 
-      if (
-        this.explorationStatesService.getState(
-          this.stateEditorService.getActiveStateName()
-        )
-      ) {
+        this.explorationRightsService.init(
+          (explorationData as ExplorationData).rights.owner_names,
+          (explorationData as ExplorationData).rights.editor_names,
+          (explorationData as ExplorationData).rights.voice_artist_names,
+          (explorationData as ExplorationData).rights.viewer_names,
+          (explorationData as ExplorationData).rights.status,
+          (explorationData as ExplorationData).rights.cloned_from,
+          (explorationData as ExplorationData).rights.community_owned,
+          (explorationData as ExplorationData).rights.viewable_if_private
+        );
+        this.userEmailPreferencesService.init(
+          (explorationData as ExplorationData).email_preferences
+            .mute_feedback_notifications,
+          (explorationData as ExplorationData).email_preferences
+            .mute_suggestion_notifications
+        );
+
+        this.userExplorationPermissionsService
+          .getPermissionsAsync()
+          .then(permissions => {
+            if (permissions.canEdit) {
+              this.editabilityService.markEditable();
+            }
+            if (permissions.canVoiceover || permissions.canEdit) {
+              this.editabilityService.markTranslatable();
+            }
+          });
+
+        this.versionHistoryService.init(explorationData.version);
+
+        this.graphDataService.recompute();
+
+        if (
+          !this.stateEditorService.getActiveStateName() ||
+          !this.explorationStatesService.getState(
+            this.stateEditorService.getActiveStateName()
+          )
+        ) {
+          this.stateEditorService.setActiveStateName(
+            this.explorationInitStateNameService.displayed as string
+          );
+        }
+
+        if (this.modifyTranslationsFeatureFlagIsEnabled) {
+          this.entityBulkTranslationsBackendApiService
+            .fetchEntityBulkTranslationsAsync(
+              this.explorationId,
+              'exploration',
+              this.currentVersion
+            )
+            .then(response => {
+              for (let language in response) {
+                // Initialize the entity translation objects with the last published translations
+                // in order to compare translation changes made.
+                let languageTranslations =
+                  response[language].translationMappingToBackendDict();
+                this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
+                  language
+                ] = EntityTranslation.createFromBackendDict({
+                  entity_id: this.explorationId,
+                  entity_type: 'exploration',
+                  entity_version: response[language].entityVersion,
+                  language_code: language,
+                  translations: languageTranslations,
+                });
+
+                this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+                  language
+                ] = EntityTranslation.createFromBackendDict({
+                  entity_id: this.explorationId,
+                  entity_type: 'exploration',
+                  entity_version: response[language].entityVersion,
+                  language_code: language,
+                  translations: languageTranslations,
+                });
+              }
+              // Populate the entity translations with draft changes
+              // if they exist.
+              this.populateEntityTranslationsWithDraftChanges(
+                explorationData.draft_changes,
+                explorationData.version
+              );
+            });
+        } else {
+          // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
+          this.populateEntityTranslationsWithDraftChanges(
+            explorationData.draft_changes,
+            explorationData.version
+          );
+        }
+
+        // Initialize changeList by draft changes if they exist.
+        if (explorationData.draft_changes !== null) {
+          this.changeListService.loadAutosavedChangeList(
+            explorationData.draft_changes
+          );
+        }
+
+        if (
+          explorationData.is_version_of_draft_valid === false &&
+          explorationData.draft_changes !== null &&
+          explorationData.draft_changes.length > 0
+        ) {
+          // Show modal displaying lost changes if the version of draft
+          // changes is invalid, and draft_changes is not `null`.
+          this.autosaveInfoModalsService.showVersionMismatchModal(
+            this.changeListService.getChangeList()
+          );
+        }
+        this.routerService.onRefreshStatisticsTab.emit();
+
+        this.routerService.onRefreshVersionHistory.emit({
+          forceRefresh: true,
+        });
+
+        if (
+          this.explorationStatesService.getState(
+            this.stateEditorService.getActiveStateName()
+          )
+        ) {
+          this.stateEditorRefreshService.onRefreshStateEditor.emit();
+        }
+
+        this.stateTutorialFirstTimeService.initEditor(
+          (explorationData as ExplorationData)
+            .show_state_editor_tutorial_on_load,
+          this.explorationId
+        );
+
+        if (
+          (explorationData as ExplorationData)
+            .show_state_translation_tutorial_on_load
+        ) {
+          this.stateTutorialFirstTimeService.markTranslationTutorialNotSeenBefore();
+        }
+
+        // TODO(#13352): Initialize StateTopAnswersStatsService and register
+        // relevant callbacks.
+        await this.explorationImprovementsService.initAsync();
+        await this.explorationImprovementsService.flushUpdatedTasksToBackend();
+
+        this.explorationWarningsService.updateWarnings();
         this.stateEditorRefreshService.onRefreshStateEditor.emit();
+        this.explorationEditorPageHasInitialized = true;
       }
-
-      this.stateTutorialFirstTimeService.initEditor(
-        (explorationData as ExplorationData).show_state_editor_tutorial_on_load,
-        this.explorationId
-      );
-
-      if (
-        (explorationData as ExplorationData)
-          .show_state_translation_tutorial_on_load
-      ) {
-        this.stateTutorialFirstTimeService.markTranslationTutorialNotSeenBefore();
-      }
-
-      // TODO(#13352): Initialize StateTopAnswersStatsService and register
-      // relevant callbacks.
-      await this.explorationImprovementsService.initAsync();
-      await this.explorationImprovementsService.flushUpdatedTasksToBackend();
-
-      this.explorationWarningsService.updateWarnings();
-      this.stateEditorRefreshService.onRefreshStateEditor.emit();
-      this.explorationEditorPageHasInitialized = true;
-    });
+    );
   }
 
   isVoiceoverTabEnabled(): boolean {
@@ -800,7 +797,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     // The initExplorationPage function is written separately since it
     // is also called in directiveSubscriptions when some external events are
     // triggered.
-    this.initExplorationPage();
     this.improvementsTabIsEnabled = false;
 
     Promise.resolve(
@@ -808,12 +804,41 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     ).then(improvementsTabIsEnabledResponse => {
       this.improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
     });
-
-    this.initExplorationPage();
+    this.explorationSaveService.onInitExplorationPage.emit();
   }
 
   isImprovementsTabEnabled(): boolean {
     return this.improvementsTabIsEnabled;
+  }
+  private maybeShowFeedbackPromptModal(): void {
+    const openThreadsCount =
+      this.threadDataBackendApiService.getOpenThreadsCount();
+
+    if (openThreadsCount === 0 || !this.isModalOpenable) {
+      return;
+    }
+
+    this.isModalOpenable = false;
+
+    const modalRef = this.ngbModal.open(FeedbackPromptModalComponent, {
+      backdrop: 'static',
+      keyboard: false,
+      windowClass: 'oppia-confirm-or-cancel-modal',
+    });
+
+    if (modalRef.componentInstance) {
+      modalRef.componentInstance.openThreadsCount = openThreadsCount;
+    }
+
+    modalRef.result.then(
+      () => {
+        this.routerService.navigateToFeedbackTab();
+        this.isModalOpenable = true;
+      },
+      () => {
+        this.isModalOpenable = true;
+      }
+    );
   }
 
   ngOnDestroy(): void {

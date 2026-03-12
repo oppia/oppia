@@ -72,9 +72,11 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/entity-translation.model';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -83,6 +85,7 @@ class MockNgbModalRef {
 class MockNgbModal {
   open() {
     return {
+      componentInstance: {},
       result: Promise.resolve(),
     };
   }
@@ -265,6 +268,7 @@ describe('Exploration editor page component', () => {
         LostChangesModalComponent,
         WelcomeModalComponent,
         HelpModalComponent,
+        FeedbackPromptModalComponent,
       ],
       providers: [
         ThreadDataBackendApiService,
@@ -329,6 +333,7 @@ describe('Exploration editor page component', () => {
           LostChangesModalComponent,
           WelcomeModalComponent,
           HelpModalComponent,
+          FeedbackPromptModalComponent,
         ],
       },
     });
@@ -337,6 +342,16 @@ describe('Exploration editor page component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEditorPageComponent);
     component = fixture.componentInstance;
+    const mockModalRef: Partial<NgbModalRef> = {
+      componentInstance: {},
+      result: Promise.resolve(),
+    };
+
+    spyOn(TestBed.inject(NgbModal), 'open').and.returnValue(
+      mockModalRef as NgbModalRef
+    );
+
+    component.feedbackPromptModalData = {openThreadsCount: 0};
 
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
@@ -370,6 +385,10 @@ describe('Exploration editor page component', () => {
       EntityBulkTranslationsBackendApiService
     );
     pageContextService = TestBed.inject(PageContextService);
+
+    spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
+    spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(Promise.resolve([]));
+    spyOn(pts, 'setDocumentTitle').and.callThrough();
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
       rs,
@@ -413,12 +432,6 @@ describe('Exploration editor page component', () => {
 
   describe('when user permission is true and draft changes not valid', () => {
     beforeEach(() => {
-      ngbModal = TestBed.inject(NgbModal);
-      tds = TestBed.inject(ThreadDataBackendApiService);
-      rs = TestBed.inject(RouterService);
-      ews = TestBed.inject(ExplorationWarningsService);
-      ueps = TestBed.inject(UserExplorationPermissionsService);
-
       registerAcceptTutorialModalEventSpy = spyOn(
         sas,
         'registerAcceptTutorialModalEvent'
@@ -438,10 +451,6 @@ describe('Exploration editor page component', () => {
       );
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
-        Promise.resolve([])
-      );
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
         Promise.resolve({
           canEdit: true,
@@ -474,7 +483,9 @@ describe('Exploration editor page component', () => {
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
         mockOpenTranslationTutorialEmitter
       );
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
 
+      ets.init(explorationData.title);
       explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
 
@@ -488,7 +499,7 @@ describe('Exploration editor page component', () => {
     it('should start editor tutorial when on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
       isLocationSetToNonStateEditorTabSpy.and.returnValue(false);
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
 
@@ -506,6 +517,13 @@ describe('Exploration editor page component', () => {
       discardPeriodicTasks();
     }));
 
+    it('should return the thread count', () => {
+      tds.countOfOpenFeedbackThreads = 2;
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      component.hasCriticalWarnings();
+      expect(component.getOpenThreadsCount()).toEqual(2);
+    });
+
     it('should skip to main content', () => {
       const mockElement = document.createElement('div');
       mockElement.classList.add('exploration-editor-content');
@@ -519,7 +537,7 @@ describe('Exploration editor page component', () => {
 
     it('should start editor tutorial when not on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(rs, 'navigateToMainTab');
       rs.navigateToSettingsTab();
@@ -534,7 +552,7 @@ describe('Exploration editor page component', () => {
 
     it('should start translation tutorial when on translation page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startTranslationTutorial').and.callThrough();
       rs.navigateToTranslationTab();
       mockRefreshTranslationTabEventEmitter.emit();
@@ -550,7 +568,7 @@ describe('Exploration editor page component', () => {
 
     it('should start translation tutorial when not on translation page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startTranslationTutorial').and.callThrough();
       spyOn(rs, 'navigateToTranslationTab');
 
@@ -579,14 +597,14 @@ describe('Exploration editor page component', () => {
 
     it('should return the thread count', () => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       component.hasCriticalWarnings();
       expect(component.getOpenThreadsCount()).toEqual(2);
     });
 
     it('should navigate to main tab', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
       isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToMainTab').and.callThrough();
@@ -602,7 +620,7 @@ describe('Exploration editor page component', () => {
 
     it('should navigate between tabs', () => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       let focusSpy = spyOn(component, 'setFocusOnActiveTab');
       spyOn(rs, 'navigateToMainTab').and.stub();
       component.selectMainTab();
@@ -650,10 +668,10 @@ describe('Exploration editor page component', () => {
 
       expect(focusSpy).toHaveBeenCalledWith('tmpMessageText');
 
-      component.activeThread = 'false';
+      component.activeThread = null as unknown as string;
       component.setFocusOnActiveTab('feedback');
 
-      expect(focusSpy).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalledWith('newThreadButton');
     });
 
     it('should generate the aria label correctly', () => {
@@ -675,7 +693,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
+      (ngbModal.open as jasmine.Spy).and.returnValue({
         result: Promise.resolve('editor'),
       } as NgbModalRef);
 
@@ -688,7 +706,7 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
+      (ngbModal.open as jasmine.Spy).and.returnValue({
         result: Promise.resolve('translation'),
       } as NgbModalRef);
 
@@ -703,7 +721,6 @@ describe('Exploration editor page component', () => {
 
   describe('Checking internet Connection', () => {
     beforeEach(() => {
-      ueps = TestBed.inject(UserExplorationPermissionsService);
       registerAcceptTutorialModalEventSpy = spyOn(
         sas,
         'registerAcceptTutorialModalEvent'
@@ -721,11 +738,12 @@ describe('Exploration editor page component', () => {
       );
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
+      (tds.getFeedbackThreadsAsync as jasmine.Spy).and.returnValue(
         Promise.resolve([])
       );
+
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
         Promise.resolve({
           canEdit: true,
@@ -781,8 +799,6 @@ describe('Exploration editor page component', () => {
     let lastPublishedTranslations: LanguageCodeToEntityTranslations;
 
     beforeEach(() => {
-      ueps = TestBed.inject(UserExplorationPermissionsService);
-      tds = TestBed.inject(ThreadDataBackendApiService);
       registerAcceptTutorialModalEventSpy = spyOn(
         sas,
         'registerAcceptTutorialModalEvent'
@@ -805,9 +821,8 @@ describe('Exploration editor page component', () => {
       );
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(1);
+      (tds.getFeedbackThreadsAsync as jasmine.Spy).and.returnValue(
         Promise.resolve([])
       );
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
@@ -906,6 +921,10 @@ describe('Exploration editor page component', () => {
       ];
       mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
         true;
+      component.feedbackPromptModalData = {
+        openThreadsCount: 0,
+      };
+      ets.init(explorationData.title);
       component.ngOnInit();
     });
 
@@ -943,7 +962,6 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should react when exploration property changes', () => {
-      ets.init('Exploration Title');
       mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setDocumentTitle).toHaveBeenCalledWith(
@@ -1077,7 +1095,7 @@ describe('Exploration editor page component', () => {
         ' modal',
       fakeAsync(() => {
         spyOn(component, 'startEditorTutorial').and.callThrough();
-        spyOn(ngbModal, 'open').and.returnValue({
+        (ngbModal.open as jasmine.Spy).and.returnValue({
           componentInstance: new MockNgbModalRef(),
           result: Promise.resolve(explorationId),
         } as NgbModalRef);
@@ -1101,9 +1119,9 @@ describe('Exploration editor page component', () => {
       'should dismiss tutorial when dismissing welcome exploration' + ' modal',
       fakeAsync(() => {
         spyOn(component, 'startEditorTutorial').and.callThrough();
-        spyOn(ngbModal, 'open').and.returnValue({
+        (ngbModal.open as jasmine.Spy).and.returnValue({
           componentInstance: new MockNgbModalRef(),
-          result: Promise.reject(explorationId),
+          result: Promise.reject('dismiss'),
         } as NgbModalRef);
 
         component.showWelcomeExplorationModal();
@@ -1142,17 +1160,6 @@ describe('Exploration editor page component', () => {
 
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
-      tds = TestBed.inject(ThreadDataBackendApiService);
-      ueps = TestBed.inject(UserExplorationPermissionsService);
-
-      registerAcceptTutorialModalEventSpy = spyOn(
-        sas,
-        'registerAcceptTutorialModalEvent'
-      );
-      registerDeclineTutorialModalEventSpy = spyOn(
-        sas,
-        'registerDeclineTutorialModalEvent'
-      );
       mockEnterEditorForTheFirstTime = new EventEmitter();
       spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
         Promise.resolve(null)
@@ -1164,9 +1171,8 @@ describe('Exploration editor page component', () => {
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(5);
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(5);
+      (tds.getFeedbackThreadsAsync as jasmine.Spy).and.returnValue(
         Promise.resolve([])
       );
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
@@ -1225,29 +1231,491 @@ describe('Exploration editor page component', () => {
     }));
   });
 
+  describe('editability marking based on permissions', () => {
+    let editabilityService: EditabilityService;
+    let ueps: UserExplorationPermissionsService;
+    let esaves: ExplorationSaveService;
+    let explorationDataService: ExplorationDataService;
+    let efbas: ExplorationFeaturesBackendApiService;
+    let tds: ThreadDataBackendApiService;
+    let userService: UserService;
+
+    beforeEach(() => {
+      editabilityService = TestBed.inject(EditabilityService);
+      ueps = TestBed.inject(UserExplorationPermissionsService);
+      esaves = TestBed.inject(ExplorationSaveService);
+      explorationDataService = TestBed.inject(ExplorationDataService);
+      efbas = TestBed.inject(ExplorationFeaturesBackendApiService);
+      tds = TestBed.inject(ThreadDataBackendApiService);
+      userService = TestBed.inject(UserService);
+
+      (tds.getFeedbackThreadsAsync as jasmine.Spy)?.calls.reset();
+    });
+
+    it('should mark editable and translatable when user can edit', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({canEdit: true, canVoiceover: false})
+      );
+
+      spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
+        cb();
+        return Promise.resolve(explorationData);
+      });
+
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({explorationIsCurated: false})
+      );
+
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isCurriculumAdmin: () => false,
+          isModerator: () => false,
+        })
+      );
+
+      const markEditableSpy = spyOn(editabilityService, 'markEditable');
+      const markTranslatableSpy = spyOn(editabilityService, 'markTranslatable');
+
+      component.ngOnInit();
+      flush();
+
+      esaves.onInitExplorationPage.emit();
+
+      flush();
+      tick(200);
+      flush();
+      tick(200);
+      flushMicrotasks();
+
+      discardPeriodicTasks();
+
+      expect(markEditableSpy).toHaveBeenCalled();
+      expect(markTranslatableSpy).toHaveBeenCalled();
+    }));
+
+    it('should mark translatable but not editable when user can voiceover but not edit', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({canEdit: false, canVoiceover: true})
+      );
+      spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
+        cb();
+        return Promise.resolve(explorationData);
+      });
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({explorationIsCurated: false})
+      );
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isCurriculumAdmin: () => false,
+          isModerator: () => false,
+        })
+      );
+
+      const markEditableSpy = spyOn(editabilityService, 'markEditable');
+      const markTranslatableSpy = spyOn(editabilityService, 'markTranslatable');
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      flush();
+      tick(200);
+      flush();
+      tick(200);
+      flushMicrotasks();
+      discardPeriodicTasks();
+
+      expect(markEditableSpy).not.toHaveBeenCalled();
+      expect(markTranslatableSpy).toHaveBeenCalled();
+    }));
+
+    it('should mark neither editable nor translatable when user has no permissions', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({canEdit: false, canVoiceover: false})
+      );
+      spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
+        cb();
+        return Promise.resolve(explorationData);
+      });
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({explorationIsCurated: false})
+      );
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isCurriculumAdmin: () => false,
+          isModerator: () => false,
+        })
+      );
+
+      const markEditableSpy = spyOn(editabilityService, 'markEditable');
+      const markTranslatableSpy = spyOn(editabilityService, 'markTranslatable');
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      flush();
+      tick(200);
+      flush();
+      tick(200);
+      flushMicrotasks();
+      discardPeriodicTasks();
+
+      expect(markEditableSpy).not.toHaveBeenCalled();
+      expect(markTranslatableSpy).not.toHaveBeenCalled();
+    }));
+  });
+
+  it('should handle null draft changes correctly', fakeAsync(() => {
+    const data = {...explorationData};
+    data.draft_changes = null;
+
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback();
+      return Promise.resolve(data);
+    });
+
+    spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+      Promise.resolve({explorationIsCurated: false})
+    );
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+      })
+    );
+
+    const entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    spyOn(entityVoiceoversService, 'init').and.callFake(() => {});
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.callFake(
+      () => {}
+    );
+
+    spyOn(
+      entityBulkTranslationsBackendApiService,
+      'fetchEntityBulkTranslationsAsync'
+    ).and.returnValue(Promise.resolve({}));
+    const platformFeatureService = TestBed.inject(PlatformFeatureService);
+    platformFeatureService.status.ExplorationEditorCanModifyTranslations = {
+      isEnabled: false,
+    };
+
+    spyOn(cls, 'loadAutosavedChangeList');
+    spyOn(
+      component,
+      'populateEntityTranslationsWithDraftChanges'
+    ).and.callThrough();
+
+    component.ngOnInit();
+    esaves.onInitExplorationPage.emit();
+    tick();
+    flush();
+    flushMicrotasks();
+
+    expect(cls.loadAutosavedChangeList).not.toHaveBeenCalled();
+    expect(
+      component.populateEntityTranslationsWithDraftChanges
+    ).toHaveBeenCalled();
+
+    discardPeriodicTasks();
+  }));
+
+  it('should reset isModalOpenable when feedback prompt modal is dismissed', fakeAsync(() => {
+    (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
+    component.isModalOpenable = true;
+    const mockModalRef = {
+      componentInstance: {},
+      result: Promise.reject(),
+    };
+    (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef);
+
+    component.maybeShowFeedbackPromptModal();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.isModalOpenable).toBeFalse();
+
+    flush();
+
+    expect(component.isModalOpenable).toBeTrue();
+  }));
+
+  it('should handle exploration linked to story correctly', fakeAsync(() => {
+    const linkedData = {...explorationData};
+    linkedData.exploration_is_linked_to_story = true;
+
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback();
+      return Promise.resolve(linkedData);
+    });
+    spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+      Promise.resolve({explorationIsCurated: false})
+    );
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+      })
+    );
+    spyOn(pageContextService, 'setExplorationIsLinkedToStory');
+
+    component.ngOnInit();
+    tick();
+    flush();
+
+    expect(component.explorationIsLinkedToStory).toBeTrue();
+    expect(pageContextService.setExplorationIsLinkedToStory).toHaveBeenCalled();
+    discardPeriodicTasks();
+  }));
+
+  it('should unlock exploration if edits are allowed', fakeAsync(() => {
+    const allowedData = {...explorationData};
+    allowedData.edits_allowed = true;
+
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback();
+      return Promise.resolve(allowedData);
+    });
+
+    spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+      Promise.resolve({explorationIsCurated: false})
+    );
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+      })
+    );
+
+    const lockSpy = spyOn(component.editabilityService, 'lockExploration');
+
+    component.ngOnInit();
+    tick();
+    flush();
+
+    expect(lockSpy).toHaveBeenCalledWith(true);
+    expect(lockSpy).toHaveBeenCalledWith(false);
+    discardPeriodicTasks();
+  }));
+
+  it('should show feedback prompt modal when there are open feedback threads', fakeAsync(() => {
+    ngbModal.open.calls.reset();
+    (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
+      false
+    );
+    (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
+    component.isModalOpenable = true;
+    component.ngOnInit();
+    tick();
+    component.maybeShowFeedbackPromptModal();
+
+    flush();
+    discardPeriodicTasks();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      FeedbackPromptModalComponent,
+      jasmine.objectContaining({
+        backdrop: 'static',
+        keyboard: false,
+        windowClass: 'oppia-confirm-or-cancel-modal',
+      })
+    );
+  }));
+
+  it('should not show feedback prompt modal when there are no open threads', fakeAsync(() => {
+    (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
+    component.feedbackPromptModalData = {openThreadsCount: 0};
+    component.isModalOpenable = true;
+
+    (ngbModal.open as jasmine.Spy).calls.reset();
+
+    component.ngOnInit();
+    esaves.onInitExplorationPage.emit();
+
+    flushMicrotasks();
+    flush();
+    discardPeriodicTasks();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  }));
+
   describe('voiceover tab', () => {
-    it('should be shwon correctly', () => {
+    it('should be shown correctly', () => {
       let isExplorationLinkedToStorySpy = spyOn(
         pageContextService,
         'isExplorationLinkedToStory'
       );
 
-      // Curated exploration must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(true);
-      let voiceoverTabIsEnabled = component.isVoiceoverTabEnabled();
-      expect(voiceoverTabIsEnabled).toBeTrue();
-
-      // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
+      expect(component.isVoiceoverTabEnabled()).toBeTrue();
       isExplorationLinkedToStorySpy.and.returnValue(false);
       mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         false;
       expect(component.isVoiceoverTabEnabled()).toBeFalse();
-
-      // Non curated exploration, when feature flag is enabled, must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
       mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         true;
       expect(component.isVoiceoverTabEnabled()).toBeTrue();
     });
+
+    it('should navigate to feedback tab when feedback prompt modal is confirmed', fakeAsync(() => {
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
+      (ngbModal.open as jasmine.Spy).calls.reset();
+
+      spyOn(rs, 'navigateToFeedbackTab');
+
+      component.isModalOpenable = true;
+
+      const mockModalRef = {
+        componentInstance: {
+          openThreadsCount: 0,
+        },
+        result: Promise.resolve(),
+      };
+      (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef);
+
+      component.maybeShowFeedbackPromptModal();
+      flush();
+
+      expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+      expect(component.isModalOpenable).toBeTrue();
+    }));
+
+    it('should not show lost changes modal if another modal is already open', fakeAsync(() => {
+      (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
+        true
+      );
+      (
+        autosaveInfoModalsService.showLostChangesModal as jasmine.Spy
+      ).calls.reset();
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      tick();
+      flush();
+
+      expect(
+        autosaveInfoModalsService.showLostChangesModal
+      ).not.toHaveBeenCalled();
+
+      discardPeriodicTasks();
+    }));
+
+    it('should not mark translation tutorial as not seen if tutorial should not be shown on load', fakeAsync(() => {
+      const data = {...explorationData};
+      data.show_state_translation_tutorial_on_load = false;
+      const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+      spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(
+        callback => {
+          callback();
+          return Promise.resolve(data);
+        }
+      );
+
+      spyOn(stfts, 'markTranslationTutorialNotSeenBefore');
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      tick();
+      flush();
+
+      expect(stfts.markTranslationTutorialNotSeenBefore).not.toHaveBeenCalled();
+
+      discardPeriodicTasks();
+    }));
   });
+
+  it('should handle cancel in user help modal', fakeAsync(() => {
+    (ngbModal.open as jasmine.Spy).and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.showUserHelpModal();
+    tick();
+
+    flush();
+  }));
+
+  it('should show lost changes modal when initialized with lost changes', fakeAsync(() => {
+    const lostChanges = [{cmd: 'some_change', state_name: 'Introduction'}];
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback(explorationId, lostChanges);
+      return Promise.resolve(explorationData);
+    });
+    (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
+      false
+    );
+    (
+      autosaveInfoModalsService.showLostChangesModal as jasmine.Spy
+    ).calls.reset();
+
+    component.ngOnInit();
+    esaves.onInitExplorationPage.emit();
+    tick();
+    flush();
+
+    expect(autosaveInfoModalsService.showLostChangesModal).toHaveBeenCalledWith(
+      lostChanges,
+      explorationId
+    );
+    discardPeriodicTasks();
+  }));
+
+  it('should not show welcome exploration modal if isModalOpenable is false', () => {
+    component.isModalOpenable = false;
+    (ngbModal.open as jasmine.Spy).calls.reset();
+
+    component.showWelcomeExplorationModal();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  });
+
+  it('should not navigate to main tab when internet disconnects if already on main tab', () => {
+    spyOn(rs, 'getActiveTabName').and.returnValue('main');
+    spyOn(rs, 'navigateToMainTab');
+
+    mockConnectionServiceEmitter.emit(false);
+
+    expect(rs.navigateToMainTab).not.toHaveBeenCalled();
+  });
+
+  it('should update existing entity translation with draft changes', fakeAsync(() => {
+    component.entityTranslationsService.languageCodeToLatestEntityTranslations =
+      {
+        fr: EntityTranslation.createFromBackendDict({
+          entity_id: explorationId,
+          entity_type: 'exploration',
+          entity_version: 1,
+          language_code: 'fr',
+          translations: {},
+        }),
+      };
+
+    const draftChanges = [
+      {
+        cmd: 'edit_translation',
+        language_code: 'fr',
+        content_id: 'content_updated',
+        translation: {
+          content_value: '<p>Updated Content</p>',
+          content_format: 'html',
+          needs_update: false,
+        },
+      },
+    ];
+
+    component.populateEntityTranslationsWithDraftChanges(draftChanges, 1);
+
+    const translation =
+      component.entityTranslationsService.languageCodeToLatestEntityTranslations.fr.getWrittenTranslation(
+        'content_updated'
+      );
+    expect(translation).toBeDefined();
+    const content = translation.getHtml
+      ? translation.getHtml()
+      : translation.toBackendDict
+        ? translation.toBackendDict().content_value
+        : translation.content_value;
+    expect(content).toBe('<p>Updated Content</p>');
+  }));
 });
