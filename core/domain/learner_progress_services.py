@@ -114,7 +114,7 @@ class DisplayableCollectionSummaryDict(TypedDict):
     last_updated_msec: float
     created_on: float
     status: str
-    node_count: int
+    total_node_count: int
     completed_node_count: int
     community_owned: bool
     thumbnail_icon_url: str
@@ -2041,7 +2041,7 @@ def get_collection_summary_dicts(
                     collection_summary.collection_model_created_on
                 ),
                 'status': collection_summary.status,
-                'node_count': collection_summary.node_count,
+                'total_node_count': collection_summary.node_count,
                 'completed_node_count': 0,
                 'community_owned': collection_summary.community_owned,
                 'thumbnail_icon_url': (

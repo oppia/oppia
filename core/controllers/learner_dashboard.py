@@ -227,7 +227,9 @@ class LearnerDashboardCollectionsProgressHandler(
 
         # Completed collections have all nodes done.
         for summary_dict in completed_collection_summary_dicts:
-            summary_dict['completed_node_count'] = summary_dict['node_count']
+            summary_dict['completed_node_count'] = summary_dict[
+                'total_node_count'
+            ]
 
         # Fetch completed node counts for incomplete collections.
         incomplete_collection_ids = [
@@ -295,14 +297,18 @@ class LearnerDashboardExplorationsProgressHandler(
             )
         )
 
-        exploration_ids_for_progress = [
-            summary_dict['id']
-            for summary_dict in (
-                incomplete_exp_summary_dicts
-                + completed_exp_summary_dicts
-                + exploration_playlist_summary_dicts
-            )
-        ]
+        seen_exploration_ids: set[str] = set()
+        exploration_ids_for_progress: list[str] = []
+        for summary_dict in (
+            incomplete_exp_summary_dicts
+            + completed_exp_summary_dicts
+            + exploration_playlist_summary_dicts
+        ):
+            exploration_id = summary_dict['id']
+            if exploration_id not in seen_exploration_ids:
+                seen_exploration_ids.add(exploration_id)
+                exploration_ids_for_progress.append(exploration_id)
+
         progress_by_exp_id = (
             learner_progress_services.get_checkpoint_progress_for_explorations(
                 self.user_id, exploration_ids_for_progress

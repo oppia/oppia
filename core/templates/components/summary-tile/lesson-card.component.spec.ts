@@ -52,7 +52,7 @@ describe('LessonCardComponent', () => {
     status: 'public',
     category: 'Algebra',
     title: 'Test Title',
-    node_count: 0,
+    total_node_count: 0,
     completed_node_count: 0,
   };
 
@@ -716,7 +716,7 @@ describe('LessonCardComponent', () => {
     component.isCommunityLessonComplete = true;
     component.story = CollectionSummary.createFromBackendDict({
       ...sampleCollection,
-      node_count: 5,
+      total_node_count: 5,
       completed_node_count: 2,
     });
 
@@ -730,7 +730,7 @@ describe('LessonCardComponent', () => {
   it('should calculate collection progress based on completed node count', fakeAsync(() => {
     component.story = CollectionSummary.createFromBackendDict({
       ...sampleCollection,
-      node_count: 5,
+      total_node_count: 5,
       completed_node_count: 2,
     });
 
@@ -745,7 +745,7 @@ describe('LessonCardComponent', () => {
   it('should set collection progress to 0 when node count is 0', fakeAsync(() => {
     component.story = CollectionSummary.createFromBackendDict({
       ...sampleCollection,
-      node_count: 0,
+      total_node_count: 0,
       completed_node_count: 0,
     });
 
