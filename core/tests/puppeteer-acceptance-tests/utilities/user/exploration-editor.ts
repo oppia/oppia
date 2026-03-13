@@ -118,6 +118,7 @@ const modifyTranslationModalSelector =
   '.e2e-test-modify-translations-modal-body';
 
 const stateNodeSelector = '.e2e-test-node-label';
+const stateNodeGroupSelector = '.e2e-test-node';
 
 // To match MAX_NODE_LABEL_LENGTH constant from app.constants.ts
 const MAX_NODE_LABEL_LENGTH = 15;
@@ -3710,7 +3711,7 @@ export class ExplorationEditor extends BaseUser {
       await this.openExplorationStateGraphInMobileView();
     }
 
-    await this.page.waitForSelector(stateNodeSelector, {visible: true});
+    await this.page.waitForSelector(stateNodeGroupSelector);
 
     const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
@@ -6174,7 +6175,7 @@ export class ExplorationEditor extends BaseUser {
       await this.openExplorationStateGraphInMobileView();
     }
 
-    await this.page.waitForSelector(stateNodeSelector, {visible: true});
+    await this.page.waitForSelector(stateNodeGroupSelector);
 
     const truncatedCardName = this.truncateCardName(cardName);
     await this.page.waitForFunction(
