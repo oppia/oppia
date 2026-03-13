@@ -120,7 +120,7 @@ const modifyTranslationModalSelector =
 const stateNodeSelector = '.e2e-test-node-label';
 const stateNodeGroupSelector = '.e2e-test-node';
 
-// To match MAX_NODE_LABEL_LENGTH constant from app.constants.ts
+// To match MAX_NODE_LABEL_LENGTH constant from app.constants.ts.
 const MAX_NODE_LABEL_LENGTH = 15;
 
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
@@ -2959,10 +2959,10 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForNetworkIdle();
     const [interactionTile] = await this.page.$x(
-      `//div[contains(@class, "e2e-test-customize-interaction-body")]` +
-        `//div[contains(@class, "oppia-interaction-tile-name") and ` +
-        `normalize-space(.)="${interactionToAdd}"]` +
-        `/ancestor::div[contains(@class, "e2e-test-interaction-tile-")]`
+      `//div[contains(@class, 'e2e-test-customize-interaction-body')]` +
+        `//div[contains(@class, 'oppia-interaction-tile-name') and ` +
+        `normalize-space(.)='${interactionToAdd}']` +
+        `/ancestor::div[contains(@class, 'e2e-test-interaction-tile-')]`
     );
 
     if (!interactionTile) {
