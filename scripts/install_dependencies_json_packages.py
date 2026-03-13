@@ -154,7 +154,7 @@ def url_open(
     """Opens a URL and returns the response.
 
     Args:
-        source_url: Union[str, Request]. The URL to be opened.
+        source_url: Union[str, Request]. The URL.
 
     Returns:
         urlopen. The 'urlopen' object.
