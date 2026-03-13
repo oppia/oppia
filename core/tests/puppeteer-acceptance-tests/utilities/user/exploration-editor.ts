@@ -2959,10 +2959,10 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForNetworkIdle();
     const [interactionTile] = await this.page.$x(
-      `//div[contains(@class, 'e2e-test-customize-interaction-body')]` +
-        `//div[contains(@class, 'oppia-interaction-tile-name') and ` +
+      "//div[contains(@class, 'e2e-test-customize-interaction-body')]" +
+        "//div[contains(@class, 'oppia-interaction-tile-name') and " +
         `normalize-space(.)='${interactionToAdd}']` +
-        `/ancestor::div[contains(@class, 'e2e-test-interaction-tile-')]`
+        "/ancestor::div[contains(@class, 'e2e-test-interaction-tile-')]"
     );
 
     if (!interactionTile) {
