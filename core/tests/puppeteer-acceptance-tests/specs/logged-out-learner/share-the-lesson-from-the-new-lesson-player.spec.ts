@@ -113,7 +113,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to share the lesson using copy link', async function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
-    await loggedOutLearner.page.waitForTimeout(1000);
+    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.expectTextPresentOnPage('Close options');
     // Expect lesson description is present on the page.
     await loggedOutLearner.expectTextPresentOnPage(
@@ -132,14 +132,17 @@ describe('Logged-Out Learner', function () {
 
     // Click on share and copy link.
     await loggedOutLearner.clickShareLessonButton();
-    await loggedOutLearner.page.waitForTimeout(5000);
+    await loggedOutLearner.expectShareLessonModal();
+    await loggedOutLearner.allowClipboardPermission();
+
     await loggedOutLearner.clickCopyLinkButton();
     await loggedOutLearner.expectLinkCopiedMessage();
     const newBrowserTab = await loggedOutLearner.openCopiedLink();
 
     // Expect lesson name present in new tab.
     await loggedOutLearner.expectTextPresentOnPage(
-      'What are the Place Values?'
+      'What are the Place Values?',
+      newBrowserTab
     );
     await newBrowserTab.close();
     await loggedOutLearner.closeShareModal();
@@ -149,7 +152,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
-    await loggedOutLearner.page.waitForTimeout(5000);
+    await loggedOutLearner.expectShareLessonModal();
 
     await loggedOutLearner.clickEmbedInWebpageButton();
     await loggedOutLearner.verifyEmbedHTMLContent(
@@ -165,6 +168,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
+    await loggedOutLearner.expectShareLessonModal();
 
     await loggedOutLearner.shareViaGoogleClassroomAndVerifyURL();
     await loggedOutLearner.closeShareModal();
@@ -174,6 +178,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
+    await loggedOutLearner.expectShareLessonModal();
 
     await loggedOutLearner.shareViaFacebookAndVerifyURL();
     await loggedOutLearner.closeShareModal();
@@ -183,7 +188,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
     await loggedOutLearner.clickShareLessonButton();
-    await loggedOutLearner.page.waitForTimeout(5000);
+    await loggedOutLearner.expectShareLessonModal();
 
     await loggedOutLearner.clickLessonAttribution();
     await loggedOutLearner.expectTextPresentOnPage(

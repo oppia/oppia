@@ -5952,6 +5952,7 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
       timeout: 10000,
     });
+    await this.waitForElementToStabilize(lessonCopyLinkbutton);
     await this.page.click(lessonCopyLinkbutton);
     showMessage('Copy Link button clicked');
   }
@@ -5960,9 +5961,8 @@ export class LoggedOutUser extends BaseUser {
    * Allow clipboard read/write permission.
    */
   async allowClipboardPermission(): Promise<void> {
-    // Grant clipboard permission for the page origin.
-    const context = await this.browserObject.defaultBrowserContext();
-
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
     await context.overridePermissions('http://localhost:8181', [
       'clipboard-read',
       'clipboard-write',
@@ -6180,7 +6180,9 @@ export class LoggedOutUser extends BaseUser {
   async copyAttributionAndVerify(
     lessonAttributionPrintContent: string
   ): Promise<void> {
+    await this.allowClipboardPermission();
     await this.page.waitForSelector(ccButtonSelector);
+    await this.waitForElementToStabilize(ccButtonSelector);
     await this.page.click(ccButtonSelector);
 
     await this.page.bringToFront();
@@ -6226,9 +6228,11 @@ export class LoggedOutUser extends BaseUser {
   async copyHTMLContentAndVerify(
     lessonEmbedHTMLContent: string
   ): Promise<void> {
+    await this.allowClipboardPermission();
     await this.page.waitForSelector(ccButtonSelector, {
       visible: true,
     });
+    await this.waitForElementToStabilize(ccButtonSelector);
     await this.page.click(ccButtonSelector);
 
     await this.page.bringToFront();
