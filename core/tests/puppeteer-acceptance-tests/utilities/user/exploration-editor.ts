@@ -3741,7 +3741,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates direct learners option when changing cards.
-   * @param cardName - Card name where learners should be directed
+   * @param cardName - ard name where learners should be directed
    */
   async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
     await this.page.waitForSelector(openOutcomeDestButton, {
