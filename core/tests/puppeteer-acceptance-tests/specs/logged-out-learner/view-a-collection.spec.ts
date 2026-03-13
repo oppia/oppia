@@ -33,7 +33,8 @@ const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
 const DESKTOP_EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
 const MOBILE_EXPLORATION_TILE_SELECTOR =
   '.e2e-mobile-test-collection-exploration';
-const COLLECTION_EXPLORATION_LINK_SELECTOR = 'a[href*="?collection_id="]';
+const DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR =
+  '.oppia-collection-path-section a[href*="?collection_id="]';
 const BACK_TO_COLLECTION_BUTTON_SELECTOR =
   '.conversation-skin-back-to-collection';
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
@@ -172,13 +173,13 @@ describe('Logged-Out Learner', function () {
       );
 
       await loggedOutLearner.page.waitForSelector(
-        COLLECTION_EXPLORATION_LINK_SELECTOR,
+        DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR,
         {
           visible: true,
         }
       );
       const firstExplorationLink = await loggedOutLearner.page.$eval(
-        COLLECTION_EXPLORATION_LINK_SELECTOR,
+        DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR,
         element => (element as HTMLAnchorElement).href
       );
       await loggedOutLearner.goto(firstExplorationLink);
