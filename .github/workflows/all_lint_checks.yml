@@ -13,6 +13,11 @@ on:
     branches:
       - develop
       - release-*
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{
@@ -23,7 +28,11 @@ jobs:
   backend_lint:
     name: Backend
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -44,7 +53,11 @@ jobs:
   frontend_lint:
     name: Custom ESLint checks
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -62,7 +75,11 @@ jobs:
   frontend_formatter:
     name: Frontend formatting with prettier
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -82,7 +99,11 @@ jobs:
   black_formatter:
     name: Frontend formatting with prettier
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
