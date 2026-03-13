@@ -35,20 +35,21 @@
               generation with essential financial skills.
             </p>
           </div>
-        <div class="align-items-center d-flex flex-column">
-          <a class="oppia-donate-btn fs-3" href="/donate" (click)="closeBanner()">
-            Donate Now <i class="fas fa-arrow-right oppia-arrow"></i>
-          </a>
+          <div class="align-items-center d-flex flex-column">
+            <a class="oppia-donate-btn fs-3" href="/donate" (click)="closeBanner()">
+              Donate Now <i class="fas fa-arrow-right oppia-arrow"></i>
+            </a>
 
-          <div class="oppia-campaign-end">
-            Campaign ends {{ campaignEndMonth }} {{ campaignEndDay }}
+            <div class="oppia-campaign-end">
+              Campaign ends {{ campaignEndMonth }} {{ campaignEndDay }}
+            </div>
           </div>
-        </div>
         </div>
       </div>
       <div class="oppia-campaign-right">
         <img [src]="getStaticImageUrl(campaignBannerImagePath)" alt="Campaign image"
-          class="oppia-campaign-image" />
+             class="oppia-campaign-image">
       </div>
     </div>
   </div>
+</div>
