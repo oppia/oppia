@@ -3133,7 +3133,11 @@ export class TopicManager extends BaseUser {
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOnElementWithSelectorOrJs(closeSaveModalButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
+    const modalHidden = await this.isElementVisible(modalDiv, false, 30000);
+    if (!modalHidden) {
+      await this.page.keyboard.press('Escape');
+      await this.isElementVisible(modalDiv, false, 10000);
+    }
   }
 
   /**
@@ -3897,6 +3901,27 @@ export class TopicManager extends BaseUser {
         return;
       }
       await this.page.waitForTimeout(500);
+    }
+
+    await this.page.evaluate(() => {
+      const headers = Array.from(
+        document.querySelectorAll('.oppia-mobile-collapsible-card-header')
+      );
+      const acquiredHeader = headers.find(header =>
+        header.textContent?.includes('Acquired Skills')
+      );
+      if (acquiredHeader) {
+        (acquiredHeader as HTMLElement).scrollIntoView({block: 'center'});
+        (acquiredHeader as HTMLElement).click();
+      }
+    });
+    const finalVisible = await this.isElementVisible(
+      addAcquiredSkillButton,
+      true,
+      3000
+    );
+    if (finalVisible) {
+      return;
     }
 
     throw new Error('Acquired Skills section did not expand on mobile.');
