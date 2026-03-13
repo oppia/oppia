@@ -25,8 +25,10 @@ import re
 import ssl
 import tempfile
 import zipfile
+import time
+import urllib.error
+from typing import Optional
 from urllib import request as urlrequest
-
 from core.tests import test_utils
 
 from typing import Any, BinaryIO, Final, NoReturn, Tuple
@@ -651,6 +653,48 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             response = install_dependencies_json_packages.url_open(test_url)
         self.assertEqual(response.getcode(), 200)
         self.assertEqual(response.url, test_url)
+
+    def test_url_open_rate_limit_retry(self) -> None:
+        test_url = 'https://example.com/test'
+
+        class MockHeaders:
+            def get(self, key: str) -> Optional[str]:
+                if key == 'x-ratelimit-remaining':
+                    return '0'
+                if key == 'x-ratelimit-reset':
+                    return str(int(time.time()) + 1)
+                return None
+
+        error = urllib.error.HTTPError(
+            url=test_url,
+            code=403,
+            msg='rate limit',
+            hdrs=MockHeaders(),
+            fp=None,
+        )
+
+        class MockResponse:
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                return 200
+
+        call_count = {'count': 0}
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            call_count['count'] += 1
+            if call_count['count'] == 1:
+                raise error
+            return MockResponse()
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(time, 'sleep', lambda x: None)
+
+        with urlopen_swap, sleep_swap:
+            response = install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(response.getcode(), 200)
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext

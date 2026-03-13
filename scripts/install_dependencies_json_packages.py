@@ -160,14 +160,14 @@ def url_open(
         urlopen. The 'urlopen' object.
 
     Raises:
-        urllib.HTTPError. If the request fails for a reason other than
+        urllib.error.HTTPError: If the request fails for a reason other than
             rate limiting, or if the retry also fails.
-        ValueError. If the rate-limit reset time cannot be parsed.
+        ValueError: If the rate-limit reset time cannot be parsed.
     """
     context = ssl.create_default_context(cafile=certifi.where())
     try:
         return urllib.request.urlopen(source_url, context=context)
-    except urlerror.HTTPError as e:
+    except urllib.error.HTTPError as e:
         if e.code != 403:
             raise
 
