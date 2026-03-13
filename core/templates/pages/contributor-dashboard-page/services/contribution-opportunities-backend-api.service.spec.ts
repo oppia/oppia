@@ -71,7 +71,7 @@ describe('Contribution Opportunities backend API service', function () {
       } as TranslationCountsDict,
       language_code: 'hi',
       is_pinned: true,
-      data_format_list_count: 0,
+      reviewer_only_content_count: 0,
     },
     {
       id: 'exp_id_2',
@@ -87,7 +87,7 @@ describe('Contribution Opportunities backend API service', function () {
       } as TranslationCountsDict,
       language_code: 'da',
       is_pinned: false,
-      data_format_list_count: 0,
+      reviewer_only_content_count: 0,
     },
   ];
   const translationOpportunityResponse = {

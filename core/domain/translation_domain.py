@@ -441,7 +441,7 @@ class BaseTranslatableObject:
         """
         return len(self.get_all_contents_which_need_translations())
 
-    def get_data_format_list_count(self) -> int:
+    def get_reviewer_only_content_count(self) -> int:
         """Returns the total number of distinct content fields available in the
         exploration that have a data format of list.
 

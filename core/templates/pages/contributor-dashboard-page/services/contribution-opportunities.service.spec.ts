@@ -68,7 +68,7 @@ describe('Contribution Opportunities Service', () => {
         },
         language_code: 'hi',
         is_pinned: false,
-        data_format_list_count: 0,
+        reviewer_only_content_count: 0,
       } as ExplorationOpportunitySummaryBackendDict,
     ],
     next_cursor: '6',

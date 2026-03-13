@@ -81,14 +81,15 @@ export class TranslationOpportunitiesComponent {
       const heading = opportunity.getOpportunityHeading();
       const languageCode =
         this.translationLanguageService.getActiveLanguageCode();
-      const dataFormatListCount = opportunity.getDataFormatListCount();
+      const reviewerOnlyContentCount =
+        opportunity.getReviewerOnlyContentCount();
       let totalCount = opportunity.getContentCount();
       let translationsCount = opportunity.getTranslationsCount(languageCode);
       const inReviewCount =
         opportunity.getTranslationsInReviewCount(languageCode);
 
       if (!this.userIsReviewer) {
-        totalCount -= dataFormatListCount;
+        totalCount -= reviewerOnlyContentCount;
       }
 
       let progressPercentage = 0;
@@ -108,7 +109,7 @@ export class TranslationOpportunitiesComponent {
         inReviewCount: inReviewCount,
         totalCount: totalCount,
         translationsCount: translationsCount,
-        dataFormatListCount: dataFormatListCount,
+        reviewerOnlyContentCount: reviewerOnlyContentCount,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
@@ -153,6 +154,7 @@ export class TranslationOpportunitiesComponent {
     });
 
     const updateReviewerStatus = async () => {
+      this.languageSelected = false;
       const activeLanguageCode =
         this.translationLanguageService.getActiveLanguageCode();
       if (activeLanguageCode) {
@@ -164,17 +166,16 @@ export class TranslationOpportunitiesComponent {
               activeLanguageCode
             );
         }
+        this.languageSelected = true;
       }
     };
 
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
       async () => {
         await updateReviewerStatus();
-        this.languageSelected = true;
       }
     );
     if (this.translationLanguageService.getActiveLanguageCode()) {
-      this.languageSelected = true;
       updateReviewerStatus();
     } else {
       this.OPPIA_AVATAR_IMAGE_URL =

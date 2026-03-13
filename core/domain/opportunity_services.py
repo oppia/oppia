@@ -125,8 +125,8 @@ def get_exploration_opportunity_summary_from_model(
         model.language_codes_with_assigned_voice_artists,
         {},
         (
-            model.data_format_list_count
-            if model.data_format_list_count is not None
+            model.reviewer_only_content_count
+            if model.reviewer_only_content_count is not None
             else 0
         ),
         False,
@@ -169,7 +169,9 @@ def _construct_new_opportunity_summary_models(
             language_codes_with_assigned_voice_artists=(
                 opportunity_summary.language_codes_with_assigned_voice_artists
             ),
-            data_format_list_count=(opportunity_summary.data_format_list_count),
+            reviewer_only_content_count=(
+                opportunity_summary.reviewer_only_content_count
+            ),
         )
 
         exploration_opportunity_summary_model_list.append(model)
@@ -247,7 +249,7 @@ def create_exp_opportunity_summary(
         language_codes_needing_voice_artists.add(exploration.language_code)
 
     content_count = exploration.get_content_count()
-    data_format_list_count = exploration.get_data_format_list_count()
+    reviewer_only_content_count = exploration.get_reviewer_only_content_count()
     translation_counts = translation_services.get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION, exploration
     )
@@ -274,7 +276,7 @@ def create_exp_opportunity_summary(
             list(language_codes_needing_voice_artists),
             [],
             {},
-            data_format_list_count,
+            reviewer_only_content_count,
         )
     )
 
@@ -391,8 +393,8 @@ def compute_opportunity_models_with_updated_exploration(
     )
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
-    exploration_opportunity_summary.data_format_list_count = (
-        updated_exploration.get_data_format_list_count()
+    exploration_opportunity_summary.reviewer_only_content_count = (
+        updated_exploration.get_reviewer_only_content_count()
     )
     incomplete_translation_language_codes = (
         _compute_exploration_incomplete_translation_languages(

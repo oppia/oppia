@@ -164,7 +164,7 @@ describe('Translation opportunities component', () => {
         },
         language_code: 'en',
         is_pinned: false,
-        data_format_list_count: 0,
+        reviewer_only_content_count: 0,
       }),
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '2',
@@ -180,7 +180,7 @@ describe('Translation opportunities component', () => {
         },
         language_code: 'en',
         is_pinned: false,
-        data_format_list_count: 0,
+        reviewer_only_content_count: 0,
       }),
     ];
 
@@ -268,7 +268,7 @@ describe('Translation opportunities component', () => {
           inReviewCount: 4,
           totalCount: 10,
           translationsCount: 4,
-          dataFormatListCount: 0,
+          reviewerOnlyContentCount: 0,
         },
         {
           id: '1',
@@ -279,7 +279,7 @@ describe('Translation opportunities component', () => {
           inReviewCount: 2,
           totalCount: 4,
           translationsCount: 2,
-          dataFormatListCount: 0,
+          reviewerOnlyContentCount: 0,
         },
       ]);
     }
@@ -311,7 +311,7 @@ describe('Translation opportunities component', () => {
         inReviewCount: 2,
         totalCount: 4,
         translationsCount: 2,
-        dataFormatListCount: 0,
+        reviewerOnlyContentCount: 0,
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -322,7 +322,7 @@ describe('Translation opportunities component', () => {
         inReviewCount: 4,
         totalCount: 10,
         translationsCount: 4,
-        dataFormatListCount: 0,
+        reviewerOnlyContentCount: 0,
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -340,7 +340,7 @@ describe('Translation opportunities component', () => {
           inReviewCount: 2,
           totalCount: 4,
           translationsCount: 2,
-          dataFormatListCount: 0,
+          reviewerOnlyContentCount: 0,
         },
         {
           id: '2',
@@ -351,14 +351,14 @@ describe('Translation opportunities component', () => {
           inReviewCount: 4,
           totalCount: 10,
           translationsCount: 4,
-          dataFormatListCount: 0,
+          reviewerOnlyContentCount: 0,
         },
       ]);
     }
   );
 
   it(
-    'should subtract data_format_list_count from totalCount for ' +
+    'should subtract reviewer_only_content_count from totalCount for ' +
       'non-reviewers',
     () => {
       spyOn(
@@ -382,7 +382,7 @@ describe('Translation opportunities component', () => {
           },
           language_code: 'en',
           is_pinned: false,
-          data_format_list_count: 4,
+          reviewer_only_content_count: 4,
         }),
       ];
 
@@ -399,7 +399,7 @@ describe('Translation opportunities component', () => {
   );
 
   it(
-    'should not subtract data_format_list_count from totalCount for ' +
+    'should not subtract reviewer_only_content_count from totalCount for ' +
       'reviewers',
     () => {
       spyOn(
@@ -424,7 +424,7 @@ describe('Translation opportunities component', () => {
           },
           language_code: 'en',
           is_pinned: false,
-          data_format_list_count: 4,
+          reviewer_only_content_count: 4,
         }),
       ];
 
@@ -502,10 +502,9 @@ describe('Translation opportunities component', () => {
   );
 
   it('should show translation opportunities when language is changed', fakeAsync(() => {
-    spyOn(
-      translationLanguageService,
-      'getActiveLanguageCode'
-    ).and.callThrough();
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
     component.ngOnInit();
     expect(component.languageSelected).toBe(false);

@@ -36,7 +36,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     content_count: int
     translation_counts: Dict[str, int]
     translation_in_review_counts: Dict[str, int]
-    data_format_list_count: int
+    reviewer_only_content_count: int
     is_pinned: bool
 
 
@@ -91,7 +91,7 @@ class ExplorationOpportunitySummary:
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
         translation_in_review_counts: Dict[str, int],
-        data_format_list_count: int = 0,
+        reviewer_only_content_count: int = 0,
         is_pinned: bool = False,
     ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
@@ -117,7 +117,7 @@ class ExplorationOpportunitySummary:
             translation_in_review_counts: dict. A dict with language code as a
                 key and number of translation in review in that language as the
                 value.
-            data_format_list_count: int. The number of content text items that
+            reviewer_only_content_count: int. The number of content text items that
                 are of set_of_strings data format.
             is_pinned: bool. Denotes whether the opportunity is pinned or not in
                 contributor dashboard.
@@ -140,7 +140,7 @@ class ExplorationOpportunitySummary:
             language_codes_with_assigned_voice_artists
         )
         self.translation_in_review_counts = translation_in_review_counts
-        self.data_format_list_count = data_format_list_count
+        self.reviewer_only_content_count = reviewer_only_content_count
         self.is_pinned = is_pinned
         self.validate()
 
@@ -181,7 +181,7 @@ class ExplorationOpportunitySummary:
                 'translation_in_review_counts'
             ],
             exploration_opportunity_summary_dict.get(
-                'data_format_list_count', 0
+                'reviewer_only_content_count', 0
             ),
         )
 
@@ -205,7 +205,7 @@ class ExplorationOpportunitySummary:
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
             'translation_in_review_counts': self.translation_in_review_counts,
-            'data_format_list_count': self.data_format_list_count,
+            'reviewer_only_content_count': self.reviewer_only_content_count,
             'is_pinned': self.is_pinned,
         }
 

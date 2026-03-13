@@ -234,7 +234,7 @@ describe('Contributions and review component', () => {
               en: 2,
             },
             is_pinned: false,
-            data_format_list_count: 0,
+            reviewer_only_content_count: 0,
           }),
           ExplorationOpportunitySummary.createFromBackendDict({
             id: '2',
@@ -249,7 +249,7 @@ describe('Contributions and review component', () => {
               en: 4,
             },
             is_pinned: false,
-            data_format_list_count: 0,
+            reviewer_only_content_count: 0,
           }),
         ],
         more: false,
