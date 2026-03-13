@@ -160,7 +160,7 @@ def url_open(
         urlopen. The 'urlopen' object.
 
     Raises:
-        urllib.error.HTTPError. If the request fails for a reason other than
+        urllib.HTTPError. If the request fails for a reason other than
             rate limiting, or if the retry also fails.
         ValueError. If the rate-limit reset time cannot be parsed.
     """
@@ -171,17 +171,16 @@ def url_open(
         if e.code != 403:
             raise
 
-        headers = e.headers or {}
+        headers = e.headers
         remaining = headers.get('x-ratelimit-remaining')
         if remaining != '0':
             raise
         reset = headers.get('x-ratelimit-reset')
         if reset is None:
             raise
-        try:
-            reset_epoch = int(reset)
-        except ValueError:
-            raise
+
+        reset_epoch = int(reset)
+
         now = int(time.time())
         wait = min(max(reset_epoch - now, 0), 120)
         time.sleep(wait)
