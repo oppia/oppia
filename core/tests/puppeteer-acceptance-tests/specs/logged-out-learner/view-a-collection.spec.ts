@@ -75,7 +75,7 @@ describe('Logged-Out Learner', function () {
     ]);
 
     await superAdmin.page.waitForFunction(
-      collectionName => {
+      (collectionName: string) => {
         const anchors = Array.from(
           document.querySelectorAll('a.thumbnail[href*="/collection/"]')
         );
