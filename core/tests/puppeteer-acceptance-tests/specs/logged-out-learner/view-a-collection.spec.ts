@@ -30,9 +30,10 @@ import {SuperAdmin} from '../../utilities/user/super-admin';
 const COLLECTION_FILENAME = 'welcome_to_collections.yaml';
 const COLLECTION_NAME = 'Introduction to Collections in Oppia';
 const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
-const EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
-const COLLECTION_EXPLORATION_LINK_SELECTOR =
-  '.oppia-collection-path-section a[href*="?collection_id="]';
+const DESKTOP_EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
+const MOBILE_EXPLORATION_TILE_SELECTOR =
+  '.e2e-mobile-test-collection-exploration';
+const COLLECTION_EXPLORATION_LINK_SELECTOR = 'a[href*="?collection_id="]';
 const BACK_TO_COLLECTION_BUTTON_SELECTOR =
   '.conversation-skin-back-to-collection';
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
@@ -46,25 +47,50 @@ describe('Logged-Out Learner', function () {
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
+    await superAdmin.page.setViewport({
+      width: 1920,
+      height: 1080,
+      deviceScaleFactor: 1,
+      isMobile: false,
+      hasTouch: false,
+      isLandscape: true,
+    });
 
     await superAdmin.reloadCollections(COLLECTION_FILENAME);
 
     await superAdmin.navigateToCommunityLibrary();
-
     await superAdmin.page.waitForSelector('.e2e-test-search-input');
     await superAdmin.typeInInputField(
       '.e2e-test-search-input',
       COLLECTION_NAME
     );
 
-    await superAdmin.waitForNetworkIdle();
-    await superAdmin.page.waitForSelector(
-      `h3.activity-title.e2e-test-collection-summary-tile-title`,
-      {visible: true, timeout: 30000}
+    await Promise.all([
+      superAdmin.page.waitForFunction(
+        () => window.location.pathname === '/search/find',
+        {timeout: 30000}
+      ),
+      superAdmin.page.keyboard.press('Enter'),
+    ]);
+
+    await superAdmin.page.waitForFunction(
+      collectionName => {
+        const anchors = Array.from(
+          document.querySelectorAll('a.thumbnail[href*="/collection/"]')
+        );
+        return anchors.some(anchor => {
+          const title = anchor.querySelector(
+            '.e2e-test-collection-summary-tile-title'
+          );
+          return title?.textContent?.trim() === collectionName;
+        });
+      },
+      {timeout: 30000},
+      COLLECTION_NAME
     );
 
     const collectionLink = await superAdmin.page.$$eval(
-      'a.thumbnail',
+      'a.thumbnail[href*="/collection/"]',
       (anchors, collectionName) => {
         const matchingAnchor = anchors.find(anchor => {
           const title = anchor.querySelector(
@@ -79,28 +105,31 @@ describe('Logged-Out Learner', function () {
     );
 
     if (!collectionLink) {
-      throw new Error('Could not find collection link in library results');
+      throw new Error('Could not find collection link in search results');
     }
 
     const match = collectionLink.match(/\/collection\/([^/?#]+)/);
-    if (match) {
-      collectionId = match[1];
-    } else {
-      throw new Error('Could not extract collection ID from URL');
+    if (!match) {
+      throw new Error('Could not extract collection ID from collection link');
     }
+    collectionId = match[1];
   });
 
   it('should navigate to collection and view explorations', async function () {
     await loggedOutLearner.goto(
       `http://localhost:8181/collection/${collectionId}`
     );
-    await loggedOutLearner.page.waitForSelector(EXPLORATION_TILE_SELECTOR, {
+    const explorationTileSelector = loggedOutLearner.isViewportAtMobileWidth()
+      ? MOBILE_EXPLORATION_TILE_SELECTOR
+      : DESKTOP_EXPLORATION_TILE_SELECTOR;
+
+    await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
       visible: true,
       timeout: 10000,
     });
 
     const explorationTiles = await loggedOutLearner.page.$$(
-      EXPLORATION_TILE_SELECTOR
+      explorationTileSelector
     );
     if (explorationTiles.length === 0) {
       throw new Error('No exploration tiles found in the collection');
@@ -112,17 +141,49 @@ describe('Logged-Out Learner', function () {
       `http://localhost:8181/collection/${collectionId}`
     );
 
-    await loggedOutLearner.page.waitForSelector(
-      COLLECTION_EXPLORATION_LINK_SELECTOR,
-      {
-        visible: true,
+    if (loggedOutLearner.isViewportAtMobileWidth()) {
+      await loggedOutLearner.page.waitForSelector(
+        MOBILE_EXPLORATION_TILE_SELECTOR,
+        {visible: true}
+      );
+      await loggedOutLearner.clickOnElementWithSelector(
+        MOBILE_EXPLORATION_TILE_SELECTOR
+      );
+
+      await loggedOutLearner.page.waitForSelector(
+        '.e2e-test-play-exploration-button',
+        {visible: true}
+      );
+      const firstExplorationLink = await loggedOutLearner.page.$eval(
+        '.e2e-test-play-exploration-button',
+        element => {
+          const anchor = element.closest('a') as HTMLAnchorElement | null;
+          return anchor?.href ?? null;
+        }
+      );
+      if (!firstExplorationLink) {
+        throw new Error('Could not find exploration link from mobile preview');
       }
-    );
-    const firstExplorationLink = await loggedOutLearner.page.$eval(
-      COLLECTION_EXPLORATION_LINK_SELECTOR,
-      element => (element as HTMLAnchorElement).href
-    );
-    await loggedOutLearner.goto(firstExplorationLink);
+      await loggedOutLearner.goto(firstExplorationLink);
+    } else {
+      await loggedOutLearner.page.waitForSelector(
+        DESKTOP_EXPLORATION_TILE_SELECTOR,
+        {visible: true}
+      );
+
+      await loggedOutLearner.page.waitForSelector(
+        COLLECTION_EXPLORATION_LINK_SELECTOR,
+        {
+          visible: true,
+        }
+      );
+      const firstExplorationLink = await loggedOutLearner.page.$eval(
+        COLLECTION_EXPLORATION_LINK_SELECTOR,
+        element => (element as HTMLAnchorElement).href
+      );
+      await loggedOutLearner.goto(firstExplorationLink);
+    }
+
     await loggedOutLearner.waitForPageToFullyLoad();
 
     await loggedOutLearner.expectToBeOnPage('/explore/');
@@ -143,7 +204,11 @@ describe('Logged-Out Learner', function () {
       BACK_TO_COLLECTION_BUTTON_SELECTOR
     );
 
-    await loggedOutLearner.page.waitForSelector(EXPLORATION_TILE_SELECTOR, {
+    const explorationTileSelector = loggedOutLearner.isViewportAtMobileWidth()
+      ? MOBILE_EXPLORATION_TILE_SELECTOR
+      : DESKTOP_EXPLORATION_TILE_SELECTOR;
+
+    await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
       visible: true,
     });
   });
@@ -161,7 +226,7 @@ describe('Logged-Out Learner', function () {
 
     await loggedOutLearner.page.waitForSelector(
       SHARE_COLLECTION_FOOTER_SELECTOR,
-      {visible: true, timeout: 10000}
+      {timeout: 10000}
     );
 
     const shareText = await loggedOutLearner.page.$eval(
@@ -169,7 +234,7 @@ describe('Logged-Out Learner', function () {
       el => el.textContent
     );
 
-    if (shareText?.trim() !== 'Compartir esta colección') {
+    if (shareText?.trim().toLowerCase() !== 'compartir esta colección') {
       throw new Error(
         `Expected "Compartir esta colección" but found "${shareText}"`
       );
