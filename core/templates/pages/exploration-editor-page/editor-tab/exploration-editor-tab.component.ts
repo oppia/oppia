@@ -282,10 +282,10 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveInteractionId(
       activeStateName,
-      cloneDeep(displayedValue.interactionId ?? '')
+      cloneDeep(displayedValue.interactionId ?? null)
     );
     this.stateEditorService.setInteractionId(
-      cloneDeep(displayedValue.interactionId ?? '')
+      cloneDeep(displayedValue.interactionId ?? null)
     );
 
     this.explorationStatesService.saveInteractionCustomizationArgs(
