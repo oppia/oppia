@@ -21,12 +21,14 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import importlib
 import os
+import sys
 import time
 
 from core import feconf
 
-import psutil
+
 from typing import Callable, ContextManager, Iterator, List, Optional, Sequence
 
 from . import (
@@ -37,13 +39,11 @@ from . import (
     servers,
 )
 
-_PARSER = argparse.ArgumentParser(
-    description="""
+_PARSER = argparse.ArgumentParser(description="""
 Run the script from the oppia root folder:
     python -m scripts.start
 Note that the root folder MUST be named 'oppia'.
-"""
-)
+""")
 _PARSER.add_argument(
     '--save_datastore',
     help='optional; if specified, does not clear the datastore.',
@@ -139,6 +139,33 @@ def _notify_about_successful_shutdown() -> None:
     )
 
 
+def check_dependencies_are_installed() -> None:
+    """Checks if required dependencies are installed. If not, it triggers
+    the installation script.
+    """
+    required_modules = [
+        'psutil',
+        'certifi',
+        'packaging',
+        'rcssmin',
+        'xmltodict',
+        'yaml',
+    ]
+    missing_modules = []
+    for module in required_modules:
+        try:
+            importlib.import_module(module)
+        except ImportError:
+            missing_modules.append(module)
+
+    if missing_modules:
+        print(
+            'Missing required Python modules: %s. '
+            'Running installation script...' % ', '.join(missing_modules)
+        )
+        install_third_party_libs.main()
+
+
 def get_build_args(parsed_args: argparse.Namespace) -> List[str]:
     """Returns the build arguments based on parsed command-line arguments."""
     build_args = []
@@ -165,6 +192,8 @@ def start_services(
     parsed_args: argparse.Namespace, stack: contextlib.ExitStack
 ) -> psutil.Process:
     """Starts all the required services and returns the dev appserver."""
+    import psutil
+
     stack.enter_context(servers.managed_redis_server())
     stack.enter_context(servers.managed_elasticsearch_dev_server())
     stack.enter_context(
@@ -212,6 +241,7 @@ def attempt_launch_browser(
     ],
 ) -> None:
     """Attempts to launch the web browser."""
+    import psutil
 
     # Try to launch browser with timeout.
     last_error: Optional[Exception] = None
@@ -270,6 +300,7 @@ def _get_ports_in_use_with_names(
 
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
+    check_dependencies_are_installed()
     parsed_args = _PARSER.parse_args(args=args)
 
     # Verify that none of the ports required by the dev services are in use
