@@ -3519,6 +3519,20 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Submit wrong answer in the fraction input box.
+   * Actual answer is 2 according to question.
+   * @param numberOfWrongAnswer - number wrong answer to response.
+   */
+  async submitFewWrongAnswerInFractionInput(
+    numberOfWrongAnswer: number
+  ): Promise<void> {
+    while (numberOfWrongAnswer--) {
+      await this.submitFractionInputResponse('4');
+      await this.page.waitForTimeout(10000);
+    }
+  }
+
+  /**
    * Submit the learner response.
    */
   async submitResponse(): Promise<void> {
@@ -7033,6 +7047,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(showSolutionButton, {
       visible: true,
     });
+    await this.waitForElementToStabilize(showSolutionButton);
     await this.page.click(showSolutionButton);
     showMessage('SHOW SOLUTION button clicked');
   }

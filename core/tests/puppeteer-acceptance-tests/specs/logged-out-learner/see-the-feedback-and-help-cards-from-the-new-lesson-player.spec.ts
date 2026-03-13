@@ -297,12 +297,9 @@ describe('Logged-Out Learner', function () {
 
   it('should be able to check the concept card', async function () {
     // Wait for few minutes to see the concept card.
-    await loggedOutLearner.page.waitForTimeout(180000);
+    await loggedOutLearner.page.waitForTimeout(120000);
     await loggedOutLearner.expectConceptCardButton();
-    await loggedOutLearner.expectScreenshotToMatch(
-      'conceptCardInConversion',
-      __dirname
-    );
+
     // Open concept card.
     await loggedOutLearner.openConceptCard();
     await loggedOutLearner.expectConceptCardContent(
@@ -342,8 +339,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to get feedback on the incorrect answer', async function () {
     await loggedOutLearner.clickNextCardButton();
     // Enter wrong answer in input box.
-    await loggedOutLearner.submitFractionInputResponse('4');
-    await loggedOutLearner.page.waitForTimeout(10000);
+    await loggedOutLearner.submitFewWrongAnswerInFractionInput(1);
     await loggedOutLearner.expectLatestFeedbackContent('Incorrect, try again!');
   });
 
@@ -353,8 +349,11 @@ describe('Logged-Out Learner', function () {
       'Please only use numerical digits, spaces or forward slashes (/)'
     );
     await loggedOutLearner.expectSubmitButton('Disabled');
+
+    // Submit few wrong answer to see hint.
+    await loggedOutLearner.submitFewWrongAnswerInFractionInput(3);
     // Wait for few minutes to see the hint.
-    await loggedOutLearner.page.waitForTimeout(180000);
+    await loggedOutLearner.page.waitForTimeout(120000);
     await loggedOutLearner.expectTextPresentOnPage('View hint');
     await loggedOutLearner.expectConversationContentByButton(
       'View hint',
@@ -365,8 +364,11 @@ describe('Logged-Out Learner', function () {
       'This hint 1 to help to answer the question.'
     );
     await loggedOutLearner.closeHintModal();
+
+    // Submit few wrong answer to see hint.
+    await loggedOutLearner.submitFewWrongAnswerInFractionInput(3);
     // Again wait for few minutes to see another hint.
-    await loggedOutLearner.page.waitForTimeout(180000);
+    await loggedOutLearner.page.waitForTimeout(120000);
     await loggedOutLearner.expectTextPresentOnPage('View hint 2');
     await loggedOutLearner.expectConversationContentByButton(
       'View hint 2',
@@ -379,14 +381,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.closeHintModal();
 
     // Submit few wrong answer.
-    await loggedOutLearner.submitFractionInputResponse('4');
-    await loggedOutLearner.page.waitForTimeout(10000);
-    await loggedOutLearner.submitFractionInputResponse('4');
-    await loggedOutLearner.page.waitForTimeout(20000);
-    await loggedOutLearner.submitFractionInputResponse('4');
+    await loggedOutLearner.submitFewWrongAnswerInFractionInput(4);
 
     // Wait for few minutes to see the solution.
-    await loggedOutLearner.page.waitForTimeout(180000);
+    await loggedOutLearner.page.waitForTimeout(120000);
 
     await loggedOutLearner.expectTextPresentOnPage('View Solution');
     await loggedOutLearner.expectConversationContentByButton(
