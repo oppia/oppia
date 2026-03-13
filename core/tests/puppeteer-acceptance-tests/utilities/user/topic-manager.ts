@@ -3703,29 +3703,11 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async addAcquiredSkill(skillName: string): Promise<void> {
+    await this.expectElementToBeVisible(chapterEditorContainerSelector);
     await this.scrollToBottomOfPage();
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      const visibleButtons = await this.page.$$(addAcquiredSkillButton);
-      const hasVisibleButton = await Promise.all(
-        visibleButtons.map(async button => {
-          const box = await button.boundingBox();
-          return Boolean(box);
-        })
-      ).then(results => results.some(Boolean));
-
-      if (!hasVisibleButton) {
-        const acquiredHeader = await this.page.waitForXPath(
-          '//div[contains(@class,"story-node-header")][.//span[contains(normalize-space(.),"Acquired Skills")]]',
-          {timeout: 10000}
-        );
-        if (acquiredHeader) {
-          await acquiredHeader.evaluate(element => {
-            element.scrollIntoView({block: 'center'});
-            (element as HTMLElement).click();
-          });
-        }
-      }
+      await this.ensureMobileAcquiredSkillsSectionIsVisible();
     }
 
     await this.page.waitForSelector(addAcquiredSkillButton, {visible: true});
@@ -3741,11 +3723,38 @@ export class TopicManager extends BaseUser {
       throw new Error('Add Acquired skill button not found.');
     }
 
-    const targetElement = this.isViewportAtMobileWidth()
-      ? visibleElements[visibleElements.length - 1]
-      : visibleElements[0];
-    await this.waitForElementToBeClickable(targetElement);
-    await targetElement.click();
+    let targetElement: ElementHandle<Element> | null = null;
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    for (const element of visibleElements) {
+      const inMobileSection = await element.evaluate(el =>
+        Boolean(el.closest('.story-skill-mobile'))
+      );
+      if (isMobileViewport === inMobileSection) {
+        targetElement = element;
+        break;
+      }
+    }
+    targetElement = targetElement ?? visibleElements[0];
+
+    const isDisabled = await targetElement.evaluate(
+      element => (element as HTMLButtonElement).disabled
+    );
+    if (isDisabled) {
+      await this.page.waitForFunction(
+        (element: HTMLButtonElement) => !element.disabled,
+        {timeout: 10000},
+        targetElement
+      );
+    }
+
+    try {
+      await this.clickOnElement(targetElement);
+    } catch (error) {
+      await targetElement.evaluate(element => {
+        element.scrollIntoView({block: 'center'});
+        (element as HTMLElement).click();
+      });
+    }
     await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 
@@ -3754,11 +3763,34 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill to remove.
    */
   async removeAcquiredSkill(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.ensureMobileAcquiredSkillsSectionIsVisible();
+    }
     const cardSelector = this.isViewportAtMobileWidth()
       ? aquiredSkillSkillMobileSelector
       : aquiredSkillSkillSelector;
     await this.page.waitForSelector(cardSelector);
     const skillCards = await this.page.$$(cardSelector);
+
+    const waitForSkillRemoval = async (timeout: number): Promise<boolean> => {
+      try {
+        await this.page.waitForFunction(
+          (selector: string, targetSkill: string) => {
+            const cards = Array.from(document.querySelectorAll(selector));
+            return !cards.some(card => {
+              const link = card.querySelector('a');
+              return link?.textContent?.trim() === targetSkill;
+            });
+          },
+          {timeout},
+          cardSelector,
+          skillName
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    };
 
     for (const skillCard of skillCards) {
       const skillText = await this.page.evaluate(
@@ -3771,19 +3803,51 @@ export class TopicManager extends BaseUser {
           removeAcquiredSkillButtonSelector
         );
         if (removeButton) {
-          await removeButton.click();
-          await this.page.waitForFunction(
-            (selector: string, targetSkill: string) => {
-              const cards = Array.from(document.querySelectorAll(selector));
-              return !cards.some(card => {
-                const link = card.querySelector('a');
-                return link?.textContent?.trim() === targetSkill;
-              });
-            },
-            {timeout: 10000},
-            cardSelector,
-            skillName
-          );
+          await removeButton.evaluate(element => {
+            element.scrollIntoView({block: 'center'});
+            (element as HTMLElement).click();
+          });
+          let removed = await waitForSkillRemoval(10000);
+          if (!removed) {
+            await this.waitForPageToFullyLoad();
+            const retryCards = await this.page.$$(cardSelector);
+            for (const retryCard of retryCards) {
+              const retrySkillText = await this.page.evaluate(
+                el => el.querySelector('a')?.textContent?.trim(),
+                retryCard
+              );
+              if (retrySkillText === skillName) {
+                const retryRemoveButton = await retryCard.$(
+                  removeAcquiredSkillButtonSelector
+                );
+                if (retryRemoveButton) {
+                  await retryRemoveButton.evaluate(element => {
+                    element.scrollIntoView({block: 'center'});
+                    (element as HTMLElement).click();
+                  });
+                  removed = await waitForSkillRemoval(8000);
+                }
+                break;
+              }
+            }
+          }
+          if (!removed) {
+            const currentSkills = await this.page.$$eval(
+              cardSelector,
+              elements =>
+                elements
+                  .map(
+                    element =>
+                      element.querySelector('a')?.textContent?.trim() || ''
+                  )
+                  .filter(text => text.length > 0)
+            );
+            throw new Error(
+              `Failed to remove acquired skill ${skillName}. Current acquired skills: ${currentSkills.join(
+                ', '
+              )}`
+            );
+          }
           await this.waitForPageToFullyLoad();
           showMessage(`Removed acquired skill: ${skillName}`);
           return;
@@ -3791,6 +3855,51 @@ export class TopicManager extends BaseUser {
       }
     }
     throw new Error(`The acquired skill ${skillName} was not found.`);
+  }
+
+  /**
+   * Ensures the acquired skills section is expanded in mobile viewport.
+   */
+  async ensureMobileAcquiredSkillsSectionIsVisible(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+
+    const isVisible = await this.isElementVisible(
+      addAcquiredSkillButton,
+      true,
+      1000
+    );
+    if (isVisible) {
+      return;
+    }
+
+    const headerXPath =
+      '//div[contains(@class,"oppia-mobile-collapsible-card-header")]' +
+      '[.//span[contains(normalize-space(.),"Acquired Skills")]]';
+
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const headerHandles = await this.page.$x(headerXPath);
+      if (!headerHandles.length) {
+        await this.page.waitForTimeout(1000);
+        continue;
+      }
+      await headerHandles[0].evaluate(element => {
+        element.scrollIntoView({block: 'center'});
+        (element as HTMLElement).click();
+      });
+      const nowVisible = await this.isElementVisible(
+        addAcquiredSkillButton,
+        true,
+        2000
+      );
+      if (nowVisible) {
+        return;
+      }
+      await this.page.waitForTimeout(500);
+    }
+
+    throw new Error('Acquired Skills section did not expand on mobile.');
   }
 
   /**
@@ -3815,7 +3924,10 @@ export class TopicManager extends BaseUser {
           removePrerequisiteSkillButtonSelector
         );
         if (removeButton) {
-          await removeButton.click();
+          await removeButton.evaluate(element => {
+            element.scrollIntoView({block: 'center'});
+            (element as HTMLElement).click();
+          });
           await this.page.waitForFunction(
             (selector: string, targetSkill: string) => {
               const cards = Array.from(document.querySelectorAll(selector));
