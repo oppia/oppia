@@ -24,6 +24,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import (
     email_manager,
+    email_services,
     exp_domain,
     html_cleaner,
     platform_parameter_domain,
@@ -37,6 +38,7 @@ from core.domain import (
     subscription_services,
     suggestion_registry,
     suggestion_services,
+    taskqueue_services,
     translation_domain,
     user_services,
 )
@@ -9335,6 +9337,8 @@ class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
 class EmailRetryQueueTests(test_utils.EmailTestBase):
     """Tests the retry logic when email sending fails."""
 
+    USER_A_EMAIL = 'a@example.com'
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_A_EMAIL, 'userA')
@@ -9347,7 +9351,7 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         enqueued_tasks = []
 
         def mock_enqueue_task(
-            url: str, payload: dict[str, str], delay: int
+            url: str, payload: dict[str, str], _delay: int
         ) -> None:
             enqueued_tasks.append((url, payload))
 
@@ -9357,7 +9361,7 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         )
 
         with send_mail_swap, enqueue_task_swap:
-            email_manager._send_email(
+            email_manager._send_email(  # pylint: disable=protected-access
                 self.user_a_id,
                 feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP,
@@ -9379,7 +9383,7 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         enqueued_tasks = []
 
         def mock_enqueue_task(
-            url: str, payload: dict[str, str], delay: int
+            url: str, payload: dict[str, str], _delay: int
         ) -> None:
             enqueued_tasks.append((url, payload))
 
@@ -9391,7 +9395,7 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         )
 
         with send_bulk_mail_swap, enqueue_task_swap:
-            email_manager._send_bulk_mail(
+            email_manager._send_bulk_mail(  # pylint: disable=protected-access
                 [self.user_a_id],
                 feconf.SYSTEM_COMMITTER_ID,
                 feconf.BULK_EMAIL_INTENT_MARKETING,
