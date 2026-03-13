@@ -246,6 +246,27 @@ export default function isElementClickable(
   };
 
   /**
+   * This function provides the reason why an element is not clickable, by checking if it is
+   * in the viewport, not blocked by any other element and not disabled.
+   *
+   * @param {Element} element The element to check the reason for not being clickable.
+   * @returns {string} The reason why the element is not clickable.
+   */
+
+  const getFailureReason = (el: Element): string => {
+    if (isElementDisabled(el)) {
+      return 'Element is disabled (HTML disabled attribute is true).';
+    }
+    if (!isElementInViewport(el)) {
+      return 'Element is outside the current browser viewport.';
+    }
+    if (!isElementNotOverlappedByOtherElements(el, getTopmostOverlappingElements(el))) {
+      return 'Element is being overlapped or obscured by another UI component.';
+    }
+    return 'Unknown reason (possibly a race condition during rendering).';
+  };
+
+  /**
    * This function checks if the element is clickable, by checking if it is
    * in the viewport, not blocked by any other element and not disabled.
    *
@@ -280,11 +301,19 @@ export default function isElementClickable(
     );
   };
 
-  // Here we check if the element is clickable and if not, we scroll it into view
-  // and check again.
-  if (!isClickable(element)) {
+  // Check if the element is clickable and scroll into view if it is not.
+  const clickableState = isClickable(element);
+  // If the element is in the expected clickable state, return true.
+  if (clickableState === clickable) {
+    return true;
+  }
+  // If the element is not in the expected clickable state, scroll it into view and return false with the reason.
+  if (!clickableState) {
     element.scrollIntoView({block: 'center', inline: 'center'});
   }
-
-  return isClickable(element) === clickable;
+  // Return the clickable state and the reason for failure if it is not clickable.
+  return {
+    isClickable: clickableState,
+    reason: getFailureReason(element)
+  } as unknown as boolean;
 }

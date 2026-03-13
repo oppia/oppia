@@ -69,6 +69,7 @@ interface ClickDetails {
 declare global {
   interface Window {
     logClick: (clickDetails: ClickDetails) => void;
+    isElementClickable: (el: Element, checkVisibility?: boolean, checkEnabled?: boolean) => { clickable?: boolean; reason?: string };
   }
 }
 
@@ -295,6 +296,7 @@ export class BaseUser {
    */
   private async setupDebugTools(): Promise<void> {
     await this.setupClickLogger();
+    await this.page.exposeFunction('isElementClickable', isElementClickable);
   }
 
   /**
@@ -495,9 +497,15 @@ export class BaseUser {
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
-        await this.page.evaluate(isElementClickable, element, true, true);
+        const result = await this.page.evaluate(
+          (el) => window.isElementClickable(el, true),
+          element
+        ) as Record<string, unknown>;
+        const reason = result?.reason || 'Timeout reached before element became clickable.';
+
         error.message =
-          `Element ${elementDesc} took too long to be clickable.\n` +
+          `FAILED TO CLICK: ${elementDesc}\n` +
+          `REASON: ${reason}\n` +
           'Original Error:\n' +
           error.message;
       }
