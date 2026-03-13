@@ -5,25 +5,10 @@ runs:
   using: 'composite'
   steps:
     - id: install-chrome
-      name: Install Chrome (retries on error)
-      uses: nick-fields/retry@v3
-      env:
-        # This must be one of the versions available from the official
-        # Google Chrome APT repository.
-        # See https://google.com/linuxrepositories/ for more details.
-        CHROME_VERSION: "145.0.7632.116-1"
+      name: Install Chrome
+      # Installs a pinned version of Chrome for Testing from:
+      # https://github.com/GoogleChromeLabs/chrome-for-testing
+      uses: browser-actions/setup-chrome@v2
       with:
-        max_attempts: 3
-        retry_on: error
-        shell: bash
-        timeout_minutes: 10
-        command: |
-          sudo apt-get update
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable=${{ env.CHROME_VERSION }}
-          google-chrome --version
-          chrome_version=$(google-chrome --version 2>&1 | tr -cd '[:digit:].')
-          chrome_version_trimmed="${CHROME_VERSION%-*}"
-          [[ "$chrome_version_trimmed" == "$chrome_version"* ]] || { echo "Error: Desired version does not start with Chrome version."; exit 1;}
+        chrome-version: '145.0.7632.116'
+        install-dependencies: true
