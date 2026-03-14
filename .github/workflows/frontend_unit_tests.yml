@@ -13,6 +13,11 @@ on:
     branches:
       - develop
       - release-*
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{
@@ -35,8 +40,11 @@ jobs:
     name: Generate job strategy matrix
     needs: setup_merge_sha
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event_action != 'destroyed' }}
-
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     outputs:
       job-strategy-matrix: ${{ steps.generate.outputs.job-strategy-matrix }}
     steps:
@@ -60,9 +68,9 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       max-parallel: 25
+      fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
         num_runs: ${{ fromJson(needs.generate-job-strategy-matrix.outputs.job-strategy-matrix) }}
-      fail-fast: false
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
