@@ -232,6 +232,13 @@ describe('AddGoalsModalComponent', () => {
     expect(component.checkedTopics.has('t4')).toBeTrue();
     expect(component.checkedTopics.has('t5')).toBeTrue();
   });
+
+  it('should disable hardcoded demo goal topics', () => {
+    expect(component.isHardcodedDemoTopic('demo-goal-fractions')).toBeTrue();
+    expect(component.isCheckboxDisabled('demo-goal-fractions')).toBeTrue();
+    expect(component.isHardcodedDemoTopic('0')).toBeFalse();
+  });
+
   describe('setsAreEqual', () => {
     it('should return true for equal sets', () => {
       const a = new Set(['1', '2']);

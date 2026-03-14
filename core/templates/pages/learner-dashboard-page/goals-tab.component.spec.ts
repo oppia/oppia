@@ -512,6 +512,32 @@ describe('Goals tab Component', () => {
     );
   });
 
+  it('should add hardcoded demo topics to modal when query param is set', () => {
+    const originalUrl = window.location.pathname + window.location.search;
+    history.replaceState(
+      {},
+      '',
+      `${window.location.pathname}?demo_goal_modal=1`
+    );
+
+    matDialogSpy.open.and.returnValue(matDialogRefSpy);
+    matDialogRefSpy.afterClosed.and.returnValue(of(new Set()));
+
+    component.openModal();
+
+    const dialogConfig = matDialogSpy.open.calls.mostRecent()
+      .args[1] as MatDialogConfig;
+
+    expect(dialogConfig.data.topics['demo-goal-geometry']).toBe(
+      'Geometry: Shapes, Perimeters and Areas'
+    );
+    expect(dialogConfig.data.topics['demo-goal-ratios']).toBe(
+      'Ratios and Proportional Reasoning'
+    );
+
+    history.replaceState({}, '', originalUrl);
+  });
+
   it('should add new goals if add-goals-modal returns set with new ids', async () => {
     component.checkedTopics = new Set();
     fixture.detectChanges();
