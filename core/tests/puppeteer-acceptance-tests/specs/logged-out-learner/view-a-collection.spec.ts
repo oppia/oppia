@@ -44,10 +44,10 @@ const BACK_TO_COLLECTION_BUTTON_SELECTOR =
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
   'Congratulations for completing this lesson!';
 
-async function reloadCollectionForThisSpec(
+const reloadCollectionForThisSpec = async (
   superAdmin: SuperAdmin,
   collectionName: string
-): Promise<void> {
+): Promise<void> => {
   await superAdmin.goto(ADMIN_PAGE_ACTIVITIES_TAB_URL);
   await superAdmin.page.waitForFunction(
     (
@@ -101,7 +101,7 @@ async function reloadCollectionForThisSpec(
   }
 
   throw new Error(`Collection "${collectionName}" not found`);
-}
+};
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
