@@ -94,7 +94,10 @@ jobs:
   e2e_test:
     needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 }}
+    if: ${{ 
+        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 
+        && github.event_name != 'merge_group'
+      }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
@@ -189,7 +192,10 @@ jobs:
   acceptance_test:
     needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 }}
+    if: ${{
+        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0
+        && github.event_name != 'merge_group'
+      }}
     strategy:
       # Fast fail only if it's a merge queue.
       fail-fast: ${{ github.event_name == 'merge_group' }}
@@ -312,7 +318,10 @@ jobs:
 
   lighthouse_accessibility_test:
     needs: [check_test_suites_to_run]
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.count > 0 }}
+    if: ${{
+        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.count > 0
+        && github.event_name != 'merge_group'
+      }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
@@ -342,7 +351,10 @@ jobs:
   lighthouse_performance_test:
     needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 }}
+    if: ${{
+        fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0
+        && github.event_name != 'merge_group'
+      }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
@@ -395,16 +407,22 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository so that local actions can be used
+        if: github.event_name != 'merge_group'
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
+        if: github.event_name != 'merge_group'
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Check workflow status
+        if: github.event_name != 'merge_group'
         uses: ./.github/actions/check-workflow-status
         id: check_workflow_status
         with:
           jobs: ${{ toJson(needs) }}
       - name: Fail if workflow status is failure
-        if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
+        if: ${{ 
+            github.event_name != 'merge_group'
+            && steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' 
+          }}
         run: |
           echo ""
           echo "NOTE TO DEVELOPERS: This CI check is failing because another e2e/acceptance/lighthouse full-stack test workflow has failed. Please see that other workflow for the relevant logs to investigate. When all full-stack workflows pass, this CI check will automatically pass."
@@ -413,6 +431,9 @@ jobs:
           echo ""
           exit 1
         shell: bash
+      - name: Pass if we are in the merge group and therefore skipping previous jobs
+        if: github.event_name == 'merge_group'
+        run: echo "Pass even though tests were skipped because we are in the merge queue"
     permissions:
       pull-requests: write
   trigger_build_and_deploy:
