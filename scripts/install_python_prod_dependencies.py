@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import collections
+import hashlib
 import importlib.metadata
 import json
 import os
@@ -725,18 +726,74 @@ def prepend_comment_to_requirements_file() -> None:
         )
 
 
+def get_requirements_checksum() -> str:
+    """Returns the SHA-256 hex digest of the current 'requirements.in' file.
+
+    Returns:
+        str. Hex digest of the SHA-256 hash of requirements.in.
+    """
+    with open(common.REQUIREMENTS_FILE_PATH, 'rb') as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
+def load_saved_requirements_checksum() -> Optional[str]:
+    """Returns the previously saved checksum for 'requirements.in', or None.
+
+    The checksum is read from PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH if it
+    exists. Returns None when the file is absent or cannot be parsed.
+
+    Returns:
+        str|None. The previously saved checksum string, or None.
+    """
+    checksums_path = common.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH
+    if not os.path.exists(checksums_path):
+        return None
+    try:
+        with open(checksums_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return data.get('requirements.in')
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def save_requirements_checksum(checksum: str) -> None:
+    """Saves the given checksum to PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH.
+
+    Args:
+        checksum: str. The SHA-256 hex digest to save.
+    """
+    with open(
+        common.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH, 'w', encoding='utf-8'
+    ) as f:
+        json.dump({'requirements.in': checksum}, f)
+
+
 def main() -> None:
     """Compares the state of the current 'third_party/python_libs' directory to
     the libraries listed in the 'requirements.txt' file. If there are
     mismatches, regenerate the 'requirements.txt' file and correct the
     mismatches.
+
+    Skips re-running pip-compile when requirements.in has not changed since the
+    last successful run, using a locally stored SHA-256 checksum.
     """
     verify_pip_is_installed()
-    print('Regenerating "requirements.txt" file...')
-    install_python_dev_dependencies.compile_pip_requirements(
-        'requirements.in', 'requirements.txt'
-    )
-    prepend_comment_to_requirements_file()
+
+    current_checksum = get_requirements_checksum()
+    saved_checksum = load_saved_requirements_checksum()
+
+    if current_checksum == saved_checksum:
+        print(
+            'requirements.in is unchanged; skipping "requirements.txt" '
+            'regeneration.'
+        )
+    else:
+        print('Regenerating "requirements.txt" file...')
+        install_python_dev_dependencies.compile_pip_requirements(
+            'requirements.in', 'requirements.txt'
+        )
+        prepend_comment_to_requirements_file()
+        save_requirements_checksum(current_checksum)
 
     mismatches = get_mismatches()
     if mismatches:

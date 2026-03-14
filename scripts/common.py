@@ -151,6 +151,14 @@ COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
 # "requirements.txt" file so that all installations using "requirements.txt"
 # will be identical.
 REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
+# Stores SHA-256 checksums of requirements.in after a successful pip-compile
+# run. This allows skipping pip-compile when requirements.in has not changed,
+# which speeds up repeated runs of the dependency installation script.
+# This file is gitignored so developers can benefit locally without affecting
+# the repo state.
+PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH = os.path.join(
+    CURR_DIR, 'pip_requirements_checksums.json'
+)
 
 WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
 WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'

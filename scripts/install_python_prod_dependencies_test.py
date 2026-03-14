@@ -160,6 +160,29 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_check_call_error
         )
 
+        # Return different checksums so main() always runs pip-compile in tests
+        # that do not explicitly test the skip-compile path.
+        self.swap_get_checksum = self.swap(
+            install_python_prod_dependencies,
+            'get_requirements_checksum',
+            lambda: 'new-checksum',
+        )
+        self.swap_load_checksum = self.swap(
+            install_python_prod_dependencies,
+            'load_saved_requirements_checksum',
+            lambda: 'old-checksum',
+        )
+        self.saved_checksums: List[str] = []
+
+        def mock_save_checksum(checksum: str) -> None:
+            self.saved_checksums.append(checksum)
+
+        self.swap_save_checksum = self.swap(
+            install_python_prod_dependencies,
+            'save_requirements_checksum',
+            mock_save_checksum,
+        )
+
     def get_git_version_string(self, name: str, sha1_piece: str) -> str:
         """Utility function for constructing a GitHub URL for testing.
 
@@ -293,7 +316,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
             with self.swap_prepend_comment, swap_get_mismatches:
                 with swap_validate_metadata_directories, self.swap_run:
-                    install_python_prod_dependencies.main()
+                    with self.swap_get_checksum, self.swap_load_checksum:
+                        with self.swap_save_checksum:
+                            install_python_prod_dependencies.main()
 
         self.assertEqual(removed_dirs, [common.THIRD_PARTY_PYTHON_LIBS_DIR])
 
@@ -365,8 +390,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         with self.swap_check_call, self.swap_Popen, self.swap_prepend_comment:
             with swap_get_mismatches, swap_validate_metadata_directories:
-                with self.swap_run:
-                    install_python_prod_dependencies.main()
+                with self.swap_run, self.swap_get_checksum:
+                    with self.swap_load_checksum, self.swap_save_checksum:
+                        install_python_prod_dependencies.main()
 
         # Check that the pip-compile command was run first.
         self.assertEqual(
@@ -478,7 +504,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
             with self.swap_prepend_comment, swap_get_mismatches:
                 with swap_validate_metadata_directories, self.swap_run:
-                    install_python_prod_dependencies.main()
+                    with self.swap_get_checksum, self.swap_load_checksum:
+                        with self.swap_save_checksum:
+                            install_python_prod_dependencies.main()
 
         self.assertEqual(removed_dirs, [common.THIRD_PARTY_PYTHON_LIBS_DIR])
 
@@ -583,7 +611,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_print = self.swap(builtins, 'print', mock_print)
         with self.swap_run, swap_get_mismatches, swap_print:
             with swap_validate_metadata_directories, self.swap_prepend_comment:
-                install_python_prod_dependencies.main()
+                with self.swap_get_checksum, self.swap_load_checksum:
+                    with self.swap_save_checksum:
+                        install_python_prod_dependencies.main()
 
         self.assertEqual(
             self.cmd_token_list,
@@ -674,7 +704,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         with self.swap_check_call, self.swap_Popen, swap_get_mismatches:
             with swap_validate_metadata_directories, self.swap_prepend_comment:
                 with swap_rm_tree, swap_list_dir, swap_is_dir, self.swap_run:
-                    install_python_prod_dependencies.main()
+                    with self.swap_get_checksum, self.swap_load_checksum:
+                        with self.swap_save_checksum:
+                            install_python_prod_dependencies.main()
 
         self.assertItemsEqual(
             self.cmd_token_list,
@@ -1050,3 +1082,116 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     normalized_library_name, normalized_library_names
                 )
                 normalized_library_names.add(normalized_library_name)
+
+    def test_get_requirements_checksum_returns_hex_string(self) -> None:
+        checksum = install_python_prod_dependencies.get_requirements_checksum()
+        self.assertIsInstance(checksum, str)
+        self.assertEqual(len(checksum), 64)
+
+    def test_load_saved_requirements_checksum_returns_none_when_file_absent(
+        self,
+    ) -> None:
+        swap_path = self.swap(
+            common,
+            'PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH',
+            '/tmp/oppia_test_checksums_absent_xyz.json',
+        )
+        with swap_path:
+            result = (
+                install_python_prod_dependencies
+                .load_saved_requirements_checksum()
+            )
+        self.assertIsNone(result)
+
+    def test_load_saved_requirements_checksum_returns_none_on_invalid_json(
+        self,
+    ) -> None:
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.json', delete=False, encoding='utf-8'
+        ) as f:
+            f.write('not valid json')
+            tmp_path = f.name
+        try:
+            swap_path = self.swap(
+                common,
+                'PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH',
+                tmp_path,
+            )
+            with swap_path:
+                result = (
+                    install_python_prod_dependencies
+                    .load_saved_requirements_checksum()
+                )
+            self.assertIsNone(result)
+        finally:
+            os.remove(tmp_path)
+
+    def test_save_and_load_requirements_checksum_round_trips(self) -> None:
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.json', delete=False, encoding='utf-8'
+        ) as f:
+            tmp_path = f.name
+        try:
+            swap_path = self.swap(
+                common,
+                'PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH',
+                tmp_path,
+            )
+            with swap_path:
+                install_python_prod_dependencies.save_requirements_checksum(
+                    'abc123'
+                )
+                result = (
+                    install_python_prod_dependencies
+                    .load_saved_requirements_checksum()
+                )
+            self.assertEqual(result, 'abc123')
+        finally:
+            os.remove(tmp_path)
+
+    def test_main_skips_pip_compile_when_checksum_unchanged(self) -> None:
+        def mock_get_mismatches() -> (
+            install_python_prod_dependencies.MismatchType
+        ):
+            return {}
+
+        print_statements = []
+
+        def mock_print(s: str) -> None:
+            print_statements.append(s)
+
+        def mock_validate_metadata_directories() -> None:
+            pass
+
+        swap_validate_metadata_directories = self.swap(
+            install_python_prod_dependencies,
+            'validate_metadata_directories',
+            mock_validate_metadata_directories,
+        )
+        swap_get_mismatches = self.swap(
+            install_python_prod_dependencies,
+            'get_mismatches',
+            mock_get_mismatches,
+        )
+        swap_same_checksum = self.swap(
+            install_python_prod_dependencies,
+            'get_requirements_checksum',
+            lambda: 'same-checksum',
+        )
+        swap_load_same_checksum = self.swap(
+            install_python_prod_dependencies,
+            'load_saved_requirements_checksum',
+            lambda: 'same-checksum',
+        )
+        swap_print = self.swap(builtins, 'print', mock_print)
+        with self.swap_run, swap_get_mismatches, swap_print:
+            with swap_validate_metadata_directories, self.swap_prepend_comment:
+                with swap_same_checksum, swap_load_same_checksum:
+                    install_python_prod_dependencies.main()
+
+        self.assertEqual(self.cmd_token_list, [])
+        self.assertIn(
+            'requirements.in is unchanged; skipping "requirements.txt" '
+            'regeneration.',
+            print_statements,
+        )

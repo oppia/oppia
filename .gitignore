@@ -62,6 +62,7 @@ yarn-error.log
 .direnv/*
 .envrc
 portserver.socket
+pip_requirements_checksums.json
 temp-tsconfig-strict.json
 
 # Oppia uses cache slugs for various resources and we need separate resource
