@@ -39,6 +39,10 @@ const PROD_MODE_ACTIVITIES_TAB_SELECTOR =
 const RELOAD_COLLECTION_ROWS_SELECTOR = '.e2e-test-reload-collection-row';
 const RELOAD_COLLECTION_TITLE_SELECTOR = '.e2e-test-reload-collection-title';
 const RELOAD_COLLECTION_BUTTON_SELECTOR = '.e2e-test-reload-collection-button';
+const LIBRARY_SEARCH_INPUT_SELECTOR = '.e2e-test-search-input';
+const COLLECTION_TILE_LINK_SELECTOR = 'a.thumbnail[href*="/collection/"]';
+const COLLECTION_TILE_TITLE_SELECTOR =
+  '.e2e-test-collection-summary-tile-title';
 const DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR =
   '.oppia-collection-path-section a[href*="?collection_id="]';
 const BACK_TO_COLLECTION_BUTTON_SELECTOR =
@@ -119,6 +123,87 @@ const reloadCollectionForThisSpec = async (
   throw new Error(`Collection "${collectionName}" not found`);
 };
 
+const getCollectionLinkFromLibrarySearch = async (
+  superAdmin: SuperAdmin,
+  collectionName: string
+): Promise<string> => {
+  const maxAttempts = 2;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (attempt > 0) {
+      await reloadCollectionForThisSpec(superAdmin, COLLECTION_FILENAME);
+      await superAdmin.navigateToCommunityLibrary();
+    }
+
+    await superAdmin.page.waitForSelector(LIBRARY_SEARCH_INPUT_SELECTOR, {
+      visible: true,
+    });
+    await superAdmin.typeInInputField(
+      LIBRARY_SEARCH_INPUT_SELECTOR,
+      collectionName
+    );
+
+    await Promise.all([
+      superAdmin.page.waitForFunction(
+        () => window.location.pathname === '/search/find',
+        {timeout: 30000}
+      ),
+      superAdmin.page.keyboard.press('Enter'),
+    ]);
+
+    try {
+      await superAdmin.page.waitForFunction(
+        (
+          expectedCollectionName: string,
+          anchorSelector: string,
+          titleSelector: string
+        ) => {
+          const anchors = Array.from(document.querySelectorAll(anchorSelector));
+          return anchors.some(anchor => {
+            const title = anchor.querySelector(titleSelector);
+            return title?.textContent?.trim() === expectedCollectionName;
+          });
+        },
+        {timeout: 60000},
+        collectionName,
+        COLLECTION_TILE_LINK_SELECTOR,
+        COLLECTION_TILE_TITLE_SELECTOR
+      );
+    } catch {
+      if (attempt < maxAttempts - 1) {
+        continue;
+      }
+      throw new Error(
+        `Could not find collection "${collectionName}" in community library search results.`
+      );
+    }
+
+    const collectionLink = (await superAdmin.page.$$eval(
+      COLLECTION_TILE_LINK_SELECTOR,
+      (anchors, expectedCollectionName) => {
+        const expectedName = String(expectedCollectionName);
+        const matchingAnchor = anchors.find(anchor => {
+          const title = anchor.querySelector(
+            '.e2e-test-collection-summary-tile-title'
+          );
+          return title?.textContent?.trim() === expectedName;
+        });
+
+        return matchingAnchor?.getAttribute('href') ?? null;
+      },
+      collectionName
+    )) as string | null;
+
+    if (collectionLink !== null) {
+      return collectionLink;
+    }
+  }
+
+  throw new Error(
+    `Could not resolve collection link for "${collectionName}" after retrying.`
+  );
+};
+
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let superAdmin: SuperAdmin;
@@ -139,48 +224,8 @@ describe('Logged-Out Learner', function () {
     await reloadCollectionForThisSpec(superAdmin, COLLECTION_FILENAME);
 
     await superAdmin.navigateToCommunityLibrary();
-    await superAdmin.page.waitForSelector('.e2e-test-search-input');
-    await superAdmin.typeInInputField(
-      '.e2e-test-search-input',
-      COLLECTION_NAME
-    );
-
-    await Promise.all([
-      superAdmin.page.waitForFunction(
-        () => window.location.pathname === '/search/find',
-        {timeout: 30000}
-      ),
-      superAdmin.page.keyboard.press('Enter'),
-    ]);
-
-    await superAdmin.page.waitForFunction(
-      (collectionName: string) => {
-        const anchors = Array.from(
-          document.querySelectorAll('a.thumbnail[href*="/collection/"]')
-        );
-        return anchors.some(anchor => {
-          const title = anchor.querySelector(
-            '.e2e-test-collection-summary-tile-title'
-          );
-          return title?.textContent?.trim() === collectionName;
-        });
-      },
-      {timeout: 30000},
-      COLLECTION_NAME
-    );
-
-    const collectionLink = await superAdmin.page.$$eval(
-      'a.thumbnail[href*="/collection/"]',
-      (anchors, collectionName) => {
-        const matchingAnchor = anchors.find(anchor => {
-          const title = anchor.querySelector(
-            '.e2e-test-collection-summary-tile-title'
-          );
-          return title?.textContent?.trim() === collectionName;
-        });
-
-        return matchingAnchor?.getAttribute('href') ?? null;
-      },
+    const collectionLink = await getCollectionLinkFromLibrarySearch(
+      superAdmin,
       COLLECTION_NAME
     );
 
