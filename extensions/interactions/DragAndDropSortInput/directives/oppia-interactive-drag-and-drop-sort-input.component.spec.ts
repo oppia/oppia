@@ -514,6 +514,235 @@ describe('Drag and drop sort input interactive component', () => {
 
       expect(component.isChildElementHaveZeroHeight(1)).toBeTrue();
     });
+
+    describe('handleKeyDownMultipleItems', () => {
+      beforeEach(() => {
+        component.multipleItemsInSamePositionArray = [
+          [],
+          ['A', 'B'],
+          [],
+          ['C'],
+          [],
+        ];
+
+        component.activeGroup = 1;
+        component.activeItem = 0;
+
+        component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+        component.listItems.reset([
+          new ElementRef(document.createElement('div')),
+          new ElementRef(document.createElement('div')),
+          new ElementRef(document.createElement('div')),
+        ]);
+      });
+
+      it('should move item down inside the same group when ArrowDown key is pressed', () => {
+        const event = new KeyboardEvent('keydown', {key: 'ArrowDown'});
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 0);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(component.multipleItemsInSamePositionArray[1]).toEqual([
+          'B',
+          'A',
+        ]);
+        expect(component.activeGroup).toBe(1);
+        expect(component.activeItem).toBe(1);
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should move item up inside the same group when ArrowUp key is pressed', () => {
+        const event = new KeyboardEvent('keydown', {key: 'ArrowUp'});
+        component.activeItem = 1;
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 1);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(component.multipleItemsInSamePositionArray[1]).toEqual([
+          'B',
+          'A',
+        ]);
+        expect(component.activeGroup).toBe(1);
+        expect(component.activeItem).toBe(0);
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should move the entire group down when Ctrl + ArrowDown keys are pressed', () => {
+        const event = new KeyboardEvent('keydown', {
+          key: 'ArrowDown',
+          ctrlKey: true,
+        });
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 0);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+
+        // Groups should be swapped.
+        expect(component.multipleItemsInSamePositionArray[1]).toEqual(['C']);
+        expect(component.multipleItemsInSamePositionArray[3]).toEqual([
+          'A',
+          'B',
+        ]);
+
+        expect(component.activeGroup).toBe(3);
+        expect(component.activeItem).toBe(0);
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should move the entire group up when Ctrl + ArrowUp keys are pressed', () => {
+        component.activeGroup = 3;
+
+        const event = new KeyboardEvent('keydown', {
+          key: 'ArrowUp',
+          ctrlKey: true,
+        });
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 3, 0);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+
+        expect(component.multipleItemsInSamePositionArray[1]).toEqual(['C']);
+        expect(component.multipleItemsInSamePositionArray[3]).toEqual([
+          'A',
+          'B',
+        ]);
+
+        expect(component.activeGroup).toBe(1);
+        expect(component.activeItem).toBe(0);
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should increment flatIndex when Tab key is pressed', () => {
+        const event = new KeyboardEvent('keydown', {key: 'Tab'});
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'getFlatIndex').and.returnValue(0);
+        spyOn(component, 'getGroupItemFromFlatIndex').and.returnValue({
+          group: 1,
+          item: 1,
+        });
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 0);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(component.activeGroup).toBe(1);
+        expect(component.activeItem).toBe(1);
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should decrement flatIndex when Shift + Tab keys are pressed', () => {
+        const event = new KeyboardEvent('keydown', {
+          key: 'Tab',
+          shiftKey: true,
+        });
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'getFlatIndex').and.returnValue(1);
+        spyOn(component, 'getGroupItemFromFlatIndex').and.returnValue({
+          group: 1,
+          item: 0,
+        });
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 1);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(component.activeGroup).toBe(1);
+        expect(component.activeItem).toBe(0);
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should not move item down when max groups limit is reached', () => {
+        const event = new KeyboardEvent('keydown', {key: 'ArrowDown'});
+
+        component.maxGroups = 1;
+
+        component.multipleItemsInSamePositionArray = [[], ['A'], []];
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 0);
+
+        expect(component.multipleItemsInSamePositionArray).toEqual([
+          [],
+          ['A'],
+          [],
+        ]);
+      });
+
+      it('should not move item up when ArrowUp is pressed on the first group', () => {
+        const event = new KeyboardEvent('keydown', {key: 'ArrowUp'});
+
+        component.multipleItemsInSamePositionArray = [[], ['A'], [], ['B']];
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 0);
+
+        expect(component.multipleItemsInSamePositionArray).toEqual([
+          [],
+          ['A'],
+          [],
+          ['B'],
+        ]);
+      });
+
+      it('should not move group down when Ctrl + ArrowDown is pressed on the last group', () => {
+        const event = new KeyboardEvent('keydown', {
+          key: 'ArrowDown',
+          ctrlKey: true,
+        });
+
+        component.multipleItemsInSamePositionArray = [[], ['A'], [], ['B']];
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 3, 0);
+
+        expect(component.multipleItemsInSamePositionArray).toEqual([
+          [],
+          ['A'],
+          [],
+          ['B'],
+        ]);
+      });
+
+      it('should not move group up when Ctrl + ArrowUp is pressed on the first group', () => {
+        const event = new KeyboardEvent('keydown', {
+          key: 'ArrowUp',
+          ctrlKey: true,
+        });
+
+        component.multipleItemsInSamePositionArray = [[], ['A'], [], ['B']];
+
+        spyOn(event, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(event, 1, 0);
+
+        expect(component.multipleItemsInSamePositionArray).toEqual([
+          [],
+          ['A'],
+          [],
+          ['B'],
+        ]);
+      });
+    });
   });
 
   it('should move the item down when ArrowDown key is pressed', () => {
