@@ -7163,22 +7163,54 @@ export class LoggedOutUser extends BaseUser {
     );
     expect(appName).toBe('Oppia.org');
   }
+  /**
+   * Function to navigate to the Get Started page and verify meta tags.
+   */
+  async navigateToGetStartedPageAndVerifyMetaTags(): Promise<void> {
+    await this.page.goto(testConstants.URLs.GetStarted, {
+      waitUntil: 'domcontentloaded',
+    });
+    await this.verifyMetaTags();
+  }
 
   /**
-   * Function to crawl main Oppia pages and verify meta tags.
+   * Function to navigate to the Donate page and verify meta tags.
    */
-  async crawlMainOppiaPages(): Promise<void> {
-    const pages = [
-      testConstants.URLs.GetStarted,
-      testConstants.URLs.Donate,
-      testConstants.URLs.Partnerships,
-      testConstants.URLs.Volunteer,
-      testConstants.URLs.Teach,
-    ];
-    for (const url of pages) {
-      await this.page.goto(url, {waitUntil: 'domcontentloaded'});
-      await this.verifyMetaTags();
-    }
+  async navigateToDonatePageAndVerifyMetaTags(): Promise<void> {
+    await this.page.goto(testConstants.URLs.Donate, {
+      waitUntil: 'domcontentloaded',
+    });
+    await this.verifyMetaTags();
+  }
+
+  /**
+   * Function to navigate to the Partnerships page and verify meta tags.
+   */
+  async navigateToPartnershipsPageAndVerifyMetaTags(): Promise<void> {
+    await this.page.goto(testConstants.URLs.Partnerships, {
+      waitUntil: 'domcontentloaded',
+    });
+    await this.verifyMetaTags();
+  }
+
+  /**
+   * Function to navigate to the Volunteer page and verify meta tags.
+   */
+  async navigateToVolunteerPageAndVerifyMetaTags(): Promise<void> {
+    await this.page.goto(testConstants.URLs.Volunteer, {
+      waitUntil: 'domcontentloaded',
+    });
+    await this.verifyMetaTags();
+  }
+
+  /**
+   * Function to navigate to the Teach page and verify meta tags.
+   */
+  async navigateToTeachPageAndVerifyMetaTags(): Promise<void> {
+    await this.page.goto(testConstants.URLs.Teach, {
+      waitUntil: 'domcontentloaded',
+    });
+    await this.verifyMetaTags();
   }
 }
 

@@ -30,9 +30,46 @@ describe('Search Engine Bot', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should crawl the main Oppia pages and verify meta tags',
+    'should verify meta tags on Get Started page',
     async function () {
-      await loggedOutUser.crawlMainOppiaPages();
+      await loggedOutUser.navigateToGetStartedPage();
+      await loggedOutUser.verifyMetaTags();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should verify meta tags on Donate page',
+    async function () {
+      await loggedOutUser.navigateToDonatePage();
+      await loggedOutUser.verifyMetaTags();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should verify meta tags on Partnerships page',
+    async function () {
+      await loggedOutUser.navigateToPartnershipsPage();
+      await loggedOutUser.verifyMetaTags();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should verify meta tags on Volunteer page',
+    async function () {
+      await loggedOutUser.navigateToVolunteerPage();
+      await loggedOutUser.verifyMetaTags();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should verify meta tags on Teach page',
+    async function () {
+      await loggedOutUser.navigateToTeachPage();
+      await loggedOutUser.verifyMetaTags();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
