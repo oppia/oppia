@@ -26,7 +26,6 @@ import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
 import {
   MusicNotesInputCustomizationArgs,
-  ReadableMusicNote,
 } from 'extensions/interactions/customization-args-defs';
 import cloneDeep from 'lodash/cloneDeep';
 
