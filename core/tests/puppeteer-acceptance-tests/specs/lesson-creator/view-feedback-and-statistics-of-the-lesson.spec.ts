@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * @fileoverview Acceptance test from CUJv3 sheet
+ * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/edit?gid=888982708#gid=888982708
  *
  * LC.6. View Feedback and Statistics of the Lesson
  */
@@ -126,7 +126,7 @@ describe('Lesson Creator', function () {
   }, 600000);
 
   it(
-    'should create a feedback thread, reply, and update status',
+    'should view and reply to exploration feedback',
     async function () {
       await lessonCreator.navigateToFeedbackTab();
       await lessonCreator.expectFeedbackPageTobeVisible();
@@ -151,7 +151,7 @@ describe('Lesson Creator', function () {
   );
 
   it(
-    'should show correct number of passers in creator dashboard statistics',
+    'should view exploration statistics and take action based on thems',
     async function () {
       await lessonCreator.navigateToExplorationEditor(explorationId);
       await lessonCreator.navigateToStatsTab();

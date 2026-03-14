@@ -7207,9 +7207,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async openCardStats(cardName: string): Promise<void> {
     await this.navigateToCard(cardName);
-    showMessage(`Waiting for stats modal of card ${cardName} to appear...`);
     await this.expectElementToBeVisible(explorationStateStatsModalSelector);
-    showMessage(`Stats modal of card ${cardName} is now open.`);
   }
 
   /**
@@ -7217,12 +7215,10 @@ export class ExplorationEditor extends BaseUser {
    * Requires the card stats modal to be open.
    */
   async expectCardEnteredTimesToBe(count: number): Promise<void> {
-    showMessage(`Checking that card entered count is ${count}...`);
     await this.expectTextContentToContain(
       explorationStateStatsEnterCountSelector,
       `Card entered: ${count} times.`
     );
-    showMessage(`Confirmed that card entered count is ${count}.`);
   }
 
   /**
@@ -7230,12 +7226,10 @@ export class ExplorationEditor extends BaseUser {
    */
   async closeCardStats(): Promise<void> {
     await this.clickOnElementWithSelector(closeModalButtonSelector);
-    showMessage('Waiting for stats modal to close...');
     await this.expectElementToBeVisible(
       explorationStateStatsModalSelector,
       false
     );
-    showMessage('Stats modal has been closed.');
   }
 
   /**
