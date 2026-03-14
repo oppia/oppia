@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import functools
-import logging
 
 from core.constants import constants
 from core.platform import models
