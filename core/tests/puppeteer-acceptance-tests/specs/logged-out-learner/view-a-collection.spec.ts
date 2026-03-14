@@ -34,6 +34,8 @@ const DESKTOP_EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
 const MOBILE_EXPLORATION_TILE_SELECTOR =
   '.e2e-mobile-test-collection-exploration';
 const ADMIN_PAGE_ACTIVITIES_TAB_URL = 'http://localhost:8181/admin#/activities';
+const PROD_MODE_ACTIVITIES_TAB_SELECTOR =
+  'oppia-admin-prod-mode-activities-tab';
 const RELOAD_COLLECTION_ROWS_SELECTOR = '.e2e-test-reload-collection-row';
 const RELOAD_COLLECTION_TITLE_SELECTOR = '.e2e-test-reload-collection-title';
 const RELOAD_COLLECTION_BUTTON_SELECTOR = '.e2e-test-reload-collection-button';
@@ -49,23 +51,37 @@ const reloadCollectionForThisSpec = async (
   collectionName: string
 ): Promise<void> => {
   await superAdmin.goto(ADMIN_PAGE_ACTIVITIES_TAB_URL);
+
   await superAdmin.page.waitForFunction(
     (
       rowsSelector: string,
+      prodModeSelector: string,
       titleSelector: string,
       expectedCollectionName: string
     ) => {
+      if (document.querySelector(prodModeSelector)) {
+        return true;
+      }
+
       const rows = Array.from(document.querySelectorAll(rowsSelector));
       return rows.some(row => {
         const title = row.querySelector(titleSelector)?.textContent;
         return title?.trim() === expectedCollectionName;
       });
     },
-    {timeout: 300000},
+    {timeout: 120000},
     RELOAD_COLLECTION_ROWS_SELECTOR,
+    PROD_MODE_ACTIVITIES_TAB_SELECTOR,
     RELOAD_COLLECTION_TITLE_SELECTOR,
     collectionName
   );
+
+  const isProdModeActivitiesTabVisible = await superAdmin.page.$(
+    PROD_MODE_ACTIVITIES_TAB_SELECTOR
+  );
+  if (isProdModeActivitiesTabVisible !== null) {
+    return;
+  }
 
   const reloadCollectionRows = await superAdmin.page.$$(
     RELOAD_COLLECTION_ROWS_SELECTOR
