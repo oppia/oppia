@@ -77,10 +77,6 @@ var suites = {
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
-  navigation: [
-    './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
   publication: [
     './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],

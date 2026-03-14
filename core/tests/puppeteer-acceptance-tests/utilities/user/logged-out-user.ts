@@ -7163,55 +7163,6 @@ export class LoggedOutUser extends BaseUser {
     );
     expect(appName).toBe('Oppia.org');
   }
-  /**
-   * Function to navigate to the Get Started page and verify meta tags.
-   */
-  async navigateToGetStartedPageAndVerifyMetaTags(): Promise<void> {
-    await this.page.goto(testConstants.URLs.GetStarted, {
-      waitUntil: 'domcontentloaded',
-    });
-    await this.verifyMetaTags();
-  }
-
-  /**
-   * Function to navigate to the Donate page and verify meta tags.
-   */
-  async navigateToDonatePageAndVerifyMetaTags(): Promise<void> {
-    await this.page.goto(testConstants.URLs.Donate, {
-      waitUntil: 'domcontentloaded',
-    });
-    await this.verifyMetaTags();
-  }
-
-  /**
-   * Function to navigate to the Partnerships page and verify meta tags.
-   */
-  async navigateToPartnershipsPageAndVerifyMetaTags(): Promise<void> {
-    await this.page.goto(testConstants.URLs.Partnerships, {
-      waitUntil: 'domcontentloaded',
-    });
-    await this.verifyMetaTags();
-  }
-
-  /**
-   * Function to navigate to the Volunteer page and verify meta tags.
-   */
-  async navigateToVolunteerPageAndVerifyMetaTags(): Promise<void> {
-    await this.page.goto(testConstants.URLs.Volunteer, {
-      waitUntil: 'domcontentloaded',
-    });
-    await this.verifyMetaTags();
-  }
-
-  /**
-   * Function to navigate to the Teach page and verify meta tags.
-   */
-  async navigateToTeachPageAndVerifyMetaTags(): Promise<void> {
-    await this.page.goto(testConstants.URLs.Teach, {
-      waitUntil: 'domcontentloaded',
-    });
-    await this.verifyMetaTags();
-  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
