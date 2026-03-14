@@ -33,12 +33,75 @@ const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
 const DESKTOP_EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
 const MOBILE_EXPLORATION_TILE_SELECTOR =
   '.e2e-mobile-test-collection-exploration';
+const ADMIN_PAGE_ACTIVITIES_TAB_URL = 'http://localhost:8181/admin#/activities';
+const RELOAD_COLLECTION_ROWS_SELECTOR = '.e2e-test-reload-collection-row';
+const RELOAD_COLLECTION_TITLE_SELECTOR = '.e2e-test-reload-collection-title';
+const RELOAD_COLLECTION_BUTTON_SELECTOR = '.e2e-test-reload-collection-button';
 const DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR =
   '.oppia-collection-path-section a[href*="?collection_id="]';
 const BACK_TO_COLLECTION_BUTTON_SELECTOR =
   '.conversation-skin-back-to-collection';
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
   'Congratulations for completing this lesson!';
+
+async function reloadCollectionForThisSpec(
+  superAdmin: SuperAdmin,
+  collectionName: string
+): Promise<void> {
+  await superAdmin.goto(ADMIN_PAGE_ACTIVITIES_TAB_URL);
+  await superAdmin.page.waitForFunction(
+    (
+      rowsSelector: string,
+      titleSelector: string,
+      expectedCollectionName: string
+    ) => {
+      const rows = Array.from(document.querySelectorAll(rowsSelector));
+      return rows.some(row => {
+        const title = row.querySelector(titleSelector)?.textContent;
+        return title?.trim() === expectedCollectionName;
+      });
+    },
+    {timeout: 90000},
+    RELOAD_COLLECTION_ROWS_SELECTOR,
+    RELOAD_COLLECTION_TITLE_SELECTOR,
+    collectionName
+  );
+
+  const reloadCollectionRows = await superAdmin.page.$$(
+    RELOAD_COLLECTION_ROWS_SELECTOR
+  );
+  for (const row of reloadCollectionRows) {
+    const titleElement = await row.$(RELOAD_COLLECTION_TITLE_SELECTOR);
+    if (!titleElement) {
+      continue;
+    }
+
+    const rowCollectionName = await superAdmin.page.evaluate(
+      element => element.textContent?.trim() ?? '',
+      titleElement
+    );
+    if (rowCollectionName !== collectionName) {
+      continue;
+    }
+
+    const reloadButton = await row.$(RELOAD_COLLECTION_BUTTON_SELECTOR);
+    if (!reloadButton) {
+      throw new Error(
+        `Reload button not found for collection "${collectionName}"`
+      );
+    }
+
+    await superAdmin.waitForElementToBeClickable(reloadButton);
+    await reloadButton.click();
+    await superAdmin.waitForNetworkIdle();
+    await superAdmin.expectActionStatusMessageToBe(
+      'Data reloaded successfully.'
+    );
+    return;
+  }
+
+  throw new Error(`Collection "${collectionName}" not found`);
+}
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
@@ -57,7 +120,7 @@ describe('Logged-Out Learner', function () {
       isLandscape: true,
     });
 
-    await superAdmin.reloadCollections(COLLECTION_FILENAME);
+    await reloadCollectionForThisSpec(superAdmin, COLLECTION_FILENAME);
 
     await superAdmin.navigateToCommunityLibrary();
     await superAdmin.page.waitForSelector('.e2e-test-search-input');
