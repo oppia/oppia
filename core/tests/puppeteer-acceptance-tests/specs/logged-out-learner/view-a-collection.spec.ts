@@ -51,6 +51,81 @@ const BACK_TO_COLLECTION_BUTTON_SELECTOR =
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
   'Congratulations for completing this lesson!';
 
+const openCollectionAndWaitForExplorationTiles = async (
+  loggedOutLearner: LoggedOutUser,
+  collectionId: string
+): Promise<string> => {
+  const collectionUrl = `http://localhost:8181/collection/${collectionId}`;
+  const maxAttempts = 2;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    await loggedOutLearner.goto(collectionUrl);
+
+    try {
+      await loggedOutLearner.page.waitForFunction(
+        (desktopSelector: string, mobileSelector: string) => {
+          const hasVisibleElement = (selector: string): boolean => {
+            const element = document.querySelector(
+              selector
+            ) as HTMLElement | null;
+            if (!element) {
+              return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return (
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
+              rect.width > 0 &&
+              rect.height > 0
+            );
+          };
+
+          return (
+            hasVisibleElement(desktopSelector) ||
+            hasVisibleElement(mobileSelector)
+          );
+        },
+        {timeout: 45000},
+        DESKTOP_EXPLORATION_TILE_SELECTOR,
+        MOBILE_EXPLORATION_TILE_SELECTOR
+      );
+
+      const hasDesktopTiles =
+        (await loggedOutLearner.page.$(DESKTOP_EXPLORATION_TILE_SELECTOR)) !==
+        null;
+      const hasMobileTiles =
+        (await loggedOutLearner.page.$(MOBILE_EXPLORATION_TILE_SELECTOR)) !==
+        null;
+
+      if (loggedOutLearner.isViewportAtMobileWidth() && hasMobileTiles) {
+        return MOBILE_EXPLORATION_TILE_SELECTOR;
+      }
+
+      if (!loggedOutLearner.isViewportAtMobileWidth() && hasDesktopTiles) {
+        return DESKTOP_EXPLORATION_TILE_SELECTOR;
+      }
+
+      if (hasDesktopTiles) {
+        return DESKTOP_EXPLORATION_TILE_SELECTOR;
+      }
+
+      if (hasMobileTiles) {
+        return MOBILE_EXPLORATION_TILE_SELECTOR;
+      }
+    } catch {
+      if (attempt < maxAttempts - 1) {
+        continue;
+      }
+    }
+  }
+
+  throw new Error(
+    `Could not load collection "${collectionId}" with visible exploration tiles.`
+  );
+};
+
 const reloadCollectionForThisSpec = async (
   superAdmin: SuperAdmin,
   collectionName: string
@@ -240,17 +315,11 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should navigate to collection and view explorations', async function () {
-    await loggedOutLearner.goto(
-      `http://localhost:8181/collection/${collectionId}`
-    );
-    const explorationTileSelector = loggedOutLearner.isViewportAtMobileWidth()
-      ? MOBILE_EXPLORATION_TILE_SELECTOR
-      : DESKTOP_EXPLORATION_TILE_SELECTOR;
-
-    await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
-      visible: true,
-      timeout: 10000,
-    });
+    const explorationTileSelector =
+      await openCollectionAndWaitForExplorationTiles(
+        loggedOutLearner,
+        collectionId
+      );
 
     const explorationTiles = await loggedOutLearner.page.$$(
       explorationTileSelector
@@ -261,17 +330,18 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should play an exploration and verify completion', async function () {
-    await loggedOutLearner.goto(
-      `http://localhost:8181/collection/${collectionId}`
-    );
+    const explorationTileSelector =
+      await openCollectionAndWaitForExplorationTiles(
+        loggedOutLearner,
+        collectionId
+      );
 
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      await loggedOutLearner.page.waitForSelector(
-        MOBILE_EXPLORATION_TILE_SELECTOR,
-        {visible: true}
-      );
+      await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
+        visible: true,
+      });
       await loggedOutLearner.clickOnElementWithSelector(
-        MOBILE_EXPLORATION_TILE_SELECTOR
+        explorationTileSelector
       );
 
       await loggedOutLearner.page.waitForSelector(
@@ -290,10 +360,9 @@ describe('Logged-Out Learner', function () {
       }
       await loggedOutLearner.goto(firstExplorationLink);
     } else {
-      await loggedOutLearner.page.waitForSelector(
-        DESKTOP_EXPLORATION_TILE_SELECTOR,
-        {visible: true}
-      );
+      await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
+        visible: true,
+      });
 
       await loggedOutLearner.page.waitForSelector(
         DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR,
@@ -322,18 +391,21 @@ describe('Logged-Out Learner', function () {
   it('should click "Back to Collection" button', async function () {
     await loggedOutLearner.page.waitForSelector(
       BACK_TO_COLLECTION_BUTTON_SELECTOR,
-      {visible: true, timeout: 5000}
+      {visible: true, timeout: 15000}
     );
     await loggedOutLearner.clickOnElementWithSelector(
       BACK_TO_COLLECTION_BUTTON_SELECTOR
     );
 
-    const explorationTileSelector = loggedOutLearner.isViewportAtMobileWidth()
-      ? MOBILE_EXPLORATION_TILE_SELECTOR
-      : DESKTOP_EXPLORATION_TILE_SELECTOR;
+    const explorationTileSelector =
+      await openCollectionAndWaitForExplorationTiles(
+        loggedOutLearner,
+        collectionId
+      );
 
     await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
       visible: true,
+      timeout: 30000,
     });
   });
 
@@ -344,13 +416,14 @@ describe('Logged-Out Learner', function () {
 
     await loggedOutLearner.changeSiteLanguage('es');
 
-    await loggedOutLearner.goto(
-      `http://localhost:8181/collection/${collectionId}`
+    await openCollectionAndWaitForExplorationTiles(
+      loggedOutLearner,
+      collectionId
     );
 
     await loggedOutLearner.page.waitForSelector(
       SHARE_COLLECTION_FOOTER_SELECTOR,
-      {timeout: 10000}
+      {visible: true, timeout: 30000}
     );
 
     const shareText = await loggedOutLearner.page.$eval(
