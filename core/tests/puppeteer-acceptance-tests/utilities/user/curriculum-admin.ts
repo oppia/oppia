@@ -1099,7 +1099,7 @@ export class CurriculumAdmin extends TopicManager {
     WorkedExampleAnswer: string
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      // showSectionsList is the caret-down icon that is only rendered when
+      // ShowSectionsList is the caret-down icon that is only rendered when
       // the sections list is collapsed. Only click it if it is visible.
       const isSectionsListCollapsed =
         await this.isElementVisible(showSectionsList);
