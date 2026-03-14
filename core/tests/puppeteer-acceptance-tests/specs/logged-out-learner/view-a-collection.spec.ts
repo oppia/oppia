@@ -129,7 +129,6 @@ const getCollectionLinkFromLibrarySearch = async (
   collectionName: string
 ): Promise<string> => {
   const maxAttempts = 2;
-  let lastSearchError: Error | null = null;
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     if (attempt > 0) {
@@ -172,9 +171,6 @@ const getCollectionLinkFromLibrarySearch = async (
         COLLECTION_TILE_TITLE_SELECTOR
       );
     } catch {
-      lastSearchError = new Error(
-        `Could not find collection "${collectionName}" in community library search results.`
-      );
       if (attempt < maxAttempts - 1) {
         continue;
       }
@@ -200,10 +196,6 @@ const getCollectionLinkFromLibrarySearch = async (
     if (collectionLink !== null) {
       return collectionLink;
     }
-
-    lastSearchError = new Error(
-      `Could not resolve collection link for "${collectionName}" from search results.`
-    );
   }
 
   // This collection comes from dummy data and has a deterministic id in
