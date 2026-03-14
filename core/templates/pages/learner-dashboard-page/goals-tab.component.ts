@@ -39,26 +39,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import './goals-tab.component.css';
 
-const HARDCODED_DEMO_GOAL_TOPICS: {[topicId: string]: string} = {
-  'demo-goal-fractions': 'Fractions',
-  'demo-goal-multiplication': 'Multiplication',
-  'demo-goal-decimals': 'Decimals',
-  'demo-goal-expressions-equations': 'Expressions and Equations',
-  'demo-goal-division': 'Division',
-  'demo-goal-geometry': 'Geometry: Shapes, Perimeters and Areas',
-  'demo-goal-percentages': 'Percentages',
-  'demo-goal-place-values-1': 'Place Values 1',
-  'demo-goal-addition-subtraction': 'Addition and Subtraction',
-  'demo-goal-ratios': 'Ratios and Proportional Reasoning',
-  'demo-goal-voiceover': 'TopicForVoiceoverTest',
-  'demo-goal-length': 'Length Measurements',
-  'demo-goal-hygiene': 'Hygiene and Diseases',
-  'demo-goal-weight': 'Weight and Mass',
-  'demo-goal-temperature': 'Temperature',
-  'demo-goal-measurement': 'Measurement',
-  'demo-goal-sets': 'Sets',
-  'demo-goal-numbers': 'Numbers',
-};
+const HARDCODED_DEMO_GOAL_TOPICS: {[topicId: string]: string} = {};
 
 const HARD_CODED_DEMO_GOAL_TOPICS_QUERY_PARAM = 'demo_goal_modal';
 

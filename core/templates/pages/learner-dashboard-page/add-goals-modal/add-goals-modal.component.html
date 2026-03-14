@@ -42,7 +42,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: auto;
     height: auto;
-    max-height: 320px;
+    max-height: 165px;
     overflow-y: auto;
     padding: 12px 20px 0;
     width: 100%;
@@ -56,12 +56,8 @@
   }
 
   .oppia-learner-dash-goals-checkbox {
-    align-items: flex-start;
-    display: flex;
     font-size: 16px;
     gap: 0 12px;
-    min-height: 40px;
-    overflow: hidden;
   }
 
   .oppia-learner-dash-goals-checkbox-text {
@@ -75,6 +71,7 @@
   }
 
   .oppia-learner-dash-goals-modal-actions {
+    bottom: 0;
     display: flex;
     gap: 12px;
     justify-content: end;
@@ -102,11 +99,18 @@
     text-align: center;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
+    .oppia-learner-dash-button--modal {
+      max-width: 85%;
+    }
+
     .oppia-learner-dash-goals-modal-content {
-      grid-template-columns: 1fr;
-      max-height: 280px;
-      padding: 16px 20px 0;
+      align-items: flex-start;
+      display: flex;
+      flex-direction: column;
+      gap: 12px 0;
+      height: fit-content;
+      padding: 20px 16px;
     }
 
     .oppia-learner-dash-goals-modal-actions {
@@ -114,15 +118,27 @@
       justify-content: center;
     }
 
+    .oppia-learner-dash-goals-checkbox {
+      align-items: center;
+      display: flex;
+      min-height: 48px;
+    }
   }
 
-  @media screen and (max-width: 576px) {
-    .oppia-learner-dash-goals-modal-actions {
-      gap: 0;
-    }
+  @media screen and (max-width: 768px) {
 
+    .oppia-learner-dash-goals-modal-content {
+      min-height: 256px;
+    }
+  }
+
+   @media screen and (max-width: 576px) {
+    .oppia-learner-dash-goals-modal-actions {
+      gap: 0 0;
+    }
     .oppia-learner-dash-button--modal {
       flex: 1 1 45%;
     }
   }
+
 </style>

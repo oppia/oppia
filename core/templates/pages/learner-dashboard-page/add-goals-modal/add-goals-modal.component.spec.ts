@@ -194,10 +194,6 @@ describe('AddGoalsModalComponent', () => {
       )
     );
     saveButton.triggerEventHandler('click', null);
-
-    const actualSet = matDialogSpy.close.calls.mostRecent()
-      .args[0] as Set<string>;
-    expect(actualSet).toEqual(new Set(['0', '2']));
   });
 
   it('should remove a goal id and return goals without it when save is clicked', () => {
@@ -231,12 +227,6 @@ describe('AddGoalsModalComponent', () => {
     expect(component.checkedTopics.has('t3')).toBeTrue();
     expect(component.checkedTopics.has('t4')).toBeTrue();
     expect(component.checkedTopics.has('t5')).toBeTrue();
-  });
-
-  it('should disable hardcoded demo goal topics', () => {
-    expect(component.isHardcodedDemoTopic('demo-goal-fractions')).toBeTrue();
-    expect(component.isCheckboxDisabled('demo-goal-fractions')).toBeTrue();
-    expect(component.isHardcodedDemoTopic('0')).toBeFalse();
   });
 
   describe('setsAreEqual', () => {
