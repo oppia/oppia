@@ -13,6 +13,11 @@ on:
     branches:
       - develop
       - release-*
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{
@@ -23,7 +28,11 @@ jobs:
   generate-job-strategy-matrix:
     name: Generate job strategy matrix
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     outputs:
       job-strategy-matrix: ${{ steps.generate.outputs.job-strategy-matrix }}
     steps:
