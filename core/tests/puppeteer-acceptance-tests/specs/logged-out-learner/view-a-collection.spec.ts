@@ -200,13 +200,6 @@ const getCollectionLinkFromLibrarySearch = async (
 
   // This collection comes from dummy data and has a deterministic id in
   // Oppia's default collection mapping.
-  await superAdmin.goto(
-    `http://localhost:8181/collection/${WELCOME_COLLECTION_ID}`
-  );
-  await superAdmin.page.waitForSelector(SHARE_COLLECTION_FOOTER_SELECTOR, {
-    visible: true,
-    timeout: 30000,
-  });
   return `/collection/${WELCOME_COLLECTION_ID}`;
 };
 
