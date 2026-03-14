@@ -87,6 +87,6 @@ describe('Community Library Browser', function () {
   });
 
   afterAll(async function () {
-    //   await UserFactory.closeAllBrowsers();
+    // Await UserFactory.closeAllBrowsers();
   });
 });
