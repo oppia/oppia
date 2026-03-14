@@ -1,21 +1,17 @@
-<div class="align-items-center d-flex flex-column h-100">
+<div class="align-items-center d-flex flex-column">
   <h3 class="oppia-learner-dash-goals-modal-title" mat-dialog-title> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING' | translate }} </h3>
   <p class="oppia-learner-dash-goals-modal-info"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_INSTRUCTIONS' | translate }}  </p>
   <div class="oppia-learner-dash-goals-modal-content pt-1 e2e-test-new-goals-list" mat-dialog-content>
     <!--TODO(#18384): What if all the goals are completed, should they be disabled and checked?-->
     <!--TODO(#18384): Topic name translate keys-->
-    <ng-container *ngFor="let topicColumn of getPublishedTopicsInColumns()">
-      <div class="oppia-learner-dash-goals-modal-column">
-        <ng-container *ngFor="let topic of topicColumn">
-          <mat-checkbox color="primary"
-                        class="oppia-learner-dash-goals-checkbox"
-                        (change)="onChange(topic.key)"
-                        [checked]="checkedTopics.has(topic.key) || completedTopics.has(topic.key)"
-                        [disabled]="isCheckboxDisabled(topic.key)">
-            <span class="oppia-learner-dash-goals-checkbox-text"> {{ topic.value }} </span>
-          </mat-checkbox>
-        </ng-container>
-      </div>
+    <ng-container *ngFor="let topic of getPublishedTopics() | keyvalue">
+      <mat-checkbox color="primary"
+                    class="oppia-learner-dash-goals-checkbox"
+                    (change)="onChange(topic.key)"
+                    [checked]="checkedTopics.has(topic.key) || completedTopics.has(topic.key)"
+                    [disabled]="isCheckboxDisabled(topic.key)">
+        <span class="oppia-learner-dash-goals-checkbox-text"> {{ topic.value }} </span>
+      </mat-checkbox>
     </ng-container>
   </div>
   <div class="oppia-learner-dash-goals-modal-actions w-100" mat-dialog-actions>
@@ -38,9 +34,8 @@
   .oppia-learner-dash-goals-modal-content {
     box-sizing: border-box;
     display: grid;
-    gap: 0 24px;
+    gap: 12px 24px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto;
     height: auto;
     max-height: 165px;
     overflow-y: auto;
@@ -48,16 +43,13 @@
     width: 100%;
   }
 
-  .oppia-learner-dash-goals-modal-column {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-width: 0;
-  }
-
   .oppia-learner-dash-goals-checkbox {
+    align-items: flex-start;
+    display: flex;
     font-size: 16px;
     gap: 0 12px;
+    min-height: 40px;
+    overflow: hidden;
   }
 
   .oppia-learner-dash-goals-checkbox-text {
@@ -105,11 +97,7 @@
     }
 
     .oppia-learner-dash-goals-modal-content {
-      align-items: flex-start;
-      display: flex;
-      flex-direction: column;
-      gap: 12px 0;
-      height: fit-content;
+      grid-template-columns: 1fr;
       padding: 20px 16px;
     }
 
