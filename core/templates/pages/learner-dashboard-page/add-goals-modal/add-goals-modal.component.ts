@@ -23,7 +23,6 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
   templateUrl: './add-goals-modal.component.html',
 })
 export class AddGoalsModalComponent {
-  private static readonly DEMO_GOAL_TOPIC_ID_PREFIX = 'demo-goal-';
   checkedTopics: Set<string>;
   completedTopics: Set<string>;
   topics: {[topicId: string]: string} = {};
@@ -61,23 +60,6 @@ export class AddGoalsModalComponent {
     return filteredTopics;
   }
 
-  getPublishedTopicsInColumns(): {key: string; value: string}[][] {
-    const publishedTopics = Object.entries(this.getPublishedTopics()).map(
-      ([key, value]) => ({key, value})
-    );
-    const columnCount = 3;
-    const itemsPerColumn = Math.ceil(publishedTopics.length / columnCount);
-    const columns: {key: string; value: string}[][] = [];
-
-    for (let columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-      const startIndex = columnIndex * itemsPerColumn;
-      const endIndex = startIndex + itemsPerColumn;
-      columns.push(publishedTopics.slice(startIndex, endIndex));
-    }
-
-    return columns.filter(column => column.length > 0);
-  }
-
   onChange(id: string): void {
     if (!this.checkedTopics.has(id)) {
       if (this.checkedTopics.size >= 5) {
@@ -109,10 +91,6 @@ export class AddGoalsModalComponent {
       this.completedTopics.has(topicId) ||
       (this.checkedTopics.size >= 5 && !this.checkedTopics.has(topicId))
     );
-  }
-
-  isHardcodedDemoTopic(topicId: string): boolean {
-    return topicId.startsWith(AddGoalsModalComponent.DEMO_GOAL_TOPIC_ID_PREFIX);
   }
 
   setsAreEqual(a: Set<string>, b: Set<string>): boolean {

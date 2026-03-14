@@ -194,6 +194,9 @@ describe('AddGoalsModalComponent', () => {
       )
     );
     saveButton.triggerEventHandler('click', null);
+    const actualSet = matDialogSpy.close.calls.mostRecent()
+      .args[0] as Set<string>;
+    expect(actualSet).toEqual(new Set(['0', '2']));
   });
 
   it('should remove a goal id and return goals without it when save is clicked', () => {

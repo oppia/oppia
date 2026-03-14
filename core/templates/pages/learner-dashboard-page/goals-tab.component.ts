@@ -39,10 +39,6 @@ import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import './goals-tab.component.css';
 
-const HARDCODED_DEMO_GOAL_TOPICS: {[topicId: string]: string} = {};
-
-const HARD_CODED_DEMO_GOAL_TOPICS_QUERY_PARAM = 'demo_goal_modal';
-
 @Component({
   selector: 'oppia-goals-tab',
   templateUrl: './goals-tab.component.html',
@@ -308,13 +304,10 @@ export class GoalsTabComponent implements OnInit {
       (obj: {[id: string]: string}, item) => ((obj[item.id] = item.name), obj),
       {} as {[id: string]: string}
     );
-    const modalTopics = this.shouldUseHardcodedDemoGoalTopics()
-      ? {...allTopics, ...HARDCODED_DEMO_GOAL_TOPICS}
-      : allTopics;
     dialogConfig.data = {
       checkedTopics: this.checkedTopics,
       completedTopics: this.completedTopics,
-      topics: modalTopics,
+      topics: allTopics,
     };
 
     dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
@@ -360,18 +353,6 @@ export class GoalsTabComponent implements OnInit {
         });
       }
     });
-  }
-
-  private shouldUseHardcodedDemoGoalTopics(): boolean {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
-    return (
-      new URLSearchParams(window.location.search).get(
-        HARD_CODED_DEMO_GOAL_TOPICS_QUERY_PARAM
-      ) === '1'
-    );
   }
 
   async removeGoal(topicId: string, topicName: string): Promise<void> {
