@@ -59,7 +59,6 @@ def get_secret(name: str, project_id: Optional[str] = None) -> Optional[str]:
         str. The value of the secret.
     """
     oppia_project_id = project_id or app_identity_services.get_application_id()
-    logging.info('Retrieved project ID: %s', oppia_project_id)
 
     secret_name = f'projects/{oppia_project_id}/secrets/{name}/versions/latest'
     try:

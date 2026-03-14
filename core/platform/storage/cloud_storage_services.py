@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import functools
-import logging
 
 from google.cloud import storage
 from typing import List, Optional, Union
@@ -95,11 +94,6 @@ def commit(
     """
     # TODO(#13500): Refactor this method that only bytes are passed
     # into raw_bytes.
-    logging.info('Voiceover synthesis log: Committing file to GCS')
-    logging.info(
-        'Voiceover synthesis log: bucket_name: %s, filepath: %s, mimetype: %s'
-        % (bucket_name, filepath, mimetype)
-    )
     blob = _get_bucket(bucket_name).blob(filepath)
     blob.upload_from_string(raw_bytes, content_type=mimetype)
 

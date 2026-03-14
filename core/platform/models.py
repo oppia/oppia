@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import inspect
-import logging
 from types import ModuleType  # pylint: disable=import-only-modules
 
 from core import feconf
@@ -480,20 +479,11 @@ class _Gae(Platform):
         Returns:
             module. The cloud_translate_services module.
         """
-        logging.info(
-            'Voiceover synthesis log: Importing storage services module'
-        )
         if constants.EMULATOR_MODE:
-            logging.info(
-                'Voiceover synthesis log: In Emulator mode, importing dev_mode_storage_services'
-            )
             from core.platform.storage import dev_mode_storage_services
 
             return dev_mode_storage_services
         else:
-            logging.info(
-                'Voiceover synthesis log: In Prod mode, importing cloud_storage_services'
-            )
             from core.platform.storage import cloud_storage_services
 
             return cloud_storage_services

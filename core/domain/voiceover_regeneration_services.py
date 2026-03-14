@@ -306,9 +306,6 @@ def synthesize_voiceover_for_html_string(
     """
     # Audio files are stored to the datastore in the dev env, and to GCS
     # in production.
-    logging.info(
-        'Voiceover synthesis log: About to create GCS file system object.'
-    )
     fs = fs_services.GcsFileSystem(
         feconf.ENTITY_TYPE_EXPLORATION,
         exploration_id,
@@ -321,10 +318,6 @@ def synthesize_voiceover_for_html_string(
         raise Exception(
             'The provided HTML content does not contain any text to synthesize.'
         )
-
-    logging.info(
-        'Voiceover synthesis log: Oppia project ID: %s.' % oppia_project_id
-    )
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
@@ -399,13 +392,8 @@ def synthesize_voiceover_for_html_string(
     # object being recursively passed around in app engine.
     del audio
 
-    logging.info('Voiceover synthesis log: Storing voiceover to GCS.')
     logging.info(
         'Voiceover synthesis log: Voiceover filename: %s.' % voiceover_filename
-    )
-    logging.info(
-        'Voiceover synthesis log: GCS bucket name: %s.'
-        % app_identity_services.get_gcs_resource_bucket_name(oppia_project_id)
     )
     fs.commit(
         '%s/%s' % ('audio', voiceover_filename),
@@ -606,13 +594,6 @@ def fetch_voiceover_by_filename(
     Returns:
         Voiceover. The fetched voiceover object.
     """
-    logging.info(
-        'Voiceover synthesis log: Fetching voiceover from GCS with filename: %s.'
-        % filename
-    )
-    logging.info(
-        'Voiceover synthesis log: About to create GCS file system object.'
-    )
     fs = fs_services.GcsFileSystem(
         feconf.ENTITY_TYPE_EXPLORATION,
         exploration_id,

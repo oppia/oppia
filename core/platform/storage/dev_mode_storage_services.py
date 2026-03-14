@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from core.platform.storage import cloud_storage_emulator
 
 from typing import List, Optional, Union
@@ -72,10 +70,6 @@ def commit(
     """
     # TODO(#13500): Refactor this method that only bytes are passed
     # into raw_bytes.
-    logging.info(
-        'Voiceover synthesis log: In Dev mode, bucket_name: %s, filepath: %s, mimetype: %s'
-        % (unused_bucket_name, filepath, mimetype)
-    )
     blob = cloud_storage_emulator.EmulatorBlob(
         filepath, raw_bytes, content_type=mimetype
     )

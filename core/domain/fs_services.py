@@ -133,10 +133,6 @@ class GcsFileSystem(GeneralFileSystem):
         self._bucket_name = app_identity_services.get_gcs_resource_bucket_name(
             oppia_project_id
         )
-        logging.info(
-            'Voiceover synthesis log: bucket name during GcsFileSystem initialization: %s'
-            % self._bucket_name
-        )
         super().__init__(entity_name, entity_id)
 
     def _get_gcs_file_url(self, filepath: str) -> str:
@@ -223,20 +219,12 @@ class GcsFileSystem(GeneralFileSystem):
         # required for binary data (i.e. when mimetype is set to
         # 'application/octet-stream').
 
-        logging.info(
-            'Voiceover synthesis log: Committing file to GCS with filepath: %s.'
-            % filepath
-        )
         self._check_filepath(filepath)
-        logging.info('Voiceover synthesis log: Checked filepath successfully.')
         storage_services.commit(
             self._bucket_name,
             self._get_gcs_file_url(filepath),
             raw_bytes,
             mimetype,
-        )
-        logging.info(
-            'Voiceover synthesis log: Committed file to GCS successfully.'
         )
 
     def delete(self, filepath: str) -> None:
