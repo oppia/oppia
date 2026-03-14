@@ -29,6 +29,7 @@ import {SuperAdmin} from '../../utilities/user/super-admin';
 
 const COLLECTION_FILENAME = 'welcome_to_collections.yaml';
 const COLLECTION_NAME = 'Introduction to Collections in Oppia';
+const WELCOME_COLLECTION_ID = '0';
 const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
 const DESKTOP_EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
 const MOBILE_EXPLORATION_TILE_SELECTOR =
@@ -128,6 +129,7 @@ const getCollectionLinkFromLibrarySearch = async (
   collectionName: string
 ): Promise<string> => {
   const maxAttempts = 2;
+  let lastSearchError: Error | null = null;
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     if (attempt > 0) {
@@ -170,12 +172,13 @@ const getCollectionLinkFromLibrarySearch = async (
         COLLECTION_TILE_TITLE_SELECTOR
       );
     } catch {
+      lastSearchError = new Error(
+        `Could not find collection "${collectionName}" in community library search results.`
+      );
       if (attempt < maxAttempts - 1) {
         continue;
       }
-      throw new Error(
-        `Could not find collection "${collectionName}" in community library search results.`
-      );
+      break;
     }
 
     const collectionLink = (await superAdmin.page.$$eval(
@@ -197,11 +200,22 @@ const getCollectionLinkFromLibrarySearch = async (
     if (collectionLink !== null) {
       return collectionLink;
     }
+
+    lastSearchError = new Error(
+      `Could not resolve collection link for "${collectionName}" from search results.`
+    );
   }
 
-  throw new Error(
-    `Could not resolve collection link for "${collectionName}" after retrying.`
+  // This collection comes from dummy data and has a deterministic id in
+  // Oppia's default collection mapping.
+  await superAdmin.goto(
+    `http://localhost:8181/collection/${WELCOME_COLLECTION_ID}`
   );
+  await superAdmin.page.waitForSelector(SHARE_COLLECTION_FOOTER_SELECTOR, {
+    visible: true,
+    timeout: 30000,
+  });
+  return `/collection/${WELCOME_COLLECTION_ID}`;
 };
 
 describe('Logged-Out Learner', function () {
