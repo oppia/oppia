@@ -1098,6 +1098,19 @@ export class CurriculumAdmin extends TopicManager {
     WorkedExampleQuestion: string,
     WorkedExampleAnswer: string
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // showSectionsList is the caret-down icon that is only rendered when
+      // the sections list is collapsed. Only click it if it is visible.
+      const isSectionsListCollapsed =
+        await this.isElementVisible(showSectionsList);
+      if (isSectionsListCollapsed) {
+        await this.clickOnElementWithSelector(showSectionsList);
+      }
+    }
+    // The "+ ADD SECTION" button is at the bottom of the study guide section
+    // list. Scroll down to ensure it is in the viewport before clicking,
+    // regardless of screen size.
+    await this.scrollToBottomOfPage();
     await this.expectElementToBeVisible(addStudyGuideSectionButton);
     await this.clickOnElementWithSelector(addStudyGuideSectionButton);
     await this.typeInInputField(
@@ -1237,7 +1250,6 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.evaluate(async textContent => {
       await navigator.clipboard.writeText(textContent);
     }, 'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(72));
-
     const richTextAreaFieldElement =
       await this.getElementInParent(richTextAreaField);
     await richTextAreaFieldElement.focus();
