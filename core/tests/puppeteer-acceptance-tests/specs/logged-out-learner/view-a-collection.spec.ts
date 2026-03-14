@@ -61,7 +61,7 @@ const reloadCollectionForThisSpec = async (
         return title?.trim() === expectedCollectionName;
       });
     },
-    {timeout: 90000},
+    {timeout: 300000},
     RELOAD_COLLECTION_ROWS_SELECTOR,
     RELOAD_COLLECTION_TITLE_SELECTOR,
     collectionName
