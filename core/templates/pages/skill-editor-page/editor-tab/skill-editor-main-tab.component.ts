@@ -23,12 +23,18 @@ import {
   OnInit,
 } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
+import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {Skill} from 'domain/skill/skill.model.ts';
-import {Topic} from 'domain/topic/topic-object.model';
+import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 import {PageTitleService} from 'services/page-title.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
+
 import {SkillEditorRoutingService} from '../services/skill-editor-routing.service';
 import {
   AssignedSkillTopicData,
@@ -51,16 +57,20 @@ export class SkillEditorMainTabComponent
   // topic.
   assignedSkillTopicData!: AssignedSkillTopicData | null;
   skill!: Skill;
-  selectedTopic!: Topic;
-  topicDropdownEnabled: boolean = false;
+
+  // Stores editable topics used to populate the topic dropdown.
+  editableTopicSummaries: CreatorTopicSummary[] = [];
 
   constructor(
+    private alertsService: AlertsService,
     private changeDetectorRef: ChangeDetectorRef,
+    private editableTopicBackendApiService: EditableTopicBackendApiService,
     private focusManagerService: FocusManagerService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private skillEditorStateService: SkillEditorStateService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private undoRedoService: UndoRedoService
   ) {}
 
@@ -79,11 +89,10 @@ export class SkillEditorMainTabComponent
         'Please save all pending ' +
         'changes before viewing the questions list.';
 
-      modalRef.result.then(null, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+      modalRef.result.then(null, () => {});
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     } else {
       this.skillEditorRoutingService.navigateToQuestionsTab();
       this.skillEditorRoutingService.creatingNewQuestion(true);
@@ -95,30 +104,94 @@ export class SkillEditorMainTabComponent
   }
 
   getAssignedSkillTopicData(): AssignedSkillTopicData | null {
-    if (!this.topicName && this.assignedSkillTopicData) {
-      this.topicName = Object.keys(this.assignedSkillTopicData)[0];
-      this.changeSelectedTopic(this.topicName);
-      return this.assignedSkillTopicData;
-    }
     this.assignedSkillTopicData =
       this.skillEditorStateService.getAssignedSkillTopicData();
+
+    if (!this.topicName && this.assignedSkillTopicData) {
+      this.topicName = Object.keys(this.assignedSkillTopicData)[0];
+      this.updateSubtopicForTopic(this.topicName);
+    }
+
     return this.assignedSkillTopicData;
   }
 
-  isTopicDropdownEnabled(): boolean {
-    this.topicDropdownEnabled = Boolean(
-      this.assignedSkillTopicData &&
-        Object.keys(this.assignedSkillTopicData).length
-    );
-    return this.topicDropdownEnabled;
+  getEditableTopicNames(): string[] {
+    return this.editableTopicSummaries.map(topicSummary => topicSummary.name);
   }
 
-  changeSelectedTopic(topicName: string): void {
-    let assignedSkillTopicData = this.assignedSkillTopicData;
-    if (!assignedSkillTopicData) {
+  isTopicDropdownEnabled(): boolean {
+    return this.editableTopicSummaries.length > 0;
+  }
+
+  // Clears the subtopic label when the selected topic has no existing
+  // skill-to-subtopic assignment.
+  updateSubtopicForTopic(topicName: string): void {
+    const assignedSkillTopicData = this.assignedSkillTopicData;
+    if (!assignedSkillTopicData || !assignedSkillTopicData[topicName]) {
+      this.subtopicName = '';
       return;
     }
     this.subtopicName = assignedSkillTopicData[topicName];
+  }
+
+  // Reuses the current assignment when the selected topic is already linked
+  // to the skill. Otherwise, it assigns the skill to that topic.
+  handleTopicSelectionChange(topicName: string): void {
+    this.topicName = topicName;
+    this.assignedSkillTopicData =
+      this.skillEditorStateService.getAssignedSkillTopicData();
+
+    if (
+      this.assignedSkillTopicData &&
+      Object.keys(this.assignedSkillTopicData).includes(topicName)
+    ) {
+      this.updateSubtopicForTopic(topicName);
+      return;
+    }
+
+    this.assignSkillToTopic(topicName);
+  }
+
+  assignSkillToTopic(topicName: string): void {
+    if (!topicName.trim()) {
+      this.alertsService.addWarning('Please select a valid topic.');
+      return;
+    }
+
+    const skillId = this.skill.getId();
+    const topicSummary = this.editableTopicSummaries.find(
+      topic => topic.name === topicName
+    );
+
+    if (!topicSummary) {
+      this.alertsService.addWarning('Could not find the selected topic.');
+      return;
+    }
+
+    const changeList: BackendChangeObject[] = [
+      {
+        cmd: 'add_uncategorized_skill_id',
+        new_uncategorized_skill_id: skillId,
+      },
+    ];
+
+    this.editableTopicBackendApiService
+      .updateTopicAsync(
+        topicSummary.id,
+        topicSummary.version,
+        'Added skill with id ' + skillId + ' to topic.',
+        changeList
+      )
+      .then(() => {
+        this.skillEditorStateService.loadSkill(skillId);
+        this.subtopicName = '';
+        this.alertsService.addSuccessMessage(
+          'The skill has been assigned to the topic.'
+        );
+      })
+      .catch((error: string) => {
+        this.alertsService.addWarning(error);
+      });
   }
 
   hasLoadedSkill(): boolean {
@@ -139,8 +212,20 @@ export class SkillEditorMainTabComponent
     // To ensure that the focus event function executes only after
     // all the functions in the main thread have executed,
     // $timeout is required.
+
     setTimeout(() => {
       this.focusManagerService.setFocus('newQuestionBtn');
     }, 0);
+
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchDashboardDataAsync()
+      .then(response => {
+        this.editableTopicSummaries = response.topicSummaries.filter(
+          summary => summary.canEditTopic === true
+        );
+      })
+      .catch((error: Error) => {
+        this.alertsService.addWarning(error.message);
+      });
   }
 }

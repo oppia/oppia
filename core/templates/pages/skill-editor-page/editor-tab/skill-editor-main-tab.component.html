@@ -21,13 +21,14 @@
           <strong class="status-key">
             Topic:
           </strong>
-          <select *ngIf="getAssignedSkillTopicData()"
-                  class="form-select"
-                  [(ngModel)]="topicName"
-                  (change)="changeSelectedTopic(topicName)"
-                  [disabled]="!isTopicDropdownEnabled()">
-            <option *ngFor="let topic of getAssignedSkillTopicData() | keyvalue" [value]="topic.key">
-              {{topic.key}}
+          <select
+            class="form-select"
+            [(ngModel)]="topicName"
+            (change)="handleTopicSelectionChange(topicName)"
+            [disabled]="!isTopicDropdownEnabled()">
+            <option value="" disabled>Select a topic</option>
+            <option *ngFor="let topic of getEditableTopicNames()" [value]="topic">
+              {{ topic }}
             </option>
           </select>
         </div>
