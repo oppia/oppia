@@ -428,9 +428,9 @@
 
 .oppia-learner-dash-goals-modal {
   border-radius: 4px;
+  max-height: 343px;
   max-width: 820px !important;
   width: min(92vw, 820px);
-  max-height: 343px;
   overflow: hidden;
 }
 
