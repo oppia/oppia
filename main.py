@@ -208,6 +208,11 @@ URLS = [
         '/<firebase_path:__/auth(?:/.*)?>', firebase.FirebaseProxyPage
     ),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
+    get_redirect_route(
+        r'%s/can_access_story_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/story/<story_url_fragment>'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.StoryViewerPageAccessValidationHandler,
+    ),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler
@@ -615,6 +620,14 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL,
         voiceover.RegenerateVoiceoverOnExpUpdateHandler,
+    ),
+    get_redirect_route(
+        r'/exploration_voiceovers_data/<exploration_id>',
+        voiceover.ExplorationDataForVoiceoverRegenerationHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL,
+        voiceover.RegenerateVoiceoversForExplorationHandler,
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -1378,6 +1391,10 @@ URLS = [
     get_redirect_route(
         '/automatic_voiceover_regeneration_record',
         voiceover.AutomaticVoiceoverRegenerationRecordHandler,
+    ),
+    get_redirect_route(
+        r'/exploration_voiceover_regeneration_status_url/<exploration_id>',
+        voiceover.VoiceoverRegenerationRequestToCloudTaskHandler,
     ),
 ]
 

@@ -328,7 +328,6 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
-
 export class CurriculumAdmin extends TopicManager {
   /**
    * Moves the classrooms in the order of the given classroom names.
@@ -2443,6 +2442,28 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.type(addTopicFormFieldInput, topicName);
     await this.clickOnElementWithSelector(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
+
+    // Wait for the topic to appear in the classroom before adding prerequisites.
+    await this.page.waitForFunction(
+      (
+        topicBoxSelector: string,
+        topicNameSelector: string,
+        expectedTopicName: string
+      ) => {
+        const topicBoxElements = document.querySelectorAll(topicBoxSelector);
+        for (const element of topicBoxElements) {
+          const topicNameElement = element.querySelector(topicNameSelector);
+          if (topicNameElement?.textContent?.trim() === expectedTopicName) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {},
+      classroomTopicBoxSelector,
+      classroomTopicNameSelector,
+      topicName
+    );
 
     for (const prerequisiteTopic of prerequisiteTopics) {
       await this.addPrerequisiteTopicForATopicInClassroom(

@@ -55,6 +55,24 @@ describe('Access validation backend api service', () => {
     httpTestingController.verify();
   });
 
+  it('should validate access to story viewer page', fakeAsync(() => {
+    avbas
+      .validateAccessToStoryViewerPage('classroom', 'topic', 'story')
+      .then(successSpy, failSpy);
+
+    let req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_story_viewer_page/' +
+        'classroom/topic/story/story'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate access to classroom page', fakeAsync(() => {
     let fragment = 'invalid';
     avbas.validateAccessToClassroomPage(fragment).then(successSpy, failSpy);

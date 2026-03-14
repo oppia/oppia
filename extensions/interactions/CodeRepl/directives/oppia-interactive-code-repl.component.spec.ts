@@ -30,6 +30,9 @@ import {ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import 'third-party-imports/skulpt.import';
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {CodeReplCustomizationArgs} from 'interactions/customization-args-defs';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('InteractiveCodeReplComponent', () => {
   let component: InteractiveCodeReplComponent;
@@ -39,13 +42,16 @@ describe('InteractiveCodeReplComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+      interactionId: InteractionSpecsKey,
+      attributes: Record<string, string>
+    ) {
       return {
-        language: attributes.languageWithValue,
-        placeholder: attributes.placeholderWithValue,
-        preCode: attributes.preCodeWithValue,
-        postCode: attributes.postCodeWithValue,
-      };
+        language: {value: attributes.languageWithValue},
+        placeholder: {value: attributes.placeholderWithValue},
+        preCode: {value: attributes.preCodeWithValue},
+        postCode: {value: attributes.postCodeWithValue},
+      } as CodeReplCustomizationArgs;
     }
   }
 
@@ -57,8 +63,14 @@ describe('InteractiveCodeReplComponent', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+      answer: InteractionAnswer,
+      rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+      submitAnswerFn: Function,
+      validateExpressionFn: Function
+    ) => {
       submitAnswerFn();
     },
   };
@@ -81,15 +93,15 @@ describe('InteractiveCodeReplComponent', () => {
   }));
 
   beforeEach(() => {
-    playerPositionService = TestBed.get(PlayerPositionService);
-    currentInteractionService = TestBed.get(CurrentInteractionService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveCodeReplComponent);
     component = fixture.componentInstance;
     component.lastAnswer = null;
-    component.languageWithValue = {value: 'python'};
-    component.placeholderWithValue = {value: '# Type your code here.'};
-    component.preCodeWithValue = {value: '# precode'};
-    component.postCodeWithValue = {value: '# postcode'};
+    component.languageWithValue = 'python';
+    component.placeholderWithValue = '# Type your code here.';
+    component.preCodeWithValue = '# precode';
+    component.postCodeWithValue = '# postcode';
   });
 
   it('should set interaction as inactive when a new card is displayed', () => {
@@ -102,7 +114,7 @@ describe('InteractiveCodeReplComponent', () => {
 
     mockNewCardAvailableEmitter.emit();
 
-    expect(component.interactionIsActive).toBeFalse();
+    expect(component.interactionIsActive).toBe(false);
   });
 
   it('should initialize when code editor interaction is added', () => {
@@ -118,7 +130,7 @@ describe('InteractiveCodeReplComponent', () => {
     expect(component.preCode).toBe('# precode\n');
     expect(component.postCode).toBe('# postcode');
     expect(component.interactionIsActive).toBe(true);
-    expect(component.hasLoaded).toBeFalse();
+    expect(component.hasLoaded).toBe(false);
     expect(component.output).toBe('');
     expect(component.code).toBe(
       '# precode\n# Type your code here.\n# postcode'
@@ -147,7 +159,7 @@ describe('InteractiveCodeReplComponent', () => {
 
       // This displays the last answer only when the interaction is not active
       // anymore. Therefore, we test to see if the pre-condition is false.
-      expect(component.interactionIsActive).toBeFalse();
+      expect(component.interactionIsActive).toBe(false);
       expect(component.code).toBe(
         "# Type your code here.\nprint('hello');\n# postcode"
       );
@@ -159,7 +171,7 @@ describe('InteractiveCodeReplComponent', () => {
   );
 
   it('should not display precode when user does not enter any characters', () => {
-    component.preCodeWithValue = {value: ' '};
+    component.preCodeWithValue = ' ';
 
     expect(component.preCode).toBeUndefined();
 
@@ -210,23 +222,23 @@ describe('InteractiveCodeReplComponent', () => {
       ' loads',
     () => {
       let cm = {
-        replaceSelection: spaces => {
+        replaceSelection: (spaces: string) => {
           expect(spaces).toBe('  ');
           expect(spaces.length).toBe(2);
         },
         getDoc: () => {
           return {
-            setCursor: pos => {
+            setCursor: (pos: number) => {
               expect(pos).toBe(2);
             },
-            getCursor: loc => {
+            getCursor: (loc: string) => {
               if (loc === 'head') {
                 return 2;
               }
             },
           };
         },
-        getOption: opt => {
+        getOption: (opt: string) => {
           if (opt === 'indentUnit') {
             return 2;
           }
@@ -263,7 +275,6 @@ describe('InteractiveCodeReplComponent', () => {
     // This throws "Argument of type '() => Promise<never>' is not assignable
     // to parameter of type 'never'" We need to suppress this error because the
     // the error case needs to be tested.
-    // @ts-expect-error
     spyOn(Sk.misceval, 'asyncToPromise').and.callFake(() => {
       return Promise.reject('Error');
     });
@@ -303,7 +314,7 @@ describe('InteractiveCodeReplComponent', () => {
     component.ngAfterViewInit();
     tick();
 
-    expect(component.hasLoaded).toBeTrue();
+    expect(component.hasLoaded).toBe(true);
     expect(detectChangesSpy).toHaveBeenCalled();
   }));
 });

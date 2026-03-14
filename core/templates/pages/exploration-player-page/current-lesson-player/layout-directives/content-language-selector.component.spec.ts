@@ -139,10 +139,10 @@ describe('Content language selector component', () => {
         },
       })
       .compileComponents();
-    contentTranslationLanguageService = TestBed.get(
+    contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService
     );
-    playerTranscriptService = TestBed.get(PlayerTranscriptService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);

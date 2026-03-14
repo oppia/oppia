@@ -34,8 +34,8 @@ import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-bac
 import {AlertsService} from 'services/alerts.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
@@ -63,9 +63,9 @@ describe('OppiaFooterComponent', () => {
   let fixture: ComponentFixture<OppiaFooterComponent>;
   let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
-  let siteAnalyticsService: SiteAnalyticsService;
   let mockWindowRef: MockWindowRef;
   let ngbModal: MockNgbModal;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -95,8 +95,8 @@ describe('OppiaFooterComponent', () => {
     alertsService = TestBed.inject(AlertsService);
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     ngbModal = TestBed.inject(NgbModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should get the siteFeedbackFormURL', () => {
@@ -325,30 +325,23 @@ describe('OppiaFooterComponent', () => {
     expect(component.subscriptionProcessing).toBeFalse();
     expect(component.emailDuplicated).toBeTrue();
   }));
-
   it('should register About footer link click event', () => {
     spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-    component.navigateToAboutPage();
+    component.onAboutLinkClick();
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
-
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   });
 
   it('should register Teach footer link click event', () => {
     spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-    component.navigateToTeachPage();
+    component.onTeachLinkClick();
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
-
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });
 });

@@ -689,6 +689,11 @@ describe('TopNavigationBarComponent', () => {
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTranslationAdmin: () => false,
+      isTranslationCoordinator: () => false,
+      isQuestionAdmin: () => false,
+      isQuestionCoordinator: () => false,
+      isReleaseCoordinator: () => false,
       isLoggedIn: () => true,
       getUsername: () => null,
     };
@@ -974,4 +979,97 @@ describe('TopNavigationBarComponent', () => {
     expect(component.classroomSummariesLength).toBe(0);
     document.body.removeChild(mockElement);
   });
+
+  it('should not show Sign In button while auth status is not resolved', () => {
+    component.authStatusResolved = false;
+    component.userIsLoggedIn = false;
+    component.username = 'testuser';
+    component.pageIsIframed = false;
+    fixture.detectChanges();
+
+    const signInButton = fixture.debugElement.query(
+      By.css('.e2e-mobile-test-login')
+    );
+
+    expect(signInButton).toBeFalsy();
+  });
+
+  it('should show Sign In button after auth status is resolved for logged out user', () => {
+    component.authStatusResolved = true;
+    component.userIsLoggedIn = false;
+    component.username = 'testuser';
+    component.pageIsIframed = false;
+    component.userMenuIsShown = true;
+    fixture.detectChanges();
+
+    const signInButton = fixture.debugElement.query(
+      By.css('.e2e-mobile-test-login')
+    );
+
+    expect(signInButton).toBeTruthy();
+  });
+
+  it('should not show profile dropdown while auth status is not resolved', () => {
+    component.authStatusResolved = false;
+    component.userIsLoggedIn = true;
+    component.pageIsIframed = false;
+    fixture.detectChanges();
+
+    const profileDropdown = fixture.debugElement.query(
+      By.css('.e2e-test-profile-dropdown')
+    );
+
+    expect(profileDropdown).toBeFalsy();
+  });
+
+  it('should show profile dropdown after auth status is resolved for logged in user', () => {
+    component.authStatusResolved = true;
+    component.userIsLoggedIn = true;
+    component.pageIsIframed = false;
+    component.userMenuIsShown = true;
+    component.profilePicturePngDataUrl = 'test-image-url';
+    fixture.detectChanges();
+
+    const profileDropdown = fixture.debugElement.query(
+      By.css('.e2e-test-profile-dropdown')
+    );
+
+    expect(profileDropdown).toBeTruthy();
+  });
+
+  it('should set authStatusResolved to true after getUserInfoAsync resolves', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'],
+      false,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+
+    expect(component.authStatusResolved).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.authStatusResolved).toBe(true);
+  }));
+
+  it('should set authStatusResolved to true even if getUserInfoAsync fails', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.rejectWith('Auth error');
+
+    expect(component.authStatusResolved).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.authStatusResolved).toBe(true);
+  }));
 });
