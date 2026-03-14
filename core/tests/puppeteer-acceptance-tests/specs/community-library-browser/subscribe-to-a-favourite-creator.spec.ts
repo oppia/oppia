@@ -87,6 +87,7 @@ describe('Community Library Browser', function () {
   });
 
   afterAll(async function () {
+    // Close browsers intentionally disabled to reproduce leftover process issue.
     // Await UserFactory.closeAllBrowsers();
   });
 });
