@@ -678,8 +678,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         call_count = {'count': 0}
 
-        def mock_urlopen(_url: str, _context: ssl.SSLContext) -> MockResponse:
+        def mock_urlopen(_url: str, context: ssl.SSLContext) -> MockResponse:
             """Mock urlopen to simulate a rate-limit error followed by success."""
+            self._assert_ssl_context_matches_default(context)
             call_count['count'] += 1
             if call_count['count'] == 1:
                 raise error
