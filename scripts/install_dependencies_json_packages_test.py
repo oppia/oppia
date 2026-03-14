@@ -19,16 +19,17 @@
 from __future__ import annotations
 
 import builtins
+import email.message
 import io
 import os
 import re
 import ssl
 import tempfile
-import zipfile
 import time
 import urllib.error
-from typing import Optional
+import zipfile
 from urllib import request as urlrequest
+
 from core.tests import test_utils
 
 from typing import Any, BinaryIO, Final, NoReturn, Tuple
@@ -655,34 +656,30 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(response.url, test_url)
 
     def test_url_open_rate_limit_retry(self) -> None:
+        """Tests retry logic when GitHub rate limit (HTTP 403) occurs."""
         test_url = 'https://example.com/test'
 
-        class MockHeaders:
-            def get(self, key: str) -> Optional[str]:
-                if key == 'x-ratelimit-remaining':
-                    return '0'
-                if key == 'x-ratelimit-reset':
-                    return str(int(time.time()) + 1)
-                return None
+        headers = email.message.Message()
+        headers.add_header('x-ratelimit-remaining', '0')
+        headers.add_header('x-ratelimit-reset', str(int(time.time()) + 1))
 
         error = urllib.error.HTTPError(
-            url=test_url,
-            code=403,
-            msg='rate limit',
-            hdrs=MockHeaders(),
-            fp=None,
+            url=test_url, code=403, msg='rate limit', hdrs=headers, fp=None
         )
 
         class MockResponse:
             def __init__(self) -> None:
+                """Initialize the mock response."""
                 self.url = test_url
 
             def getcode(self) -> int:
+                """Return HTTP status code."""
                 return 200
 
         call_count = {'count': 0}
 
-        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+        def mock_urlopen(_url: str, _context: ssl.SSLContext) -> MockResponse:
+            """Mock urlopen to simulate a rate-limit error followed by success."""
             call_count['count'] += 1
             if call_count['count'] == 1:
                 raise error
