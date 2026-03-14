@@ -87,7 +87,6 @@ export class AddGoalsModalComponent {
 
   isCheckboxDisabled(topicId: string): boolean {
     return (
-      this.isHardcodedDemoTopic(topicId) ||
       this.completedTopics.has(topicId) ||
       (this.checkedTopics.size >= 5 && !this.checkedTopics.has(topicId))
     );
