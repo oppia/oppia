@@ -86,7 +86,7 @@ describe('Community Library Browser', function () {
     await communityLibraryBrowser.expectSubscribedCreatorsToContain('currAdm');
   });
 
-  afterAll(async function () {
-    //await UserFactory.closeAllBrowsers();
-  });
+  //afterAll(async function () {
+  //await UserFactory.closeAllBrowsers();
+  //});
 });
