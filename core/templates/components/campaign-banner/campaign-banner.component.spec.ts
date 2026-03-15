@@ -22,6 +22,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {CampaignBannerComponent} from './campaign-banner.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {AppConstants} from 'app.constants';
 
 interface CampaignConfig {
   startDate: Date;
@@ -40,6 +41,9 @@ class MockPlatformFeatureService {
   status = {
     EnableCampaignBanner: {
       isEnabled: true,
+    },
+    EnableCampaignBannerTestMode: {
+      isEnabled: false,
     },
   };
 }
@@ -72,13 +76,6 @@ describe('CampaignBannerComponent', () => {
       PlatformFeatureService
     ) as unknown as MockPlatformFeatureService;
 
-    (component.campaignConfig as unknown as CampaignConfig) = {
-      startDate: new Date(Date.now() - 100000),
-      endDate: new Date(Date.now() + 100000),
-      bannerReRenderIntervalMs: 100000,
-      bannerImageRelativePath: 'test_path.png',
-    };
-
     spyOn(localStorage, 'getItem').and.callFake((key: string) => {
       if (key === 'lang') {
         return 'en';
@@ -94,20 +91,10 @@ describe('CampaignBannerComponent', () => {
   });
 
   it('should check if language is English correctly', () => {
-    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
-      if (key === 'lang') {
-        return 'en';
-      }
-      return null;
-    });
+    (localStorage.getItem as jasmine.Spy).and.returnValue('en');
     expect(component.isLanguageEnglish()).toBe(true);
 
-    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
-      if (key === 'lang') {
-        return 'hi';
-      }
-      return null;
-    });
+    (localStorage.getItem as jasmine.Spy).and.returnValue('hi');
     expect(component.isLanguageEnglish()).toBe(false);
   });
 
@@ -123,33 +110,30 @@ describe('CampaignBannerComponent', () => {
 
   it('should show banner when campaign active and lang is English', () => {
     platformFeatureService.status.EnableCampaignBanner.isEnabled = true;
-    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
-      if (key === 'lang') {
-        return 'en';
-      }
-      return null;
-    });
+
+    component.setCampaignConfig();
+
+    const config = component.campaignConfig as CampaignConfig;
+    config.startDate = new Date(Date.now() - 100000);
+    config.endDate = new Date(Date.now() + 100000);
 
     component.computeBannerVisibility();
+
     expect(component.shouldShowBanner).toBe(true);
   });
 
   it('should hide banner if language is not English', () => {
-    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
-      if (key === 'lang') {
-        if (key === 'lang') {
-          return 'pt';
-        }
-      }
-      return null;
-    });
+    (localStorage.getItem as jasmine.Spy).and.returnValue('pt');
 
+    component.setCampaignConfig();
     component.computeBannerVisibility();
+
     expect(component.shouldShowBanner).toBe(false);
   });
 
   it('should hide banner if recently closed', () => {
     const now = Date.now();
+
     (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
       if (key === 'lang') {
         return 'en';
@@ -160,7 +144,9 @@ describe('CampaignBannerComponent', () => {
       return null;
     });
 
+    component.setCampaignConfig();
     component.bannerReRenderInterval = 100000;
+
     component.computeBannerVisibility();
     expect(component.shouldShowBanner).toBe(false);
   });
@@ -176,20 +162,30 @@ describe('CampaignBannerComponent', () => {
       }
       return null;
     });
+    component.setCampaignConfig();
+    const config = component.campaignConfig as CampaignConfig;
+    config.startDate = new Date(Date.now() - 100000);
+    config.endDate = new Date(Date.now() + 100000);
 
     component.bannerReRenderInterval = 1000;
+
     component.computeBannerVisibility();
+
     expect(component.shouldShowBanner).toBe(true);
   });
 
   it('should hide banner if feature flag is disabled', () => {
     platformFeatureService.status.EnableCampaignBanner.isEnabled = false;
+    component.setCampaignConfig();
     component.computeBannerVisibility();
     expect(component.shouldShowBanner).toBe(false);
   });
 
   it('should hide banner if campaign is not active', () => {
-    const config = component.campaignConfig as unknown as CampaignConfig;
+    component.setCampaignConfig();
+
+    const config = component.campaignConfig as CampaignConfig;
+
     config.startDate = new Date(Date.now() - 200000);
     config.endDate = new Date(Date.now() - 100000);
 
@@ -207,12 +203,51 @@ describe('CampaignBannerComponent', () => {
       'campaignBannerClosedAt',
       jasmine.any(String)
     );
+
     expect(computeVisibilitySpy).toHaveBeenCalled();
   });
 
   it('should initialize campaign config on init', () => {
+    spyOn(component, 'setCampaignConfig').and.callThrough();
+
     component.ngOnInit();
-    expect(component.campaignBannerImagePath).toBe('test_path.png');
-    expect(component.bannerReRenderInterval).toBe(100000);
+
+    expect(component.setCampaignConfig).toHaveBeenCalled();
+
+    expect(component.campaignBannerImagePath).toBe(
+      AppConstants.CAMPAIGN_CONFIG_PROD.bannerImageRelativePath
+    );
+
+    expect(component.bannerReRenderInterval).toBe(
+      AppConstants.CAMPAIGN_CONFIG_PROD.bannerReRenderIntervalMs
+    );
+  });
+
+  it('should set campaign config to PROD when prod flag enabled', () => {
+    platformFeatureService.status.EnableCampaignBanner.isEnabled = true;
+    platformFeatureService.status.EnableCampaignBannerTestMode.isEnabled =
+      false;
+
+    component.setCampaignConfig();
+
+    expect(component.campaignConfig).toEqual(AppConstants.CAMPAIGN_CONFIG_PROD);
+  });
+
+  it('should set campaign config to TEST when prod flag disabled', () => {
+    platformFeatureService.status.EnableCampaignBanner.isEnabled = false;
+
+    component.setCampaignConfig();
+
+    expect(component.campaignConfig).toEqual(AppConstants.CAMPAIGN_CONFIG_TEST);
+  });
+
+  it('should show banner when test mode flag enabled', () => {
+    platformFeatureService.status.EnableCampaignBanner.isEnabled = false;
+    platformFeatureService.status.EnableCampaignBannerTestMode.isEnabled = true;
+
+    component.setCampaignConfig();
+    component.computeBannerVisibility();
+
+    expect(component.shouldShowBanner).toBe(true);
   });
 });

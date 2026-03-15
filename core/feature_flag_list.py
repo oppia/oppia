@@ -84,6 +84,14 @@ class FeatureNames(enum.Enum):
     )
     ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
     ENABLE_CAMPAIGN_BANNER = 'enable_campaign_banner'
+    # A separate flag is used for testing the campaign banner with early dates.
+    # This allows testing the feature before the actual campaign dates that will
+    # be used in production. Without a separate test flag, we would need to change
+    # the campaign date values for testing and then update them again before
+    # releasing to production. That process would require additional PRs,
+    # cherry-picks, or hotfixes. Using a dedicated test-mode flag avoids that
+    # overhead and keeps testing and production configurations separate.
+    ENABLE_CAMPAIGN_BANNER_TEST_MODE = 'enable_campaign_banner_test_mode'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -111,7 +119,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
-    FeatureNames.ENABLE_CAMPAIGN_BANNER,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -127,6 +134,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+    FeatureNames.ENABLE_CAMPAIGN_BANNER_TEST_MODE,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -140,6 +148,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
+    FeatureNames.ENABLE_CAMPAIGN_BANNER,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -317,7 +326,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.ENABLE_CAMPAIGN_BANNER.value: (
         (
             'This flag enables the campaign banner for the fundraising campaign.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.PROD,
+        )
+    ),
+    FeatureNames.ENABLE_CAMPAIGN_BANNER_TEST_MODE.value: (
+        (
+            'This flag enables the campaign banner for the fundraising campaign in test mode.',
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
 }

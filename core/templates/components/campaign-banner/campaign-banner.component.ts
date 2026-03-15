@@ -33,7 +33,6 @@ export class CampaignBannerComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  showBanner = false;
   shouldShowBanner = false;
 
   STORAGE_KEY = 'campaignBannerClosedAt';
@@ -44,12 +43,20 @@ export class CampaignBannerComponent implements OnInit {
   campaignBannerImagePath!: string;
   bannerReRenderInterval!: number;
 
-  campaignConfig = AppConstants.CAMPAIGN_CONFIG;
+  campaignConfig!: typeof AppConstants.CAMPAIGN_CONFIG_TEST;
 
   ngOnInit(): void {
+    this.setCampaignConfig();
     this.initializeCampaignConfig();
     this.setCampaignEndText();
     this.computeBannerVisibility();
+  }
+  setCampaignConfig(): void {
+    const isProdMode =
+      this.platformFeaturesService.status.EnableCampaignBanner.isEnabled;
+    this.campaignConfig = isProdMode
+      ? AppConstants.CAMPAIGN_CONFIG_PROD
+      : AppConstants.CAMPAIGN_CONFIG_TEST;
   }
 
   private initializeCampaignConfig(): void {
@@ -60,7 +67,9 @@ export class CampaignBannerComponent implements OnInit {
 
   computeBannerVisibility(): void {
     const featureEnabled =
-      this.platformFeaturesService.status.EnableCampaignBanner.isEnabled;
+      this.platformFeaturesService.status.EnableCampaignBanner.isEnabled ||
+      this.platformFeaturesService.status.EnableCampaignBannerTestMode
+        .isEnabled;
 
     const active = this.isCampaignActive();
 

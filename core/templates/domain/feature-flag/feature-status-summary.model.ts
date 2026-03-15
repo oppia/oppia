@@ -47,6 +47,7 @@ export enum FeatureNames {
   EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
   EnableReadyForReviewTest = 'enable_ready_for_review_test',
   EnableCampaignBanner = 'enable_campaign_banner',
+  EnableCampaignBannerTestMode = 'enable_campaign_banner_test_mode',
 }
 
 export interface FeatureStatusSummaryBackendDict {
