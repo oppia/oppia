@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service to show loading screen.
+ * @fileoverview Service to broadcast sign-in events across the application.
+ * This lightweight service acts as an event broker so that services like
+ * PreventPageUnloadEventService can react to sign-in without depending
+ * on AuthService (which requires Firebase).
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
@@ -21,19 +24,6 @@ import {EventEmitter, Injectable} from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class LoaderService {
-  loadingMessageChangedEventEmitter = new EventEmitter<string>();
-  get onLoadingMessageChange(): EventEmitter<string> {
-    return this.loadingMessageChangedEventEmitter;
-  }
-
-  constructor() {}
-
-  showLoadingScreen(message: string): void {
-    this.loadingMessageChangedEventEmitter.emit(message);
-  }
-
-  hideLoadingScreen(): void {
-    this.loadingMessageChangedEventEmitter.emit('');
-  }
+export class SignInEventService {
+  onUserSignIn: EventEmitter<void> = new EventEmitter<void>();
 }
