@@ -4072,13 +4072,9 @@ export class LoggedOutUser extends BaseUser {
         chapter
       );
       if (chapterText.trim().includes(chapterName.trim())) {
-        await Promise.all([
-          this.page.waitForNavigation({
-            waitUntil: ['networkidle2', 'load'],
-          }),
-          this.waitForElementToBeClickable(chapter),
-          chapter.click(),
-        ]);
+        await this.waitForElementToBeClickable(chapter);
+        await chapter.click();
+        await this.expectPageURLToContain(testConstants.URLs.ExplorationPlayer);
         return;
       }
     }
@@ -4109,11 +4105,9 @@ export class LoggedOutUser extends BaseUser {
           title
         );
         if (titleText.trim() === storyName.trim()) {
-          await Promise.all([
-            this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
-            this.waitForElementToBeClickable(title),
-            title.click(),
-          ]);
+          await this.waitForElementToBeClickable(title);
+          await title.click();
+          await this.page.waitForSelector(chapterTitleSelector);
 
           await this.skipLoginPrompt();
 
@@ -4125,13 +4119,8 @@ export class LoggedOutUser extends BaseUser {
               chapter
             );
             if (chapterText.trim().includes(chapterName.trim())) {
-              await Promise.all([
-                this.page.waitForNavigation({
-                  waitUntil: ['networkidle2', 'load'],
-                }),
-                this.waitForElementToBeClickable(chapter),
-                chapter.click(),
-              ]);
+              await this.waitForElementToBeClickable(chapter);
+              await chapter.click();
 
               await this.expectPageURLToContain(
                 testConstants.URLs.ExplorationPlayer
