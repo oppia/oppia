@@ -224,11 +224,12 @@ describe('Logged-In Learner', function () {
 
     await loggedInUser.expectMobileLayoutToBeCorrect();
 
-    // Scroll to the bottom so that lazily-rendered elements below the fold are
-    // fully painted before we capture the screenshot, then scroll back to the
-    // top so the snapshot is taken from the beginning of the page.
-    await loggedInUser.scrollToBottomOfPage();
+    // Scroll through the page in smaller steps to trigger lazy-rendered
+    // elements, then return to the top for a deterministic screenshot.
+    await loggedInUser.scrollThroughPageInSteps();
     await loggedInUser.scrollToTopOfPage();
+    await loggedInUser.waitForVisualStateToSettle();
+
     await loggedInUser.expectScreenshotToMatch('goalsTabMobileView', __dirname);
   });
 

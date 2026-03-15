@@ -1299,6 +1299,56 @@ export class BaseUser {
   }
 
   /**
+   * Scrolls the page in steps to trigger lazy rendering below the fold.
+   */
+  async scrollThroughPageInSteps(
+    stepSizeInPixels: number = 200
+  ): Promise<void> {
+    await this.page.evaluate(async (step: number) => {
+      const totalScrollableHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+      for (let y = 0; y <= totalScrollableHeight; y += step) {
+        window.scrollTo(0, y);
+        await new Promise(resolve => setTimeout(resolve, 60));
+      }
+      window.scrollTo(0, totalScrollableHeight);
+    }, stepSizeInPixels);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Waits for fonts, images, and animation frames before screenshots.
+   */
+  async waitForVisualStateToSettle(): Promise<void> {
+    await this.page.evaluate(async () => {
+      if ('fonts' in document) {
+        await (document as Document & {fonts: {ready: Promise<void>}}).fonts
+          .ready;
+      }
+
+      const imageLoads = Array.from(document.images).map(image => {
+        if (image.complete) {
+          return Promise.resolve();
+        }
+        return new Promise<void>(resolve => {
+          image.addEventListener('load', () => resolve(), {once: true});
+          image.addEventListener('error', () => resolve(), {once: true});
+        });
+      });
+      await Promise.all(imageLoads);
+
+      await new Promise<void>(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => resolve());
+        });
+      });
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Returns text in nested element
    * @param {string} selector - The selector of the element to get text from.
    */
