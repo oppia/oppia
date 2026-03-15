@@ -2489,7 +2489,22 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.page.waitForSelector(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+    await this.clickOnElementWithSelector(createExplorationButtonSelector);
+
+    // If the create activity modal appears (user has collection editor role),
+    // click the exploration option.
+    try {
+      await this.page.waitForSelector('.e2e-test-creation-modal', {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickAndWaitForNavigation(
+        '.e2e-test-create-exploration',
+        true
+      );
+    } catch {
+      // No modal appeared, navigation already happened directly.
+    }
 
     await this.page.waitForFunction(
       (targetURL: string) => {

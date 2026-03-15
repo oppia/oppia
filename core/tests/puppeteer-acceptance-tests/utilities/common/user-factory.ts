@@ -65,6 +65,10 @@ import {
 } from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
+import {
+  CollectionEditor,
+  CollectionEditorFactory,
+} from '../user/collection-editor';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -87,6 +91,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
   [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
+  [ROLES.COLLECTION_EDITOR]: CollectionEditorFactory,
 } as const;
 
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
@@ -121,13 +126,18 @@ type BasicRolesUser = LoggedOutUser &
   Contributor &
   ContributorAdmin &
   PracticeQuestionReviewer &
-  VoiceoverSubmitter;
+  VoiceoverSubmitter &
+  CollectionEditor;
 
 /**
  * Global user instances that are created and can be reused again.
  */
 let superAdminInstance:
-  | (SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin)
+  | (SuperAdmin &
+      BlogAdmin &
+      TranslationAdmin &
+      VoiceoverAdmin &
+      CollectionEditor)
   | null = null;
 let activeUsers: BaseUser[] = [];
 
@@ -299,6 +309,7 @@ export class UserFactory {
       ContributorAdminFactory(),
       PracticeQuestionReviewerFactory(),
       VoiceoverSubmitterFactory(),
+      CollectionEditorFactory(),
     ]);
 
     user.username = username;
@@ -321,7 +332,13 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     username: string
-  ): Promise<SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin> {
+  ): Promise<
+    SuperAdmin &
+      BlogAdmin &
+      TranslationAdmin &
+      VoiceoverAdmin &
+      CollectionEditor
+  > {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -339,10 +356,13 @@ export class UserFactory {
     await superAdmin.expectUserToHaveRole(username, ROLES.TRANSLATION_ADMIN);
     await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.VOICEOVER_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.COLLECTION_EDITOR);
+    await superAdmin.expectUserToHaveRole(username, ROLES.COLLECTION_EDITOR);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
       TranslationAdminFactory(),
       VoiceoverAdminFactory(),
+      CollectionEditorFactory(),
     ]);
 
     return superAdminInstance;
