@@ -368,12 +368,8 @@ export class TopicsAndSkillsDashboardPageComponent {
     );
   }
 
-  getTotalCountValueForSkills(): number | string {
-    if (this.skillSummaries.length > this.itemsPerPage) {
-      return 'many';
-    }
-
-    return this.skillSummaries.length;
+  getTotalCountValueForSkills(): number {
+    return this.totalSkillCount;
   }
 
   refreshPagination(): void {
