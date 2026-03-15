@@ -277,6 +277,11 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION']: (
             voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic
         ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+        ]: (
+            voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent
+        ),
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
@@ -318,6 +323,10 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             assert cloud_task_run_domain_instance is not None
             cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
 
+            taskqueue_services.update_cloud_task_run_model(
+                cloud_task_run_domain_instance
+            )
+
             deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
                 payload['fn_identifier']
             ]
@@ -331,10 +340,27 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             deferred_task_function(*payload['args'], **payload['kwargs'])
 
-            cloud_task_run_domain_instance.latest_job_state = 'SUCCEEDED'
+            updated_cloud_task_run_domain_instance = (
+                taskqueue_services.get_cloud_task_run_by_model_id(
+                    cloud_task_model_id
+                )
+            )
+            assert updated_cloud_task_run_domain_instance is not None
+
+            if (
+                updated_cloud_task_run_domain_instance.latest_job_state
+                == 'PERMANENTLY_FAILED'
+            ):
+                # If the task has permanently failed during its execution,
+                # we do not update its state to SUCCEEDED.
+                return
+
+            updated_cloud_task_run_domain_instance.latest_job_state = (
+                'SUCCEEDED'
+            )
 
             taskqueue_services.update_cloud_task_run_model(
-                cloud_task_run_domain_instance
+                updated_cloud_task_run_domain_instance
             )
         except Exception as e:
             assert cloud_task_run_domain_instance is not None

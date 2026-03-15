@@ -28,9 +28,8 @@ from core.domain import (
     email_manager,
     exp_domain,
     exp_fetchers,
-    platform_parameter_list,
-    platform_parameter_services,
     state_domain,
+    taskqueue_services,
     translation_domain,
     translation_fetchers,
     user_services,
@@ -378,9 +377,6 @@ def compute_voiceover_related_change(
     return new_voiceovers_models
 
 
-# NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
-# model does not contain any data yet. Issue #19590 tracks the changes required
-# in order to use this function.
 def get_all_language_accent_codes_for_voiceovers() -> (
     Dict[str, Dict[str, bool]]
 ):
@@ -917,6 +913,7 @@ def _regenerate_voiceovers_for_given_contents(
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     date_time: str,
     author_id: str,
+    specific_language_accent_code: Optional[str] = None,
     task_run_id: Optional[str] = None,
 ) -> None:
     """Private helper method to regenerate voiceovers for specified contents
@@ -936,6 +933,8 @@ def _regenerate_voiceovers_for_given_contents(
             regeneration process was initiated.
         author_id: str. The ID of the user who triggered the voiceover
             regeneration, either directly or indirectly.
+        specific_language_accent_code: Optional[str]. The specific language
+            accent code to use for voiceover regeneration, if provided.
         task_run_id: str|None. The unique identifier for the voiceover
             regeneration task. If None, the method is invoked by a
             synchronous process and task-tracking is not required.
@@ -1013,6 +1012,8 @@ def _regenerate_voiceovers_for_given_contents(
             voiceover_regeneration_task
         )
 
+    errors_while_voiceover_regeneration = []
+
     for language_code in language_codes:
         language_accent_codes = (
             language_code_to_autogeneratable_accent_codes.get(language_code, [])
@@ -1023,6 +1024,12 @@ def _regenerate_voiceovers_for_given_contents(
         )
 
         for language_accent_code in language_accent_codes:
+            if (
+                specific_language_accent_code is not None
+                and language_accent_code != specific_language_accent_code
+            ):
+                continue
+
             language_accents_used_for_voiceover_regeneration.append(
                 language_accent_codes_to_descriptions.get(
                     language_accent_code, ''
@@ -1070,23 +1077,47 @@ def _regenerate_voiceovers_for_given_contents(
             voiceover_regeneration_task
         )
 
-    # Confirming that the app can deliver emails.
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
+    send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
+        exploration_id,
+        exploration_title,
+        date_time,
+        language_accents_used_for_voiceover_regeneration,
+        error_collections_during_voiceover_regeneration,
+        number_of_contents_for_voiceover_regeneration,
+        number_of_contents_failed_to_regenerate,
+        author_id,
     )
-    if server_can_send_emails:
-        send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
-            exploration_id,
-            exploration_title,
-            date_time,
-            language_accents_used_for_voiceover_regeneration,
-            error_collections_during_voiceover_regeneration,
-            number_of_contents_for_voiceover_regeneration,
-            number_of_contents_failed_to_regenerate,
-            author_id,
+
+    if requested_task_is_async:
+        error_string = ''
+        for error_collection in error_collections_during_voiceover_regeneration:
+            error_string += (
+                'Exploration ID: %s\nLanguage Accent Code: %s\nErrors: %s \n'
+                % (
+                    error_collection['exploration_id'],
+                    error_collection['language_accent_code'],
+                    error_collection['error_messages'],
+                )
+            )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert task_run_id is not None
+        cloud_task_run_domain_instance = (
+            taskqueue_services.get_cloud_task_run_by_model_id(task_run_id)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert cloud_task_run_domain_instance is not None
+
+        if errors_while_voiceover_regeneration:
+            cloud_task_run_domain_instance.latest_job_state = (
+                'PERMANENTLY_FAILED'
+            )
+            cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(
+                error_string
+            )
+            taskqueue_services.update_cloud_task_run_model(
+                cloud_task_run_domain_instance
+            )
 
 
 def regenerate_voiceovers_on_exploration_update(
@@ -1174,7 +1205,7 @@ def regenerate_voiceovers_on_exploration_update(
         language_code_to_contents_mapping,
         date_time,
         author_id,
-        task_run_id,
+        task_run_id=task_run_id,
     )
 
 
@@ -1236,7 +1267,7 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
         language_code_to_contents_mapping,
         date_time,
         author_id,
-        task_run_id,
+        task_run_id=task_run_id,
     )
 
 
@@ -1312,6 +1343,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
         language_code_to_contents_mapping,
         date_time,
         author_id,
+        specific_language_accent_code=language_accent_code,
     )
 
 
