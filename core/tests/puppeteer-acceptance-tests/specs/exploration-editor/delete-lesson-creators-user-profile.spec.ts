@@ -94,6 +94,7 @@ describe('Lesson Creator Profile Deletion', function () {
       'This exploration is public and community-editable. It is available in the Oppia library.'
     );
     await expEditor2.navigateToExplorationEditor(positiveNumbersExpId);
+    await expEditor2.navigateToSettingsTab();
     await expEditor2.expectUserToBeExplorationManager('expEditor2');
   }, 600000);
 

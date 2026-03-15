@@ -199,11 +199,6 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
-const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
-const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
-const permissionSettingsContentSelector =
-  '.e2e-test-permission-settings-content';
-const feedbackSettingsContentSelector = '.e2e-test-feedback-settings-content';
 const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
@@ -2579,16 +2574,8 @@ export class ExplorationEditor extends BaseUser {
 
     // Generate the selectors for the section header and content.
     const identifier = section.replace(' ', '-').toLowerCase();
-    let sectionContentSelector = `.e2e-test-${identifier}-content`;
-    let sectionHeaderSelector = `.e2e-test-${identifier}-header`;
-
-    if (section === 'Permissions') {
-      sectionContentSelector = permissionSettingsContentSelector;
-      sectionHeaderSelector = permissionSettingsDropdown;
-    } else if (section === 'Feedback') {
-      sectionContentSelector = feedbackSettingsContentSelector;
-      sectionHeaderSelector = feedbackSettingsDropdown;
-    }
+    const sectionContentSelector = `.e2e-test-${identifier}-content`;
+    const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
 
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
@@ -5012,9 +4999,6 @@ export class ExplorationEditor extends BaseUser {
    * Verifies by checking that the username appears explicitly in the Managers section.
    */
   async expectUserToBeExplorationManager(username: string): Promise<void> {
-    // Ensure we are on the settings tab where role management is displayed.
-    await this.navigateToSettingsTab();
-
     // Verify the username is listed in the Managers section (the definitive check per CUJ).
     await this.expectElementToBeVisible('.e2e-test-roles-content');
     const owners = await this.page.$$(ownersListSelector);
