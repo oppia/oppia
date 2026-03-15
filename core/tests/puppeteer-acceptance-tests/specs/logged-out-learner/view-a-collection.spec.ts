@@ -60,10 +60,8 @@ describe('Logged-Out Learner', function () {
       isLandscape: true,
     });
 
-    // expId1 needs a Continue button since the test plays this exploration.
     const expId1 =
       await superAdmin.createAndPublishExplorationWithCards('Exploration 1');
-    // expId2 just needs to exist; skip welcome modal on second visit.
     const expId2 =
       await superAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Exploration 2',
