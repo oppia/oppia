@@ -29,14 +29,6 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
-  additionalEditorFeatures: [
-    './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
-  ],
-
-  additionalEditorFeaturesModals: [
-    './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],

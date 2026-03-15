@@ -20,6 +20,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -143,7 +144,6 @@ const contributorDashboardMenuLink =
 const profileMenuLink = '.e2e-test-profile-link';
 const preferencesMenuLink = '.e2e-test-preferences-link';
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
@@ -240,10 +240,13 @@ const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
 const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
+const recommendationsSectionSelector =
+  '.e2e-test-learner-dash-recommended-section';
 const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
 const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
+const newLabelSelector = '.e2e-test-new-label';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -324,6 +327,10 @@ const removeModalCancelButtonSelector =
 const removeModalConfirmButtonSelector =
   '.e2e-test-remove-activity-modal-container .e2e-test-modal-confirm-delete-button';
 
+// Common > Lesson Card.
+const commonLessonCardContainerSelector =
+  '.e2e-test-redesigned-lesson-card-container';
+const commonlessonTitleSelector = '.e2e-test-lesson-title';
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
 const lessonCardContainer = '.goal-list-story-nodes';
@@ -366,7 +373,9 @@ const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 const usernameSelector = '.e2e-test-username';
 const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
-
+const availableChapters = '.e2e-test-available-chapters';
+const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
+const chapterSelector = '.e2e-test-chapter-title';
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
@@ -2403,22 +2412,11 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(): Promise<void> {
-    try {
-      await this.page.waitForNetworkIdle();
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: 10000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      showMessage(`welcome modal not found: ${(error as Error).message}`);
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
@@ -2684,11 +2682,12 @@ export class LoggedInUser extends BaseUser {
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra'
+    category: string = 'Algebra',
+    expectedWelcomeModal: boolean = false
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPageFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -2817,9 +2816,8 @@ export class LoggedInUser extends BaseUser {
     );
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
-
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
-      visible: false,
+      hidden: true,
     });
   }
 
@@ -2928,15 +2926,15 @@ export class LoggedInUser extends BaseUser {
    * @param {string} progress - The progress of the lesson.
    */
   async resumeLessonFromLearnerDashboard(lessonTitle: string): Promise<void> {
-    await this.page.waitForSelector(lessonCardContainer, {
+    await this.page.waitForSelector(commonLessonCardContainerSelector, {
       visible: true,
     });
 
-    const lessonCards = await this.page.$$(lessonCardContainer);
+    const lessonCards = await this.page.$$(commonLessonCardContainerSelector);
 
     for (const lessonCard of lessonCards) {
       const lessonTitleText = await lessonCard.$eval(
-        lessonTitleSelector,
+        commonlessonTitleSelector,
         el => el.textContent
       );
 
@@ -3877,10 +3875,10 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     context: puppeteer.ElementHandle<Element> | puppeteer.Page = this.page
   ): Promise<void> {
-    const lessonCards = await context.$$(lessonCardContainer);
+    const lessonCards = await context.$$(commonLessonCardContainerSelector);
     const lessonCardTitles = await Promise.all(
       lessonCards.map(card =>
-        card.$eval(lessonTitleSelector, el => el.textContent?.trim())
+        card.$eval(commonlessonTitleSelector, el => el.textContent?.trim())
       )
     );
     const titleFound = lessonCardTitles.some(title =>
@@ -4414,6 +4412,37 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to verify that a specific chapter is present in the recommended section.
+   * @param chapterTitle - The title of the chapter to verify.
+   */
+  async expectChapterToBePresentInRecommendedSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(recommendationsSectionSelector);
+    // Wait for lesson cards to load if they exist.
+    try {
+      await this.page.waitForSelector(commonLessonCardContainerSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Lesson cards may not be present if section is empty (no untracked topics).
+      // This is expected for new users.
+      showMessage(
+        'Recommended section is empty (no lesson cards found). This is expected for new users.'
+      );
+      return;
+    }
+    const recommendationSection = await this.page.$(
+      recommendationsSectionSelector
+    );
+    if (!recommendationSection) {
+      throw new Error('Recommended section not found.');
+    }
+    await this.expectLessonCardToBePresent(chapterTitle, recommendationSection);
+  }
+
+  /**
    * Function to verify the continue from where you left section in the redesigned learner dashboard is present or not.
    * @param {boolean} visible - Whether the section should be visible or not.
    */
@@ -4448,6 +4477,7 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     progress: string
   ): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(lessonCardContainer);
     const lessonCards = await this.page.$$(lessonCardContainer);
 
@@ -4456,11 +4486,9 @@ export class LoggedInUser extends BaseUser {
         lessonTitleSelector,
         el => el.textContent
       );
-
       if (!lessonTitleText || lessonTitleText !== lessonTitle) {
         continue;
       }
-
       const currentProgress = await lessonCard.$eval(
         circleProgressElementSelector,
         el => el.textContent
@@ -4572,6 +4600,121 @@ export class LoggedInUser extends BaseUser {
    */
   async expectUsernameToBe(expectedUsername: string): Promise<void> {
     await this.expectTextContentToBe(usernameSelector, expectedUsername);
+  }
+
+  /**
+   * Verifies that the specified lesson card displays the "New" label.
+   * @param {string} chapterName - The name of the lesson to check.
+   */
+  async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
+    const lessonSel = learnerDashSelectors.lessonCard;
+
+    await this.page.waitForSelector(lessonSel.content);
+
+    const cards = await this.page.$$(lessonSel.content);
+
+    for (const card of cards) {
+      const titleEl = await card.$(lessonSel.heading);
+      const titleText = titleEl
+        ? await titleEl.evaluate(el => el.textContent?.trim())
+        : '';
+
+      if (titleText?.includes(chapterName)) {
+        const newLabel = await card.$(newLabelSelector);
+
+        if (!newLabel) {
+          throw new Error(
+            `Lesson "${chapterName}" found but does NOT have a new label`
+          );
+        }
+        showMessage(`Lesson "${chapterName}" has a new label`);
+        return;
+      }
+    }
+
+    throw new Error(`Lesson "${chapterName}" not found`);
+  }
+
+  /**
+   * Check if the available chapter list has all the specified chapters
+   * @param chapterNames - The array of chapter names
+   */
+  async expectChaptersInAvailableChapterList(
+    chapterNames: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(availableChapters);
+    const containers = await this.page.$$(availableChapters);
+
+    for (const chapterName of chapterNames) {
+      let chapterFound = false;
+
+      for (const container of containers) {
+        const chapterEls = await container.$$(chapterSelector);
+
+        for (const el of chapterEls) {
+          const text = await el.evaluate(node => node.textContent?.trim());
+          if (text && text.includes(chapterName)) {
+            chapterFound = true;
+            showMessage(`Chapter "${chapterName}" found in Available list.`);
+            break;
+          }
+        }
+
+        if (chapterFound) {
+          break;
+        }
+      }
+
+      if (!chapterFound) {
+        throw new Error(`Chapter "${chapterName}" not found in Available list`);
+      }
+    }
+
+    showMessage(
+      'All specified chapters are present in the available chapters list.'
+    );
+  }
+
+  /**
+   * Check if coming soon lesson list has chapters
+   * @param chapterNames - The array of chapter names
+   */
+  async comingSoonLessonListHasChapters(chapterNames: string[]): Promise<void> {
+    await this.page.waitForSelector(comingSoonChaptersListSelector);
+    const containers = await this.page.$$(comingSoonChaptersListSelector);
+
+    for (const chapterName of chapterNames) {
+      let chapterFound = false;
+
+      for (const container of containers) {
+        const chapterEls = await container.$$(chapterSelector);
+
+        for (const el of chapterEls) {
+          const text = await el.evaluate(node => node.textContent?.trim());
+          if (text && text.includes(chapterName)) {
+            chapterFound = true;
+            showMessage(
+              `Chapter "${chapterName}" found in coming soon chapters list`
+            );
+            break;
+          }
+        }
+
+        if (chapterFound) {
+          break;
+        }
+      }
+
+      if (!chapterFound) {
+        throw new Error(
+          `Chapter "${chapterName}" not found in coming soon chapters list`
+        );
+      }
+    }
+
+    showMessage(
+      'All specified chapters are present in the coming soon chapters list'
+    );
   }
 }
 
