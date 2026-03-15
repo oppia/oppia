@@ -31,6 +31,8 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
+import {EventEmitter} from '@angular/core';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserInfo} from 'domain/user/user-info.model';
 
 class MockUserService {
@@ -61,6 +63,12 @@ describe('Login required message component', () => {
       imports: [HttpClientTestingModule],
       declarations: [LoginRequiredMessageComponent],
       providers: [
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<void>(),
+          },
+        },
         {
           provide: UserService,
           useClass: MockUserService,
