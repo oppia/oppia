@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -31,7 +33,9 @@ INSTALLATION_TOOL_VERSIONS = {
     'pip-tools': '7.5.2',
     'setuptools': '80.9.0',
 }
+PIP_REQUIREMENTS_CHECKSUM_FILE_PATH = 'pip_requirements_checksums.json'
 REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.in'
+
 COMPILED_REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.txt'
 
 _PARSER = argparse.ArgumentParser('Install Python development dependencies')
@@ -46,6 +50,50 @@ _PARSER.add_argument(
 
 
 def check_python_env_is_suitable() -> None:
+def get_file_hash(filepath: str) -> str:
+    """Returns MD5 hash of a file.
+
+    Args:
+        filepath: str. Path to the file.
+
+    Returns:
+        str. The MD5 hash of the file.
+    """
+    hasher = hashlib.md5()
+    with open(filepath, 'rb') as f:
+        hasher.update(f.read())
+    return hasher.hexdigest()
+
+
+def requirements_changed() -> bool:
+    """Check if requirements.in files changed since last install.
+
+    Returns:
+        bool. True if requirements have changed, False otherwise.
+    """
+    current_hashes = {
+        REQUIREMENTS_DEV_FILE_PATH: get_file_hash(
+            REQUIREMENTS_DEV_FILE_PATH),
+    }
+    if not os.path.exists(PIP_REQUIREMENTS_CHECKSUM_FILE_PATH):
+        return True
+    with open(
+        PIP_REQUIREMENTS_CHECKSUM_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
+        stored_hashes = json.load(f)
+    return current_hashes != stored_hashes
+
+
+def save_checksums() -> None:
+    """Save current requirements.in hashes after successful install."""
+    current_hashes = {
+        REQUIREMENTS_DEV_FILE_PATH: get_file_hash(
+            REQUIREMENTS_DEV_FILE_PATH),
+    }
+    with open(
+        PIP_REQUIREMENTS_CHECKSUM_FILE_PATH, 'w', encoding='utf-8'
+    ) as f:
+        json.dump(current_hashes, f)
     """Raise an error if we are not in a virtual environment or on CI.
 
     We want developers to use a virtual environment when developing locally so
@@ -215,4 +263,16 @@ def main(cli_args: Optional[List[str]] = None) -> None:
 # This code cannot be covered by tests since it only runs when this file
 # is executed as a script.
 if __name__ == '__main__':  # pragma: no cover
-    main()
+ main()
+    install_installation_tools()
+    if not requirements_changed():
+        print('Requirements unchanged, skipping installation.')
+        return
+    diff = compile_pip_requirements(
+        REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH
+    )
+    if args.uninstall:
+        uninstall_dev_dependencies()
+    else:
+        install_dev_dependencies()
+        save_checksums()
