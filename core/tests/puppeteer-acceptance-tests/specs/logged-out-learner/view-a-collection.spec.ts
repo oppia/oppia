@@ -26,24 +26,14 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {SuperAdmin} from '../../utilities/user/super-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {CollectionEditor} from '../../utilities/user/collection-editor';
 
-const COLLECTION_FILENAME = 'welcome_to_collections.yaml';
 const COLLECTION_NAME = 'Introduction to Collections in Oppia';
-const WELCOME_COLLECTION_ID = '0';
 const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
 const DESKTOP_EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
 const MOBILE_EXPLORATION_TILE_SELECTOR =
   '.e2e-mobile-test-collection-exploration';
-const ADMIN_PAGE_ACTIVITIES_TAB_URL = 'http://localhost:8181/admin#/activities';
-const PROD_MODE_ACTIVITIES_TAB_SELECTOR =
-  'oppia-admin-prod-mode-activities-tab';
-const RELOAD_COLLECTION_ROWS_SELECTOR = '.e2e-test-reload-collection-row';
-const RELOAD_COLLECTION_TITLE_SELECTOR = '.e2e-test-reload-collection-title';
-const RELOAD_COLLECTION_BUTTON_SELECTOR = '.e2e-test-reload-collection-button';
-const LIBRARY_SEARCH_INPUT_SELECTOR = '.e2e-test-search-input';
-const COLLECTION_TILE_LINK_SELECTOR = 'a.thumbnail[href*="/collection/"]';
-const COLLECTION_TILE_TITLE_SELECTOR =
-  '.e2e-test-collection-summary-tile-title';
 const DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR =
   '.oppia-collection-path-section a[href*="?collection_id="]';
 const BACK_TO_COLLECTION_BUTTON_SELECTOR =
@@ -51,241 +41,16 @@ const BACK_TO_COLLECTION_BUTTON_SELECTOR =
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
   'Congratulations for completing this lesson!';
 
-const openCollectionAndWaitForExplorationTiles = async (
-  loggedOutLearner: LoggedOutUser,
-  collectionId: string
-): Promise<string> => {
-  const collectionUrl = `http://localhost:8181/collection/${collectionId}`;
-  const maxAttempts = 2;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    await loggedOutLearner.goto(collectionUrl);
-
-    try {
-      await loggedOutLearner.page.waitForFunction(
-        (desktopSelector: string, mobileSelector: string) => {
-          const hasVisibleElement = (selector: string): boolean => {
-            const element = document.querySelector(
-              selector
-            ) as HTMLElement | null;
-            if (!element) {
-              return false;
-            }
-
-            const style = window.getComputedStyle(element);
-            const rect = element.getBoundingClientRect();
-            return (
-              style.display !== 'none' &&
-              style.visibility !== 'hidden' &&
-              rect.width > 0 &&
-              rect.height > 0
-            );
-          };
-
-          return (
-            hasVisibleElement(desktopSelector) ||
-            hasVisibleElement(mobileSelector)
-          );
-        },
-        {timeout: 45000},
-        DESKTOP_EXPLORATION_TILE_SELECTOR,
-        MOBILE_EXPLORATION_TILE_SELECTOR
-      );
-
-      const hasDesktopTiles =
-        (await loggedOutLearner.page.$(DESKTOP_EXPLORATION_TILE_SELECTOR)) !==
-        null;
-      const hasMobileTiles =
-        (await loggedOutLearner.page.$(MOBILE_EXPLORATION_TILE_SELECTOR)) !==
-        null;
-
-      if (loggedOutLearner.isViewportAtMobileWidth() && hasMobileTiles) {
-        return MOBILE_EXPLORATION_TILE_SELECTOR;
-      }
-
-      if (!loggedOutLearner.isViewportAtMobileWidth() && hasDesktopTiles) {
-        return DESKTOP_EXPLORATION_TILE_SELECTOR;
-      }
-
-      if (hasDesktopTiles) {
-        return DESKTOP_EXPLORATION_TILE_SELECTOR;
-      }
-
-      if (hasMobileTiles) {
-        return MOBILE_EXPLORATION_TILE_SELECTOR;
-      }
-    } catch {
-      if (attempt < maxAttempts - 1) {
-        continue;
-      }
-    }
-  }
-
-  throw new Error(
-    `Could not load collection "${collectionId}" with visible exploration tiles.`
-  );
-};
-
-const reloadCollectionForThisSpec = async (
-  superAdmin: SuperAdmin,
-  collectionName: string
-): Promise<void> => {
-  await superAdmin.goto(ADMIN_PAGE_ACTIVITIES_TAB_URL);
-
-  await superAdmin.page.waitForFunction(
-    (
-      rowsSelector: string,
-      prodModeSelector: string,
-      titleSelector: string,
-      expectedCollectionName: string
-    ) => {
-      if (document.querySelector(prodModeSelector)) {
-        return true;
-      }
-
-      const rows = Array.from(document.querySelectorAll(rowsSelector));
-      return rows.some(row => {
-        const title = row.querySelector(titleSelector)?.textContent;
-        return title?.trim() === expectedCollectionName;
-      });
-    },
-    {timeout: 120000},
-    RELOAD_COLLECTION_ROWS_SELECTOR,
-    PROD_MODE_ACTIVITIES_TAB_SELECTOR,
-    RELOAD_COLLECTION_TITLE_SELECTOR,
-    collectionName
-  );
-
-  const isProdModeActivitiesTabVisible = await superAdmin.page.$(
-    PROD_MODE_ACTIVITIES_TAB_SELECTOR
-  );
-  if (isProdModeActivitiesTabVisible !== null) {
-    return;
-  }
-
-  const reloadCollectionRows = await superAdmin.page.$$(
-    RELOAD_COLLECTION_ROWS_SELECTOR
-  );
-  for (const row of reloadCollectionRows) {
-    const titleElement = await row.$(RELOAD_COLLECTION_TITLE_SELECTOR);
-    if (!titleElement) {
-      continue;
-    }
-
-    const rowCollectionName = await superAdmin.page.evaluate(
-      element => element.textContent?.trim() ?? '',
-      titleElement
-    );
-    if (rowCollectionName !== collectionName) {
-      continue;
-    }
-
-    const reloadButton = await row.$(RELOAD_COLLECTION_BUTTON_SELECTOR);
-    if (!reloadButton) {
-      throw new Error(
-        `Reload button not found for collection "${collectionName}"`
-      );
-    }
-
-    await superAdmin.waitForElementToBeClickable(reloadButton);
-    await reloadButton.click();
-    await superAdmin.waitForNetworkIdle();
-    await superAdmin.expectActionStatusMessageToBe(
-      'Data reloaded successfully.'
-    );
-    return;
-  }
-
-  throw new Error(`Collection "${collectionName}" not found`);
-};
-
-const getCollectionLinkFromLibrarySearch = async (
-  superAdmin: SuperAdmin,
-  collectionName: string
-): Promise<string> => {
-  const maxAttempts = 2;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    if (attempt > 0) {
-      await reloadCollectionForThisSpec(superAdmin, COLLECTION_FILENAME);
-      await superAdmin.navigateToCommunityLibrary();
-    }
-
-    await superAdmin.page.waitForSelector(LIBRARY_SEARCH_INPUT_SELECTOR, {
-      visible: true,
-    });
-    await superAdmin.typeInInputField(
-      LIBRARY_SEARCH_INPUT_SELECTOR,
-      collectionName
-    );
-
-    await Promise.all([
-      superAdmin.page.waitForFunction(
-        () => window.location.pathname === '/search/find',
-        {timeout: 30000}
-      ),
-      superAdmin.page.keyboard.press('Enter'),
-    ]);
-
-    try {
-      await superAdmin.page.waitForFunction(
-        (
-          expectedCollectionName: string,
-          anchorSelector: string,
-          titleSelector: string
-        ) => {
-          const anchors = Array.from(document.querySelectorAll(anchorSelector));
-          return anchors.some(anchor => {
-            const title = anchor.querySelector(titleSelector);
-            return title?.textContent?.trim() === expectedCollectionName;
-          });
-        },
-        {timeout: 60000},
-        collectionName,
-        COLLECTION_TILE_LINK_SELECTOR,
-        COLLECTION_TILE_TITLE_SELECTOR
-      );
-    } catch {
-      if (attempt < maxAttempts - 1) {
-        continue;
-      }
-      break;
-    }
-
-    const collectionLink = (await superAdmin.page.$$eval(
-      COLLECTION_TILE_LINK_SELECTOR,
-      (anchors, expectedCollectionName) => {
-        const expectedName = String(expectedCollectionName);
-        const matchingAnchor = anchors.find(anchor => {
-          const title = anchor.querySelector(
-            '.e2e-test-collection-summary-tile-title'
-          );
-          return title?.textContent?.trim() === expectedName;
-        });
-
-        return matchingAnchor?.getAttribute('href') ?? null;
-      },
-      collectionName
-    )) as string | null;
-
-    if (collectionLink !== null) {
-      return collectionLink;
-    }
-  }
-
-  // This collection comes from dummy data and has a deterministic id in
-  // Oppia's default collection mapping.
-  return `/collection/${WELCOME_COLLECTION_ID}`;
-};
-
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
-  let superAdmin: SuperAdmin;
+  let superAdmin: SuperAdmin & ExplorationEditor & CollectionEditor;
   let collectionId: string;
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
-    superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
+    superAdmin = (await UserFactory.createNewSuperAdmin(
+      'superAdm'
+    )) as unknown as SuperAdmin & ExplorationEditor & CollectionEditor;
     await superAdmin.page.setViewport({
       width: 1920,
       height: 1080,
@@ -295,31 +60,37 @@ describe('Logged-Out Learner', function () {
       isLandscape: true,
     });
 
-    await reloadCollectionForThisSpec(superAdmin, COLLECTION_FILENAME);
+    // expId1 needs a Continue button since the test plays this exploration.
+    const expId1 =
+      await superAdmin.createAndPublishExplorationWithCards('Exploration 1');
+    // expId2 just needs to exist; skip welcome modal on second visit.
+    const expId2 =
+      await superAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Exploration 2',
+        'Algebra',
+        false
+      );
 
-    await superAdmin.navigateToCommunityLibrary();
-    const collectionLink = await getCollectionLinkFromLibrarySearch(
-      superAdmin,
-      COLLECTION_NAME
+    collectionId = await superAdmin.createAndPublishCollection(
+      COLLECTION_NAME,
+      'Learn about collections in Oppia',
+      'Algebra',
+      [expId1, expId2]
     );
-
-    if (!collectionLink) {
-      throw new Error('Could not find collection link in search results');
-    }
-
-    const match = collectionLink.match(/\/collection\/([^/?#]+)/);
-    if (!match) {
-      throw new Error('Could not extract collection ID from collection link');
-    }
-    collectionId = match[1];
   });
 
   it('should navigate to collection and view explorations', async function () {
-    const explorationTileSelector =
-      await openCollectionAndWaitForExplorationTiles(
-        loggedOutLearner,
-        collectionId
-      );
+    await loggedOutLearner.goto(
+      `http://localhost:8181/collection/${collectionId}`
+    );
+    const explorationTileSelector = loggedOutLearner.isViewportAtMobileWidth()
+      ? MOBILE_EXPLORATION_TILE_SELECTOR
+      : DESKTOP_EXPLORATION_TILE_SELECTOR;
+
+    await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
+      visible: true,
+      timeout: 10000,
+    });
 
     const explorationTiles = await loggedOutLearner.page.$$(
       explorationTileSelector
@@ -330,18 +101,17 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should play an exploration and verify completion', async function () {
-    const explorationTileSelector =
-      await openCollectionAndWaitForExplorationTiles(
-        loggedOutLearner,
-        collectionId
-      );
+    await loggedOutLearner.goto(
+      `http://localhost:8181/collection/${collectionId}`
+    );
 
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
-        visible: true,
-      });
+      await loggedOutLearner.page.waitForSelector(
+        MOBILE_EXPLORATION_TILE_SELECTOR,
+        {visible: true}
+      );
       await loggedOutLearner.clickOnElementWithSelector(
-        explorationTileSelector
+        MOBILE_EXPLORATION_TILE_SELECTOR
       );
 
       await loggedOutLearner.page.waitForSelector(
@@ -360,9 +130,10 @@ describe('Logged-Out Learner', function () {
       }
       await loggedOutLearner.goto(firstExplorationLink);
     } else {
-      await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
-        visible: true,
-      });
+      await loggedOutLearner.page.waitForSelector(
+        DESKTOP_EXPLORATION_TILE_SELECTOR,
+        {visible: true}
+      );
 
       await loggedOutLearner.page.waitForSelector(
         DESKTOP_COLLECTION_EXPLORATION_LINK_SELECTOR,
@@ -391,21 +162,18 @@ describe('Logged-Out Learner', function () {
   it('should click "Back to Collection" button', async function () {
     await loggedOutLearner.page.waitForSelector(
       BACK_TO_COLLECTION_BUTTON_SELECTOR,
-      {visible: true, timeout: 15000}
+      {visible: true, timeout: 5000}
     );
     await loggedOutLearner.clickOnElementWithSelector(
       BACK_TO_COLLECTION_BUTTON_SELECTOR
     );
 
-    const explorationTileSelector =
-      await openCollectionAndWaitForExplorationTiles(
-        loggedOutLearner,
-        collectionId
-      );
+    const explorationTileSelector = loggedOutLearner.isViewportAtMobileWidth()
+      ? MOBILE_EXPLORATION_TILE_SELECTOR
+      : DESKTOP_EXPLORATION_TILE_SELECTOR;
 
     await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
       visible: true,
-      timeout: 30000,
     });
   });
 
@@ -416,14 +184,13 @@ describe('Logged-Out Learner', function () {
 
     await loggedOutLearner.changeSiteLanguage('es');
 
-    await openCollectionAndWaitForExplorationTiles(
-      loggedOutLearner,
-      collectionId
+    await loggedOutLearner.goto(
+      `http://localhost:8181/collection/${collectionId}`
     );
 
     await loggedOutLearner.page.waitForSelector(
       SHARE_COLLECTION_FOOTER_SELECTOR,
-      {visible: true, timeout: 30000}
+      {timeout: 10000}
     );
 
     const shareText = await loggedOutLearner.page.$eval(
