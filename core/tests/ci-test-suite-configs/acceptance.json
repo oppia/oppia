@@ -101,6 +101,18 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
     },
     {
+      "name": "lesson-creator/create-a-basic-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/modify-an-existing-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/modify-an-existing-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/save-and-publish-the-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/save-and-publish-the-exploration.spec.ts"
+    },
+    {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts"
     },
