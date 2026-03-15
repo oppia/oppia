@@ -295,7 +295,18 @@ describe('Logged-Out Learner', function () {
       isLandscape: true,
     });
 
+<<<<<<< HEAD
     await reloadCollectionForThisSpec(superAdmin, COLLECTION_FILENAME);
+=======
+    const expId1 =
+      await superAdmin.createAndPublishExplorationWithCards('Exploration 1');
+    const expId2 =
+      await superAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Exploration 2',
+        'Algebra',
+        false
+      );
+>>>>>>> 2b2bd33863 (linter fixes)
 
     await superAdmin.navigateToCommunityLibrary();
     const collectionLink = await getCollectionLinkFromLibrarySearch(

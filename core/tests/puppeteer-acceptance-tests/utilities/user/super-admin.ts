@@ -603,7 +603,6 @@ export class SuperAdmin extends BaseUser {
           element => element.innerText,
           collectionNameElement
         );
-        console.log(`Found collection row: "${name.trim()}"`); // ← debug line
         if (name.trim() === collectionName) {
           const reloadButton = await reloadCollectionRows[i].$(
             reloadCollectionButton
