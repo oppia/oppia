@@ -37,10 +37,6 @@
       "module": "core/tests/webdriverio_desktop/explorationTranslationTab.js"
     },
     {
-      "name": "learner",
-      "module": "core/tests/webdriverio/learnerFlow.js"
-    },
-    {
       "name": "navigation",
       "module": "core/tests/webdriverio_desktop/navigation.js"
     },

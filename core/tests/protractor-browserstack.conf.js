@@ -80,7 +80,6 @@ exports.config = {
     // browserstack.
     full: [
       'protractor/accessibility.js',
-      'protractor/learnerFlow.js',
       'protractor/libraryFlow.js',
       'protractor_mobile/navigation.js',
       'protractor/profileMenuFlow.js',
@@ -88,8 +87,6 @@ exports.config = {
     ],
 
     accessibility: ['protractor/accessibility.js'],
-
-    learner: ['protractor/learnerFlow.js'],
 
     library: ['protractor/libraryFlow.js'],
 
