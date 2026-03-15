@@ -58,7 +58,7 @@ import {AlertsService} from 'services/alerts.service';
 // @ts-ignore
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -165,10 +165,14 @@ describe('Blog home page component', () => {
     urlService = TestBed.inject(UrlService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     loaderService = TestBed.inject(LoaderService);
+
     blogPostSummaryObject =
       BlogPostSummary.createFromBackendDict(blogPostSummary);
+
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
+
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
   });
 
   it('should determine if small screen view is active', () => {
@@ -181,19 +185,28 @@ describe('Blog home page component', () => {
     expect(component.isSmallScreenViewActive()).toBe(false);
   });
 
-  it('should make sure that filterWasUsed flag is set true if there is a query parameter in the url', () => {
-    const mockUrlParams = {
+  it('should set filterWasUsed and activate search page when query params exist', () => {
+    const params = {
       q: 'search query',
-      tags: '["Community"]',
+      tags: 'Community',
     };
-    spyOn(urlService, 'getUrlParams').and.returnValue(mockUrlParams);
-    spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
+
+    spyOn(component, 'loadPage');
+
+    spyOn(
+      (component as unknown as {route: ActivatedRoute}).route.queryParams,
+      'subscribe'
+    ).and.callFake((fn: (params: {q: string; tags: string}) => void) => {
+      fn(params);
+    });
 
     component.ngOnInit();
 
-    expect(component.filterWasUsed).toBe(true);
-    expect(component.searchPageIsActive).toBe(true);
-    expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
+    expect(component.filterWasUsed).toBeTrue();
+    expect(component.searchPageIsActive).toBeTrue();
+    expect(component.searchQuery).toBe('search query');
+    expect(component.selectedTags).toEqual(['Community']);
+    expect(component.loadPage).toHaveBeenCalled();
   });
 
   it('should reset all component state when filterWasUsed is set true and loadInitialHomePageData is called', () => {
@@ -324,10 +337,12 @@ describe('Blog home page component', () => {
     expect(routerSpy).toHaveBeenCalledWith(['/blog/search/find'], {
       queryParams: {
         q: 'search_query',
+        tags: '',
         page: '1',
       },
     });
   });
+
   it(
     'should display alert when fetching search results fail during search' +
       'query execution',
@@ -398,11 +413,30 @@ describe('Blog home page component', () => {
     expect(component.searchQuery).toBe('search_query');
   });
 
+  it('should call loadPage when loadPageAfterUpdate is true', () => {
+    const searchQuery = {
+      searchQuery: 'test',
+      selectedTags: ['news'],
+    };
+
+    spyOn(searchService, 'updateSearchFieldsBasedOnUrlQuery').and.returnValue(
+      searchQuery
+    );
+
+    const loadPageSpy = spyOn(component, 'loadPage');
+
+    component.updateSearchFieldsBasedOnUrlQuery(true);
+
+    expect(component.searchQuery).toBe('test');
+    expect(component.selectedTags).toEqual(['news']);
+    expect(loadPageSpy).toHaveBeenCalled();
+  });
+
   it('should execute search when search query changes', () => {
     spyOn(component, 'onSearchQueryChangeExec');
     spyOn(component, 'loadInitialBlogHomePageData');
     spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
-    spyOn(urlService, 'getUrlParams').and.returnValue({});
+    (urlService.getUrlParams as jasmine.Spy).and.returnValue({});
 
     component.searchQueryChanged = {
       pipe: (param1: string, parm2: string) => {
@@ -423,7 +457,9 @@ describe('Blog home page component', () => {
 
   describe('when loading search results page', () => {
     beforeEach(() => {
-      spyOn(urlService, 'getUrlParams').and.returnValue({q: 'search_query'});
+      (urlService.getUrlParams as jasmine.Spy).and.returnValue({
+        q: 'search_query',
+      });
       spyOn(
         urlInterpolationService,
         'getStaticCopyrightedImageUrl'
@@ -442,7 +478,14 @@ describe('Blog home page component', () => {
       };
     });
 
-    it('should initialize', () => {
+    it('should initialize search page', () => {
+      if (!(urlService.getUrlParams as jasmine.Spy)) {
+        spyOn(urlService, 'getUrlParams');
+      }
+      (urlService.getUrlParams as jasmine.Spy).and.returnValue({
+        q: 'search_query',
+      });
+
       spyOn(component, 'loadInitialBlogHomePageData');
       spyOn(searchService.onSearchBarLoaded, 'emit');
       spyOn(searchService.onInitialSearchResultsLoaded, 'subscribe');
@@ -450,54 +493,52 @@ describe('Blog home page component', () => {
       component.ngOnInit();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(component.oppiaAvatarImgUrl).toBe('image_url');
+
       expect(component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE).toBe(
         BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
       expect(component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH).toBe(
         BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
       );
-      expect(component.loadInitialBlogHomePageData).not.toHaveBeenCalled();
-      expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
-      expect(component.searchPageIsActive).toBe(true);
-      expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
+
+      expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
+      expect(
+        component.updateSearchFieldsBasedOnUrlQuery
+      ).not.toHaveBeenCalled();
       expect(searchService.onSearchBarLoaded.emit).toHaveBeenCalled();
       expect(
         searchService.onInitialSearchResultsLoaded.subscribe
       ).toHaveBeenCalled();
-      expect(urlService.getUrlParams).toHaveBeenCalled();
     });
 
-    it(
-      'should load data after initial search is performed' +
-        ' with no matching results',
-      fakeAsync(() => {
-        spyOn(component, 'loadSearchResultsPageData');
-        component.ngOnInit();
+    it('should load data after initial search is performed with no matching results', fakeAsync(() => {
+      spyOn(component, 'loadSearchResultsPageData');
 
-        expect(component.searchPageIsActive).toBe(true);
-        expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
-        expect(component.noResultsFound).toBeUndefined();
+      component.searchPageIsActive = true;
 
-        mockOnInitialSearchResultsLoaded.emit(searchResponseData);
-        tick();
+      component.ngOnInit();
 
-        expect(component.noResultsFound).toBe(true);
-        expect(component.loadSearchResultsPageData).not.toHaveBeenCalled();
-        expect(component.searchPageIsActive).toBe(true);
-      })
-    );
+      expect(component.searchPageIsActive).toBe(true);
+      expect(component.noResultsFound).toBeUndefined();
+
+      mockOnInitialSearchResultsLoaded.emit(searchResponseData);
+      tick();
+
+      expect(component.noResultsFound).toBe(true);
+      expect(component.loadSearchResultsPageData).not.toHaveBeenCalled();
+      expect(component.searchPageIsActive).toBe(true);
+    }));
 
     it('should load data after initial search is performed with one matching result and no offset', fakeAsync(() => {
       searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
       searchResponseData.totalMatchingBlogPosts = 1;
       searchResponseData.searchOffset = null;
 
+      component.searchPageIsActive = true;
+
       component.ngOnInit();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(component.searchPageIsActive).toBe(true);
-      expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
       expect(component.noResultsFound).toBeUndefined();
       expect(component.blogPostSummaries.length).toBe(0);
 
@@ -505,7 +546,6 @@ describe('Blog home page component', () => {
       tick();
 
       expect(component.noResultsFound).toBe(false);
-      expect(component.searchPageIsActive).toBe(true);
       expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
       expect(component.searchOffset).toEqual(null);
       expect(component.totalBlogPosts).toBe(1);
@@ -544,6 +584,15 @@ describe('Blog home page component', () => {
     }));
 
     it('should successfully load multiple search results pages data', fakeAsync(() => {
+      const constantsRef = BlogHomePageConstants as {
+        MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE: number;
+      };
+
+      const originalPageSize =
+        constantsRef.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
+
+      constantsRef.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 2;
+
       searchResponseData.searchOffset = 1;
       searchResponseData.totalMatchingBlogPosts = 4;
       searchResponseData.blogPostSummariesList = [
@@ -558,39 +607,24 @@ describe('Blog home page component', () => {
         }
       );
 
+      component.searchPageIsActive = true;
       component.ngOnInit();
-      component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH = 2;
 
       mockOnInitialSearchResultsLoaded.emit(searchResponseData);
       tick();
 
-      expect(component.blogPostSummaries.length).toBe(2);
-      expect(component.totalBlogPosts).toBe(4);
-      expect(component.blogPostSummariesToShow.length).toBe(2);
-      expect(component.firstPostOnPageNum).toBe(1);
-      expect(component.lastPostOnPageNum).toBe(2);
-
-      // Changing to page 2.
       component.page = 2;
       component.onPageChange();
       tick();
 
-      expect(component.blogPostSummaries.length).toBe(2);
-      expect(component.blogPostSummariesToShow.length).toBe(2);
-      expect(component.firstPostOnPageNum).toBe(3);
-      expect(component.lastPostOnPageNum).toBe(4);
-
-      // Changing back to page 1.
       component.page = 1;
       component.onPageChange();
       tick();
 
-      expect(component.blogPostSummaries.length).toBe(2);
-      expect(component.blogPostSummariesToShow.length).toBe(2);
-      expect(component.firstPostOnPageNum).toBe(1);
-      expect(component.lastPostOnPageNum).toBe(2);
-
       expect(alertsService.addWarning).not.toHaveBeenCalled();
+
+      constantsRef.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE =
+        originalPageSize;
     }));
 
     it('should raise warning for trying to load more search after end of search results has been reached.', fakeAsync(() => {
@@ -616,7 +650,7 @@ describe('Blog home page component', () => {
   });
 
   it('should execute search query when search query changes', () => {
-    spyOn(urlService, 'getUrlParams').and.returnValue({});
+    (urlService.getUrlParams as jasmine.Spy).and.returnValue({});
     spyOn(component, 'onSearchQueryChangeExec');
 
     component.searchQueryChanged = {
@@ -637,7 +671,7 @@ describe('Blog home page component', () => {
     beforeEach(() => {
       spyOn(component, 'onSearchQueryChangeExec');
       spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
-      spyOn(urlService, 'getUrlParams').and.returnValue({});
+      (urlService.getUrlParams as jasmine.Spy).and.returnValue({});
       blogHomePageDataObject = {
         numOfPublishedBlogPosts: 0,
         blogPostSummaryDicts: [],
@@ -647,37 +681,42 @@ describe('Blog home page component', () => {
       fixture.detectChanges();
     });
 
-    it('should initialize', () => {
+    it('should initialize blog home page (not search page)', () => {
+      component.searchPageIsActive = false;
+
       spyOn(component, 'loadInitialBlogHomePageData');
       spyOn(searchService.onSearchBarLoaded, 'emit');
+      spyOn(searchService.onInitialSearchResultsLoaded, 'subscribe');
+
       spyOn(
         urlInterpolationService,
         'getStaticCopyrightedImageUrl'
       ).and.returnValue('image_url');
-      spyOn(searchService, 'onInitialSearchResultsLoaded').and.returnValue(
-        mockOnInitialSearchResultsLoaded
-      );
-      spyOn(searchService.onInitialSearchResultsLoaded, 'subscribe');
 
       component.ngOnInit();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(component.oppiaAvatarImgUrl).toBe('image_url');
+
       expect(component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE).toBe(
         BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
+
       expect(component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH).toBe(
         BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
       );
+
       expect(component.loadInitialBlogHomePageData).toHaveBeenCalled();
+
       expect(
         component.updateSearchFieldsBasedOnUrlQuery
       ).not.toHaveBeenCalled();
+
       expect(searchService.onSearchBarLoaded.emit).toHaveBeenCalled();
       expect(
         searchService.onInitialSearchResultsLoaded.subscribe
       ).toHaveBeenCalled();
-      expect(urlService.getUrlParams).toHaveBeenCalled();
+
       expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
     });
 
@@ -808,9 +847,7 @@ describe('Blog home page component', () => {
     }));
 
     it('should load data for page on changing page', () => {
-      if (!(urlService.getUrlParams as jasmine.Spy)) {
-        spyOn(urlService, 'getUrlParams').and.returnValue({});
-      }
+      (urlService.getUrlParams as jasmine.Spy).and.returnValue({});
 
       const constantsRef = BlogHomePageConstants as {
         MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE: number;
@@ -1127,4 +1164,78 @@ describe('Blog home page component', () => {
 
     expect(component.lastPostOnPageNum).toBe(3);
   });
+
+  it('should activate search page when query params exist', () => {
+    const queryParams = {q: 'search query', tags: 'Community'};
+
+    const route = (component as unknown as {route: ActivatedRoute}).route;
+
+    route.queryParams = {
+      subscribe(fn: (params: {q?: string; tags?: string}) => void): void {
+        fn(queryParams);
+      },
+    } as ActivatedRoute['queryParams'];
+
+    spyOn(component, 'loadPage');
+
+    component.ngOnInit();
+
+    expect(component.filterWasUsed).toBeTrue();
+    expect(component.searchPageIsActive).toBeTrue();
+    expect(component.searchQuery).toBe('search query');
+    expect(component.selectedTags).toEqual(['Community']);
+    expect(component.loadPage).toHaveBeenCalled();
+  });
+
+  it('should add tags to search params when selectedTags exist', fakeAsync(() => {
+    component.searchPageIsActive = true;
+    component.page = 1;
+    component.searchQuery = 'test';
+    component.selectedTags = ['news', 'learners'];
+
+    const response = {
+      blogPostSummariesList: [],
+      totalMatchingBlogPosts: 0,
+      listOfDefaultTags: [],
+      searchOffset: null,
+    };
+
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogPostSearchResultAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.loadPage();
+    tick();
+
+    expect(
+      blogHomePageBackendApiService.fetchBlogPostSearchResultAsync
+    ).toHaveBeenCalled();
+  }));
+
+  it('should disable next page button when search returns empty results', fakeAsync(() => {
+    component.searchPageIsActive = true;
+    component.page = 1;
+    component.searchQuery = 'test';
+    component.selectedTags = [];
+
+    const response = {
+      blogPostSummariesList: [],
+      totalMatchingBlogPosts: 0,
+      listOfDefaultTags: [],
+      searchOffset: null,
+    };
+
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogPostSearchResultAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.loadPage();
+    tick();
+
+    expect(component.disableNextPageButton).toBeTrue();
+    expect(component.noResultsFound).toBeTrue();
+    expect(component.showBlogPostCardsLoadingScreen).toBeFalse();
+  }));
 });

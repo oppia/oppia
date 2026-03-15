@@ -104,7 +104,7 @@ export class BlogHomePageComponent implements OnInit {
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
 
     this.route.queryParams.subscribe(params => {
-      this.page = params['page'] ? Number(params['page']) : 1;
+      this.page = params.page ? Number(params.page) : 1;
 
       this.calculateFirstPostOnPageNum(
         this.page,
@@ -116,12 +116,12 @@ export class BlogHomePageComponent implements OnInit {
         BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
 
-      if (params['q'] || params['tags']) {
+      if (params.q || params.tags) {
         this.searchPageIsActive = true;
         this.filterWasUsed = true;
 
-        this.searchQuery = params['q'] || '';
-        this.selectedTags = params['tags'] ? params['tags'].split(',') : [];
+        this.searchQuery = params.q || '';
+        this.selectedTags = params.tags ? params.tags.split(',') : [];
 
         this.loadPage();
       } else {
@@ -285,7 +285,7 @@ export class BlogHomePageComponent implements OnInit {
         .catch(error => {
           if (this.blogPostSummaries.length === 0) {
             this.alertsService.addWarning(
-              'Unable to fetch search results. Please try again.'
+              'No more search resutls found. End of search results.'
             );
           }
 
