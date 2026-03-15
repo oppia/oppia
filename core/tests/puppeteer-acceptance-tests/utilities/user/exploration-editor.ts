@@ -27,6 +27,7 @@ import path from 'path';
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -34,7 +35,6 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -433,6 +433,26 @@ const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
+
+const explorationGraphSelector = 'oppia-exploration-graph';
+const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
+const explorationGraphNodeDeleteButtonSelector =
+  'g.e2e-test-delete-node rect.oppia-node-delete';
+const explorationGraphNodeSelector = 'g.e2e-test-node';
+const confirmDeleteStateButtonSelector = '.e2e-test-confirm-delete-state';
+
+const lostChangesModalSelector = '.e2e-test-lost-changes-modal';
+const discardAndExportLostChangesButtonSelector =
+  'button.e2e-test-discard-and-export-lost-changes-button';
+const stateNameSubmitButtonSelector = 'button.e2e-test-state-name-submit';
+const stateNameInputSelector = '.e2e-test-state-name-input';
+const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
+
+const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
+const saveRecommendationModalSaveButtonSelector =
+  'button.e2e-test-recommendation-prompt-save-button';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -2780,41 +2800,9 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
-    try {
-      const modalElement = await this.page.waitForSelector(
-        dismissWelcomeModalSelector,
-        {
-          visible: true,
-          timeout: 10000,
-        }
-      );
-      if (modalElement) {
-        // We use click() directly here to avoid being blocked by the backdrop
-        // while trying to close the modal itself.
-        await modalElement.click();
-        await this.page.waitForSelector(dismissWelcomeModalSelector, {
-          hidden: true,
-        });
-        // Important: Wait for the backdrop to fade out, otherwise it blocks
-        // subsequent clicks on the page elements.
-        await this.page
-          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-          .catch(() => {});
-        showMessage('Tutorial pop-up closed successfully.');
-      }
-    } catch (error) {
-      if (!failIfMissing) {
-        showMessage(
-          'Welcome Modal not found, but test can be continued.\n' +
-            `Error: ${error.message}`
-        );
-      } else {
-        throw new Error(
-          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
-        );
-      }
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
@@ -2826,7 +2814,7 @@ export class ExplorationEditor extends BaseUser {
     // The existing dismissWelcomeModal() in this class already handles the
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(false);
     await this.dismissFeedbackPromptModalIfPresent();
   }
 
@@ -2855,6 +2843,7 @@ export class ExplorationEditor extends BaseUser {
     } catch (error) {
       // Modal didn't appear or already dismissed.
     }
+    await this.dismissWelcomeModal(false);
   }
 
   /**
@@ -2905,9 +2894,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -4770,13 +4756,11 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
     category: string = 'Algebra',
-    flag: boolean = true
+    flag: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    if (flag) {
-      await this.dismissWelcomeModal();
-    }
+    await this.dismissWelcomeModal(flag);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -4857,11 +4841,12 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
     category: string = 'Mathematics',
-    numberOfCards: number = 2
+    numberOfCards: number = 2,
+    expectedWelcomeModal: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
 
     for (let i = 0; i < numberOfCards - 1; i++) {
       await this.updateCardContent(`Content ${i}`);
@@ -6143,11 +6128,13 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Verifies that the edit card content pencil button is visible.
+   * @param {boolean} isVisible - Whether the button is expected to be visible.
    */
-  async expectEditCardContentPencilButtonToBeVisible(): Promise<void> {
+  async expectEditCardContentPencilButtonToBeVisible(
+    isVisible: boolean = true
+  ): Promise<void> {
     const visible = await this.isElementVisible(editCardContentButtonSelector);
-
-    expect(visible).toBe(true);
+    expect(visible).toBe(isVisible);
   }
 
   /**
@@ -6652,9 +6639,6 @@ export class ExplorationEditor extends BaseUser {
     imageDescription: string,
     imageCaption: string | null
   ): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
@@ -6668,9 +6652,6 @@ export class ExplorationEditor extends BaseUser {
    * Block Quote, Image, Math Formula, and Concept Card.
    */
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
@@ -6756,9 +6737,6 @@ export class ExplorationEditor extends BaseUser {
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
@@ -7230,6 +7208,293 @@ export class ExplorationEditor extends BaseUser {
       confirmDeleteInteractionButtonSelector,
       false
     );
+  }
+
+  /**
+   * Clicks on a node element in the exploration graph
+   * @param stateName The name of the state to be clicked
+   * @param selectorToClick The selector of the element to be clicked within the node
+   * @returns A boolean indicating if the click was successful
+   */
+  async clickOnGraphNodeElement(
+    stateName: string,
+    selectorToClick: string
+  ): Promise<boolean> {
+    await this.page.waitForFunction(
+      (nodeSelector: string) =>
+        document.querySelectorAll(nodeSelector).length > 0,
+      {timeout: 60000},
+      explorationGraphNodeSelector
+    );
+    return await this.page.evaluate(
+      (name: string, selectorToClick: string, nodeSelector: string) => {
+        const nodes = Array.from(document.querySelectorAll(nodeSelector));
+
+        const targetNode = nodes.find(node => {
+          const title = node.querySelector('title')?.textContent || '';
+          const normalizedTitle = title.replace(/\s+/g, ' ').trim();
+          const normalizedName = name.replace(/\s+/g, ' ').trim();
+          return normalizedTitle.includes(normalizedName);
+        });
+
+        if (!targetNode) {
+          return false;
+        }
+
+        const element = targetNode.querySelector(
+          selectorToClick
+        ) as HTMLElement | null;
+
+        if (!element) {
+          return false;
+        }
+
+        element.scrollIntoView({block: 'center', inline: 'center'});
+        element.dispatchEvent(new Event('click', {bubbles: true}));
+        return true;
+      },
+      stateName,
+      selectorToClick,
+      explorationGraphNodeSelector
+    );
+  }
+
+  /**
+   * Deletes a state from the exploration
+   * @param stateName The name of the state to be deleted
+   */
+
+  async deleteState(stateName: string): Promise<void> {
+    await this.expectExplorationGraphToContainCard(stateName);
+    const isMobile = this.isViewportAtMobileWidth();
+
+    if (isMobile) {
+      await this.openExplorationStateGraphInMobileView();
+    } else {
+      await this.navigateToCard(stateName);
+    }
+
+    await this.expectElementToBeVisible(explorationGraphSelector);
+
+    await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeBackgroundSelector
+    );
+
+    const deleteClicked = await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeDeleteButtonSelector
+    );
+
+    if (!deleteClicked) {
+      throw new Error(
+        `Delete button not found in graph for card: ${stateName}`
+      );
+    }
+
+    await this.expectElementToBeVisible(confirmDeleteStateButtonSelector);
+    await this.clickOnElementWithSelector(confirmDeleteStateButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, name: string) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === name
+        );
+      },
+      {timeout: 60000},
+      stateNodeSelector,
+      stateName
+    );
+
+    if (isMobile) {
+      const closeBtn = await this.page.$(closeModalButtonSelector);
+      if (closeBtn) {
+        await this.clickOnElementWithSelector(closeModalButtonSelector);
+      }
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Expects the lost changes modal to be visible or not and matches the heading if visible
+   * @param isVisible - Whether the modal should be visible or not
+   */
+  async expectLostChangesModalToBeVisible(isVisible: boolean): Promise<void> {
+    await this.expectElementToBeVisible(lostChangesModalSelector, isVisible);
+
+    if (isVisible) {
+      await this.expectModalTitleToBe('Error Saving Exploration');
+    }
+  }
+
+  /**
+   * Exports and discards lost changes from the lost changes modal
+   */
+  async exportAndDiscardLostChanges(): Promise<void> {
+    await this.expectLostChangesModalToBeVisible(true);
+
+    await this.expectElementToBeVisible(
+      discardAndExportLostChangesButtonSelector,
+      true
+    );
+
+    await this.clickOnElementWithSelector(
+      discardAndExportLostChangesButtonSelector
+    );
+
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Expects a file to be downloaded with given file name
+   */
+  async expectLostChangesFileToBeDownloaded(): Promise<void> {
+    const downloadedFile =
+      await this.waitForExplorationDownload('lostChanges.txt');
+    expect(downloadedFile).toBe('lostChanges.txt');
+    await this.waitForPageToFullyLoad();
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Updates the name of a state in the exploration editor
+   * @param newStateName - The new name for the state
+   */
+  async updateStateName(newStateName: string): Promise<void> {
+    await this.expectElementToBeVisible(currentCardNameContainerSelector, true);
+    await this.clickOnElementWithSelector(currentCardNameContainerSelector);
+
+    await this.page.evaluate(selector => {
+      const input = document.querySelector(selector) as HTMLInputElement;
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+    }, stateNameInputSelector);
+
+    await this.page.keyboard.type(newStateName);
+    await this.clickOnElementWithSelector(stateNameSubmitButtonSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      newStateName
+    );
+  }
+
+  /**
+   * Expects the state name to be a specific value
+   * @param expectedStateName The expected state name
+   */
+  async expectStateNameToBe(expectedStateName: string): Promise<void> {
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      expectedStateName
+    );
+  }
+
+  /**
+   * Expects the exploration graph to not contain a specific card
+   * @param cardName The name of the card to check
+   */
+  async expectExplorationGraphToNotContainCard(
+    cardName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === value
+        );
+      },
+      {timeout: 60000},
+      stateNodeSelector,
+      cardName
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Clicks on the discard lost changes button
+   */
+  async discardLostChanges(): Promise<void> {
+    await this.expectElementToBeVisible(errorSavingExplorationModal);
+    await this.clickOnElementWithSelector(errorSavingExplorationModal);
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Expects the card height limit warning to be visible
+   */
+  async expectCardHeightLimitWarningToBeVisible(): Promise<void> {
+    await this.expectTextContentToContain(
+      cardHeightLimitWarningSelector,
+      'This card is quite long'
+    );
+  }
+
+  /**
+   * Expects the save recommendation modal to be visible
+   */
+  async expectSaveRecommendationModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(saveRecommendationModalSelector, true);
+
+    await this.expectModalTitleToBe('Save Changes');
+
+    await this.expectModalContentToContain(
+      'It is recommended to save if the exploration has more than 50 changes.'
+    );
+  }
+
+  /**
+   * Clicks on the save draft button in the save recommendation modal
+   * * @param commitMessage - The commit message text to be saved.
+   */
+  async saveExplorationDraftFromSaveRecommendationModal(
+    commitMessage: string = 'Testing Testing'
+  ): Promise<void> {
+    await this.expectSaveRecommendationModalToBeVisible();
+    await this.clickOnElementWithSelector(
+      saveRecommendationModalSaveButtonSelector
+    );
+
+    if (commitMessage) {
+      await this.clickOnElementWithSelector(commitMessageSelector);
+      await this.typeInInputField(commitMessageSelector, commitMessage);
+    }
+
+    await this.clickOnElementWithSelector(saveDraftButton);
+    await this.expectElementToBeVisible(saveDraftButton, false);
+
+    await this.expectElementToBeVisible(toastMessage, true);
+    await this.expectElementToBeVisible(toastMessage, false);
+    showMessage('Exploration is saved successfully.');
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(saveRecommendationModalSelector, false);
+  }
+
+  /**
+   * Navigates to creator dashboard using profile dropdown.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(creatorDashboardMenuLink);
+    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
+    await this.expectElementToBeVisible(creatorDashboardContainerSelector);
   }
 }
 
