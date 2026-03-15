@@ -818,7 +818,6 @@
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS": "Pilih hingga 5 topik yang Anda minati, lalu selesaikan semua bab pada topik yang dipilih untuk mencapai sasaran pembelajaran Anda.",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE": "Bab <[number]>: <[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS": "<[current]> DARI <[total]> BAB YANG SELESAI",
-  "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE": "<[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "Batal",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING": "Tambahkan atau ubah sasaran",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_INSTRUCTIONS": "Anda dapat memilih hingga 5 sasaran dalam satu waktu",
