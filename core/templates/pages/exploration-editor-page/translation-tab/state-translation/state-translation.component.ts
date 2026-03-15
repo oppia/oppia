@@ -362,7 +362,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     let outcome = answerGroup.outcome;
     let hasFeedback = outcome.hasNonemptyFeedback();
 
-    if (answerGroup.rules) {
+    if (answerGroup.rules && answerGroup.rules.length > 0) {
       let firstRule = this.ConvertToPlainTextPipe.transform(
         this.parameterizeRuleDescriptionPipe.transform(
           answerGroup.rules[0],
@@ -379,6 +379,8 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         );
       }
       summary = '[' + summary + '] ';
+    } else {
+      summary = '[Answer] ';
     }
 
     if (hasFeedback) {

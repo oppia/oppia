@@ -28,6 +28,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
+import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
@@ -163,8 +164,25 @@ export class TranslationStatusService implements OnInit {
         let noTranslationCount = 0;
         let noVoiceoverCount = 0;
 
-        let allContentIds =
-          this.explorationStatesService.getAllContentIdsByStateName(stateName);
+        let state = this.explorationStatesService.getState(stateName);
+        let allContentIds = state
+          .getAllContents()
+          .filter(content => {
+            let value = BaseTranslatableObject.getContentValue(content);
+            if (Array.isArray(value)) {
+              if (value.length === 0) {
+                return false;
+              }
+              return value.some(
+                val =>
+                  (val || '').trim() !== '' && (val || '').trim() !== '<p></p>'
+              );
+            }
+            let strValue = (value as string) || '';
+            return strValue.trim() !== '' && strValue.trim() !== '<p></p>';
+          })
+          .map(content => content.contentId as string);
+
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
         // This is used to prevent users from adding unwanted hints audio, as

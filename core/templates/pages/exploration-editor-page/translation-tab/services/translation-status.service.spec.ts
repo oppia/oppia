@@ -17,6 +17,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -428,13 +429,13 @@ describe('Translation status service', () => {
       ttams.activateVoiceoverMode();
       var explorationAudioRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationAudioRequiredCount).toBe(8);
+      expect(explorationAudioRequiredCount).toBe(5);
 
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       var explorationTranslationsRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationTranslationsRequiredCount).toBe(8);
+      expect(explorationTranslationsRequiredCount).toBe(5);
 
       // To test changes after adding a new state.
       ess.addState('Fourth', () => {});
@@ -446,14 +447,14 @@ describe('Translation status service', () => {
       tls.setActiveLanguageCode('en');
       var explorationAudioRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationAudioRequiredCount).toBe(9);
+      expect(explorationAudioRequiredCount).toBe(5);
 
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
       var explorationTranslationsRequiredCount =
         tss.getExplorationContentRequiredCount();
-      expect(explorationTranslationsRequiredCount).toBe(9);
+      expect(explorationTranslationsRequiredCount).toBe(5);
     }
   );
 
@@ -496,12 +497,12 @@ describe('Translation status service', () => {
 
     ttams.activateVoiceoverMode();
 
-    expect(tss.getExplorationContentRequiredCount()).toBe(8);
+    expect(tss.getExplorationContentRequiredCount()).toBe(5);
 
     entityVoiceoversService.setActiveLanguageAccentCode('en-US');
 
     tss.refresh();
-    expect(tss.getExplorationContentNotAvailableCount()).toEqual(7);
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(4);
     let color = tss.getActiveStateContentIdStatusColor('content_0');
     expect(tss.NO_ASSETS_AVAILABLE_COLOR).toEqual(color);
 
@@ -512,7 +513,7 @@ describe('Translation status service', () => {
     } as FeatureStatusChecker);
 
     tss.refresh();
-    expect(tss.getExplorationContentNotAvailableCount()).toEqual(6);
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(3);
     color = tss.getActiveStateContentIdStatusColor('content_0');
     expect(tss.ALL_ASSETS_AVAILABLE_COLOR).toEqual(color);
 
@@ -521,7 +522,7 @@ describe('Translation status service', () => {
 
     entityVoiceoversService.setActiveLanguageAccentCode('en-IN');
     tss.refresh();
-    expect(tss.getExplorationContentNotAvailableCount()).toEqual(8);
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(5);
   });
 
   it('should return a correct count of audio not available in an exploration', () => {
@@ -531,6 +532,10 @@ describe('Translation status service', () => {
     expect(explorationAudioNotAvailableCount).toBe(0);
 
     ess.addState('Fourth', () => {});
+    ess.saveStateContent(
+      'Fourth',
+      SubtitledHtml.createDefault('Fourth content', 'content_9')
+    );
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
     tss.refresh();
@@ -549,9 +554,13 @@ describe('Translation status service', () => {
       tss.refresh();
       var explorationTranslationNotAvailableCount =
         tss.getExplorationContentNotAvailableCount();
-      expect(explorationTranslationNotAvailableCount).toBe(7);
+      expect(explorationTranslationNotAvailableCount).toBe(4);
 
       ess.addState('Fourth', () => {});
+      ess.saveStateContent(
+        'Fourth',
+        SubtitledHtml.createDefault('Fourth content', 'content_9')
+      );
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
       ess.saveInteractionId('Fourth', 'EndExploration');
 
@@ -559,7 +568,7 @@ describe('Translation status service', () => {
       tss.refresh();
       explorationTranslationNotAvailableCount =
         tss.getExplorationContentNotAvailableCount();
-      expect(explorationTranslationNotAvailableCount).toBe(8);
+      expect(explorationTranslationNotAvailableCount).toBe(5);
     }
   );
 

@@ -54,6 +54,7 @@ import {TranslationTabActiveContentIdService} from '../services/translation-tab-
 import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
 import {StateTranslationComponent} from './state-translation.component';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
@@ -80,7 +81,7 @@ class MockParameterizeRuleDescriptionPipe {
 @Pipe({name: 'wrapTextWithEllipsis'})
 class MockWrapTextWithEllipsisPipe {
   transform(input: string, characterCount: number): string {
-    return '';
+    return input;
   }
 }
 
@@ -108,6 +109,7 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
 
   let explorationState1 = {
     Introduction: {
@@ -297,7 +299,11 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
+    );
     explorationStatesService.init(explorationState1, false);
+    explorationLanguageCodeService.displayed = 'en';
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.entityTranslation =
@@ -633,8 +639,7 @@ describe('State translation component', () => {
           ' been added yet',
         () => {
           expect(component.getEmptyContentMessage()).toBe(
-            'The translation for this section has not been created yet.' +
-              ' Switch to translation mode to add a text translation.'
+            'There is no content available for voiceover.'
           );
         }
       );
@@ -716,6 +721,7 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
 
   let explorationState1 = {
     Introduction: {
@@ -870,6 +876,7 @@ describe('State translation component', () => {
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
+        ExplorationLanguageCodeService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService,
         {
@@ -903,7 +910,11 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
+    );
     explorationStatesService.init(explorationState1, false);
+    explorationLanguageCodeService.displayed = 'en';
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
@@ -1128,6 +1139,7 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
   let routerService: RouterService;
 
   let explorationState1 = {
@@ -1346,6 +1358,7 @@ describe('State translation component', () => {
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
+        ExplorationLanguageCodeService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService,
         {
@@ -1379,8 +1392,13 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
+    );
     routerService = TestBed.inject(RouterService);
     explorationStatesService.init(explorationState1, false);
+    explorationLanguageCodeService.displayed = 'en';
+    explorationLanguageCodeService.displayed = 'en';
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
@@ -1528,7 +1546,10 @@ describe('State translation component', () => {
   });
 
   it('should return translation html when translation available', () => {
-    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+    (translationLanguageService.getActiveLanguageCode as any).and.returnValue(
+      'hi'
+    );
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1567,7 +1588,10 @@ describe('State translation component', () => {
   });
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
-    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+    (translationLanguageService.getActiveLanguageCode as any).and.returnValue(
+      'hi'
+    );
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
@@ -1797,6 +1821,7 @@ describe('State translation component', () => {
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
   let explorationState1 = {
     Introduction: {
       content: {
@@ -1986,6 +2011,7 @@ describe('State translation component', () => {
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
+        ExplorationLanguageCodeService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService,
         {
@@ -2019,8 +2045,11 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
-
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
+    );
     explorationStatesService.init(explorationState1, false);
+    explorationLanguageCodeService.displayed = 'en';
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
