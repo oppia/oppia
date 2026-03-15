@@ -224,6 +224,11 @@ describe('Logged-In Learner', function () {
 
     await loggedInUser.expectMobileLayoutToBeCorrect();
 
+    // Scroll to the bottom so that lazily-rendered elements below the fold are
+    // fully painted before we capture the screenshot, then scroll back to the
+    // top so the snapshot is taken from the beginning of the page.
+    await loggedInUser.scrollToBottomOfPage();
+    await loggedInUser.scrollToTopOfPage();
     await loggedInUser.expectScreenshotToMatch('goalsTabMobileView', __dirname);
   });
 
