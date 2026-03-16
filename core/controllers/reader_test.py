@@ -861,7 +861,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
@@ -877,7 +877,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         self.assertEqual(
             recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_6]
@@ -900,7 +900,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         recommendation_ids = self._get_recommendation_ids(
-            self.EXP_ID_0, author_recommended_ids_str='["6","7"]'
+            self.EXP_ID_0, author_recommended_ids_str='["7","6"]'
         )
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
@@ -1025,7 +1025,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
@@ -1065,7 +1065,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         # Only author specified explorations should be recommended since all
         # others in the collection have been completed.
@@ -1106,7 +1106,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
@@ -1121,7 +1121,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         self.assertEqual(
             recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_6]
@@ -1230,7 +1230,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
@@ -1280,7 +1280,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["6","7"]',
+            author_recommended_ids_str='["7","6"]',
         )
         # Only author specified explorations should be recommended since all
         # others in the collection have been completed.
