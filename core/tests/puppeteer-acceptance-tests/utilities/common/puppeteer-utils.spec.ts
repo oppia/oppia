@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Tests for screenshot capture behavior in puppeteer utils.
+ */
+
 import fs from 'fs';
 import {Page} from 'puppeteer';
 
@@ -48,7 +52,7 @@ describe('BaseUser.captureScreenshotsForFailedTest', () => {
     mkdirSyncSpy.mockRestore();
   });
 
-  it('skips screenshots for closed pages without throwing', async () => {
+  it('should skip screenshots for closed pages without throwing', async () => {
     const user = new BaseUser();
     const pageMock = {
       isClosed: jest.fn().mockReturnValue(true),
@@ -67,7 +71,7 @@ describe('BaseUser.captureScreenshotsForFailedTest', () => {
     );
   });
 
-  it('logs screenshot errors without failing', async () => {
+  it('should log screenshot errors without failing', async () => {
     const user = new BaseUser();
     const pageMock = {
       isClosed: jest.fn().mockReturnValue(false),

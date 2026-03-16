@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Tests for user-factory browser cleanup behavior.
+ */
+
 import fs from 'fs';
 
 import {BaseUser} from './puppeteer-utils';
@@ -46,7 +50,7 @@ describe('UserFactory.closeAllBrowsers', () => {
     showMessageSpy.mockRestore();
   });
 
-  it('captures screenshots when no active users are tracked', async () => {
+  it('should capture screenshots when no active users are tracked', async () => {
     const fallbackUser = new BaseUser();
     const captureSpy = jest
       .spyOn(fallbackUser, 'captureScreenshotsForFailedTest')
