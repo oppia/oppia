@@ -438,29 +438,6 @@ describe('Interaction', () => {
   );
 
   it(
-    'should correctly set customization arguments for ' + 'MusicNotesInput',
-    () => {
-      const testInteraction = Interaction.createFromBackendDict({
-        answer_groups: answerGroupsDict,
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          sequenceToGuess: {value: []},
-          initialSequence: {value: []},
-        },
-        default_outcome: defaultOutcomeDict,
-        hints: hintsDict,
-        id: 'MusicNotesInput',
-        solution: solutionDict,
-      });
-
-      expect(testInteraction.customizationArgs).toEqual({
-        sequenceToGuess: {value: []},
-        initialSequence: {value: []},
-      });
-    }
-  );
-
-  it(
     'should correctly set customization arguments for ' +
       'NumericExpressionInput',
     () => {
@@ -539,27 +516,6 @@ describe('Interaction', () => {
         requireNonnegativeInput: {
           value: false,
         },
-      });
-    }
-  );
-
-  it(
-    'should correctly set customization arguments for ' + 'PencilCodeEditor',
-    () => {
-      const testInteraction = Interaction.createFromBackendDict({
-        answer_groups: answerGroupsDict,
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          initialCode: {value: ''},
-        },
-        default_outcome: defaultOutcomeDict,
-        hints: hintsDict,
-        id: 'PencilCodeEditor',
-        solution: solutionDict,
-      });
-
-      expect(testInteraction.customizationArgs).toEqual({
-        initialCode: {value: ''},
       });
     }
   );

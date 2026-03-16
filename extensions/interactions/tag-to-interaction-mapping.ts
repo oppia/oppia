@@ -51,9 +51,6 @@ import {ShortResponseMathEquationInput} from './MathEquationInput/directives/opp
 import {InteractiveMultipleChoiceInputComponent} from './MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component';
 import {ResponseMultipleChoiceInputComponent} from './MultipleChoiceInput/directives/oppia-response-multiple-choice-input.component';
 import {ShortResponseMultipleChoiceInputComponent} from './MultipleChoiceInput/directives/oppia-short-response-multiple-choice-input.component';
-import {MusicNotesInputComponent} from './MusicNotesInput/directives/oppia-interactive-music-notes-input.component';
-import {ResponseMusicNotesInput} from './MusicNotesInput/directives/oppia-response-music-notes-input.component';
-import {ShortResponseMusicNotesInput} from './MusicNotesInput/directives/oppia-short-response-music-notes-input.component';
 import {InteractiveNumberWithUnitsComponent} from './NumberWithUnits/directives/oppia-interactive-number-with-units.component';
 import {ResponseNumberWithUnitsComponent} from './NumberWithUnits/directives/oppia-response-number-with-units.component';
 import {ShortResponseNumberWithUnitsComponent} from './NumberWithUnits/directives/oppia-short-response-number-with-units.component';
@@ -63,9 +60,6 @@ import {ShortResponseNumericExpressionInput} from './NumericExpressionInput/dire
 import {InteractiveNumericInput} from './NumericInput/directives/oppia-interactive-numeric-input.component';
 import {ResponseNumericInput} from './NumericInput/directives/oppia-response-numeric-input.component';
 import {ShortResponseNumericInput} from './NumericInput/directives/oppia-short-response-numeric-input.component';
-import {PencilCodeEditor} from './PencilCodeEditor/directives/oppia-interactive-pencil-code-editor.component';
-import {ResponePencilCodeEditor} from './PencilCodeEditor/directives/oppia-response-pencil-code-editor.component';
-import {ShortResponePencilCodeEditor} from './PencilCodeEditor/directives/oppia-short-response-pencil-code-editor.component';
 import {InteractiveRatioExpressionInputComponent} from './RatioExpressionInput/directives/oppia-interactive-ratio-expression-input.component';
 import {ResponseRatioExpressionInputComponent} from './RatioExpressionInput/directives/oppia-response-ratio-expression-input.component';
 import {ShortResponseRatioExpressionInputComponent} from './RatioExpressionInput/directives/oppia-short-response-ratio-expression-input.component';
@@ -93,12 +87,10 @@ export const TAG_TO_INTERACTION_MAPPING = {
   'OPPIA-INTERACTIVE-MATH-EQUATION-INPUT': InteractiveMathEquationInput,
   'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT':
     InteractiveMultipleChoiceInputComponent,
-  'OPPIA-INTERACTIVE-MUSIC-NOTES-INPUT': MusicNotesInputComponent,
   'OPPIA-INTERACTIVE-NUMBER-WITH-UNITS': InteractiveNumberWithUnitsComponent,
   'OPPIA-INTERACTIVE-NUMERIC-EXPRESSION-INPUT':
     InteractiveNumericExpressionInput,
   'OPPIA-INTERACTIVE-NUMERIC-INPUT': InteractiveNumericInput,
-  'OPPIA-INTERACTIVE-PENCIL-CODE-EDITOR': PencilCodeEditor,
   'OPPIA-INTERACTIVE-RATIO-EXPRESSION-INPUT':
     InteractiveRatioExpressionInputComponent,
   'OPPIA-INTERACTIVE-SET-INPUT': InteractiveSetInputComponent,
@@ -116,11 +108,9 @@ export const TAG_TO_INTERACTION_MAPPING = {
   'OPPIA-RESPONSE-ITEM-SELECTION-INPUT': ResponseItemSelectionInputComponent,
   'OPPIA-RESPONSE-MATH-EQUATION-INPUT': ResponseMathEquationInput,
   'OPPIA-RESPONSE-MULTIPLE-CHOICE-INPUT': ResponseMultipleChoiceInputComponent,
-  'OPPIA-RESPONSE-MUSIC-NOTES-INPUT': ResponseMusicNotesInput,
   'OPPIA-RESPONSE-NUMBER-WITH-UNITS': ResponseNumberWithUnitsComponent,
   'OPPIA-RESPONSE-NUMERIC-EXPRESSION-INPUT': ResponseNumericExpressionInput,
   'OPPIA-RESPONSE-NUMERIC-INPUT': ResponseNumericInput,
-  'OPPIA-RESPONSE-PENCIL-CODE-EDITOR': ResponePencilCodeEditor,
   'OPPIA-RESPONSE-RATIO-EXPRESSION-INPUT':
     ResponseRatioExpressionInputComponent,
   'OPPIA-RESPONSE-SET-INPUT': ResponseSetInputComponent,
@@ -141,13 +131,11 @@ export const TAG_TO_INTERACTION_MAPPING = {
   'OPPIA-SHORT-RESPONSE-MATH-EQUATION-INPUT': ShortResponseMathEquationInput,
   'OPPIA-SHORT-RESPONSE-MULTIPLE-CHOICE-INPUT':
     ShortResponseMultipleChoiceInputComponent,
-  'OPPIA-SHORT-RESPONSE-MUSIC-NOTES-INPUT': ShortResponseMusicNotesInput,
   'OPPIA-SHORT-RESPONSE-NUMBER-WITH-UNITS':
     ShortResponseNumberWithUnitsComponent,
   'OPPIA-SHORT-RESPONSE-NUMERIC-EXPRESSION-INPUT':
     ShortResponseNumericExpressionInput,
   'OPPIA-SHORT-RESPONSE-NUMERIC-INPUT': ShortResponseNumericInput,
-  'OPPIA-SHORT-RESPONSE-PENCIL-CODE-EDITOR': ShortResponePencilCodeEditor,
   'OPPIA-SHORT-RESPONSE-RATIO-EXPRESSION-INPUT':
     ShortResponseRatioExpressionInputComponent,
   'OPPIA-SHORT-RESPONSE-SET-INPUT': ShortResponseSetInputComponent,

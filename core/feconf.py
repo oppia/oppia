@@ -793,7 +793,8 @@ DEMO_EXPLORATIONS = {
     '7': 'hola.yaml',
     # Exploration with ID 8 was removed as it contained string values inside
     # NumericInput interaction.
-    '9': 'pitch_perfect.yaml',
+    # Exploration with ID 9 was removed as it used the deleted
+    # MusicNotesInput interaction.
     '10': 'test_interactions',
     '11': 'modeling_graphs',
     '12': 'protractor_test_1.yaml',

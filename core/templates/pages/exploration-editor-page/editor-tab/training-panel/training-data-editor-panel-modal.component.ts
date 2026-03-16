@@ -35,7 +35,6 @@ import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives
 import {MathEquationInputRulesService} from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
-import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {
@@ -64,7 +63,6 @@ export const RULES_SERVICE_MAPPING = {
   MathEquationInputRulesService: MathEquationInputRulesService,
   NumericExpressionInputRulesService: NumericExpressionInputRulesService,
   NumericInputRulesService: NumericInputRulesService,
-  PencilCodeEditorRulesService: PencilCodeEditorRulesService,
   GraphInputRulesService: GraphInputRulesService,
   SetInputRulesService: SetInputRulesService,
   TextInputRulesService: TextInputRulesService,

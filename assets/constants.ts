@@ -6114,13 +6114,7 @@ export default {
   }, {
     "name": "Programming",
     "interaction_ids": [
-      "CodeRepl",
-      "PencilCodeEditor"
-    ]
-  }, {
-    "name": "Music",
-    "interaction_ids": [
-      "MusicNotesInput"
+      "CodeRepl"
     ]
   }, {
     "name": "Geography",

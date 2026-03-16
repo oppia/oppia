@@ -3232,7 +3232,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name],
-            'PencilCodeEditor',
+            'CodeRepl',
             content_id_generator,
         )
         temp_rule = old_answer_groups[0]['rule_specs'][0]
@@ -3428,7 +3428,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
-        interaction.id = 'PencilCodeEditor'
+        interaction.id = 'CodeRepl'
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )

@@ -24,7 +24,6 @@ import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {
   FractionAnswer,
-  MusicNotesAnswer,
   NumberWithUnitsAnswer,
   RatioInputAnswer,
 } from 'interactions/answer-defs';
@@ -156,16 +155,6 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
         }
         // TODO(sll): Generalize this to use the inline string representation
         // of an object type.
-      } else if (varType === 'MusicPhrase') {
-        replacementText = '[';
-        const key = inputs[varName] as MusicNotesAnswer[];
-        for (var i = 0; i < Object.keys(key).length; i++) {
-          if (i !== 0) {
-            replacementText += ', ';
-          }
-          replacementText += key[i].readableNoteName;
-        }
-        replacementText += ']';
       } else if (varType === 'CoordTwoDim') {
         const key = inputs[varName] as Record<number, number>;
         let latitude = key[0] || 0.0;

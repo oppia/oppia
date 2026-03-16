@@ -45,14 +45,12 @@ import {
   MultipleChoiceInputRulesService,
   // eslint-disable-next-line max-len
 } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
-import {MusicNotesInputRulesService} from 'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import {NumberWithUnitsRulesService} from 'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import {
   NumericExpressionInputRulesService,
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
-import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
   RatioExpressionInputRulesService,
   // eslint-disable-next-line max-len
@@ -86,11 +84,9 @@ export class InteractionRulesRegistryService {
     private itemSelectionInputRulesService: ItemSelectionInputRulesService,
     private mathEquationInputRulesService: MathEquationInputRulesService,
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
-    private musicNotesInputRulesService: MusicNotesInputRulesService,
     private numberWithUnitsRulesService: NumberWithUnitsRulesService,
     private numericExpressionInputRulesService: NumericExpressionInputRulesService,
     private numericInputRulesService: NumericInputRulesService,
-    private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
     private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
     private setInputRulesService: SetInputRulesService,
     private textInputRulesService: TextInputRulesService
@@ -110,12 +106,10 @@ export class InteractionRulesRegistryService {
         ItemSelectionInputRulesService: this.itemSelectionInputRulesService,
         MathEquationInputRulesService: this.mathEquationInputRulesService,
         MultipleChoiceInputRulesService: this.multipleChoiceInputRulesService,
-        MusicNotesInputRulesService: this.musicNotesInputRulesService,
         NumberWithUnitsRulesService: this.numberWithUnitsRulesService,
         NumericExpressionInputRulesService:
           this.numericExpressionInputRulesService,
         NumericInputRulesService: this.numericInputRulesService,
-        PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
         RatioExpressionInputRulesService: this.ratioExpressionInputRulesService,
         SetInputRulesService: this.setInputRulesService,
         TextInputRulesService: this.textInputRulesService,

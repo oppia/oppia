@@ -47,7 +47,7 @@ import {
   MultipleChoiceInputRulesService,
   // eslint-disable-next-line max-len
 } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
-import {MusicNotesInputRulesService} from 'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
+
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {
   NormalizeWhitespacePunctuationAndCasePipe,
@@ -59,7 +59,7 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
-import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+
 import {
   RatioExpressionInputRulesService,
   // eslint-disable-next-line max-len
@@ -81,11 +81,11 @@ describe('Interaction Rules Registry Service', () => {
   let itemSelectionInputRulesService: ItemSelectionInputRulesService;
   let mathEquationInputRulesService: MathEquationInputRulesService;
   let multipleChoiceInputRulesService: MultipleChoiceInputRulesService;
-  let musicNotesInputRulesService: MusicNotesInputRulesService;
+
   let numberWithUnitsRulesService: NumberWithUnitsRulesService;
   let numericExpressionInputRulesService: NumericExpressionInputRulesService;
   let numericInputRulesService: NumericInputRulesService;
-  let pencilCodeEditorRulesService: PencilCodeEditorRulesService;
+
   let ratioExpressionInputRulesService: RatioExpressionInputRulesService;
   let setInputRulesService: SetInputRulesService;
   let textInputRulesService: TextInputRulesService;
@@ -98,44 +98,42 @@ describe('Interaction Rules Registry Service', () => {
       ],
     });
 
-    interactionRulesRegistryService = TestBed.inject(
+    interactionRulesRegistryService = TestBed.get(
       InteractionRulesRegistryService
     );
 
-    algebraicExpressionInputRulesService = TestBed.inject(
+    algebraicExpressionInputRulesService = TestBed.get(
       AlgebraicExpressionInputRulesService
     );
-    codeReplRulesService = TestBed.inject(CodeReplRulesService);
-    continueRulesService = TestBed.inject(ContinueRulesService);
-    dragAndDropSortInputRulesService = TestBed.inject(
+    codeReplRulesService = TestBed.get(CodeReplRulesService);
+    continueRulesService = TestBed.get(ContinueRulesService);
+    dragAndDropSortInputRulesService = TestBed.get(
       DragAndDropSortInputRulesService
     );
-    endExplorationRulesService = TestBed.inject(EndExplorationRulesService);
-    fractionInputRulesService = TestBed.inject(FractionInputRulesService);
-    graphInputRulesService = TestBed.inject(GraphInputRulesService);
-    imageClickInputRulesService = TestBed.inject(ImageClickInputRulesService);
-    interactiveMapRulesService = TestBed.inject(InteractiveMapRulesService);
-    itemSelectionInputRulesService = TestBed.inject(
+    endExplorationRulesService = TestBed.get(EndExplorationRulesService);
+    fractionInputRulesService = TestBed.get(FractionInputRulesService);
+    graphInputRulesService = TestBed.get(GraphInputRulesService);
+    imageClickInputRulesService = TestBed.get(ImageClickInputRulesService);
+    interactiveMapRulesService = TestBed.get(InteractiveMapRulesService);
+    itemSelectionInputRulesService = TestBed.get(
       ItemSelectionInputRulesService
     );
-    mathEquationInputRulesService = TestBed.inject(
-      MathEquationInputRulesService
-    );
-    multipleChoiceInputRulesService = TestBed.inject(
+    mathEquationInputRulesService = TestBed.get(MathEquationInputRulesService);
+    multipleChoiceInputRulesService = TestBed.get(
       MultipleChoiceInputRulesService
     );
-    musicNotesInputRulesService = TestBed.inject(MusicNotesInputRulesService);
-    numberWithUnitsRulesService = TestBed.inject(NumberWithUnitsRulesService);
-    numericExpressionInputRulesService = TestBed.inject(
+
+    numberWithUnitsRulesService = TestBed.get(NumberWithUnitsRulesService);
+    numericExpressionInputRulesService = TestBed.get(
       NumericExpressionInputRulesService
     );
-    numericInputRulesService = TestBed.inject(NumericInputRulesService);
-    pencilCodeEditorRulesService = TestBed.inject(PencilCodeEditorRulesService);
-    ratioExpressionInputRulesService = TestBed.inject(
+    numericInputRulesService = TestBed.get(NumericInputRulesService);
+
+    ratioExpressionInputRulesService = TestBed.get(
       RatioExpressionInputRulesService
     );
-    setInputRulesService = TestBed.inject(SetInputRulesService);
-    textInputRulesService = TestBed.inject(TextInputRulesService);
+    setInputRulesService = TestBed.get(SetInputRulesService);
+    textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
   it('should throw an error for falsey interaction ids', () => {
@@ -254,14 +252,6 @@ describe('Interaction Rules Registry Service', () => {
     ).toBe(multipleChoiceInputRulesService);
   });
 
-  it('should return the correct rules service for MusicNotesInput', () => {
-    expect(
-      interactionRulesRegistryService.getRulesServiceByInteractionId(
-        'MusicNotesInput'
-      )
-    ).toBe(musicNotesInputRulesService);
-  });
-
   it('should return the correct rules service for NumberWithUnits', () => {
     expect(
       interactionRulesRegistryService.getRulesServiceByInteractionId(
@@ -284,14 +274,6 @@ describe('Interaction Rules Registry Service', () => {
         'NumericInput'
       )
     ).toBe(numericInputRulesService);
-  });
-
-  it('should return the correct rules service for PencilCodeEditor', () => {
-    expect(
-      interactionRulesRegistryService.getRulesServiceByInteractionId(
-        'PencilCodeEditor'
-      )
-    ).toBe(pencilCodeEditorRulesService);
   });
 
   it('should return the correct rules service for RatioExpressionInput', () => {

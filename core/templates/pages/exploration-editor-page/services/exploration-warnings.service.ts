@@ -46,10 +46,8 @@ import {MathEquationInputValidationService} from 'interactions/MathEquationInput
 import {ItemSelectionInputValidationService} from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import {MultipleChoiceInputValidationService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
-import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import {NumericExpressionInputValidationService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
-import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
 import {TextInputValidationService} from 'interactions/TextInput/directives/text-input-validation.service';
@@ -86,12 +84,10 @@ const INTERACTION_SERVICE_MAPPING = {
   ItemSelectionInputValidationService: ItemSelectionInputValidationService,
   MathEquationInputValidationService: MathEquationInputValidationService,
   MultipleChoiceInputValidationService: MultipleChoiceInputValidationService,
-  MusicNotesInputValidationService: MusicNotesInputValidationService,
   NumberWithUnitsValidationService: NumberWithUnitsValidationService,
   NumericExpressionInputValidationService:
     NumericExpressionInputValidationService,
   NumericInputValidationService: NumericInputValidationService,
-  PencilCodeEditorValidationService: PencilCodeEditorValidationService,
   RatioExpressionInputValidationService: RatioExpressionInputValidationService,
   SetInputValidationService: SetInputValidationService,
   TextInputValidationService: TextInputValidationService,

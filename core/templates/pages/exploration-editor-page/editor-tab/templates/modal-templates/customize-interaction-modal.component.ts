@@ -56,10 +56,8 @@ import {SetInputValidationService} from 'interactions/SetInput/directives/set-in
 import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
 import {MathEquationInputValidationService} from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import {MultipleChoiceInputValidationService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
-import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import {TextInputValidationService} from 'interactions/TextInput/directives/text-input-validation.service';
 import {InteractiveMapValidationService} from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
-import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {Warning} from 'interactions/base-interaction-validation.service';
@@ -94,12 +92,10 @@ const INTERACTION_SERVICE_MAPPING = {
   ItemSelectionInputValidationService: ItemSelectionInputValidationService,
   MathEquationInputValidationService: MathEquationInputValidationService,
   MultipleChoiceInputValidationService: MultipleChoiceInputValidationService,
-  MusicNotesInputValidationService: MusicNotesInputValidationService,
   NumberWithUnitsValidationService: NumberWithUnitsValidationService,
   NumericExpressionInputValidationService:
     NumericExpressionInputValidationService,
   NumericInputValidationService: NumericInputValidationService,
-  PencilCodeEditorValidationService: PencilCodeEditorValidationService,
   RatioExpressionInputValidationService: RatioExpressionInputValidationService,
   SetInputValidationService: SetInputValidationService,
   TextInputValidationService: TextInputValidationService,

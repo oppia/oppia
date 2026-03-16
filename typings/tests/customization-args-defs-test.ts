@@ -42,16 +42,12 @@ import {
   MathEquationInputCustomizationArgsBackendDict,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
-  MusicNotesInputCustomizationArgs,
-  MusicNotesInputCustomizationArgsBackendDict,
   NumberWithUnitsCustomizationArgs,
   NumberWithUnitsCustomizationArgsBackendDict,
   NumericExpressionInputCustomizationArgs,
   NumericExpressionInputCustomizationArgsBackendDict,
   NumericInputCustomizationArgs,
   NumericInputCustomizationArgsBackendDict,
-  PencilCodeEditorCustomizationArgs,
-  PencilCodeEditorCustomizationArgsBackendDict,
   RatioExpressionInputCustomizationArgs,
   RatioExpressionInputCustomizationArgsBackendDict,
   SetInputCustomizationArgs,
@@ -178,14 +174,6 @@ type TestMultipleChoiceInputCustomizationArgsInterfacesMatch = AssertTrue<
   >
 >;
 
-type TestMusicNotesInputCustomizationArgsInterfacesMatch = AssertTrue<
-  IsExactAfterReplacement<
-    MusicNotesInputCustomizationArgsBackendDict,
-    {},
-    MusicNotesInputCustomizationArgs
-  >
->;
-
 type TestNumberWithUnitsCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     NumberWithUnitsCustomizationArgsBackendDict,
@@ -207,14 +195,6 @@ type TestNumericInputCustomizationArgsInterfacesMatch = AssertTrue<
     NumericInputCustomizationArgsBackendDict,
     {requireNonnegativeInput: {value: boolean}},
     NumericInputCustomizationArgs
-  >
->;
-
-type TestPencilCodeEditorCustomizationArgsInterfacesMatch = AssertTrue<
-  IsExactAfterReplacement<
-    PencilCodeEditorCustomizationArgsBackendDict,
-    {},
-    PencilCodeEditorCustomizationArgs
   >
 >;
 

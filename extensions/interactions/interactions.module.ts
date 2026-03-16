@@ -36,12 +36,10 @@ import {NumericInputModule} from './NumericInput/numeric-input-interactions.modu
 import {MathEquationInputModule} from './MathEquationInput/math-equation-input-interactions.module';
 import {InteractiveMapInteractionModule} from './InteractiveMap/interactive-map-interactions.module';
 import {MultipleChoiceInputInteractionModule} from './MultipleChoiceInput/multiple-choice-input-interactions.module';
-import {MusicNotesInputModule} from './MusicNotesInput/music-notes-input-interactions.module';
 import {SetInputInteractionModule} from './SetInput/set-input-interactions.module';
 import {TextInputInteractionModule} from './TextInput/text-input-interactions.module';
 import {RatioExpressionInputInteractionModule} from './RatioExpressionInput/ratio-expression-input-interactions.module';
 import {TranslateModule} from '@ngx-translate/core';
-import {PencilCodeEditorModule} from './PencilCodeEditor/pencil-code-editor-interactions.module';
 
 @NgModule({
   imports: [
@@ -59,8 +57,6 @@ import {PencilCodeEditorModule} from './PencilCodeEditor/pencil-code-editor-inte
     NumericExpressionInputModule,
     NumericInputModule,
     MathEquationInputModule,
-    MusicNotesInputModule,
-    PencilCodeEditorModule,
     InteractiveMapInteractionModule,
     MultipleChoiceInputInteractionModule,
     RatioExpressionInputInteractionModule,
@@ -82,10 +78,8 @@ import {PencilCodeEditorModule} from './PencilCodeEditor/pencil-code-editor-inte
     ItemSelectionInputInteractionModule,
     NumberWithUnitsInteractionModule,
     NumericExpressionInputModule,
-    PencilCodeEditorModule,
     NumericInputModule,
     MathEquationInputModule,
-    MusicNotesInputModule,
     InteractiveMapInteractionModule,
     MultipleChoiceInputInteractionModule,
     RatioExpressionInputInteractionModule,

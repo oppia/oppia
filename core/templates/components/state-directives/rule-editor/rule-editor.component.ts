@@ -194,9 +194,8 @@ export class RuleEditorComponent
 
     // The following is necessary in order to ensure that the
     // object-editor HTML tags load correctly when the rule type is
-    // changed. This is an issue for, e.g., the MusicNotesInput
-    // interaction, where the rule inputs can sometimes be integers and
-    // sometimes be lists of music notes.
+    // changed. This is an issue for interactions where the rule inputs
+    // can sometimes be integers and sometimes be other types.
     this.ruleDescriptionFragments = [];
     this.ngZone.run(() => {
       this.ruleDescriptionFragments = result;

@@ -100,36 +100,6 @@ describe('Solution', () => {
       ).toEqual(
         'One solution is "[Graph]". This is the explanation to the answer.'
       );
-      const musicNotesInputCustomizationArgs = {
-        sequenceToGuess: {
-          value: [
-            {
-              readableNoteName: 'name',
-              noteDuration: {
-                num: 1,
-                den: 1,
-              },
-            },
-          ],
-        },
-        initialSequence: {
-          value: [
-            {
-              readableNoteName: 'name',
-              noteDuration: {
-                num: 1,
-                den: 1,
-              },
-            },
-          ],
-        },
-      };
-      expect(
-        solution.getSummary('MusicNotesInput', musicNotesInputCustomizationArgs)
-      ).toEqual(
-        'One solution is "[Music Notes]". This is the explanation to the' +
-          ' answer.'
-      );
       const textInputCustomizationArgs = {
         placeholder: {
           value: {},

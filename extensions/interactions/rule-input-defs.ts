@@ -19,7 +19,6 @@
 import {
   FractionAnswer,
   NumberWithUnitsAnswer,
-  MusicNotesAnswer,
   GraphAnswer,
 } from 'interactions/answer-defs';
 
@@ -117,45 +116,6 @@ export interface MultipleChoiceRuleInputs {
   x: number;
 }
 
-// MusicNotes interaction has multiple types of inputs based on
-// rule type.
-export interface MusicNotesEqualsRuleInputs {
-  x: MusicNotesAnswer[];
-}
-
-export interface MusicNotesIsLongerThanRuleInputs {
-  k: number;
-}
-
-export interface MusicNotesHasLengthInclusivelyBetweenRuleInputs {
-  a: number;
-  b: number;
-}
-
-export interface MusicNotesIsEqualToExceptForRuleInputs {
-  x: MusicNotesAnswer[];
-  k: number;
-}
-
-export interface MusicNotesIsTranspositionOfRuleInputs {
-  x: MusicNotesAnswer[];
-  y: number;
-}
-
-export interface MusicNotesIsTranspositionOfExceptForRuleInputs {
-  x: MusicNotesAnswer[];
-  y: number;
-  k: number;
-}
-
-export type MusicNotesRuleInputs =
-  | MusicNotesEqualsRuleInputs
-  | MusicNotesIsLongerThanRuleInputs
-  | MusicNotesHasLengthInclusivelyBetweenRuleInputs
-  | MusicNotesIsEqualToExceptForRuleInputs
-  | MusicNotesIsTranspositionOfRuleInputs
-  | MusicNotesIsTranspositionOfExceptForRuleInputs;
-
 export interface NumberWithUnitsRuleInputs {
   f: NumberWithUnitsAnswer;
 }
@@ -184,10 +144,6 @@ export type NumericInputRuleInputs =
   | NumericInputEqualRuleInputs
   | NumericInputIsInclusivelyBetweenRuleInputs
   | NumericInputIsWithinToleranceRuleInputs;
-
-export interface PencilCodeEditorRuleInputs {
-  x: string;
-}
 
 export interface RatioInputEqualRuleInputs {
   x: number[];
@@ -241,11 +197,9 @@ export type InteractionRuleInputs =
   | ItemSelectionRuleInputs
   | MathEquationRuleInputs
   | MultipleChoiceRuleInputs
-  | MusicNotesRuleInputs
   | NumericExpressionRuleInputs
   | NumberWithUnitsRuleInputs
   | NumericInputRuleInputs
-  | PencilCodeEditorRuleInputs
   | RatioInputRuleInputs
   | SetInputRuleInputs
   | TextInputRuleInputs;

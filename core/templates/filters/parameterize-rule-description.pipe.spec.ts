@@ -212,41 +212,6 @@ describe('ParameterizeRuleDescriptionPipe', () => {
     expect(result).toEqual('has the same value and units as ');
   });
 
-  it('should correctly parameterize for MusicPhrase', () => {
-    var rules = Rule.createNew(
-      'IsEqualToExceptFor',
-      {
-        x: {
-          0: {
-            readableNoteName: '0',
-          },
-          1: {
-            readableNoteName: '1',
-          },
-          2: {
-            readableNoteName: '0',
-          },
-          3: {
-            readableNoteName: '1',
-          },
-        },
-        k: -5,
-      },
-      {
-        x: 'ruleSome',
-        k: '',
-      }
-    );
-
-    let result = parameterizeRuleDescriptionPipe.transform(
-      rules,
-      'MusicNotesInput',
-      null
-    );
-
-    expect(result).toEqual('is equal to [0, 1, 0, 1] except for -5 notes');
-  });
-
   it('should correctly parameterize for InteractiveMap', () => {
     var rules = Rule.createNew(
       'Within',

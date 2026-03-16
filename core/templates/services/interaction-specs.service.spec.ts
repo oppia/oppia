@@ -100,12 +100,6 @@ describe('InteractionSpecsService', () => {
       ).toBeFalse();
     });
 
-    it('should return false for PencilCodeEditor', () => {
-      expect(
-        interactionSpecsService.isInteractionTrainable('PencilCodeEditor')
-      ).toBeFalse();
-    });
-
     it('should return true for TextInput', () => {
       expect(
         interactionSpecsService.isInteractionTrainable('TextInput')
@@ -115,12 +109,6 @@ describe('InteractionSpecsService', () => {
     it('should return false for InteractiveMap', () => {
       expect(
         interactionSpecsService.isInteractionTrainable('InteractiveMap')
-      ).toBeFalse();
-    });
-
-    it('should return false for MusicNotesInput', () => {
-      expect(
-        interactionSpecsService.isInteractionTrainable('MusicNotesInput')
       ).toBeFalse();
     });
 

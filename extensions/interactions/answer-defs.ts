@@ -74,14 +74,6 @@ export type MathEquationAnswer = string;
 
 export type MultipleChoiceAnswer = number;
 
-export interface MusicNotesAnswer {
-  readableNoteName: string;
-  noteDuration: {
-    num: number;
-    den: number;
-  };
-}
-
 export interface NumberWithUnitsAnswer {
   type: string;
   real: number;
@@ -92,13 +84,6 @@ export interface NumberWithUnitsAnswer {
 export type NumericExpressionAnswer = string;
 
 export type NumericInputAnswer = number;
-
-export interface PencilCodeEditorAnswer {
-  code: string;
-  output: string;
-  evaluation: string;
-  error: string;
-}
 
 export type RatioInputAnswer = number[];
 
@@ -117,13 +102,10 @@ export type InteractionAnswer =
   | InteractiveMapAnswer
   | ItemSelectionAnswer
   | MultipleChoiceAnswer
-  | MusicNotesAnswer
   | NumericExpressionAnswer
   | NumberWithUnitsAnswer
   | NumericInputAnswer
-  | PencilCodeEditorAnswer
   | RatioInputAnswer
   | SetInputAnswer
   | TextInputAnswer
-  | MusicNotesAnswer[]
   | MathEquationAnswer;

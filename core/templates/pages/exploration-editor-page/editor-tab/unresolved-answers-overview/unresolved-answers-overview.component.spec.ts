@@ -202,8 +202,8 @@ describe('Unresolved Answers Overview Component', () => {
     expect(component.getCurrentInteractionId()).toBe('Continue');
     expect(component.isCurrentInteractionLinear()).toBe(true);
 
-    stateInteractionIdService.init(stateName, 'PencilCodeEditor');
-    expect(component.getCurrentInteractionId()).toBe('PencilCodeEditor');
+    stateInteractionIdService.init(stateName, 'TextInput');
+    expect(component.getCurrentInteractionId()).toBe('TextInput');
     expect(component.isCurrentInteractionLinear()).toBe(false);
   });
 

@@ -39,14 +39,6 @@ export interface ImageWithRegions {
   imagePath: string;
 }
 
-export interface ReadableMusicNote {
-  readableNoteName: string;
-  noteDuration: {
-    num: number;
-    den: number;
-  };
-}
-
 export interface AlgebraicExpressionInputCustomizationArgs {
   useFractionForDivision: boolean;
   allowedVariables: {
@@ -303,34 +295,6 @@ export interface MultipleChoiceInputCustomizationArgs {
   };
 }
 
-export interface MusicNotesInputCustomizationArgsBackendDict {
-  sequenceToGuess: {
-    value: ReadableMusicNote[];
-  };
-  initialSequence: {
-    value: ReadableMusicNote[];
-  };
-}
-export interface MusicNotesInputCustomizationArgs {
-  sequenceToGuess: {
-    value: ReadableMusicNote[];
-  };
-  initialSequence: {
-    value: ReadableMusicNote[];
-  };
-}
-
-export interface PencilCodeEditorCustomizationArgsBackendDict {
-  initialCode: {
-    value: string;
-  };
-}
-export interface PencilCodeEditorCustomizationArgs {
-  initialCode: {
-    value: string;
-  };
-}
-
 export interface RatioExpressionInputCustomizationArgsBackendDict {
   placeholder: {
     value: SubtitledUnicodeBackendDict;
@@ -422,11 +386,9 @@ export type InteractionCustomizationArgsBackendDict =
   | ItemSelectionInputCustomizationArgsBackendDict
   | MathEquationInputCustomizationArgsBackendDict
   | MultipleChoiceInputCustomizationArgsBackendDict
-  | MusicNotesInputCustomizationArgsBackendDict
   | NumberWithUnitsCustomizationArgsBackendDict
   | NumericExpressionInputCustomizationArgsBackendDict
   | NumericInputCustomizationArgsBackendDict
-  | PencilCodeEditorCustomizationArgsBackendDict
   | RatioExpressionInputCustomizationArgsBackendDict
   | SetInputCustomizationArgsBackendDict
   | TextInputCustomizationArgsBackendDict;
@@ -444,11 +406,9 @@ export type InteractionCustomizationArgs =
   | ItemSelectionInputCustomizationArgs
   | MathEquationInputCustomizationArgs
   | MultipleChoiceInputCustomizationArgs
-  | MusicNotesInputCustomizationArgs
   | NumberWithUnitsCustomizationArgs
   | NumericExpressionInputCustomizationArgs
   | NumericInputCustomizationArgs
-  | PencilCodeEditorCustomizationArgs
   | RatioExpressionInputCustomizationArgs
   | SetInputCustomizationArgs
   | TextInputCustomizationArgs;

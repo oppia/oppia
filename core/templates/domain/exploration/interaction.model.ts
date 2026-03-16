@@ -47,12 +47,10 @@ import {
   MathEquationInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
-  MusicNotesInputCustomizationArgs,
   NumberWithUnitsCustomizationArgs,
   NumericExpressionInputCustomizationArgs,
   NumericInputCustomizationArgsBackendDict,
   NumericInputCustomizationArgs,
-  PencilCodeEditorCustomizationArgs,
   RatioExpressionInputCustomizationArgs,
   RatioExpressionInputCustomizationArgsBackendDict,
   SetInputCustomizationArgs,
@@ -494,8 +492,6 @@ export class Interaction extends BaseTranslatableObject {
         return this.createFromIMultipleChoiceInputCustomizationArgsBackendDict(
           caBackendDict as MultipleChoiceInputCustomizationArgsBackendDict
         );
-      case 'MusicNotesInput':
-        return cloneDeep(caBackendDict as MusicNotesInputCustomizationArgs);
       case 'NumberWithUnits':
         return cloneDeep(caBackendDict as NumberWithUnitsCustomizationArgs);
       case 'NumericExpressionInput':
@@ -506,8 +502,6 @@ export class Interaction extends BaseTranslatableObject {
         return this.createFromNumericInputCustomizationArgsBackendDict(
           caBackendDict as NumericInputCustomizationArgsBackendDict
         );
-      case 'PencilCodeEditor':
-        return cloneDeep(caBackendDict as PencilCodeEditorCustomizationArgs);
       case 'RatioExpressionInput':
         return this.createFromRatioExpressionInputCustomizationArgsBackendDict(
           caBackendDict as RatioExpressionInputCustomizationArgsBackendDict

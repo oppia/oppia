@@ -24,11 +24,11 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
+  CodeReplAnswer,
   DragAndDropAnswer,
   FractionAnswer,
   InteractionAnswer,
   NumberWithUnitsAnswer,
-  PencilCodeEditorAnswer,
 } from 'interactions/answer-defs';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {
@@ -99,13 +99,8 @@ export class Solution extends BaseTranslatableObject {
     let correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
-    } else if (
-      interactionId === 'CodeRepl' ||
-      interactionId === 'PencilCodeEditor'
-    ) {
-      correctAnswer = (this.correctAnswer as PencilCodeEditorAnswer).code;
-    } else if (interactionId === 'MusicNotesInput') {
-      correctAnswer = '[Music Notes]';
+    } else if (interactionId === 'CodeRepl') {
+      correctAnswer = (this.correctAnswer as CodeReplAnswer).code;
     } else if (interactionId === 'FractionInput') {
       correctAnswer = Fraction.fromDict(
         this.correctAnswer as FractionAnswer
