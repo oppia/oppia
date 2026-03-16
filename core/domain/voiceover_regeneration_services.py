@@ -47,10 +47,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
-        speech_synthesis_services,
-        voiceover_models,
-    )
+    from mypy_imports import speech_synthesis_services, voiceover_models
 
 (voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 

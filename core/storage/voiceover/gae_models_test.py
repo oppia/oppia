@@ -22,6 +22,8 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict, List, Union
+
 MYPY = False
 if MYPY:  # pragma: no cover
     # Here, 'state_domain' is imported only for type checking.
@@ -283,7 +285,7 @@ class CachedAutomaticVoiceoversModelTests(test_utils.GenericTestBase):
             plaintext
         )
         voiceover_filename = 'en-IN-content_1-qwerty.mp3'
-        audio_offset_list = [
+        audio_offset_list: List[Dict[str, Union[str, float]]] = [
             {'token': 'This', 'audio_offset_msecs': 0.0},
             {'token': 'is', 'audio_offset_msecs': 100.0},
             {'token': 'a', 'audio_offset_msecs': 200.0},
