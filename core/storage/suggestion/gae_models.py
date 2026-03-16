@@ -1219,6 +1219,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             suggestion_type: str. The type of suggestion to query for.
             user_id: str. The id of the user trying to make this query.
             sort_key: str|None. The key to sort the suggestions by.
+            target_ids: list(str)|None. Optional target ids to filter
+                suggestions by. If None, no filtering is applied.
+            language_code: str|None. Optional language code to filter
+                suggestions by. If None, no filtering is applied.
 
         Returns:
             Tuple of (results, next_offset). Where:
