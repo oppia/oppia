@@ -848,3 +848,44 @@ class BlogAuthorDetails:
                 'Expected Author Bio to be a string,'
                 ' received %s' % self.author_bio
             )
+
+
+
+
+class BlogPostExitedEventLogEntry:
+    """Domain object for a blog post exited event."""
+
+    def __init__(
+        self, 
+        blog_post_id: str, 
+        time_user_stayed_on_blog_post: float
+    ) -> None:
+        """Constructs a BlogPostExitedEventLogEntry domain object.
+
+        Args:
+            blog_post_id: str. The ID of the blog post.
+            time_user_stayed_on_blog_post: float. Time user stayed on the blog post.
+        """
+        self.blog_post_id = blog_post_id
+        self.time_user_stayed_on_blog_post = time_user_stayed_on_blog_post
+
+    def validate(self) -> None:
+        """Validates the properties of the domain object.
+
+        Raises:
+            ValidationError. One or more attributes are invalid.
+        """
+        if not isinstance(self.blog_post_id, str):
+            raise utils.ValidationError(
+                'Expected blog_post_id to be a string, received %s' %
+                self.blog_post_id)
+        if not self.blog_post_id:
+            raise utils.ValidationError('blog_post_id cannot be empty.')
+
+        if not isinstance(self.time_user_stayed_on_blog_post, float):
+            raise utils.ValidationError(
+                'Expected time_user_stayed_on_blog_post to be a float, '
+                'received %s' % self.time_user_stayed_on_blog_post)
+        if self.time_user_stayed_on_blog_post < 0.0:
+            raise utils.ValidationError(
+                'time_user_stayed_on_blog_post cannot be negative.')

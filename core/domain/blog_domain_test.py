@@ -872,3 +872,40 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             ' received %s' % self.author_details.author_bio,
         ):
             self.author_details.validate()
+
+
+class BlogPostExitedEventLogEntryTests(test_utils.GenericTestBase):
+    """Tests for the BlogPostExitedEventLogEntry domain object."""
+
+    def test_initialization_and_validation_with_valid_data(self) -> None:
+        event = blog_domain.BlogPostExitedEventLogEntry('post_id_1', 15.5)
+        event.validate()
+
+    def test_validation_fails_with_non_string_blog_post_id(self) -> None:
+        event = blog_domain.BlogPostExitedEventLogEntry(123, 15.5) # type: ignore[arg-type]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected blog_post_id to be a string, received 123'):
+            event.validate()
+
+    def test_validation_fails_with_empty_blog_post_id(self) -> None:
+        event = blog_domain.BlogPostExitedEventLogEntry('', 15.5)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'blog_post_id cannot be empty.'):
+            event.validate()
+
+    def test_validation_fails_with_non_float_time_stayed(self) -> None:
+        event = blog_domain.BlogPostExitedEventLogEntry('post_1', '15.5') # type: ignore[arg-type]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected time_user_stayed_on_blog_post to be a float, '
+            'received 15.5'):
+            event.validate()
+
+    def test_validation_fails_with_negative_time_stayed(self) -> None:
+        event = blog_domain.BlogPostExitedEventLogEntry('post_1', -5.0)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'time_user_stayed_on_blog_post cannot be negative.'):
+            event.validate()
