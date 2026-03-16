@@ -41,6 +41,7 @@ from core.domain import (
     suggestion_registry,
     taskqueue_services,
     translation_domain,
+    translation_fetchers,
     user_domain,
     user_services,
     voiceover_services,
@@ -262,10 +263,44 @@ def create_suggestion(
             change_cmd['state_name'], change_cmd['content_id']
         )
         if content_html != change_cmd['content_html']:
+
             raise Exception(
                 'The Exploration content has changed since this translation '
                 'was submitted.'
             )
+
+        # Do not allow creating a suggestion if there is already a suggestion
+        # in review for the same content_id and language_code.
+        existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
+            target_id, language_code
+        )
+        for existing_suggestion in existing_suggestions:
+            if existing_suggestion.change_cmd['content_id'] == (
+                change_cmd['content_id']
+            ):
+                raise Exception(
+                    'A translation suggestion for this content already exists '
+                    'and is currently in review.'
+                )
+
+        # Do not allow creating a suggestion if the content has already been
+        # translated and is up-to-date.
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            target_id,
+            exploration.version,
+            language_code,
+        )
+        if change_cmd['content_id'] in entity_translation.translations:
+            if not entity_translation.translations[
+                change_cmd['content_id']
+            ].needs_update:
+                raise Exception(
+                    'The content with content_id %s has already been '
+                    'translated to %s and is up-to-date.'
+                    % (change_cmd['content_id'], language_code)
+                )
+
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id,
             target_id,
@@ -833,6 +868,32 @@ def accept_suggestion(
             'The suggestion with id %s has already been accepted/'
             'rejected.' % (suggestion_id)
         )
+
+    # Do not allow accepting a suggestion if the content has already been
+    # translated and is up-to-date. We use the current exploration version
+    # (not the version at submission) to match the version used when saving
+    # the translation in suggestion_registry.py.
+    if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(suggestion.target_type),
+            suggestion.target_id,
+            exploration.version,
+            suggestion.language_code,
+        )
+        if suggestion.change_cmd.content_id in entity_translation.translations:
+            if not entity_translation.translations[
+                suggestion.change_cmd.content_id
+            ].needs_update:
+                raise Exception(
+                    'The content with content_id %s has already been '
+                    'translated to %s and is up-to-date.'
+                    % (
+                        suggestion.change_cmd.content_id,
+                        suggestion.language_code,
+                    )
+                )
+
     suggestion.pre_accept_validate()
     html_string = ''.join(suggestion.get_all_html_content_strings())
     error_list = html_validation_service.validate_math_tags_in_html_with_attribute_math_content(
