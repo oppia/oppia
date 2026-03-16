@@ -132,6 +132,7 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
+        this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
 
         if (mobile) {
@@ -404,6 +405,7 @@ export class BaseUser {
         )
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
+    this.attachNavigationLogs(this.page);
     this.setupDebugTools();
   }
 
@@ -1288,6 +1290,7 @@ export class BaseUser {
 
     await newPage.bringToFront();
     this.page = newPage;
+    this.attachNavigationLogs(this.page);
     return newPage;
   }
 
@@ -2241,6 +2244,15 @@ export class BaseUser {
     await this.expectElementToBeVisible(hideOSKButtonSelector);
     await this.clickOnElementWithSelector(hideOSKButtonSelector);
     await this.expectElementToBeVisible(hideOSKButtonSelector, false);
+  }
+
+  /**
+   * Logs every navigation event on the page.
+   */
+  attachNavigationLogs(page: Page): void {
+    page.on('framenavigated', frame => {
+      showMessage('NAVIGATED: ' + frame.url());
+    });
   }
 }
 

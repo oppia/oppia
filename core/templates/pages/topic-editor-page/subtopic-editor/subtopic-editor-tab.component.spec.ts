@@ -22,6 +22,7 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {SubtopicEditorTabComponent} from './subtopic-editor-tab.component';
+import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {
   ComponentFixture,
   TestBed,
@@ -550,7 +551,7 @@ describe('Subtopic editor tab', () => {
         'isShowRestructuredStudyGuidesFeatureEnabled'
       ).and.returnValue(true);
       let newStudyGuide = StudyGuide.createDefault('new_study_guide_id', 2);
-      let mockSections = [];
+      let mockSections: StudyGuideSection[] = [];
       spyOn(newStudyGuide, 'getSections').and.returnValue(mockSections);
       (topicEditorStateService.getStudyGuide as jasmine.Spy).and.returnValue(
         newStudyGuide
@@ -612,26 +613,18 @@ describe('Subtopic editor tab', () => {
 
   it('should change active section index', () => {
     component.sections = [
-      {
-        heading: {
-          content_id: 'section_heading_0',
-          unicode_str: 'Section 1',
-        },
-        content: {
-          content_id: 'section_content_1',
-          html: 'Section 1 content',
-        },
-      },
-      {
-        heading: {
-          content_id: 'section_heading_2',
-          unicode_str: 'Section 2',
-        },
-        content: {
-          content_id: 'section_content_3',
-          html: 'Section 2 content',
-        },
-      },
+      StudyGuideSection.create(
+        'Section 1',
+        'Section 1 content',
+        'section_heading_0',
+        'section_content_1'
+      ),
+      StudyGuideSection.create(
+        'Section 2',
+        'Section 2 content',
+        'section_heading_2',
+        'section_content_3'
+      ),
     ];
     component.activeSectionIndex = -1;
     component.studyGuide = {
@@ -745,5 +738,37 @@ describe('Subtopic editor tab', () => {
     component.ngOnInit();
     expect(component.sectionsListIsShown).toEqual(true);
     expect(component.skillsListIsShown).toEqual(true);
+  });
+
+  it('should return early from initEditor when topic url fragment is null', () => {
+    let topicWithoutUrlFragment = new Topic(
+      'id',
+      'Topic name',
+      'Abbrev',
+      '',
+      'Description',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      'str',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
+    );
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(
+      topicWithoutUrlFragment
+    );
+    spyOn(topicEditorStateService, 'loadSubtopicPage');
+
+    component.initEditor();
+
+    expect(topicEditorStateService.loadSubtopicPage).not.toHaveBeenCalled();
   });
 });
