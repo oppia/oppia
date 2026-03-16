@@ -49,6 +49,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeLanguageCode!: string | null;
+  @Input() includeAllOption = false;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;
   @ViewChild('filterDiv') filterDivRef!: ElementRef;
@@ -65,6 +66,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   explanationPopupPxOffsetY = 0;
   explanationPopupContent = '';
 
+  private readonly allLanguagesOption: Options = {
+    id: '',
+    description: 'All languages',
+  };
+
   constructor(
     private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService,
     private languageUtilService: LanguageUtilService,
@@ -78,7 +84,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
           this.translationLanguageService.getActiveLanguageCode()
         ];
     });
-    this.filteredOptions = this.options = this.languageUtilService
+    const baseOptions = this.languageUtilService
       .getAllVoiceoverLanguageCodes()
       .map(languageCode => {
         const description =
@@ -86,6 +92,16 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.languageIdToDescription[languageCode] = description;
         return {id: languageCode, description};
       });
+    if (this.includeAllOption) {
+      this.languageIdToDescription[this.allLanguagesOption.id] =
+        this.allLanguagesOption.description;
+      this.filteredOptions = this.options = [
+        this.allLanguagesOption,
+        ...baseOptions,
+      ];
+    } else {
+      this.filteredOptions = this.options = baseOptions;
+    }
 
     this.contributionOpportunitiesBackendApiService
       .fetchFeaturedTranslationLanguagesAsync()
@@ -93,14 +109,21 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.featuredLanguages = featuredLanguages;
       });
 
-    this.languageSelection = this.activeLanguageCode
-      ? this.languageIdToDescription[this.activeLanguageCode]
-      : 'Language';
+    if (this.includeAllOption && this.activeLanguageCode === '') {
+      this.languageSelection = this.allLanguagesOption.description;
+    } else {
+      this.languageSelection = this.activeLanguageCode
+        ? this.languageIdToDescription[this.activeLanguageCode]
+        : 'Language';
+    }
 
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
       .then((preferredLanguageCode: string | null) => {
-        if (preferredLanguageCode) {
+        if (
+          preferredLanguageCode &&
+          (!this.includeAllOption || this.activeLanguageCode)
+        ) {
           this.populateLanguageSelection(preferredLanguageCode);
         }
       });
@@ -125,9 +148,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   selectOption(activeLanguageCode: string): void {
     this.populateLanguageSelection(activeLanguageCode);
     this.dropdownShown = false;
-    this.contributionOpportunitiesBackendApiService.savePreferredTranslationLanguageAsync(
-      activeLanguageCode
-    );
+    if (activeLanguageCode) {
+      this.contributionOpportunitiesBackendApiService.savePreferredTranslationLanguageAsync(
+        activeLanguageCode
+      );
+    }
   }
 
   showExplanationPopup(index: number): void {

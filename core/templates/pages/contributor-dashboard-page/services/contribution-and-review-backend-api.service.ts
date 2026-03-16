@@ -104,7 +104,8 @@ export class ContributionAndReviewBackendApiService {
     offset: number,
     sortKey: string,
     explorationId: string | null,
-    topicName: string | null
+    topicName: string | null,
+    languageCode: string | null
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -112,7 +113,9 @@ export class ContributionAndReviewBackendApiService {
         'add_question',
         limit || 0,
         offset,
-        sortKey
+        sortKey,
+        topicName,
+        null
       );
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
@@ -121,7 +124,9 @@ export class ContributionAndReviewBackendApiService {
         'translate_content',
         limit || 0,
         offset,
-        sortKey
+        sortKey,
+        topicName,
+        languageCode
       );
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
@@ -154,7 +159,9 @@ export class ContributionAndReviewBackendApiService {
     suggestionType: string,
     limit: number,
     offset: number,
-    sortKey: string
+    sortKey: string,
+    topicName: string | null,
+    languageCode: string | null
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.SUBMITTED_SUGGESTION_LIST_HANDLER_URL,
@@ -163,11 +170,23 @@ export class ContributionAndReviewBackendApiService {
         suggestion_type: suggestionType,
       }
     );
-    const params = {
+    const params: {
+      limit: string;
+      offset: string;
+      sort_key: string;
+      topic_name?: string;
+      language_code?: string;
+    } = {
       limit: limit.toString(),
       offset: offset.toString(),
       sort_key: sortKey,
     };
+    if (topicName) {
+      params.topic_name = topicName;
+    }
+    if (languageCode) {
+      params.language_code = languageCode;
+    }
     return this.http.get<FetchSuggestionsResponse>(url, {params}).toPromise();
   }
 

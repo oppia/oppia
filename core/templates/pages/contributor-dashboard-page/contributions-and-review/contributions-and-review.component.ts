@@ -161,6 +161,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   userCreatedTranslationsSortKey: string;
   reviewableTranslationsSortKey: string;
   topicReady: boolean;
+  submittedTranslationsLanguageCode: string;
   commitTimeout?: NodeJS.Timeout;
   queuedSuggestionSummary = null;
   queuedSuggestion = null;
@@ -567,6 +568,20 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
   }
 
+  isSubmittedQuestionsTab(): boolean {
+    return (
+      this.activeTabType === this.TAB_TYPE_CONTRIBUTIONS &&
+      this.activeTabSubtype === this.SUGGESTION_TYPE_QUESTION
+    );
+  }
+
+  isSubmittedTranslationsTab(): boolean {
+    return (
+      this.activeTabType === this.TAB_TYPE_CONTRIBUTIONS &&
+      this.activeTabSubtype === this.SUGGESTION_TYPE_TRANSLATE
+    );
+  }
+
   openQuestionSuggestionModal(
     suggestionId: string,
     suggestion: Suggestion,
@@ -801,6 +816,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
   }
 
+  setUserCreatedQuestionsSortKey(sortKey: string): void {
+    this.userCreatedQuestionsSortKey = sortKey;
+    this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+  }
+
   ngOnInit(): void {
     this.SUGGESTION_TYPE_QUESTION = 'add_question';
     this.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
@@ -823,6 +843,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.userIsLoggedIn = false;
     this.topicReady = false;
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
+    this.submittedTranslationsLanguageCode = '';
     this.activeTabType = '';
     this.activeTabSubtype = '';
     this.dropdownShown = false;
@@ -870,6 +891,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.translationTopicService.onActiveTopicChanged.subscribe(() => {
         this.activeExplorationId = null;
+        if (this.activeTabType && this.activeTabSubtype) {
+          this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+        }
       })
     );
 
@@ -948,9 +972,17 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.tabNameToOpportunityFetchFunction = {
       [this.SUGGESTION_TYPE_QUESTION]: {
         [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
+          const activeTopicName =
+            this.translationTopicService.getActiveTopicName();
+          const topicName =
+            !activeTopicName ||
+            activeTopicName === AppConstants.TOPIC_SENTINEL_NAME_ALL
+              ? null
+              : activeTopicName;
           return this.contributionAndReviewService.getUserCreatedQuestionSuggestionsAsync(
             shouldResetOffset,
-            this.userCreatedQuestionsSortKey
+            this.userCreatedQuestionsSortKey,
+            topicName
           );
         },
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
@@ -963,9 +995,21 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {
         [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
+          const activeTopicName =
+            this.translationTopicService.getActiveTopicName();
+          const topicName =
+            !activeTopicName ||
+            activeTopicName === AppConstants.TOPIC_SENTINEL_NAME_ALL
+              ? null
+              : activeTopicName;
+          const languageCode = this.submittedTranslationsLanguageCode
+            ? this.submittedTranslationsLanguageCode
+            : null;
           return this.contributionAndReviewService.getUserCreatedTranslationSuggestionsAsync(
             shouldResetOffset,
-            this.userCreatedTranslationsSortKey
+            this.userCreatedTranslationsSortKey,
+            topicName,
+            languageCode
           );
         },
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
@@ -1012,7 +1056,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
-    this.opportunitiesListRef.onChangeLanguage(languageCode);
+    if (this.isReviewTranslationsTab()) {
+      this.opportunitiesListRef.onChangeLanguage(languageCode);
+    }
+  }
+
+  onChangeSubmittedTranslationLanguage(languageCode: string): void {
+    this.submittedTranslationsLanguageCode = languageCode;
+    if (this.isSubmittedTranslationsTab()) {
+      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+    }
   }
 
   ngOnDestroy(): void {

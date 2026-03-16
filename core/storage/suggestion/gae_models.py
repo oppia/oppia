@@ -1206,6 +1206,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         suggestion_type: str,
         user_id: str,
         sort_key: Optional[str],
+        target_ids: Optional[List[str]] = None,
+        language_code: Optional[str] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches suggestions of suggestion_type which the supplied user has
         created.
@@ -1225,11 +1227,24 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
+        if target_ids is not None and len(target_ids) == 0:
+            return ([], offset)
+
         suggestion_query = cls.get_all().filter(
             datastore_services.all_of(
                 cls.suggestion_type == suggestion_type, cls.author_id == user_id
             )
         )
+
+        if target_ids is not None:
+            suggestion_query = suggestion_query.filter(
+                cls.target_id.IN(target_ids)
+            )
+
+        if language_code:
+            suggestion_query = suggestion_query.filter(
+                cls.language_code == language_code
+            )
 
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             suggestion_query = suggestion_query.order(-cls.created_on)

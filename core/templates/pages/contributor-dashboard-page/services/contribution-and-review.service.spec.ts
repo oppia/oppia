@@ -145,7 +145,7 @@ describe('Contribution and review service', () => {
       );
 
       cars
-        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
+        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key', null)
         .then(response => {
           expect(response.suggestionIdToDetails.suggestion_id_1).toEqual(
             expectedSuggestionDict
@@ -172,7 +172,7 @@ describe('Contribution and review service', () => {
       // Only the first 2 results should be returned and the extra result
       // should be cached.
       cars
-        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
+        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key', null)
         .then(response => {
           expect(response.suggestionIdToDetails.suggestion_id_1).toEqual(
             expectedSuggestionDict
@@ -217,7 +217,7 @@ describe('Contribution and review service', () => {
       // Return both the cached 3rd suggestion and the new 4th suggestion to the
       // caller.
       cars
-        .getUserCreatedQuestionSuggestionsAsync(false, 'sort_key')
+        .getUserCreatedQuestionSuggestionsAsync(false, 'sort_key', null)
         .then(response => {
           expect(response.suggestionIdToDetails.suggestion_id_3).toEqual(
             expectedSuggestion3Dict
@@ -247,7 +247,7 @@ describe('Contribution and review service', () => {
       // Only the first 2 results should be returned and the extra result
       // should be cached.
       cars
-        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
+        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key', null)
         .then(response => {
           expect(response.suggestionIdToDetails.suggestion_id_1).toEqual(
             expectedSuggestionDict
@@ -268,7 +268,7 @@ describe('Contribution and review service', () => {
 
       // Return the first 2 results from offset 0 again.
       cars
-        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
+        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key', null)
         .then(response => {
           expect(response.suggestionIdToDetails.suggestion_id_1).toEqual(
             expectedSuggestionDict
@@ -365,7 +365,8 @@ describe('Contribution and review service', () => {
         0,
         'sort_key',
         null,
-        'topicName'
+        'topicName',
+        null
       );
     });
   });
@@ -377,14 +378,53 @@ describe('Contribution and review service', () => {
       );
 
       cars
-        .getUserCreatedTranslationSuggestionsAsync(true, 'sort_key')
+        .getUserCreatedTranslationSuggestionsAsync(
+          true,
+          'sort_key',
+          'topicName',
+          'en'
+        )
         .then(response => {
           expect(response.suggestionIdToDetails.suggestion_id_1).toEqual(
             expectedSuggestionDict
           );
         });
 
-      expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
+      expect(fetchSuggestionsAsyncSpy).toHaveBeenCalledWith(
+        'SUBMITTED_TRANSLATION_SUGGESTIONS',
+        20,
+        0,
+        'sort_key',
+        null,
+        'topicName',
+        'en'
+      );
+    });
+  });
+
+  describe('getUserCreatedQuestionSuggestionsAsync', () => {
+    it('should return question suggestions and opportunity details', () => {
+      fetchSuggestionsAsyncSpy.and.returnValue(
+        Promise.resolve(backendFetchResponse)
+      );
+
+      cars
+        .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key', 'topicName')
+        .then(response => {
+          expect(response.suggestionIdToDetails.suggestion_id_1).toEqual(
+            expectedSuggestionDict
+          );
+        });
+
+      expect(fetchSuggestionsAsyncSpy).toHaveBeenCalledWith(
+        'SUBMITTED_QUESTION_SUGGESTIONS',
+        20,
+        0,
+        'sort_key',
+        null,
+        'topicName',
+        null
+      );
     });
   });
 
@@ -420,7 +460,15 @@ describe('Contribution and review service', () => {
           );
         });
 
-      expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
+      expect(fetchSuggestionsAsyncSpy).toHaveBeenCalledWith(
+        'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+        20,
+        0,
+        'skill_id_1',
+        null,
+        null,
+        null
+      );
     });
 
     it(

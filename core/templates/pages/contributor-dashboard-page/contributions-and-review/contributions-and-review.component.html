@@ -92,6 +92,13 @@
                                               (setActiveLanguageCode)="onChangeLanguage($event)">
         </review-translation-language-selector>
       </div>
+      <div *ngIf="isSubmittedTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
+        <translation-language-selector class="oppia-language-selector e2e-test-language-dropdown"
+                                       [activeLanguageCode]="submittedTranslationsLanguageCode"
+                                       [includeAllOption]="true"
+                                       (setActiveLanguageCode)="onChangeSubmittedTranslationLanguage($event)">
+        </translation-language-selector>
+      </div>
       <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container" [hidden]="!isReviewQuestionsTab()">
         <span class="sort-questions-select float-end"
               *ngIf="isReviewQuestionsTab()">
@@ -100,6 +107,21 @@
                   class="sort-options"
                   aria-label="Sort by"
                   (change)="setReviewableQuestionsSortKey(reviewableQuestionsSortKey)">
+            <option *ngFor="let key of REVIEWABLE_QUESTIONS_SORT_KEYS"
+                    [value]="key"
+                    [innerHTML]="key">
+            </option>
+          </select>
+        </span>
+      </div>
+      <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container" [hidden]="!isSubmittedQuestionsTab()">
+        <span class="sort-questions-select float-end"
+              *ngIf="isSubmittedQuestionsTab()">
+          <p class="sort-by-text">Sort By</p>
+          <select [(ngModel)]="userCreatedQuestionsSortKey"
+                  class="sort-options"
+                  aria-label="Sort by"
+                  (change)="setUserCreatedQuestionsSortKey(userCreatedQuestionsSortKey)">
             <option *ngFor="let key of REVIEWABLE_QUESTIONS_SORT_KEYS"
                     [value]="key"
                     [innerHTML]="key">

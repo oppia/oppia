@@ -134,7 +134,8 @@ export class ContributionAndReviewService {
     fetcher: SuggestionFetcher,
     shouldResetOffset: boolean,
     explorationId: string | null,
-    topicName: string | null
+    topicName: string | null,
+    languageCode: string | null
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -154,7 +155,8 @@ export class ContributionAndReviewService {
         fetcher.offset,
         fetcher.sortKey,
         explorationId,
-        topicName
+        topicName,
+        languageCode
       )
       .then(responseBody => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
@@ -201,6 +203,7 @@ export class ContributionAndReviewService {
         0,
         AppConstants.SUGGESTIONS_SORT_KEY_DATE,
         explorationId,
+        null,
         null
       )
       .then(fetchSuggestionsResponse => {
@@ -335,13 +338,15 @@ export class ContributionAndReviewService {
 
   async getUserCreatedQuestionSuggestionsAsync(
     shouldResetOffset: boolean = true,
-    sortKey: string
+    sortKey: string,
+    topicName: string | null
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedQuestionFetcher,
       shouldResetOffset,
       null,
+      topicName,
       null
     );
   }
@@ -356,20 +361,24 @@ export class ContributionAndReviewService {
       this.reviewableQuestionFetcher,
       shouldResetOffset,
       null,
-      topicName
+      topicName,
+      null
     );
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
-    sortKey: string
+    sortKey: string,
+    topicName: string | null,
+    languageCode: string | null
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset,
       null,
-      null
+      topicName,
+      languageCode
     );
   }
 
@@ -385,6 +394,7 @@ export class ContributionAndReviewService {
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,
+      null,
       null,
       null
     );

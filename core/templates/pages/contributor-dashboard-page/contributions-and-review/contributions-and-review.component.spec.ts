@@ -792,6 +792,7 @@ describe('Contributions and review component', () => {
           return;
         }
       );
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
 
       expect(component.languageCode).toBeUndefined();
 
@@ -871,6 +872,14 @@ describe('Contributions and review component', () => {
       component.setReviewableQuestionsSortKey('Name');
 
       expect(component.reviewableQuestionsSortKey).toBe('Name');
+    });
+
+    it('should change the sort key of submitted questions', () => {
+      expect(component.userCreatedQuestionsSortKey).toBe('Date');
+
+      component.setUserCreatedQuestionsSortKey('Name');
+
+      expect(component.userCreatedQuestionsSortKey).toBe('Name');
     });
 
     it('should open question suggestion modal', fakeAsync(() => {
@@ -1827,7 +1836,7 @@ describe('Contributions and review component', () => {
 
       expect(
         contributionAndReviewService.getUserCreatedQuestionSuggestionsAsync
-      ).toHaveBeenCalled();
+      ).toHaveBeenCalledWith(undefined, jasmine.any(String), null);
       expect(
         contributionAndReviewService.getReviewableTranslationSuggestionsAsync
       ).toHaveBeenCalled();

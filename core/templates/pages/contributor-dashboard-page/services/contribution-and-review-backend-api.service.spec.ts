@@ -77,7 +77,8 @@ describe('Contribution and review backend API service', () => {
           AppConstants.OPPORTUNITIES_PAGE_SIZE,
           0,
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-          'All',
+          null,
+          null,
           null
         )
         .then(successHandler, failureHandler);
@@ -91,7 +92,9 @@ describe('Contribution and review backend API service', () => {
         'add_question',
         AppConstants.OPPORTUNITIES_PAGE_SIZE,
         0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+        null,
+        null
       );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
@@ -109,7 +112,8 @@ describe('Contribution and review backend API service', () => {
           AppConstants.OPPORTUNITIES_PAGE_SIZE,
           0,
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-          'All',
+          null,
+          null,
           null
         )
         .then(successHandler, failureHandler);
@@ -123,7 +127,9 @@ describe('Contribution and review backend API service', () => {
         'translate_content',
         AppConstants.OPPORTUNITIES_PAGE_SIZE,
         0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+        null,
+        null
       );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
@@ -142,7 +148,8 @@ describe('Contribution and review backend API service', () => {
           0,
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
           null,
-          'specifiedTopic'
+          'specifiedTopic',
+          null
         )
         .then(successHandler, failureHandler);
       const req = http.expectOne(url);
@@ -176,6 +183,7 @@ describe('Contribution and review backend API service', () => {
           0,
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
           explorationId,
+          null,
           null
         )
         .then(successHandler, failureHandler);
@@ -204,7 +212,8 @@ describe('Contribution and review backend API service', () => {
           AppConstants.OPPORTUNITIES_PAGE_SIZE,
           0,
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-          'All',
+          null,
+          null,
           null
         )
         .then(successHandler, failureHandler);

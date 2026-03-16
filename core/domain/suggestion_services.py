@@ -1852,6 +1852,8 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    exp_ids: Optional[List[str]] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionAddQuestion], int]: ...
 
 
@@ -1862,6 +1864,8 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    exp_ids: Optional[List[str]] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionTranslateContent], int]: ...
 
 
@@ -1872,6 +1876,8 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    exp_ids: Optional[List[str]] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
 
 
@@ -1881,6 +1887,8 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    exp_ids: Optional[List[str]] = None,
+    language_code: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -1892,6 +1900,11 @@ def get_submitted_suggestions_by_offset(
         offset: int. The number of results to skip from the beginning
             of all results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
+        exp_ids: list(str)|None. Optional target ids to filter suggestions by
+            (exploration ids for translations or skill ids for questions). If
+            None, no filtering is applied.
+        language_code: str|None. Optional language code to filter translation
+            suggestions by. If None, no filtering is applied.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1902,7 +1915,13 @@ def get_submitted_suggestions_by_offset(
     """
     submitted_suggestion_models, next_offset = (
         suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
-            limit, offset, suggestion_type, user_id, sort_key
+            limit,
+            offset,
+            suggestion_type,
+            user_id,
+            sort_key,
+            exp_ids,
+            language_code,
         )
     )
     suggestions = [

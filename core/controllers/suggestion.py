@@ -900,6 +900,9 @@ class ReviewableSuggestionsHandler(
                 )
             topic_name = self.normalized_request.get('topic_name')
             skill_ids = self._get_skill_ids_for_topic(topic_name)
+            if skill_ids is not None and len(skill_ids) == 0:
+                self._render_suggestions(target_type, [], 0)
+                return
 
             suggestions, next_offset = (
                 suggestion_services.get_reviewable_question_suggestions_by_offset(
@@ -917,6 +920,8 @@ class UserSubmittedSuggestionsHandlerNormalizedRequestDict(TypedDict):
     limit: int
     offset: int
     sort_key: str
+    topic_name: Optional[str]
+    language_code: Optional[str]
 
 
 class UserSubmittedSuggestionsHandler(
@@ -947,7 +952,7 @@ class UserSubmittedSuggestionsHandler(
             'limit': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'offset': {
@@ -960,8 +965,57 @@ class UserSubmittedSuggestionsHandler(
                 'schema': {'type': 'basestring'},
                 'choices': feconf.SUGGESTIONS_SORT_KEYS,
             },
+            'topic_name': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'language_code': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
+
+    def _get_skill_ids_for_topic(
+        self, topic_name: Optional[str]
+    ) -> Optional[List[str]]:
+        """Gets all skill ids for the provided topic.
+
+        Returns None to indicate that no filtering is needed.
+        """
+        if (
+            topic_name is None
+            or topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
+            return None
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.InvalidInputException(
+                f'The topic \'{topic_name}\' is not valid'
+            )
+        return topic.get_all_skill_ids()
+
+    def _get_exploration_ids_for_topic(
+        self, topic_name: Optional[str]
+    ) -> Optional[List[str]]:
+        """Gets all exploration ids for the provided topic.
+
+        Returns None to indicate that no filtering is needed.
+        """
+        if (
+            topic_name is None
+            or topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
+            return None
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.InvalidInputException(
+                f'The topic \'{topic_name}\' is not valid'
+            )
+        opportunity_summaries = opportunity_services.get_exploration_opportunity_summaries_by_topic_id(
+            topic.id
+        )
+        return [summary.id for summary in opportunity_summaries]
 
     @acl_decorators.can_suggest_changes
     def get(self, target_type: str, suggestion_type: str) -> None:
@@ -979,9 +1033,30 @@ class UserSubmittedSuggestionsHandler(
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
+        if limit == 0:
+            self._render_suggestions(target_type, [], offset)
+            return
+        topic_name = self.normalized_request.get('topic_name')
+        language_code = self.normalized_request.get('language_code')
+        if language_code == '':
+            language_code = None
+        target_ids = None
+        if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            target_ids = self._get_exploration_ids_for_topic(topic_name)
+        elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            target_ids = self._get_skill_ids_for_topic(topic_name)
+            if target_ids is not None and len(target_ids) == 0:
+                self._render_suggestions(target_type, [], 0)
+                return
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
-                self.user_id, suggestion_type, limit, offset, sort_key
+                self.user_id,
+                suggestion_type,
+                limit,
+                offset,
+                sort_key,
+                target_ids,
+                language_code,
             )
         )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -1014,6 +1089,8 @@ class UserSubmittedSuggestionsHandler(
                         limit,
                         next_offset,
                         sort_key,
+                        target_ids,
+                        language_code,
                     )
                 )
                 suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(
