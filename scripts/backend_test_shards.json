@@ -144,13 +144,11 @@
         "extensions.interactions.EndExploration.EndExploration_test",
         "extensions.interactions.NumericInput.NumericInput_test",
         "extensions.interactions.NumericExpressionInput.NumericExpressionInput_test",
-        "extensions.interactions.MusicNotesInput.MusicNotesInput_test",
         "extensions.interactions.GraphInput.GraphInput_test",
         "extensions.interactions.MathEquationInput.MathEquationInput_test",
         "extensions.interactions.MultipleChoiceInput.MultipleChoiceInput_test",
         "extensions.interactions.NumberWithUnits.NumberWithUnits_test",
         "extensions.interactions.DragAndDropSortInput.DragAndDropSortInput_test",
-        "extensions.interactions.PencilCodeEditor.PencilCodeEditor_test",
         "extensions.interactions.Continue.Continue_test",
         "extensions.interactions.ImageClickInput.ImageClickInput_test",
         "extensions.interactions.AlgebraicExpressionInput.AlgebraicExpressionInput_test"

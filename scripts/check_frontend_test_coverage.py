@@ -68,10 +68,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/pages/exploration-player-page/services/'
     'learner-answer-info.service.ts',
     'core/templates/services/suggestion-modal.service.ts',
-    'extensions/interactions/MusicNotesInput/directives/'
-    'oppia-interactive-music-notes-input.component.ts',
-    'extensions/interactions/PencilCodeEditor/directives/'
-    'oppia-interactive-pencil-code-editor.component.ts',
 ]
 
 
