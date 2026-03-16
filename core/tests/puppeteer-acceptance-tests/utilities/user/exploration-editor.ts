@@ -2827,7 +2827,7 @@ export class ExplorationEditor extends BaseUser {
         stayInEditorButtonSelector,
         {
           visible: true,
-          timeout: 10000,
+          timeout: 5000,
         }
       );
       if (modalElement) {
@@ -2843,7 +2843,6 @@ export class ExplorationEditor extends BaseUser {
     } catch (error) {
       // Modal didn't appear or already dismissed.
     }
-    await this.dismissWelcomeModal(false);
   }
 
   /**
