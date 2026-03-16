@@ -3869,11 +3869,6 @@ export class TopicManager extends BaseUser {
       return;
     }
 
-    await this.page.waitForSelector('.story-skill-mobile', {
-      visible: true,
-      timeout: 10000,
-    });
-
     const isVisible = await this.isElementVisible(
       addAcquiredSkillButton,
       true,
@@ -3883,55 +3878,8 @@ export class TopicManager extends BaseUser {
       return;
     }
 
-    const headerXPath =
-      '//div[contains(@class,"oppia-mobile-collapsible-card-header")]' +
-      '[.//span[contains(normalize-space(.),"Acquired Skills")]]';
-
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const headerHandles = await this.page.$x(headerXPath);
-      if (!headerHandles.length) {
-        await this.page.waitForTimeout(1000);
-        continue;
-      }
-      await headerHandles[0].evaluate(element => {
-        element.scrollIntoView({block: 'center'});
-        (element as HTMLElement).click();
-      });
-      const nowVisible = await this.isElementVisible(
-        addAcquiredSkillButton,
-        true,
-        5000
-      );
-      if (nowVisible) {
-        return;
-      }
-      await this.page.waitForTimeout(500);
-    }
-
-    await this.page.evaluate(() => {
-      const headers = Array.from(
-        document.querySelectorAll(
-          '.story-skill-mobile .oppia-mobile-collapsible-card-header'
-        )
-      );
-      const acquiredHeader = headers.find(header =>
-        header.textContent?.includes('Acquired Skills')
-      );
-      if (acquiredHeader) {
-        (acquiredHeader as HTMLElement).scrollIntoView({block: 'center'});
-        (acquiredHeader as HTMLElement).click();
-      }
-    });
-    const finalVisible = await this.isElementVisible(
-      addAcquiredSkillButton,
-      true,
-      8000
-    );
-    if (finalVisible) {
-      return;
-    }
-
-    throw new Error('Acquired Skills section did not expand on mobile.');
+    await this.expandHeaderInMobile('Acquired Skills');
+    await this.expectElementToBeVisible(addAcquiredSkillButton);
   }
 
   /**
@@ -5138,7 +5086,9 @@ export class TopicManager extends BaseUser {
    * Expands the given header in the mobile viewport.
    * @param {string} header - The header to expand.
    */
-  async expandHeaderInMobile(header: 'Prerequisite Skills'): Promise<void> {
+  async expandHeaderInMobile(
+    header: 'Prerequisite Skills' | 'Acquired Skills'
+  ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       showMessage('Skipping test as the viewport is not mobile');
       return;
