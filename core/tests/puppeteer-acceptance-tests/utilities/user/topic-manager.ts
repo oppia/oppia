@@ -4087,9 +4087,10 @@ export class TopicManager extends BaseUser {
     const warningIndicatorSelector = '.e2e-test-warning-indicator';
     const warningTextSelector = '.e2e-test-warnings-text';
 
+    const requireVisible = !this.isViewportAtMobileWidth();
     const warningIndicator = await this.page.waitForSelector(
       warningIndicatorSelector,
-      {visible: true}
+      requireVisible ? {visible: true} : undefined
     );
     if (!warningIndicator) {
       throw new Error('Warning indicator not found.');
@@ -4106,18 +4107,22 @@ export class TopicManager extends BaseUser {
       await this.page.hover(warningIndicatorSelector);
     }
 
-    let warningVisible = await this.isElementVisible(
-      warningTextSelector,
-      true,
-      2000
-    );
+    const waitForWarningText = async (): Promise<boolean> => {
+      if (requireVisible) {
+        return await this.isElementVisible(warningTextSelector, true, 2000);
+      }
+      try {
+        await this.page.waitForSelector(warningTextSelector, {timeout: 2000});
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    let warningVisible = await waitForWarningText();
     if (!warningVisible) {
       await this.clickOnElementWithSelectorOrJs(warningIndicatorSelector);
-      warningVisible = await this.isElementVisible(
-        warningTextSelector,
-        true,
-        2000
-      );
+      warningVisible = await waitForWarningText();
     }
     if (!warningVisible) {
       const warnings = await this.page.$$eval(warningTextSelector, elements =>
