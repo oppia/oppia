@@ -28,6 +28,11 @@
               "src/assets",
               {
                 "glob": "**/*",
+                "input": "node_modules/mathjax",
+                "output": "/assets/mathjax"
+              },
+              {
+                "glob": "**/*",
                 "input": "./node_modules/midi/examples/soundfont/",
                 "output": "./midi/examples/soundfont/"
               },
@@ -108,7 +113,12 @@
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/favicon.ico",
-              "assets"
+              "assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/mathjax",
+                "output": "/assets/mathjax"
+              }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
