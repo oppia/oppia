@@ -727,7 +727,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     EXP_ID_0: Final = '0'
     EXP_ID_1: Final = '1'
     EXP_ID_7: Final = '7'
-    EXP_ID_9: Final = '9'
+    EXP_ID_6: Final = '6'
 
     # Explorations contained within the demo collection.
     EXP_ID_19: Final = '19'
@@ -751,7 +751,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         exp_services.load_demo(self.EXP_ID_0)
         exp_services.load_demo(self.EXP_ID_1)
         exp_services.load_demo(self.EXP_ID_7)
-        exp_services.load_demo(self.EXP_ID_9)
+        exp_services.load_demo(self.EXP_ID_6)
         collection_services.load_demo(self.COL_ID)
         self.logout()
 
@@ -844,11 +844,11 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         finishes an exploration in-viewer, and there are system recommendations.
         """
         self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_6])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True
         )
-        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_6])
 
     def test_logged_in_with_no_sysexps_some_authexps_no_col_has_some_exps(
         self,
@@ -861,9 +861,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
     def test_logged_in_with_sysexps_and_authexps_no_col_has_some_exps(
         self,
@@ -873,14 +873,14 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         exploration IDs and recommendations from the system.
         """
         self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_6])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9]
+            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_6]
         )
 
     # Logged in in-editor tests.
@@ -900,9 +900,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         recommendation_ids = self._get_recommendation_ids(
-            self.EXP_ID_0, author_recommended_ids_str='["7","9"]'
+            self.EXP_ID_0, author_recommended_ids_str='["6","7"]'
         )
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
     # Logged in collection tests.
     def test_logged_in_no_sysexps_no_authexps_first_exp_in_col_has_exp(
@@ -960,7 +960,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._set_recommendations(
-            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9]
+            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_6]
         )
         self._complete_exploration_in_collection(self.EXP_ID_19)
         recommendation_ids = self._get_recommendation_ids(
@@ -982,7 +982,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._set_recommendations(
-            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9]
+            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_6]
         )
         self._complete_exploration_in_collection(self.EXP_ID_20)
         recommendation_ids = self._get_recommendation_ids(
@@ -1004,7 +1004,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._complete_entire_collection_in_order()
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_6])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             collection_id=self.COL_ID,
@@ -1025,12 +1025,12 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9]
+            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_6]
         )
 
     def test_logged_in_no_sysexps_with_authexps_mid_exp_in_col_has_exps(
@@ -1065,11 +1065,11 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
         # Only author specified explorations should be recommended since all
         # others in the collection have been completed.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
     # Logged out standard viewer tests.
     def test_logged_out_with_no_sysexps_no_authexps_no_col_has_no_exps(
@@ -1090,11 +1090,11 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """Check there are recommended explorations when a user is logged out,
         finishes an exploration in-viewer, and there are system recommendations.
         """
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_6])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True
         )
-        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_6])
 
     def test_logged_out_no_sysexps_some_authexps_no_col_has_some_exps(
         self,
@@ -1106,9 +1106,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
     def test_logged_out_with_sysexps_and_authexps_no_col_has_some_exps(
         self,
@@ -1117,14 +1117,14 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         finishes an exploration in-viewer, and there are both author-specified
         exploration IDs and recommendations from the system.
         """
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_6])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             include_system_recommendations=True,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9]
+            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_6]
         )
 
     # Logged out collection tests.
@@ -1173,7 +1173,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         ignored in favor of the collection's own recommendations.
         """
         self._set_recommendations(
-            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9]
+            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_6]
         )
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19,
@@ -1192,7 +1192,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         ignored in favor of the collection's own recommendations.
         """
         self._set_recommendations(
-            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9]
+            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_6]
         )
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_20,
@@ -1210,7 +1210,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         out and completes the last exploration of the collection. This is true
         even if there are system recommendations for the last exploration.
         """
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_6])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             collection_id=self.COL_ID,
@@ -1230,12 +1230,12 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9]
+            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_6]
         )
 
     def test_logged_out_no_sysexps_with_authexps_mid_exp_in_col_has_exps(
@@ -1280,11 +1280,11 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0,
             collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","9"]',
+            author_recommended_ids_str='["6","7"]',
         )
         # Only author specified explorations should be recommended since all
         # others in the collection have been completed.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_6])
 
     def test_get_recommendation_ids_with_invalid_author_recommended_ids(
         self,

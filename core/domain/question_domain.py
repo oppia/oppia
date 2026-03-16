@@ -879,6 +879,18 @@ class Question(translation_domain.BaseTranslatableObject):
         # Retrieve a cached version (state schema v35) of
         # interaction_specs.json to ensure that this migration remains
         # stable even when interaction_specs.json is changed.
+        # If the interaction_id no longer exists (e.g. it was deleted), we
+        # skip the customization args migration and just set the
+        # next_content_id_index.
+        all_specs = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            36
+        )
+        if interaction_id not in all_specs:
+            question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-item]
+                max_existing_content_id_index + 1
+            )
+            return question_state_dict
+
         ca_specs = [
             domain.CustomizationArgSpec(
                 ca_spec_dict['name'],
@@ -887,13 +899,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 ca_spec_dict['default_value'],
             )
             for ca_spec_dict in (
-                interaction_registry.Registry.get_all_specs_for_state_schema_version(
-                    36
-                )[
-                    interaction_id
-                ][
-                    'customization_arg_specs'
-                ]
+                all_specs[interaction_id]['customization_arg_specs']
             )
         ]
 
