@@ -486,6 +486,25 @@ describe('Drag and drop sort input interactive component', () => {
       expect(listItemElements[0].nativeElement.focus).toHaveBeenCalled();
     });
 
+    it('should not focus when flat index item does not exist', () => {
+      component.activeGroup = 0;
+      component.activeItem = 5;
+
+      component.multipleItemsInSamePositionArray = [['A']];
+
+      component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+      component.listItems.reset([
+        new ElementRef(document.createElement('div')),
+      ]);
+
+      const listItemElements = component.listItems.toArray();
+      spyOn(listItemElements[0].nativeElement, 'focus');
+
+      component.setFocus();
+
+      expect(listItemElements[0].nativeElement.focus).not.toHaveBeenCalled();
+    });
+
     it('should not hide item when drag is started', () => {
       component.dragStarted = true;
 
@@ -513,6 +532,65 @@ describe('Drag and drop sort input interactive component', () => {
       component.hide = [1, 2];
 
       expect(component.isChildElementHaveZeroHeight(1)).toBeTrue();
+    });
+
+    describe('getFlatIndex', () => {
+      it('should correctly calculate flat index when groups contain empty arrays', () => {
+        component.multipleItemsInSamePositionArray = [
+          [],
+          ['A'],
+          [],
+          ['B', 'C'],
+        ];
+
+        const returnedFlatIndex = component.getFlatIndex(3, 1);
+
+        const expectedFlatIndex = 2;
+
+        expect(returnedFlatIndex).toBe(expectedFlatIndex);
+      });
+
+      it('should skip undefined groups when calculating flat index', () => {
+        component.multipleItemsInSamePositionArray = [
+          ['A'],
+          undefined as unknown as string[],
+          ['B', 'C'],
+        ];
+
+        const returnedFlatIndex = component.getFlatIndex(2, 1);
+
+        const expectedFlatIndex = 2;
+
+        expect(returnedFlatIndex).toBe(expectedFlatIndex);
+      });
+    });
+
+    describe('getGroupItemFromFlatIndex', () => {
+      it('should return correct group and item when flat index exists', () => {
+        component.multipleItemsInSamePositionArray = [['A', 'B'], ['C']];
+
+        const returnedGroupItem = component.getGroupItemFromFlatIndex(2);
+
+        const expectedGroupItem = {
+          group: 1,
+          item: 0,
+        };
+
+        expect(returnedGroupItem).toEqual(expectedGroupItem);
+      });
+
+      it('should return default group and item when flat index is out of bounds', () => {
+        component.multipleItemsInSamePositionArray = [[], []];
+
+        const returnedGroupItem = component.getGroupItemFromFlatIndex(5);
+
+        const expectedGroupItem = {
+          group: 0,
+          item: 0,
+        };
+
+        expect(returnedGroupItem).toEqual(expectedGroupItem);
+      });
     });
 
     describe('handleKeyDownMultipleItems', () => {
@@ -585,7 +663,6 @@ describe('Drag and drop sort input interactive component', () => {
 
         expect(event.preventDefault).toHaveBeenCalled();
 
-        // Groups should be swapped.
         expect(component.multipleItemsInSamePositionArray[1]).toEqual(['C']);
         expect(component.multipleItemsInSamePositionArray[3]).toEqual([
           'A',
@@ -741,6 +818,81 @@ describe('Drag and drop sort input interactive component', () => {
           [],
           ['B'],
         ]);
+      });
+
+      it('should move item to a new group when ArrowDown is pressed on the last item and max groups is not reached', () => {
+        const arrowDownEvent = new KeyboardEvent('keydown', {key: 'ArrowDown'});
+
+        component.multipleItemsInSamePositionArray = [[], ['A'], []];
+
+        component.activeGroup = 1;
+        component.activeItem = 0;
+        component.maxGroups = 3;
+
+        component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+        component.listItems.reset([
+          new ElementRef(document.createElement('div')),
+        ]);
+
+        spyOn(arrowDownEvent, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(arrowDownEvent, 1, 0);
+
+        expect(arrowDownEvent.preventDefault).toHaveBeenCalled();
+        expect(component.activeGroup).toBeDefined();
+        expect(component.activeItem).toBeDefined();
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should move item to the previous group when ArrowUp is pressed at the first position of a group', () => {
+        const arrowUpEvent = new KeyboardEvent('keydown', {key: 'ArrowUp'});
+
+        component.multipleItemsInSamePositionArray = [[], ['A'], [], ['B'], []];
+
+        component.activeGroup = 3;
+        component.activeItem = 0;
+
+        component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+        component.listItems.reset([
+          new ElementRef(document.createElement('div')),
+          new ElementRef(document.createElement('div')),
+        ]);
+
+        spyOn(arrowUpEvent, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(arrowUpEvent, 3, 0);
+
+        expect(arrowUpEvent.preventDefault).toHaveBeenCalled();
+        expect(component.multipleItemsInSamePositionArray[1]).toContain('B');
+        expect(component.setFocus).toHaveBeenCalled();
+      });
+
+      it('should update active group and item after transferring an item to another group', () => {
+        const arrowDownEvent = new KeyboardEvent('keydown', {key: 'ArrowDown'});
+
+        component.multipleItemsInSamePositionArray = [[], ['A'], [], ['B'], []];
+
+        component.activeGroup = 1;
+        component.activeItem = 0;
+
+        component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
+        component.listItems.reset([
+          new ElementRef(document.createElement('div')),
+          new ElementRef(document.createElement('div')),
+          new ElementRef(document.createElement('div')),
+        ]);
+
+        spyOn(arrowDownEvent, 'preventDefault');
+        spyOn(component, 'setFocus');
+
+        component.handleKeyDownMultipleItems(arrowDownEvent, 1, 0);
+
+        expect(arrowDownEvent.preventDefault).toHaveBeenCalled();
+        expect(component.activeGroup).toBeDefined();
+        expect(component.activeItem).toBeDefined();
+        expect(component.setFocus).toHaveBeenCalled();
       });
     });
   });
