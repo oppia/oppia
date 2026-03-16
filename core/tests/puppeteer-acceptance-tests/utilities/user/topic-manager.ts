@@ -3869,6 +3869,11 @@ export class TopicManager extends BaseUser {
       return;
     }
 
+    await this.page.waitForSelector('.story-skill-mobile', {
+      visible: true,
+      timeout: 10000,
+    });
+
     const isVisible = await this.isElementVisible(
       addAcquiredSkillButton,
       true,
@@ -3895,7 +3900,7 @@ export class TopicManager extends BaseUser {
       const nowVisible = await this.isElementVisible(
         addAcquiredSkillButton,
         true,
-        2000
+        5000
       );
       if (nowVisible) {
         return;
@@ -3905,7 +3910,9 @@ export class TopicManager extends BaseUser {
 
     await this.page.evaluate(() => {
       const headers = Array.from(
-        document.querySelectorAll('.oppia-mobile-collapsible-card-header')
+        document.querySelectorAll(
+          '.story-skill-mobile .oppia-mobile-collapsible-card-header'
+        )
       );
       const acquiredHeader = headers.find(header =>
         header.textContent?.includes('Acquired Skills')
@@ -3918,7 +3925,7 @@ export class TopicManager extends BaseUser {
     const finalVisible = await this.isElementVisible(
       addAcquiredSkillButton,
       true,
-      3000
+      8000
     );
     if (finalVisible) {
       return;

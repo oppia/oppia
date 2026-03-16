@@ -276,6 +276,7 @@ describe('Topic Manager', function () {
 
     // Delete prerequisite and acquired skills.
     await topicManager.removeAcquiredSkill('Addition');
+    await topicManager.saveStoryDraft();
     await topicManager.openChapterEditor(
       'New Title',
       'The Broken Calculator',
