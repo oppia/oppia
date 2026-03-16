@@ -18,7 +18,6 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -142,7 +141,7 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
 
   /**
    * Returns the progress text for current diagnostic test.
-   * @returns {string} The progress text.
+   * @returns The progress text.
    */
   getProgressText(): string {
     return this.translateService.instant(
@@ -177,7 +176,7 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
 
   /**
    * Sets the recommended topic summaries based on the provided IDs.
-   * @param {string[]} recommendedTopicIds - The IDs of the recommended topics.
+   * @param recommendedTopicIds The IDs of the recommended topics.
    */
   getRecommendedTopicSummaries(recommendedTopicIds: string[]): void {
     if (!this.classroomData) {
@@ -201,8 +200,8 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
 
   /**
    * Returns the button text for the recommended topic.
-   * @param {string} topicName - The name of the topic.
-   * @returns {string} The translated button text.
+   * @param topicName The name of the topic.
+   * @returns The translated button text.
    */
   getTopicButtonText(topicName: string): string {
     return this.translateService.instant(
@@ -215,8 +214,8 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
 
   /**
    * Returns the topic URL from the provided URL fragment.
-   * @param {string | null} urlFragment - The URL fragment of the topic.
-   * @returns {string} The interpolated topic URL.
+   * @param urlFragment The URL fragment of the topic.
+   * @returns The interpolated topic URL.
    */
   getTopicUrlFromUrlFragment(urlFragment: string | null): string {
     if (!urlFragment || !this.classroomUrlFragment) {
@@ -232,7 +231,7 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
 
   /**
    * Registers a site analytics event for recommended topic acceptance.
-   * @param {string} topicName - The name of the topic.
+   * @param topicName The name of the topic.
    */
   getRecommendationAcceptanceEvent(topicName: string): void {
     if (this.classroomData) {
@@ -251,7 +250,7 @@ export class DiagnosticTestPlayerComponent implements OnInit, OnDestroy {
 
   /**
    * Returns whether the new lesson player is enabled.
-   * @returns {boolean} Whether the feature flag is enabled.
+   * @returns Whether the feature flag is enabled.
    */
   isNewLessonPlayerEnabled(): boolean {
     return this.platformFeatureService.status.NewLessonPlayer.isEnabled;

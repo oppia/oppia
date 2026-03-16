@@ -1159,10 +1159,9 @@ def _get_filtered_completed_story_summaries(
             # So, we are sure that the story cannot be None here and that's why
             # we used assert here.
             assert story is not None
-            if (
-                len(story_fetchers.get_completed_node_ids(user_id, story_id))
-                != story.story_contents.get_published_node_count()
-            ):
+            if len(
+                story_fetchers.get_completed_node_ids(user_id, story_id)
+            ) != len(story.story_contents.nodes):
                 remove_story_from_completed_list(user_id, story_id)
                 record_story_started(user_id, story_id)
                 completed_to_incomplete_story_summaries.append(story_summary)
