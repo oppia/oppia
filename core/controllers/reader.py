@@ -733,9 +733,7 @@ class AnswerSubmittedEventHandler(
             )
         except AssertionError as e:
             raise self.InvalidInputException(
-                'At \'%s\' these errors are happening:\n'
-                'Schema validation for \'answer\' failed: %s'
-                % (self.request.uri, e)
+                'Schema validation for \'answer\' failed: %s' % e
             ) from e
 
         event_services.AnswerSubmissionEventHandler.record(

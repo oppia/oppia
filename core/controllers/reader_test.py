@@ -2709,8 +2709,6 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'At \'http://localhost/explorehandler/answer_submitted_event/16\' '
-            'these errors are happening:\n'
             'Schema validation for \'answer\' failed: Validation failed: '
             'is_valid_algebraic_expression ({}) for object V = uab',
         )
