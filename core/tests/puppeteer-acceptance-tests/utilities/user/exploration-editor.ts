@@ -2772,7 +2772,9 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
       await this.clickOnElementWithSelector(feedBackButtonTab);
-      await this.waitForNetworkIdle();
+      await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
+        visible: true,
+      });
     }
 
     await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
@@ -5710,7 +5712,10 @@ export class ExplorationEditor extends BaseUser {
    */
   async viewFeedbackThread(expectedThread: number): Promise<void> {
     await this.navigateToFeedbackTab();
-    await this.page.waitForSelector(feedbackSubjectSelector);
+    await this.page.waitForSelector(feedbackSubjectSelector, {
+      visible: true,
+      timeout: 30000,
+    });
     const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
 
     if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
