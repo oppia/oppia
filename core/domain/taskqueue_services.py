@@ -388,23 +388,6 @@ def get_cloud_task_run_by_given_params(
             <= model.last_updated.replace(tzinfo=datetime.timezone.utc)
             <= end_datetime
         )
-        and (
-            model.function_id
-            in [
-                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
-                ],
-                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
-                ],
-                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
-                ],
-                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
-                ],
-            ]
-        )
     ]
     return [
         convert_cloud_task_run_model_to_domain_object(model)

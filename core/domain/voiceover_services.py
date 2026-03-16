@@ -809,29 +809,6 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     )
 
 
-def _remove_empty_contents_for_voiceover_regeneration(
-    language_code_to_contents_mapping: Dict[str, Dict[str, str]],
-) -> None:
-    """Removes empty contents from the provided input.
-
-    Args:
-        language_code_to_contents_mapping: dict. A dictionary mapping language
-            codes to the corresponding content IDs and their associated HTML
-            that require voiceover regeneration.
-    """
-    for (
-        _,
-        content_ids_to_content_values,
-    ) in language_code_to_contents_mapping.items():
-        content_ids_to_remove = [
-            content_id
-            for content_id, html in (content_ids_to_content_values.items())
-            if not html.strip()
-        ]
-        for content_id in content_ids_to_remove:
-            del content_ids_to_content_values[content_id]
-
-
 def extract_english_voiceover_texts_from_exploration(
     exploration: exp_domain.Exploration,
 ) -> Dict[str, Dict[str, str]]:
@@ -933,11 +910,6 @@ def regenerate_voiceovers_for_given_contents(
         specific_language_accent_code: Optional[str]. The specific language
             accent code to use for voiceover regeneration, if provided.
     """
-    # Remove empty contents from the voiceover regeneration mapping.
-    _remove_empty_contents_for_voiceover_regeneration(
-        language_code_to_contents_mapping
-    )
-
     # Get all language codes that need voiceover regeneration in this request.
     language_codes = list(language_code_to_contents_mapping.keys())
 
@@ -1101,6 +1073,17 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
     voiceover_cloud_task_services.create_voiceover_regeneration_task_batch_models(
         voiceover_regeneration_task_batch_instances
     )
+    logging.info(
+        'Voiceover regeneration logs: Number of batches: %s, Parent Cloud Task Run ID: %s, Child Cloud Task Run IDs: %s'
+        % (
+            batch_counter,
+            parent_cloud_task_run_id,
+            [
+                instance.child_cloud_task_run_id
+                for instance in voiceover_regeneration_task_batch_instances
+            ],
+        )
+    )
 
 
 def regenerate_voiceovers_for_batch_contents(
@@ -1143,6 +1126,12 @@ def regenerate_voiceovers_for_batch_contents(
 
     voiceover_regeneration_batch_execution_job = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
         parent_cloud_task_run_id, child_cloud_task_run_id
+    )
+
+    logging.info(
+        'Voiceover regeneration logs: Trying to fetch voiceover regeneration batch execution job, '
+        'parent_cloud_task_run_id: %s, child_cloud_task_run_id: %s.'
+        % (parent_cloud_task_run_id, child_cloud_task_run_id)
     )
 
     # Ruling out the possibility of None for mypy type checking.

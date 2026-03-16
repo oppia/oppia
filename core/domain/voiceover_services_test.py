@@ -1819,23 +1819,22 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             entity_voiceovers.language_accent_code, language_accent_code
         )
         self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
-        self.assertEqual(
+        default_audio_offset = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0},
+        ]
+        self.assertDictEqual(
             entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
             {
-                'content_0': [
-                    {'token': 'This', 'audio_offset_msecs': 0.0},
-                    {'token': 'is', 'audio_offset_msecs': 100.0},
-                    {'token': 'a', 'audio_offset_msecs': 200.0},
-                    {'token': 'test', 'audio_offset_msecs': 300.0},
-                    {'token': 'text', 'audio_offset_msecs': 400.0},
-                ],
-                'feedback_1': [
-                    {'token': 'This', 'audio_offset_msecs': 0.0},
-                    {'token': 'is', 'audio_offset_msecs': 100.0},
-                    {'token': 'a', 'audio_offset_msecs': 200.0},
-                    {'token': 'test', 'audio_offset_msecs': 300.0},
-                    {'token': 'text', 'audio_offset_msecs': 400.0},
-                ],
+                'content_0': default_audio_offset,
+                'feedback_1': default_audio_offset,
+                'content_2': default_audio_offset,
+                'default_outcome_1': default_audio_offset,
+                'content-3': default_audio_offset,
+                'ca_placeholder_2': default_audio_offset,
             },
         )
 
@@ -1929,8 +1928,22 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             )
         )
         expected_language_accent_to_content_status_map = {
-            'en-US': {'content_0': 'SUCCEEDED', 'feedback_1': 'SUCCEEDED'},
-            'en-IN': {'content_0': 'SUCCEEDED', 'feedback_1': 'SUCCEEDED'},
+            'en-US': {
+                'ca_placeholder_2': 'SUCCEEDED',
+                'content-3': 'SUCCEEDED',
+                'content_0': 'SUCCEEDED',
+                'content_2': 'SUCCEEDED',
+                'default_outcome_1': 'SUCCEEDED',
+                'feedback_1': 'SUCCEEDED',
+            },
+            'en-IN': {
+                'ca_placeholder_2': 'SUCCEEDED',
+                'content-3': 'SUCCEEDED',
+                'content_0': 'SUCCEEDED',
+                'content_2': 'SUCCEEDED',
+                'default_outcome_1': 'SUCCEEDED',
+                'feedback_1': 'SUCCEEDED',
+            },
             'ar-AE': {'content_0': 'SUCCEEDED', 'feedback_1': 'SUCCEEDED'},
         }
 

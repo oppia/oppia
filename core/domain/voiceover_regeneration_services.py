@@ -24,6 +24,7 @@ import html
 import io
 import json
 import logging
+import os
 import uuid
 
 from core import feconf, utils
@@ -265,6 +266,23 @@ def get_text_with_delimiters(soup: bs4.BeautifulSoup, delimiter: str) -> str:
     return ''.join(text_segments)
 
 
+def empty_voiceover_raw_audio_data() -> bytes:
+    """Provides the byte string to represent the raw audio data for an empty voiceover.
+
+    Returns:
+        bytes. The byte string representing the raw audio data for an empty
+        voiceover.
+    """
+
+    voiceover_path = os.path.join(
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, 'empty.mp3'
+    )
+
+    with open(voiceover_path, 'rb', encoding=None) as file:
+        binary_audio_data = file.read()
+    return binary_audio_data
+
+
 def synthesize_voiceover_for_html_string(
     exploration_id: str,
     content_html: str,
@@ -345,6 +363,10 @@ def synthesize_voiceover_for_html_string(
 
     if error_details:
         raise Exception(error_details)
+
+    if not binary_audio_data:
+        binary_audio_data = empty_voiceover_raw_audio_data()
+        audio_offset_list = []
 
     tempbuffer = io.BytesIO()
     tempbuffer.write(binary_audio_data)
