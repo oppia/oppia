@@ -24,9 +24,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
-import {
-  MusicNotesInputCustomizationArgs,
-} from 'extensions/interactions/customization-args-defs';
+import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import cloneDeep from 'lodash/cloneDeep';
 
 describe('MusicNotesInputValidationService', () => {
