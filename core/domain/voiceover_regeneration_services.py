@@ -24,6 +24,7 @@ import html
 import io
 import json
 import logging
+import os
 import uuid
 
 from core import feconf, utils
@@ -47,7 +48,6 @@ from typing import Dict, List, Optional, Tuple, Union
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
-        app_identity_services,
         speech_synthesis_services,
         voiceover_models,
     )
@@ -55,7 +55,6 @@ if MYPY:  # pragma: no cover
 (voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 
 speech_synthesis_services = models.Registry.import_speech_synthesis_services()
-app_identity_services = models.Registry.import_app_identity_services()
 
 
 def _extract_text_from_link_tag(element: bs4.Tag) -> str:
@@ -270,6 +269,23 @@ def get_text_with_delimiters(soup: bs4.BeautifulSoup, delimiter: str) -> str:
     return ''.join(text_segments)
 
 
+def empty_voiceover_raw_audio_data() -> bytes:
+    """Provides the byte string to represent the raw audio data for an empty voiceover.
+
+    Returns:
+        bytes. The byte string representing the raw audio data for an empty
+        voiceover.
+    """
+
+    voiceover_path = os.path.join(
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, 'empty.mp3'
+    )
+
+    with open(voiceover_path, 'rb', encoding=None) as file:
+        binary_audio_data = file.read()
+    return binary_audio_data
+
+
 def synthesize_voiceover_for_html_string(
     exploration_id: str,
     content_html: str,
@@ -313,11 +329,6 @@ def synthesize_voiceover_for_html_string(
     )
 
     parsed_text = parse_html(content_html)
-
-    if not parsed_text:
-        raise Exception(
-            'The provided HTML content does not contain any text to synthesize.'
-        )
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
@@ -374,13 +385,8 @@ def synthesize_voiceover_for_html_string(
         raise Exception(error_details)
 
     if not binary_audio_data:
-        logging.error(
-            'Voiceover synthesis error: Invalid audio returned from Azure Text-to-Speech service for exploration ID: %s, content_html: %s. Error details: %s'
-            % (exploration_id, content_html, error_details)
-        )
-        raise Exception(
-            'Invalid audio returned from Azure Text-to-Speech service.'
-        )
+        binary_audio_data = empty_voiceover_raw_audio_data()
+        audio_offset_list = []
 
     with io.BytesIO(binary_audio_data) as tempbuffer:
         audio = mp3.MP3(tempbuffer)
@@ -602,13 +608,10 @@ def fetch_voiceover_by_filename(
 
     binary_audio_data = fs.get('%s/%s' % ('audio', filename))
 
-    tempbuffer = io.BytesIO()
-    tempbuffer.write(binary_audio_data)
-    tempbuffer.seek(0)
-    audio = mp3.MP3(tempbuffer)
-
-    duration_secs = audio.info.length
-    audio_size_bytes = tempbuffer.getbuffer().nbytes
+    with io.BytesIO(binary_audio_data) as tempbuffer:
+        audio = mp3.MP3(tempbuffer)
+        duration_secs = audio.info.length
+        audio_size_bytes = tempbuffer.getbuffer().nbytes
 
     return state_domain.Voiceover(
         filename, audio_size_bytes, False, duration_secs

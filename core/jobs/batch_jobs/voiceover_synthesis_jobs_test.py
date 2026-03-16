@@ -459,7 +459,6 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
 
         expected_output_1 = (
             'EntityVoiceovers ID: exploration-exploration_id_1-2-en-US.\n'
-            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 101.\n'
             'EntityVoiceovers ID: exploration-exploration_id_1-2-hi-IN.\n'
             'Total content IDs processed: 1. Total characters processed: 41.\n'
@@ -467,7 +466,6 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
 
         expected_output_2 = (
             'EntityVoiceovers ID: exploration-exploration_id_2-2-en-US.\n'
-            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 103.\n'
             'EntityVoiceovers ID: exploration-exploration_id_2-2-pt-BR.\n'
             'Total content IDs processed: 1. Total characters processed: 53.\n'
@@ -543,7 +541,6 @@ class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
 
         expected_output_1 = (
             'EntityVoiceovers ID: exploration-exploration_id_1-2-en-US.\n'
-            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 101.\n'
             'EntityVoiceovers ID: exploration-exploration_id_1-2-hi-IN.\n'
             'Total content IDs processed: 1. Total characters processed: 41.\n'
@@ -551,7 +548,6 @@ class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
 
         expected_output_2 = (
             'EntityVoiceovers ID: exploration-exploration_id_2-2-en-US.\n'
-            'Content IDs failed: [default_outcome_1, ca_placeholder_2]. Error message: The provided HTML content does not contain any text to synthesize.\n'
             'Total content IDs processed: 4. Total characters processed: 103.\n'
             'EntityVoiceovers ID: exploration-exploration_id_2-2-pt-BR.\n'
             'Total content IDs processed: 1. Total characters processed: 53.\n'

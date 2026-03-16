@@ -292,19 +292,13 @@ class CachedAutomaticVoiceoversModelTests(test_utils.GenericTestBase):
             {'token': '!', 'audio_offset_msecs': 450.0},
         ]
 
-        cached_model_id = (
-            voiceover_models.CachedAutomaticVoiceoversModel.generate_id(
-                language_accent_code, hash_code, provider
+        cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code=language_accent_code,
+                plaintext=plaintext,
+                voiceover_filename=voiceover_filename,
+                audio_offset_list=audio_offset_list,
             )
-        )
-        cached_model = voiceover_models.CachedAutomaticVoiceoversModel(
-            id=cached_model_id,
-            language_accent_code=language_accent_code,
-            provider=provider,
-            hash_code=hash_code,
-            plaintext=plaintext,
-            voiceover_filename=voiceover_filename,
-            audio_offset_list=audio_offset_list,
         )
 
         cached_model.update_timestamps()

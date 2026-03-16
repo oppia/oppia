@@ -420,7 +420,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
                 )
             )
 
-    def test_should_raise_exception_if_regenerated_audio_is_empty(self) -> None:
+    def test_should_get_empty_audio_sucessfully(self) -> None:
         content_html = '<p> This is a test text </p>'
         exploration_id = 'exp_id'
         language_accent_code = 'en-US'
@@ -439,13 +439,10 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             'regenerate_speech_from_text',
             _mock_regenerate_speech_from_text,
         ):
-            with self.assertRaisesRegex(
-                Exception,
-                'Invalid audio returned from Azure Text-to-Speech service',
-            ):
-                voiceover_regeneration_services.synthesize_voiceover_for_html_string(
-                    exploration_id, content_html, language_accent_code, filename
-                )
+            audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+                exploration_id, content_html, language_accent_code, filename
+            )
+        self.assertEqual(audio_offset_list, [])
 
     def test_should_be_able_to_get_new_voiceover_filename(self) -> None:
         content_id = 'content_0'
