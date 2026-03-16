@@ -3712,6 +3712,34 @@ export class TopicManager extends BaseUser {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.ensureMobileAcquiredSkillsSectionIsVisible();
+      const mobileBodySelector = '.e2e-test-section-body-acquired-skills';
+      await this.expectElementToBeVisible(mobileBodySelector);
+      const mobileBody = await this.page.$(mobileBodySelector);
+      if (!mobileBody) {
+        throw new Error('Acquired Skills mobile section not found.');
+      }
+      const addButton = await mobileBody.$(addAcquiredSkillButton);
+      if (!addButton) {
+        throw new Error(
+          'Add Acquired skill button not found in mobile section.'
+        );
+      }
+      const isDisabled = await addButton.evaluate(
+        element => (element as HTMLButtonElement).disabled
+      );
+      if (isDisabled) {
+        await this.page.waitForFunction(
+          (element: HTMLButtonElement) => !element.disabled,
+          {timeout: 10000},
+          addButton
+        );
+      }
+      await addButton.evaluate(element => {
+        element.scrollIntoView({block: 'center'});
+        (element as HTMLElement).click();
+      });
+      await this.filterAndSelectSkillInSkillSelector(skillName);
+      return;
     }
 
     await this.page.waitForSelector(addAcquiredSkillButton, {visible: true});
@@ -3869,8 +3897,9 @@ export class TopicManager extends BaseUser {
       return;
     }
 
+    const mobileBodySelector = '.e2e-test-section-body-acquired-skills';
     const isVisible = await this.isElementVisible(
-      addAcquiredSkillButton,
+      mobileBodySelector,
       true,
       1000
     );
@@ -3879,7 +3908,7 @@ export class TopicManager extends BaseUser {
     }
 
     await this.expandHeaderInMobile('Acquired Skills');
-    await this.expectElementToBeVisible(addAcquiredSkillButton);
+    await this.expectElementToBeVisible(mobileBodySelector);
   }
 
   /**
