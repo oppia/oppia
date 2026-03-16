@@ -170,13 +170,7 @@ export class ContributionAndReviewBackendApiService {
         suggestion_type: suggestionType,
       }
     );
-    const params: {
-      limit: string;
-      offset: string;
-      sort_key: string;
-      topic_name?: string;
-      language_code?: string;
-    } = {
+    const params: {[param: string]: string} = {
       limit: limit.toString(),
       offset: offset.toString(),
       sort_key: sortKey,
