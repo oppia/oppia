@@ -117,8 +117,9 @@ class ExplorationOpportunitySummary:
             translation_in_review_counts: dict. A dict with language code as a
                 key and number of translation in review in that language as the
                 value.
-            reviewer_only_content_count: int. The number of content text items that
-                are of set_of_strings data format.
+            reviewer_only_content_count: int. The number of content items that are
+                only translatable by reviewers (e.g. content with
+                'set_of_strings' data format).
             is_pinned: bool. Denotes whether the opportunity is pinned or not in
                 contributor dashboard.
         """

@@ -59,6 +59,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     language_codes_needing_voice_artists = datastore_services.StringProperty(
         repeated=True, indexed=True
     )
+    # The number of content items that are only translatable by reviewers
+    # (e.g. content with 'set_of_strings' data format).
     reviewer_only_content_count = datastore_services.IntegerProperty(
         required=True, default=0, indexed=False
     )

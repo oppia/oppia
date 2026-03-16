@@ -442,11 +442,12 @@ class BaseTranslatableObject:
         return len(self.get_all_contents_which_need_translations())
 
     def get_reviewer_only_content_count(self) -> int:
-        """Returns the total number of distinct content fields available in the
-        exploration that have a data format of list.
+        """Returns the total number of content items in the exploration that
+        are only translatable by reviewers (e.g. content with
+        'set_of_strings' data format).
 
         Returns:
-            int. The number of such content fields.
+            int. The number of reviewer-only content items.
         """
         count = 0
         content_id_to_translatable_content = (
