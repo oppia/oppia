@@ -1218,6 +1218,11 @@ def regenerate_voiceovers_for_batch_contents(
         voiceover_regeneration_job_status
     )
 
+    logging.info(
+        'Voiceover regeneration logs: %s'
+        % voiceover_regeneration_job_status.to_dict()
+    )
+
     if voiceover_regeneration_job_status.are_all_voiceovers_attempted():
         logging.info(
             'Voiceover regeneration logs: All voiceover regeneration attempts '
@@ -1433,7 +1438,9 @@ def regenerate_voiceovers_on_exploration_update(
             language_code_to_contents_mapping.setdefault(language_code, {})[
                 content_id
             ] = updated_content
-
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
+    )
     regenerate_voiceovers_for_given_contents(
         exploration_id,
         exploration_version,
@@ -1490,6 +1497,9 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
         extract_translated_voiceover_texts_from_entity_translations(
             entity_translations
         )
+    )
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
     )
 
     regenerate_voiceovers_for_given_contents(
@@ -1568,7 +1578,9 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
                 [entity_translation]
             )
         )
-
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
+    )
     regenerate_voiceovers_for_given_contents(
         exploration_id,
         exploration_version,
@@ -1602,6 +1614,9 @@ def regenerate_voiceovers_after_accepting_suggestion(
     language_code_to_contents_mapping = {
         language_code: {content_id: translated_html_content}
     }
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
+    )
     regenerate_voiceovers_for_given_contents(
         exploration_id,
         exploration_version,
