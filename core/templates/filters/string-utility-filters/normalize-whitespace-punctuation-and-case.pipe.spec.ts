@@ -52,6 +52,10 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
     expect(nwpcp.transform(' teSTstrinG12  ')).toEqual('teststring12');
     expect(nwpcp.transform(' tesT1 teSt2 ')).toEqual('test1 test2');
 
+    // Should not insert a space after punctuation if next character is also
+    // punctuation (i.e. not alphanumeric).
+    expect(nwpcp.transform('hello?!')).toEqual('hello?!');
+
     expect(nwpcp.transform('tesT1\n teSt2')).toEqual('test1\ntest2');
   });
 });

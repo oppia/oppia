@@ -886,6 +886,9 @@ class Question(translation_domain.BaseTranslatableObject):
             36
         )
         if interaction_id not in all_specs:
+            # Here we use MyPy ignore because the latest schema of state dict
+            # doesn't contain the next_content_id_index property, but this
+            # conversion function works with older schema versions that do.
             question_state_dict['next_content_id_index'] = (  # type: ignore[typeddict-item]
                 max_existing_content_id_index + 1
             )
