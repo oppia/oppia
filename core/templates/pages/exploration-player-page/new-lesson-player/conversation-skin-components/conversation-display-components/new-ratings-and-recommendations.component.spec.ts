@@ -37,6 +37,7 @@ import {MockTranslateService} from 'components/forms/schema-based-editors/integr
 import {AlertsService} from 'services/alerts.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
 import {LearnerViewRatingService} from '../../../services/learner-view-rating.service';
@@ -85,6 +86,7 @@ describe('New Ratings and recommendations component', () => {
   let ngbModal: NgbModal;
   let bottomSheet: MatBottomSheet;
   let windowRef: WindowRef;
+  let signInEventService: SignInEventService;
 
   class MockWindowRef {
     nativeWindow = {
@@ -140,6 +142,12 @@ describe('New Ratings and recommendations component', () => {
         LocalStorageService,
         SiteAnalyticsService,
         {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
+        {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
@@ -179,6 +187,7 @@ describe('New Ratings and recommendations component', () => {
     ngbModal = TestBed.inject(NgbModal);
     bottomSheet = TestBed.inject(MatBottomSheet);
     windowRef = TestBed.inject(WindowRef);
+    signInEventService = TestBed.inject(SignInEventService);
   });
 
   it('should create', () => {
@@ -522,6 +531,7 @@ describe('New Ratings and recommendations component', () => {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve('login_url')
     );
+    spyOn(signInEventService.onUserSignIn, 'emit');
 
     componentInstance.signIn('.sign-in-button');
     tick();
@@ -531,6 +541,9 @@ describe('New Ratings and recommendations component', () => {
       '.sign-in-button'
     );
     expect(windowRef.nativeWindow.location).toBe('login_url');
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'newRatingsAndRecommendations'
+    );
   }));
 
   it(

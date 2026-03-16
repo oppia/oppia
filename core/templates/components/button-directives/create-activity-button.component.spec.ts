@@ -26,7 +26,7 @@ import {ExplorationCreationService} from 'components/entity-creation-services/ex
 import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import {UrlParamsType, UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {CreateActivityButtonComponent} from './create-activity-button.component';
@@ -74,7 +74,7 @@ describe('CreateActivityButtonComponent', () => {
   let userService: UserService;
   let urlService: MockUrlService;
   let explorationCreationService: ExplorationCreationService;
-  let siteAnalyticsService: SiteAnalyticsService;
+  let signInEventService: SignInEventService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
 
@@ -156,7 +156,7 @@ describe('CreateActivityButtonComponent', () => {
           useValue: windowRef,
         },
         ExplorationCreationService,
-        SiteAnalyticsService,
+        SignInEventService,
       ],
     }).compileComponents();
   }));
@@ -167,7 +167,7 @@ describe('CreateActivityButtonComponent', () => {
     userService = TestBed.inject(UserService);
     urlService = TestBed.inject(UrlService);
     explorationCreationService = TestBed.inject(ExplorationCreationService);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    signInEventService = TestBed.inject(SignInEventService);
     ngbModal = TestBed.inject(NgbModal);
     fixture.detectChanges();
   });
@@ -378,16 +378,13 @@ describe('CreateActivityButtonComponent', () => {
       ' and is not logged in',
     fakeAsync(() => {
       windowRef.nativeWindow.location.href = '';
-      const siteAnalyticsServiceSpy = spyOn(
-        siteAnalyticsService,
-        'registerStartLoginEvent'
-      );
+      spyOn(signInEventService.onUserSignIn, 'emit');
 
       component.onRedirectToLogin('login-url');
       tick(150);
       fixture.detectChanges();
 
-      expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+      expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
         'createActivityButton'
       );
       expect(windowRef.nativeWindow.location.href).toBe('login-url');
@@ -395,18 +392,15 @@ describe('CreateActivityButtonComponent', () => {
   );
 
   it(
-    'should call the site analytics service on redirect' + ' to login',
+    'should emit sign in event on redirect' + ' to login',
     fakeAsync(() => {
-      const siteAnalyticsServiceSpy = spyOn(
-        siteAnalyticsService,
-        'registerStartLoginEvent'
-      );
+      spyOn(signInEventService.onUserSignIn, 'emit');
 
       component.onRedirectToLogin('login-url');
       tick(150);
       fixture.detectChanges();
 
-      expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+      expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
         'createActivityButton'
       );
     })

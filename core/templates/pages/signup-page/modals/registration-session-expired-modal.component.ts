@@ -20,6 +20,7 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 @Component({
   selector: 'oppia-registration-session-expired-modal',
@@ -29,12 +30,16 @@ export class RegistrationSessionExpiredModalComponent {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private userService: UserService,
+    private signInEventService: SignInEventService,
     private windowRef: WindowRef
   ) {}
 
   continueRegistration(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
+        this.signInEventService.onUserSignIn.emit(
+          'registrationSessionExpiredModal'
+        );
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;
         }, 150);

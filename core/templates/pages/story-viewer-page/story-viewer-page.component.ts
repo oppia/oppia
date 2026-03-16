@@ -31,6 +31,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {AppConstants} from 'app.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LoaderService} from 'services/loader.service';
@@ -92,6 +93,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private assetsBackendApiService: AssetsBackendApiService,
     private userService: UserService,
+    private signInEventService: SignInEventService,
     private windowRef: WindowRef,
     private urlService: UrlService,
     private loaderService: LoaderService,
@@ -152,9 +154,12 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
 
   signIn(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
-      loginUrl
-        ? (this.windowRef.nativeWindow.location.href = loginUrl)
-        : this.windowRef.nativeWindow.location.reload();
+      if (loginUrl) {
+        this.signInEventService.onUserSignIn.emit('storyViewerPage');
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      } else {
+        this.windowRef.nativeWindow.location.reload();
+      }
     });
   }
 

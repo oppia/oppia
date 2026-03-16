@@ -25,5 +25,5 @@ import {EventEmitter, Injectable} from '@angular/core';
   providedIn: 'root',
 })
 export class SignInEventService {
-  onUserSignIn: EventEmitter<void> = new EventEmitter<void>();
+  onUserSignIn: EventEmitter<string> = new EventEmitter<string>();
 }

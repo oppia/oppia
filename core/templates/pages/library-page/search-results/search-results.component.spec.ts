@@ -24,6 +24,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {SearchResultsComponent} from './search-results.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -39,7 +40,7 @@ import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend
 describe('Search Results component', () => {
   let fixture: ComponentFixture<SearchResultsComponent>;
   let componentInstance: SearchResultsComponent;
-  let siteAnalyticsService: SiteAnalyticsService;
+  let signInEventService: SignInEventService;
   let searchService: SearchService;
   let userService: UserService;
   let loaderService: LoaderService;
@@ -69,6 +70,7 @@ describe('Search Results component', () => {
         LoaderService,
         SearchService,
         SiteAnalyticsService,
+        SignInEventService,
         UrlInterpolationService,
         UserService,
       ],
@@ -79,7 +81,7 @@ describe('Search Results component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SearchResultsComponent);
     componentInstance = fixture.componentInstance;
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    signInEventService = TestBed.inject(SignInEventService);
     searchService = TestBed.inject(SearchService);
     userService = TestBed.inject(UserService);
     loaderService = TestBed.inject(LoaderService);
@@ -128,10 +130,12 @@ describe('Search Results component', () => {
   }));
 
   it('should redirect to login', fakeAsync(() => {
-    spyOn(siteAnalyticsService, 'registerStartLoginEvent');
+    spyOn(signInEventService.onUserSignIn, 'emit');
     componentInstance.onRedirectToLogin('login');
     tick(200);
-    expect(siteAnalyticsService.registerStartLoginEvent).toHaveBeenCalled();
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'noSearchResults'
+    );
   }));
 
   it('should get static image url', () => {

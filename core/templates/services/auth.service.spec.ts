@@ -33,7 +33,7 @@ describe('Auth service', function () {
   let creds: firebase.auth.UserCredential;
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
-  let signInEventService: jasmine.SpyObj<SignInEventService>;
+  let signInEventService: SignInEventService;
 
   beforeEach(async () => {
     angularFireAuth = jasmine.createSpyObj<AngularFireAuth>([
@@ -57,14 +57,13 @@ describe('Auth service', function () {
       providers: [
         {provide: AngularFireAuth, useValue: angularFireAuth},
         {provide: AuthBackendApiService, useValue: authBackendApiService},
-        {
-          provide: SignInEventService,
-          useValue: signInEventService,
-        },
+        SignInEventService,
       ],
     });
 
     authService = TestBed.inject(AuthService);
+    signInEventService = TestBed.inject(SignInEventService);
+    spyOn(signInEventService.onUserSignIn, 'emit');
 
     email = 'a@a.com';
     password = await md5(email);
@@ -158,7 +157,9 @@ describe('Auth service', function () {
     expect(authBackendApiService.beginSessionAsync).toHaveBeenCalledWith(
       idToken
     );
-    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalled();
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'authService'
+    );
   });
 
   it('should propogate signInWithEmailAndPassword errors', async () => {
@@ -235,9 +236,11 @@ describe('Auth service', function () {
         true
       );
 
-      expect(angularFireAuth.getRedirectResult).toHaveBeenCalled();
       expect(authBackendApiService.beginSessionAsync).toHaveBeenCalledWith(
         idToken
+      );
+      expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+        'authService'
       );
     });
 

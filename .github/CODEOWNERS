@@ -733,6 +733,7 @@
 /core/domain/taskqueue*.py @oppia/lace-backend-reviewers
 /core/templates/services/auth.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/auth-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/sign-in-event.service.ts @oppia/lace-frontend-reviewers
 
 
 # Dynamic Feature Gating project

@@ -23,6 +23,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {initializeGoogleAnalytics} from 'google-analytics.initializer';
 import {LocalStorageService} from './local-storage.service';
 import {UserService} from './user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
@@ -41,7 +42,8 @@ export class SiteAnalyticsService {
   constructor(
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
-    private userService: UserService
+    private userService: UserService,
+    private signInEventService: SignInEventService
   ) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
       // This ensures that google analytics is initialized whenever this
@@ -51,6 +53,10 @@ export class SiteAnalyticsService {
     }
 
     this._initializeLoginStatus();
+
+    this.signInEventService.onUserSignIn.subscribe((source: string) => {
+      this.registerStartLoginEvent(source);
+    });
   }
 
   private async _initializeLoginStatus(): Promise<void> {

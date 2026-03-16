@@ -23,6 +23,7 @@ import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import './post-chapter-recommendations.component.css';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
@@ -53,6 +54,7 @@ export class PostChapterRecommendationsComponent {
     private urlService: UrlService,
     private platformFeatureService: PlatformFeatureService,
     private userService: UserService,
+    private signInEventService: SignInEventService,
     private windowRef: WindowRef
   ) {}
 
@@ -76,6 +78,7 @@ export class PostChapterRecommendationsComponent {
   signIn(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
+        this.signInEventService.onUserSignIn.emit('postChapterRecommendations');
         (
           this.windowRef.nativeWindow as {location: string | Location}
         ).location = loginUrl;

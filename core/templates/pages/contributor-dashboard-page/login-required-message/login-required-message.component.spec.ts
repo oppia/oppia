@@ -26,6 +26,7 @@ import {
 
 import {LoginRequiredMessageComponent} from 'pages/contributor-dashboard-page/login-required-message/login-required-message.component';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {
   HttpClientTestingModule,
@@ -102,11 +103,16 @@ describe('Login required message component', () => {
 
   it('should go to login url when login button is clicked', fakeAsync(() => {
     spyOn(userService, 'getLoginUrlAsync').and.resolveTo('login-url');
+    const signInEventService = TestBed.inject(SignInEventService);
+    spyOn(signInEventService.onUserSignIn, 'emit');
 
     component.onLoginButtonClicked();
     flushMicrotasks();
     tick(151);
 
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'loginButton'
+    );
     expect(windowRef.nativeWindow.location.href).toBe('login-url');
   }));
 

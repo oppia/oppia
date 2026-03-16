@@ -22,6 +22,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {UserService} from 'services/user.service';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
+import {SignInEventService} from 'services/sign-in-event.service';
+import {EventEmitter} from '@angular/core';
 
 describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
@@ -30,6 +32,7 @@ describe('Site Analytics Service', () => {
   let pathname = 'pathname';
   let localStorageService: jasmine.SpyObj<LocalStorageService>;
   let userService: jasmine.SpyObj<UserService>;
+  let signInEventService: SignInEventService;
   const explorationId = 'abc1';
 
   class MockWindowRef {
@@ -48,6 +51,8 @@ describe('Site Analytics Service', () => {
       'setLastPageViewTime',
     ]);
     const userServiceSpy = jasmine.createSpyObj('UserService', ['isLoggedIn']);
+    const signInEventEventEmitter = new EventEmitter<string>();
+
     TestBed.configureTestingModule({
       providers: [
         SiteAnalyticsService,
@@ -57,10 +62,17 @@ describe('Site Analytics Service', () => {
         },
         {provide: LocalStorageService, useValue: localStorageServiceSpy},
         {provide: UserService, useValue: userServiceSpy},
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: signInEventEventEmitter,
+          },
+        },
       ],
     }).compileComponents();
 
     sas = TestBed.inject(SiteAnalyticsService);
+    signInEventService = TestBed.inject(SignInEventService);
     ws = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(
       LocalStorageService
@@ -82,6 +94,17 @@ describe('Site Analytics Service', () => {
     it('should register start login event', () => {
       const element = 'LoginEventButton';
       sas.registerStartLoginEvent(element);
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'login', {
+        source_element: 'LoginEventButton',
+        page_path: pathname,
+        login_status: 'logged_in',
+      });
+    });
+
+    it('should register start login event when a sign-in event is emitted', () => {
+      const element = 'LoginEventButton';
+      signInEventService.onUserSignIn.emit(element);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'login', {
         source_element: 'LoginEventButton',

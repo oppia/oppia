@@ -181,35 +181,34 @@ class ContributionOpportunitiesHandler(
                     this batch. If False, there are no further results after
                     this batch.
         """
-        # We want to focus attention on lessons that are part of a classroom.
-        # See issue #12221.
-        classroom_topic_ids: List[str] = []
-        classrooms = classroom_config_services.get_all_classrooms()
-        for classroom in classrooms:
-            classroom_topic_ids.extend(classroom.get_topic_ids())
-        classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
-        # Associate each skill with one classroom topic name.
+        # Fetch all topics to include skills from unpublished topics.
+        all_topics = topic_fetchers.get_all_topics()
+        # Associate each skill with its topic name.
         # TODO(#8912): Associate each skill/skill opportunity with all linked
         # topics.
-        classroom_topic_skill_id_to_topic_name = {}
-        for topic in classroom_topics:
+        skill_id_to_topic_name = {}
+        for topic in all_topics:
             if topic is None:
                 continue
-            for skill_id in topic.get_all_skill_ids():
-                classroom_topic_skill_id_to_topic_name[skill_id] = topic.name
+            # We only show skills for topics that have at least one canonical
+            # story, as these are considered 'curated' content.
+            story_count = len(topic.get_all_story_references())
+            print(
+                f"DEBUG: Topic {topic.name} (ID {topic.id}) has {story_count} stories and {len(topic.get_all_skill_ids())} skills"
+            )
+            if story_count > 0:
+                for skill_id in topic.get_all_skill_ids():
+                    skill_id_to_topic_name[skill_id] = topic.name
 
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor)
         )
         opportunities: List[ClientSideSkillOpportunityDict] = []
         # Fetch opportunities until we have at least a page's worth that
-        # correspond to a classroom or there are no more opportunities.
+        # correspond to a curated topic or there are no more opportunities.
         while len(opportunities) < constants.OPPORTUNITIES_PAGE_SIZE:
             for skill_opportunity in skill_opportunities:
-                if (
-                    skill_opportunity.id
-                    in classroom_topic_skill_id_to_topic_name
-                ):
+                if skill_opportunity.id in skill_id_to_topic_name:
                     skill_opportunity_dict = skill_opportunity.to_dict()
                     client_side_skill_opportunity_dict: (
                         ClientSideSkillOpportunityDict
@@ -221,11 +220,9 @@ class ContributionOpportunitiesHandler(
                         'question_count': skill_opportunity_dict[
                             'question_count'
                         ],
-                        'topic_name': (
-                            classroom_topic_skill_id_to_topic_name[
-                                skill_opportunity.id
-                            ]
-                        ),
+                        'topic_name': skill_id_to_topic_name[
+                            skill_opportunity.id
+                        ],
                     }
                     opportunities.append(client_side_skill_opportunity_dict)
             if (

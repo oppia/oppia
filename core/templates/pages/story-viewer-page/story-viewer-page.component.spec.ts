@@ -35,6 +35,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {PageTitleService} from 'services/page-title.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
@@ -71,6 +72,7 @@ describe('Story Viewer Page component', () => {
   let userService: UserService;
   let pageTitleService: PageTitleService;
   let windowRef: WindowRef;
+  let signInEventService: SignInEventService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
   let mockPlatformFeatureService: MockPlatformFeatureService;
@@ -106,6 +108,12 @@ describe('Story Viewer Page component', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -118,6 +126,7 @@ describe('Story Viewer Page component', () => {
     alertsService = TestBed.inject(AlertsService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     windowRef = TestBed.inject(WindowRef);
+    signInEventService = TestBed.inject(SignInEventService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     translateService = TestBed.inject(TranslateService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
@@ -398,9 +407,13 @@ describe('Story Viewer Page component', () => {
 
   it('should sign in correctly', fakeAsync(() => {
     spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/home');
+    spyOn(signInEventService.onUserSignIn, 'emit');
     component.signIn();
     flushMicrotasks();
     expect(windowRef.nativeWindow.location.href).toBe('/home');
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'storyViewerPage'
+    );
   }));
 
   it(

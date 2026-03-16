@@ -20,6 +20,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 import {UrlService} from 'services/contextual/url.service';
@@ -38,8 +39,6 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {ProgressUrlService} from '../../services/progress-url.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {SignInEventService} from 'services/sign-in-event.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -107,9 +106,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private localStorageService: LocalStorageService,
     private progressUrlService: ProgressUrlService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
+    private signInEventService: SignInEventService,
     private playerPositionService: PlayerPositionService,
-    private siteAnalyticsService: SiteAnalyticsService,
-    private signInEventService: SignInEventService
+    private siteAnalyticsService: SiteAnalyticsService
   ) {
     super(ngbActiveModal);
   }
@@ -281,12 +280,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
-      this.signInEventService.onUserSignIn.emit();
-      // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
-      // rather than manually being triggered by buttons.
-      this.siteAnalyticsService.registerStartLoginEvent(
-        'lessonInformationCardModal'
-      );
+      this.signInEventService.onUserSignIn.emit('lessonInformationCard');
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });

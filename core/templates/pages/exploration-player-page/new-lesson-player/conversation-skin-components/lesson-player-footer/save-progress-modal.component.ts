@@ -59,10 +59,7 @@ export class SaveProgressModalComponent {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
-      this.signInEventService.onUserSignIn.emit();
-      // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
-      // rather than manually being triggered by buttons.
-      this.siteAnalyticsService.registerStartLoginEvent('saveProgressModal');
+      this.signInEventService.onUserSignIn.emit('saveProgressModal');
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });

@@ -31,6 +31,7 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {AlertsService} from '../../../../services/alerts.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
+import {SignInEventService} from '../../../../services/sign-in-event.service';
 import {UserService} from '../../../../services/user.service';
 import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
 import {MockLimitToPipe} from '../templates/lesson-information-card-modal.component.spec';
@@ -64,6 +65,8 @@ describe('Ratings and recommendations component', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
+  let signInEventService: SignInEventService;
+  let windowRef: WindowRef;
 
   const mockNgbPopover = jasmine.createSpyObj('NgbPopover', [
     'close',
@@ -119,6 +122,12 @@ describe('Ratings and recommendations component', () => {
         TopicViewerBackendApiService,
         LocalStorageService,
         {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
+        {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
@@ -146,6 +155,8 @@ describe('Ratings and recommendations component', () => {
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    signInEventService = TestBed.inject(SignInEventService);
+    windowRef = TestBed.inject(WindowRef);
   });
 
   it(
@@ -366,12 +377,16 @@ describe('Ratings and recommendations component', () => {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve('login_url')
     );
+    spyOn(signInEventService.onUserSignIn, 'emit');
 
     componentInstance.signIn('.sign-in-button');
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
     expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'ratingsAndRecommendations'
+    );
   }));
 
   it(

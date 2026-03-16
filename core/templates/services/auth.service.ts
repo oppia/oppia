@@ -138,6 +138,7 @@ export class AuthService {
     if (creds?.user) {
       const idToken = await creds.user.getIdToken();
       await this.authBackendApiService.beginSessionAsync(idToken);
+      this.signInEventService.onUserSignIn.emit('authService');
       return true;
     } else {
       return false;
@@ -186,7 +187,7 @@ export class AuthService {
     if (this.creds?.user !== null) {
       const idToken = await this.creds.user.getIdToken();
       await this.authBackendApiService.beginSessionAsync(idToken);
-      this.signInEventService.onUserSignIn.emit();
+      this.signInEventService.onUserSignIn.emit('authService');
     }
   }
 

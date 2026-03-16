@@ -23,6 +23,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {LoaderService} from 'services/loader.service';
 import {SearchService} from 'services/search.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
 
 @Component({
@@ -39,6 +40,7 @@ export class SearchResultsComponent {
     private loaderService: LoaderService,
     private searchService: SearchService,
     private siteAnalyticsService: SiteAnalyticsService,
+    private signInEventService: SignInEventService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService
   ) {}
@@ -48,7 +50,7 @@ export class SearchResultsComponent {
   }
 
   onRedirectToLogin(destinationUrl: string): boolean {
-    this.siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+    this.signInEventService.onUserSignIn.emit('noSearchResults');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = destinationUrl;
     }, 150);

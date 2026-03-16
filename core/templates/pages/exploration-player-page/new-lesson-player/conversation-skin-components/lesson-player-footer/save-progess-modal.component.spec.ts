@@ -33,6 +33,8 @@ import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SignInEventService} from 'services/sign-in-event.service';
+import {EventEmitter} from '@angular/core';
 
 class MockWindowRef {
   nativeWindow = {
@@ -74,6 +76,7 @@ describe('SaveProgressModalComponent', () => {
   let localStorageService: LocalStorageService;
   let ngbActiveModal: NgbActiveModal;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let signInEventService: SignInEventService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -83,6 +86,12 @@ describe('SaveProgressModalComponent', () => {
         UserService,
         LocalStorageService,
         I18nLanguageCodeService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         {
           provide: NgbActiveModal,
           useValue: {
@@ -110,6 +119,7 @@ describe('SaveProgressModalComponent', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    signInEventService = TestBed.inject(SignInEventService);
     mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
   });
 
@@ -147,6 +157,7 @@ describe('SaveProgressModalComponent', () => {
       Promise.resolve(loginUrl)
     );
     spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
+    spyOn(signInEventService.onUserSignIn, 'emit');
 
     componentInstance.loggedOutProgressUniqueUrlId = uniqueUrlId;
 
@@ -159,6 +170,9 @@ describe('SaveProgressModalComponent', () => {
     expect(
       localStorageService.updateUniqueProgressIdOfLoggedOutLearner
     ).toHaveBeenCalledWith(uniqueUrlId);
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'saveProgressModal'
+    );
     expect(mockWindowRef.nativeWindow.location.href).toEqual(loginUrl);
   }));
 

@@ -25,7 +25,9 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {EventEmitter} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {RegistrationSessionExpiredModalComponent} from './registration-session-expired-modal.component';
@@ -44,6 +46,7 @@ describe('Registration Session Expired Modal Component', () => {
   let componentInstance: RegistrationSessionExpiredModalComponent;
   let userService: UserService;
   let windowRef: WindowRef;
+  let signInEventService: SignInEventService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -56,6 +59,12 @@ describe('Registration Session Expired Modal Component', () => {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
     }).compileComponents();
   }));
@@ -65,6 +74,7 @@ describe('Registration Session Expired Modal Component', () => {
     componentInstance = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     windowRef = TestBed.inject(WindowRef);
+    signInEventService = TestBed.inject(SignInEventService);
   });
 
   it('should be defined', () => {
@@ -75,9 +85,13 @@ describe('Registration Session Expired Modal Component', () => {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve('login_url')
     );
+    spyOn(signInEventService.onUserSignIn, 'emit');
     componentInstance.continueRegistration();
     tick();
     tick(200);
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'registrationSessionExpiredModal'
+    );
   }));
 
   it('should reload page when login url is not available', fakeAsync(() => {

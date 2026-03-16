@@ -21,7 +21,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
 import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import {AppConstants} from 'app.constants';
@@ -39,7 +39,7 @@ export class CreateActivityButtonComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private siteAnalyticsService: SiteAnalyticsService,
+    private signInEventService: SignInEventService,
     private urlService: UrlService,
     private explorationCreationService: ExplorationCreationService,
     private ngbModal: NgbModal,
@@ -47,7 +47,7 @@ export class CreateActivityButtonComponent implements OnInit {
   ) {}
 
   onRedirectToLogin(destinationUrl: string): boolean {
-    this.siteAnalyticsService.registerStartLoginEvent('createActivityButton');
+    this.signInEventService.onUserSignIn.emit('createActivityButton');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = destinationUrl;
     }, 150);

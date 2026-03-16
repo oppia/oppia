@@ -34,11 +34,11 @@ import {UrlService} from '../../../../services/contextual/url.service';
 import {UserService} from '../../../../services/user.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {SignInEventService} from '../../../../services/sign-in-event.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {LessonInformationCardModalComponent} from './lesson-information-card-modal.component';
-import {SignInEventService} from 'services/sign-in-event.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {DateTimeFormatService} from '../../../../services/date-time-format.service';
 import {ProgressUrlService} from '../../services/progress-url.service';
@@ -102,7 +102,7 @@ class MockPlayerPositionService {
 }
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string>();
 }
 
 class MockWindowRef {
@@ -151,6 +151,7 @@ describe('Lesson Information card modal component', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let explorationEngineService: ExplorationEngineService;
   let explorationModeService: ExplorationModeService;
+  let signInEventService: SignInEventService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -248,6 +249,7 @@ describe('Lesson Information card modal component', () => {
       CheckpointCelebrationUtilityService
     );
     explorationModeService = TestBed.inject(ExplorationModeService);
+    signInEventService = TestBed.inject(SignInEventService);
 
     spyOn(
       i18nLanguageCodeService,
@@ -509,6 +511,7 @@ describe('Lesson Information card modal component', () => {
       Promise.resolve('https://oppia.org/login')
     );
     spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
+    spyOn(signInEventService.onUserSignIn, 'emit');
     componentInstance.loggedOutProgressUniqueUrlId = 'abcdef';
 
     expect(mockWindowRef.nativeWindow.location.href).toEqual('');
@@ -519,6 +522,9 @@ describe('Lesson Information card modal component', () => {
     expect(
       localStorageService.updateUniqueProgressIdOfLoggedOutLearner
     ).toHaveBeenCalledWith('abcdef');
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'lessonInformationCard'
+    );
     expect(mockWindowRef.nativeWindow.location.href).toEqual(
       'https://oppia.org/login'
     );

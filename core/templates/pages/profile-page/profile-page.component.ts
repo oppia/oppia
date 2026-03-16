@@ -27,6 +27,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {ProfilePageBackendApiService} from './profile-page-backend-api.service';
 
 import './profile-page.component.css';
@@ -92,6 +93,7 @@ export class ProfilePageComponent {
     private profilePageBackendApiService: ProfilePageBackendApiService,
     private ratingComputationService: RatingComputationService,
     private userService: UserService,
+    private signInEventService: SignInEventService,
     private windowRef: WindowRef
   ) {}
 
@@ -180,6 +182,7 @@ export class ProfilePageComponent {
     if (this.userNotLoggedIn) {
       this.userService.getLoginUrlAsync().then(loginUrl => {
         if (loginUrl) {
+          this.signInEventService.onUserSignIn.emit('profilePage');
           this.windowRef.nativeWindow.location.href = loginUrl;
         } else {
           this.windowRef.nativeWindow.location.reload();

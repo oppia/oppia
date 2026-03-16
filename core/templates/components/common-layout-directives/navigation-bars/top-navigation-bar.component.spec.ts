@@ -95,7 +95,7 @@ class MockWindowRef {
 }
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string>();
 }
 
 describe('TopNavigationBarComponent', () => {
@@ -118,6 +118,7 @@ describe('TopNavigationBarComponent', () => {
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
+  let signInEventService: SignInEventService;
   let threadSummaryList = [
     {
       status: 'open',
@@ -221,6 +222,7 @@ describe('TopNavigationBarComponent', () => {
     );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    signInEventService = TestBed.inject(SignInEventService);
 
     spyOn(searchService, 'onSearchBarLoaded').and.returnValue(
       new EventEmitter<string>()
@@ -321,19 +323,19 @@ describe('TopNavigationBarComponent', () => {
   }));
 
   it(
-    'should register start login event when user is being redirected to' +
+    'should emit sign in event when user is being redirected to' +
       ' the login page',
     fakeAsync(() => {
       spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
-      spyOn(siteAnalyticsService, 'registerStartLoginEvent');
+      spyOn(signInEventService.onUserSignIn, 'emit');
 
       component.onLoginButtonClicked();
       tick(151);
 
       fixture.whenStable().then(() => {
-        expect(
-          siteAnalyticsService.registerStartLoginEvent
-        ).toHaveBeenCalledWith('loginButton');
+        expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+          'loginButton'
+        );
       });
     })
   );

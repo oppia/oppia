@@ -31,6 +31,8 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlatformFeatureService} from '../../services/platform-feature.service';
 import {UserService} from '../../services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SignInEventService} from 'services/sign-in-event.service';
+import {EventEmitter} from '@angular/core';
 
 class MockPlatformFeatureService {
   status = {
@@ -59,6 +61,7 @@ describe('End chapter check mark component', function () {
   let mockWindowRef: MockWindowRef;
   let userService: UserService;
   let urlService: UrlService;
+  let signInEventService: SignInEventService;
 
   beforeEach(waitForAsync(() => {
     mockPlatformFeatureService = new MockPlatformFeatureService();
@@ -78,6 +81,12 @@ describe('End chapter check mark component', function () {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
     }).compileComponents();
   }));
@@ -88,6 +97,7 @@ describe('End chapter check mark component', function () {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
+    signInEventService = TestBed.inject(SignInEventService);
   });
 
   it('should get static image url', () => {
@@ -107,11 +117,15 @@ describe('End chapter check mark component', function () {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve('login_url')
     );
+    spyOn(signInEventService.onUserSignIn, 'emit');
 
     component.signIn();
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'postChapterRecommendations'
+    );
     expect(mockWindowRef.nativeWindow.location).toBe('login_url');
   }));
 

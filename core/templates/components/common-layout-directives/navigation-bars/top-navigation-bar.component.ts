@@ -30,6 +30,7 @@ import {
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import debounce from 'lodash/debounce';
@@ -50,7 +51,6 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
-import {SignInEventService} from 'services/sign-in-event.service';
 
 import './top-navigation-bar.component.css';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
@@ -206,6 +206,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,
     private siteAnalyticsService: SiteAnalyticsService,
+    private signInEventService: SignInEventService,
     private userService: UserService,
     private deviceInfoService: DeviceInfoService,
     private windowDimensionsService: WindowDimensionsService,
@@ -216,7 +217,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private platformFeatureService: PlatformFeatureService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private languageBannerService: LanguageBannerService,
-    private signInEventService: SignInEventService,
     private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
@@ -475,10 +475,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
-        this.signInEventService.onUserSignIn.emit();
-        // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
-        // rather than manually being triggered by buttons.
-        this.siteAnalyticsService.registerStartLoginEvent('loginButton');
+        this.signInEventService.onUserSignIn.emit('loginButton');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;
         }, 150);

@@ -31,6 +31,7 @@ export class PreventPageUnloadEventService {
     this: Window,
     ev: BeforeUnloadEvent
   ) => void;
+
   constructor(
     private windowRef: WindowRef,
     private signInEventService: SignInEventService

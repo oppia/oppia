@@ -23,11 +23,12 @@ import {EventEmitter} from '@angular/core';
 import {SignInEventService} from 'services/sign-in-event.service';
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string>();
 }
 
 describe('Prevent page unload event service', function () {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let signInEventService: SignInEventService;
   let windowRef: WindowRef;
   let mockSignInEventService: MockSignInEventService;
 
@@ -50,6 +51,7 @@ describe('Prevent page unload event service', function () {
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
     );
+    signInEventService = TestBed.inject(SignInEventService);
     windowRef = TestBed.inject(WindowRef);
   });
 
@@ -155,8 +157,17 @@ describe('Prevent page unload event service', function () {
 
   it('should remove listener on sign in', () => {
     spyOn(preventPageUnloadEventService, 'removeListener');
-    mockSignInEventService.onUserSignIn.emit();
+    mockSignInEventService.onUserSignIn.emit('test');
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+  });
+
+  it('should remove listener when sign in event occurs', () => {
+    preventPageUnloadEventService.addListener();
+    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
+
+    signInEventService.onUserSignIn.emit('test');
+
+    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
   });
 });

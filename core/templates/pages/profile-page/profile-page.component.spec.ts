@@ -29,7 +29,9 @@ import {ProfilePageBackendApiService} from './profile-page-backend-api.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {EventEmitter} from '@angular/core';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -52,6 +54,7 @@ describe('Profile page', () => {
   let mockWindowRef: MockWindowRef;
   let profilePageBackendApiService: ProfilePageBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let signInEventService: SignInEventService;
 
   let profileData = UserProfile.createFromBackendDict({
     username: '',
@@ -163,6 +166,12 @@ describe('Profile page', () => {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -200,6 +209,7 @@ describe('Profile page', () => {
       'default-image-url-png',
       'default-image-url-webp',
     ]);
+    signInEventService = TestBed.inject(SignInEventService);
   });
 
   afterEach(() => {
@@ -244,12 +254,16 @@ describe('Profile page', () => {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve(loginUrl)
     );
+    spyOn(signInEventService.onUserSignIn, 'emit');
 
     componentInstance.ngOnInit();
     tick();
     componentInstance.changeSubscriptionStatus();
     tick();
     expect(mockWindowRef.nativeWindow.location.href).toBe(loginUrl);
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
+      'profilePage'
+    );
   }));
 
   it(

@@ -26,6 +26,7 @@ import {AlertsService} from 'services/alerts.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
@@ -105,6 +106,7 @@ export class RatingsAndRecommendationsComponent {
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private assetsBackendApiService: AssetsBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
+    private signInEventService: SignInEventService,
     private explorationModeService: ExplorationModeService
   ) {}
 
@@ -194,6 +196,7 @@ export class RatingsAndRecommendationsComponent {
     this.siteAnalyticsService.registerNewSignupEvent(srcElement);
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
+        this.signInEventService.onUserSignIn.emit('ratingsAndRecommendations');
         (
           this.windowRef.nativeWindow as {location: string | Location}
         ).location = loginUrl;
