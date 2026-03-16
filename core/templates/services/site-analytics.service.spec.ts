@@ -1079,5 +1079,17 @@ describe('Site Analytics Service', () => {
         login_status: 'logged_in',
       });
     });
+
+    it('should register campaign page Donate CTA button click event', () => {
+      sas.registeCampaignBannerDonateButtonClick();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'campaign_page_donate_button_click',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
   });
 });

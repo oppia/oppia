@@ -642,6 +642,12 @@ export class SiteAnalyticsService {
     });
   }
 
+  registeCampaignBannerDonateButtonClick(): void {
+    this._sendEventToGoogleAnalytics('campaign_page_donate_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
   registerClickFooterButtonEvent(
     buttonName: NavbarAndFooterGATrackingPages
   ): void {

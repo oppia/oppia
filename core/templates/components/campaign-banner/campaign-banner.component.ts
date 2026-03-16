@@ -20,7 +20,9 @@ import {Component, OnInit} from '@angular/core';
 import './campaign-banner.component.css';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {AppConstants} from 'app.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'campaign-banner',
@@ -29,8 +31,10 @@ import {AppConstants} from 'app.constants';
 })
 export class CampaignBannerComponent implements OnInit {
   constructor(
+    private windowRef: WindowRef,
     private platformFeaturesService: PlatformFeatureService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   shouldShowBanner = false;
@@ -109,6 +113,12 @@ export class CampaignBannerComponent implements OnInit {
   closeBanner(): void {
     localStorage.setItem(this.STORAGE_KEY, Date.now().toString());
     this.computeBannerVisibility();
+  }
+
+  navigateToDonatePage(): void {
+    this.siteAnalyticsService.registeCampaignBannerDonateButtonClick();
+    this.windowRef.nativeWindow.location.href = '/donate';
+    this.closeBanner();
   }
 
   isLanguageEnglish(): boolean {

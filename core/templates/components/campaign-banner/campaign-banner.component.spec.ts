@@ -23,6 +23,8 @@ import {CampaignBannerComponent} from './campaign-banner.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AppConstants} from 'app.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 interface CampaignConfig {
   startDate: Date;
@@ -48,12 +50,29 @@ class MockPlatformFeatureService {
   };
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/learn/math',
+      href: '',
+    },
+    gtag: () => {},
+  };
+}
+
+class MockSiteAnalyticsService {
+  registeCampaignBannerDonateButtonClick(): void {}
+}
+
 describe('CampaignBannerComponent', () => {
   let component: CampaignBannerComponent;
   let fixture: ComponentFixture<CampaignBannerComponent>;
   let platformFeatureService: MockPlatformFeatureService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let mockWindowRef: MockWindowRef;
 
   beforeEach(async () => {
+    mockWindowRef = new MockWindowRef();
     await TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [CampaignBannerComponent],
@@ -66,6 +85,14 @@ describe('CampaignBannerComponent', () => {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService,
         },
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef,
+        },
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService,
+        },
       ],
     }).compileComponents();
 
@@ -75,7 +102,7 @@ describe('CampaignBannerComponent', () => {
     platformFeatureService = TestBed.inject(
       PlatformFeatureService
     ) as unknown as MockPlatformFeatureService;
-
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     spyOn(localStorage, 'getItem').and.callFake((key: string) => {
       if (key === 'lang') {
         return 'en';
@@ -249,5 +276,17 @@ describe('CampaignBannerComponent', () => {
     component.computeBannerVisibility();
 
     expect(component.shouldShowBanner).toBe(true);
+  });
+  it('should navigate to donate page and register analytics event', () => {
+    spyOn(siteAnalyticsService, 'registeCampaignBannerDonateButtonClick');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToDonatePage();
+
+    expect(
+      siteAnalyticsService.registeCampaignBannerDonateButtonClick
+    ).toHaveBeenCalled();
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/donate');
   });
 });
