@@ -54,10 +54,9 @@ describe('BaseUser.captureScreenshotsForFailedTest', () => {
 
   it('should skip screenshots for closed pages without throwing', async () => {
     const user = new BaseUser();
-    const pageMock = {
-      isClosed: jest.fn().mockReturnValue(true),
-      screenshot: jest.fn(),
-    } as Page;
+    const pageMock = {} as Page;
+    pageMock.isClosed = jest.fn().mockReturnValue(true);
+    pageMock.screenshot = jest.fn();
     user.page = pageMock;
     user.username = 'test-user';
 
@@ -73,10 +72,11 @@ describe('BaseUser.captureScreenshotsForFailedTest', () => {
 
   it('should log screenshot errors without failing', async () => {
     const user = new BaseUser();
-    const pageMock = {
-      isClosed: jest.fn().mockReturnValue(false),
-      screenshot: jest.fn().mockRejectedValue(new Error('Target closed')),
-    } as Page;
+    const pageMock = {} as Page;
+    pageMock.isClosed = jest.fn().mockReturnValue(false);
+    pageMock.screenshot = jest
+      .fn()
+      .mockRejectedValue(new Error('Target closed'));
     user.page = pageMock;
 
     await expect(
