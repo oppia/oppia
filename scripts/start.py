@@ -29,7 +29,19 @@ import time
 from core import feconf
 
 
-from typing import Callable, ContextManager, Iterator, List, Optional, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    ContextManager,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+)
+
+if TYPE_CHECKING:
+    import psutil
+
 
 from . import (
     build,
@@ -39,11 +51,13 @@ from . import (
     servers,
 )
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run the script from the oppia root folder:
     python -m scripts.start
 Note that the root folder MUST be named 'oppia'.
-""")
+"""
+)
 _PARSER.add_argument(
     '--save_datastore',
     help='optional; if specified, does not clear the datastore.',
@@ -192,7 +206,7 @@ def start_services(
     parsed_args: argparse.Namespace, stack: contextlib.ExitStack
 ) -> psutil.Process:
     """Starts all the required services and returns the dev appserver."""
-    import psutil
+    import psutil  # pylint: disable=import-outside-toplevel
 
     stack.enter_context(servers.managed_redis_server())
     stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -241,7 +255,7 @@ def attempt_launch_browser(
     ],
 ) -> None:
     """Attempts to launch the web browser."""
-    import psutil
+    import psutil  # pylint: disable=import-outside-toplevel
 
     # Try to launch browser with timeout.
     last_error: Optional[Exception] = None
