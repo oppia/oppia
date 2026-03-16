@@ -877,17 +877,28 @@ class ElasticSearchStub:
         if terms:
             filtered_docs = []
             for term in terms:
-                for _, v in term.items():
-                    values = v['query'].split(' ')
-                    for doc in result_docs:
-                        strs = [
-                            val for val in doc.values() if isinstance(val, str)
-                        ]
-                        words = []
-                        for s in strs:
-                            words += s.split(' ')
-                        if all(value in words for value in values):
-                            filtered_docs.append(doc)
+                if 'bool' in term:
+                    should_clauses = term['bool']['should']
+                else:
+                    should_clauses = [term]
+
+                for doc in result_docs:
+                    strs = [val for val in doc.values() if isinstance(val, str)]
+                    words = []
+                    for s in strs:
+                        words += s.split(' ')
+
+                    first_clause = should_clauses[0]
+                    values = next(iter(first_clause.values()))['query'].split()
+                    doc_matches = False
+                    for v in values:
+                        for w in words:
+                            if len(v) >= 3 and (v in w or w in v):
+                                doc_matches = True
+                                break
+
+                    if doc_matches:
+                        filtered_docs.append(doc)
             result_docs = filtered_docs
 
         formatted_result_docs: List[ResultDocumentDict] = [

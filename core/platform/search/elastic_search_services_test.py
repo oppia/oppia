@@ -215,7 +215,28 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 {
                     'query': {
                         'bool': {
-                            'must': [{'multi_match': {'query': 'query'}}],
+                            'must': [
+                                {
+                                    'bool': {
+                                        'should': [
+                                            {
+                                                'multi_match': {
+                                                    'query': 'query',
+                                                    'fuzziness': 'AUTO',
+                                                    'prefix_length': 1,
+                                                    'max_expansions': 50,
+                                                }
+                                            },
+                                            {
+                                                'multi_match': {
+                                                    'query': 'query',
+                                                    'type': 'phrase_prefix',
+                                                }
+                                            },
+                                        ]
+                                    }
+                                }
+                            ],
                             'filter': [
                                 {
                                     'match': {
@@ -387,9 +408,31 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                         'bool': {
                             'must': [
                                 {
-                                    'multi_match': {
-                                        'query': 'query',
-                                        'fields': ['title', 'summary'],
+                                    'bool': {
+                                        'should': [
+                                            {
+                                                'multi_match': {
+                                                    'query': 'query',
+                                                    'fields': [
+                                                        'title',
+                                                        'summary',
+                                                    ],
+                                                    'fuzziness': 'AUTO',
+                                                    'prefix_length': 1,
+                                                    'max_expansions': 50,
+                                                }
+                                            },
+                                            {
+                                                'multi_match': {
+                                                    'query': 'query',
+                                                    'fields': [
+                                                        'title',
+                                                        'summary',
+                                                    ],
+                                                    'type': 'phrase_prefix',
+                                                }
+                                            },
+                                        ]
                                     }
                                 }
                             ],
@@ -470,3 +513,202 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(result, [])
         self.assertEqual(new_offset, None)
+
+    def test_search_returns_result_for_all_prefixes_of_word(self) -> None:
+        elastic_search_services.add_documents_to_index(
+            [{'id': 'exp_chemistry', 'title': 'chemistry basics'}],
+            'explorations',
+        )
+        word = 'chemistry'
+        for i in range(3, len(word) + 1):
+            prefix = word[:i]
+            results, _ = elastic_search_services.search(
+                prefix, 'explorations', [], []
+            )
+            self.assertIn(
+                'exp_chemistry',
+                results,
+                msg='Expected exp_chemistry in results for prefix "%s"'
+                % prefix,
+            )
+
+    def test_search_does_not_return_result_for_unrelated_query(self) -> None:
+        elastic_search_services.add_documents_to_index(
+            [{'id': 'exp_chemistry', 'title': 'chemistry basics'}],
+            'explorations',
+        )
+        results, _ = elastic_search_services.search(
+            'physics', 'explorations', [], []
+        )
+        self.assertNotIn('exp_chemistry', results)
+
+    def test_search_does_not_return_result_for_query_below_min_length(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [{'id': 'exp_chemistry', 'title': 'chemistry basics'}],
+            'explorations',
+        )
+        for short_query in ['c', 'ch']:
+            results, _ = elastic_search_services.search(
+                short_query, 'explorations', [], []
+            )
+            self.assertNotIn(
+                'exp_chemistry',
+                results,
+                msg='Expected no results for short query "%s"' % short_query,
+            )
+
+    def test_blog_post_search_returns_result_for_all_prefixes_of_word(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [
+                {
+                    'id': 'blog_algo',
+                    'title': 'algorithm basics',
+                    'summary': 'introduction to algorithms',
+                }
+            ],
+            search_services.SEARCH_INDEX_BLOG_POSTS,
+        )
+        word = 'algorithm'
+        for i in range(3, len(word) + 1):
+            prefix = word[:i]
+            results, _ = elastic_search_services.blog_post_summaries_search(
+                prefix, []
+            )
+            self.assertIn(
+                'blog_algo',
+                results,
+                msg='Expected blog_algo in results for prefix "%s"' % prefix,
+            )
+
+    def test_blog_post_search_does_not_return_result_for_unrelated_query(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [
+                {
+                    'id': 'blog_algo',
+                    'title': 'algorithm basics',
+                    'summary': 'introduction to algorithms',
+                }
+            ],
+            search_services.SEARCH_INDEX_BLOG_POSTS,
+        )
+        results, _ = elastic_search_services.blog_post_summaries_search(
+            'cooking', []
+        )
+        self.assertNotIn('blog_algo', results)
+
+    def test_blog_post_search_does_not_return_result_for_query_below_min_length(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [
+                {
+                    'id': 'blog_algo',
+                    'title': 'algorithm basics',
+                    'summary': 'introduction to algorithms',
+                }
+            ],
+            search_services.SEARCH_INDEX_BLOG_POSTS,
+        )
+        for short_query in ['a', 'al']:
+            results, _ = elastic_search_services.blog_post_summaries_search(
+                short_query, []
+            )
+            self.assertNotIn(
+                'blog_algo',
+                results,
+                msg='Expected no results for short query "%s"' % short_query,
+            )
+
+    def test_search_returns_result_for_mixed_case_query(self) -> None:
+        elastic_search_services.add_documents_to_index(
+            [{'id': 'exp_chemistry', 'title': 'chemistry basics'}],
+            'explorations',
+        )
+        results, _ = elastic_search_services.search(
+            'ChEmIsTrY', 'explorations', [], []
+        )
+        self.assertIn('exp_chemistry', results)
+
+    def test_search_returns_result_for_query_with_surrounding_whitespace(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [{'id': 'exp_chemistry', 'title': 'chemistry basics'}],
+            'explorations',
+        )
+        results, _ = elastic_search_services.search(
+            '  chemistry  ', 'explorations', [], []
+        )
+        self.assertIn('exp_chemistry', results)
+
+    def test_blog_post_search_returns_result_for_mixed_case_query(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [
+                {
+                    'id': 'blog_algo',
+                    'title': 'algorithm basics',
+                    'summary': 'introduction to algorithms',
+                }
+            ],
+            search_services.SEARCH_INDEX_BLOG_POSTS,
+        )
+        results, _ = elastic_search_services.blog_post_summaries_search(
+            'AlGoRiThM', []
+        )
+        self.assertIn('blog_algo', results)
+
+    def test_blog_post_search_returns_result_for_query_with_surrounding_whitespace(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [
+                {
+                    'id': 'blog_algo',
+                    'title': 'algorithm basics',
+                    'summary': 'introduction to algorithms',
+                }
+            ],
+            search_services.SEARCH_INDEX_BLOG_POSTS,
+        )
+        results, _ = elastic_search_services.blog_post_summaries_search(
+            '  algorithm  ', []
+        )
+        self.assertIn('blog_algo', results)
+
+    def test_search_does_not_raise_error_for_special_character_query(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [{'id': 'exp_chemistry', 'title': 'chemistry basics'}],
+            'explorations',
+        )
+        results, _ = elastic_search_services.search(
+            '@#$%', 'explorations', [], []
+        )
+        self.assertNotIn('exp_chemistry', results)
+
+    def test_blog_post_search_does_not_raise_error_for_special_character_query(
+        self,
+    ) -> None:
+        elastic_search_services.add_documents_to_index(
+            [
+                {
+                    'id': 'blog_algo',
+                    'title': 'algorithm basics',
+                    'summary': 'introduction to algorithms',
+                }
+            ],
+            search_services.SEARCH_INDEX_BLOG_POSTS,
+        )
+        results, _ = elastic_search_services.blog_post_summaries_search(
+            '@#$%', []
+        )
+        self.assertNotIn('blog_algo', results)

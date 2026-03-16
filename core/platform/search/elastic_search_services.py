@@ -255,6 +255,73 @@ def clear_index(index_name: str) -> None:
     )
 
 
+# Here we use type Any because the query_definition is a dictionary having
+# values of various types.
+# This can be seen from the type stubs of elastic search.
+def _build_query_must_clause(
+    query_string: str,
+    fields: Optional[List[str]] = None,
+) -> List[Dict[str, Any]]:
+    """Builds the must clause for an Elasticsearch bool query.
+
+    Fuzzy and phrase_prefix matching are only applied for queries of 3 or
+    more characters to avoid overly broad results for very short queries.
+
+    Args:
+        query_string: str. The search query string.
+        fields: list(str)|None. Optional list of fields to restrict the
+            search to. If None, all indexed fields are searched.
+
+    Returns:
+        list(dict). The must clause list to assign to
+        query_definition['query']['bool']['must'].
+    """
+    # Normalize to lowercase so that mixed-case queries (e.g. "ChEmIsTrY")
+    # match indexed content regardless of case.
+    query_string = query_string.lower()
+    # Fuzzy and prefix matching are only applied for queries of 3+ characters
+    # to avoid overly broad results for very short queries (e.g. single letters
+    # would match almost everything).
+    if len(query_string.strip()) >= 3:
+        # Here we use type Any because the query dictionaries have values of
+        # various types (str, int, list). This can be seen from the type stubs
+        # of elastic search.
+        fuzzy_query: Dict[str, Any] = {
+            'query': query_string,
+            'fuzziness': 'AUTO',
+            'prefix_length': 1,
+            'max_expansions': 50,
+        }
+        # Here we use type Any because the query dictionaries have values of
+        # various types (str, int, list). This can be seen from the type stubs
+        # of elastic search.
+        phrase_prefix_query: Dict[str, Any] = {
+            'query': query_string,
+            'type': 'phrase_prefix',
+        }
+        if fields is not None:
+            fuzzy_query['fields'] = fields
+            phrase_prefix_query['fields'] = fields
+        return [
+            {
+                'bool': {
+                    'should': [
+                        {'multi_match': fuzzy_query},
+                        {'multi_match': phrase_prefix_query},
+                    ]
+                }
+            }
+        ]
+    else:
+        # Here we use type Any because the query dictionaries have values of
+        # various types (str, int, list). This can be seen from the type stubs
+        # of elastic search.
+        basic_query: Dict[str, Any] = {'query': query_string}
+        if fields is not None:
+            basic_query['fields'] = fields
+        return [{'multi_match': basic_query}]
+
+
 def search(
     query_string: str,
     index_name: str,
@@ -323,13 +390,9 @@ def search(
         ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [
-            {
-                'multi_match': {
-                    'query': query_string,
-                }
-            }
-        ]
+        query_definition['query']['bool']['must'] = _build_query_must_clause(
+            query_string
+        )
     if categories:
         category_string = ' '.join(['"%s"' % cat for cat in categories])
         query_definition['query']['bool']['filter'].append(
@@ -408,14 +471,9 @@ def blog_post_summaries_search(
         ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [
-            {
-                'multi_match': {
-                    'query': query_string,
-                    'fields': ['title', 'summary'],
-                }
-            }
-        ]
+        query_definition['query']['bool']['must'] = _build_query_must_clause(
+            query_string, fields=['title', 'summary']
+        )
     if tags:
         for tag in tags:
             query_definition['query']['bool']['filter'].append(
