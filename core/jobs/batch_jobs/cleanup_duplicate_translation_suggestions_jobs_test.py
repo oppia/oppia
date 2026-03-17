@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2024 The Oppia Authors. All Rights Reserved.
+# Copyright 2026 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,7 +71,13 @@ class AuditDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
         )
         self.put_multi([suggestion1, suggestion2])
 
-        self.assert_job_output_is_empty()
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'
+                ),
+            ]
+        )
 
     def test_duplicates_are_reported(self) -> None:
         suggestion1 = self.create_model(
@@ -110,6 +116,12 @@ class AuditDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult.as_stdout(
                     'Duplicates found for exploration exp1, language hi, '
                     'content_id content1. Suggestion IDs: [\'suggestion1\', \'suggestion2\']'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='REJECTED DUPLICATE SUGGESTIONS COUNT SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'
                 ),
             ]
         )
@@ -194,10 +206,17 @@ class CleanupDuplicateTranslationSuggestionsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'
+                    stdout='DUPLICATE GROUPS COUNT SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Duplicates found for exploration exp1, language hi, '
+                    'content_id content1. Suggestion IDs: [\'suggestion1\', \'suggestion2\']'
                 ),
                 job_run_result.JobRunResult(
                     stdout='REJECTED DUPLICATE SUGGESTIONS COUNT SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'
                 ),
             ]
         )

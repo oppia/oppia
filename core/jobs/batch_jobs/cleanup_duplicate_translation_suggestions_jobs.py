@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2024 The Oppia Authors. All Rights Reserved.
+# Copyright 2026 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,80 +35,10 @@ if MYPY:  # pragma: no cover
 (suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
-class AuditDuplicateTranslationSuggestionsJob(base_jobs.JobBase):
-    """Job that audits duplicate translation suggestions."""
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of audit results.
-
-        Returns:
-            PCollection. A PCollection of the audit results.
-        """
-        suggestions_grouped_by_content = (
-            self.pipeline
-            | 'Get all translation suggestions in review'
-            >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False
-                )
-                .filter(
-                    suggestion_models.GeneralSuggestionModel.suggestion_type
-                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                )
-                .filter(
-                    suggestion_models.GeneralSuggestionModel.status
-                    == suggestion_models.STATUS_IN_REVIEW
-                )
-            )
-            | 'Key by target_id, language_code, and content_id'
-            >> beam.Map(
-                lambda model: (
-                    (
-                        model.target_id,
-                        model.language_code,
-                        model.change_cmd['content_id'],
-                    ),
-                    model,
-                )
-            )
-            | 'Group by content' >> beam.GroupByKey()
-        )
-
-        duplicate_suggestions_report = (
-            suggestions_grouped_by_content
-            | 'Filter duplicates' >> beam.Filter(lambda item: len(item[1]) > 1)
-            | 'Report duplicates'
-            >> beam.Map(
-                lambda item: job_run_result.JobRunResult.as_stdout(
-                    f'Duplicates found for exploration {item[0][0]}, '
-                    f'language {item[0][1]}, content_id {item[0][2]}. '
-                    f'Suggestion IDs: {[m.id for m in item[1]]}'
-                )
-            )
-        )
-
-        duplicate_groups_count = (
-            suggestions_grouped_by_content
-            | 'Filter only duplicate groups'
-            >> beam.Filter(lambda item: len(item[1]) > 1)
-            | 'Count duplicate groups'
-            >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'DUPLICATE GROUPS COUNT'
-                )
-            )
-            | 'Filter non-zero counts'
-            >> beam.Filter(lambda result: 'SUCCESS: 0' not in result.stdout)
-        )
-
-        return (
-            duplicate_suggestions_report,
-            duplicate_groups_count,
-        ) | 'Combine results' >> beam.Flatten()
-
-
 class CleanupDuplicateTranslationSuggestionsJob(base_jobs.JobBase):
     """Job that cleans up duplicate translation suggestions."""
+
+    DATASTORE_UPDATES_ALLOWED = True
 
     @staticmethod
     def _reject_extra_suggestions(
@@ -177,11 +107,42 @@ class CleanupDuplicateTranslationSuggestionsJob(base_jobs.JobBase):
                 )
             )
             | 'Group by content' >> beam.GroupByKey()
+            | 'Convert values to list'
+            >> beam.Map(lambda item: (item[0], list(item[1])))
+        )
+
+        duplicate_suggestions = (
+            suggestions_grouped_by_content
+            | 'Filter only duplicate groups'
+            >> beam.Filter(lambda item: len(item[1]) > 1)
+        )
+
+        duplicate_suggestions_report = (
+            duplicate_suggestions
+            | 'Report duplicates'
+            >> beam.Map(
+                lambda item: job_run_result.JobRunResult.as_stdout(
+                    f'Duplicates found for exploration {item[0][0]}, '
+                    f'language {item[0][1]}, content_id {item[0][2]}. '
+                    f'Suggestion IDs: {[m.id for m in item[1]]}'
+                )
+            )
+        )
+
+        duplicate_groups_count = (
+            duplicate_suggestions
+            | 'Count duplicate groups'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'DUPLICATE GROUPS COUNT'
+                )
+            )
+            | 'Filter non-zero counts'
+            >> beam.Filter(lambda result: 'SUCCESS: 0' not in result.stdout)
         )
 
         suggestions_to_update = (
-            suggestions_grouped_by_content
-            | 'Filter duplicates' >> beam.Filter(lambda item: len(item[1]) > 1)
+            duplicate_suggestions
             | 'Reject extra suggestions'
             >> beam.FlatMap(self._reject_extra_suggestions)
         )
@@ -207,12 +168,23 @@ class CleanupDuplicateTranslationSuggestionsJob(base_jobs.JobBase):
             )
         )
 
-        unused_put_results = (
-            suggestions_to_update
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                suggestions_to_update
+                | 'Put models into the datastore' >> ndb_io.PutModels()
+            )
 
         return (
+            duplicate_suggestions_report,
+            duplicate_groups_count,
             total_suggestions_count,
             rejected_suggestions_count,
         ) | 'Combine results' >> beam.Flatten()
+
+
+class AuditDuplicateTranslationSuggestionsJob(
+    CleanupDuplicateTranslationSuggestionsJob
+):
+    """Job that audits duplicate translation suggestions."""
+
+    DATASTORE_UPDATES_ALLOWED = False
