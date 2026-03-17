@@ -50,7 +50,7 @@ describe('Auth service', function () {
     signInEventService = jasmine.createSpyObj<SignInEventService>(
       'SignInEventService',
       [],
-      {onUserSignIn: new (await import('@angular/core')).EventEmitter<void>()}
+      {onUserSignIn: new (await import('@angular/core')).EventEmitter<string>()}
     );
 
     TestBed.configureTestingModule({
