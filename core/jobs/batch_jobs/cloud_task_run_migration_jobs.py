@@ -22,6 +22,7 @@ from __future__ import annotations
 import datetime
 import logging
 
+from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -99,8 +100,8 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
                 lambda model: (
                     model.latest_job_state
                     in [
-                        cloud_task_models.CloudTaskState.PENDING,
-                        cloud_task_models.CloudTaskState.RUNNING,
+                        cloud_task_models.CloudTaskState.PENDING.value,
+                        cloud_task_models.CloudTaskState.RUNNING.value,
                     ]
                     and (
                         datetime.datetime.utcnow()
@@ -159,5 +160,138 @@ class MarkStaleCloudTaskRunModelsAsFailedAuditJob(
 ):
     """Audit job to check for CloudTaskRunModel entries that have been stuck in the
     RUNNING or PENDING state for more than three days and log their IDs."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+
+class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
+    """One-off job to update the content voiceover regeneration status in
+    VoiceoverRegenerationTaskMappingModel entries, marking them as FAILED if
+    they have remained in the GENERATING state for more than three days.
+    """
+
+    DATASTORE_UPDATES_ALLOWED = True
+
+    def mark_stale_model_as_failed(
+        self,
+        voiceover_regeneration_task_mapping_model: cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+    ) -> cloud_task_models.VoiceoverRegenerationTaskMappingModel:
+        """Marks the given VoiceoverRegenerationTaskMappingModel's content
+        voiceover generation status as FAILED.
+        Args:
+            voiceover_regeneration_task_mapping_model: VoiceoverRegenerationTaskMappingModel. The model to be marked as
+                FAILED.
+
+        Returns:
+            VoiceoverRegenerationTaskMappingModel. The updated VoiceoverRegenerationTaskMappingModel with its
+            content voiceover generation status marked as FAILED.
+        """
+        counter = 0
+        with datastore_services.get_ndb_context():
+            for (
+                language_accent_code,
+                content_status_map,
+            ) in (
+                voiceover_regeneration_task_mapping_model.language_accent_to_content_status_map.items()
+            ):
+                for content_id, status in content_status_map.items():
+                    if (
+                        status
+                        == feconf.VoiceoverRegenerationState.GENERATING.value
+                    ):
+                        voiceover_regeneration_task_mapping_model.language_accent_to_content_status_map[
+                            language_accent_code
+                        ][
+                            content_id
+                        ] = feconf.VoiceoverRegenerationState.FAILED.value
+                        counter += 1
+
+            voiceover_regeneration_task_mapping_model.last_updated = (
+                datetime.datetime.utcnow()
+            )
+
+        logging.info(
+            'Marked the GENERATING status of the %s contents to FAILED in VoiceoverRegenerationTaskMappingModel with ID: %s.'
+            % (counter, voiceover_regeneration_task_mapping_model.id)
+        )
+
+        return voiceover_regeneration_task_mapping_model
+
+    def run(self) -> job_run_result.JobRunResult:
+        """Runs the MarkStaleVoiceoverRegenerationJobModelsAsFailedJob.
+
+        This job marks VoiceoverRegenerationTaskMappingModel entries as FAILED if they
+        have remained in the GENERATING state for more than three days.
+
+        Returns:
+            JobRunResult. Contains the total number of VoiceoverRegenerationTaskMappingModel entries
+            marked as FAILED, along with the IDs of those entries.
+        """
+        # Stale VoiceoverRegenerationTaskMappingModels are those that have been in the
+        # GENERATING state for more than three days.
+        stale_voiceover_regeneration_task_mapping_models = (
+            self.pipeline
+            | 'Get VoiceoverRegenerationTaskMappingModels from the datastore'
+            >> ndb_io.GetModels(
+                cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_all()
+            )
+            | 'Filter VoiceoverRegenerationTaskMappingModels which was last updated more than three days ago'
+            >> beam.Filter(
+                lambda model: (
+                    datetime.datetime.utcnow()
+                    >= model.last_updated + datetime.timedelta(days=3)
+                )
+            )
+        )
+
+        updated_voiceover_regeneration_task_mapping_models = (
+            stale_voiceover_regeneration_task_mapping_models
+            | 'Mark stale VoiceoverRegenerationTaskMappingModel state as FAILED'
+            >> beam.Map(lambda model: self.mark_stale_model_as_failed(model))
+        )
+
+        count_run_result = (
+            updated_voiceover_regeneration_task_mapping_models
+            | 'Count updated VoiceoverRegenerationTaskMappingModels'
+            >> beam.combiners.Count.Globally()
+            | 'Format count to JobRunResult'
+            >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: %d.'
+                    % count
+                )
+            )
+        )
+
+        updated_model_ids_result = (
+            updated_voiceover_regeneration_task_mapping_models
+            | 'Adds updated VoiceoverRegenerationTaskMappingModel IDs to job run result'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: %s.'
+                    % model.id
+                )
+            )
+        )
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            _ = (
+                updated_voiceover_regeneration_task_mapping_models
+                | 'Write updated VoiceoverRegenerationTaskMappingModels to datastore'
+                >> ndb_io.PutModels()
+            )
+
+        return (
+            count_run_result,
+            updated_model_ids_result,
+        ) | beam.Flatten()
+
+
+class MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJob(
+    MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
+):
+    """Audit job to check for content status in the VoiceoverRegenerationTaskMappingModel
+    entries that have been stuck in the GENERATING state for more than three
+    days and log their IDs."""
 
     DATASTORE_UPDATES_ALLOWED = False
