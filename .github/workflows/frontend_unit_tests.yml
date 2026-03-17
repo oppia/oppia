@@ -18,6 +18,7 @@ on:
       - synchronize
       - reopened
       - closed
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{
