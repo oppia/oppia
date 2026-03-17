@@ -92,7 +92,6 @@ import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 
 // Services used by the exploration editor page.
-import {AlertsService} from 'services/alerts.service';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
@@ -139,7 +138,6 @@ import {InteractionDetailsCacheService} from './editor-tab/services/interaction-
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
-import {LoaderService} from 'services/loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {ParameterMetadataService} from './services/parameter-metadata.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -314,7 +312,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     ExplorationEditorPageRootComponent,
   ],
   providers: [
-    AlertsService,
     AnswerClassificationService,
     AssetsBackendApiService,
     AutosaveInfoModalsService,
@@ -362,7 +359,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     InternetConnectivityService,
     JoyrideService,
     LanguageUtilService,
-    LoaderService,
     LocalStorageService,
     LoggerService,
     ParameterMetadataService,
