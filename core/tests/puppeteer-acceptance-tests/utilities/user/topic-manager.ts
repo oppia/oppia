@@ -3522,7 +3522,24 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       if (storyName) {
-        await this.openStoryEditor(storyName, topicName);
+        if (!this.isViewportAtMobileWidth()) {
+          await this.openStoryEditor(storyName, topicName);
+        } else {
+          const onStoryEditorPage =
+            (await this.isElementVisible(
+              chapterEditorContainerSelector,
+              true,
+              2000
+            )) ||
+            (await this.isElementVisible(
+              storyEditorContainerSelector,
+              true,
+              2000
+            ));
+          if (!onStoryEditorPage) {
+            await this.openStoryEditor(storyName, topicName);
+          }
+        }
       }
 
       await this.ensureChapterListIsVisible();
