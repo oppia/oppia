@@ -121,17 +121,20 @@
 
 @media (max-width: 1024px) {
   .practice-tab .oppia-practice-tab-container .oppia-page-card {
-    width: 60vw;
+    box-sizing: border-box;
+    max-width: 550px;
+    width: 100%;
   }
 }
 
 @media (max-width: 500px) {
   .practice-tab .oppia-practice-tab-container .oppia-page-card {
     padding: 15px 24px 64px 24px;
-    width: 90vw;
   }
   .practice-tab .practice-tab-for-learner-dashboard .oppia-page-card {
-    width: 69vw;
+    box-sizing: border-box;
+    max-width: 550px;
+    width: 100%;
   }
   .practice-tab .practice-tab-for-learner-dashboard .capsule-progress {
     height: 13px;
