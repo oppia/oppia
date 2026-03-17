@@ -43,11 +43,13 @@
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              {
+                "input": "src/vendor-styles.css",
+                "bundleName": "vendor-styles",
+                "inject": true
+              },
               "core/templates/css/oppia.css",
-              "core/templates/css/oppia-material.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "core/templates/css/oppia-material.css"
             ]
           },
           "configurations": {
@@ -121,11 +123,13 @@
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              {
+                "input": "src/vendor-styles.css",
+                "bundleName": "vendor-styles",
+                "inject": true
+              },
               "core/templates/css/oppia.css",
-              "core/templates/css/oppia-material.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "core/templates/css/oppia-material.css"
             ]
           }
         },
