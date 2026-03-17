@@ -143,7 +143,6 @@ describe('Auth service', function () {
     });
     angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(creds);
 
-    spyOn(signInEventService.onUserSignIn, 'emit');
     await expectAsync(authService.signInWithEmail(email)).toBeResolvedTo();
 
     expect(angularFireAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(

@@ -107,8 +107,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private progressUrlService: ProgressUrlService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
     private signInEventService: SignInEventService,
-    private playerPositionService: PlayerPositionService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private playerPositionService: PlayerPositionService
   ) {
     super(ngbActiveModal);
   }
