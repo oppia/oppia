@@ -753,10 +753,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         self.assertEqual(entity_voiceovers[0].entity_id, self.exploration_id)
         self.assertEqual(entity_voiceovers[0].language_accent_code, 'en-US')
 
-        # The exploration contains two non-empty contents, content_0 and
-        # content_3, that are voiceovered automatically.
         self.assertListEqual(
-            ['content_0', 'content_3'],
+            ['content_0', 'default_outcome_1', 'ca_placeholder_2', 'content_3'],
             list(entity_voiceovers[0].voiceovers_mapping.keys()),
         )
 
@@ -771,6 +769,8 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         ]
         automated_voiceovers_audio_offsets_msecs = {
             'content_0': dummy_audio_offset,
+            'default_outcome_1': dummy_audio_offset,
+            'ca_placeholder_2': dummy_audio_offset,
             'content_3': dummy_audio_offset,
         }
 
@@ -960,15 +960,16 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         automated_voiceovers_audio_offsets_msecs = {
             'content_0': dummy_audio_offset,
             'content_3': dummy_audio_offset,
+            'default_outcome_1': dummy_audio_offset,
+            'ca_placeholder_2': dummy_audio_offset,
         }
         self.assertDictEqual(
             entity_voiceovers[0].automated_voiceovers_audio_offsets_msecs,
             automated_voiceovers_audio_offsets_msecs,
         )
-        # The exploration contains two non-empty contents, content_0 and
-        # content_3, that are voiceovered automatically.
+
         self.assertListEqual(
-            ['content_0', 'content_3'],
+            ['content_0', 'default_outcome_1', 'ca_placeholder_2', 'content_3'],
             list(entity_voiceovers[0].voiceovers_mapping.keys()),
         )
 
@@ -1198,7 +1199,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
         self.assertEqual(hindi_entity_voiceover.language_accent_code, 'hi-IN')
 
         self.assertListEqual(
-            ['content_0', 'content_3'],
+            ['content_0', 'default_outcome_1', 'ca_placeholder_2', 'content_3'],
             list(english_entity_voiceover.voiceovers_mapping.keys()),
         )
         # Hindi translation was added only for the first content.
