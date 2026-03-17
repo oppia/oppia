@@ -15,5 +15,6 @@
 /**
  * @fileoverview This file imports the Guppy library.
  */
+import 'guppy-dev/build/guppy-default.min.css';
 
 (window as Window).Guppy = require('guppy-dev/build/guppy.min.js');

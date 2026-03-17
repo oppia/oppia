@@ -78,7 +78,7 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
             story_id: str. The id of the story.
             story_model: StoryModel. The story model to migrate.
             topic_id_to_topic: dict(str, Topic). The mapping from topic ID to
-                topic.
+                topic
 
         Returns:
             Result((str, Story), (str, Exception)). Result containing tuple that
