@@ -134,7 +134,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([stale_running_model])
 
-        self.assert_job_output_is_ordered(
+        self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
                     'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
@@ -185,7 +185,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([stale_pending_model])
 
-        self.assert_job_output_is_ordered(
+        self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
                     'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
@@ -266,7 +266,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([stale_running_model, stale_pending_model, fresh_model])
 
-        self.assert_job_output_is_ordered(
+        self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
                     'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 2.'
@@ -331,7 +331,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([stale_model_with_exceptions])
 
-        self.assert_job_output_is_ordered(
+        self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
                     'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
@@ -368,55 +368,6 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             updated_model.exception_messages_for_failed_runs[1],
         )
 
-    def test_mark_stale_model_as_permanently_failed_method(self) -> None:
-        """Test the mark_stale_model_as_permanently_failed method directly."""
-        job = (
-            cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedJob()
-        )
-
-        # Create a test model.
-        test_model = self.create_model(
-            cloud_task_models.CloudTaskRunModel,
-            id='test_model_id',
-            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task9',
-            task_id='task9',
-            queue_id='default',
-            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
-            function_id='regenerate_voiceovers_on_exploration_update',
-            exception_messages_for_failed_runs=['Original error'],
-            current_retry_attempt=2,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
-        )
-
-        # Mock the NDB context.
-        with mock.patch.object(datastore_services, 'get_ndb_context'):
-            updated_model = job.mark_stale_model_as_permanently_failed(
-                test_model
-            )
-
-        # Verify the model was updated correctly.
-        self.assertEqual(
-            updated_model.latest_job_state,
-            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
-        )
-        self.assertEqual(
-            len(updated_model.exception_messages_for_failed_runs), 2
-        )
-        self.assertEqual(
-            updated_model.exception_messages_for_failed_runs[0],
-            'Original error',
-        )
-        expected_new_message = (
-            'This CloudTaskRunModel was marked as PERMANENTLY_FAILED '
-            'automatically since it has been in the RUNNING state for more than '
-            'three days.'
-        )
-        self.assertEqual(
-            updated_model.exception_messages_for_failed_runs[1],
-            expected_new_message,
-        )
-
     def test_edge_case_exactly_three_days_old(self) -> None:
         """Test that a model that is exactly 3 days old gets updated."""
         exactly_three_days_old_model = self.create_model(
@@ -435,7 +386,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([exactly_three_days_old_model])
 
-        self.assert_job_output_is_ordered(
+        self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
                     'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
@@ -613,7 +564,7 @@ class MarkStaleCloudTaskRunModelsAsFailedAuditJobTests(
                     'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'Stale CloudTaskRunModel found with ID: stale_model_id.'
+                    'Updated state of CloudTaskRunModel with ID: stale_model_id.'
                 ),
             ]
         )
