@@ -44,7 +44,8 @@ const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 const oskContainerSelector = '.e2e-test-osk-container';
 const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
-
+const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
+const chapterTitleSelector = '.e2e-test-chapter-title';
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -131,6 +132,7 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
+        this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
 
         if (mobile) {
@@ -403,6 +405,7 @@ export class BaseUser {
         )
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
+    this.attachNavigationLogs(this.page);
     this.setupDebugTools();
   }
 
@@ -746,6 +749,47 @@ export class BaseUser {
     await this.waitForElementToStabilize(selector);
 
     await element.type(text);
+  }
+
+  /**
+   * This function converts a given date string into ISO format (YYYY-MM-DD).
+   */
+  private toISODate(dateString: string): string {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      throw new Error(`Invalid date string: ${dateString}`);
+    }
+
+    return date.toISOString().split('T')[0];
+  }
+
+  /**
+   * This function set publication date for chapter.
+   */
+  async setNodePlannedPublicationDate(): Promise<void> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3);
+    const dateString = futureDate.toLocaleDateString('en-US');
+    const isoDate = this.toISODate(dateString);
+    await this.page.$eval(
+      plannedPublicationDateInput,
+      (el, value) => {
+        const input = el as HTMLInputElement;
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        nativeInputValueSetter?.call(input, value);
+
+        input.dispatchEvent(new Event('input', {bubbles: true}));
+        input.dispatchEvent(new Event('change', {bubbles: true}));
+        input.dispatchEvent(new Event('blur', {bubbles: true}));
+      },
+      isoDate
+    );
+    showMessage('Planned publication date is set to: ' + isoDate);
   }
 
   /**
@@ -1268,6 +1312,7 @@ export class BaseUser {
 
     await newPage.bringToFront();
     this.page = newPage;
+    this.attachNavigationLogs(this.page);
     return newPage;
   }
 
@@ -1571,6 +1616,43 @@ export class BaseUser {
         ? await this.page.waitForSelector(selector)
         : selector;
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
+  }
+
+  /**
+   * Retrieves a chapter element by its name.
+   * @param {string} chapterName - The name of the chapter to search for.
+   */
+  private async getChapterByName(
+    chapterName: string
+  ): Promise<ElementHandle<Element>> {
+    const chapters = await this.page.$$(chapterTitleSelector);
+
+    for (const chapter of chapters) {
+      const text = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        chapter
+      );
+
+      if (text?.includes(chapterName)) {
+        return chapter;
+      }
+    }
+
+    throw new Error(`Chapter with name "${chapterName}" not found`);
+  }
+
+  /**
+   * Verifies whether a chapter is clickable or not.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
+   */
+  async expectChapterToBeClickable(
+    chapterName: string,
+    shouldBeClickable: boolean = true
+  ): Promise<void> {
+    const chapterElement = await this.getChapterByName(chapterName);
+
+    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
   }
 
   /**
@@ -2184,6 +2266,15 @@ export class BaseUser {
     await this.expectElementToBeVisible(hideOSKButtonSelector);
     await this.clickOnElementWithSelector(hideOSKButtonSelector);
     await this.expectElementToBeVisible(hideOSKButtonSelector, false);
+  }
+
+  /**
+   * Logs every navigation event on the page.
+   */
+  attachNavigationLogs(page: Page): void {
+    page.on('framenavigated', frame => {
+      showMessage('NAVIGATED: ' + frame.url());
+    });
   }
 }
 
