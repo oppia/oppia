@@ -497,9 +497,118 @@ export class BaseUser {
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
+        const clickabilityDiagnostics = await this.page.evaluate(
+          (targetElement: Element) => {
+            const describeElement = (el: Element | null): string => {
+              if (!el) {
+                return 'none';
+              }
+
+              const tag = el.tagName.toLowerCase();
+              const id = el.id ? `#${el.id}` : '';
+              const classNames = el.className
+                ? String(el.className).trim().split(/\s+/).filter(Boolean)
+                : [];
+              const classes =
+                classNames.length > 0 ? `.${classNames.join('.')}` : '';
+              return `<${tag}${id}${classes}>`;
+            };
+
+            const rect = targetElement.getBoundingClientRect();
+            const inViewport =
+              rect.top <= window.innerHeight &&
+              rect.bottom > 0 &&
+              rect.left <= window.innerWidth &&
+              rect.right > 0;
+
+            const isNativeDisabled =
+              (targetElement instanceof HTMLButtonElement ||
+                targetElement instanceof HTMLInputElement ||
+                targetElement instanceof HTMLSelectElement ||
+                targetElement instanceof HTMLTextAreaElement ||
+                targetElement instanceof HTMLOptionElement) &&
+              targetElement.disabled;
+            const isAriaDisabled =
+              targetElement.getAttribute('aria-disabled') === 'true' ||
+              targetElement.closest('[aria-disabled="true"]') !== null;
+            const isDisabled = isNativeDisabled || isAriaDisabled;
+
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const centerTopElement = document.elementFromPoint(
+              centerX,
+              centerY
+            );
+            const firstClientRect = targetElement.getClientRects()[0];
+            const firstRectTopElement = firstClientRect
+              ? document.elementFromPoint(
+                  firstClientRect.left + firstClientRect.width / 2,
+                  firstClientRect.top + firstClientRect.height / 2
+                )
+              : null;
+
+            const isCoveredByOtherElement = [
+              centerTopElement,
+              firstRectTopElement,
+            ]
+              .filter(Boolean)
+              .some(topElement => {
+                if (!topElement) {
+                  return false;
+                }
+                return (
+                  topElement !== targetElement &&
+                  !targetElement.contains(topElement) &&
+                  !topElement.contains(targetElement)
+                );
+              });
+
+            const blockingElement =
+              [centerTopElement, firstRectTopElement]
+                .filter(
+                  topElement =>
+                    topElement &&
+                    topElement !== targetElement &&
+                    !targetElement.contains(topElement) &&
+                    !topElement.contains(targetElement)
+                )
+                .map(topElement => describeElement(topElement))[0] ?? 'none';
+
+            const reasons: string[] = [];
+            if (isDisabled) {
+              reasons.push('Element is disabled.');
+            }
+            if (!inViewport) {
+              reasons.push('Element is not in the viewport.');
+            }
+            if (isCoveredByOtherElement) {
+              reasons.push(`Element is blocked by ${blockingElement}.`);
+            }
+
+            return {
+              reasons,
+              isDisabled,
+              inViewport,
+              isCoveredByOtherElement,
+              blockingElement,
+            };
+          },
+          element
+        );
         await this.page.evaluate(isElementClickable, element, true, true);
+
+        const reasonsText =
+          clickabilityDiagnostics.reasons.length > 0
+            ? clickabilityDiagnostics.reasons
+                .map(
+                  (reason: string, index: number) => `${index + 1}. ${reason}`
+                )
+                .join('\n')
+            : 'No specific reason detected from diagnostics.';
+
         error.message =
           `Element ${elementDesc} took too long to be clickable.\n` +
+          `Detected reasons:\n${reasonsText}\n` +
           'Original Error:\n' +
           error.message;
       }
