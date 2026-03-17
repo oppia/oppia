@@ -222,11 +222,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       return;
     }
 
-    let skillToAdd = this.skillForDiagnosticTestFormControl.value;
-    if (!skillToAdd) {
-      return;
-    }
-    this.skillForDiagnosticTestFormControl.setValue(null);
     this.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
     const skillSummary = this.availableSkillSummariesForDiagnosticTest.find(
