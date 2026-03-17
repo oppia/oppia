@@ -29,10 +29,6 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
-  blog: [
-    './core/tests/webdriverio_desktop/blog.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
