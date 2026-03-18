@@ -1254,6 +1254,108 @@ describe('Settings Tab Component', () => {
     expect(component.errorMessage).toBe('');
   });
 
+  describe('Settings Tab Component - Title Validation for Role Assignment', () => {
+    describe('onRolesFormUsernameBlur', () => {
+      it('should disable save button and show error when exploration title is empty', () => {
+        component.loggedInUser = 'ownerUser';
+        component.newMemberUsername = 'newUser';
+        component.newMemberRole = {name: 'owner', value: 'owner'};
+        component.rolesSaveButtonEnabled = true;
+        component.errorMessage = '';
+
+        explorationTitleService.init('');
+        component.saveExplorationTitle();
+
+        component.onRolesFormUsernameBlur();
+
+        expect(component.rolesSaveButtonEnabled).toBe(false);
+        expect(component.errorMessage).toBe(
+          'Please add a title to this exploration before sharing it with other users.'
+        );
+      });
+
+      it('should enable save button when exploration has a title and username is valid', () => {
+        component.loggedInUser = 'ownerUser';
+        component.newMemberUsername = 'newUser';
+        component.newMemberRole = {name: 'owner', value: 'owner'};
+        component.rolesSaveButtonEnabled = false;
+        component.errorMessage = 'Some previous error';
+
+        explorationTitleService.init('My Exploration Title');
+        component.saveExplorationTitle();
+
+        spyOn(
+          explorationRightsService,
+          'checkUserAlreadyHasRoles'
+        ).and.returnValue(false);
+
+        component.onRolesFormUsernameBlur();
+
+        expect(component.rolesSaveButtonEnabled).toBe(true);
+        expect(component.errorMessage).toBe('');
+      });
+
+      it('should still check for self-assignment even when title is empty', () => {
+        component.loggedInUser = 'ownerUser';
+        component.newMemberUsername = 'ownerUser';
+        component.newMemberRole = {name: 'owner', value: 'owner'};
+        component.rolesSaveButtonEnabled = true;
+        component.errorMessage = '';
+
+        explorationTitleService.init('');
+        component.saveExplorationTitle();
+
+        component.onRolesFormUsernameBlur();
+
+        expect(component.rolesSaveButtonEnabled).toBe(false);
+        expect(component.errorMessage).toBe(
+          'Please add a title to this exploration before sharing it with other users.'
+        );
+      });
+
+      it('should show error about missing title before showing error about existing role', () => {
+        component.loggedInUser = 'ownerUser';
+        component.newMemberUsername = 'existingUser';
+        component.newMemberRole = {name: 'owner', value: 'owner'};
+        component.rolesSaveButtonEnabled = true;
+        component.errorMessage = '';
+
+        explorationTitleService.init('');
+        component.saveExplorationTitle();
+
+        spyOn(
+          explorationRightsService,
+          'checkUserAlreadyHasRoles'
+        ).and.returnValue(true);
+        spyOn(explorationRightsService, 'getOldRole').and.returnValue('owner');
+
+        component.onRolesFormUsernameBlur();
+
+        expect(component.rolesSaveButtonEnabled).toBe(false);
+        expect(component.errorMessage).toBe(
+          'Please add a title to this exploration before sharing it with other users.'
+        );
+      });
+    });
+
+    describe('isTitlePresent', () => {
+      it('should return true when exploration has a title', () => {
+        explorationTitleService.init('Valid Title');
+        expect(component.isTitlePresent()).toBe(true);
+      });
+
+      it('should return false when exploration title is empty', () => {
+        explorationTitleService.init('');
+        expect(component.isTitlePresent()).toBe(false);
+      });
+
+      it('should return false when exploration title is only whitespace', () => {
+        explorationTitleService.init('   ');
+        expect(component.isTitlePresent()).toBe(true);
+      });
+    });
+  });
+
   it('should toggle exploration visibility', () => {
     spyOn(explorationRightsService, 'setViewability');
     spyOn(explorationRightsService, 'viewableIfPrivate').and.returnValue(false);

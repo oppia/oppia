@@ -555,6 +555,11 @@ class ExplorationRightsHandler(
                     'Users are not allowed to assign other roles to '
                     'themselves.'
                 )
+            if not exploration.title:
+                raise self.InvalidInputException(
+                    "Please add a title to this exploration before sharing "
+                    "it with other users."
+                )
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role
             )

@@ -1897,6 +1897,33 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.logout()
 
+    def test_cannot_add_member_without_exploration_title(self) -> None:
+        """Test that adding a member fails when exploration has no title."""
+        self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id,
+            self.owner_id,
+            title='',  # Empty title
+            category='My category',
+        )
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        csrf_token = self.get_new_csrf_token()
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        # Should fail because title is empty
+        self.put_json(
+            rights_url,
+            {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
     def test_for_deassign_viewer_role_from_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
