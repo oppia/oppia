@@ -21,7 +21,6 @@ from __future__ import annotations
 import itertools
 import random
 import string
-import hashlib
 
 from core import feconf, utils
 from core.constants import constants
