@@ -1981,7 +1981,8 @@ class DeletedUsernameTests(test_utils.GenericTestBase):
             deleted_username.validate()
 
     def test_validate_with_non_string(self) -> None:
-        # Here use cast because we intentionally pass a non-string value to test validation.
+        # Here we use cast because we intentionally pass a non-string value
+        # to test validation logic for incorrect types.
         deleted_username = user_domain.DeletedUsername(
             username_hash=cast(str, 123)
         )
