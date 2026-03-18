@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core.domain import suggestion_registry, user_domain
+from core.domain import suggestion_registry, user_domain, user_services
 from core.platform import models
 
 from typing import List, Optional, Sequence, Tuple
@@ -458,7 +458,7 @@ def get_all_translation_coordinator_stats(
             .fetch()
         )
     return [
-        user_domain.TranslationCoordinatorStats(model.id, model.coordinator_ids)
+        user_services.get_translation_rights_from_model(model)
         for model in translation_coordinator_models
     ]
 

@@ -3199,31 +3199,22 @@ def assign_coordinator(
     if assignee.user_id is None:
         raise Exception('Cannot change the role of the Guest user.')
 
-    language_rights = suggestion_models.TranslationCoordinatorsModel.get(
+    language_rights_model = suggestion_models.TranslationCoordinatorsModel.get(
         language_id, strict=False
     )
 
-    if language_rights is None:
-        model = suggestion_models.TranslationCoordinatorsModel(
-            id=language_id,
-            coordinator_ids=[assignee.user_id],
-            coordinators_count=1,
+    if language_rights_model is None:
+        rights = user_domain.TranslationCoordinatorStats(
+            language_id, [assignee.user_id]
         )
-        model.update_timestamps()
-        model.put()
     else:
-        if assignee.user_id in language_rights.coordinator_ids:
+        rights = get_translation_rights_from_model(language_rights_model)
+        if assignee.user_id in rights.coordinator_ids:
             raise Exception(
                 'This user already is a coordinator for this language.'
             )
-
-        language_rights.coordinator_ids.append(assignee.user_id)
-        language_rights.coordinators_count += 1
-
-        suggestion_models.TranslationCoordinatorsModel.update_timestamps(
-            language_rights, update_last_updated_time=True
-        )
-        suggestion_models.TranslationCoordinatorsModel.put(language_rights)
+        rights.coordinator_ids.append(assignee.user_id)
+    save_translation_rights(rights)
 
 
 def deassign_coordinator(
@@ -3251,7 +3242,7 @@ def deassign_coordinator(
         raise Exception(
             'Guest user is not allowed to deassign roles to a user.'
         )
-    language_rights = suggestion_models.TranslationCoordinatorsModel.get(
+    language_rights_model = suggestion_models.TranslationCoordinatorsModel.get(
         language_id, strict=False
     )
     if (
@@ -3268,19 +3259,14 @@ def deassign_coordinator(
     if assignee.user_id is None:
         raise Exception('Cannot change the role of the Guest user.')
 
-    if language_rights is None:
+    if language_rights_model is None:
         raise Exception('No model exists for provided language.')
 
-    if assignee.user_id not in language_rights.coordinator_ids:
+    rights = get_translation_rights_from_model(language_rights_model)
+    if assignee.user_id not in rights.coordinator_ids:
         raise Exception('This user is not a coordinator for this language')
-
-    language_rights.coordinator_ids.remove(assignee.user_id)
-    language_rights.coordinators_count -= 1
-
-    suggestion_models.TranslationCoordinatorsModel.update_timestamps(
-        language_rights, update_last_updated_time=True
-    )
-    suggestion_models.TranslationCoordinatorsModel.put(language_rights)
+    rights.coordinator_ids.remove(assignee.user_id)
+    save_translation_rights(rights)
 
 
 def get_translation_rights_from_model(
@@ -3301,6 +3287,25 @@ def get_translation_rights_from_model(
         translation_coordinator_model.id,
         translation_coordinator_model.coordinator_ids,
     )
+
+
+def save_translation_rights(
+    translation_rights: user_domain.TranslationCoordinatorStats,
+) -> None:
+    """Saves the TranslationCoordinatorStats domain object to storage.
+    Args:
+        translation_rights: TranslationCoordinatorStats. The domain object to be
+            saved in storage.
+    """
+    model = suggestion_models.TranslationCoordinatorsModel(
+        id=translation_rights.language_id,
+        coordinator_ids=translation_rights.coordinator_ids,
+        coordinators_count=translation_rights.coordinators_count,
+    )
+    suggestion_models.TranslationCoordinatorsModel.update_timestamps(
+        model, update_last_updated_time=True
+    )
+    suggestion_models.TranslationCoordinatorsModel.put(model)
 
 
 def get_translation_rights_with_user(

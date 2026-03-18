@@ -490,12 +490,17 @@ def remove_user_from_translation_coordinators(user_id: str) -> None:
 
     models_to_update: List[suggestion_models.TranslationCoordinatorsModel] = []
     for coordinator_model in translation_coordinator_models:
-        if user_id in coordinator_model.coordinator_ids:
-            coordinator_model.coordinator_ids.remove(user_id)
-            coordinator_model.coordinators_count = len(
-                coordinator_model.coordinator_ids
+        rights = user_services.get_translation_rights_from_model(
+            coordinator_model
+        )
+        if user_id in rights.coordinator_ids:
+            rights.coordinator_ids.remove(user_id)
+            updated_model = suggestion_models.TranslationCoordinatorsModel(
+                id=rights.language_id,
+                coordinator_ids=rights.coordinator_ids,
+                coordinators_count=rights.coordinators_count,
             )
-            models_to_update.append(coordinator_model)
+            models_to_update.append(updated_model)
 
     if models_to_update:
         suggestion_models.TranslationCoordinatorsModel.update_timestamps_multi(
