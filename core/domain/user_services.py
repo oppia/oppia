@@ -1738,22 +1738,13 @@ def mark_user_for_deletion(user_id: str) -> None:
 
 def save_deleted_username(normalized_username: str) -> None:
     """Save the username of deleted user."""
-
-    hashed_normalized_username = utils.convert_to_hash(
-        normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
-    )
-
+    hashed_normalized_username = hashlib.md5(
+        normalized_username.encode('utf-8')
+    ).hexdigest()
     deleted_username = user_domain.DeletedUsername(
         username_hash=hashed_normalized_username
     )
-
-    # Validate only if hash length matches expected format.
-    if (
-        isinstance(hashed_normalized_username, str)
-        and len(hashed_normalized_username) == 32
-    ):
-        deleted_username.validate()
-
+    deleted_username.validate()
     deleted_user_model = get_deleted_username_model_from_domain_object(
         deleted_username
     )
