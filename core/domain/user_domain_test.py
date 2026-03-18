@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 
+from typing import cast
 from core import feconf, utils
 from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
@@ -1981,6 +1982,8 @@ class DeletedUsernameTests(test_utils.GenericTestBase):
             deleted_username.validate()
 
     def test_validate_with_non_string(self) -> None:
-        deleted_username = user_domain.DeletedUsername(username_hash=123)
+        deleted_username = user_domain.DeletedUsername(
+            username_hash=cast(str, 123)
+        )
         with self.assertRaisesRegex(utils.ValidationError, 'string'):
             deleted_username.validate()
