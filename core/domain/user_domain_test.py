@@ -21,14 +21,13 @@ from __future__ import annotations
 import datetime
 import logging
 
-from typing import cast
 from core import feconf, utils
 from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional, TypedDict
+from typing import List, Optional, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1982,6 +1981,7 @@ class DeletedUsernameTests(test_utils.GenericTestBase):
             deleted_username.validate()
 
     def test_validate_with_non_string(self) -> None:
+        # Here use cast because we intentionally pass a non-string value to test validation.
         deleted_username = user_domain.DeletedUsername(
             username_hash=cast(str, 123)
         )
