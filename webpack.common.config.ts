@@ -213,7 +213,7 @@ module.exports = {
           },
         ],
       },
-      // Rule for guppy-dev CSS - process url() for fonts and icons
+      // Rule for guppy-dev CSS - process url() for fonts and icons.
       {
         test: /\.css$/,
         include: [path.resolve(__dirname, 'node_modules/guppy-dev')],
@@ -227,7 +227,7 @@ module.exports = {
           },
         ],
       },
-      // Rule for all other CSS - keep url: false as original
+      // Rule for all other CSS - keep url: false as original.
       {
         test: /\.css$/,
         include: [
