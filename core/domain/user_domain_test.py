@@ -1971,13 +1971,13 @@ class DeletedUsernameTests(test_utils.GenericTestBase):
             deleted_username.validate()
 
     def test_validate_with_invalid_length(self) -> None:
-        deleted_username = user_domain.DeletedUsername(username_hash='abc123')
+        deleted_username = user_domain.DeletedUsername(username_hash='a' * 33)
         with self.assertRaisesRegex(utils.ValidationError, '32'):
             deleted_username.validate()
 
     def test_validate_with_invalid_characters(self) -> None:
-        deleted_username = user_domain.DeletedUsername(username_hash='z' * 32)
-        with self.assertRaisesRegex(utils.ValidationError, 'hexadecimal'):
+        deleted_username = user_domain.DeletedUsername(username_hash='!' * 32)
+        with self.assertRaisesRegex(utils.ValidationError, 'valid hash'):
             deleted_username.validate()
 
     def test_validate_with_non_string(self) -> None:

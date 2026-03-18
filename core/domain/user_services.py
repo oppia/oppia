@@ -1738,9 +1738,9 @@ def mark_user_for_deletion(user_id: str) -> None:
 
 def save_deleted_username(normalized_username: str) -> None:
     """Save the username of deleted user."""
-    hashed_normalized_username = hashlib.md5(
-        normalized_username.encode('utf-8')
-    ).hexdigest()
+    hashed_normalized_username = utils.convert_to_hash(
+        normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
+    )
     deleted_username = user_domain.DeletedUsername(
         username_hash=hashed_normalized_username
     )
