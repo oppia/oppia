@@ -1871,7 +1871,7 @@ class DeletedUsername:
             raise utils.ValidationError(
                 'username_hash must be at most 32 characters long.'
             )
-        if not re.match(r'^[A-Za-z0-9abc]+$', self.username_hash):
+        if not re.match(r'^[A-Za-z0-9]+$', self.username_hash):
             raise utils.ValidationError(
                 'username_hash must be a valid hash string.'
             )
