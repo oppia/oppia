@@ -196,7 +196,7 @@ export class Interaction extends BaseTranslatableObject {
     return undefined;
   }
 
-  setId(newValue: string): void {
+  setId(newValue: string | null): void {
     this.id = newValue;
   }
 
