@@ -1981,9 +1981,10 @@ class DeletedUsernameTests(test_utils.GenericTestBase):
             deleted_username.validate()
 
     def test_validate_with_non_string(self) -> None:
-        # Here use cast because we intentionally pass a non-string value to test validation.
         deleted_username = user_domain.DeletedUsername(
-            username_hash=cast(str, 123)
+            username_hash=cast(
+                str, 123
+            )  # Here use cast because we intentionally pass a non-string value to test validation.
         )
         with self.assertRaisesRegex(utils.ValidationError, 'string'):
             deleted_username.validate()
