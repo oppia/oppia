@@ -81,7 +81,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     audit_non_existent_threads_messages_jobs,
-
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     audit_threads_with_missing_suggestions_jobs,
