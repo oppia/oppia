@@ -1,9 +1,11 @@
 <background-banner
-  *ngIf="!(diagnosticTestIsStarted && !diagnosticTestIsFinished && !isNewLessonPlayerEnabled())"></background-banner>
+  *ngIf="!(diagnosticTestIsStarted && !diagnosticTestIsFinished && !isNewLessonPlayerEnabled())">
+</background-banner>
 <div class="diagnostic-test-container position-relative"
   [ngClass]="{'new-diagnostic-test-container': isNewLessonPlayerEnabled()}">
   <oppia-player-header
-    *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled()"></oppia-player-header>
+    *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled()">
+  </oppia-player-header>
   <div class="oppia-diagnostic-test-page-header"
     *ngIf="!(diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled())">
     <button class="btn oppia-back-to-classroom-button">
@@ -35,8 +37,8 @@
       </div>
     </div>
     <button class="btn oppia-diagnostic-test-start-button e2e-test-start-diagnostic-test"
-      (click)="startDiagnosticTest()" [disabled]="isStartTestButtonDisabled"
-      translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
+            (click)="startDiagnosticTest()" [disabled]="isStartTestButtonDisabled"
+            translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
     </button>
   </mat-card>
   <div *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished">
@@ -79,15 +81,15 @@
         <div class="oppia-topic-recommendation-container">
           <ng-container *ngFor="let topicSummary of recommendedTopicSummaries">
             <div *ngIf="topicSummary.getUrlFragment()"
-              class="oppia-topic-summary-tile e2e-test-recommended-topic-summary-tile">
+                 class="oppia-topic-summary-tile e2e-test-recommended-topic-summary-tile">
               <oppia-topic-summary-tile [topicSummary]="topicSummary" [classroomUrlFragment]="classroomUrlFragment"
                 [isPublished]="topicSummary.isTopicPublished()">
               </oppia-topic-summary-tile>
               <div class="oppia-start-button">
                 <button class="btn oppia-start-topic-button"
-                  (click)="getRecommendationAcceptanceEvent(topicSummary.getName())">
+                        (click)="getRecommendationAcceptanceEvent(topicSummary.getName())">
                   <a class="oppia-anchor-tag-under-button"
-                    [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
+                     [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
                     {{getTopicButtonText(topicSummary.getName())}}
                   </a>
                 </button>
