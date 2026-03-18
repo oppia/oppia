@@ -365,7 +365,10 @@ export class BaseUser {
     }
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
-    await this.clickAndWaitForNavigation('Sign In');
+    await this.clickAndWaitForNavigation('Sign In', false, {
+      waitUntil: 'load',
+      timeout: 60000,
+    });
   }
 
   /**
@@ -380,7 +383,10 @@ export class BaseUser {
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
-    await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
+    await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON, false, {
+      waitUntil: 'load',
+      timeout: 60000,
+    });
     this.username = username;
     this.email = email;
   }
