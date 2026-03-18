@@ -1747,6 +1747,8 @@ def save_deleted_username(normalized_username: str) -> None:
         username_hash=hashed_normalized_username
     )
 
+    deleted_username.validate()
+
     deleted_user_model = get_deleted_username_model_from_domain_object(
         deleted_username
     )
@@ -1765,7 +1767,8 @@ def get_deleted_username_from_model(
 def get_deleted_username_model_from_domain_object(
     deleted_username: user_domain.DeletedUsername,
 ) -> user_models.DeletedUsernameModel:
-    """Converts DeletedUsername domain object to DeletedUsernameModel."""
+
+    deleted_username.validate()
 
     return user_models.DeletedUsernameModel(id=deleted_username.username_hash)
 
