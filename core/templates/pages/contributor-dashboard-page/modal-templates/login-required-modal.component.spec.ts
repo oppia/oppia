@@ -37,7 +37,7 @@ describe('Login Required Modal Content', () => {
         {
           provide: SignInEventService,
           useValue: {
-            onUserSignIn: new EventEmitter<void>(),
+            onUserSignIn: new EventEmitter<string>(),
           },
         },
       ],
