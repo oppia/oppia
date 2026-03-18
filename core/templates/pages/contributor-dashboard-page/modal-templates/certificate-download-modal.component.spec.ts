@@ -141,6 +141,16 @@ describe('Contributor Certificate Download Modal Component', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should set max selectable date on both date pickers', () => {
+    const dateInputs =
+      fixture.nativeElement.querySelectorAll('input[type="date"]');
+
+    expect(dateInputs.length).toBe(2);
+    dateInputs.forEach((input: HTMLInputElement) => {
+      expect(input.max).toBe(component.maxSelectableDate);
+    });
+  });
+
   it('should set errorsFound and errorMessage for To date in the future', () => {
     const today = new Date();
     const tomorrow = new Date(today);
