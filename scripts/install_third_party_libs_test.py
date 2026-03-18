@@ -183,7 +183,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_external_script_call() -> None:
             pass
 
-        def mock_mkdir(unused_path: str) -> None:
+        def mock_mkdir(unused_path: str, unused_mode: int = 0o777) -> None:
             pass
 
         def mock_copytree(unused_src: str, unused_dst: str) -> None:
@@ -433,6 +433,129 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
         with swap_call:
             install_third_party_libs.install_elasticsearch_dev_server()
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+
+class CopyMissingGuppyKatexFontsTests(test_utils.TestBase):
+    """Tests for copy_missing_guppy_katex_fonts."""
+
+    def test_copy_missing_guppy_katex_fonts_returns_if_source_dir_missing(
+        self,
+    ) -> None:
+        makedirs_called = False
+        copy_called = False
+
+        source_dir = os.path.join(
+            common.NODE_MODULES_PATH, 'guppy-dev', 'lib', 'katex', 'fonts'
+        )
+
+        def mock_exists(path: str) -> bool:
+            if path == source_dir:
+                return False
+            return True
+
+        def mock_makedirs(unused_path: str, exist_ok: bool = False) -> None:
+            del exist_ok
+            nonlocal makedirs_called
+            makedirs_called = True
+
+        def mock_copy(unused_src: str, unused_dst: str) -> None:
+            nonlocal copy_called
+            copy_called = True
+
+        swap_exists = self.swap(os.path, 'exists', mock_exists)
+        swap_makedirs = self.swap(os, 'makedirs', mock_makedirs)
+        swap_copy = self.swap(shutil, 'copy', mock_copy)
+
+        with swap_exists, swap_makedirs, swap_copy:
+            install_third_party_libs.copy_missing_guppy_katex_fonts()
+
+        self.assertFalse(makedirs_called)
+        self.assertFalse(copy_called)
+
+    def test_copy_missing_guppy_katex_fonts_creates_target_dir_with_exist_ok(
+        self,
+    ) -> None:
+        makedirs_args: List[Tuple[str, bool]] = []
+
+        target_dir = os.path.join(
+            common.NODE_MODULES_PATH, 'guppy-dev', 'build', 'fonts'
+        )
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_makedirs(path: str, exist_ok: bool = False) -> None:
+            makedirs_args.append((path, exist_ok))
+
+        def mock_copy(unused_src: str, unused_dst: str) -> None:
+            pass
+
+        swap_exists = self.swap(os.path, 'exists', mock_exists)
+        swap_makedirs = self.swap(os, 'makedirs', mock_makedirs)
+        swap_copy = self.swap(shutil, 'copy', mock_copy)
+
+        with swap_exists, swap_makedirs, swap_copy:
+            install_third_party_libs.copy_missing_guppy_katex_fonts()
+
+        self.assertEqual(makedirs_args, [(target_dir, True)])
+
+    def test_copy_missing_guppy_katex_fonts_copies_only_missing_files(
+        self,
+    ) -> None:
+        copied_files: List[Tuple[str, str]] = []
+
+        source_dir = os.path.join(
+            common.NODE_MODULES_PATH, 'guppy-dev', 'lib', 'katex', 'fonts'
+        )
+        target_dir = os.path.join(
+            common.NODE_MODULES_PATH, 'guppy-dev', 'build', 'fonts'
+        )
+
+        existing_target_files = {
+            os.path.join(target_dir, 'KaTeX_Main-BoldItalic.ttf'),
+        }
+
+        source_files = {
+            os.path.join(source_dir, 'KaTeX_Main-BoldItalic.ttf'),
+            os.path.join(source_dir, 'KaTeX_Main-BoldItalic.woff'),
+            os.path.join(source_dir, 'KaTeX_Main-BoldItalic.woff2'),
+        }
+
+        def mock_exists(path: str) -> bool:
+            if path == source_dir:
+                return True
+            if path in source_files:
+                return True
+            if path in existing_target_files:
+                return True
+            return False
+
+        def mock_makedirs(unused_path: str, exist_ok: bool = False) -> None:
+            del exist_ok
+
+        def mock_copy(src: str, dst: str) -> None:
+            copied_files.append((src, dst))
+
+        swap_exists = self.swap(os.path, 'exists', mock_exists)
+        swap_makedirs = self.swap(os, 'makedirs', mock_makedirs)
+        swap_copy = self.swap(shutil, 'copy', mock_copy)
+
+        with swap_exists, swap_makedirs, swap_copy:
+            install_third_party_libs.copy_missing_guppy_katex_fonts()
+
+        self.assertEqual(
+            copied_files,
+            [
+                (
+                    os.path.join(source_dir, 'KaTeX_Main-BoldItalic.woff'),
+                    os.path.join(target_dir, 'KaTeX_Main-BoldItalic.woff'),
+                ),
+                (
+                    os.path.join(source_dir, 'KaTeX_Main-BoldItalic.woff2'),
+                    os.path.join(target_dir, 'KaTeX_Main-BoldItalic.woff2'),
+                ),
+            ],
+        )
 
 
 class SetupTests(test_utils.GenericTestBase):

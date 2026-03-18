@@ -20,6 +20,7 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WebpackRTLPlugin = require('webpack-rtl-plugin');
+const fs = require('fs');
 var path = require('path');
 var webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
@@ -43,6 +44,38 @@ var defaultMeta = {
     'Oppia is a free, open-source learning platform. Join ' +
     'the community to create or try an exploration today!',
 };
+
+class CopyGuppyAssetsPlugin {
+  apply(compiler) {
+    compiler.hooks.done.tap('CopyGuppyAssetsPlugin', () => {
+      const outputPath = compiler.options.output.path;
+      const guppyBuildPath = path.resolve(
+        __dirname,
+        'node_modules',
+        'guppy-dev',
+        'build'
+      );
+      const assetDirectories = ['fonts', 'icons'];
+
+      assetDirectories.forEach(directoryName => {
+        const sourceDirectory = path.join(guppyBuildPath, directoryName);
+        const targetDirectory = path.join(outputPath, directoryName);
+
+        if (!fs.existsSync(sourceDirectory)) {
+          return;
+        }
+
+        fs.mkdirSync(targetDirectory, {recursive: true});
+        fs.readdirSync(sourceDirectory).forEach(filename => {
+          fs.copyFileSync(
+            path.join(sourceDirectory, filename),
+            path.join(targetDirectory, filename)
+          );
+        });
+      });
+    });
+  }
+}
 
 module.exports = {
   resolve: {
@@ -132,6 +165,7 @@ module.exports = {
         zindex: false,
       },
     }),
+    new CopyGuppyAssetsPlugin(),
   ],
   module: {
     rules: [
@@ -179,6 +213,21 @@ module.exports = {
           },
         ],
       },
+      // Rule for guppy-dev CSS - process url() for fonts and icons.
+      {
+        test: /\.css$/,
+        include: [path.resolve(__dirname, 'node_modules/guppy-dev')],
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              url: true,
+            },
+          },
+        ],
+      },
+      // Rule for all other CSS - keep url: false as original.
       {
         test: /\.css$/,
         include: [
@@ -186,12 +235,37 @@ module.exports = {
           path.resolve(__dirname, 'extensions'),
           path.resolve(__dirname, 'node_modules'),
         ],
+        exclude: [path.resolve(__dirname, 'node_modules/guppy-dev')],
         use: [
           MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
             options: {
               url: false,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(woff|woff2|ttf|eot)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'fonts/',
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'icons/',
             },
           },
         ],
