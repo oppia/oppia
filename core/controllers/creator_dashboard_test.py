@@ -90,7 +90,7 @@ class HomePageTests(test_utils.GenericTestBase):
         """Test the logged-out version of the home page."""
         response = self.get_html_response('/')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('</lightweight-oppia-root>', response)
+        self.assertIn('</oppia-root>', response)
 
 
 class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
@@ -441,6 +441,63 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
                 }
             },
         )
+
+    def test_get_dashboard_stats_without_average_ratings(self) -> None:
+        """Test to ensure coverage when average_ratings is None."""
+        user_models.UserStatsModel(
+            id=self.owner_id,
+            total_plays=10,
+            num_ratings=0,
+            average_ratings=None,
+        ).put()
+
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+        dashboard_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
+            'dashboard_stats'
+        ]
+        self.assertEqual(
+            dashboard_stats,
+            {
+                'total_plays': 10,
+                'num_ratings': 0,
+                'average_ratings': None,
+                'total_open_feedback': 0,
+            },
+        )
+        self.logout()
+
+    def test_last_week_stats_without_average_ratings(self) -> None:
+        """Test to ensure coverage when last week average_ratings is None."""
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+
+        get_last_week_dashboard_stats_swap = self.swap(
+            user_services,
+            'get_last_week_dashboard_stats',
+            lambda _: {
+                'key_2': {
+                    'num_ratings': 0,
+                    'average_ratings': None,
+                    'total_plays': 10,
+                }
+            },
+        )
+
+        with get_last_week_dashboard_stats_swap:
+            last_week_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
+                'last_week_stats'
+            ]
+
+        self.assertEqual(
+            last_week_stats,
+            {
+                'key_2': {
+                    'num_ratings': 0,
+                    'average_ratings': None,
+                    'total_plays': 10,
+                }
+            },
+        )
+        self.logout()
 
     def test_broken_last_week_stats_produce_exception(self) -> None:
         self.login(self.OWNER_EMAIL, is_super_admin=True)
