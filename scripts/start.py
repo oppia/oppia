@@ -23,6 +23,8 @@ import argparse
 import contextlib
 import importlib
 import os
+import subprocess
+import sys
 import time
 
 from core import feconf

@@ -461,6 +461,8 @@ def main() -> None:
 
     print('Running install_third_party_libs script...')
 
+    install_missing_runtime_python_modules()
+
     # This ensures dev dependencies are present and compiled before we
     # proceed to other setup tasks that require them.
     install_python_dev_dependencies.main(['--assert_compiled'])
