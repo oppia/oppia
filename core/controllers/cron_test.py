@@ -1421,7 +1421,7 @@ class CronMarkStaleCloudTaskRunModelsAsFailedHandlerTests(
     def test_cron_mark_stale_cloud_task_run_models_as_failed_handler(
         self,
     ) -> None:
-        self.testapp_swap = self.swap(
+        testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context)
         )
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1437,7 +1437,7 @@ class CronMarkStaleCloudTaskRunModelsAsFailedHandlerTests(
                 }
             ],
         )
-        with swap_with_checks, self.testapp_swap:
+        with swap_with_checks, testapp_swap:
             self.get_html_response(
                 '/cron/cloud_task/mark_stale_cloud_task_run_as_failed'
             )
@@ -1451,7 +1451,7 @@ class CronMarkStaleVoiceoverRegenerationContentAsFailedHandlerTests(
     def test_cron_mark_stale_voiceover_regeneration_content_as_failed_handler(
         self,
     ) -> None:
-        self.testapp_swap = self.swap(
+        testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context)
         )
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1467,7 +1467,7 @@ class CronMarkStaleVoiceoverRegenerationContentAsFailedHandlerTests(
                 }
             ],
         )
-        with swap_with_checks, self.testapp_swap:
+        with swap_with_checks, testapp_swap:
             self.get_html_response(
                 '/cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed'
             )

@@ -27,14 +27,12 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 from typing import Type
-from unittest import mock
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import cloud_task_models, datastore_services
+    from mypy_imports import cloud_task_models
 
 (cloud_task_models,) = models.Registry.import_models([models.Names.CLOUD_TASK])
-datastore_services = models.Registry.import_datastore_services()
 
 
 class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):

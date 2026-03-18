@@ -79,7 +79,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
 
         return cloud_task_run_model
 
-    def run(self) -> job_run_result.JobRunResult:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the MarkStaleCloudTaskRunModelsAsFailedJob.
 
         This job marks CloudTaskRunModel entries as PERMANENTLY_FAILED if they
@@ -114,9 +114,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
         updated_cloud_task_run_models = (
             stale_cloud_task_run_models
             | 'Mark stale CloudTaskRunModel state as PERMANENTLY_FAILED'
-            >> beam.Map(
-                lambda model: self.mark_stale_model_as_permanently_failed(model)
-            )
+            >> beam.Map(self.mark_stale_model_as_permanently_failed)
         )
 
         count_run_result = (
@@ -178,9 +176,10 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
     ) -> cloud_task_models.VoiceoverRegenerationTaskMappingModel:
         """Marks the given VoiceoverRegenerationTaskMappingModel's content
         voiceover generation status as FAILED.
+
         Args:
-            voiceover_regeneration_task_mapping_model: VoiceoverRegenerationTaskMappingModel. The model to be marked as
-                FAILED.
+            voiceover_regeneration_task_mapping_model: VoiceoverRegenerationTaskMappingModel.
+                The model to be marked as FAILED.
 
         Returns:
             VoiceoverRegenerationTaskMappingModel. The updated VoiceoverRegenerationTaskMappingModel with its
@@ -217,7 +216,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
 
         return voiceover_regeneration_task_mapping_model
 
-    def run(self) -> job_run_result.JobRunResult:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the MarkStaleVoiceoverRegenerationJobModelsAsFailedJob.
 
         This job marks VoiceoverRegenerationTaskMappingModel entries as FAILED if they
@@ -247,7 +246,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
         updated_voiceover_regeneration_task_mapping_models = (
             stale_voiceover_regeneration_task_mapping_models
             | 'Mark stale VoiceoverRegenerationTaskMappingModel state as FAILED'
-            >> beam.Map(lambda model: self.mark_stale_model_as_failed(model))
+            >> beam.Map(self.mark_stale_model_as_failed)
         )
 
         count_run_result = (
