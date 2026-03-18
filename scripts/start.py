@@ -23,11 +23,9 @@ import argparse
 import contextlib
 import importlib
 import os
-import sys
 import time
 
 from core import feconf
-
 
 from typing import (
     TYPE_CHECKING,
@@ -39,10 +37,6 @@ from typing import (
     Sequence,
 )
 
-if TYPE_CHECKING:
-    import psutil
-
-
 from . import (
     build,
     common,
@@ -50,6 +44,10 @@ from . import (
     install_third_party_libs,
     servers,
 )
+
+if TYPE_CHECKING:
+    import psutil
+
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -206,7 +204,6 @@ def start_services(
     parsed_args: argparse.Namespace, stack: contextlib.ExitStack
 ) -> psutil.Process:
     """Starts all the required services and returns the dev appserver."""
-    import psutil  # pylint: disable=import-outside-toplevel
 
     stack.enter_context(servers.managed_redis_server())
     stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -255,7 +252,6 @@ def attempt_launch_browser(
     ],
 ) -> None:
     """Attempts to launch the web browser."""
-    import psutil  # pylint: disable=import-outside-toplevel
 
     # Try to launch browser with timeout.
     last_error: Optional[Exception] = None

@@ -88,9 +88,6 @@ def managed_process(
         Exception. The process exited unexpectedly (only raised if
             raise_on_nonzero_exit is True).
     """
-    if TYPE_CHECKING:
-        import psutil
-
     import psutil  # pylint: disable=import-outside-toplevel
 
     get_proc_info: Callable[[psutil.Process], str] = lambda p: (
@@ -131,8 +128,6 @@ def managed_process(
                     procs_to_kill.append(proc)
                 else:
                     logging.info('%s has already ended.' % get_proc_info(proc))
-
-            import psutil  # pylint: disable=import-outside-toplevel
 
             procs_gone, procs_still_alive = psutil.wait_procs(
                 procs_to_kill, timeout=timeout_secs
@@ -204,7 +199,6 @@ def managed_dev_appserver(
     Yields:
         psutil.Process. The dev_appserver process.
     """
-    import psutil  # pylint: disable=import-outside-toplevel
 
     dev_appserver_args: List[Union[str, int]] = [
         common.CURRENT_PYTHON_BIN,
@@ -258,7 +252,6 @@ def managed_firebase_auth_emulator(
     Yields:
         psutil.Process. The Firebase emulator process.
     """
-    import psutil  # pylint: disable=import-outside-toplevel
 
     emulator_args = [
         common.FIREBASE_PATH,
@@ -301,7 +294,6 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     Yields:
         psutil.Process. The ElasticSearch server process.
     """
-    import psutil  # pylint: disable=import-outside-toplevel
 
     # Clear previous data stored in the local cluster.
     if os.path.exists(common.ES_PATH_DATA_DIR):
@@ -351,7 +343,6 @@ def managed_cloud_datastore_emulator(
     Yields:
         psutil.Process. The emulator process.
     """
-    import psutil  # pylint: disable=import-outside-toplevel
 
     emulator_hostport = '%s:%d' % (
         feconf.CLOUD_DATASTORE_EMULATOR_HOST,
@@ -437,8 +428,6 @@ def managed_redis_server() -> Iterator[psutil.Process]:
     # dump file so that the redis server starts with a clean slate.
     if os.path.exists(common.REDIS_DUMP_PATH):
         os.remove(common.REDIS_DUMP_PATH)
-
-    import psutil  # pylint: disable=import-outside-toplevel
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
@@ -798,7 +787,6 @@ def managed_webdriverio_server(
     Raises:
         ValueError. Number of sharding instances are less than 0.
     """
-    import psutil  # pylint: disable=import-outside-toplevel
 
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
@@ -881,7 +869,6 @@ def managed_acceptance_tests_server(
         Exception. The suite_name is not in the list of the acceptance tests
             suite names.
     """
-    import psutil  # pylint: disable=import-outside-toplevel
 
     available_suites = {}
     with open(

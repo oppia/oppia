@@ -432,7 +432,16 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
         open_swap = self.swap(builtins, 'open', MockFile)
         cd_swap = self.swap(common, 'CD', MockCD)
 
-        with swap_call, untar_files_swap, mac_os_swap, open_swap, cd_swap:
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        os_path_exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with (
+            swap_call
+        ), (
+            untar_files_swap
+        ), mac_os_swap, open_swap, cd_swap, os_path_exists_swap:
             install_third_party_libs.install_redis_cli()
 
         self.assertTrue(check_function_calls['open_is_called'])

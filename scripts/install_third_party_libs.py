@@ -41,7 +41,6 @@ from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
 
-
 from typing import Final
 
 from . import clean, common
@@ -86,6 +85,21 @@ def clean_pyc_files() -> None:
             if file_name.endswith('.pyc'):
                 filepath = os.path.join(directory, file_name)
                 os.remove(filepath)
+
+
+def install_missing_runtime_python_modules() -> None:
+    """Checks for required runtime Python modules and installs any that are
+    missing.
+    """
+    required_modules = ['psutil']
+    for module in required_modules:
+        try:
+            importlib.import_module(module)
+        except ImportError:
+            print('Installing missing module: %s...' % module)
+            subprocess.check_call(
+                [sys.executable, '-m', 'pip', 'install', module]
+            )
 
 
 def test_python_version() -> None:
@@ -382,6 +396,22 @@ def install_redis_cli() -> None:
             # It will build the redis-cli and redis-server files so that we can
             # run the server from inside the oppia folder by executing the
             # script src/redis-cli and src/redis-server.
+
+            # On macOS, we need to patch config.h to add
+            # _DARWIN_C_SOURCE before __APPLE__ is checked. This is
+            # needed for Redis 7.x to compile correctly on macOS.
+            if common.is_mac_os():
+                config_h_path = os.path.join('src', 'config.h')
+                if os.path.exists(config_h_path):
+                    with open(config_h_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    if '#ifdef __APPLE__' in content:
+                        content = content.replace(
+                            '#ifdef __APPLE__',
+                            '#define _DARWIN_C_SOURCE\n#ifdef __APPLE__',
+                        )
+                        with open(config_h_path, 'w', encoding='utf-8') as f:
+                            f.write(content)
 
             subprocess.call(['make'])
 
