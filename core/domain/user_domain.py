@@ -1859,6 +1859,7 @@ class DeletedUsername:
         self.username_hash = username_hash
 
     def validate(self) -> None:
+        """Validates the username_hash."""
         if not isinstance(self.username_hash, str):
             raise utils.ValidationError(
                 'Expected username_hash to be a string, received %s'
