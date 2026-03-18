@@ -149,11 +149,11 @@ describe('Entity voiceovers service', () => {
 
   it('should be able to mark voiceovers as needing update', () => {
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
-    let mapping = entityVoiceovers.voiceoversMapping['content0'];
+    let mapping = entityVoiceovers.voiceoversMapping.content0;
     expect(mapping?.manual?.needsUpdate).toBeFalsy();
 
     entityVoiceoversService.markManualVoiceoverAsNeedingUpdate('content0');
-    mapping = entityVoiceovers.voiceoversMapping['content0'];
+    mapping = entityVoiceovers.voiceoversMapping.content0;
     expect(mapping?.manual?.needsUpdate).toBeTruthy();
   });
 
