@@ -1765,8 +1765,6 @@ def get_deleted_username_model_from_domain_object(
 ) -> user_models.DeletedUsernameModel:
     """Converts DeletedUsername domain object to DeletedUsernameModel."""
 
-    deleted_username.validate()
-
     return user_models.DeletedUsernameModel(id=deleted_username.username_hash)
 
 
