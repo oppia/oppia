@@ -1778,6 +1778,31 @@ describe('ImageEditor', () => {
     });
   });
 
+  it('should show inline warning if uploaded image cannot be read', () => {
+    component.data = {mode: component.MODE_EMPTY, metadata: {}, crop: true};
+
+    const mockImageObjectWithError = {
+      onload: null,
+      onerror: null,
+      set src(_url: string) {
+        if (this.onerror) {
+          this.onerror(new Event('error'));
+        }
+      },
+    };
+    (window.Image as jasmine.Spy).and.returnValue(
+      mockImageObjectWithError as unknown as HTMLImageElement
+    );
+
+    const file = new File(['invalid svg'], 'invalid.svg', {
+      type: 'image/svg+xml',
+    });
+    component.onFileChanged(file);
+
+    expect(component.invalidImageWarningIsShown).toBeTrue();
+    expect(component.data.mode).toBe(component.MODE_EMPTY);
+  });
+
   it("should crop svg when user clicks the 'crop' button", () => {
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func({image: obj.images});
