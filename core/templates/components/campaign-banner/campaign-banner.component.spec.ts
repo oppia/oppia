@@ -61,7 +61,8 @@ class MockWindowRef {
 }
 
 class MockSiteAnalyticsService {
-  registeCampaignBannerDonateButtonClick(): void {}
+  registerCampaignBannerDonateButtonClick(): void {}
+  registerCampaignBannerVisibility(): void {}
 }
 
 describe('CampaignBannerComponent', () => {
@@ -126,7 +127,7 @@ describe('CampaignBannerComponent', () => {
   });
 
   it('should return static image url correctly', () => {
-    expect(component.getStaticImageUrl('test.png')).toBe('/assets/test.png');
+    expect(component.getStaticImageUrl('test.webp')).toBe('/assets/test.webp');
   });
 
   it('should set campaign end text correctly', () => {
@@ -278,15 +279,39 @@ describe('CampaignBannerComponent', () => {
     expect(component.shouldShowBanner).toBe(true);
   });
   it('should navigate to donate page and register analytics event', () => {
-    spyOn(siteAnalyticsService, 'registeCampaignBannerDonateButtonClick');
+    spyOn(siteAnalyticsService, 'registerCampaignBannerDonateButtonClick');
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.navigateToDonatePage();
 
     expect(
-      siteAnalyticsService.registeCampaignBannerDonateButtonClick
+      siteAnalyticsService.registerCampaignBannerDonateButtonClick
     ).toHaveBeenCalled();
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/donate');
+  });
+  it('should call registerBannerVisibility when banner is visible', () => {
+    spyOn(siteAnalyticsService, 'registerCampaignBannerVisibility');
+
+    platformFeatureService.status.EnableCampaignBanner.isEnabled = true;
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
+      if (key === 'lang') {
+        return 'en';
+      }
+      return null;
+    });
+
+    component.setCampaignConfig();
+
+    const config = component.campaignConfig as CampaignConfig;
+    config.startDate = new Date(Date.now() - 100000);
+    config.endDate = new Date(Date.now() + 100000);
+
+    component.computeBannerVisibility();
+
+    expect(component.shouldShowBanner).toBe(true);
+    expect(
+      siteAnalyticsService.registerCampaignBannerVisibility
+    ).toHaveBeenCalled();
   });
 });

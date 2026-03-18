@@ -642,8 +642,14 @@ export class SiteAnalyticsService {
     });
   }
 
-  registeCampaignBannerDonateButtonClick(): void {
+  registerCampaignBannerDonateButtonClick(): void {
     this._sendEventToGoogleAnalytics('campaign_page_donate_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerCampaignBannerVisibility(): void {
+    this._sendEventToGoogleAnalytics('campaign_banner_shown', {
       page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }

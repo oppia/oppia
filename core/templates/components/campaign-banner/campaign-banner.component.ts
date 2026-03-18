@@ -86,6 +86,10 @@ export class CampaignBannerComponent implements OnInit {
 
     this.shouldShowBanner =
       featureEnabled && this.isLanguageEnglish() && active && !recentlyClosed;
+
+    if (this.shouldShowBanner) {
+      this.registerBannerVisibility();
+    }
   }
 
   isCampaignActive(): boolean {
@@ -116,7 +120,7 @@ export class CampaignBannerComponent implements OnInit {
   }
 
   navigateToDonatePage(): void {
-    this.siteAnalyticsService.registeCampaignBannerDonateButtonClick();
+    this.siteAnalyticsService.registerCampaignBannerDonateButtonClick();
     this.windowRef.nativeWindow.location.href = '/donate';
     this.closeBanner();
   }
@@ -124,5 +128,9 @@ export class CampaignBannerComponent implements OnInit {
   isLanguageEnglish(): boolean {
     const languageCode = localStorage.getItem(this.LANGUAGE_CODE_KEY);
     return languageCode === 'en';
+  }
+
+  registerBannerVisibility(): void {
+    this.siteAnalyticsService.registerCampaignBannerVisibility();
   }
 }
