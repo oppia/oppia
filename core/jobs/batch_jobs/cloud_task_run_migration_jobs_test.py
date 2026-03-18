@@ -368,7 +368,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             updated_model.exception_messages_for_failed_runs[1],
         )
 
-    def test_edge_case_exactly_three_days_old(self) -> None:
+    def test_should_update_model_that_is_exactly_three_days_old(self) -> None:
         """Test that a model that is exactly 3 days old gets updated."""
         exactly_three_days_old_model = self.create_model(
             cloud_task_models.CloudTaskRunModel,
@@ -397,7 +397,9 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-    def test_edge_case_just_under_three_days_old(self) -> None:
+    def test_should_not_update_model_that_is_just_under_three_days_old(
+        self,
+    ) -> None:
         """Test that a model that is just under 3 days old does not get updated."""
         just_under_three_days_old_model = self.create_model(
             cloud_task_models.CloudTaskRunModel,
@@ -439,7 +441,7 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             cloud_task_models.CloudTaskState.RUNNING.value,
         )
 
-    def test_model_with_failed_and_awaiting_retry_state_not_updated(
+    def test_should_not_update_model_with_failed_and_awaiting_retry_state(
         self,
     ) -> None:
         """Test that models in FAILED_AND_AWAITING_RETRY state are not updated."""
@@ -480,7 +482,9 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             cloud_task_models.CloudTaskState.FAILED_AND_AWAITING_RETRY.value,
         )
 
-    def test_model_with_permanently_failed_state_not_updated(self) -> None:
+    def test_should_not_update_model_with_permanently_failed_state(
+        self,
+    ) -> None:
         """Test that models already in PERMANENTLY_FAILED state are not updated."""
         permanently_failed_model = self.create_model(
             cloud_task_models.CloudTaskRunModel,
@@ -580,4 +584,361 @@ class MarkStaleCloudTaskRunModelsAsFailedAuditJobTests(
         self.assertEqual(
             updated_model.latest_job_state,
             cloud_task_models.CloudTaskState.RUNNING.value,
+        )
+
+
+class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
+    job_test_utils.JobTestBase
+):
+    """Tests for MarkStaleVoiceoverRegenerationJobModelsAsFailedJob."""
+
+    JOB_CLASS: Type[
+        cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
+    ] = (
+        cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
+    )
+
+    def test_empty_storage(self) -> None:
+        """Test that the job runs successfully with empty storage."""
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 0.'
+                )
+            ]
+        )
+
+    def test_no_stale_models(self) -> None:
+        """Test that the job does not update non-stale models."""
+        fresh_model = self.create_model(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            id='exp1:taskrun1',
+            exploration_id='exp1',
+            cloud_task_run_id='taskrun1',
+            language_accent_to_content_status_map={
+                'en-us': {
+                    'content_1': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                }
+            },
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=2),
+        )
+
+        self.put_multi([fresh_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 0.'
+                )
+            ]
+        )
+
+        updated_model = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                'exp1:taskrun1'
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.language_accent_to_content_status_map,
+            {
+                'en-us': {
+                    'content_1': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                }
+            },
+        )
+
+    def test_updates_stale_model_generating_statuses_to_failed(self) -> None:
+        """Test that stale GENERATING statuses are marked as FAILED."""
+        stale_model = self.create_model(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            id='exp2:taskrun2',
+            exploration_id='exp2',
+            cloud_task_run_id='taskrun2',
+            language_accent_to_content_status_map={
+                'en-us': {
+                    'content_1': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    ),
+                    'content_2': (
+                        feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                    ),
+                },
+                'hi-in': {
+                    'content_3': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                },
+            },
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        self.put_multi([stale_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp2:taskrun2.'
+                ),
+            ]
+        )
+
+        updated_model = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                'exp2:taskrun2'
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.language_accent_to_content_status_map,
+            {
+                'en-us': {
+                    'content_1': feconf.VoiceoverRegenerationState.FAILED.value,
+                    'content_2': (
+                        feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                    ),
+                },
+                'hi-in': {
+                    'content_3': feconf.VoiceoverRegenerationState.FAILED.value
+                },
+            },
+        )
+
+    def test_updates_multiple_stale_models(self) -> None:
+        """Test that the job updates multiple stale models correctly."""
+        stale_model_1 = self.create_model(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            id='exp3:taskrun3',
+            exploration_id='exp3',
+            cloud_task_run_id='taskrun3',
+            language_accent_to_content_status_map={
+                'en-us': {
+                    'content_1': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                }
+            },
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=5),
+        )
+
+        stale_model_2 = self.create_model(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            id='exp4:taskrun4',
+            exploration_id='exp4',
+            cloud_task_run_id='taskrun4',
+            language_accent_to_content_status_map={
+                'hi-in': {
+                    'content_2': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                }
+            },
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        fresh_model = self.create_model(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            id='exp5:taskrun5',
+            exploration_id='exp5',
+            cloud_task_run_id='taskrun5',
+            language_accent_to_content_status_map={
+                'en-us': {
+                    'content_3': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                }
+            },
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(hours=23),
+        )
+
+        self.put_multi([stale_model_1, stale_model_2, fresh_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 2.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp3:taskrun3.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp4:taskrun4.'
+                ),
+            ]
+        )
+
+        updated_stale_model_1 = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                'exp3:taskrun3'
+            )
+        )
+        updated_stale_model_2 = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                'exp4:taskrun4'
+            )
+        )
+        updated_fresh_model = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                'exp5:taskrun5'
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_stale_model_1 is not None
+        assert updated_stale_model_2 is not None
+        assert updated_fresh_model is not None
+
+        self.assertEqual(
+            updated_stale_model_1.language_accent_to_content_status_map,
+            {
+                'en-us': {
+                    'content_1': feconf.VoiceoverRegenerationState.FAILED.value
+                }
+            },
+        )
+        self.assertEqual(
+            updated_stale_model_2.language_accent_to_content_status_map,
+            {
+                'hi-in': {
+                    'content_2': feconf.VoiceoverRegenerationState.FAILED.value
+                }
+            },
+        )
+        self.assertEqual(
+            updated_fresh_model.language_accent_to_content_status_map,
+            {
+                'en-us': {
+                    'content_3': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                }
+            },
+        )
+
+    def test_should_update_model_that_is_exactly_three_days_old(self) -> None:
+        """Test that a model exactly three days old gets updated."""
+        exactly_three_days_old_model = self.create_model(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            id='exp6:taskrun6',
+            exploration_id='exp6',
+            cloud_task_run_id='taskrun6',
+            language_accent_to_content_status_map={
+                'en-us': {
+                    'content_1': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    )
+                }
+            },
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=3),
+        )
+
+        self.put_multi([exactly_three_days_old_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp6:taskrun6.'
+                ),
+            ]
+        )
+
+
+class MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJobTests(
+    job_test_utils.JobTestBase
+):
+    """Tests for MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJob."""
+
+    JOB_CLASS: Type[
+        cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJob
+    ] = (
+        cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJob
+    )
+
+    def test_empty_storage(self) -> None:
+        """Test that the audit job runs successfully with empty storage."""
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 0.'
+                )
+            ]
+        )
+
+    def test_audit_job_does_not_update_models(self) -> None:
+        """Test that the audit job does not update stale models."""
+        stale_model = self.create_model(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            id='exp7:taskrun7',
+            exploration_id='exp7',
+            cloud_task_run_id='taskrun7',
+            language_accent_to_content_status_map={
+                'en-us': {
+                    'content_1': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    ),
+                    'content_2': (
+                        feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                    ),
+                }
+            },
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        self.put_multi([stale_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp7:taskrun7.'
+                ),
+            ]
+        )
+
+        updated_model = (
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+                'exp7:taskrun7'
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.language_accent_to_content_status_map,
+            {
+                'en-us': {
+                    'content_1': (
+                        feconf.VoiceoverRegenerationState.GENERATING.value
+                    ),
+                    'content_2': (
+                        feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                    ),
+                }
+            },
         )
