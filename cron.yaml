@@ -36,5 +36,8 @@ cron:
   url: /cron/mail/reviewers/new_contributor_dashboard_suggestions
   schedule: every day 17:00
 - description: weekly job to mark stale CloudTaskRunModels as failed
-  url: /cron/cloud_task/mark_stale_run_as_failed
-  schedule: every monday 9:00
+  url: /cron/cloud_task/mark_stale_cloud_task_run_as_failed
+  schedule: every 48 hours
+- description: weekly job to mark stale voiceover regeneration content as failed
+  url: /cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed
+  schedule: every 48 hours
