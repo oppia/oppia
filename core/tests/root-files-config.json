@@ -30,6 +30,7 @@
     "core/tests/karma.conf.ts",
     "core/tests/protractor-browserstack.conf.js",
     "core/tests/wdio.conf.js",
+    "core/tests/webdriverio_utils/ModeratorPage.js",
     "data/README.md",
     "data/voiceovers/README.md",
     "extensions/README.md",
