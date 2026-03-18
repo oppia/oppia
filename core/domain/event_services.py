@@ -28,6 +28,7 @@ from core.domain import (
     stats_domain,
     stats_services,
     taskqueue_services,
+    answer_submitted_event_log_entry_services,
 )
 from core.platform import models
 
@@ -168,7 +169,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
             exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
         )
 
-        stats_models.AnswerSubmittedEventLogEntryModel.create(
+        answer_submitted_event_log_entry_services.create_answer_submitted_event_log_entry(
             exploration_id,
             exploration_version,
             state_name,
