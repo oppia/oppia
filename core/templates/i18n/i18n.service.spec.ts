@@ -353,8 +353,8 @@ describe('I18n service', () => {
         i18nLanguageCodeService,
         'onI18nLanguageCodeChange'
       ).and.returnValue(mockI18nLanguageCodeServiceSubject);
-      const prevLangCode = I18nLanguageCodeService.prevLangCode;
-      I18nLanguageCodeService.prevLangCode = 'en';
+      const prevLangCode = i18nLanguageCodeService.prevLangCode;
+      i18nLanguageCodeService.prevLangCode = 'en';
       spyOn(windowRef.nativeWindow.location, 'reload');
       i18nService.initialize();
       mockI18nLanguageCodeServiceSubject.emit('ar');
@@ -372,7 +372,7 @@ describe('I18n service', () => {
       expect(windowRef.nativeWindow.location.href).toBe(
         'http://localhost:8181/?dir=ltr'
       );
-      I18nLanguageCodeService.prevLangCode = prevLangCode;
+      i18nLanguageCodeService.prevLangCode = prevLangCode;
       flushMicrotasks();
     })
   );
@@ -401,8 +401,8 @@ describe('I18n service', () => {
         i18nLanguageCodeService,
         'onI18nLanguageCodeChange'
       ).and.returnValue(mockI18nLanguageCodeServiceSubject);
-      const prevLangCode = I18nLanguageCodeService.prevLangCode;
-      I18nLanguageCodeService.prevLangCode = 'en';
+      const prevLangCode = i18nLanguageCodeService.prevLangCode;
+      i18nLanguageCodeService.prevLangCode = 'en';
       spyOn(windowRef.nativeWindow.location, 'reload');
       i18nService.initialize();
       // In our code, we check if the dir cookie is set and use it to determine
@@ -416,7 +416,7 @@ describe('I18n service', () => {
         'http://localhost:8181'
       );
       mockI18nLanguageCodeServiceSubject.emit('ar');
-      I18nLanguageCodeService.prevLangCode = prevLangCode;
+      i18nLanguageCodeService.prevLangCode = prevLangCode;
       expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
       expect(windowRef.nativeWindow.location.href).toBe(
         'http://localhost:8181'

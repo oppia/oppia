@@ -27,6 +27,7 @@ import path from 'path';
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -34,7 +35,6 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -2790,28 +2790,9 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
-    try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        // If we know the modal should appear, we can wait longer.
-        timeout: failIfMissing ? 20000 : 5000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      if (!failIfMissing) {
-        showMessage(
-          'Welcome Modal not found, but test can be continued.\n' +
-            `Error: ${error.message}`
-        );
-      } else {
-        throw new Error(
-          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
-        );
-      }
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
@@ -2823,7 +2804,7 @@ export class ExplorationEditor extends BaseUser {
     // The existing dismissWelcomeModal() in this class already handles the
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(false);
   }
 
   /**
@@ -2874,9 +2855,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -4719,13 +4697,11 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
     category: string = 'Algebra',
-    flag: boolean = true
+    flag: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    if (flag) {
-      await this.dismissWelcomeModal();
-    }
+    await this.dismissWelcomeModal(flag);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -4806,11 +4782,12 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
     category: string = 'Mathematics',
-    numberOfCards: number = 2
+    numberOfCards: number = 2,
+    expectedWelcomeModal: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
 
     for (let i = 0; i < numberOfCards - 1; i++) {
       await this.updateCardContent(`Content ${i}`);
@@ -6607,9 +6584,6 @@ export class ExplorationEditor extends BaseUser {
     imageDescription: string,
     imageCaption: string | null
   ): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
@@ -6623,9 +6597,6 @@ export class ExplorationEditor extends BaseUser {
    * Block Quote, Image, Math Formula, and Concept Card.
    */
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
@@ -6711,9 +6682,6 @@ export class ExplorationEditor extends BaseUser {
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
