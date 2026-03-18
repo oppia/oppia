@@ -47,6 +47,12 @@ jobs:
               core.setFailed(`Invalid repo (${repo}) or owner (${owner})`);
               return;
             }
+            const rawComment = (context.payload.comment?.body || '');
+            const comment = rawComment
+                       .split('\n')
+                       .filter(line => !line.trim().startsWith('>'))
+                       .join('\n')
+                       .trim();
             const comment = (context.payload.comment?.body || '').trim();
             const reviewerPattern = /((?:@[\w-]+[\s,]*)+)\s+(ptal|take\s+a\s+pass|please\s+review)\b/i;
             const match = comment.match(reviewerPattern);
@@ -73,6 +79,9 @@ jobs:
               core.setFailed('Issue is not a PR');
               return;
             }
+            reviewers = reviewers.filter(
+                r => r !== context.payload.comment.user.login
+            );
             await github.rest.issues.addAssignees({
               owner,
               repo,
