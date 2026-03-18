@@ -42,8 +42,9 @@ from core.jobs import base_jobs
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import
+    audit_non_existent_threads_messages_jobs,
     audit_stories_with_disconnected_node_ids_job,
-    audit_topics_with_hanging_stories_job,
+    audit_threads_with_missing_suggestions_jobs,
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
     collection_info_jobs,
@@ -56,9 +57,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     exploration_voiceover_sync_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
+    number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
-    remove_hanging_story_references_job,
     skill_inspection_jobs,
     skill_migration_jobs,
     story_migration_jobs,
