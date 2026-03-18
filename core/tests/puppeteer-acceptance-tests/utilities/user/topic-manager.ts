@@ -3525,17 +3525,11 @@ export class TopicManager extends BaseUser {
         if (!this.isViewportAtMobileWidth()) {
           await this.openStoryEditor(storyName, topicName);
         } else {
-          const onStoryEditorPage =
-            (await this.isElementVisible(
-              chapterEditorContainerSelector,
-              true,
-              2000
-            )) ||
-            (await this.isElementVisible(
-              storyEditorContainerSelector,
-              true,
-              2000
-            ));
+          const onStoryEditorPage = await this.isElementVisible(
+            storyEditorContainerSelector,
+            true,
+            2000
+          );
           if (!onStoryEditorPage) {
             await this.openStoryEditor(storyName, topicName);
           }
@@ -4221,19 +4215,10 @@ export class TopicManager extends BaseUser {
    */
   async ensureChapterListIsVisible(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileChapterCollapsibleCard, {
-        visible: true,
-      });
-      const chapterListVisible = await this.isElementVisible(
-        chapterTitleSelector,
-        true,
-        2000
-      );
-      if (!chapterListVisible) {
-        await this.page.$eval(mobileChapterCollapsibleCard, element => {
-          element.scrollIntoView({block: 'center'});
-          (element as HTMLElement).click();
-        });
+      await this.waitForStaticAssetsToLoad();
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOnElementWithSelector(mobileChapterCollapsibleCard);
       }
     }
     await this.page.waitForSelector(chapterTitleSelector, {
