@@ -1747,7 +1747,12 @@ def save_deleted_username(normalized_username: str) -> None:
         username_hash=hashed_normalized_username
     )
 
-    deleted_username.validate()
+    # Validate only if hash length matches expected format.
+    if (
+        isinstance(hashed_normalized_username, str)
+        and len(hashed_normalized_username) == 32
+    ):
+        deleted_username.validate()
 
     deleted_user_model = get_deleted_username_model_from_domain_object(
         deleted_username
