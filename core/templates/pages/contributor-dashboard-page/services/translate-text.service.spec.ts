@@ -26,6 +26,7 @@ import {
   StateAndContent,
   TranslateTextService,
 } from 'pages/contributor-dashboard-page/services/translate-text.service';
+import {TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING} from 'domain/exploration/written-translation.model';
 
 describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
@@ -214,6 +215,34 @@ describe('TranslateTextService', () => {
 
       expect(textAndAvailability).toEqual(textAndPreviousAvailability);
     }));
+
+    it('should return empty translation for set data format', fakeAsync(() => {
+      const sampleStateWiseContentMapping = {
+        stateName1: {
+          contentId1: {
+            content_format: TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+            content_value: ['a', 'b'],
+            content_type: 'rule',
+            interaction_id: 'TextInput',
+            rule_type: 'Equals',
+          },
+        },
+      };
+      translateTextService.init('1', 'en', () => {});
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1,
+      });
+      flushMicrotasks();
+
+      const textAndAvailability = translateTextService.getTextToTranslate();
+
+      expect(textAndAvailability.translation).toEqual([]);
+    }));
   });
 
   // Testing setters and getters of StateAndContent class.
@@ -251,6 +280,30 @@ describe('TranslateTextService', () => {
     it('should not submit when active content is unavailable', () => {
       const successCallback = jasmine.createSpy('successCallback');
       const errorCallback = jasmine.createSpy('errorCallback');
+
+      translateTextService.suggestTranslatedText(
+        'translated text',
+        'hi',
+        [],
+        'html',
+        successCallback,
+        errorCallback
+      );
+
+      httpTestingController.expectNone('/suggestionhandler/');
+      expect(successCallback).not.toHaveBeenCalled();
+      expect(errorCallback).not.toHaveBeenCalled();
+    });
+
+    it('should not submit when content is missing for active ids', () => {
+      const successCallback = jasmine.createSpy('successCallback');
+      const errorCallback = jasmine.createSpy('errorCallback');
+
+      translateTextService.activeExpId = 'exp1';
+      translateTextService.activeExpVersion = '1';
+      translateTextService.activeStateName = 'state1';
+      translateTextService.activeContentId = 'content1';
+      translateTextService.stateWiseContents = {state1: {}};
 
       translateTextService.suggestTranslatedText(
         'translated text',
