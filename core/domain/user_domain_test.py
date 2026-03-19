@@ -1993,7 +1993,7 @@ class DeletedUsernameTests(test_utils.GenericTestBase):
 
 class DeletedUsernameServicesTests(test_utils.GenericTestBase):
 
-    def test_get_deleted_username_from_model(self):
+    def test_get_deleted_username_from_model(self) -> None:
         model = user_models.DeletedUsernameModel(id='a' * 32)
         obj = user_services.get_deleted_username_from_model(model)
 
@@ -2002,7 +2002,7 @@ class DeletedUsernameServicesTests(test_utils.GenericTestBase):
         self.assertTrue(obj.username_hash.isalnum())
         obj.validate()
 
-    def test_get_model_from_domain_object(self):
+    def test_get_model_from_domain_object(self) -> None:
         domain_obj = user_domain.DeletedUsername(username_hash='a' * 32)
 
         model = user_services.get_deleted_username_model_from_domain_object(
@@ -2011,7 +2011,7 @@ class DeletedUsernameServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(model.id, 'a' * 32)
 
-    def test_save_deleted_username(self):
+    def test_save_deleted_username(self) -> None:
         normalized_username = 'testuser'
 
         user_services.save_deleted_username(normalized_username)
