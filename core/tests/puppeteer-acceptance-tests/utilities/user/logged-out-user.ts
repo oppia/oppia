@@ -5951,27 +5951,42 @@ export class LoggedOutUser extends BaseUser {
    * Copy share link in share model of new lesson player.
    */
   async clickCopyLinkButton(): Promise<void> {
-    await this.page.bringToFront();
-    await this.page.waitForSelector(lessonCopyLinkbutton, {
-      visible: true,
-      timeout: 10000,
-    });
-    await this.waitForElementToStabilize(lessonCopyLinkbutton);
-    await this.page.click(lessonCopyLinkbutton);
-    showMessage('Copy Link button clicked');
+    try {
+      await this.waitForPageToFullyLoad();
+      await this.page.bringToFront();
+      await this.page.waitForSelector(lessonCopyLinkbutton, {
+        visible: true,
+      });
+      await this.waitForElementToBeClickable(lessonCopyLinkbutton);
+      await this.page.click(lessonCopyLinkbutton);
+      showMessage('Copy Link button clicked');
+
+      const clipboardData = await this.page.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
+
+      if (!clipboardData) {
+        throw new Error('Failed to copy the share lesson URL.');
+      }
+
+      showMessage(`clipboard Data: ${clipboardData}`);
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
   }
 
   /**
    * Allow clipboard read/write permission.
    */
   async allowClipboardPermission(): Promise<void> {
-    // OverridePermissions is used to allow clipboard access.
-    const context = this.page.browser().defaultBrowserContext();
-    await context.overridePermissions('http://localhost:8181', [
+    const context = this.page.browserContext();
+    const origin = new URL(this.page.url()).origin;
+
+    await context.overridePermissions(origin, [
       'clipboard-read',
       'clipboard-write',
     ]);
-    showMessage('Clipboard read/write permission allowed');
   }
 
   /**
@@ -6185,8 +6200,9 @@ export class LoggedOutUser extends BaseUser {
     lessonAttributionPrintContent: string
   ): Promise<void> {
     await this.allowClipboardPermission();
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(ccButtonSelector);
-    await this.waitForElementToStabilize(ccButtonSelector);
+    await this.waitForElementToBeClickable(ccButtonSelector);
     await this.page.click(ccButtonSelector);
 
     await this.page.bringToFront();
@@ -6233,10 +6249,11 @@ export class LoggedOutUser extends BaseUser {
     lessonEmbedHTMLContent: string
   ): Promise<void> {
     await this.allowClipboardPermission();
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(ccButtonSelector, {
       visible: true,
     });
-    await this.waitForElementToStabilize(ccButtonSelector);
+    await this.waitForElementToBeClickable(ccButtonSelector);
     await this.page.click(ccButtonSelector);
 
     await this.page.bringToFront();
