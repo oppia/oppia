@@ -556,8 +556,10 @@ const currentProgessSelector = '.e2e-test-progress-container';
 
 // Topic Page.
 const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
+const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
 const lessonsTabButtonSelector = '.e2e-test-lesson-tab-link';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
+const practiceTabContainerSelector = '.e2e-test-practice-tab-container';
 const lessonsTabContainerSelector = '.e2e-test-lessons-tab-container';
 const revisionTabSelector = 'subtopics-list';
 
