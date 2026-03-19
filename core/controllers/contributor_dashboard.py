@@ -193,9 +193,6 @@ class ContributionOpportunitiesHandler(
             # We only show skills for topics that have at least one canonical
             # story, as these are considered 'curated' content.
             story_count = len(topic.get_all_story_references())
-            print(
-                f"DEBUG: Topic {topic.name} (ID {topic.id}) has {story_count} stories and {len(topic.get_all_skill_ids())} skills"
-            )
             if story_count > 0:
                 for skill_id in topic.get_all_skill_ids():
                     skill_id_to_topic_name[skill_id] = topic.name

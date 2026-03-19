@@ -2850,39 +2850,6 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-# coding: utf-8
-#
-# Copyright 2024 The Oppia Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""Tests for structured skill ordering in contributor dashboard."""
-
-from __future__ import annotations
-
-from core import feconf
-from core.constants import constants
-from core.domain import (
-    classroom_config_services,
-    opportunity_services,
-    topic_domain,
-    topic_fetchers,
-    user_services,
-)
-from core.tests import test_utils
-
-from typing import List
-
 
 class SkillOpportunitySortingTest(test_utils.GenericTestBase):
     """Test for tiered sorting of skill opportunities."""
@@ -2972,28 +2939,28 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         )
 
         # Update question counts
-        opportunity_services.update_skill_opportunity_question_count(
+        opportunity_services.update_skill_opportunity_question_counts(
             self.skill_id_t1_high, 5
         )
-        opportunity_services.update_skill_opportunity_question_count(
+        opportunity_services.update_skill_opportunity_question_counts(
             self.skill_id_t1_low, 2
         )
-        opportunity_services.update_skill_opportunity_question_count(
+        opportunity_services.update_skill_opportunity_question_counts(
             self.skill_id_t1_aaa, 5
         )
-        opportunity_services.update_skill_opportunity_question_count(
+        opportunity_services.update_skill_opportunity_question_counts(
             self.skill_id_t1_zzz, 5
         )
-        opportunity_services.update_skill_opportunity_question_count(
+        opportunity_services.update_skill_opportunity_question_counts(
             self.skill_id_t2_full, 10
         )
         # skill_id_t3_unpub remains 0
 
         # Update descriptions for tie-breaking test
-        skill_aaa = self.save_new_skill(
+        self.save_new_skill(
             self.skill_id_t1_aaa, self.owner_id, description='aaa'
         )
-        skill_zzz = self.save_new_skill(
+        self.save_new_skill(
             self.skill_id_t1_zzz, self.owner_id, description='zzz'
         )
         # update_skill_opportunity_skill_description is likely what we need if it exists,
@@ -3005,6 +2972,12 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
     def _publish_topic_with_skills(
         self, topic: topic_domain.Topic, skill_ids: List[str]
     ) -> None:
+        """Publishes a topic with skills.
+
+        Args:
+            topic: Topic. The topic to publish.
+            skill_ids: list(str). The skill IDs to add to the topic.
+        """
         topic_services.save_new_topic(self.admin_id, topic)
         for skill_id in skill_ids:
             self.save_new_skill(
