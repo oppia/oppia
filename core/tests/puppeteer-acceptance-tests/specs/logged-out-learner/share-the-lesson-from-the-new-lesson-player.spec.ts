@@ -133,7 +133,6 @@ describe('Logged-Out Learner', function () {
     // Click on share and copy link.
     await loggedOutLearner.clickShareLessonButton();
     await loggedOutLearner.expectShareLessonModal();
-    await loggedOutLearner.allowClipboardPermission();
 
     await loggedOutLearner.clickCopyLinkButton();
     await loggedOutLearner.expectLinkCopiedMessage();

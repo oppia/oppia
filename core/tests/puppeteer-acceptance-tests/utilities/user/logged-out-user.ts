@@ -5948,18 +5948,38 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Copy share link in share model of new lesson player.
+   * Copy share link in share modal of new lesson player.
    */
   async clickCopyLinkButton(): Promise<void> {
     try {
       await this.waitForPageToFullyLoad();
+      await this.allowClipboardPermission();
       await this.page.bringToFront();
+
       await this.page.waitForSelector(lessonCopyLinkbutton, {
         visible: true,
       });
+
       await this.waitForElementToBeClickable(lessonCopyLinkbutton);
-      await this.page.click(lessonCopyLinkbutton);
-      showMessage('Copy Link button clicked');
+
+      const element = await this.page.$(lessonCopyLinkbutton);
+      if (!element) {
+        throw new Error('Copy link buttond not found');
+      }
+      const box = await element.boundingBox();
+
+      if (!box) {
+        throw new Error('Could not determine button position.');
+      }
+
+      // Move mouse to the center of the element.
+      await this.page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+
+      // Perform real mouse click.
+      await this.page.mouse.down();
+      await this.page.mouse.up();
+
+      showMessage('Copy Link button clicked via mouse event');
 
       const clipboardData = await this.page.evaluate(async () => {
         return await navigator.clipboard.readText();
@@ -5980,13 +6000,21 @@ export class LoggedOutUser extends BaseUser {
    * Allow clipboard read/write permission.
    */
   async allowClipboardPermission(): Promise<void> {
-    const context = this.page.browserContext();
-    const origin = new URL(this.page.url()).origin;
+    const origin = 'http://localhost:8181';
 
+    // Standard Puppeteer permission override.
+    const context = this.browserObject.defaultBrowserContext();
     await context.overridePermissions(origin, [
       'clipboard-read',
       'clipboard-write',
     ]);
+
+    // CDP permission grant (more reliable for clipboard).
+    const client = await this.page.target().createCDPSession();
+    await client.send('Browser.grantPermissions', {
+      origin: origin,
+      permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'],
+    });
   }
 
   /**
