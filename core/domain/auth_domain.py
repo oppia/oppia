@@ -278,7 +278,7 @@ class CsrfSecret:
         """Initializes CsrfSecret domain object.
 
         Args:
-        oppia_csrf_secret: str. The CSRF secret value.
+            oppia_csrf_secret: str. The CSRF secret value.
         """
         self.oppia_csrf_secret = oppia_csrf_secret
 
