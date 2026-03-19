@@ -177,6 +177,28 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             self.assertFalse(more)
         self.logout()
 
+    def test_get_questions_with_deleted_question(self) -> None:
+        question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id,
+            self.admin_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.skill_id],
+            content_id_generator.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            self.admin_id, question_id, self.skill_id, 0.5
+        )
+        question_services.delete_question(self.admin_id, question_id)
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s?offset=0' % (feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id)
+        )
+        self.assertEqual(len(json_response['question_summary_dicts']), 0)
+        self.logout()
+
     def test_get_fails_when_offset_not_valid(self) -> None:
         self.get_json(
             '%s/%s?offset=a'

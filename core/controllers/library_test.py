@@ -456,6 +456,20 @@ class LibraryPageTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response_2['error'], error_msg)
 
+    def test_library_handler_with_search_offset(self) -> None:
+        """Test library handler with a search offset."""
+        response_dict = self.get_json(
+            feconf.LIBRARY_SEARCH_DATA_URL, params={'offset': '1'}
+        )
+        self.assertEqual(
+            {
+                'is_super_admin': False,
+                'activity_list': [],
+                'search_cursor': None,
+            },
+            response_dict,
+        )
+
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 

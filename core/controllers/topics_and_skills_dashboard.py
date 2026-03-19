@@ -605,14 +605,13 @@ class NewSkillHandler(
         files = self.normalized_payload['files']
 
         new_skill_id = skill_services.get_new_skill_id()
-        if linked_topic_ids is not None:
-            topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
-            for topic in topics:
-                if topic is None:
-                    raise self.InvalidInputException
-                topic_services.add_uncategorized_skill(
-                    self.user_id, topic.id, new_skill_id
-                )
+        topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
+        for topic in topics:
+            if topic is None:
+                raise self.InvalidInputException
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic.id, new_skill_id
+            )
 
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(

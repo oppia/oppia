@@ -20,7 +20,9 @@ from core import feconf
 from core.domain import (
     story_domain,
     story_services,
+    topic_domain,
     topic_fetchers,
+    topic_services,
     user_services,
 )
 from core.tests import test_utils
@@ -494,6 +496,26 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual('Name', json_response['topic_name'])
         self.assertEqual(len(json_response['skill_summaries']), 0)
+        self.logout()
+
+    def test_editable_story_handler_get_with_multiple_stories(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        story_id_2 = story_services.get_new_story_id()
+        self.save_new_story(story_id_2, self.admin_id, self.topic_id)
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_ADD_CANONICAL_STORY,
+                    'story_id': story_id_2,
+                }
+            )
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id, self.topic_id, changelist, 'Add story'
+        )
+        self.get_json(
+            '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
+        )
         self.logout()
 
     def test_editable_story_handler_put(self) -> None:

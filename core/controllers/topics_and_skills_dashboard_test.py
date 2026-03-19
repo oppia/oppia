@@ -103,6 +103,12 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.save_new_valid_classroom(
+            classroom_id='empty_classroom',
+            name='empty_classroom',
+            url_fragment='empty',
+            topic_id_to_prerequisite_topic_ids={},
+        )
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL
         )
@@ -154,8 +160,11 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'], skill_id
         )
-        self.assertEqual(len(json_response['all_classroom_names']), 1)
-        self.assertEqual(json_response['all_classroom_names'], ['math'])
+        self.assertEqual(len(json_response['all_classroom_names']), 2)
+        self.assertEqual(
+            sorted(json_response['all_classroom_names']),
+            ['empty_classroom', 'math'],
+        )
         self.assertEqual(json_response['can_delete_topic'], False)
         self.assertEqual(json_response['can_create_topic'], False)
         self.assertEqual(json_response['can_delete_skill'], False)

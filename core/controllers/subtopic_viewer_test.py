@@ -24,6 +24,7 @@ from core.domain import (
     subtopic_page_domain,
     subtopic_page_services,
     topic_domain,
+    topic_fetchers,
     topic_services,
     translation_domain,
     user_services,
@@ -549,6 +550,58 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'prev_subtopic_dict': expected_prev_subtopic_dict,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
+
+    def test_get_for_only_subtopic_in_topic(self) -> None:
+        self.save_new_skill(
+            'skill_id_only', self.admin_id, description='Skill Description'
+        )
+        topic_id_4 = topic_fetchers.get_new_topic_id()
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Only Subtopic', 'only-url-frag'
+        )
+        subtopic.skill_ids = ['skill_id_only']
+        self.save_new_topic(
+            topic_id_4,
+            self.admin_id,
+            name='Only Subtopic Topic',
+            abbreviated_name='onlytopic',
+            url_fragment='onlytopic',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic(topic_id_4, self.admin_id)
+
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id_4
+            )
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            subtopic_page,
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Only Subtopic',
+                        'url_fragment': 'only-url-frag',
+                    }
+                )
+            ],
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'onlytopic', 'only-url-frag')
+        )
+        self.assertEqual(json_response['next_subtopic_dict'], None)
+        self.assertEqual(json_response['prev_subtopic_dict'], None)
 
     def test_cannot_get_with_unpublished_topic(self) -> None:
         topic_services.unpublish_topic(self.topic_id, self.admin_id)
