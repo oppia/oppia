@@ -1,4 +1,4 @@
-<div>
+<div class="oppia-search-bar-result-container">
   <div class="oppia-search-bar-container">
     <oppia-search-bar [enableDropup]="false"></oppia-search-bar>
   </div>
@@ -40,6 +40,9 @@
     height: 50px;
     margin: 0 auto 20px;
     width: max-content;
+  }
+  .oppia-search-bar-result-container{
+    min-height: 90vh;
   }
   @media (max-width: 800px) {
     .oppia-search-results-intro {
