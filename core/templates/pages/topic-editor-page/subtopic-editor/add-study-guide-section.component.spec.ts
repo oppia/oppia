@@ -56,7 +56,8 @@ describe('Add Study Guide Section Modal Component', () => {
   let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
-    htmlLengthService = new MockHtmlLengthService();
+    htmlLengthService =
+      new MockHtmlLengthService() as unknown as HtmlLengthService;
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

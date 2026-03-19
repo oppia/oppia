@@ -74,7 +74,7 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
   let skill: Skill;
   let extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService;
   let mockImageFile: ImageFile;
-  let mockBlob: Blob;
+  let mockBlob: Blob = new Blob();
 
   let misconceptionDict1: MisconceptionBackendDict;
   let rubricDict: RubricBackendDict;
@@ -160,8 +160,9 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
       // to parameter of type 'FileReader'.". We need to suppress this error
       // because 'FileReader' has around 15 more properties. We have only
       // defined the properties we need in 'MockReaderObject'.
-      // @ts-expect-error
-      spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
+      spyOn(window, 'FileReader').and.returnValue(
+        new MockReaderObject() as any
+      );
     });
 
     it(

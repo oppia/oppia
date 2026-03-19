@@ -61,6 +61,8 @@ describe('Subtopic viewer navbar breadcrumb component', function () {
                 resolve(
                   ReadOnlySubtopicPageData.createFromBackendDict({
                     subtopic_title: 'Subtopic Title',
+                    current_subtopic_id: 1,
+                    sections: [],
                     page_contents: {
                       subtitled_html: {
                         content_id: 'content_1',

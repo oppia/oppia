@@ -106,7 +106,8 @@ describe('Subtopic viewer page', function () {
     [],
     {},
     {},
-    true,
+    false,
+    '',
     '',
     ''
   );
@@ -118,6 +119,7 @@ describe('Subtopic viewer page', function () {
       topic_id: topicId,
       topic_name: topicName,
       subtopic_title: subtopicTitle,
+      current_subtopic_id: 1,
       page_contents: {
         subtitled_html: {
           content_id: '',
@@ -135,7 +137,7 @@ describe('Subtopic viewer page', function () {
           },
           content: {
             content_id: 'sections_content_1',
-            unicode_str: 'Test content',
+            html: 'Test content',
           },
         },
       ],
@@ -155,6 +157,7 @@ describe('Subtopic viewer page', function () {
       topic_id: topicId,
       topic_name: topicName,
       subtopic_title: subtopicTitle,
+      current_subtopic_id: 1,
       page_contents: {
         subtitled_html: {
           content_id: '',
@@ -313,7 +316,7 @@ describe('Subtopic viewer page', function () {
         subtopicDataObject.getNextSubtopic()
       );
       expect(component.prevSubtopic).toBeUndefined();
-      expect(component.subtopicSummaryIsShown).toBeTrue();
+      expect(component.subtopicSummaryIsShown).toBe(true);
 
       expect(component.subtopicTitleTranslationKey).toEqual(
         'I18N_SUBTOPIC_123abcd_test_TITLE'
@@ -448,7 +451,7 @@ describe('Subtopic viewer page', function () {
       subtopicDataObjectWithPrevSubtopic.getPrevSubtopic()
     );
     expect(component.nextSubtopic).toBeUndefined();
-    expect(component.subtopicSummaryIsShown).toBeTrue();
+    expect(component.subtopicSummaryIsShown).toBe(true);
 
     component.ngOnDestroy();
   }));
@@ -501,7 +504,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    };
+    } as unknown as any;
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/test-url'
@@ -520,7 +523,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    };
+    } as unknown as any;
     const mockEvent = new MouseEvent('click', {ctrlKey: true});
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
@@ -540,7 +543,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    };
+    } as unknown as any;
 
     component.openStudyGuide();
 
@@ -699,7 +702,7 @@ describe('Subtopic viewer page', function () {
     component.nextSubtopic = {
       getTitle: () => longTitle,
       getUrlFragment: () => 'test-fragment',
-    };
+    } as unknown as any;
 
     const desktopResult = component.checkNextSubtopicTitleLengthAndModify();
     // 20 chars + '...'.
@@ -720,7 +723,7 @@ describe('Subtopic viewer page', function () {
     component.nextSubtopic = {
       getTitle: () => shortTitle,
       getUrlFragment: () => 'test-fragment',
-    };
+    } as unknown as any;
 
     const shortResult = component.checkNextSubtopicTitleLengthAndModify();
     expect(shortResult).toBe(shortTitle);

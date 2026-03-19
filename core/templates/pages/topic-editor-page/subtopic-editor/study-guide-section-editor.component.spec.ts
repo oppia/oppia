@@ -51,7 +51,8 @@ describe('Study Guide Section editor component', () => {
   let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
-    htmlLengthService = new MockHtmlLengthService();
+    htmlLengthService =
+      new MockHtmlLengthService() as unknown as HtmlLengthService;
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [StudyGuideSectionEditorComponent],
@@ -93,7 +94,7 @@ describe('Study Guide Section editor component', () => {
             html: '<p>section content</p>',
           },
         },
-      ] as StudyGuideSection[],
+      ] as unknown as StudyGuideSection[],
       2,
       'en'
     );
@@ -117,7 +118,7 @@ describe('Study Guide Section editor component', () => {
           content_id: 'section_content_1',
         };
       },
-    } as StudyGuideSection;
+    } as unknown as StudyGuideSection;
     component.ngOnInit();
   });
 

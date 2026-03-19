@@ -171,11 +171,13 @@ describe('SubtopicPreviewTab', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
     // Default to feature flag disabled.
-    platformFeatureService.status = {
-      ShowRestructuredStudyGuides: {
-        isEnabled: false,
+    Object.defineProperty(platformFeatureService, 'status', {
+      value: {
+        ShowRestructuredStudyGuides: {
+          isEnabled: false,
+        },
       },
-    };
+    });
   });
 
   describe('when ShowRestructuredStudyGuides feature is disabled', () => {
