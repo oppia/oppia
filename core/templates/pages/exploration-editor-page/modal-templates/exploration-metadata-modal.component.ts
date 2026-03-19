@@ -172,9 +172,8 @@ export class ExplorationMetadataModalComponent
     this.explorationLanguageCodeService.saveDisplayedValue();
     this.explorationTagsService.saveDisplayedValue();
 
-    // TODO(#20338): Get rid of the $timeout here.
-    // It's currently used because there is a race condition: the
-    // saveDisplayedValue() calls above result in autosave calls.
+    // The setTimeout delay is needed to avoid a race condition:
+    // the saveDisplayedValue() calls above result in autosave calls.
     // These race with the discardDraft() call that
     // will be called when the draft changes entered here
     // are properly saved to the backend.
