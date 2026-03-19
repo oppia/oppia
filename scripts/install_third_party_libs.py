@@ -433,8 +433,10 @@ def main() -> None:
 
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
-    from . import pre_commit_hook  # pylint: disable=wrong-import-position
-    from . import pre_push_hook  # pylint: disable=wrong-import-position
+    from . import (  # pylint: disable=wrong-import-position
+        pre_commit_hook,
+        pre_push_hook,
+    )
 
     # Install additional runtime modules if they are missing.
     # This is to ensure that the environment is fully set up for tests.
