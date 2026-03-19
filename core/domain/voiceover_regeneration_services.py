@@ -327,6 +327,13 @@ def synthesize_voiceover_for_html_string(
 
     parsed_text = parse_html(content_html)
 
+    # If the voiceover regeneration is initiated via a Beam Dataflow job, the
+    # oppia_project_id is explicitly provided as an argument. In this setup,
+    # the empty voiceover audio file from assets isn’t accessible, so the
+    # regeneration step is skipped.
+    if parsed_text == '' and oppia_project_id is not None:
+        return []
+
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
             parsed_text
@@ -408,7 +415,7 @@ def synthesize_voiceover_for_html_string(
     # voiceovers in the cache.
     if cached_model is not None:
         if cached_model.plaintext != parsed_text:
-            if len(parsed_text) < len(cached_model.plaintext):
+            if len(str(parsed_text)) < len(str(cached_model.plaintext)):
                 # Since the current text is shorter than the one in the cached
                 # model, there is a higher likelihood of repetition in
                 # other content. Thus, updating the cached model to store the

@@ -420,8 +420,8 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
                 )
             )
 
-    def test_should_get_empty_audio_sucessfully(self) -> None:
-        content_html = '<p> This is a test text </p>'
+    def test_should_get_empty_audio_sucessfully_in_sync(self) -> None:
+        content_html = '<p></p>'
         exploration_id = 'exp_id'
         language_accent_code = 'en-US'
         filename = 'content_0-en-US-asdjytdyop.mp3'
@@ -442,6 +442,21 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
                 exploration_id, content_html, language_accent_code, filename
             )
+        self.assertEqual(audio_offset_list, [])
+
+    def test_should_get_empty_audio_sucessfully_in_async(self) -> None:
+        content_html = '<p></p>'
+        exploration_id = 'exp_id'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+            exploration_id,
+            content_html,
+            language_accent_code,
+            filename,
+            'dev-project-id',
+        )
         self.assertEqual(audio_offset_list, [])
 
     def test_should_be_able_to_get_new_voiceover_filename(self) -> None:
