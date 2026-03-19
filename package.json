@@ -173,6 +173,7 @@
     "firebase": "^8.10.0",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
+    "mathjax": "2.7.5",
     "globalthis": "^1.0.2",
     "guppy-dev": "git+https://github.com/oppia/guppy#f509e",
     "hammerjs": "^2.0.8",
