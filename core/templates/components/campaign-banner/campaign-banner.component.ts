@@ -47,7 +47,7 @@ export class CampaignBannerComponent implements OnInit {
   campaignBannerImagePath!: string;
   bannerReRenderInterval!: number;
 
-  campaignConfig!: typeof AppConstants.CAMPAIGN_CONFIG_TEST;
+  campaignConfig!: typeof AppConstants.FINANCIAL_LITERACY_CAMPAIGN_CONFIG_TEST;
 
   ngOnInit(): void {
     this.setCampaignConfig();
@@ -59,8 +59,8 @@ export class CampaignBannerComponent implements OnInit {
     const isProdMode =
       this.platformFeaturesService.status.EnableCampaignBanner.isEnabled;
     this.campaignConfig = isProdMode
-      ? AppConstants.CAMPAIGN_CONFIG_PROD
-      : AppConstants.CAMPAIGN_CONFIG_TEST;
+      ? AppConstants.FINANCIAL_LITERACY_CAMPAIGN_CONFIG_PROD
+      : AppConstants.FINANCIAL_LITERACY_CAMPAIGN_CONFIG_TEST;
   }
 
   private initializeCampaignConfig(): void {

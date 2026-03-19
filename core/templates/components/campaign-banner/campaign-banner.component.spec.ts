@@ -243,11 +243,13 @@ describe('CampaignBannerComponent', () => {
     expect(component.setCampaignConfig).toHaveBeenCalled();
 
     expect(component.campaignBannerImagePath).toBe(
-      AppConstants.CAMPAIGN_CONFIG_PROD.bannerImageRelativePath
+      AppConstants.FINANCIAL_LITERACY_CAMPAIGN_CONFIG_PROD
+        .bannerImageRelativePath
     );
 
     expect(component.bannerReRenderInterval).toBe(
-      AppConstants.CAMPAIGN_CONFIG_PROD.bannerReRenderIntervalMs
+      AppConstants.FINANCIAL_LITERACY_CAMPAIGN_CONFIG_PROD
+        .bannerReRenderIntervalMs
     );
   });
 
@@ -258,7 +260,9 @@ describe('CampaignBannerComponent', () => {
 
     component.setCampaignConfig();
 
-    expect(component.campaignConfig).toEqual(AppConstants.CAMPAIGN_CONFIG_PROD);
+    expect(component.campaignConfig).toEqual(
+      AppConstants.FINANCIAL_LITERACY_CAMPAIGN_CONFIG_PROD
+    );
   });
 
   it('should set campaign config to TEST when prod flag disabled', () => {
@@ -266,7 +270,9 @@ describe('CampaignBannerComponent', () => {
 
     component.setCampaignConfig();
 
-    expect(component.campaignConfig).toEqual(AppConstants.CAMPAIGN_CONFIG_TEST);
+    expect(component.campaignConfig).toEqual(
+      AppConstants.FINANCIAL_LITERACY_CAMPAIGN_CONFIG_TEST
+    );
   });
 
   it('should show banner when test mode flag enabled', () => {
