@@ -1087,6 +1087,7 @@ export class BaseUser {
     const specName = process.env.SPEC_NAME;
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
+    await currentPage.evaluate(() => window.scrollTo(0, 0));
     // To wait for all images to load and the page to be stable.
     await currentPage.waitForTimeout(5000);
 
