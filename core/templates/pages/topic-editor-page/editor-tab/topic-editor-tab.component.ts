@@ -51,48 +51,45 @@ import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearr
   templateUrl: './topic-editor-tab.component.html',
 })
 export class TopicEditorTabComponent implements OnInit, OnDestroy {
-  skillCreationIsAllowed!: boolean;
-  topic!: Topic;
-  skillQuestionCountDict!: Record<string, number>;
-  topicRights!: TopicRights;
-  topicNameEditorIsShown!: boolean;
-  topicDataHasLoaded!: boolean;
-  editableName!: string;
-  editableMetaTagContent!: string;
-  editablePageTitleFragmentForWeb!: string;
-  editablePracticeIsDisplayed!: boolean;
-  initialTopicName!: string;
-  initialTopicUrlFragment!: string;
-  editableTopicUrlFragment!: string;
-  editableDescription!: string;
-  allowedBgColors!: readonly string[];
-  topicNameExists!: boolean;
-  topicUrlFragmentExists!: boolean;
-  hostname!: string;
-  availableSkillSummariesForDiagnosticTest!: ShortSkillSummary[];
-  selectedSkillSummariesForDiagnosticTest!: ShortSkillSummary[];
-  diagnosticTestSkillsDropdownIsShown!: boolean;
-  topicPreviewCardIsShown!: boolean;
-  SUBTOPIC_LIST!: string;
-  SKILL_LIST!: string;
-  STORY_LIST!: string;
-  subtopicCardSelectedIndexes!: Record<string | number, boolean>;
-  subtopicsListIsShown!: boolean;
-  selectedSkillEditOptionsIndex!: Record<
-    string | number,
-    Record<number, boolean> | {}
-  >;
-  editableDescriptionIsEmpty!: boolean;
-  topicDescriptionChanged!: boolean;
-  subtopics!: Subtopic[];
-  subtopicQuestionCountDict!: Record<number, number>;
-  uncategorizedSkillSummaries!: ShortSkillSummary[];
-  editableThumbnailDataUrl!: string;
-  canonicalStorySummaries!: StorySummary[];
-  mainTopicCardIsShown!: boolean;
-  storiesListIsShown!: boolean;
-  uncategorizedEditOptionsIndex!: number | null;
-  subtopicEditOptionsAreShown!: number | null;
+  skillCreationIsAllowed: boolean;
+  topic: Topic;
+  skillQuestionCountDict: object;
+  topicRights: TopicRights;
+  topicNameEditorIsShown: boolean;
+  topicDataHasLoaded: boolean;
+  editableName: string;
+  editableMetaTagContent: string;
+  editablePageTitleFragmentForWeb: string;
+  editablePracticeIsDisplayed: boolean;
+  initialTopicName: string;
+  initialTopicUrlFragment: string;
+  editableTopicUrlFragment: string;
+  editableDescription: string;
+  allowedBgColors;
+  topicNameExists: boolean;
+  topicUrlFragmentExists: boolean;
+  hostname: string;
+  availableSkillSummariesForDiagnosticTest: ShortSkillSummary[];
+  selectedSkillSummariesForDiagnosticTest: ShortSkillSummary[];
+  diagnosticTestSkillsDropdownIsShown: boolean;
+  topicPreviewCardIsShown: boolean;
+  SUBTOPIC_LIST: string;
+  SKILL_LIST: string;
+  STORY_LIST: string;
+  subtopicCardSelectedIndexes: {};
+  subtopicsListIsShown: boolean;
+  selectedSkillEditOptionsIndex: {};
+  editableDescriptionIsEmpty: boolean;
+  topicDescriptionChanged: boolean;
+  subtopics: Subtopic[];
+  subtopicQuestionCountDict: {};
+  uncategorizedSkillSummaries: ShortSkillSummary[];
+  editableThumbnailDataUrl: string;
+  canonicalStorySummaries: StorySummary[];
+  mainTopicCardIsShown: boolean;
+  storiesListIsShown: boolean;
+  uncategorizedEditOptionsIndex: number;
+  subtopicEditOptionsAreShown: number;
   skillOptionDialogueBox: boolean = true;
   maxCharsInTopicName!: number;
   MAX_CHARS_IN_TOPIC_URL_FRAGMENT!: number;
@@ -104,7 +101,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   classroomUrlFragment: string | null = null;
   classroomName: string | null = null;
   curriculumAdminUsernames: string[] = [];
-  generatedUrlPrefix!: string;
+  generatedUrlPrefix: string;
 
   constructor(
     private pageContextService: PageContextService,
@@ -143,10 +140,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       this.topicEditorStateService.isSkillCreationAllowed();
     this.topic = this.topicEditorStateService.getTopic();
     this.skillQuestionCountDict =
-      this.topicEditorStateService.getSkillQuestionCountDict() as Record<
-        string,
-        number
-      >;
+      this.topicEditorStateService.getSkillQuestionCountDict();
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.topicNameEditorIsShown = false;
     if (this.topicEditorStateService.hasLoadedTopic()) {
@@ -187,16 +181,11 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     });
     this.uncategorizedSkillSummaries =
       this.topic.getUncategorizedSkillSummaries();
-    const entityType = this.pageContextService.getEntityType();
-    const entityId = this.pageContextService.getEntityId();
-    if (!entityType || !entityId) {
-      return;
-    }
     this.editableThumbnailDataUrl =
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.topic.getThumbnailFilename(),
-        entityType,
-        entityId
+        this.pageContextService.getEntityType(),
+        this.pageContextService.getEntityId()
       );
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}`;
   }
@@ -214,25 +203,17 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   addSkillForDiagnosticTest(): void {
-    const skillToAdd = this.skillForDiagnosticTestFormControl.value;
-
-    // Guard clause: Do not proceed if no valid skill is selected.
-    if (!skillToAdd || typeof skillToAdd.getId !== 'function') {
-      this.skillForDiagnosticTestFormControl.setValue(null);
-      return;
-    }
-
+    let skillToAdd = this.skillForDiagnosticTestFormControl.value;
+    this.skillForDiagnosticTestFormControl.setValue(null);
     this.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
-    const skillSummary = this.availableSkillSummariesForDiagnosticTest.find(
+    let skillSummary = this.availableSkillSummariesForDiagnosticTest.find(
       skill => skill.getId() === skillToAdd.getId()
     );
-
     if (skillSummary) {
-      this.availableSkillSummariesForDiagnosticTest =
-        this.availableSkillSummariesForDiagnosticTest.filter(
-          skill => skill.getId() !== skillSummary.getId()
-        );
+      let index =
+        this.availableSkillSummariesForDiagnosticTest.indexOf(skillSummary);
+      this.availableSkillSummariesForDiagnosticTest.splice(index, 1);
     }
 
     this.topicUpdateService.updateDiagnosticTestSkills(
@@ -243,15 +224,14 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   removeSkillFromDiagnosticTest(skillToRemove: ShortSkillSummary): void {
-    // Guard clause: Do not proceed if no valid skill is provided.
-    if (!skillToRemove || typeof skillToRemove.getId !== 'function') {
-      return;
+    let skillSummary = this.selectedSkillSummariesForDiagnosticTest.find(
+      skill => skill.getId() === skillToRemove.getId()
+    );
+    if (skillSummary) {
+      let index =
+        this.selectedSkillSummariesForDiagnosticTest.indexOf(skillSummary);
+      this.selectedSkillSummariesForDiagnosticTest.splice(index, 1);
     }
-
-    this.selectedSkillSummariesForDiagnosticTest =
-      this.selectedSkillSummariesForDiagnosticTest.filter(
-        skill => skill.getId() !== skillToRemove.getId()
-      );
 
     this.availableSkillSummariesForDiagnosticTest.push(skillToRemove);
 
@@ -563,7 +543,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     return '1 Story';
   }
 
-  togglePreviewListCards(listType: string | null = null): void {
+  togglePreviewListCards(listType: string = null): void {
     if (!this.windowDimensionsService.isWindowNarrow()) {
       return;
     }
@@ -622,8 +602,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   showSkillEditOptions(
-    subtopicIndex: string | number | null = null,
-    skillIndex: number | null = null
+    subtopicIndex: string | number = null,
+    skillIndex: number = null
   ): void {
     if (subtopicIndex === null && skillIndex === null) {
       this.skillOptionDialogueBox = true;
@@ -636,9 +616,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       this.selectedSkillEditOptionsIndex = {};
       return;
     }
-    if (subtopicIndex === null || skillIndex === null) {
-      return;
-    }
+    this.selectedSkillEditOptionsIndex[subtopicIndex] = {};
     this.selectedSkillEditOptionsIndex[subtopicIndex] = {
       [skillIndex]: true,
     };

@@ -419,7 +419,7 @@
             <option *ngFor="let skillSummary of availableSkillSummariesForDiagnosticTest"
                     class="e2e-test-diagnostic-test-skill-option"
                     [ngValue]="skillSummary">
-                    {{ skillSummary?.getDescription() || '' }}
+                    {{ skillSummary.getDescription()  }}
             </option>
           </select>
 
