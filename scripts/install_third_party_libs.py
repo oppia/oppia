@@ -431,9 +431,6 @@ def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
 
-    # This ensures dev dependencies are present and compiled before we
-    # proceed to other setup tasks that require them.
-    install_python_dev_dependencies.main(['--assert_compiled'])
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
     from . import pre_commit_hook  # pylint: disable=wrong-import-position
