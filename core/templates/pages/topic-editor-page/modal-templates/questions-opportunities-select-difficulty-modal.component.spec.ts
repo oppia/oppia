@@ -161,7 +161,7 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
       // because 'FileReader' has around 15 more properties. We have only
       // defined the properties we need in 'MockReaderObject'.
       spyOn(window, 'FileReader').and.returnValue(
-        new MockReaderObject() as any
+        new MockReaderObject() as unknown as FileReader
       );
     });
 

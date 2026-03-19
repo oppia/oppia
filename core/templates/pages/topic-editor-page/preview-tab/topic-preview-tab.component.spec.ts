@@ -107,6 +107,8 @@ describe('Topic Preview Tab Component', () => {
     ]);
     Object.defineProperty(mockTranslateService, 'onLangChange', {
       value: new EventEmitter(),
+      enumerable: true,
+      writable: true,
     });
 
     TestBed.configureTestingModule({

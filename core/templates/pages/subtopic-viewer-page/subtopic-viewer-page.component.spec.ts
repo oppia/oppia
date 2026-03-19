@@ -28,6 +28,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TranslateService} from '@ngx-translate/core';
 
 import {PageTitleService} from 'services/page-title.service';
+import {Subtopic} from 'domain/topic/subtopic.model';
 import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import {SubtopicViewerPageComponent} from './subtopic-viewer-page.component';
 import {AlertsService} from 'services/alerts.service';
@@ -504,7 +505,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    } as unknown as any;
+    } as unknown as Subtopic;
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/test-url'
@@ -523,7 +524,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    } as unknown as any;
+    } as unknown as Subtopic;
     const mockEvent = new MouseEvent('click', {ctrlKey: true});
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
@@ -543,7 +544,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    } as unknown as any;
+    } as unknown as Subtopic;
 
     component.openStudyGuide();
 
@@ -702,7 +703,7 @@ describe('Subtopic viewer page', function () {
     component.nextSubtopic = {
       getTitle: () => longTitle,
       getUrlFragment: () => 'test-fragment',
-    } as unknown as any;
+    } as unknown as Subtopic;
 
     const desktopResult = component.checkNextSubtopicTitleLengthAndModify();
     // 20 chars + '...'.
@@ -723,7 +724,7 @@ describe('Subtopic viewer page', function () {
     component.nextSubtopic = {
       getTitle: () => shortTitle,
       getUrlFragment: () => 'test-fragment',
-    } as unknown as any;
+    } as unknown as Subtopic;
 
     const shortResult = component.checkNextSubtopicTitleLengthAndModify();
     expect(shortResult).toBe(shortTitle);
