@@ -76,6 +76,15 @@ describe('Search Engine Bot', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it(
+    'should verify meta tags on Splash page',
+    async function () {
+      await loggedOutUser.navigateToSplashPage();
+      await loggedOutUser.verifyMetaTags();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
