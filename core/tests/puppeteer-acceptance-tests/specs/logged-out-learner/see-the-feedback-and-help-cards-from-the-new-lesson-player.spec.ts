@@ -352,8 +352,6 @@ describe('Logged-Out Learner', function () {
 
     // Submit few wrong answer to see hint.
     await loggedOutLearner.submitFewWrongAnswerInFractionInput(3);
-    // Wait for few minutes to see the hint.
-    await loggedOutLearner.page.waitForTimeout(120000);
     await loggedOutLearner.expectTextPresentOnPage('View hint');
     await loggedOutLearner.expectConversationContentByButton(
       'View hint',
@@ -367,8 +365,6 @@ describe('Logged-Out Learner', function () {
 
     // Submit few wrong answer to see hint.
     await loggedOutLearner.submitFewWrongAnswerInFractionInput(3);
-    // Again wait for few minutes to see another hint.
-    await loggedOutLearner.page.waitForTimeout(120000);
     await loggedOutLearner.expectTextPresentOnPage('View hint 2');
     await loggedOutLearner.expectConversationContentByButton(
       'View hint 2',
@@ -382,9 +378,6 @@ describe('Logged-Out Learner', function () {
 
     // Submit few wrong answer.
     await loggedOutLearner.submitFewWrongAnswerInFractionInput(4);
-
-    // Wait for few minutes to see the solution.
-    await loggedOutLearner.page.waitForTimeout(120000);
 
     await loggedOutLearner.expectTextPresentOnPage('View Solution');
     await loggedOutLearner.expectConversationContentByButton(
