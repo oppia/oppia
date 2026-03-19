@@ -66,13 +66,12 @@
   width: 100vw;
 }
 
-.splash-page .oppia-splash-button-container .btn.oppia-splash-button {
+.splash-page .oppia-splash-button {
   background-color: #015c53;
   border-radius: 5px;
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
-  letter-spacing: normal;
   margin-bottom: 40px;
   margin-top: -20px;
   min-width: 300px;
@@ -88,7 +87,7 @@
 }
 
 @media only screen and (max-width: 500px) {
-  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
+  .splash-page button.btn.oppia-splash-button {
     font-size: 3.6vw;
   }
 }
@@ -116,7 +115,7 @@
 }
 
 @media (min-width: 575px) {
-  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
+  .splash-page .oppia-splash-button {
     left: -webkit-calc(130px - -15%);
     left: -moz-calc(130px - -15%);
     left: -o-calc(130px - -15%);
@@ -125,7 +124,7 @@
 }
 
 @media (max-width: 365px) {
-  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
+  .splash-page .oppia-splash-button {
     min-width: 95%;
   }
 }
@@ -464,7 +463,7 @@
     z-index: 10;
   }
 
-  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
+  .splash-page .oppia-splash-button {
     min-width: auto;
   }
 

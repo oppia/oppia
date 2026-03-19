@@ -47,7 +47,7 @@ export class CollectionEditorStateService {
     private undoRedoService: UndoRedoService
   ) {}
 
-  private _setCollection(collection: Collection): void {
+  private _setCollection(collection: Collection) {
     this._collection.copyFromCollection(collection);
     if (this._collectionIsInitialized) {
       this._collectionInitializedEventEmitter.emit();
@@ -75,7 +75,7 @@ export class CollectionEditorStateService {
     this.editableCollectionBackendApiService
       .fetchCollectionAsync(collectionId)
       .then(
-        (newCollectionObject: Collection) => {
+        newCollectionObject => {
           this._updateCollection(newCollectionObject);
         },
         error => {
@@ -88,7 +88,7 @@ export class CollectionEditorStateService {
     this.collectionRightsBackendApiService
       .fetchCollectionRightsAsync(collectionId)
       .then(
-        (newBackendCollectionRightsObject: CollectionRights) => {
+        newBackendCollectionRightsObject => {
           this._setCollectionRights(newBackendCollectionRightsObject);
           this._collectionIsLoading = false;
         },
@@ -193,7 +193,7 @@ export class CollectionEditorStateService {
         this.undoRedoService.getCommittableChangeList()
       )
       .then(
-        (collectionObject: Collection) => {
+        collectionObject => {
           this._updateCollection(collectionObject);
           this.undoRedoService.clearChanges();
           this._collectionIsBeingSaved = false;

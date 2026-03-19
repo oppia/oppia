@@ -1035,9 +1035,11 @@ textarea {
   content: ">";
 }
 
-.oppia-navbar-breadcrumb-rtl .oppia-navbar-breadcrumb-separator {
+.oppia-navbar-breadcrumb-rtl-separator {
   margin-left: 8px;
-  margin-right: 8px;
+}
+.oppia-navbar-breadcrumb-rtl-separator:after {
+  content: "<";
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile a:hover {

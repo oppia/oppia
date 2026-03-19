@@ -17,10 +17,8 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {SignInEventService} from 'services/sign-in-event.service';
 import {LoginRequiredModalContent} from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
 import {LoginRequiredMessageComponent} from '../login-required-message/login-required-message.component';
 
@@ -32,15 +30,7 @@ describe('Login Required Modal Content', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [LoginRequiredModalContent, LoginRequiredMessageComponent],
-      providers: [
-        NgbActiveModal,
-        {
-          provide: SignInEventService,
-          useValue: {
-            onUserSignIn: new EventEmitter<void>(),
-          },
-        },
-      ],
+      providers: [NgbActiveModal],
     }).compileComponents();
     fixture = TestBed.createComponent(LoginRequiredModalContent);
     component = fixture.componentInstance;

@@ -58,7 +58,6 @@ import {ExplorationModeService} from 'pages/exploration-player-page/services/exp
 import {ChapterProgressService} from 'pages/exploration-player-page/services/chapter-progress.service';
 import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 
 @Component({
@@ -126,8 +125,7 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
     private conversationFlowService: ConversationFlowService,
-    private chapterProgressService: ChapterProgressService,
-    private preventPageUnloadEventService: PreventPageUnloadEventService
+    private chapterProgressService: ChapterProgressService
   ) {}
 
   ngOnInit(): void {
@@ -271,11 +269,11 @@ export class ConversationSkinComponent {
       this.isLoggedIn = userInfo.isLoggedIn();
       this.conversationFlowService.setIsLoggedIn(this.isLoggedIn);
 
-      this.preventPageUnloadEventService.addListener(() => {
+      this.windowRef.nativeWindow.addEventListener('beforeunload', e => {
         let redirectToRefresherExplorationConfirmed =
           this.conversationFlowService.getRedirectToRefresherExplorationConfirmed();
         if (redirectToRefresherExplorationConfirmed) {
-          return false;
+          return;
         }
         if (
           this.conversationFlowService.getHasInteractedAtLeastOnce() &&
@@ -288,9 +286,13 @@ export class ConversationSkinComponent {
             this.learnerParamsService.getAllParams()
           );
 
-          return true;
+          let confirmationMessage =
+            'Please save your progress before navigating away from the' +
+            ' page; else, you will lose your exploration progress.';
+          (e || this.windowRef.nativeWindow.event).returnValue =
+            confirmationMessage;
+          return confirmationMessage;
         }
-        return false;
       });
 
       let pid =
@@ -397,7 +399,6 @@ export class ConversationSkinComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.preventPageUnloadEventService.removeListener();
   }
 
   getAnswerIsBeingProcessed(): boolean {

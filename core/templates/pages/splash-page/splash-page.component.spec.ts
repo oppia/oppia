@@ -30,7 +30,6 @@ import {UserService} from 'services/user.service';
 import {SplashPageComponent} from './splash-page.component';
 import {of} from 'rxjs';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 
 class MockWindowRef {
   _window = {
@@ -81,11 +80,7 @@ describe('Splash Page', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        SplashPageComponent,
-        MockTranslatePipe,
-        PrimaryButtonComponent,
-      ],
+      declarations: [SplashPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
@@ -152,6 +147,14 @@ describe('Splash Page', () => {
     expect(
       siteAnalyticsService.registerClickBrowseLessonsButtonEvent
     ).toHaveBeenCalled();
+  });
+
+  it('should direct users to the android page on click', function () {
+    expect(mockWindowRef.nativeWindow.location.href).not.toEqual('/android');
+
+    component.onClickAccessAndroidButton();
+
+    expect(mockWindowRef.nativeWindow.location.href).toEqual('/android');
   });
 
   it('should record analytics when Start Contributing is clicked', function () {

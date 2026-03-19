@@ -16,7 +16,7 @@
  * @fileoverview Service for informing of the i18n language code changes.
  */
 
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable, EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {ClassroomTranslationKeys} from 'pages/classroom-page/classroom-page.component';
 
@@ -39,9 +39,24 @@ export interface LanguageInfo {
   providedIn: 'root',
 })
 export class I18nLanguageCodeService {
-  prevLangCode: string = 'en';
-  languageCodeChangeEventEmitter = new EventEmitter<string>();
-  languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
+  // TODO(#9154): Remove static when migration is complete.
+  /**
+   * The static keyword is used here because this service is used in both
+   * angular and angularjs. Since we are using upgradedServices.ts, where a new
+   * instance is created for angularjs and angular will creates a new instance
+   * for the angular part, we end up having two instances of the service.
+   * In order to keep the variables same, static is used until migration is
+   * complete.
+   */
+  static prevLangCode: string = 'en';
+  static languageCodeChangeEventEmitter = new EventEmitter<string>();
+  static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
+  // TODO(#9154): Remove this variable when translation service is extended.
+  /**
+   * It stores all classroom metadata translation keys, like topic/story
+   * title, description keys which currently cannot be translated from the
+   * translations dashboard.
+   */
   private _HACKY_TRANSLATION_KEYS: readonly string[] =
     AppConstants.HACKY_TRANSLATION_KEYS;
 
@@ -61,7 +76,8 @@ export class I18nLanguageCodeService {
   constructor() {}
 
   getCurrentI18nLanguageCode(): string {
-    return this.languageCode;
+    // TODO(#9154): Change I18nLanguageCodeService to "this".
+    return I18nLanguageCodeService.languageCode;
   }
 
   isLanguageRTL(langCode: string): boolean {
@@ -173,13 +189,15 @@ export class I18nLanguageCodeService {
   }
 
   get onI18nLanguageCodeChange(): EventEmitter<string> {
-    return this.languageCodeChangeEventEmitter;
+    // TODO(#9154): Change I18nLanguageCodeService to "this".
+    return I18nLanguageCodeService.languageCodeChangeEventEmitter;
   }
 
   setI18nLanguageCode(code: string): void {
-    this.prevLangCode = this.languageCode;
-    this.languageCode = code;
-    this.languageCodeChangeEventEmitter.emit(code);
+    // TODO(#9154): Change I18nLanguageCodeService to "this".
+    I18nLanguageCodeService.prevLangCode = I18nLanguageCodeService.languageCode;
+    I18nLanguageCodeService.languageCode = code;
+    I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
   }
 
   get onPreferredLanguageCodesLoaded(): EventEmitter<string[]> {

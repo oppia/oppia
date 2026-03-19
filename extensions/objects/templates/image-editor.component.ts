@@ -170,7 +170,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   userIsDraggingCropArea: boolean = false;
   cropAreaResizeDirection: null | number;
   userIsResizingCropArea: boolean = false;
-  invalidImageWarningIsShown: boolean = false;
   invalidTagsAndAttributes: {tags: string[]; attrs: string[]};
   processedImageIsTooLarge: boolean;
   entityId: string;
@@ -268,7 +267,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       tags: [],
       attrs: [],
     };
-    this.invalidImageWarningIsShown = false;
     this.processedImageIsTooLarge = false;
 
     this.entityId = this.pageContextService.getEntityId();
@@ -622,7 +620,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       tags: [],
       attrs: [],
     };
-    this.invalidImageWarningIsShown = false;
     this.validityChange.emit({empty: false});
   }
 
@@ -946,12 +943,10 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   setUploadedFile(file: File): void {
-    this.invalidImageWarningIsShown = false;
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        this.invalidImageWarningIsShown = false;
         // Check point 2 in the note before imports and after fileoverview.
         this.imgData = reader.result as string;
         let imageData: string | SafeResourceUrl = reader.result as string;
@@ -986,9 +981,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
           y2: dimensions.height,
         };
         this.updateValidationWithLatestDimensions();
-      };
-      img.onerror = () => {
-        this.invalidImageWarningIsShown = true;
       };
       img.src = reader.result as string;
     };

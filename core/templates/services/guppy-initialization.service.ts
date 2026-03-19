@@ -59,7 +59,7 @@ export class GuppyInitializationService {
 
       guppyInstance.configure(
         'empty_content',
-        '\\color{grey}{\\small \\text{' + placeholderText + '}}'
+        '\\color{grey}{\\text{\\small{' + placeholderText + '}}}'
       );
 
       // Initialize it with a value for the creator's view.

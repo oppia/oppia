@@ -13,11 +13,6 @@ on:
     branches:
       - develop
       - release-*
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - closed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{
@@ -28,11 +23,7 @@ jobs:
   run_backend_associated_test_file_checks:
     name: Verify associated test files
     runs-on: ubuntu-22.04
-    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
-    if: ${{ ! (
-        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
-        || (github.event_name == 'pull_request' && github.event.action == 'closed')
-      ) }}
+    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -49,11 +40,7 @@ jobs:
   run_tests:
     name: Shard ${{ matrix.shard }}
     runs-on: ubuntu-22.04
-    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
-    if: ${{ ! (
-        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
-        || (github.event_name == 'pull_request' && github.event.action == 'closed')
-      ) }}
+    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
     strategy:
       fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:

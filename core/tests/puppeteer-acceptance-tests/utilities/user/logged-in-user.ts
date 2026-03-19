@@ -20,7 +20,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
-import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -144,6 +143,7 @@ const contributorDashboardMenuLink =
 const profileMenuLink = '.e2e-test-profile-link';
 const preferencesMenuLink = '.e2e-test-preferences-link';
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
+const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
@@ -2412,11 +2412,22 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    const explorationEditor = new ExplorationEditorModal(this);
-    await explorationEditor.dismissWelcomeModal(failIfMissing);
+  async dismissWelcomeModal(): Promise<void> {
+    try {
+      await this.page.waitForNetworkIdle();
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 10000,
+      });
+      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${(error as Error).message}`);
+    }
   }
 
   /**
@@ -2682,12 +2693,11 @@ export class LoggedInUser extends BaseUser {
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra',
-    expectedWelcomeModal: boolean = false
+    category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPageFromCreatorDashboard();
-    await this.dismissWelcomeModal(expectedWelcomeModal);
+    await this.dismissWelcomeModal();
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -2816,8 +2826,9 @@ export class LoggedInUser extends BaseUser {
     );
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
+
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
-      hidden: true,
+      visible: false,
     });
   }
 

@@ -407,7 +407,7 @@ export class ExplorationStatesService {
   saveStateProperty(
     stateName: string,
     backendName: 'widget_id',
-    newValue: string | null
+    newValue: string
   ): void;
   saveStateProperty(
     stateName: string,
@@ -628,7 +628,7 @@ export class ExplorationStatesService {
     return this.getStatePropertyMemento(stateName, 'widget_id');
   }
 
-  saveInteractionId(stateName: string, newInteractionId: string | null): void {
+  saveInteractionId(stateName: string, newInteractionId: string): void {
     this.saveStateProperty(stateName, 'widget_id', newInteractionId);
     this.stateInteractionSavedCallbacks.forEach(callback => {
       callback(this._states.getState(stateName));

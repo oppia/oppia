@@ -67,7 +67,6 @@ describe('Versioned exploration caching service', () => {
             confirmed_unclassified_answers: [],
             id: null,
           },
-          inapplicable_skill_misconception_ids: [],
         },
       },
     },
@@ -116,12 +115,12 @@ describe('Versioned exploration caching service', () => {
   });
 
   it('should check if data is already cached for given id and version', () => {
-    expect(versionedExplorationCachingService.isCached('exp_1', 1)).toBe(true);
-    expect(versionedExplorationCachingService.isCached('exp_2', 1)).toBe(false);
+    expect(versionedExplorationCachingService.isCached('exp_1', 1)).toBeTrue();
+    expect(versionedExplorationCachingService.isCached('exp_2', 1)).toBeFalse();
   });
 
   it('should add fetched exploration data to the cache', () => {
-    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBe(false);
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
 
     versionedExplorationCachingService.cacheVersionedExplorationData(
       'exp_1',
@@ -129,11 +128,11 @@ describe('Versioned exploration caching service', () => {
       testVersionedExplorationData
     );
 
-    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBe(true);
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeTrue();
   });
 
   it('should retrieve cached exploration data', () => {
-    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBe(false);
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
 
     versionedExplorationCachingService.cacheVersionedExplorationData(
       'exp_1',
@@ -141,7 +140,7 @@ describe('Versioned exploration caching service', () => {
       testVersionedExplorationData
     );
 
-    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBe(true);
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeTrue();
     expect(
       versionedExplorationCachingService.retrieveCachedVersionedExplorationData(
         'exp_1',
@@ -151,7 +150,7 @@ describe('Versioned exploration caching service', () => {
   });
 
   it('should remove cached exploration data', () => {
-    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBe(false);
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
 
     versionedExplorationCachingService.cacheVersionedExplorationData(
       'exp_1',
@@ -159,13 +158,13 @@ describe('Versioned exploration caching service', () => {
       testVersionedExplorationData
     );
 
-    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBe(true);
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeTrue();
 
     versionedExplorationCachingService.removeCachedVersionedExplorationData(
       'exp_1',
       2
     );
 
-    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBe(false);
+    expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
   });
 });

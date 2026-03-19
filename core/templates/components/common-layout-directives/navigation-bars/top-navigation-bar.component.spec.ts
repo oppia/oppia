@@ -36,7 +36,6 @@ import {SearchService} from 'services/search.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {AlertsService} from 'services/alerts.service';
-import {SignInEventService} from 'services/sign-in-event.service';
 import {MockI18nService, MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopNavigationBarComponent} from './top-navigation-bar.component';
 import {SidebarStatusService} from 'services/sidebar-status.service';
@@ -92,10 +91,6 @@ class MockWindowRef {
       },
     },
   };
-}
-
-class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
 }
 
 describe('TopNavigationBarComponent', () => {
@@ -187,10 +182,6 @@ describe('TopNavigationBarComponent', () => {
         {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
-        },
-        {
-          provide: SignInEventService,
-          useClass: MockSignInEventService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

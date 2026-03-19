@@ -22,18 +22,25 @@ import {EventEmitter, Injectable} from '@angular/core';
   providedIn: 'root',
 })
 export class LoaderService {
-  loadingMessageChangedEventEmitter = new EventEmitter<string>();
+  // TODO(#8472): Remove static when migration is complete.
+  // Until then, we need to use static so that the two instances of the service
+  // created by our hybrid app (one for Angular, the other for AngularJS) can
+  // refer to the same objects.
+  static loadingMessageChangedEventEmitter = new EventEmitter<string>();
   get onLoadingMessageChange(): EventEmitter<string> {
-    return this.loadingMessageChangedEventEmitter;
+    // TODO(#9154): Change LoaderService to "this".
+    return LoaderService.loadingMessageChangedEventEmitter;
   }
 
   constructor() {}
 
   showLoadingScreen(message: string): void {
-    this.loadingMessageChangedEventEmitter.emit(message);
+    // TODO(#9154): Change LoaderService to "this".
+    LoaderService.loadingMessageChangedEventEmitter.emit(message);
   }
 
   hideLoadingScreen(): void {
-    this.loadingMessageChangedEventEmitter.emit('');
+    // TODO(#9154): Change LoaderService to "this".
+    LoaderService.loadingMessageChangedEventEmitter.emit('');
   }
 }

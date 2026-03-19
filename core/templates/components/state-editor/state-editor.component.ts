@@ -226,11 +226,9 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           this.stateName,
           stateData.interaction.hints
         );
-        // TODO(#25231): InteractionBackendDict.id should use
-        // InteractionSpecsKey instead of string.
         this.stateInteractionIdService.init(
           this.stateName,
-          stateData.interaction.id as InteractionSpecsKey
+          stateData.interaction.id
         );
         this.stateCustomizationArgsService.init(
           this.stateName,

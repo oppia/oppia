@@ -45,49 +45,49 @@ import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtop
   templateUrl: './subtopic-editor-tab.component.html',
 })
 export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
-  hostname!: string;
-  topic!: Topic;
-  classroomUrlFragment!: string;
-  subtopic!: Subtopic;
-  subtopicId!: number;
-  errorMsg!: string | null;
-  subtopicUrlFragmentIsValid!: boolean;
-  subtopicUrlFragmentExists!: boolean;
-  skillIds!: string[];
-  questionCount!: number;
-  skillQuestionCountDict!: Record<string, number>;
-  editableTitle!: string;
-  editableThumbnailFilename!: string;
-  editableThumbnailBgColor!: string;
-  initialSubtopicUrlFragment!: string;
-  editableUrlFragment!: string;
-  subtopicPage!: SubtopicPage;
-  studyGuide!: StudyGuide;
+  hostname: string;
+  topic: Topic;
+  classroomUrlFragment: string;
+  subtopic: Subtopic;
+  subtopicId: number;
+  errorMsg: string;
+  subtopicUrlFragmentIsValid: boolean;
+  subtopicUrlFragmentExists: boolean;
+  skillIds: string[];
+  questionCount: number;
+  skillQuestionCountDict: object;
+  editableTitle: string;
+  editableThumbnailFilename: string;
+  editableThumbnailBgColor: string;
+  initialSubtopicUrlFragment: string;
+  editableUrlFragment: string;
+  subtopicPage: SubtopicPage;
+  studyGuide: StudyGuide;
   activeSectionIndex: number = -1;
-  allowedBgColors!: readonly string[];
-  htmlData!: string;
-  sections!: StudyGuideSection[];
+  allowedBgColors;
+  htmlData: string;
+  sections: StudyGuideSection[];
   isEditable: boolean = false;
-  uncategorizedSkillSummaries!: ShortSkillSummary[];
-  schemaEditorIsShown!: boolean;
-  htmlDataBeforeUpdate!: string;
-  toIndex!: number;
-  fromIndex!: number;
-  subtopicPreviewCardIsShown!: boolean;
-  skillsListIsShown!: boolean;
-  subtopicEditorCardIsShown!: boolean;
-  sectionsListIsShown!: boolean;
-  selectedSkillEditOptionsIndex!: number;
+  uncategorizedSkillSummaries: ShortSkillSummary[];
+  schemaEditorIsShown: boolean;
+  htmlDataBeforeUpdate: string;
+  toIndex: number;
+  fromIndex: number;
+  subtopicPreviewCardIsShown: boolean;
+  skillsListIsShown: boolean;
+  subtopicEditorCardIsShown: boolean;
+  sectionsListIsShown: boolean;
+  selectedSkillEditOptionsIndex: number;
   maxCharsInSubtopicTitle!: number;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
-  SUBTOPIC_PAGE_SCHEMA!: {
+  SUBTOPIC_PAGE_SCHEMA: {
     type: string;
     ui_config: {
       rte_component_config_id: string;
       rows: number;
     };
   };
-  generatedUrlPrefix!: string;
+  generatedUrlPrefix: string;
 
   constructor(
     private questionBackendApiService: QuestionBackendApiService,
@@ -109,16 +109,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.hostname = this.windowRef.nativeWindow.location.hostname;
     this.topic = this.topicEditorStateService.getTopic();
     this.classroomUrlFragment =
-      this.topicEditorStateService.getClassroomUrlFragment() || '';
-    const topicUrlFragment = this.topic.getUrlFragment();
-    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}/${topicUrlFragment}/studyguide`;
+      this.topicEditorStateService.getClassroomUrlFragment();
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}/${this.topic.getUrlFragment()}/studyguide`;
     this.subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
-    const subtopicResult = this.topic.getSubtopicById(this.subtopicId);
-    if (!subtopicResult) {
+    this.subtopic = this.topic.getSubtopicById(this.subtopicId);
+    if (!this.subtopic) {
       this.topicEditorRoutingService.navigateToMainTab();
-      return;
     }
-    this.subtopic = subtopicResult;
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
     this.subtopicUrlFragmentIsValid = false;
@@ -144,18 +141,12 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
           });
       }
       this.skillQuestionCountDict =
-        this.topicEditorStateService.getSkillQuestionCountDict() as Record<
-          string,
-          number
-        >;
+        this.topicEditorStateService.getSkillQuestionCountDict();
       this.editableTitle = this.subtopic.getTitle();
-      const thumbnailFilename = this.subtopic.getThumbnailFilename();
-      const thumbnailBgColor = this.subtopic.getThumbnailBgColor();
-      const urlFragment = this.subtopic.getUrlFragment();
-      this.editableThumbnailFilename = thumbnailFilename || '';
-      this.editableThumbnailBgColor = thumbnailBgColor || '';
-      this.editableUrlFragment = urlFragment || '';
-      this.initialSubtopicUrlFragment = urlFragment || '';
+      this.editableThumbnailFilename = this.subtopic.getThumbnailFilename();
+      this.editableThumbnailBgColor = this.subtopic.getThumbnailBgColor();
+      this.editableUrlFragment = this.subtopic.getUrlFragment();
+      this.initialSubtopicUrlFragment = this.subtopic.getUrlFragment();
       if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         this.studyGuide = this.topicEditorStateService.getStudyGuide();
       } else {

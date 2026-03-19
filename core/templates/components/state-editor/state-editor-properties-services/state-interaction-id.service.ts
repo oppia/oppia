@@ -23,13 +23,12 @@ import {
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-property.service';
 import {UtilsService} from 'services/utils.service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Injectable({
   providedIn: 'root',
 })
 // TODO(sll): Add validation.
-export class StateInteractionIdService extends StatePropertyService<InteractionSpecsKey> {
+export class StateInteractionIdService extends StatePropertyService<string> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionId';
