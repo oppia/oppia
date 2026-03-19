@@ -147,6 +147,7 @@ export class ContributorAdmin extends BaseUser {
     await this.clearAllTextFrom(dateInputSelector);
     await this.typeInInputField(dateInputSelector, yesterdayDate);
     await this.page.keyboard.press('Enter');
+    await this.expectElementValueToBe(dateInputSelector, yesterdayDate);
   }
 
   /**
