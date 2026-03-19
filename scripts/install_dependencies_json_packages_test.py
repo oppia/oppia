@@ -694,6 +694,49 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         self.assertEqual(response.getcode(), 200)
 
+    def test_url_open_rate_limit_failure_cases(self) -> None:
+        """Tests failure cases for rate limit handling."""
+        test_url = 'https://example.com/test'
+
+        headers1 = email.message.Message()
+        headers1.add_header('x-ratelimit-remaining', '5')
+
+        error1 = urllib.error.HTTPError(
+            url=test_url, code=403, msg='forbidden', hdrs=headers1, fp=None
+        )
+
+        headers2 = email.message.Message()
+        headers2.add_header('x-ratelimit-remaining', '0')
+
+        error2 = urllib.error.HTTPError(
+            url=test_url, code=403, msg='rate limit', hdrs=headers2, fp=None
+        )
+
+        headers3 = email.message.Message()
+        headers3.add_header('x-ratelimit-remaining', '0')
+        headers3.add_header('x-ratelimit-reset', str(int(time.time()) + 1000))
+
+        error3 = urllib.error.HTTPError(
+            url=test_url, code=403, msg='rate limit', hdrs=headers3, fp=None
+        )
+
+        errors = [error1, error2, error3]
+
+        def mock_urlopen(_url, context):
+            raise errors.pop(0)
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with urlopen_swap:
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
+
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
+
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
+
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext
     ) -> None:

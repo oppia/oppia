@@ -182,7 +182,11 @@ def url_open(
         reset_epoch = int(reset)
 
         now = int(time.time())
-        wait = min(max(reset_epoch - now, 0), 120)
+        wait = max(reset_epoch - now, 0)
+        max_wait_time = 120
+        if wait > max_wait_time:
+            raise e
+
         time.sleep(wait)
         return urllib.request.urlopen(source_url, context=context)
 
