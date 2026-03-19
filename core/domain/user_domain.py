@@ -1862,15 +1862,17 @@ class DeletedUsername:
         """Validates the username_hash."""
         if not isinstance(self.username_hash, str):
             raise utils.ValidationError(
-                'Expected username_hash to be a string, received %s'
-                % self.username_hash
+                f'Expected username_hash to be a string, received {self.username_hash}'
             )
-        if not self.username_hash:
+
+        if len(self.username_hash) == 0:
             raise utils.ValidationError('username_hash cannot be empty.')
-        if len(self.username_hash) > 32 or len(self.username_hash) == 0:
+
+        if len(self.username_hash) > 32:
             raise utils.ValidationError(
                 'username_hash must be at most 32 characters long.'
             )
+
         if not re.match(r'^[A-Za-z0-9]+$', self.username_hash):
             raise utils.ValidationError(
                 'username_hash must be a valid hash string.'

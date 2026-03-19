@@ -26,6 +26,7 @@ from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
+from core.storage.user import gae_models as user_models
 
 from typing import List, Optional, TypedDict, cast
 
@@ -1988,3 +1989,37 @@ class DeletedUsernameTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(utils.ValidationError, 'string'):
             deleted_username.validate()
+
+
+class DeletedUsernameServicesTests(test_utils.GenericTestBase):
+
+    def test_get_deleted_username_from_model(self):
+        model = user_models.DeletedUsernameModel(id='a' * 32)
+        obj = user_services.get_deleted_username_from_model(model)
+
+        self.assertIsInstance(obj, user_domain.DeletedUsername)
+        self.assertEqual(obj.username_hash, 'a' * 32)
+        self.assertTrue(obj.username_hash.isalnum())
+        obj.validate()
+
+    def test_get_model_from_domain_object(self):
+        domain_obj = user_domain.DeletedUsername(username_hash='a' * 32)
+
+        model = user_services.get_deleted_username_model_from_domain_object(
+            domain_obj
+        )
+
+        self.assertEqual(model.id, 'a' * 32)
+
+    def test_save_deleted_username(self):
+        normalized_username = 'testuser'
+
+        user_services.save_deleted_username(normalized_username)
+
+        model = user_models.DeletedUsernameModel.get_by_id(
+            utils.convert_to_hash(
+                normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
+            )
+        )
+
+        self.assertIsNotNone(model)
