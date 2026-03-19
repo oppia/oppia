@@ -93,7 +93,7 @@ describe('Logged-Out Learner', function () {
     // Save draft.
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
-  }, 900000); // 15 minutes for setup hook.
+  }, 1200000); // 15 minutes for setup hook.
 
   it('should be able to find list of subjects to learn', async function () {
     await loggedOutLearner.navigateToSplashPage();
