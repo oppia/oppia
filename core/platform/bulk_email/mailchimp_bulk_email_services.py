@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import ast
 import hashlib
 import logging
 
@@ -130,7 +129,7 @@ def _create_user_in_mailchimp_db(
             mailchimp_audience_id, subscribed_mailchimp_data
         )
     except mailchimpclient.MailChimpError as error:
-        error_message = ast.literal_eval(str(error))
+        error_message = error.args[0]
         # This is the specific error message returned for the case where the
         # user was permanently deleted from the Mailchimp database earlier.
         # This was found by experimenting with the MailChimp API. Note that the
@@ -177,14 +176,7 @@ def permanently_delete_user_from_list(user_email: str) -> None:
             mailchimp_audience_id, subscriber_hash
         )
     except mailchimpclient.MailChimpError as error:
-        # This has to be done since the message can only be accessed from
-        # MailChimpError by error.message in Python2, but this is deprecated in
-        # Python3.
-        # In Python3, the message can be accessed directly by KeyError
-        # (https://github.com/VingtCinq/python-mailchimp/pull/65), so as a
-        # workaround for Python2, the 'message' attribute is obtained by
-        # str() and then it is converted to dict. This works in Python3 as well.
-        error_message = ast.literal_eval(str(error))
+        error_message = error.args[0]
         # Ignore if the error corresponds to "User does not exist".
         if error_message['status'] != 404:
             raise Exception(error_message['detail']) from error
@@ -316,14 +308,7 @@ def add_or_update_user_status(
                     unsubscribed_mailchimp_data,
                 )
         except mailchimpclient.MailChimpError as mailchimp_err:
-            # This has to be done since the message can only be accessed from
-            # MailChimpError by error.message in Python2, but this is deprecated
-            # in Python3.  In Python3, the message can be accessed directly by
-            # KeyError (https://github.com/VingtCinq/python-mailchimp/pull/65),
-            # so as a workaround for Python2, the 'message' attribute is
-            # obtained by str() and then it is converted to dict. This works in
-            # Python3 as well.
-            error_message = ast.literal_eval(str(mailchimp_err))
+            error_message = mailchimp_err.args[0]
             # Error 404 corresponds to 'User does not exist'.
             if error_message['status'] == 404:
                 if can_receive_email_updates:

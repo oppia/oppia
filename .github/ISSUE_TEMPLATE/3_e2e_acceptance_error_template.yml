@@ -14,6 +14,19 @@ body:
         [this wiki page](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR)
         and are filing this issue as part of the process described there.
         Thanks!
+  - type: checkboxes
+    id: read-procedure
+    attributes:
+      label: I have read the procedure
+      description: >
+        Please confirm that you have read the note above by selecting the option
+        that best describes your situation.
+      options:
+        - label: I reproduced the flake on the develop branch.
+        - label: I observed this flake directly on the develop branch.
+        - label: The changes in my PR are unrelated to the failure.
+    validations:
+      required: true
   - type: dropdown
     id: ci-test-type
     attributes:
