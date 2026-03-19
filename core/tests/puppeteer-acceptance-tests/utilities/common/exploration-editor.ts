@@ -56,6 +56,25 @@ export class ExplorationEditorModal {
           'Welcome Modal not found, but test can be continued.\n' +
             `Error: ${error.message}`
         );
+        try {
+          await this.userInstance.page.waitForSelector(
+            dismissWelcomeModalSelector,
+            {
+              visible: true,
+              timeout: 25000,
+            }
+          );
+          await this.userInstance.clickOnElementWithSelector(
+            dismissWelcomeModalSelector
+          );
+          await this.userInstance.expectElementToBeVisible(
+            dismissWelcomeModalSelector,
+            false
+          );
+          showMessage('Welcome modal appeared late and was dismissed.');
+        } catch {
+          showMessage('Welcome modal confirmed absent after extended wait.');
+        }
         return;
       }
       throw new Error(
