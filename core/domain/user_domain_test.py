@@ -25,8 +25,8 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
 from core.platform import models
-from core.tests import test_utils
 from core.storage.user import gae_models as user_models
+from core.tests import test_utils
 
 from typing import List, Optional, TypedDict, cast
 
