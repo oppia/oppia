@@ -6264,12 +6264,21 @@ export class LoggedOutUser extends BaseUser {
   async expectSubheadingInAboutUsPageToContain(
     subheading: string
   ): Promise<void> {
+    const normalizeSubheadingText = (text: string | null | undefined): string =>
+      (text ?? '')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+
     const subheadings = await this.page.$$eval(
       aboutUsSubheadingSelector,
       elements => elements.map(element => (element as HTMLElement).textContent)
     );
 
-    if (subheadings.includes(subheading)) {
+    const normalizedExpectedSubheading = normalizeSubheadingText(subheading);
+    const normalizedSubheadings = subheadings.map(normalizeSubheadingText);
+
+    if (normalizedSubheadings.includes(normalizedExpectedSubheading)) {
       showMessage(`Subheading ${subheading} is present.`);
     } else {
       throw new Error(

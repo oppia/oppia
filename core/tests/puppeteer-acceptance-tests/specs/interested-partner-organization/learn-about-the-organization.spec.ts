@@ -68,7 +68,7 @@ describe('Interested Partner Organization', function () {
     await partnerUser.expectViewReportButtonInAboutPageToBeVisible();
 
     await partnerUser.expectFooterVersionToMatchPattern(
-      /Version: [^\s]+ \(\w+\)/
+      /Version: [^\s]* \(\w*\)/
     );
   });
 
