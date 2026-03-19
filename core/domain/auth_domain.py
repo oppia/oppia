@@ -282,7 +282,7 @@ class CsrfSecret:
         """
         self.oppia_csrf_secret = oppia_csrf_secret
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the CSRF secret value."""
         if not isinstance(self.oppia_csrf_secret, str):
             raise utils.ValidationError('oppia_csrf_secret must be a string')

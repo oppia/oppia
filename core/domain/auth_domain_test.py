@@ -258,4 +258,4 @@ class CsrfSecretTests(test_utils.TestBase):
 
     def test_csrf_secret_not_string(self) -> None:
         with self.assertRaisesRegex(utils.ValidationError, 'must be a string'):
-            auth_domain.CsrfSecret(123).validate()
+            auth_domain.CsrfSecret(123).validate()  # type: ignore[arg-type]
