@@ -2690,6 +2690,17 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+      const success = await this.page
+        .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+        .then(() => true)
+        .catch(() => false);
+      if (!success) {
+        await this.page.reload({waitUntil: 'networkidle0'});
+        await this.page.waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 30000,
+        });
+      }
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
@@ -3591,6 +3602,17 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(publishExplorationButtonSelector);
     }
     await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+    const success = await this.page
+      .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+      .then(() => true)
+      .catch(() => false);
+    if (!success) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(explorationIdElement, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
     await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
 
     const explorationUrlAfterPublished = await this.page.url();
@@ -5901,7 +5923,29 @@ export class ExplorationEditor extends BaseUser {
    */
   async clickOnPublishButtonInPublishModal(): Promise<void> {
     await this.expectElementToBeVisible(explorationConfirmPublishButton);
+    const success = await this.page
+      .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+      .then(() => true)
+      .catch(() => false);
+    if (!success) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(explorationIdElement, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
     await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+    const success = await this.page
+      .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+      .then(() => true)
+      .catch(() => false);
+    if (!success) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(explorationIdElement, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
     await this.expectElementToBeVisible(explorationConfirmPublishButton, false);
   }
 
