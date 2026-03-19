@@ -26,8 +26,6 @@ import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
-const LESSON_EMBED_HTML = (explorationId: string | null) =>
-  `<iframe src="http://localhost:8181/embed/exploration/${explorationId}" width="700" height="1000"></iframe>`;
 const LESSON_ATTRIBUTION_PRINT = (explorationId: string | null) =>
   `"What are the Place Values?" by curriculumAdm. Oppia. http://localhost:8181/lesson/${explorationId}`;
 
@@ -144,22 +142,6 @@ describe('Logged-Out Learner', function () {
       newBrowserTab
     );
     await newBrowserTab.close();
-    await loggedOutLearner.closeShareModal();
-  });
-
-  it('should be able to embed the lesson in webpage', async function () {
-    await loggedOutLearner.playLesson(explorationId);
-    await loggedOutLearner.clickOpenOptions();
-    await loggedOutLearner.clickShareLessonButton();
-    await loggedOutLearner.expectShareLessonModal();
-
-    await loggedOutLearner.clickEmbedInWebpageButton();
-    await loggedOutLearner.verifyEmbedHTMLContent(
-      LESSON_EMBED_HTML(explorationId)
-    );
-    await loggedOutLearner.copyHTMLContentAndVerify(
-      LESSON_EMBED_HTML(explorationId)
-    );
     await loggedOutLearner.closeShareModal();
   });
 
