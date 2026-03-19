@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for crawling the main Oppia pages.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * SE.1. Crawl the main Oppia pages
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -66,7 +68,7 @@ describe('Search Engine Bot', function () {
   );
 
   it(
-    'should verify meta tags on Teach page',
+    'should verify meta tags on Parents/Teachers page',
     async function () {
       await loggedOutUser.navigateToTeachPage();
       await loggedOutUser.verifyMetaTags();
