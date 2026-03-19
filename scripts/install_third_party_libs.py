@@ -36,10 +36,10 @@ import subprocess
 import sys
 import tarfile
 
-from scripts import (
+from . import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
-from scripts import (
+from . import (
     install_dependencies_json_packages,
     install_python_prod_dependencies,
 )
