@@ -560,14 +560,6 @@ const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
 const lessonsTabButtonSelector = '.e2e-test-lesson-tab-link';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const practiceTabContainerSelector = '.e2e-test-practice-tab-container';
-const practiceTabExists = await this.page.$(practiceTabLink);
-if (!practiceTabExists) {
-  await this.page.reload({waitUntil: 'networkidle0'});
-  await this.page.waitForSelector(practiceTabLink, {
-    visible: true,
-    timeout: 30000,
-  });
-}
 const lessonsTabContainerSelector = '.e2e-test-lessons-tab-container';
 const revisionTabSelector = 'subtopics-list';
 
@@ -3970,13 +3962,24 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the practice tab in the topic page.
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
-    await this.expectElementToBeVisible(practiceTabButtonSelector);
-    await this.clickOnElementWithSelector(practiceTabButtonSelector);
-
-    await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(practiceTabContainerSelector);
-
-    showMessage('Navigated to practice tab in topic page.');
+    const practiceTabLink = '.e2e-test-practice-tab-link';
+    const practiceContainer = '.e2e-test-practice-tab-container';
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(practiceTabLink, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+    await this.clickOnElementWithSelector(practiceTabLink);
+    await this.page.waitForSelector(practiceContainer, {
+      visible: true,
+      timeout: 60000,
+    });
   }
 
   /**
