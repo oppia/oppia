@@ -427,12 +427,25 @@ def managed_redis_server() -> Iterator[psutil.Process]:
         human_readable_name='Redis Server',
         shell=True,
     )
-    with proc_context as proc:
-        common.wait_for_port_to_be_in_use(feconf.REDISPORT)
+    if common.is_mac_os():
+        # Patch for macOS Redis termination issue.
+        # See #24607 for details.
         try:
-            yield proc
+            with proc_context as proc:
+                common.wait_for_port_to_be_in_use(feconf.REDISPORT)
+                yield proc
         finally:
+            # Ensure redis is shut down properly on macOS
             subprocess.check_call([common.REDIS_CLI_PATH, 'shutdown', 'nosave'])
+    else:
+        with proc_context as proc:
+            common.wait_for_port_to_be_in_use(feconf.REDISPORT)
+            try:
+                yield proc
+            finally:
+                subprocess.check_call(
+                    [common.REDIS_CLI_PATH, 'shutdown', 'nosave']
+                )
 
 
 def create_managed_web_browser(port: int) -> ContextManager[psutil.Process]:

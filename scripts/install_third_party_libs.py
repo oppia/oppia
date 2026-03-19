@@ -439,6 +439,20 @@ def main() -> None:
     from . import pre_commit_hook  # pylint: disable=wrong-import-position
     from . import pre_push_hook  # pylint: disable=wrong-import-position
 
+    # Install additional runtime modules if they are missing.
+    # This is to ensure that the environment is fully set up for tests.
+    if not os.path.exists(
+        os.path.join(
+            common.OPPIA_TOOLS_DIR, 'redis-cli-%s' % common.REDIS_CLI_VERSION
+        )
+    ):
+        install_redis_cli()
+
+    if not os.path.exists(
+        os.path.join(common.OPPIA_TOOLS_DIR, 'google-cloud-sdk')
+    ):
+        install_gcloud_sdk()
+
     if common.is_windows_os():
         raise Exception(
             'Installation of Oppia is not supported on Windows OS. Please use '
