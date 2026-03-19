@@ -269,3 +269,14 @@ class UserAuthDetails:
             'parent_user_id': self.parent_user_id,
             'deleted': self.deleted,
         }
+
+
+class CsrfSecret:
+    def __init__(self, oppia_csrf_secret: str) -> None:
+        self.oppia_csrf_secret = oppia_csrf_secret
+
+    def validate(self):
+        if not isinstance(self.oppia_csrf_secret, str):
+            raise utils.ValidationError('oppia_csrf_secret must be a string')
+        if not self.oppia_csrf_secret:
+            raise utils.ValidationError('oppia_csrf_secret cannot be empty')

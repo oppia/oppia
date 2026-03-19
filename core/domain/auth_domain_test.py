@@ -245,3 +245,17 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             'parent_user_id must be set for a profile user',
         ):
             self.user_auth_details.validate()
+
+
+class CsrfSecretTests(test_utils.TestBase):
+    def test_csrf_secret_valid(self) -> None:
+        obj = auth_domain.CsrfSecret('abc123')
+        obj.validate()
+
+    def test_csrf_secret_empty(self) -> None:
+        with self.assertRaisesRegex(utils.ValidationError, 'cannot be empty'):
+            auth_domain.CsrfSecret('').validate()
+
+    def test_csrf_secret_not_string(self) -> None:
+        with self.assertRaisesRegex(utils.ValidationError, 'must be a string'):
+            auth_domain.CsrfSecret(123).validate()
