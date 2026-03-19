@@ -74,7 +74,7 @@ const multipleChoiceResponseDropdown =
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 const textInputInteractionOption =
-  'tr#e2e-test-schema-based-list-editor-table-row';
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
