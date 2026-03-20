@@ -41,6 +41,9 @@ jobs:
       - name: Third Party Size Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.third_party_size_check
+      - name: Check Unused I18N Keys
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.check_unused_i18n_keys
       - name: Run Lint Checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.linters.run_lint_checks --shard other --verbose
