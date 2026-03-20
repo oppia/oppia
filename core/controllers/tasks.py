@@ -299,7 +299,7 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # of 3 retries for all errors to prevent infinite queues.
 
         if num_of_attempts_of_retry_made >= 3:
-            logging.error("Failed sending email after three retries")
+            logging.error('Failed sending email after three retries')
             self.render_json({})
             return
 
