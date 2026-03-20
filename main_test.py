@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import contextlib
 import importlib
+import sys
+from unittest import mock
 
 import main
 from core.constants import constants
@@ -103,16 +105,68 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             datastore_services, 'get_ndb_context', get_ndb_context_mock
         )
 
-        # Create middleware that wraps wsgi_app_mock.
-        # The function 'wsgi_app_mock' is casted to be of type WSGIApplication
-        # because we are passing it as a WSGIApplication not as a function.
         middleware = main.NdbWsgiMiddleware(
             cast(webapp2.WSGIApplication, wsgi_app_mock)
         )
         test_response = webtest.TestResponse()
 
-        # Verify that NdbWsgiMiddleware keeps the test_response the same.
         with get_ndb_context_swap:
             self.assertEqual(
                 middleware({'key': 'value'}, test_response), test_response
             )
+
+
+class MainRoutingTests(test_utils.GenericTestBase):
+    """Test the routing helper functions in main.py."""
+
+    def test_get_redirect_route_creates_correct_route(self) -> None:
+        """Tests that the redirect route is created with the correct name and flags."""
+
+        class MockHandler(webapp2.RequestHandler):
+            pass
+
+        route = main.get_redirect_route(
+            '/my/test/route', MockHandler, defaults={'key': 'value'}
+        )
+
+        self.assertEqual(route.name, '_my_test_route')
+        self.assertTrue(route.strict_slash)
+
+
+class MainModuleDevModeTests(test_utils.GenericTestBase):
+    """Test DEV_MODE specific logic in main.py."""
+
+    def test_android_test_data_route_added_in_dev_mode(self) -> None:
+        """Tests that the android test data route is added when DEV_MODE is True."""
+
+        with self.swap(constants, 'DEV_MODE', True):
+            importlib.reload(main)
+
+            android_route_exists = any(
+                route.name == '_initialize_android_test_data'
+                for route in main.URLS
+            )
+            self.assertTrue(android_route_exists)
+
+        with self.swap(constants, 'DEV_MODE', False):
+            importlib.reload(main)
+
+    def test_firebase_connection_not_established_when_in_pytest(self) -> None:
+        """Tests that Firebase does not connect when pytest is running."""
+
+        added_fake_pytest = False
+        if 'pytest' not in sys.modules:
+            sys.modules['pytest'] = mock.Mock()
+            added_fake_pytest = True
+
+        try:
+            with mock.patch(
+                'core.platform.auth.firebase_auth_services.establish_firebase_connection'
+            ) as mock_connection:
+
+                importlib.reload(main)
+
+                mock_connection.assert_not_called()
+        finally:
+            if added_fake_pytest:
+                sys.modules.pop('pytest', None)
