@@ -89,7 +89,6 @@ _LOAD_TESTS_DIR: Final = os.path.join(
 TIME_REPORT_PATH: Final = os.path.join(
     os.getcwd(), 'backend_test_time_report.json'
 )
-AVERAGE_TEST_CASE_TIME: Final = 2
 
 # Error code indicating a segmentation fault, which can occur transiently due to
 # instability in gRPC (a dependency of apache-beam[gcp]). This error was first
@@ -427,9 +426,7 @@ def check_test_results(
                     )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                test_time_by_average_test_case = (
-                    test_count * AVERAGE_TEST_CASE_TIME
-                )
+                test_time_by_average_test_case = test_time / test_count
                 time_report[spec.test_target] = (
                     test_time,
                     test_time_by_average_test_case,
