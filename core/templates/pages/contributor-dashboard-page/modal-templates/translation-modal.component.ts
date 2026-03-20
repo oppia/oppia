@@ -370,8 +370,8 @@ export class TranslationModalComponent {
       more: this.moreAvailable,
       status: this.activeStatus,
       translation: this.activeWrittenTranslation,
-      dataFormat: this.activeDataFormat = '',
     } = translatableItem);
+    this.activeDataFormat = translatableItem.dataFormat || '';
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
