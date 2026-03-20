@@ -3072,7 +3072,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest = 'XYZ'
         state.update_interaction_default_outcome(default_outcome)
         self._assert_validation_error(
-            exploration, 'destination XYZ is not a valid'
+            exploration, 'Expected all content id indexes to be less than'
         )
 
     def test_validation_invalid_rulespec(self) -> None:
@@ -3096,13 +3096,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state_name = 'ABC'
 
         interaction = state.interaction
+        interaction.answer_groups.append(
+            state_domain.AnswerGroup(
+                outcome=state_domain.Outcome(
+                    dest='End',
+                    feedback=state_domain.SubtitledHtml('', 'default_outcome'),
+                    labelled_as_correct=False,
+                    dest_if_really_stuck=None,
+                    param_changes=[],
+                    refresher_exploration_id=None,
+                    missing_prerequisite_skill_id=None,
+                ),
+                rule_specs=[
+                    state_domain.RuleSpec(rule_type='Equals', inputs={'x': 1})
+                ],
+                training_data=[],
+                tagged_skill_misconception_id=None,
+            )
+        )
         answer_group = interaction.answer_groups[0]
 
         rule_spec = answer_group.rule_specs[0]
         rule_spec.inputs = {}
 
         self._assert_validation_error(
-            exploration, 'RuleSpec \'Contains\' is missing inputs'
+            exploration, 'RuleSpec \'Equals\' is missing inputs'
         )
 
     def test_validation_invalid_interaction(self) -> None:
