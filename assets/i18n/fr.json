@@ -830,7 +830,6 @@
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS": "Choisissez jusqu'à 5 sujets qui vous intéressent puis complétez tous les chapitres sur les sujets sélectionnés pour atteindre vos objectifs d'apprentissage.",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE": "Chapitre <[number]> : <[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS": "<[current]> / <[total]> CHAPITRE(S) TERMINÉ(S)",
-  "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE": "<[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW": "<[topic]> : <[story]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "Annuler",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING": "Ajouter ou modifier un objectif",
