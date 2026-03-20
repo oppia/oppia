@@ -44,6 +44,7 @@ runs:
         ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }}
         --prod_env
         --server_log_level=info
+        --force_cleanup_on_start
         | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
 
     - name: Upload test logs

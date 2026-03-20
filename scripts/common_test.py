@@ -1286,6 +1286,63 @@ class CommonTests(test_utils.GenericTestBase):
 
             self.assertTrue(common.is_oppia_server_already_running())
 
+    def test_kill_processes_based_on_ports(self) -> None:
+        import psutil  # pylint: disable=import-outside-toplevel
+
+        class MockConnection:
+            def __init__(self, port: int) -> None:
+                class Laddr:
+                    def __init__(self, p: int) -> None:
+                        self.port = p
+                self.laddr = Laddr(port)
+
+        class MockProcess:
+            def __init__(self, pid: int, name: str, ports: List[int]) -> None:
+                self.info = {'pid': pid, 'name': name}
+                self.ports = ports
+                self.terminate_called = False
+                self.kill_called = False
+
+            def connections(self, kind: str) -> List[MockConnection]:
+                return [MockConnection(p) for p in self.ports]
+
+            def terminate(self) -> None:
+                self.terminate_called = True
+
+            def kill(self) -> None:
+                self.kill_called = True
+
+        proc1 = MockProcess(101, 'node', [8181])
+        proc2 = MockProcess(102, 'python', [8000])
+        proc3 = MockProcess(103, 'other', [9999])
+
+        def mock_process_iter(attrs: List[str]) -> List[MockProcess]:
+            return [proc1, proc2, proc3]
+
+        def mock_wait_procs(
+            procs: List[MockProcess], timeout: int
+        ) -> Tuple[List[MockProcess], List[MockProcess]]:
+            # proc1 successfully terminated, proc2 is still alive
+            return ([proc1], [proc2])
+
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(
+                self.swap(psutil, 'process_iter', mock_process_iter)
+            )
+            stack.enter_context(
+                self.swap(psutil, 'wait_procs', mock_wait_procs)
+            )
+            common.kill_processes_based_on_ports([8181, 8000])
+
+        self.assertTrue(proc1.terminate_called)
+        self.assertFalse(proc1.kill_called)
+
+        self.assertTrue(proc2.terminate_called)
+        self.assertTrue(proc2.kill_called)
+
+        self.assertFalse(proc3.terminate_called)
+        self.assertFalse(proc3.kill_called)
+
     def test_start_subprocess_for_result(self) -> None:
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE

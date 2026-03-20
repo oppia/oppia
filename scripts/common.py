@@ -1038,6 +1038,48 @@ def modify_constants(
         )
 
 
+def kill_processes_based_on_ports(ports: List[int]) -> None:
+    """Kills any process listening on the given ports.
+
+    Args:
+        ports: list(int). A list of port numbers. Any process listening on
+            these ports will be killed.
+    """
+    import psutil  # pylint: disable=import-outside-toplevel
+    procs_to_kill = []
+    for proc in psutil.process_iter(['name', 'pid']):
+        try:
+            for conn in proc.connections(kind='inet'):
+                if conn.laddr.port in ports:
+                    procs_to_kill.append(proc)
+                    break
+        except (
+            psutil.NoSuchProcess,
+            psutil.AccessDenied,
+            psutil.ZombieProcess
+        ):
+            pass
+
+    for proc in procs_to_kill:
+        print(
+            'Killing process %s (PID: %s) listening on one of the target '
+            'ports.' % (proc.info['name'], proc.info['pid'])
+        )
+        try:
+            proc.terminate()
+        except psutil.NoSuchProcess:
+            pass
+
+    if procs_to_kill:
+        _, alive = psutil.wait_procs(procs_to_kill, timeout=5)
+        for p in alive:
+            try:
+                p.kill()
+            except psutil.NoSuchProcess:
+                pass
+
+
+
 def is_oppia_server_already_running() -> bool:
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.

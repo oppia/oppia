@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import sys
 
+from core import feconf
 from scripts import build, common, servers
 
 from typing import Final, List, Optional, Tuple
@@ -72,6 +73,12 @@ _PARSER.add_argument(
     '--mobile', help='Run the tests in mobile mode.', action='store_true'
 )
 
+_PARSER.add_argument(
+    '--force_cleanup_on_start',
+    help='If true, forcibly terminates any running test servers before starting.',
+    action='store_true',
+)
+
 
 def compile_test_ts_files() -> None:
     """Compiles the test typescript files into a build directory."""
@@ -109,6 +116,17 @@ def compile_test_ts_files() -> None:
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
+    if args.force_cleanup_on_start:
+        ports_to_kill = [
+            common.GAE_PORT_FOR_E2E_TESTING,
+            feconf.GAE_ADMIN_SERVER_PORT,
+            feconf.ES_LOCALHOST_PORT,
+            feconf.CLOUD_DATASTORE_EMULATOR_PORT,
+            feconf.FIREBASE_EMULATOR_PORT,
+            feconf.REDISPORT,
+        ]
+        common.kill_processes_based_on_ports(ports_to_kill)
+
     if common.is_oppia_server_already_running():
         sys.exit(
             """
