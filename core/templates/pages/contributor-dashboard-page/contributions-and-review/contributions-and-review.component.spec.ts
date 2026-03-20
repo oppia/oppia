@@ -804,6 +804,19 @@ describe('Contributions and review component', () => {
       ).toHaveBeenCalledWith('es');
     }));
 
+    it('should update submitted translation language and reload opportunities', () => {
+      component.switchToTab(
+        component.TAB_TYPE_CONTRIBUTIONS,
+        'translate_content'
+      );
+      component.onChangeSubmittedTranslationLanguage('es');
+
+      expect(component.submittedTranslationsLanguageCode).toBe('es');
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+      ).toHaveBeenCalled();
+    });
+
     describe('isReviewTranslationsTab()', () => {
       it('should return true on Review Translations tab', fakeAsync(() => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');

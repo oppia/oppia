@@ -456,4 +456,32 @@ describe('Contribution and review backend API service', () => {
     });
     expect(failureHandler).not.toHaveBeenCalled();
   }));
+
+  it('should include submitted suggestions topic and language filters', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failureHandler = jasmine.createSpy('failure');
+    const url = '/getsubmittedsuggestions/exploration/translate_content';
+
+    carbas
+      .fetchSubmittedSuggestionsAsync(
+        'exploration',
+        'translate_content',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0,
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+        'Algebra',
+        'hi'
+      )
+      .then(successHandler, failureHandler);
+
+    const req = http.expectOne(request => request.url === url);
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.params.get('topic_name')).toBe('Algebra');
+    expect(req.request.params.get('language_code')).toBe('hi');
+    req.flush(suggestionsBackendObject);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failureHandler).not.toHaveBeenCalled();
+  }));
 });

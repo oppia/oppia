@@ -44,6 +44,9 @@ describe('ErrorPageComponent', () => {
     fixture = TestBed.createComponent(ErrorPageComponent);
     component = fixture.componentInstance;
     windowRef = TestBed.inject(WindowRef);
+    // Ensure this suite starts from a clean storage state even if a
+    // previous spec left global sessionStorage entries behind.
+    windowRef.nativeWindow.sessionStorage.clear();
   });
 
   afterEach(() => {

@@ -3646,6 +3646,80 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['target_id_to_opportunity_dict'], {})
         self.assertEqual(response['next_offset'], 0)
 
+    def test_translation_suggestions_with_topic_filter(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'topic',
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
+
+    def test_question_suggestions_with_topic_filter(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/skill/add_question',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'topic',
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 0)
+        self.assertEqual(response['next_offset'], 0)
+
+    def test_handler_with_invalid_topic_name_raises_error(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'invalid-topic-name',
+            },
+            expected_status_int=400,
+        )
+
+    def test_question_handler_with_invalid_topic_name_raises_error(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        self.get_json(
+            '/getsubmittedsuggestions/skill/add_question',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'invalid-topic-name',
+            },
+            expected_status_int=400,
+        )
+
+    def test_handler_sets_empty_language_code_to_none(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'language_code': '',
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 1)
+
     def test_question_suggestions_data_for_deleted_opportunities(self) -> None:
         self.login(self.AUTHOR_EMAIL)
 
@@ -4232,6 +4306,35 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(len(response['suggestions']), 2)
+
+    def test_skill_handler_with_topic_without_skills_returns_no_questions(
+        self,
+    ) -> None:
+        empty_topic = topic_domain.Topic.create_default_topic(
+            'empty-topic',
+            'Empty Topic',
+            'empty-abbrev',
+            'description',
+            'empty-fragm',
+        )
+        empty_topic.thumbnail_filename = 'thumbnail.svg'
+        empty_topic.thumbnail_bg_color = '#C6DCDA'
+        empty_topic.subtopics = []
+        empty_topic.next_subtopic_id = 1
+        empty_topic.skill_ids_for_diagnostic_test = []
+        topic_services.save_new_topic(self.owner_id, empty_topic)
+
+        response = self.get_json(
+            '/getreviewablesuggestions/skill/add_question',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'Empty Topic',
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 0)
+        self.assertEqual(response['next_offset'], 0)
 
     def test_topic_question_handler_returns_no_data(self) -> None:
         response = self.get_json(
