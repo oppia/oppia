@@ -31,7 +31,6 @@
   padding: 32px 0 30px 40px;
   width: 736px;
 }
-
 .home-tab .suggested-for-you .classroom-name {
   color: #333;
   font-size: 19px;
@@ -39,20 +38,16 @@
   padding: 24px 0 8px 0;
   text-transform: capitalize;
 }
-
 .home-tab .suggested-for-you .oppia-classroom-link {
   text-decoration: none;
 }
-
 .home-tab .suggested-for-you .topic-summary-tile {
   display: inline-block;
   padding-right: 20px;
 }
-
 .home-tab .suggested-for-you .untracked-topics {
   width: fit-content;
 }
-
 .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
 .home-tab .suggested-for-you .suggested-for-you-heading,
 .home-tab .empty-suggested-for-you .suggested-for-you-heading {
@@ -61,13 +56,11 @@
   font-size: 24px;
   margin: 0;
 }
-
 .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
   color: #333;
   font-size: 18px;
   padding-top: 32px;
 }
-
 .home-tab .suggested-for-you .classroom-card {
   background-color: #eee;
   border-radius: 4px;
@@ -79,7 +72,6 @@
   width: 144px;
   z-index: 5;
 }
-
 .home-tab .suggested-for-you .classroom-text {
   color: #333;
   font-size: 15px;
@@ -90,22 +82,18 @@
   text-transform: capitalize;
   top: 85px;
 }
-
 .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
   display: inline-block;
 }
-
 #setting-a-goal-link {
   color: #004d45;
   font-weight: bold;
 }
-
 .home-tab .empty-suggested-for-you-section {
   color: #333;
   font-size: 18px;
   padding: 30px 0;
 }
-
 .home-tab .empty-suggested-for-you-section a {
   color: #000;
   font-weight: 600;
@@ -127,102 +115,81 @@
   padding: 32px 30px 30px 40px;
   width: 736px;
 }
-
 .home-tab .suggested-for-you .suggested-for-you-section {
   display: inline-block;
   padding: 8px 16px 0 0;
 }
-
 .home-tab .continue-where-you-left-off .topic-summary {
   display: inline-block;
   padding-right: 30px;
   width: 228px;
 }
-
 @media screen and (max-width: 1200px) {
   .home-tab .greeting {
     margin-left: 0;
     padding-top: 30px;
   }
-
-  .home-tab .continue-where-you-left-off,
-  .home-tab .suggested-for-you,
+  .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
   .home-tab .empty-suggested-for-you {
     margin-left: 0;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
     overflow: scroll;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar,
   .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar {
     -webkit-appearance: none;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
   .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {
     background-color: #eee;
     border: 1px solid #fff;
     border-radius: 8px;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal,
   .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
     height: 5px;
   }
 }
-
 @media screen and (max-width: 767px) {
   .home-tab .greeting {
     font-size: 23px;
     margin: 24px 0 0 20px;
   }
-
-  .home-tab .continue-where-you-left-off,
-  .home-tab .suggested-for-you,
+  .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
   .home-tab .empty-suggested-for-you {
     margin-left: auto;
     width: 465px;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
   .home-tab .suggested-for-you .suggested-for-you-heading {
     font-size: 20px;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
     overflow: scroll;
   }
-
   .home-tab .suggested-for-you .topic-summary-tile-section {
     width: 656px;
   }
-
   .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
     margin-bottom: 0;
   }
-
   .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
     font-size: 15px;
   }
-
   .home-tab .empty-suggested-for-you-section {
     padding: 32px 32px 32px 0;
   }
-
   .home-tab .suggested-for-you .topic-summary-tile-scroll {
     overflow: scroll;
     width: 305px;
   }
 }
-
 @media screen and (min-width: 768px) and (max-width: 1000px) {
   .home-tab .greeting {
     font-size: 25px;
     margin-left: 0;
   }
-
   /*change width to 100% for redesign*/
   .home-tab .continue-where-you-left-off,
   .home-tab .suggested-for-you,
@@ -231,30 +198,24 @@
     padding: 40px 0 20px 32px;
     width: 500px;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
   .home-tab .suggested-for-you .suggested-for-you-heading {
     font-size: 20px;
   }
-
   .home-tab .suggested-for-you .topic-summary-tile-scroll {
     overflow: scroll;
     width: 440px;
   }
-
   .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
     overflow: scroll;
   }
-
   .home-tab .empty-suggested-for-you-section {
     padding: 17px 32px 17px 0;
   }
 }
 
 @media(max-width: 500px) {
-
-  .home-tab .continue-where-you-left-off,
-  .home-tab .suggested-for-you,
+  .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
   .home-tab .empty-suggested-for-you {
     margin-left: auto;
     width: 100%;
