@@ -1,5 +1,18 @@
 <div class="e2e-test-preview-tab-container">
   <div *ngIf="isExplorationPopulated">
+    <div class="oppia-language-selector">
+      <label class="language-label">🌐 Language:</label>
+
+      <select [(ngModel)]="currentLanguageCode" class="language-dropdown">
+        <option *ngFor="let lang of availableLanguageCodes" [value]="lang">
+          {{ lang === 'en' ? 'English' :
+          lang === 'hi' ? 'Hindi' :
+          lang === 'es' ? 'Spanish' :
+          lang === 'fr' ? 'French' :
+          lang }}
+        </option>
+      </select>
+    </div>
     <div *ngIf="previewWarning">
       <div class="oppia-preview-state-warning">{{ previewWarning }}</div>
     </div>
@@ -8,7 +21,9 @@
     <page-footer *ngIf="!isNewLessonPlayerEnabled()">
       <oppia-exploration-footer></oppia-exploration-footer>
     </page-footer>
-    <oppia-new-conversation-skin class="preview-conversation-skin" *ngIf="voiceoversAreLoaded && isNewLessonPlayerEnabled()"></oppia-new-conversation-skin>
+    <oppia-new-conversation-skin class="preview-conversation-skin"
+      *ngIf="voiceoversAreLoaded && isNewLessonPlayerEnabled()">
+    </oppia-new-conversation-skin>
   </div>
 
   <div class="oppia-preview-bottom-right-container" [ngClass]="{'restart-btn': isNewLessonPlayerEnabled()}">
@@ -36,10 +51,11 @@
   Note that this affects both the learner mode and the 'editor preview'
   mode.
   */
-  html, body {
+  html,
+  body {
     background: #e8e7e3 no-repeat center center fixed;
     background-size: cover;
-    color: rgba(0,0,0,0.87);
+    color: rgba(0, 0, 0, 0.87);
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 1.0em;
   }
@@ -123,4 +139,44 @@
       top: 46px;
     }
   }
+
+  .preview-language-selector-container {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 2000;
+  }
+
+  .oppia-language-selector {
+    display: flex;
+    margin: 12px 0;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+  }
+
+  .language-label {
+    font-size: 14px;
+    color: #2c3e50;
+  }
+
+  .language-dropdown {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .language-dropdown:hover {
+    border-color: #007bff;
+  }
+
+  .language-dropdown:focus {
+    outline: none;
+    border-color: #28a745;
+    background-color: #fff;
+  }
+
 </style>

@@ -17,37 +17,37 @@
  * editor page.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
-import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ParamChange} from 'domain/exploration/param-change.model';
-import {ParamChanges} from 'domain/exploration/param-changes.model';
-import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { ParamChange } from 'domain/exploration/param-change.model';
+import { ParamChanges } from 'domain/exploration/param-changes.model';
+import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import {
   ExplorationParams,
   LearnerParamsService,
 } from 'pages/exploration-player-page/services/learner-params.service';
-import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
-import {Subscription} from 'rxjs';
-import {PageContextService} from 'services/page-context.service';
-import {ExplorationFeaturesService} from 'services/exploration-features.service';
-import {ExplorationDataService} from '../services/exploration-data.service';
-import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
-import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
-import {ExplorationStatesService} from '../services/exploration-states.service';
-import {GraphDataService} from '../services/graph-data.service';
-import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
-import {ParameterMetadataService} from '../services/parameter-metadata.service';
-import {RouterService} from '../services/router.service';
-import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
-import {ChangeListService} from '../services/change-list.service';
-import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
-import {Voiceover} from 'domain/exploration/voiceover.model';
+import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
+import { Subscription } from 'rxjs';
+import { PageContextService } from 'services/page-context.service';
+import { ExplorationFeaturesService } from 'services/exploration-features.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
+import { ExplorationParamChangesService } from '../services/exploration-param-changes.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { GraphDataService } from '../services/graph-data.service';
+import { ConversationFlowService } from 'pages/exploration-player-page/services/conversation-flow.service';
+import { ParameterMetadataService } from '../services/parameter-metadata.service';
+import { RouterService } from '../services/router.service';
+import { PreviewSetParametersModalComponent } from './templates/preview-set-parameters-modal.component';
+import { EntityVoiceoversService } from 'services/entity-voiceovers.services';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { ExplorationChangeEditVoiceovers } from 'domain/exploration/exploration-draft.model';
+import { ChangeListService } from '../services/change-list.service';
+import { EntityVoiceovers } from 'domain/voiceover/entity-voiceovers.model';
+import { Voiceover } from 'domain/exploration/voiceover.model';
 
 @Component({
   selector: 'oppia-preview-tab',
@@ -60,7 +60,8 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
   isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
   voiceoversAreLoaded: boolean = false;
-
+  currentLanguageCode: string = 'en';
+  availableLanguageCodes: string[] = [];
   constructor(
     private pageContextService: PageContextService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
@@ -81,7 +82,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private entityVoiceoversService: EntityVoiceoversService,
     private conversationFlowService: ConversationFlowService,
     private changeListService: ChangeListService
-  ) {}
+  ) { }
 
   getManualParamChanges(
     initStateNameForPreview: string
@@ -195,7 +196,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     this.isExplorationPopulated = false;
 
     this.explorationDataService
-      .getDataAsync(() => {})
+      .getDataAsync(() => { })
       .then(async explorationData => {
         // TODO(#13564): Remove this part of code and make sure that this
         // function is executed only after the Promise in initExplorationPage
@@ -227,7 +228,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         if (
           initStateNameForPreview &&
           initStateNameForPreview !==
-            this.explorationInitStateNameService.savedMemento
+          this.explorationInitStateNameService.savedMemento
         ) {
           this.previewWarning =
             'Preview started from "' + initStateNameForPreview + '"';
@@ -260,6 +261,14 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
           this.updateManualVoiceoverWithChangeList();
           this.voiceoversAreLoaded = true;
+
+          this.availableLanguageCodes = [
+            this.explorationDataService.data.language_code,
+            'hi',
+            'es',
+            'fr',
+          ];
+          this.currentLanguageCode = this.availableLanguageCodes[0] || 'en';
         });
       });
   }
