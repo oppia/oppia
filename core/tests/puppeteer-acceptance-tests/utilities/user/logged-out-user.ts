@@ -7111,7 +7111,8 @@ export class LoggedOutUser extends BaseUser {
   async expectSolutionModelVisible(): Promise<void> {
     const solutionModalContainer = 'oppia-displaynew-solution-modal';
     const modalHeaderSelector = '.oppia-learner-hint-and-solution-modal-title';
-    const modalBodySelector = '.modal-body';
+    const modalBodySelector =
+      'oppia-displaynew-solution-modal .modal-body label';
 
     await this.page.waitForSelector(solutionModalContainer, {
       visible: true,
