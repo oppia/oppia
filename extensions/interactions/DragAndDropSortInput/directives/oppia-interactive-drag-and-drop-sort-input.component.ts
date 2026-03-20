@@ -90,8 +90,12 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
 
   getFlatIndex(groupIndex: number, itemIndex: number): number {
     let index = 0;
-    for (let g = 0; g < groupIndex; g++) {
-      const group = this.multipleItemsInSamePositionArray[g];
+    for (
+      let currentGroupIndex = 0;
+      currentGroupIndex < groupIndex;
+      currentGroupIndex++
+    ) {
+      const group = this.multipleItemsInSamePositionArray[currentGroupIndex];
       if (!group) {
         continue;
       }
@@ -102,11 +106,16 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
 
   getGroupItemFromFlatIndex(flatIndex: number): {group: number; item: number} {
     let count = 0;
-    for (let g = 0; g < this.multipleItemsInSamePositionArray.length; g++) {
-      const groupLength = this.multipleItemsInSamePositionArray[g].length;
+    for (
+      let currentGroupIndex = 0;
+      currentGroupIndex < this.multipleItemsInSamePositionArray.length;
+      currentGroupIndex++
+    ) {
+      const groupLength =
+        this.multipleItemsInSamePositionArray[currentGroupIndex].length;
       if (flatIndex < count + groupLength) {
         return {
-          group: g,
+          group: currentGroupIndex,
           item: flatIndex - count,
         };
       }
@@ -319,7 +328,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         let newGroupIndex = groupIndex + 2;
         if (newGroupIndex >= this.multipleItemsInSamePositionArray.length) {
           const currentGroups = this.multipleItemsInSamePositionArray.filter(
-            g => g.length > 0
+            group => group.length > 0
           ).length;
           // Possible to add group under the rest.
           if (currentGroups < this.maxGroups) {
@@ -340,10 +349,15 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
 
         this.resetArray();
         // Updates the active group and item index after transfer.
-        for (let g = 0; g < this.multipleItemsInSamePositionArray.length; g++) {
-          const idx = this.multipleItemsInSamePositionArray[g].indexOf(item);
+        for (
+          let groupIndex = 0;
+          groupIndex < this.multipleItemsInSamePositionArray.length;
+          groupIndex++
+        ) {
+          const idx =
+            this.multipleItemsInSamePositionArray[groupIndex].indexOf(item);
           if (idx !== -1) {
-            this.activeGroup = g;
+            this.activeGroup = groupIndex;
             this.activeItem = idx;
             break;
           }
