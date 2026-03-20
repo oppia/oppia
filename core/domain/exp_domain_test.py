@@ -3127,7 +3127,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_validation_invalid_param_specs(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
 
-        exploration.param_specs = 'A string'
+        # Here we use MyPy ignore because we are assigning invalid type
+        # intentionally to test validation logic.
+        exploration.param_specs = 'A string'  # type: ignore[assignment]
 
         self._assert_validation_error(exploration, 'param_specs to be a dict')
 
