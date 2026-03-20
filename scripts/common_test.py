@@ -1546,3 +1546,105 @@ class UrlRetrieveTests(CommonTests):
                 )
             with open(output_path, 'rb', encoding=None) as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+
+class LogToTerminalTests(test_utils.GenericTestBase):
+    """Tests for the LogType enum and log_to_terminal function."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.print_arr: list[str] = []
+
+        def mock_print(msg: str) -> None:
+            self.print_arr.append(msg)
+
+        self.print_swap = self.swap(builtins, 'print', mock_print)
+
+    def test_log_type_enum_values(self) -> None:
+        """Test that the LogType enum contains the expected values."""
+        self.assertEqual(common.LogType.INFO.value, 'info')
+        self.assertEqual(common.LogType.ERROR.value, 'error')
+        self.assertEqual(common.LogType.SUCCESS.value, 'success')
+        self.assertEqual(common.LogType.WARNING.value, 'warning')
+
+    def test_log_to_terminal_with_error_type(self) -> None:
+        """Test that ERROR type prints the message in red."""
+        with self.print_swap:
+            common.log_to_terminal('Something failed', common.LogType.ERROR)
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(self.print_arr[0], '\033[91mSomething failed\033[0m')
+
+    def test_log_to_terminal_with_success_type(self) -> None:
+        """Test that SUCCESS type prints the message in green."""
+        with self.print_swap:
+            common.log_to_terminal('All tests passed', common.LogType.SUCCESS)
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(self.print_arr[0], '\033[92mAll tests passed\033[0m')
+
+    def test_log_to_terminal_with_warning_type(self) -> None:
+        """Test that WARNING type prints the message in yellow."""
+        with self.print_swap:
+            common.log_to_terminal('Deprecation notice', common.LogType.WARNING)
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(self.print_arr[0], '\033[93mDeprecation notice\033[0m')
+
+    def test_log_to_terminal_with_info_type(self) -> None:
+        """Test that INFO type prints the message in blue."""
+        with self.print_swap:
+            common.log_to_terminal('Starting server', common.LogType.INFO)
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(self.print_arr[0], '\033[94mStarting server\033[0m')
+
+    def test_log_to_terminal_without_type_auto_detects_error(self) -> None:
+        """Test that auto-detection colors error messages in red."""
+        with self.print_swap:
+            common.log_to_terminal('An error occurred in the test')
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(
+            self.print_arr[0], '\033[91mAn error occurred in the test\033[0m'
+        )
+
+    def test_log_to_terminal_without_type_auto_detects_failure(self) -> None:
+        """Test that auto-detection colors failure messages in red."""
+        with self.print_swap:
+            common.log_to_terminal('Test FAILED unexpectedly')
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(
+            self.print_arr[0], '\033[91mTest FAILED unexpectedly\033[0m'
+        )
+
+    def test_log_to_terminal_without_type_auto_detects_warning(self) -> None:
+        """Test that auto-detection colors warning messages in yellow."""
+        with self.print_swap:
+            common.log_to_terminal('Warning: deprecated API usage')
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(
+            self.print_arr[0], '\033[93mWarning: deprecated API usage\033[0m'
+        )
+
+    def test_log_to_terminal_without_type_normal_message(self) -> None:
+        """Test that normal messages are printed without coloring."""
+        with self.print_swap:
+            common.log_to_terminal('Running test suite')
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(self.print_arr[0], 'Running test suite')
+
+    def test_log_to_terminal_auto_detects_traceback(self) -> None:
+        """Test that auto-detection colors traceback messages in red."""
+        with self.print_swap:
+            common.log_to_terminal('Traceback (most recent call last):')
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(
+            self.print_arr[0],
+            '\033[91mTraceback (most recent call last):\033[0m',
+        )
+
+    def test_log_to_terminal_auto_detects_exception(self) -> None:
+        """Test that auto-detection colors exception messages in red."""
+        with self.print_swap:
+            common.log_to_terminal('Exception raised during execution')
+        self.assertEqual(len(self.print_arr), 1)
+        self.assertEqual(
+            self.print_arr[0],
+            '\033[91mException raised during execution\033[0m',
+        )

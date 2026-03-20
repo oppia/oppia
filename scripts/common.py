@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import enum
+
 import contextlib
 import errno
 import getpass
@@ -45,6 +47,94 @@ _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
+
+
+class LogType(enum.Enum):
+    """Enum for different types of log messages."""
+
+    INFO = 'info'
+    ERROR = 'error'
+    SUCCESS = 'success'
+    WARNING = 'warning'
+
+
+# ANSI escape codes for terminal text colors.
+_ANSI_COLORS: Final[Dict[LogType, str]] = {
+    LogType.ERROR: '\033[91m',
+    LogType.SUCCESS: '\033[92m',
+    LogType.WARNING: '\033[93m',
+    LogType.INFO: '\033[94m',
+}
+_ANSI_RESET: Final = '\033[0m'
+
+# Keywords that indicate error messages when auto-detecting log type.
+_ERROR_KEYWORDS: Final[List[str]] = [
+    'error',
+    'Error',
+    'ERROR',
+    'fail',
+    'Fail',
+    'FAIL',
+    'FAILED',
+    'Exception',
+    'exception',
+    'Traceback',
+]
+# Keywords that indicate warning messages when auto-detecting log type.
+_WARNING_KEYWORDS: Final[List[str]] = [
+    'warning',
+    'Warning',
+    'WARNING',
+    'warn',
+    'Warn',
+    'WARN',
+]
+
+
+def log_to_terminal(
+    message: str, message_type: Optional[LogType] = None
+) -> None:
+    """Prints a message to the terminal, optionally colored by its type.
+
+    If message_type is provided, the message is printed in the
+    corresponding color. If message_type is not provided, the function
+    auto-detects whether the message contains error or warning keywords
+    and colors it accordingly. Messages that do not match any auto-detect
+    pattern are printed without coloring.
+
+    Args:
+        message: str. The message to print.
+        message_type: Optional[LogType]. The type of the log message.
+            If None, the function will attempt to auto-detect the type.
+    """
+    if message_type is None:
+        message_type = _auto_detect_log_type(message)
+
+    if message_type is not None:
+        color_code = _ANSI_COLORS[message_type]
+        print('%s%s%s' % (color_code, message, _ANSI_RESET))
+    else:
+        print(message)
+
+
+def _auto_detect_log_type(message: str) -> Optional[LogType]:
+    """Attempts to detect the log type based on keywords in the message.
+
+    Args:
+        message: str. The message to analyze.
+
+    Returns:
+        Optional[LogType]. The detected log type, or None if no
+        keywords matched.
+    """
+    for keyword in _ERROR_KEYWORDS:
+        if keyword in message:
+            return LogType.ERROR
+    for keyword in _WARNING_KEYWORDS:
+        if keyword in message:
+            return LogType.WARNING
+    return None
+
 
 CURRENT_PYTHON_BIN = sys.executable
 
