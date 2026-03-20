@@ -3017,7 +3017,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.title = 'Hello #'
         self._assert_validation_error(exploration, 'Invalid character #')
 
-
     def test_validation_invalid_state_name(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -3025,13 +3024,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         bad_state = state_domain.State.create_default_state(
-        '/',
-        content_id_generator.generate(
-            translation_domain.ContentType.CONTENT
-        ),
-        content_id_generator.generate(
-            translation_domain.ContentType.DEFAULT_OUTCOME
-        ),
+            '/',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
         )
 
         exploration.states = {'/': bad_state}
@@ -3039,20 +3038,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid character / in a state name'
         )
 
-
     def test_validation_empty_states(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.states = {}
         self._assert_validation_error(exploration, 'exploration has no states')
 
-
     def test_validation_invalid_init_state(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.init_state_name = ''
-        self._assert_validation_error(
-            exploration, 'has no initial state name'
-        )
-
+        self._assert_validation_error(exploration, 'has no initial state name')
 
     def test_validation_invalid_destination(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3062,28 +3056,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         state = state_domain.State.create_default_state(
             'ABC',
-        content_id_generator.generate(
-            translation_domain.ContentType.CONTENT
-        ),
-        content_id_generator.generate(
-            translation_domain.ContentType.DEFAULT_OUTCOME
-        ),
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
         )
 
         self.set_interaction_for_state(state, 'TextInput', content_id_generator)
-
         exploration.states = {'ABC': state}
         exploration.init_state_name = 'ABC'
-
         default_outcome = state.interaction.default_outcome
         assert default_outcome is not None
         default_outcome.dest = 'XYZ'
         state.update_interaction_default_outcome(default_outcome)
-
         self._assert_validation_error(
             exploration, 'destination XYZ is not a valid'
         )
-
 
     def test_validation_invalid_rulespec(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3092,15 +3082,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
 
         state = state_domain.State.create_default_state(
-        'ABC',
-        content_id_generator.generate(
-            translation_domain.ContentType.CONTENT
-        ),
-        content_id_generator.generate(
-            translation_domain.ContentType.DEFAULT_OUTCOME
-        ),
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
         )
-
         self.set_interaction_for_state(state, 'TextInput', content_id_generator)
 
         exploration.states = {'ABC': state}
@@ -3113,39 +3102,35 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.inputs = {}
 
         self._assert_validation_error(
-            exploration, "RuleSpec 'Contains' is missing inputs"
+            exploration, 'RuleSpec \'Contains\' is missing inputs'
         )
-
 
     def test_validation_invalid_interaction(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         state = list(exploration.states.values())[0]
 
         interaction = state.interaction
-        interaction.id = 15  # type: ignore
+        # Here we use MyPy ignore because this test intentionally assigns
+        # an invalid type to check validation errors.
+        interaction.id = 15  # type: ignore[assignment]
 
         self._assert_validation_error(
             exploration, 'Expected interaction id to be a string'
         )
 
-
     def test_validation_invalid_language_code(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.language_code = 'fake_code'
 
-        self._assert_validation_error(
-            exploration, 'Invalid language_code'
-        )
-
+        self._assert_validation_error(exploration, 'Invalid language_code')
 
     def test_validation_invalid_param_specs(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
 
-        exploration.param_specs = 'A string'  
+        exploration.param_specs = 'A string'
 
-        self._assert_validation_error(
-            exploration, 'param_specs to be a dict'
-        )
+        self._assert_validation_error(exploration, 'param_specs to be a dict')
+
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
