@@ -282,6 +282,17 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
         )
 
+        # Cloud tasks automatically increment this header on each retry.
+        # It starts at 0 for the first attempt.
+        #
+        # Note: We use X-AppEngine-TaskExecutionCount instead of
+        # X-AppEngine-TaskRetryCount because TaskRetryCount includes infrastructure
+        # failures (e.g., lack of available instances) where the task never
+        # actually reached this handler. TaskExecutionCount strictly counts how
+        # many times this handler actually executed and failed, which is the
+        # exact metric we want to limit against.
+        # Docs: <https://cloud.google.com/tasks/docs/creating-appengine-handlers>.
+
         # TODO(#25307): Improve this retry mechanism by differentiating between
         # 4xx client errors (which should be dropped immediately) and 5xx server
         # errors (which should be retried). Until then, we enforce a hard limit
