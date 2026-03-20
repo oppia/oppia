@@ -278,6 +278,15 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         html_body = payload.get('html_body')
         text_body = payload.get('text_body')
 
+        num_of_attempts_of_retry_made = int(
+            self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
+        )
+
+        if num_of_attempts_of_retry_made >= 3:
+            logging.error("Failed sending email after three retries")
+            self.render_json({})
+            return
+
         try:
             email_services.send_mail(
                 sender_email, recipient_id, subject, text_body, html_body

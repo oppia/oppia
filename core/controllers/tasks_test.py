@@ -882,3 +882,25 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
         self.assertIn(
             b'Failed to resend email: Mock email failure', response.body
         )
+
+    def test_drops_task_after_max_retries_exceeded(self) -> None:
+        def mock_send_mail_that_fails(*_args: str, **_kwargs: str) -> None:
+            raise Exception('Mock email failure')
+
+        send_mail_swap = self.swap(
+            email_services, 'send_mail', mock_send_mail_that_fails
+        )
+
+        self.headers['X-AppEngine-TaskExecutionCount'] = '3'
+
+        with send_mail_swap:
+            response = self.post_task(
+                self.url,
+                self.payload,
+                self.headers,
+                csrf_token=self.csrf_token,
+                expect_errors=False,
+                expected_status_int=200,
+            )
+
+        self.assertEqual(response.status_int, 200)
