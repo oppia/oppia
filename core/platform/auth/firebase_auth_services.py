@@ -619,23 +619,36 @@ def _get_auth_claims_from_session_cookie(
 def _create_auth_claims(
     firebase_claims: dict[str, str],
 ) -> auth_domain.AuthClaims:
-    """Returns a new AuthClaims domain object from Firebase claims.
+    """Returns a new AuthClaims domain object from the Firebase-provided dict.
+
+    To learn more about what "claims" are, see the "Terminology" section of this
+    module's documentation comments.
 
     Args:
-        firebase_claims: dict(str: *). The raw claims returned by Firebase SDK.
+        firebase_claims: dict(str: *). The raw claims provided by Firebase.
+            Oppia relies on the following raw claims:
+                sub: str. The user's unique "Firebase Account ID". This is the
+                    only claim that is GUARANTEED to exist.
+                email: str|None. The user's primary email address.
+                role: str|None. The user's administrator role. This value can
+                    only be assigned to a user by Oppia's SERVER ADMINISTRATORS.
+                    Users have ZERO CONTROL over what their assigned role is.
 
     Returns:
-        AuthClaims. Oppia's representation of auth claims.
+        AuthClaims. Oppia's representation of the Firebase SDK claims.
     """
-    auth_id = firebase_claims['sub']
-    email = firebase_claims.get('email')
+    firebase_account_id = firebase_claims['sub']
+    primary_email = firebase_claims.get('email')
+    assigned_role = firebase_claims.get('role')
     role_is_super_admin = (
-        email
+        primary_email
         == platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         )
-        or firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN
+        or assigned_role == feconf.FIREBASE_ROLE_SUPER_ADMIN
     )
     return auth_domain.AuthClaims(
-        auth_id, email, role_is_super_admin=role_is_super_admin
+        firebase_account_id,
+        primary_email,
+        role_is_super_admin=role_is_super_admin,
     )
