@@ -1850,3 +1850,22 @@ class TranslationCoordinatorStats:
             'coordinator_ids': self.coordinator_ids,
             'coordinators_count': self.coordinators_count,
         }
+
+
+class FirebaseSeed:
+    """Domain object for FirebaseSeedModel.
+
+    This model has no fields, so no properties are required.
+    """
+
+    def __init__(self) -> None:
+        """Initializes FirebaseSeed domain object."""
+        pass
+
+    def validate(self) -> None:
+        """Validates the FirebaseSeed domain object.
+
+        Since there are no fields, no validation checks are required.
+        """
+
+        return
