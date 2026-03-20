@@ -365,21 +365,14 @@ export class TranslationModalComponent {
   }
 
   updateActiveState(translatableItem: TranslatableItem): void {
-    const {
-      text,
-      more,
-      status,
-      translation,
-      dataFormat,
-      contentType,
-      ruleType,
-      interactionId,
-    } = translatableItem;
-    this.textToTranslate = text || '';
-    this.moreAvailable = more;
-    this.activeStatus = status;
-    this.activeWrittenTranslation = translation;
-    this.activeDataFormat = dataFormat || '';
+    ({
+      text: this.textToTranslate = '',
+      more: this.moreAvailable,
+      status: this.activeStatus,
+      translation: this.activeWrittenTranslation,
+      dataFormat: this.activeDataFormat = '',
+    } = translatableItem);
+    const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
       interactionId

@@ -33,7 +33,7 @@ import {
 export interface TranslatableItem {
   translation: string | string[];
   status: Status;
-  text: string | string[] | null;
+  text: string | string[];
   more: boolean;
   dataFormat?: string;
   contentType?: string;
@@ -121,7 +121,7 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-    text: string | string[] | null,
+    text: string | string[],
     more: boolean,
     status: Status,
     translation: string | string[]
@@ -204,7 +204,7 @@ export class TranslateTextService {
   }
 
   getTextToTranslate(): TranslatableItem {
-    const text = this._getNextText();
+    const text = this._getNextText() ?? '';
     const {status = this.PENDING, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
@@ -217,7 +217,7 @@ export class TranslateTextService {
   }
 
   getPreviousTextToTranslate(): TranslatableItem {
-    const text = this._getPreviousText();
+    const text = this._getPreviousText() ?? '';
     const {status = this.PENDING, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
