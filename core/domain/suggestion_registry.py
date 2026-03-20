@@ -821,6 +821,8 @@ class SuggestionTranslateContent(BaseSuggestion):
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
             translation_domain.TranslatableContentFormat(
@@ -832,7 +834,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
             self.target_id,
-            self.target_version_at_submission,
+            exploration.version,
             self.language_code,
             self.change_cmd.content_id,
             translated_content,

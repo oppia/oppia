@@ -407,3 +407,90 @@ class TranslationOpportunityModel(base_models.BaseModel):
             ),
             translation_counts=translation_counts,
         )
+
+
+class ExplorationOpportunitySummaryAuditModel(base_models.BaseModel):
+    """Audit model for tracking changes to the translation counts in
+    ExplorationOpportunitySummaryModel.
+    """
+
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    action = datastore_services.StringProperty(required=True, indexed=True)
+    old_translation_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    new_translation_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    content_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'action': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'old_translation_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'new_translation_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def create_new(
+        cls,
+        exploration_id: str,
+        language_code: str,
+        action: str,
+        old_translation_count: int,
+        new_translation_count: int,
+        content_count: int,
+    ) -> 'ExplorationOpportunitySummaryAuditModel':
+        """Creates and returns a new ExplorationOpportunitySummaryAuditModel
+        instance.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            language_code: str. The language code.
+            action: str. The action that caused the count change.
+            old_translation_count: int. Previous translation count.
+            new_translation_count: int. New translation count.
+            content_count: int. Total content count.
+
+        Returns:
+            ExplorationOpportunitySummaryAuditModel. A new model instance.
+        """
+        model_id = cls.get_new_id('')
+        model = cls(
+            id=model_id,
+            exploration_id=exploration_id,
+            language_code=language_code,
+            action=action,
+            old_translation_count=old_translation_count,
+            new_translation_count=new_translation_count,
+            content_count=content_count,
+        )
+        model.update_timestamps()
+        return model
