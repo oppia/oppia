@@ -282,6 +282,11 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
         )
 
+        # TODO(#25307): Improve this retry mechanism by differentiating between
+        # 4xx client errors (which should be dropped immediately) and 5xx server
+        # errors (which should be retried). Until then, we enforce a hard limit
+        # of 3 retries for all errors to prevent infinite queues.
+
         if num_of_attempts_of_retry_made >= 3:
             logging.error("Failed sending email after three retries")
             self.render_json({})
