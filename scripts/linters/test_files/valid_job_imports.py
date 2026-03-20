@@ -21,6 +21,7 @@ python_linter_test.py. This file contain valid python syntax.
 from __future__ import annotations
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    blog_author_details_migration_jobs,
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
     collection_info_jobs,
@@ -79,10 +80,13 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     missing_translation_images_repair_jobs,
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    audit_threads_with_missing_suggestions_jobs,
+    audit_stories_with_disconnected_node_ids_job,
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    audit_stories_with_disconnected_node_ids_job
+    audit_non_existent_threads_messages_jobs,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    audit_threads_with_missing_suggestions_jobs,
 )
 
 

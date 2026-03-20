@@ -28,6 +28,8 @@ import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {RearrangeSkillsInSubtopicsModalComponent} from './rearrange-skills-in-subtopics-modal.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {SubtopicValidationService} from '../services/subtopic-validation.service';
 
 class MockActiveModal {
   close(): void {
@@ -94,6 +96,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   let fixture: ComponentFixture<RearrangeSkillsInSubtopicsModalComponent>;
   let topicEditorStateService: TopicEditorStateService;
   let topicUpdateService: TopicUpdateService;
+  let urlInterpolationService: UrlInterpolationService;
+  let subtopicValidationService: SubtopicValidationService;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let topic: Topic;
@@ -105,6 +109,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       providers: [
         TopicEditorStateService,
         TopicUpdateService,
+        UrlInterpolationService,
+        SubtopicValidationService,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
@@ -119,6 +125,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       topicDict: {
         id: 'sample_topic_id',
         name: 'Topic name',
+        abbreviated_name: 'topic',
+        url_fragment: 'topic-name',
         description: 'Topic description',
         version: 1,
         uncategorized_skill_ids: ['skill_1'],
@@ -147,12 +155,20 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
             id: 1,
             title: 'Title',
             skill_ids: ['skill_2'],
+            thumbnail_filename: 'thumbnail.svg',
+            thumbnail_bg_color: '#C6DCDA',
+            url_fragment: 'title',
           },
         ],
         next_subtopic_id: 2,
         language_code: 'en',
         skill_ids_for_diagnostic_test: [],
-      },
+        thumbnail_filename: 'thumbnail.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'topic meta tag',
+        page_title_fragment_for_web: 'topic page title',
+      } as TopicBackendDict,
       skillIdToDescriptionDict: {
         skill_1: 'Description 1',
         skill_2: 'Description 2',
@@ -163,6 +179,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     component = fixture.componentInstance;
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     topicUpdateService = TestBed.inject(TopicUpdateService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    subtopicValidationService = TestBed.inject(SubtopicValidationService);
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
@@ -203,65 +221,121 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       0
     );
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
     component.onMoveSkillEnd(dragDropEvent, null);
     expect(removeSkillSpy).not.toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is moved', () => {
-    const event = {
+    const previousData = [
+      ShortSkillSummary.create('1', 'Skill 1'),
+      ShortSkillSummary.create('2', 'Skill 2'),
+    ];
+
+    const containerData = [ShortSkillSummary.create('3', 'Skill 3')];
+
+    const previousContainer = {
+      id: 'prev',
+      data: previousData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: containerData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 1,
-      currentIndex: 2,
-      previousContainer: {
-        data: ['1', '2'],
-      },
-      container: {
-        data: ['3'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      currentIndex: 0,
+      previousContainer,
+      container,
+      item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
+
     let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(2, skillSummary);
     component.onMoveSkillEnd(event, 1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic', () => {
-    const event = {
+    const previousData = [
+      ShortSkillSummary.create('1', 'Skill 1'),
+      ShortSkillSummary.create('2', 'Skill 2'),
+    ];
+
+    const containerData = [ShortSkillSummary.create('1', 'Skill 1')];
+
+    const previousContainer = {
+      id: 'prev',
+      data: previousData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: containerData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 1,
-      currentIndex: 1,
-      previousContainer: {
-        data: ['1', '2'],
-      },
-      container: {
-        data: ['1'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      currentIndex: 0,
+      previousContainer,
+      container,
+      item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
+
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-    component.oldSubtopicId = 1;
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(1, skillSummary);
     component.onMoveSkillEnd(event, null);
     expect(removeSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when new Subtopic Id is null', () => {
-    const event = {
+    const previousData = [
+      ShortSkillSummary.create('1', 'Skill 1'),
+      ShortSkillSummary.create('2', 'Skill 2'),
+    ];
+
+    const containerData = [ShortSkillSummary.create('1', 'Skill 1')];
+
+    const previousContainer = {
+      id: 'prev',
+      data: previousData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: containerData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 1,
-      currentIndex: 1,
-      previousContainer: {
-        data: ['1'],
-      },
-      container: {
-        data: ['1'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      currentIndex: 0,
+      previousContainer,
+      container,
+      item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
 
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
+    component.skillSummaryToMove = ShortSkillSummary.create('1', 'Skill 1');
     component.oldSubtopicId = null;
     component.onMoveSkillEnd(event, null);
     expect(removeSkillSpy).not.toHaveBeenCalled();
   });
 
   it('should not call TopicUpdateService if subtopic name validation fails', () => {
+    component.ngOnInit();
     component.editableName = 'subtopic1';
     let subtopicTitleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
     component.updateSubtopicTitle(1);
@@ -269,6 +343,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   it('should call TopicUpdateService to update subtopic title', () => {
+    component.ngOnInit();
+    component.editableName = 'new unique title';
     let subtopicTitleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
     component.updateSubtopicTitle(1);
     expect(subtopicTitleSpy).toHaveBeenCalled();
@@ -279,9 +355,9 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     expect(component.selectedSubtopicId).toEqual(1);
     component.editNameOfSubtopicWithId(10);
     expect(component.selectedSubtopicId).toEqual(10);
-    component.editNameOfSubtopicWithId(0);
+    component.editNameOfSubtopicWithId(null);
     expect(component.editableName).toEqual('');
-    expect(component.selectedSubtopicId).toEqual(0);
+    expect(component.selectedSubtopicId).toEqual(null);
   });
 
   it('should call initEditor on calls from topic being initialized', () => {
@@ -305,11 +381,191 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     expect(component.initEditor).toHaveBeenCalledTimes(2);
     topicReinitializedEventEmitter.emit();
     expect(component.initEditor).toHaveBeenCalledTimes(3);
-    let skillSummary = {
-      getDescription: () => {
-        return null;
-      },
+  });
+
+  it('should set oldSubtopicId to null when oldSubtopicId is falsy in onMoveSkillStart', () => {
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(0, skillSummary);
+    expect(component.oldSubtopicId).toBeNull();
+  });
+
+  it('should return false when skill description exists in isSkillDeleted', () => {
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    expect(component.isSkillDeleted(skillSummary)).toBeFalsy();
+  });
+
+  it('should reset editableName when editNameOfSubtopicWithId is called with null', () => {
+    component.editableName = 'some name';
+    component.selectedSubtopicId = 5;
+    component.editNameOfSubtopicWithId(null);
+    expect(component.editableName).toEqual('');
+    expect(component.selectedSubtopicId).toEqual(null);
+  });
+
+  it('should not call removeSkillFromSubtopic when newSubtopicId equals oldSubtopicId', () => {
+    const previousData = [
+      ShortSkillSummary.create('1', 'Skill 1'),
+      ShortSkillSummary.create('2', 'Skill 2'),
+    ];
+
+    const containerData = [ShortSkillSummary.create('3', 'Skill 3')];
+
+    const previousContainer = {
+      id: 'prev',
+      data: previousData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: containerData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
+      previousIndex: 1,
+      currentIndex: 0,
+      previousContainer,
+      container,
+      item: {data: previousData[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
     };
-    component.isSkillDeleted(skillSummary as ShortSkillSummary);
+
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(1, skillSummary);
+    component.onMoveSkillEnd(event, 1);
+    expect(removeSkillSpy).not.toHaveBeenCalled();
+  });
+
+  it('should call moveItemInArray when item is moved within the same container', () => {
+    const containerData = [
+      ShortSkillSummary.create('1', 'Skill 1'),
+      ShortSkillSummary.create('2', 'Skill 2'),
+      ShortSkillSummary.create('3', 'Skill 3'),
+    ];
+    const container = {
+      id: 'sameContainer',
+      data: containerData,
+    };
+    const event = {
+      previousIndex: 0,
+      currentIndex: 2,
+      previousContainer: container,
+      container: container,
+      item: {data: containerData[0]},
+    } as CdkDragDrop<ShortSkillSummary[]>;
+
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill 1');
+    component.onMoveSkillStart(1, skillSummary);
+    component.onMoveSkillEnd(event, 1);
+
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+    expect(removeSkillSpy).not.toHaveBeenCalled();
+  });
+
+  it('should set error message when subtopic name validation fails', () => {
+    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
+      false
+    );
+    component.ngOnInit();
+    component.editableName = 'duplicate name';
+    component.updateSubtopicTitle(1);
+    expect(component.errorMsg).toEqual(
+      'A subtopic with this title already exists'
+    );
+  });
+
+  it('should initialize subtopics and uncategorizedSkillSummaries in initEditor', () => {
+    component.ngOnInit();
+    expect(component.subtopics).toBeDefined();
+    expect(component.uncategorizedSkillSummaries).toBeDefined();
+    expect(component.subtopics).toEqual(topic.getSubtopics());
+    expect(component.uncategorizedSkillSummaries).toEqual(
+      topic.getUncategorizedSkillSummaries()
+    );
+  });
+
+  it('should call urlInterpolationService.interpolateUrl with correct params', () => {
+    let interpolateSpy = spyOn(
+      urlInterpolationService,
+      'interpolateUrl'
+    ).and.callThrough();
+    component.getSkillEditorUrl('test_skill_id');
+    expect(interpolateSpy).toHaveBeenCalledWith('/skill_editor/<skillId>', {
+      skillId: 'test_skill_id',
+    });
+  });
+
+  it('should have maxCharsInSubtopicTitle set from AppConstants', () => {
+    expect(component.maxCharsInSubtopicTitle).toBeDefined();
+    expect(typeof component.maxCharsInSubtopicTitle).toBe('number');
+  });
+
+  it('should initialize editableName to empty string on ngOnInit', () => {
+    component.ngOnInit();
+    expect(component.editableName).toEqual('');
+  });
+
+  it('should call editNameOfSubtopicWithId(null) after successful title update', () => {
+    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
+      true
+    );
+    spyOn(topicUpdateService, 'setSubtopicTitle');
+    spyOn(component, 'editNameOfSubtopicWithId').and.callThrough();
+
+    component.ngOnInit();
+    component.editableName = 'valid new title';
+    component.updateSubtopicTitle(1);
+
+    expect(component.editNameOfSubtopicWithId).toHaveBeenCalledWith(null);
+    expect(component.editableName).toEqual('');
+    expect(component.selectedSubtopicId).toEqual(null);
+  });
+
+  it('should call initEditor after onMoveSkillEnd completes skill transfer', () => {
+    const previousData = [ShortSkillSummary.create('1', 'Skill 1')];
+
+    const containerData = [ShortSkillSummary.create('2', 'Skill 2')];
+
+    const previousContainer = {
+      id: 'prev',
+      data: previousData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: containerData,
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
+      previousIndex: 0,
+      currentIndex: 0,
+      previousContainer,
+      container,
+      item: {data: previousData[0]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
+
+    spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    spyOn(component, 'initEditor').and.callThrough();
+
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(1, skillSummary);
+    component.onMoveSkillEnd(event, 2);
+
+    expect(component.initEditor).toHaveBeenCalledTimes(2);
+  });
+
+  it('should unsubscribe from directiveSubscriptions on ngOnDestroy', () => {
+    component.ngOnInit();
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+    component.ngOnDestroy();
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });
