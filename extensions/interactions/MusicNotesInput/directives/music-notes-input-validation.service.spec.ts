@@ -80,7 +80,7 @@ describe('MusicNotesInputValidationService', () => {
 
   // Test for empty initialSequence.
   it('should return critical warning when initialSequence is empty', () => {
-    var warnings = validatorService.getAllWarnings(
+    const warnings = validatorService.getAllWarnings(
       currentState,
       {
         sequenceToGuess: {
@@ -97,14 +97,14 @@ describe('MusicNotesInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Initial sequence should not be empty.',
+        message: 'The initial sequence must not be empty. Please add at least one note to the initial sequence.',
       },
     ]);
   });
 
   // Test for non-empty initialSequence.
   it('should return no warnings when initialSequence is not empty', () => {
-    var warnings = validatorService.getAllWarnings(
+    const warnings = validatorService.getAllWarnings(
       currentState,
       {
         sequenceToGuess: {
@@ -154,7 +154,7 @@ describe('MusicNotesInputValidationService', () => {
 
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
 
-    var warnings = validatorService.getAllWarnings(
+    const warnings = validatorService.getAllWarnings(
       currentState,
       customizationArgs, // Now this is properly initialized in beforeEach.
       answerGroups,

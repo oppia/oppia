@@ -43,7 +43,7 @@ export class MusicNotesInputValidationService {
     if (customizationArgs.initialSequence.value.length === 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Initial sequence should not be empty.',
+        message: 'The initial sequence must not be empty. Please add at least one note to the initial sequence.',
       });
     }
     return warningsList;
