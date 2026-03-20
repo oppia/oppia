@@ -182,7 +182,7 @@ describe('TranslateTextService', () => {
 
     it('should return no text or metadata for completely empty states', fakeAsync(() => {
       const expectedTextAndAvailability = {
-        text: null,
+        text: '',
         more: false,
         status: 'pending',
         translation: '',
