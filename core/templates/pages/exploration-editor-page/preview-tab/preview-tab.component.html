@@ -65,7 +65,6 @@
   }
 
   .oppia-preview-bottom-right-container {
-    /* Fixed at bottom right corner (before footer) and appear on top of other div*/
     bottom: 42px;
     display: block;
     position: fixed;
@@ -142,30 +141,30 @@
 
   .preview-language-selector-container {
     position: fixed;
-    top: 10px;
     right: 20px;
+    top: 10px;
     z-index: 2000;
   }
 
   .oppia-language-selector {
-    display: flex;
-    margin: 12px 0;
     align-items: center;
-    gap: 10px;
+    display: flex;
     font-weight: 500;
+    gap: 10px;
+    margin: 12px 0;
   }
 
   .language-label {
-    font-size: 14px;
     color: #2c3e50;
+    font-size: 14px;
   }
 
   .language-dropdown {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
     background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     cursor: pointer;
+    padding: 6px 10px;
     transition: all 0.2s ease;
   }
 
@@ -174,9 +173,8 @@
   }
 
   .language-dropdown:focus {
-    outline: none;
-    border-color: #28a745;
     background-color: #fff;
+    border-color: #28a745;
+    outline: none;
   }
-
 </style>
