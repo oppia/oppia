@@ -832,7 +832,6 @@
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS": "अपनी रुचि के अधिकतम 5 विषय चुनें, और फिर अपने शिक्षण लक्ष्य को प्राप्त करने के लिए चयनित विषयों पर सभी अध्यायों को पूरा करें।",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE": "अध्याय <[number]>:<[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS": "<[current]> OF <[total]> अध्याय समाप्त",
-  "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE": "<[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW": "<[topic]>: <[story]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "रद्द करें",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING": "लक्ष्य जोड़ें या संपादित करें",
