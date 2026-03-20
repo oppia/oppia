@@ -97,6 +97,8 @@ describe('Topic editor tab directive', () => {
   let undoRedoService: UndoRedoService;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let windowDimensionsService: WindowDimensionsService;
+  let pageContextService: PageContextService;
+  let assetsBackendApiService: AssetsBackendApiService;
   let topic: Topic;
   let skillSummary: ShortSkillSummary;
   let story1: StoryReference;
