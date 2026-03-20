@@ -3602,6 +3602,50 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(response, {})
 
+    def test_handler_returns_empty_for_zero_limit(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/skill/add_question',
+            {
+                'limit': 0,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+        self.assertEqual(response['suggestions'], [])
+        self.assertEqual(response['target_id_to_opportunity_dict'], {})
+        self.assertEqual(response['next_offset'], 0)
+
+    def test_question_suggestions_returns_empty_for_topic_without_skills(
+        self,
+    ) -> None:
+        empty_topic_id = 'empty_topic'
+        empty_topic_name = 'Empty Topic'
+        empty_topic = topic_domain.Topic.create_default_topic(
+            empty_topic_id, empty_topic_name, 'abbr', 'desc', 'fragm-2'
+        )
+        empty_topic.thumbnail_filename = 'thumbnail.svg'
+        empty_topic.thumbnail_bg_color = '#C6DCDA'
+        empty_topic.subtopics = []
+        empty_topic.next_subtopic_id = 1
+        empty_topic.skill_ids_for_diagnostic_test = []
+        topic_services.save_new_topic(self.owner_id, empty_topic)
+
+        self.login(self.AUTHOR_EMAIL)
+        response = self.get_json(
+            '/getsubmittedsuggestions/skill/add_question',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': empty_topic_name,
+            },
+        )
+        self.assertEqual(response['suggestions'], [])
+        self.assertEqual(response['target_id_to_opportunity_dict'], {})
+        self.assertEqual(response['next_offset'], 0)
+
     def test_question_suggestions_data_for_deleted_opportunities(self) -> None:
         self.login(self.AUTHOR_EMAIL)
 

@@ -1547,6 +1547,81 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, authored_question_suggestion_id)
         self.assertEqual(question_suggestion_offset, 1)
 
+    def test_user_created_suggestions_by_offset_with_filters(self) -> None:
+        user_id = 'author2'
+        suggestion_1_id = 'exploration.exp2.thread_1'
+        suggestion_2_id = 'exploration.exp3.thread_1'
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp2',
+            self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW,
+            user_id,
+            'reviewer_2',
+            self.change_cmd,
+            self.score_category,
+            suggestion_1_id,
+            'hi',
+        )
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp3',
+            self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW,
+            user_id,
+            'reviewer_2',
+            self.change_cmd,
+            self.score_category,
+            suggestion_2_id,
+            'en',
+        )
+
+        results, offset = (
+            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+                limit=2,
+                offset=0,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                target_ids=['exp3'],
+            )
+        )
+        assert results is not None
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, suggestion_2_id)
+        self.assertEqual(offset, 1)
+
+        results, offset = (
+            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+                limit=2,
+                offset=0,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                language_code='hi',
+            )
+        )
+        assert results is not None
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, suggestion_1_id)
+        self.assertEqual(offset, 1)
+
+        results, offset = (
+            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+                limit=2,
+                offset=0,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                target_ids=[],
+            )
+        )
+        assert results is not None
+        self.assertEqual(len(results), 0)
+        self.assertEqual(offset, 0)
+
     def test_get_translation_suggestions_in_review_with_exp_id_with_invalid_exp(
         self,
     ) -> None:
