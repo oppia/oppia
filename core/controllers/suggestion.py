@@ -52,6 +52,33 @@ from typing import (
     Union,
     cast,
 )
+# File: core/controllers/suggestion.py
+
+from core.controllers import base
+
+class SuggestionHandler(base.BaseHandler):
+    def post(self):
+        suggestion_text = self.payload.get('suggestion_text', '').strip()
+        if not suggestion_text:
+            self.render_json({
+                'status': 'error',
+                'message': 'Suggestion cannot be empty. Please write something!'
+            })
+            return
+# File: core/controllers/suggestion_test.py
+
+def test_empty_suggestion_rejected(self):
+    response = self.post_json('/suggestion', {'suggestion_text': ''})
+    self.assertEqual(response['status'], 'error')
+    self.assertIn('cannot be empty', response['message'])
+    suggestion_text = self.payload.get('suggestion_text', '').strip()
+    if not suggestion_text:
+        self.render_json({
+        'status': 'error',
+        'message': 'Suggestion cannot be empty. Please write something!'
+    })
+    return
+        # existing code continues here
 
 # Note: These private type variables are only defined to implement
 # the Generic typing structure of SuggestionsProviderHandler, because
