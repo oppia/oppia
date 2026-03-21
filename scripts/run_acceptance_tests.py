@@ -162,7 +162,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             )
         )
 
-        print("\n[INFO] Servers have come up.\n")
+        print('\n[INFO] Servers have come up.\n')
 
         output_lines = []
         while True:
@@ -192,28 +192,22 @@ def main(args: Optional[List[str]] = None) -> None:
     test_name = parsed_args.suite
 
     print(
-        "\n"
-        + "-" * 60
-        + f"\n[START] Running acceptance test: {test_name}"
-        + "\n"
-        + "-" * 60
-        + "\n"
+        f"\n{'-' * 60}"
+        f"\n[START] Running acceptance test: {test_name}"
+        f"\n{'-' * 60}\n"
     )
 
     with servers.managed_portserver():
         _, return_code = run_tests(parsed_args)
 
     if return_code == 0:
-        print(f"\n[SUCCESS] Completed test: {test_name}\n")
+        print(f'\n[SUCCESS] Completed test: {test_name}\n')
     else:
         print(
-            "\n"
-            + "!" * 60
-            + f"\n[FAILURE] Test failed: {test_name}"
-            + f"\n[ERROR] Return code: {return_code}"
-            + "\n"
-            + "!" * 60
-            + "\n"
+            f"\n{'!' * 60}"
+            f"\n[FAILURE] Test failed: {test_name}"
+            f"\n[ERROR] Return code: {return_code}"
+            f"\n{'!' * 60}\n"
         )
 
     sys.exit(return_code)
