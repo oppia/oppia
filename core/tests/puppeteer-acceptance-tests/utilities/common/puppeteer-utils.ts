@@ -366,7 +366,7 @@ export class BaseUser {
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In', false, {
-      waitUntil: 'load',
+      waitUntil: ['networkidle2', 'load'],
       timeout: 60000,
     });
   }
@@ -384,7 +384,7 @@ export class BaseUser {
       'button.e2e-test-register-user:not([disabled])'
     );
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON, false, {
-      waitUntil: 'load',
+      waitUntil: ['networkidle2', 'load'],
       timeout: 60000,
     });
     this.username = username;
@@ -397,7 +397,7 @@ export class BaseUser {
   async reloadPage(): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.page.reload({
-      waitUntil: 'load',
+      waitUntil: ['networkidle0', 'load'],
       timeout: 60000,
     });
   }
@@ -662,7 +662,7 @@ export class BaseUser {
     selector: string,
     useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
-      waitUntil: 'load',
+      waitUntil: ['networkidle2', 'load'],
       timeout: 60000,
     }
   ): Promise<void> {
@@ -816,7 +816,7 @@ export class BaseUser {
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
     await this.page.goto(url, {
-      waitUntil: 'load',
+      waitUntil: ['networkidle0', 'load'],
       timeout: 60000,
     });
 
