@@ -85,6 +85,12 @@ const mobileNavbarDropdown =
 const saveTopicButton = 'button.e2e-test-save-topic-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const mobileBackToStoryEditorButton = '.oppia-mobile-back-to-parent';
+const storyEditorBreadcrumbStoryNameSelector =
+  '.topic-story-name .chapter-name';
+const chapterEditorBreadcrumbStoryNameSelector =
+  '.e2e-test-back-to-story-editor-button';
+const chapterEditorBreadcrumbChapterNameSelector =
+  '.story-chapter-name .chapter-name';
 
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
@@ -3265,11 +3271,109 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Gets the active tab in the story editor flow from the current hash.
+   */
+  async getStoryEditorActiveTab(): Promise<
+    'story_editor' | 'chapter_editor' | 'story_preview' | 'other'
+  > {
+    const currentUrl = this.page.url();
+    if (!currentUrl.includes('/story_editor/')) {
+      return 'other';
+    }
+
+    const hash = await this.page.evaluate(() => window.location.hash || '');
+    const normalizedHash = hash.startsWith('#') ? hash.slice(1) : hash;
+
+    if (normalizedHash.startsWith('/chapter_editor/')) {
+      return 'chapter_editor';
+    }
+    if (normalizedHash.startsWith('/story_preview/')) {
+      return 'story_preview';
+    }
+    return 'story_editor';
+  }
+
+  /**
+   * Gets the story title shown in the current story/chapter editor flow.
+   */
+  async getCurrentStoryNameInStoryFlow(): Promise<string | null> {
+    const selectors = [
+      chapterEditorBreadcrumbStoryNameSelector,
+      storyEditorBreadcrumbStoryNameSelector,
+    ];
+
+    for (const selector of selectors) {
+      const element = await this.page.$(selector);
+      if (!element) {
+        continue;
+      }
+
+      const text = await this.page.evaluate(
+        (el: Element) => el.textContent?.trim() ?? '',
+        element
+      );
+      const normalizedText = text.replace(/\/$/, '').trim();
+      if (normalizedText) {
+        return normalizedText;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets the chapter title shown in chapter editor.
+   */
+  async getCurrentChapterNameInChapterEditor(): Promise<string | null> {
+    const element = await this.page.$(
+      chapterEditorBreadcrumbChapterNameSelector
+    );
+    if (!element) {
+      return null;
+    }
+
+    const text = await this.page.evaluate(
+      (el: Element) => el.textContent?.trim() ?? '',
+      element
+    );
+    return text || null;
+  }
+
+  /**
+   * Returns to the story editor from the mobile chapter editor.
+   */
+  async returnToStoryEditorInMobile(): Promise<void> {
+    await this.clickOnElementWithSelectorOrJs(mobileBackToStoryEditorButton);
+    await this.page.waitForFunction(() => {
+      const hash = (window.location.hash || '').replace(/\/+$/, '');
+      return hash === '' || hash === '#';
+    });
+    await this.expectElementToBeVisible(storyEditorContainerSelector);
+  }
+
+  /**
    * Opens the story editor for a given story and topic.
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
    */
   async openStoryEditor(storyName: string, topicName?: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const currentStoryName = await this.getCurrentStoryNameInStoryFlow();
+      const activeTab = await this.getStoryEditorActiveTab();
+
+      if (currentStoryName === storyName) {
+        if (activeTab === 'story_editor') {
+          await this.expectElementToBeVisible(storyEditorContainerSelector);
+          return;
+        }
+
+        if (activeTab === 'chapter_editor') {
+          await this.returnToStoryEditorInMobile();
+          return;
+        }
+      }
+    }
+
     // If topic name is given, navigate to topic.
     if (topicName) {
       await this.openTopicEditor(topicName);
@@ -3277,17 +3381,24 @@ export class TopicManager extends BaseUser {
 
     try {
       if (this.isViewportAtMobileWidth()) {
-        await this.expectElementToBeVisible(
-          mobileCollapsibleCardHeaderSelector
+        const storyListVisible = await this.isElementVisible(
+          storyTitleSelector,
+          true,
+          2000
         );
-        const elements = await this.page.$$(
-          mobileCollapsibleCardHeaderSelector
-        );
-        if (elements.length < 4) {
-          throw new Error('Not enough collapsible cards found');
+        if (!storyListVisible) {
+          await this.expectElementToBeVisible(
+            mobileCollapsibleCardHeaderSelector
+          );
+          const elements = await this.page.$$(
+            mobileCollapsibleCardHeaderSelector
+          );
+          if (elements.length < 4) {
+            throw new Error('Not enough collapsible cards found');
+          }
+          // 4th collapsible card is for stories.
+          await elements[3].click();
         }
-        // 4th collapsible card is for stories.
-        await elements[3].click();
       }
 
       await this.page.waitForSelector(storyTitleSelector);
@@ -3526,33 +3637,30 @@ export class TopicManager extends BaseUser {
         if (!this.isViewportAtMobileWidth()) {
           await this.openStoryEditor(storyName, topicName);
         } else {
-          const onStoryEditorPage = await this.isElementVisible(
-            storyEditorContainerSelector,
-            true,
-            2000
-          );
-          if (!onStoryEditorPage) {
-            const onChapterEditorPage = await this.isElementVisible(
-              chapterEditorContainerSelector,
-              true,
-              2000
-            );
-            if (onChapterEditorPage) {
-              await this.clickOnElementWithSelectorOrJs(
-                mobileBackToStoryEditorButton
+          const currentStoryName = await this.getCurrentStoryNameInStoryFlow();
+          const activeTab = await this.getStoryEditorActiveTab();
+
+          if (
+            currentStoryName === storyName &&
+            activeTab === 'chapter_editor'
+          ) {
+            const currentChapterName =
+              await this.getCurrentChapterNameInChapterEditor();
+            if (currentChapterName === chapterName) {
+              await this.expectElementToBeVisible(
+                chapterEditorContainerSelector
               );
-              await this.expectElementToBeVisible(storyEditorContainerSelector);
-            } else {
-              await this.openStoryEditor(storyName, topicName);
+              return;
             }
-          }
-          const storyEditorVisible = await this.isElementVisible(
-            storyEditorContainerSelector,
-            true,
-            2000
-          );
-          if (!storyEditorVisible) {
+            await this.returnToStoryEditorInMobile();
+          } else if (
+            currentStoryName !== storyName ||
+            activeTab === 'other' ||
+            activeTab === 'story_preview'
+          ) {
             await this.openStoryEditor(storyName, topicName);
+          } else {
+            await this.expectElementToBeVisible(storyEditorContainerSelector);
           }
         }
       }
@@ -4236,7 +4344,14 @@ export class TopicManager extends BaseUser {
    */
   async ensureChapterListIsVisible(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.waitForStaticAssetsToLoad();
+      const chapterListVisible = await this.isElementVisible(
+        chapterTitleSelector,
+        true,
+        1000
+      );
+      if (chapterListVisible) {
+        return;
+      }
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
         await this.clickOnElementWithSelector(mobileChapterCollapsibleCard);
