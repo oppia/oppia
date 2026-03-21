@@ -40,7 +40,8 @@
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
     "core/tests/puppeteer-acceptance-tests/utilities/common/user-factory.spec.ts",
-    "core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.spec.ts"
+    "core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.spec.ts",
+    ".pytest_cache/README.md"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
