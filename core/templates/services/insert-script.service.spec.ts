@@ -142,7 +142,7 @@ describe('InsertScriptService', () => {
 
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
       expect(mockScriptElement.src).toContain(
-        '/third_party/static/MathJax-2.7.5/MathJax.js?config=default'
+        '/assets/mathjax/MathJax.js?config=TeX-AMS_SVG'
       );
       done();
     });

@@ -5023,7 +5023,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         # Translation suggestion 4 has waited 1 minute for review.
         translation_suggestion_4 = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'fr',
+                'de',
                 '<p>Translation 2 for reviewer 2</p>',
                 self.mocked_review_submission_datetime
                 + datetime.timedelta(days=1, hours=1),
@@ -5078,7 +5078,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '<li>The following हिन्दी (Hindi) translation suggestion was '
             'submitted for review 1 minute ago:'
             '<br>Translation 1 for reviewer 2</li><br>'
-            '<li>The following français (French) translation suggestion was '
+            '<li>The following Deutsch (German) translation suggestion was '
             'submitted for review 1 minute ago:'
             '<br>Translation 2 for reviewer 2</li><br>'
             '</ul><br>'
@@ -6583,7 +6583,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
     ) -> None:
         translation_suggestion = (
             self._create_translation_suggestion_in_lang_with_html_and_datetime(
-                'en',
+                'fr',
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime,
             )
@@ -6603,7 +6603,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
             ' in on the Contributor Dashboard page. Here are some examples'
             ' of contributions that are waiting for review:'
             '<br><br>The following suggestions are available for review: '
-            '<br><br><ul><li>The following English translation suggestion '
+            '<br><br><ul><li>The following français (French) translation suggestion '
             'was submitted for review 2 days ago:<br>What is the'
             ' meaning of life?</li><br></ul><br>Please take some time '
             'to review any of the above contributions '
@@ -6622,8 +6622,8 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
                 ] = DefaultDict(  # pylint: disable=line-too-long
                     list
                 )
-                reviewer_ids_by_language['en'] = [self.reviewer_1_id]
-                suggestions_by_language['en'] = [
+                reviewer_ids_by_language['fr'] = [self.reviewer_1_id]
+                suggestions_by_language['fr'] = [
                     reviewable_suggestion_email_info
                 ]
 

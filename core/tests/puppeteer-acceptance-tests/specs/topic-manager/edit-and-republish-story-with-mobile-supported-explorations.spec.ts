@@ -43,7 +43,9 @@ describe('Topic Manager', function () {
     // Create two simple explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Exploring Quadratic Equations'
+        'Exploring Quadratic Equations',
+        'Algebra',
+        true
       );
 
     explorationId2 =
@@ -54,7 +56,6 @@ describe('Topic Manager', function () {
     // Create an exploration with Code Editor.
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdmin.dismissWelcomeModal();
 
     // Create an exlporation unsupported by mobile.
     explorationId3 = await curriculumAdmin.createSimpleProgrammingExploration();
