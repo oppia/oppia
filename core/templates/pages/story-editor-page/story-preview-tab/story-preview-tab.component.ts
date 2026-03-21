@@ -107,6 +107,7 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     var result = '/explore/' + node.getExplorationId();
     result = this.urlService.addField(result, 'story_id', this.storyId);
     result = this.urlService.addField(result, 'node_id', node.getId());
+    result = this.urlService.addField(result, 'story_editor_page', 'true');
     return result;
   }
 

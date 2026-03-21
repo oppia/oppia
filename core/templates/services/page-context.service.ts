@@ -390,6 +390,10 @@ export class PageContextService {
     );
   }
 
+  isInStoryEditorPreviewMode(): boolean {
+    return this.urlService.getUrlParams()['story_editor_page'] === 'true';
+  }
+
   canAddOrEditComponents(): boolean {
     var currentPageContext = this.getPageContext();
     var allowedPageContext: string[] = [
