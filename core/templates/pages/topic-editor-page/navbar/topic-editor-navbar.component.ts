@@ -43,22 +43,22 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 export class TopicEditorNavbarComponent
   implements OnInit, OnDestroy, AfterContentChecked
 {
-  validationIssues: string[];
-  topic: Topic;
-  prepublishValidationIssues: string[];
-  topicRights: TopicRights;
-  topicId: string;
-  topicName: string;
-  discardChangesButtonIsShown: boolean;
-  showTopicEditOptions: boolean;
-  topicSkillIds: string[];
-  showNavigationOptions: boolean;
-  warningsAreShown: boolean;
-  navigationChoices: string[];
-  activeTab: string;
-  changeListLength: number;
-  topicIsSaveable: boolean;
-  totalWarningsCount: number;
+  validationIssues!: string[];
+  topic!: Topic;
+  prepublishValidationIssues!: string[];
+  topicRights!: TopicRights;
+  topicId!: string;
+  topicName!: string;
+  discardChangesButtonIsShown!: boolean;
+  showTopicEditOptions!: boolean;
+  topicSkillIds!: string[];
+  showNavigationOptions!: boolean;
+  warningsAreShown!: boolean;
+  navigationChoices!: string[];
+  activeTab!: string;
+  changeListLength!: number;
+  topicIsSaveable!: boolean;
+  totalWarningsCount!: number;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -89,10 +89,13 @@ export class TopicEditorNavbarComponent
       this.validationIssues.push('Topic URL fragment already exists.');
     }
     let prepublishTopicValidationIssues = this.topic.prepublishValidate();
-    let subtopicPrepublishValidationIssues = [].concat.apply(
-      [],
-      this.topic.getSubtopics().map(subtopic => subtopic.prepublishValidate())
-    );
+    let subtopicPrepublishValidationIssues: string[] = [];
+    this.topic.getSubtopics().forEach(subtopic => {
+      subtopicPrepublishValidationIssues =
+        subtopicPrepublishValidationIssues.concat(
+          subtopic.prepublishValidate()
+        );
+    });
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues
     );
@@ -130,14 +133,12 @@ export class TopicEditorNavbarComponent
         }
         this.topicRights.markTopicAsPublished();
         this.topicEditorStateService.setTopicRights(this.topicRights);
-      })
-      .then(() => {
         let successToast = 'Topic published.';
+        this.alertsService.addSuccessMessage(successToast, 1000);
         if (redirectToDashboard) {
           this.windowRef.nativeWindow.location.href =
             '/topics-and-skills-dashboard';
         }
-        this.alertsService.addSuccessMessage(successToast, 1000);
       });
   }
 
@@ -215,6 +216,7 @@ export class TopicEditorNavbarComponent
         this.topicRights.markTopicAsUnpublished();
         this.topicEditorStateService.setTopicRights(this.topicRights);
       });
+    return true;
   }
 
   toggleNavigationOptions(): void {
@@ -253,6 +255,7 @@ export class TopicEditorNavbarComponent
     } else if (activeTab === 'topic_preview') {
       return 'Preview';
     }
+    return 'Editor';
   }
 
   openTopicViewer(): void {
@@ -295,6 +298,9 @@ export class TopicEditorNavbarComponent
       const topicUrlFragment = this.topic.getUrlFragment();
       const classroomUrlFragment =
         this.topicEditorStateService.getClassroomUrlFragment();
+      if (!classroomUrlFragment) {
+        return;
+      }
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
           ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,

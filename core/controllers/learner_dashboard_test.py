@@ -19,6 +19,9 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
     learner_progress_services,
     story_domain,
     story_services,
@@ -26,9 +29,12 @@ from core.domain import (
     topic_domain,
     topic_services,
 )
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Final
+
+user_models = models.Registry.import_models([models.Names.USER])[0]
 
 
 class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -945,4 +951,390 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             response['subscription_list'][0]['creator_username'],
             self.OWNER_USERNAME,
         )
+        self.logout()
+
+    def test_exploration_progress_is_zero_for_new_explorations(self) -> None:
+        """Test that progress is 0 for explorations with no checkpoint data."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration with checkpoint.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as incomplete without visiting checkpoints.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, exploration.init_state_name, 1
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        incomplete_exps = response['incomplete_explorations_list']
+        self.assertEqual(len(incomplete_exps), 1)
+        self.assertEqual(incomplete_exps[0]['id'], self.EXP_ID_1)
+        self.assertEqual(incomplete_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(incomplete_exps[0]['total_checkpoints_count'], 1)
+
+        self.logout()
+
+    def test_exploration_progress_calculation_with_checkpoints(self) -> None:
+        """Test that progress is correctly calculated based on checkpoints."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create exploration with checkpoint.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as incomplete and record checkpoint progress.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, exploration.init_state_name, 1
+        )
+
+        # Record checkpoint progress (visited the only checkpoint).
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.viewer_id, self.EXP_ID_1),
+            user_id=self.viewer_id,
+            exploration_id=self.EXP_ID_1,
+            most_recently_reached_checkpoint_state_name=exploration.init_state_name,
+        ).put()
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        incomplete_exps = response['incomplete_explorations_list']
+        self.assertEqual(len(incomplete_exps), 1)
+        self.assertEqual(incomplete_exps[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(incomplete_exps[0]['total_checkpoints_count'], 1)
+
+        self.logout()
+
+    def test_completed_exploration_progress_is_100(self) -> None:
+        """Test that completed explorations always show 100% progress."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        completed_exps = response['completed_explorations_list']
+        self.assertEqual(len(completed_exps), 1)
+        self.assertEqual(completed_exps[0]['id'], self.EXP_ID_1)
+        self.assertEqual(completed_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(completed_exps[0]['total_checkpoints_count'], 1)
+
+        self.logout()
+
+    def test_exploration_playlist_has_progress_field(self) -> None:
+        """Test that exploration playlist items include progress field."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Add to playlist.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        playlist = response['exploration_playlist']
+        self.assertEqual(len(playlist), 1)
+        self.assertEqual(playlist[0]['id'], self.EXP_ID_1)
+        self.assertEqual(playlist[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(playlist[0]['total_checkpoints_count'], 1)
+
+        self.logout()
+
+    def test_multiple_explorations_have_individual_progress(self) -> None:
+        """Test that multiple explorations each have their own progress."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create three explorations with checkpoints.
+        for i, exp_id in enumerate(
+            [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]
+        ):
+            exploration = self.save_new_valid_exploration(
+                exp_id,
+                self.owner_id,
+                title=f'Test Exploration {i+1}',
+                category='Test',
+            )
+            exp_services.update_exploration(
+                self.owner_id,
+                exp_id,
+                [
+                    exp_domain.ExplorationChange(
+                        {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'state_name': exploration.init_state_name,
+                            'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                            'new_value': True,
+                        }
+                    ),
+                ],
+                'Mark initial state as checkpoint',
+            )
+            self.publish_exploration(self.owner_id, exp_id)
+            learner_progress_services.mark_exploration_as_incomplete(
+                self.viewer_id, exp_id, exploration.init_state_name, 1
+            )
+
+        # Set different checkpoint progress for each.
+        # EXP_ID_1: No checkpoint visited (0%)
+        # EXP_ID_2: No checkpoint visited (0%)
+        # EXP_ID_3: Visited the checkpoint (0% = floor((1-1)/1*100) = 0%)
+        exp_3 = exp_fetchers.get_exploration_by_id(self.EXP_ID_3)
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.viewer_id, self.EXP_ID_3),
+            user_id=self.viewer_id,
+            exploration_id=self.EXP_ID_3,
+            most_recently_reached_checkpoint_state_name=exp_3.init_state_name,
+        ).put()
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        incomplete_exps = response['incomplete_explorations_list']
+        self.assertEqual(len(incomplete_exps), 3)
+
+        # Find each exploration and check its checkpoint counts.
+        exp_counts_map = {
+            exp['id']: (
+                exp['visited_checkpoints_count'],
+                exp['total_checkpoints_count'],
+            )
+            for exp in incomplete_exps
+        }
+        self.assertEqual(exp_counts_map[self.EXP_ID_1], (0, 1))
+        self.assertEqual(exp_counts_map[self.EXP_ID_2], (0, 1))
+        self.assertEqual(exp_counts_map[self.EXP_ID_3], (1, 1))
+
+        self.logout()
+
+    def test_exploration_progress_with_missing_progress_data(self) -> None:
+        """Test that progress is 0 when progress data is missing."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration with checkpoint.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as incomplete without visiting checkpoints.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, exploration.init_state_name, 1
+        )
+
+        with self.swap_to_always_return(
+            learner_progress_services,
+            'get_checkpoint_progress_for_explorations',
+            {},
+        ):
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+
+        incomplete_exps = response['incomplete_explorations_list']
+        self.assertEqual(len(incomplete_exps), 1)
+        self.assertEqual(incomplete_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(incomplete_exps[0]['total_checkpoints_count'], 0)
+
+        self.logout()
+
+    def test_completed_exploration_without_progress_data(self) -> None:
+        """Test completed explorations when no progress data is available."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        with self.swap_to_always_return(
+            learner_progress_services,
+            'get_checkpoint_progress_for_explorations',
+            {},
+        ):
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+
+        completed_exps = response['completed_explorations_list']
+        self.assertEqual(len(completed_exps), 1)
+        self.assertEqual(completed_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(completed_exps[0]['total_checkpoints_count'], 0)
+
+        self.logout()
+
+    def test_exploration_playlist_without_progress_data(self) -> None:
+        """Test exploration playlist when no progress data is available."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Add to playlist.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        with self.swap_to_always_return(
+            learner_progress_services,
+            'get_checkpoint_progress_for_explorations',
+            {},
+        ):
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+
+        playlist = response['exploration_playlist']
+        self.assertEqual(len(playlist), 1)
+        self.assertEqual(playlist[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(playlist[0]['total_checkpoints_count'], 0)
+
         self.logout()
