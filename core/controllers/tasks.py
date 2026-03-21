@@ -17,12 +17,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import traceback
 
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
+    email_services,
     exp_fetchers,
     exp_services,
     feedback_services,
@@ -230,6 +232,87 @@ class FlagExplorationEmailHandler(
         email_manager.send_flag_exploration_email(
             exploration.title, exploration_id, reporter_id, report_text
         )
+        self.render_json({})
+
+
+class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler task for retrying unsuccessfully sent emails."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'sender_email': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'recipient_id': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'subject': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'html_body': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'text_body': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.can_perform_tasks_in_taskqueue
+    def post(self) -> None:
+        """Attempts to resend an email.
+
+        If it fails, raises an error to trigger an automatic retry via Cloud Tasks.
+        """
+        payload = json.loads(self.request.body)
+
+        sender_email = payload.get('sender_email')
+        recipient_id = payload.get('recipient_id')
+        subject = payload.get('subject')
+        html_body = payload.get('html_body')
+        text_body = payload.get('text_body')
+
+        num_of_attempts_of_retry_made = int(
+            self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
+        )
+
+        # Cloud tasks automatically increment this header on each retry.
+        # It starts at 0 for the first attempt.
+        #
+        # Note: We use X-AppEngine-TaskExecutionCount instead of
+        # X-AppEngine-TaskRetryCount because TaskRetryCount includes infrastructure
+        # failures (e.g., lack of available instances) where the task never
+        # actually reached this handler. TaskExecutionCount strictly counts how
+        # many times this handler actually executed and failed, which is the
+        # exact metric we want to limit against.
+        # Docs: <https://cloud.google.com/tasks/docs/creating-appengine-handlers>.
+
+        # TODO(#25307): Improve this retry mechanism by differentiating between
+        # 4xx client errors (which should be dropped immediately) and 5xx server
+        # errors (which should be retried). Until then, we enforce a hard limit
+        # of 3 retries for all errors to prevent infinite queues.
+
+        if num_of_attempts_of_retry_made >= 3:
+            logging.error('Failed sending email after three retries')
+            self.render_json({})
+            return
+
+        try:
+            email_services.send_mail(
+                sender_email, recipient_id, subject, text_body, html_body
+            )
+        except Exception as e:
+            logging.error(
+                'Email retry failed for recipient %s: %s', recipient_id, e
+            )
+            raise Exception('Failed to resend email: %s' % e) from e
+
         self.render_json({})
 
 
