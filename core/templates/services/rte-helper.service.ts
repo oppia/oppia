@@ -66,7 +66,7 @@ export class RteHelperService {
     customizationArgSpecs: CustomizationArgsSpecsType,
     attrsCustomizationArgsDict: CustomizationArgsForRteType,
     onSubmitCallback?: (arg0: unknown) => void,
-    onDismissCallback?: (reason: boolean | 'cancel') => void
+    onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
   ): void {
     document.execCommand('enableObjectResizing', false);
     const modalRef = this.modalService.open(RteHelperModalComponent, {
@@ -86,7 +86,12 @@ export class RteHelperService {
       },
       reason => {
         if (onDismissCallback) {
-          onDismissCallback(reason);
+          // Treat non-boolean dismiss reasons (e.g. ESC) as cancel behavior.
+          // Existing widgets should stay, while newly-created ones should be
+          // removed.
+          onDismissCallback(
+            reason === true || (componentIsNewlyCreated && reason !== false)
+          );
         }
       }
     );
