@@ -190,11 +190,13 @@ def main(args: Optional[List[str]] = None) -> None:
     """Run acceptance tests."""
     parsed_args = _PARSER.parse_args(args=args)
     test_name = parsed_args.suite
+    sep = '-' * 60
+    fail_sep = '!' * 60
 
     print(
-        f"\n{'-' * 60}"
-        f"\n[START] Running acceptance test: {test_name}"
-        f"\n{'-' * 60}\n"
+        f'\n{sep}'
+        f'\n[START] Running acceptance test: {test_name}'
+        f'\n{sep}\n'
     )
 
     with servers.managed_portserver():
@@ -204,10 +206,10 @@ def main(args: Optional[List[str]] = None) -> None:
         print(f'\n[SUCCESS] Completed test: {test_name}\n')
     else:
         print(
-            f"\n{'!' * 60}"
-            f"\n[FAILURE] Test failed: {test_name}"
-            f"\n[ERROR] Return code: {return_code}"
-            f"\n{'!' * 60}\n"
+            f'\n{fail_sep}'
+            f'\n[FAILURE] Test failed: {test_name}'
+            f'\n[ERROR] Return code: {return_code}'
+            f'\n{fail_sep}\n'
         )
 
     sys.exit(return_code)
