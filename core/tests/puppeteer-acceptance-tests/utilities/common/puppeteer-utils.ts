@@ -87,6 +87,7 @@ export class BaseUser {
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
   static instances: BaseUser[] = []; // Track instances.
+  snapshotErrors: string[] = [];
 
   constructor() {
     BaseUser.instances.push(this);
@@ -905,6 +906,10 @@ export class BaseUser {
         );
       }
     }
+    if (this.snapshotErrors.length > 0) {
+      const allErrors = this.snapshotErrors.join('\n\n---\n\n');
+      throw new Error(`Snapshot mismatches found:\n\n${allErrors}`);
+    }
     await this.browserObject.close();
     showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);
   }
@@ -1169,7 +1174,7 @@ export class BaseUser {
         'replace the old one(s).\r\nTo download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
         ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
         ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
-      throw new Error(errorMessage);
+      this.snapshotErrors.push(errorMessage);
     }
   }
 
