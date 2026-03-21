@@ -60,12 +60,8 @@ describe('Translation language selector', () => {
     {
       fetchFeaturedTranslationLanguagesAsync: async () =>
         Promise.resolve(featuredLanguages),
-      getPreferredTranslationLanguageAsync: async () => {
-        if (preferredLanguageCode) {
-          component.populateLanguageSelection(preferredLanguageCode);
-        }
-        return Promise.resolve(preferredLanguageCode);
-      },
+      getPreferredTranslationLanguageAsync: async () =>
+        Promise.resolve(preferredLanguageCode),
       savePreferredTranslationLanguageAsync: async () => Promise.resolve(),
     };
 
@@ -379,5 +375,38 @@ describe('Translation language selector', () => {
     expect(component.filteredOptions).toEqual([
       {id: 'es', description: 'español (Spanish)'},
     ]);
+  });
+
+  it('should not auto-populate preferred language when all languages is selected', fakeAsync(() => {
+    preferredLanguageCode = 'fr';
+    component.includeAllOption = true;
+    component.activeLanguageCode = '';
+
+    spyOn(component, 'populateLanguageSelection').and.callThrough();
+
+    component.ngOnInit();
+    flush();
+
+    expect(component.languageSelection).toBe('All languages');
+    expect(component.options[0]).toEqual({
+      id: '',
+      description: 'All languages',
+    });
+    expect(component.populateLanguageSelection).not.toHaveBeenCalledWith(
+      preferredLanguageCode
+    );
+  }));
+
+  it('should not save preferred language for all-language option', () => {
+    spyOn(
+      contributionOpportunitiesBackendApiServiceStub,
+      'savePreferredTranslationLanguageAsync' as never
+    );
+
+    component.selectOption('');
+
+    expect(
+      contributionOpportunitiesBackendApiServiceStub.savePreferredTranslationLanguageAsync
+    ).not.toHaveBeenCalled();
   });
 });
