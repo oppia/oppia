@@ -609,20 +609,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_payload_args_update_handler_args_successfully(self) -> None:
-        """Test that when a valid payload properly updates the handler args"""
+        """Test that when a valid payload properly updates the handler args."""
 
         mock_request = mock.Mock()
         mock_request.environ = {'REQUEST_METHOD': 'POST'}
         mock_request.route_kwargs = {}
 
         valid_json_payload = json.dumps({'custom_key': 'custom_value'})
-
-        def mock_get_arg(arg_name: str) -> Optional[str]:
-            if arg_name == 'payload':
-                return valid_json_payload
-            return None
-
-        mock_request.get.side_effect = mock_get_arg
+        mock_request.get.return_value = valid_json_payload
         mock_request.arguments.return_value = ['payload']
 
         handler = self.MockPostHandler(mock_request, mock.Mock())
