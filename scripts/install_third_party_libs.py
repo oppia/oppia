@@ -36,17 +36,14 @@ import subprocess
 import sys
 import tarfile
 
-from scripts import (
-    install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
-)
-from scripts import (
+from typing import Final
+
+from . import (
+    clean,
+    common,
     install_dependencies_json_packages,
     install_python_prod_dependencies,
 )
-
-from typing import Final
-
-from . import clean, common
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
@@ -431,13 +428,26 @@ def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
 
-    # This ensures dev dependencies are present and compiled before we
-    # proceed to other setup tasks that require them.
-    install_python_dev_dependencies.main(['--assert_compiled'])
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
-    from . import pre_commit_hook  # pylint: disable=wrong-import-position
-    from . import pre_push_hook  # pylint: disable=wrong-import-position
+    from . import (  # pylint: disable=wrong-import-position
+        pre_commit_hook,
+        pre_push_hook,
+    )
+
+    # Install additional runtime modules if they are missing.
+    # This is to ensure that the environment is fully set up for tests.
+    if not os.path.exists(
+        os.path.join(
+            common.OPPIA_TOOLS_DIR, 'redis-cli-%s' % common.REDIS_CLI_VERSION
+        )
+    ):
+        install_redis_cli()
+
+    if not os.path.exists(
+        os.path.join(common.OPPIA_TOOLS_DIR, 'google-cloud-sdk')
+    ):
+        install_gcloud_sdk()
 
     if common.is_windows_os():
         raise Exception(

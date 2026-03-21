@@ -308,6 +308,13 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # a build_stack callback since that would run on successful builds as
     # well.
     if not parsed_args.skip_install:
+        from . import (
+            install_python_dev_dependencies,
+            install_python_prod_dependencies,
+        )
+
+        install_python_dev_dependencies.main(['--assert_compiled'])
+        install_python_prod_dependencies.main()
         install_third_party_libs.main()
 
     build_args = get_build_args(parsed_args)
