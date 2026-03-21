@@ -4015,7 +4015,7 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(sidebarSelector, {visible: true});
 
-    await this.isElementVisible(sidebarSelectorPic, true);
+    await this.expectElementToBeVisible(sidebarSelectorPic, true);
     const buttonTexts = await this.page.$$eval(
       `${sidebarSelector} .oppia-learner-dash-sidebar_btn`,
       els => els.map(el => el.textContent?.trim() || '')
@@ -4043,7 +4043,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToClassroomFromLearnerDashboard(
     classroom: string
   ): Promise<void> {
-    await this.isElementVisible(
+    await this.expectElementToBeVisible(
       classroomButtonOnRedesignedLearnerDashboard,
       true
     );
