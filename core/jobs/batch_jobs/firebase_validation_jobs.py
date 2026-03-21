@@ -28,7 +28,7 @@ from core.jobs.types import firebase_adapters, job_run_result
 import apache_beam as beam
 from typing import Iterable, TypedDict
 
-# CORRUPT outputs are **unexpected**, and require a SERVER ADMIN to investigate!
+# CORRUPT outputs are **unexpected**, and require a SERVER ADMIN to investigate.
 TAG_CORRUPT = 'CORRUPT'
 
 # FIXABLE outputs are _expected_, and can be fixed by running `FirebaseSyncJob`.
