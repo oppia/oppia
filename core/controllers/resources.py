@@ -32,6 +32,31 @@ from core.domain import platform_parameter_registry as registry
 from core.domain import platform_parameter_services, value_generators_domain
 
 from typing import Dict, TypedDict
+# File: core/controllers/suggestion.py
+
+from core.controllers import base
+
+class SuggestionHandler(base.BaseHandler):
+    def post(self):
+        suggestion_text = self.payload.get('suggestion_text', '').strip()
+        
+        # Empty suggestion check (from previous PR)
+        if not suggestion_text:
+            self.render_json({
+                'status': 'error',
+                'message': 'Suggestion cannot be empty. Please write something!'
+            })
+            return
+        
+        # NEW: Check for suggestion length
+        if len(suggestion_text) > 500:
+            self.render_json({
+                'status': 'error',
+                'message': 'Suggestion is too long. Maximum 500 characters allowed.'
+            })
+            return
+        
+        # existing code continues here
 
 
 class ValueGeneratorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
