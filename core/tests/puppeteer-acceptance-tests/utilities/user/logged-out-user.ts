@@ -6736,9 +6736,10 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectConceptCardButton(): Promise<boolean> {
     try {
+      // Wait for few minutes to see the concept card.
       await this.page.waitForSelector(conceptCardButton, {
         visible: true,
-        timeout: 30000,
+        timeout: 120000,
       });
       return true;
     } catch (error) {

@@ -148,7 +148,6 @@ describe('Logged-Out Learner', function () {
   it('should be able to resume progress using the 72-hour link', async function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.submitFractionInputResponse('1/2');
 
     // Click on the 'Save' button.

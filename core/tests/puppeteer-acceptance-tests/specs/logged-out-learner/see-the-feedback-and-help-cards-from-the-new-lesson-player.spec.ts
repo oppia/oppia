@@ -296,8 +296,6 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to check the concept card', async function () {
-    // Wait for few minutes to see the concept card.
-    await loggedOutLearner.page.waitForTimeout(120000);
     await loggedOutLearner.expectConceptCardButton();
 
     // Open concept card.
