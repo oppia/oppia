@@ -37,6 +37,38 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, Final, List, Tuple
+# File: core/controllers/suggestion.py
+
+from core.controllers import base
+
+class SuggestionHandler(base.BaseHandler):
+    def post(self):
+        suggestion_text = self.payload.get('suggestion_text', '').strip()
+        
+        # Empty suggestion check (from previous PR)
+        if not suggestion_text:
+            self.render_json({
+                'status': 'error',
+                'message': 'Suggestion cannot be empty. Please write something!'
+            })
+            return
+        
+        # NEW: Check for suggestion length
+        if len(suggestion_text) > 500:
+            self.render_json({
+                'status': 'error',
+                'message': 'Suggestion is too long. Maximum 500 characters allowed.'
+            })
+            return
+        
+        # existing code continues here
+    # File: core/controllers/suggestion_test.py
+
+def test_long_suggestion_rejected(self):
+    long_text = "a" * 501
+    response = self.post_json('/suggestion', {'suggestion_text': long_text})
+    self.assertEqual(response['status'], 'error')
+    self.assertIn('too long', response['message'])
 
 MYPY = False
 if MYPY:  # pragma: no cover
