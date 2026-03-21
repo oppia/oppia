@@ -17,9 +17,6 @@
 from __future__ import annotations
 
 import datetime
-import random
-import string
-import time
 import unittest.mock
 
 from core import feconf
@@ -48,7 +45,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -187,13 +184,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             [
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1,
-                self.expected_skill_opportunity_dict_2,
             ],
         )
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_skill_opportunity_data_returns_non_classroom_topics(
+    def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
         self,
     ) -> None:
         classroom_config_services.delete_classroom(self.classroom_id)
@@ -202,14 +198,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL, params={}
         )
 
-        self.assertEqual(
-            response['opportunities'],
-            [
-                self.expected_skill_opportunity_dict_0,
-                self.expected_skill_opportunity_dict_1,
-                self.expected_skill_opportunity_dict_2,
-            ],
-        )
+        self.assertEqual(response['opportunities'], [])
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
@@ -222,10 +211,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL, params={}
         )
 
-        # Topic 0 is deleted, but Topic 1 still exists and has skill_id_2.
-        self.assertEqual(
-            response['opportunities'], [self.expected_skill_opportunity_dict_2]
-        )
+        self.assertEqual(response['opportunities'], [])
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
@@ -281,13 +267,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 params={'cursor': next_cursor},
             )
 
-            # Skill 2 is part of topic 1 (which has a story). It is now
-            # returned even if not in a classroom.
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_skill_opportunity_dict_2],
-            )
+            # Skill 2 is not part of a Classroom topic and so its corresponding
+            # opportunity is not returned.
+            self.assertEqual(len(next_response['opportunities']), 0)
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
@@ -314,57 +296,41 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic_id_to_prerequisite_topic_ids={topic_id: []},
         )
 
-        # Create a new exploration to link to the story.
-        self.save_new_valid_exploration(
-            '99', self.owner_id, title='title 99', category='Biology'
-        )
-        self.publish_exploration(self.owner_id, '99')
-
-        # Add a story to the new topic so it is considered curated.
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_9', topic_id, '99'
-        )
-
         # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
-        # skipped if we swap get_all_topics to return only topic 9.
-        # This allows us to test the multiple fetch logic specifically for
-        # topic 9.
-        with self.swap(
-            topic_fetchers,
-            'get_all_topics',
-            lambda: [topic_fetchers.get_topic_by_id(topic_id)],
-        ):
-            with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
-                response = self.get_json(
-                    '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                    params={},
-                )
-                self.assertEqual(len(response['opportunities']), 3)
-                self.assertEqual(
-                    response['opportunities'],
-                    [
-                        {
-                            'id': skill_id_3,
-                            'skill_description': 'skill_description',
-                            'question_count': 0,
-                            'topic_name': topic_name,
-                        },
-                        {
-                            'id': skill_id_4,
-                            'skill_description': 'skill_description',
-                            'question_count': 0,
-                            'topic_name': topic_name,
-                        },
-                        {
-                            'id': skill_id_5,
-                            'skill_description': 'skill_description',
-                            'question_count': 0,
-                            'topic_name': topic_name,
-                        },
-                    ],
-                )
-                self.assertFalse(response['more'])
-                self.assertIsInstance(response['next_cursor'], str)
+        # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked
+        # to a classroom, another fetch will be made to retrieve skill_id_3,
+        # skill_id_4, skill_id_5 to fulfill the page size.
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
+            response = self.get_json(
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={},
+            )
+            self.assertEqual(len(response['opportunities']), 3)
+            self.assertEqual(
+                response['opportunities'],
+                [
+                    {
+                        'id': skill_id_3,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name,
+                    },
+                    {
+                        'id': skill_id_4,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name,
+                    },
+                    {
+                        'id': skill_id_5,
+                        'skill_description': 'skill_description',
+                        'question_count': 0,
+                        'topic_name': topic_name,
+                    },
+                ],
+            )
+            self.assertFalse(response['more'])
+            self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_with_zero_page_size_returns_no_opportunity(
         self,
@@ -389,33 +355,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic_id_to_prerequisite_topic_ids={topic_id: []},
         )
 
-        # Create a new exploration to link to the story.
-        self.save_new_valid_exploration(
-            '100', self.owner_id, title='title 100', category='Biology'
-        )
-        self.publish_exploration(self.owner_id, '100')
-
-        # Add a story to the new topic so it is considered curated.
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_10', topic_id, '100'
-        )
-
         # Test when no opportunities are returned.
-        with self.swap(
-            topic_fetchers,
-            'get_all_topics',
-            lambda: [topic_fetchers.get_topic_by_id(topic_id)],
-        ):
-            with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 0):
-                response = self.get_json(
-                    '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                    params={},
-                )
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 0):
+            response = self.get_json(
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={},
+            )
 
-                # Verify that no opportunities are returned.
-                self.assertEqual(len(response['opportunities']), 0)
-                self.assertTrue(response['more'])
-                self.assertIsInstance(response['next_cursor'], str)
+            # Verify that no opportunities are returned.
+            self.assertEqual(len(response['opportunities']), 0)
+            self.assertTrue(response['more'])
+            self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data_pagination(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
@@ -2851,348 +2801,3 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
-
-class SkillOpportunitySortingTest(test_utils.GenericTestBase):
-    """Test for tiered sorting of skill opportunities."""
-
-    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
-
-    def setUp(self) -> None:
-        super().setUp()
-        admin_email = 'admin@example.com'
-        admin_username = 'user' + ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(10)
-        )
-        owner_email = 'owner@example.com'
-        owner_username = 'owner' + ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(10)
-        )
-
-        self.signup(admin_email, admin_username)
-        self.admin_id = self.get_user_id_from_email(admin_email)
-        user_services.add_user_role(
-            self.admin_id, feconf.ROLE_ID_CURRICULUM_ADMIN
-        )
-        self.logout()
-
-        self.signup(owner_email, owner_username)
-        self.owner_id = self.get_user_id_from_email(owner_email)
-        self.logout()
-
-        # Create topics:
-        # 1. Published topic 1 (in published classroom)
-        # 2. Published topic 2 (in published classroom)
-        # 3. Unpublished curated topic (not in classroom, has stories)
-
-        suffix1 = ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(5)
-        )
-        suffix2 = ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(5)
-        )
-        suffix3 = ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(5)
-        )
-
-        self.topic_id_1 = suffix1 + ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
-        )
-        self.topic_id_2 = suffix2 + ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
-        )
-        self.topic_id_3 = suffix3 + ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
-        )
-
-        # Skill IDs
-        suffix = ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(8)
-        )
-        self.skill_id_t1_high = 'high' + suffix
-        self.skill_id_t1_low = 'low' + suffix
-        self.skill_id_t2_full = 'full' + suffix
-        self.skill_id_t3_unpub = 'unpu' + suffix
-        self.skill_id_t1_aaa = 'aaas' + suffix
-        self.skill_id_t1_zzz = 'zzzs' + suffix
-
-        topic_1 = topic_domain.Topic(
-            topic_id=self.topic_id_1,
-            name='Topic 1' + suffix1,
-            abbreviated_name='Topic 1' + suffix1,
-            url_fragment='topic-one-' + suffix1,
-            thumbnail_filename='topic_1.svg',
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][
-                0
-            ],
-            thumbnail_size_in_bytes=1000,
-            description='Description 1',
-            canonical_story_references=[],
-            additional_story_references=[],
-            uncategorized_skill_ids=[],
-            subtopics=[],
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            next_subtopic_id=1,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            version=1,
-            story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content='meta',
-            practice_tab_is_displayed=False,
-            page_title_fragment_for_web='topic-one',
-            skill_ids_for_diagnostic_test=[],
-        )
-        topic_2 = topic_domain.Topic(
-            topic_id=self.topic_id_2,
-            name='Topic 2' + suffix2,
-            abbreviated_name='Topic 2' + suffix2,
-            url_fragment='topic-two-' + suffix2,
-            thumbnail_filename='topic_2.svg',
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][
-                0
-            ],
-            thumbnail_size_in_bytes=1000,
-            description='Description 2',
-            canonical_story_references=[],
-            additional_story_references=[],
-            uncategorized_skill_ids=[],
-            subtopics=[],
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            next_subtopic_id=1,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            version=1,
-            story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content='meta',
-            practice_tab_is_displayed=False,
-            page_title_fragment_for_web='topic-two',
-            skill_ids_for_diagnostic_test=[],
-        )
-        topic_3 = topic_domain.Topic(
-            topic_id=self.topic_id_3,
-            name='Topic 3' + suffix3,
-            abbreviated_name='Topic 3' + suffix3,
-            url_fragment='topic-three-' + suffix3,
-            thumbnail_filename='topic_3.svg',
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][
-                0
-            ],
-            thumbnail_size_in_bytes=1000,
-            description='Description 3',
-            canonical_story_references=[],
-            additional_story_references=[],
-            uncategorized_skill_ids=[],
-            subtopics=[],
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            next_subtopic_id=1,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            version=1,
-            story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content='meta',
-            practice_tab_is_displayed=False,
-            page_title_fragment_for_web='topic-three',
-            skill_ids_for_diagnostic_test=[],
-        )
-        topic_1.add_subtopic(1, 'Subtopic 1', 'sub-one')
-        topic_2.add_subtopic(1, 'Subtopic 1', 'sub-one')
-        topic_3.add_subtopic(1, 'Subtopic 1', 'sub-one')
-
-        self._publish_topic_with_skills(
-            topic_1,
-            [
-                self.skill_id_t1_aaa,
-                self.skill_id_t1_high,
-                self.skill_id_t1_zzz,
-                self.skill_id_t1_low,
-            ],
-            skill_id_to_description={
-                self.skill_id_t1_aaa: 'aaa',
-                self.skill_id_t1_zzz: 'zzz',
-            },
-        )
-        self._publish_topic_with_skills(topic_2, [self.skill_id_t2_full])
-        self._publish_topic_with_skills(topic_3, [self.skill_id_t3_unpub])
-
-        # Add topic 1 and 2 to a published classroom
-        classroom_id = ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
-        )
-        self.save_new_valid_classroom(
-            classroom_id=classroom_id,
-            name='Classroom 1',
-            topic_id_to_prerequisite_topic_ids={
-                self.topic_id_1: [],
-                self.topic_id_2: [],
-            },
-            is_published=True,
-        )
-
-        # Create explorations and link them as stories to make topics 'curated'
-        self.save_new_valid_exploration('exp1', self.owner_id)
-        self.publish_exploration(self.owner_id, 'exp1')
-        self.save_new_valid_exploration('exp2', self.owner_id)
-        self.publish_exploration(self.owner_id, 'exp2')
-        self.save_new_valid_exploration('exp3', self.owner_id)
-        self.publish_exploration(self.owner_id, 'exp3')
-
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_1', self.topic_id_1, 'exp1'
-        )
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_2', self.topic_id_2, 'exp2'
-        )
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_3', self.topic_id_3, 'exp3'
-        )
-
-        # Update question counts
-        opportunity_services.increment_question_counts(
-            [self.skill_id_t1_high], 5
-        )
-        opportunity_services.increment_question_counts(
-            [self.skill_id_t1_low], 2
-        )
-        opportunity_services.increment_question_counts(
-            [self.skill_id_t1_aaa], 5
-        )
-        opportunity_services.increment_question_counts(
-            [self.skill_id_t1_zzz], 5
-        )
-        opportunity_services.increment_question_counts(
-            [self.skill_id_t2_full], 10
-        )
-        # skill_id_t3_unpub remains 0
-
-        # update_skill_opportunity_skill_description is likely what we need if it exists,
-        # otherwise we manually update the model if needed but usually save_new_skill
-        # creates the opportunity summary with that description.
-        # Wait, I already called _publish_topic_with_skills which might have created it.
-        # Let's ensure descriptions are what we want.
-
-    def _publish_topic_with_skills(
-        self,
-        topic: topic_domain.Topic,
-        skill_ids: List[str],
-        skill_id_to_description: Optional[Dict[str, str]] = None,
-    ) -> None:
-        topic_services.save_new_topic(self.admin_id, topic)
-        story_id = ''.join(
-            random.choices(string.ascii_lowercase + string.digits, k=12)
-        )
-        story_url_fragment = (
-            'frag-'
-            + ''.join(c for c in topic.id if c in string.ascii_lowercase)[:10]
-        )
-        story_services.save_new_story(
-            self.admin_id,
-            story_domain.Story.create_default_story(
-                story_id, 'Story', 'Description', topic.id, story_url_fragment
-            ),
-        )
-        topic_services.add_canonical_story(self.admin_id, topic.id, story_id)
-        for i, skill_id in enumerate(skill_ids):
-            description = 'skill description'
-            if skill_id_to_description and skill_id in skill_id_to_description:
-                description = skill_id_to_description[skill_id]
-            self.save_new_skill(
-                skill_id, self.owner_id, description=description
-            )
-            time.sleep(0.1)
-            topic_services.add_uncategorized_skill(
-                self.admin_id, topic.id, skill_id
-            )
-            if i == 0:
-                topic_services.update_topic_and_subtopic_pages(
-                    self.admin_id,
-                    topic.id,
-                    [
-                        topic_domain.TopicChange(
-                            {
-                                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-                                'old_subtopic_id': None,
-                                'new_subtopic_id': 1,
-                                'skill_id': skill_id,
-                            }
-                        ),
-                        topic_domain.TopicChange(
-                            {
-                                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                                'property_name': 'skill_ids_for_diagnostic_test',
-                                'new_value': [skill_id],
-                                'old_value': [],
-                            }
-                        ),
-                    ],
-                    'Link skill and update diagnostic test',
-                )
-        topic_services.publish_topic(topic.id, self.admin_id)
-
-    def test_skill_opportunity_sorting_and_pagination(self) -> None:
-        # Test Sorting Tiers
-        response = self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={},
-        )
-        opportunities = response['opportunities']
-        expected_ids = [
-            self.skill_id_t3_unpub,
-            self.skill_id_t1_high,
-            self.skill_id_t1_low,
-            self.skill_id_t1_aaa,
-            self.skill_id_t1_zzz,
-            self.skill_id_t2_full,
-        ]
-        actual_ids = [opp['id'] for opp in opportunities]
-        self.assertEqual(actual_ids, expected_ids)
-
-        # Test Pagination
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 2):
-            # Page 1
-            response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={},
-            )
-            self.assertEqual(len(response['opportunities']), 2)
-            self.assertEqual(
-                response['opportunities'][0]['id'], self.skill_id_t3_unpub
-            )
-            self.assertEqual(
-                response['opportunities'][1]['id'], self.skill_id_t1_high
-            )
-            self.assertTrue(response['more'])
-            next_cursor = response['next_cursor']
-            self.assertIsInstance(next_cursor, str)
-
-            # Page 2
-            response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'cursor': next_cursor},
-            )
-            self.assertEqual(len(response['opportunities']), 2)
-            self.assertEqual(
-                response['opportunities'][0]['id'], self.skill_id_t1_low
-            )
-            self.assertEqual(
-                response['opportunities'][1]['id'], self.skill_id_t1_aaa
-            )
-            self.assertTrue(response['more'])
-            next_cursor = response['next_cursor']
-            self.assertIsInstance(next_cursor, str)
-
-            # Page 3 (Final)
-            response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'cursor': next_cursor},
-            )
-            self.assertEqual(len(response['opportunities']), 2)
-            self.assertEqual(
-                response['opportunities'][0]['id'], self.skill_id_t1_zzz
-            )
-            self.assertEqual(
-                response['opportunities'][1]['id'], self.skill_id_t2_full
-            )
-            self.assertFalse(response['more'])
-            self.assertIsInstance(response['next_cursor'], str)

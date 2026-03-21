@@ -50,7 +50,7 @@ describe('Auth service', function () {
     signInEventService = jasmine.createSpyObj<SignInEventService>(
       'SignInEventService',
       [],
-      {onUserSignIn: new (await import('@angular/core')).EventEmitter<string>()}
+      {onUserSignIn: new (await import('@angular/core')).EventEmitter<void>()}
     );
 
     TestBed.configureTestingModule({
@@ -142,6 +142,8 @@ describe('Auth service', function () {
       code: 'auth/user-not-found',
     });
     angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(creds);
+
+    spyOn(signInEventService.onUserSignIn, 'emit');
     await expectAsync(authService.signInWithEmail(email)).toBeResolvedTo();
 
     expect(angularFireAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(

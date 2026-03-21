@@ -39,6 +39,7 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {ProgressUrlService} from '../../services/progress-url.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -107,7 +108,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private progressUrlService: ProgressUrlService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
     private signInEventService: SignInEventService,
-    private playerPositionService: PlayerPositionService
+    private playerPositionService: PlayerPositionService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {
     super(ngbActiveModal);
   }

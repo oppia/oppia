@@ -133,7 +133,6 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
-      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
@@ -195,7 +194,6 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
-      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
@@ -242,9 +240,9 @@ describe('Version history service', () => {
       ''
     );
 
-    expect(versionHistoryService.shouldFetchNewMetadataVersionHistory()).toBe(
-      true
-    );
+    expect(
+      versionHistoryService.shouldFetchNewMetadataVersionHistory()
+    ).toBeTrue();
 
     versionHistoryService.insertMetadataVersionHistoryData(
       4,
@@ -257,9 +255,9 @@ describe('Version history service', () => {
       ''
     );
 
-    expect(versionHistoryService.shouldFetchNewMetadataVersionHistory()).toBe(
-      false
-    );
+    expect(
+      versionHistoryService.shouldFetchNewMetadataVersionHistory()
+    ).toBeFalse();
   });
 
   it('should find whether new state version history data should be fetched', () => {
@@ -299,7 +297,6 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
-      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
@@ -317,20 +314,20 @@ describe('Version history service', () => {
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
 
-    expect(versionHistoryService.shouldFetchNewStateVersionHistory()).toBe(
-      true
-    );
+    expect(
+      versionHistoryService.shouldFetchNewStateVersionHistory()
+    ).toBeTrue();
 
     versionHistoryService.insertStateVersionHistoryData(4, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(5, stateData, '');
 
-    expect(versionHistoryService.shouldFetchNewStateVersionHistory()).toBe(
-      false
-    );
+    expect(
+      versionHistoryService.shouldFetchNewStateVersionHistory()
+    ).toBeFalse();
   });
 
   it('should get whether we should show backward state diff data', () => {
-    expect(versionHistoryService.canShowBackwardStateDiffData()).toBe(false);
+    expect(versionHistoryService.canShowBackwardStateDiffData()).toBeFalse();
 
     const stateObject = {
       classifier_model_id: null,
@@ -368,7 +365,6 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
-      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
@@ -387,11 +383,11 @@ describe('Version history service', () => {
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(4, stateData, '');
 
-    expect(versionHistoryService.canShowBackwardStateDiffData()).toBe(true);
+    expect(versionHistoryService.canShowBackwardStateDiffData()).toBeTrue();
   });
 
   it('should get whether we should show backward metadata diff data', () => {
-    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBe(false);
+    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBeFalse();
 
     const explorationMetadata = new ExplorationMetadata(
       'title',
@@ -419,11 +415,11 @@ describe('Version history service', () => {
       ''
     );
 
-    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBe(true);
+    expect(versionHistoryService.canShowBackwardMetadataDiffData()).toBeTrue();
   });
 
   it('should get whether we should show foward state diff data', () => {
-    expect(versionHistoryService.canShowForwardStateDiffData()).toBe(false);
+    expect(versionHistoryService.canShowForwardStateDiffData()).toBeFalse();
 
     const stateObject = {
       classifier_model_id: null,
@@ -461,7 +457,6 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
-      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
@@ -483,11 +478,11 @@ describe('Version history service', () => {
     versionHistoryService.incrementCurrentPositionInStateVersionHistoryList();
     versionHistoryService.incrementCurrentPositionInStateVersionHistoryList();
 
-    expect(versionHistoryService.canShowForwardStateDiffData()).toBe(true);
+    expect(versionHistoryService.canShowForwardStateDiffData()).toBeTrue();
   });
 
   it('should get whether we should show foward metadata diff data', () => {
-    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBe(false);
+    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBeFalse();
 
     const explorationMetadata = new ExplorationMetadata(
       'title',
@@ -522,7 +517,7 @@ describe('Version history service', () => {
     versionHistoryService.incrementCurrentPositionInMetadataVersionHistoryList();
     versionHistoryService.incrementCurrentPositionInMetadataVersionHistoryList();
 
-    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBe(true);
+    expect(versionHistoryService.canShowForwardMetadataDiffData()).toBeTrue();
   });
 
   it('should get backward state diff data', () => {
@@ -562,7 +557,6 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
-      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
@@ -623,7 +617,6 @@ describe('Version history service', () => {
         solution: null,
         id: 'TextInput',
       },
-      inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
