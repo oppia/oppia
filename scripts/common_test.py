@@ -1156,6 +1156,7 @@ class CommonTests(test_utils.GenericTestBase):
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": true,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('  "SCREENSHOT_CONSISTENCY": false,\n')
             tmp.write('  "BRANCH_NAME": "",\n')
             tmp.write('  "SHORT_COMMIT_HASH": ""\n')
             tmp.write('};')
@@ -1166,7 +1167,8 @@ class CommonTests(test_utils.GenericTestBase):
         # to set the attribute.
         setattr(feconf_temp_file, 'name', mock_feconf_path)
         with open(mock_feconf_path, 'w', encoding='utf-8') as tmp:
-            tmp.write('ENABLE_MAINTENANCE_MODE = False')
+            tmp.write('ENABLE_MAINTENANCE_MODE = False\n')
+            tmp.write('SCREENSHOT_CONSISTENCY = False\n')
 
         with constants_path_swap, feconf_path_swap, check_output_swap:
             common.modify_constants(prod_env=True, maintenance_mode=False)
@@ -1178,13 +1180,15 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "SCREENSHOT_CONSISTENCY": false,\n'
                     '  "BRANCH_NAME": "test",\n'
                     '  "SHORT_COMMIT_HASH": "test"\n'
                     '};',
                 )
             with open(mock_feconf_path, 'r', encoding='utf-8') as feconf_file:
                 self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False'
+                    feconf_file.read(),
+                    'ENABLE_MAINTENANCE_MODE = False\nSCREENSHOT_CONSISTENCY = False\n',
                 )
 
             common.modify_constants(prod_env=False, maintenance_mode=True)
@@ -1196,13 +1200,15 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "SCREENSHOT_CONSISTENCY": false,\n'
                     '  "BRANCH_NAME": "test",\n'
                     '  "SHORT_COMMIT_HASH": "test"\n'
                     '};',
                 )
             with open(mock_feconf_path, 'r', encoding='utf-8') as feconf_file:
                 self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True'
+                    feconf_file.read(),
+                    'ENABLE_MAINTENANCE_MODE = True\nSCREENSHOT_CONSISTENCY = False\n',
                 )
 
         constants_temp_file.close()
@@ -1228,6 +1234,7 @@ class CommonTests(test_utils.GenericTestBase):
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": false,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('  "SCREENSHOT_CONSISTENCY": true,\n')
             tmp.write('  "BRANCH_NAME": "test",\n')
             tmp.write('  "SHORT_COMMIT_HASH": "test"\n')
             tmp.write('};')
@@ -1237,7 +1244,8 @@ class CommonTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(feconf_temp_file, 'name', mock_feconf_path)
         with open(mock_feconf_path, 'w', encoding='utf-8') as tmp:
-            tmp.write('ENABLE_MAINTENANCE_MODE = True')
+            tmp.write('ENABLE_MAINTENANCE_MODE = True\n')
+            tmp.write('SCREENSHOT_CONSISTENCY = True\n')
         self.contextManager.__exit__(None, None, None)
         with constants_path_swap, feconf_path_swap:
             common.set_constants_to_default()
@@ -1249,13 +1257,15 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "SCREENSHOT_CONSISTENCY": false,\n'
                     '  "BRANCH_NAME": "",\n'
                     '  "SHORT_COMMIT_HASH": ""\n'
                     '};',
                 )
             with open(mock_feconf_path, 'r', encoding='utf-8') as feconf_file:
                 self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False'
+                    feconf_file.read(),
+                    'ENABLE_MAINTENANCE_MODE = False\nSCREENSHOT_CONSISTENCY = False\n',
                 )
         constants_temp_file.close()
         feconf_temp_file.close()
