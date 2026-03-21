@@ -26,6 +26,8 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const MOBILE_LONG_RUNNING_TEST_TIMEOUT_MSECS = 600000;
 
 describe('Topic Manager', function () {
   let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
@@ -200,105 +202,111 @@ describe('Topic Manager', function () {
     await topicManager.discardStoryChanges();
   });
 
-  it('should be able to edit and preview the chapter', async function () {
-    await topicManager.openStoryEditor(
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.ensureChapterIsInitial('Solving problems');
+  it(
+    'should be able to edit and preview the chapter',
+    async function () {
+      await topicManager.openStoryEditor(
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
+      await topicManager.ensureChapterIsInitial('Solving problems');
 
-    await topicManager.openChapterEditor(
-      'Solving problems',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.addAcquiredSkill('Addition');
-    await topicManager.saveStoryDraft();
+      await topicManager.openChapterEditor(
+        'Solving problems',
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
+      await topicManager.addAcquiredSkill('Addition');
+      await topicManager.saveStoryDraft();
 
-    await topicManager.openChapterEditor(
-      'Simple Exploration',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.editChapterDetails(
-      'New Title',
-      'New Description',
-      'New Chapter Outline',
-      testConstants.data.curriculumAdminThumbnailImage
-    );
-    await topicManager.saveStoryDraft();
-    await topicManager.previewChapterCard();
-    await topicManager.expectPreviewCardToBeVisible(
-      'New Title',
-      'New Description'
-    );
+      await topicManager.openChapterEditor(
+        'Simple Exploration',
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
+      await topicManager.editChapterDetails(
+        'New Title',
+        'New Description',
+        'New Chapter Outline',
+        testConstants.data.curriculumAdminThumbnailImage
+      );
+      await topicManager.saveStoryDraft();
+      await topicManager.previewChapterCard();
+      await topicManager.expectPreviewCardToBeVisible(
+        'New Title',
+        'New Description'
+      );
 
-    // Add prerequisite skill.
-    await topicManager.addPrerequisiteSkill('Addition');
-    await topicManager.expectPrerequisiteSkillToBeVisible('Addition');
+      // Add prerequisite skill.
+      await topicManager.addPrerequisiteSkill('Addition');
+      await topicManager.expectPrerequisiteSkillToBeVisible('Addition');
 
-    // Add a prerequisite skill that is already a prerequisite skill and expect warning.
-    await topicManager.addPrerequisiteSkill('Addition');
-    await topicManager.expectToastMessageToBe(
-      'The given skill id is already a prerequisite skill.'
-    );
-    await topicManager.discardStoryChanges();
+      // Add a prerequisite skill that is already a prerequisite skill and expect warning.
+      await topicManager.addPrerequisiteSkill('Addition');
+      await topicManager.expectToastMessageToBe(
+        'The given skill id is already a prerequisite skill.'
+      );
+      await topicManager.discardStoryChanges();
 
-    // Re-open chapter editor.
-    await topicManager.openChapterEditor(
-      'New Title',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
+      // Re-open chapter editor.
+      await topicManager.openChapterEditor(
+        'New Title',
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
 
-    // Add aquired skill.
-    await topicManager.addAcquiredSkill('Subtraction');
-    await topicManager.expectAquiredSkillToBeVisible('Subtraction');
-    await topicManager.saveStoryDraft();
+      // Add aquired skill.
+      await topicManager.addAcquiredSkill('Subtraction');
+      await topicManager.expectAquiredSkillToBeVisible('Subtraction');
+      await topicManager.saveStoryDraft();
 
-    // Add a prerequisite skill that is already an acquired skill and expect warning.
-    await topicManager.addPrerequisiteSkill('Subtraction');
-    await topicManager.expectWarningInIndicator(
-      new RegExp(
-        'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
-          'prerequisite skill id ' +
-          'list in .*'
-      )
-    );
-    await topicManager.discardStoryChanges();
+      // Add a prerequisite skill that is already an acquired skill and expect warning.
+      await topicManager.addPrerequisiteSkill('Subtraction');
+      await topicManager.expectWarningInIndicator(
+        new RegExp(
+          'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
+            'prerequisite skill id ' +
+            'list in .*'
+        )
+      );
+      await topicManager.discardStoryChanges();
 
-    // Re-open chapter editor.
-    await topicManager.openChapterEditor(
-      'Solving problems',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
+      // Re-open chapter editor.
+      await topicManager.openChapterEditor(
+        'Solving problems',
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
 
-    // Delete prerequisite and acquired skills.
-    await topicManager.removeAcquiredSkill('Addition');
-    await topicManager.saveStoryDraft();
-    await topicManager.openChapterEditor(
-      'New Title',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.removeAcquiredSkill('Subtraction');
-    await topicManager.saveStoryDraft();
+      // Delete prerequisite and acquired skills.
+      await topicManager.removeAcquiredSkill('Addition');
+      await topicManager.saveStoryDraft();
+      await topicManager.openChapterEditor(
+        'New Title',
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
+      await topicManager.removeAcquiredSkill('Subtraction');
+      await topicManager.saveStoryDraft();
 
-    await topicManager.openChapterEditor(
-      'Solving problems',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.expectAquiredSkillToBeVisible('Addition', false);
-    await topicManager.openChapterEditor(
-      'New Title',
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
-    await topicManager.expectPrerequisiteSkillToBeVisible('Addition', false);
-    await topicManager.expectAquiredSkillToBeVisible('Subtraction', false);
-  });
+      await topicManager.openChapterEditor(
+        'Solving problems',
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
+      await topicManager.expectAquiredSkillToBeVisible('Addition', false);
+      await topicManager.openChapterEditor(
+        'New Title',
+        'The Broken Calculator',
+        'Arithmetic Operations'
+      );
+      await topicManager.expectPrerequisiteSkillToBeVisible('Addition', false);
+      await topicManager.expectAquiredSkillToBeVisible('Subtraction', false);
+    },
+    process.env.MOBILE === 'true'
+      ? MOBILE_LONG_RUNNING_TEST_TIMEOUT_MSECS
+      : DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
