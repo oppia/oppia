@@ -2861,12 +2861,12 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         admin_email = 'admin@example.com'
-        admin_username = 'user' + ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(10)
+        admin_username = 'user%s' % ''.join(
+            random.sample(string.ascii_lowercase, 10)
         )
         owner_email = 'owner@example.com'
-        owner_username = 'owner' + ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(10)
+        owner_username = 'owner%s' % ''.join(
+            random.sample(string.ascii_lowercase, 10)
         )
 
         self.signup(admin_email, admin_username)
@@ -2891,20 +2891,32 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
 
         self.topic_id_1 = '%s%s' % (
             suffix1,
-            ''.join(random.sample(string.ascii_lowercase + string.digits, 7)),
+            ''.join(
+                random.sample(
+                    '%s%s' % (string.ascii_lowercase, string.digits), 7
+                )
+            ),
         )
         self.topic_id_2 = '%s%s' % (
             suffix2,
-            ''.join(random.sample(string.ascii_lowercase + string.digits, 7)),
+            ''.join(
+                random.sample(
+                    '%s%s' % (string.ascii_lowercase, string.digits), 7
+                )
+            ),
         )
         self.topic_id_3 = '%s%s' % (
             suffix3,
-            ''.join(random.sample(string.ascii_lowercase + string.digits, 7)),
+            ''.join(
+                random.sample(
+                    '%s%s' % (string.ascii_lowercase, string.digits), 7
+                )
+            ),
         )
 
-        # Skill IDs
+        # Skill IDs.
         suffix = ''.join(
-            random.sample(string.ascii_lowercase + string.digits, 8)
+            random.sample('%s%s' % (string.ascii_lowercase, string.digits), 8)
         )
         self.skill_id_t1_high = 'high%s' % suffix
         self.skill_id_t1_low = 'low%s' % suffix
@@ -3008,9 +3020,9 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         self._publish_topic_with_skills(topic_2, [self.skill_id_t2_full])
         self._publish_topic_with_skills(topic_3, [self.skill_id_t3_unpub])
 
-        # Add topic 1 and 2 to a published classroom
+        # Add topic 1 and 2 to a published classroom.
         classroom_id = ''.join(
-            random.sample(string.ascii_lowercase + string.digits, 7)
+            random.sample('%s%s' % (string.ascii_lowercase, string.digits), 7)
         )
         self.save_new_valid_classroom(
             classroom_id=classroom_id,
@@ -3022,7 +3034,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
             is_published=True,
         )
 
-        # Create explorations and link them as stories to make topics 'curated'
+        # Create explorations and link them as stories to make topics 'curated'.
         self.save_new_valid_exploration('exp1', self.owner_id)
         self.publish_exploration(self.owner_id, 'exp1')
         self.save_new_valid_exploration('exp2', self.owner_id)
@@ -3040,7 +3052,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_3', self.topic_id_3, 'exp3'
         )
 
-        # Update question counts
+        # Update question counts.
         opportunity_services.increment_question_counts(
             [self.skill_id_t1_high], 5
         )
@@ -3056,9 +3068,9 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         opportunity_services.increment_question_counts(
             [self.skill_id_t2_full], 10
         )
-        # skill_id_t3_unpub remains 0
+        # Skill_id_t3_unpub remains 0.
 
-        # update_skill_opportunity_skill_description is likely what we need if it exists,
+        # Update_skill_opportunity_skill_description is likely what we need if it exists,
         # otherwise we manually update the model if needed but usually save_new_skill
         # creates the opportunity summary with that description.
         # Wait, I already called _publish_topic_with_skills which might have created it.
@@ -3080,7 +3092,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         """
         topic_services.save_new_topic(self.admin_id, topic)
         story_id = ''.join(
-            random.sample(string.ascii_lowercase + string.digits, 12)
+            random.sample('%s%s' % (string.ascii_lowercase, string.digits), 12)
         )
         story_url_fragment = (
             'frag-%s'
@@ -3122,6 +3134,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
                                 'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
                                 'property_name': 'skill_ids_for_diagnostic_test',
                                 'new_value': [skill_id],
+                                # Here we use cast because Mypy cannot infer the type.
                                 'old_value': cast(List[str], []),
                             }
                         ),
@@ -3131,7 +3144,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         topic_services.publish_topic(topic.id, self.admin_id)
 
     def test_skill_opportunity_sorting_and_pagination(self) -> None:
-        # Test Sorting Tiers
+        # Test sorting tiers.
         response = self.get_json(
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={},
@@ -3148,9 +3161,9 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         actual_ids = [opp['id'] for opp in opportunities]
         self.assertEqual(actual_ids, expected_ids)
 
-        # Test Pagination
+        # Test pagination.
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 2):
-            # Page 1
+            # Page 1.
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={},
@@ -3166,7 +3179,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
             next_cursor = response['next_cursor']
             self.assertIsInstance(next_cursor, str)
 
-            # Page 2
+            # Page 2.
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'cursor': next_cursor},
