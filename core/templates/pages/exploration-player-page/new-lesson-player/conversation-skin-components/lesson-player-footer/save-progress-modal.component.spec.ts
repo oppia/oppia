@@ -112,7 +112,7 @@ describe('SaveProgressModalComponent', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     signInEventService = TestBed.inject(SignInEventService);
-    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
+    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
   });
 
   it('should create', () => {

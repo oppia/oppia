@@ -33,7 +33,6 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
-import {SignInEventService} from 'services/sign-in-event.service';
 import {UserInfo} from 'domain/user/user-info.model';
 
 class MockUserService {
