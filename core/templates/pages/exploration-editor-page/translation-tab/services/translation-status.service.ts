@@ -193,6 +193,20 @@ export class TranslationStatusService implements OnInit {
           });
         }
 
+        // Filter out content IDs where the HTML content is empty. Empty HTML
+        // fields should not require translation.
+        const state = this.explorationStatesService.getState(stateName);
+        if (state) {
+          const originalHtmlContent = state.content.html;
+          allContentIds = allContentIds.filter(contentId => {
+            // Check if this is the main content
+            if (contentId === 'content' && !originalHtmlContent) {
+              return false;
+            }
+            return true;
+          });
+        }
+
         this.explorationTranslationContentRequiredCount += allContentIds.length;
 
         // Rule inputs do not need voiceovers. To have an accurate
