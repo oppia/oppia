@@ -975,6 +975,7 @@ def modify_constants(
     Args:
         prod_env: bool. Whether the server is started in prod mode.
         emulator_mode: bool. Whether the server is started in emulator mode.
+        screenshot_consistency: bool. Whether to maintain a consistent UI state across screenshot runs.
         maintenance_mode: bool. Whether the site should be put into
             the maintenance mode.
         version_info_must_be_set: bool. Whether the version info must be set.
