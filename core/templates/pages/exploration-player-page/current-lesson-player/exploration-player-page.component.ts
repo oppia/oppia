@@ -103,6 +103,9 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
           },
         ]);
       })
+      .catch(() => {
+        window.location.href = '/error/404';
+      })
       .finally(() => {
         this.isLoadingExploration = false;
       });
