@@ -281,7 +281,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
-      this.signInEventService.onUserSignIn.emit('lessonInformationCard');
+      this.signInEventService.onUserSignIn.emit('lessonInformationCardModal');
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });

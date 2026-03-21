@@ -2885,46 +2885,39 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         # 2. Published topic 2 (in published classroom)
         # 3. Unpublished curated topic (not in classroom, has stories)
 
-        suffix1 = ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(5)
-        )
-        suffix2 = ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(5)
-        )
-        suffix3 = ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(5)
-        )
+        suffix1 = ''.join(random.sample(string.ascii_lowercase, 5))
+        suffix2 = ''.join(random.sample(string.ascii_lowercase, 5))
+        suffix3 = ''.join(random.sample(string.ascii_lowercase, 5))
 
-        self.topic_id_1 = suffix1 + ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
+        self.topic_id_1 = '%s%s' % (
+            suffix1,
+            ''.join(random.sample(string.ascii_lowercase + string.digits, 7)),
         )
-        self.topic_id_2 = suffix2 + ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
+        self.topic_id_2 = '%s%s' % (
+            suffix2,
+            ''.join(random.sample(string.ascii_lowercase + string.digits, 7)),
         )
-        self.topic_id_3 = suffix3 + ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
+        self.topic_id_3 = '%s%s' % (
+            suffix3,
+            ''.join(random.sample(string.ascii_lowercase + string.digits, 7)),
         )
 
         # Skill IDs
         suffix = ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(8)
+            random.sample(string.ascii_lowercase + string.digits, 8)
         )
-        self.skill_id_t1_high = 'high' + suffix
-        self.skill_id_t1_low = 'low' + suffix
-        self.skill_id_t2_full = 'full' + suffix
-        self.skill_id_t3_unpub = 'unpu' + suffix
-        self.skill_id_t1_aaa = 'aaas' + suffix
-        self.skill_id_t1_zzz = 'zzzs' + suffix
+        self.skill_id_t1_high = 'high%s' % suffix
+        self.skill_id_t1_low = 'low%s' % suffix
+        self.skill_id_t2_full = 'full%s' % suffix
+        self.skill_id_t3_unpub = 'unpu%s' % suffix
+        self.skill_id_t1_aaa = 'aaas%s' % suffix
+        self.skill_id_t1_zzz = 'zzzs%s' % suffix
 
         topic_1 = topic_domain.Topic(
             topic_id=self.topic_id_1,
-            name='Topic 1' + suffix1,
-            abbreviated_name='Topic 1' + suffix1,
-            url_fragment='topic-one-' + suffix1,
+            name='Topic 1 %s' % suffix1,
+            abbreviated_name='Topic 1 %s' % suffix1,
+            url_fragment='topic-one-%s' % suffix1,
             thumbnail_filename='topic_1.svg',
             thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][
                 0
@@ -2947,9 +2940,9 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         )
         topic_2 = topic_domain.Topic(
             topic_id=self.topic_id_2,
-            name='Topic 2' + suffix2,
-            abbreviated_name='Topic 2' + suffix2,
-            url_fragment='topic-two-' + suffix2,
+            name='Topic 2 %s' % suffix2,
+            abbreviated_name='Topic 2 %s' % suffix2,
+            url_fragment='topic-two-%s' % suffix2,
             thumbnail_filename='topic_2.svg',
             thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][
                 0
@@ -2972,9 +2965,9 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         )
         topic_3 = topic_domain.Topic(
             topic_id=self.topic_id_3,
-            name='Topic 3' + suffix3,
-            abbreviated_name='Topic 3' + suffix3,
-            url_fragment='topic-three-' + suffix3,
+            name='Topic 3 %s' % suffix3,
+            abbreviated_name='Topic 3 %s' % suffix3,
+            url_fragment='topic-three-%s' % suffix3,
             thumbnail_filename='topic_3.svg',
             thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][
                 0
@@ -3017,8 +3010,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
 
         # Add topic 1 and 2 to a published classroom
         classroom_id = ''.join(
-            random.choice(string.ascii_lowercase + string.digits)
-            for _ in range(7)
+            random.sample(string.ascii_lowercase + string.digits, 7)
         )
         self.save_new_valid_classroom(
             classroom_id=classroom_id,
@@ -3078,13 +3070,21 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
         skill_ids: List[str],
         skill_id_to_description: Optional[Dict[str, str]] = None,
     ) -> None:
+        """Publishes a topic with skills.
+
+        Args:
+            topic: topic_domain.Topic. The topic to publish.
+            skill_ids: list(str). The IDs of the skills to add to the topic.
+            skill_id_to_description: dict(str, str) or None. Mapping of skill ID
+                to its description.
+        """
         topic_services.save_new_topic(self.admin_id, topic)
         story_id = ''.join(
-            random.choices(string.ascii_lowercase + string.digits, k=12)
+            random.sample(string.ascii_lowercase + string.digits, 12)
         )
         story_url_fragment = (
-            'frag-'
-            + ''.join(c for c in topic.id if c in string.ascii_lowercase)[:10]
+            'frag-%s'
+            % ''.join(c for c in topic.id if c in string.ascii_lowercase)[:10]
         )
         story_services.save_new_story(
             self.admin_id,
@@ -3122,7 +3122,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
                                 'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
                                 'property_name': 'skill_ids_for_diagnostic_test',
                                 'new_value': [skill_id],
-                                'old_value': [],
+                                'old_value': cast(List[str], []),
                             }
                         ),
                     ],

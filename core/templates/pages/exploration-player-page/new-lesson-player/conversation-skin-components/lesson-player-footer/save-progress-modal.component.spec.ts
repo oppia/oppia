@@ -33,8 +33,6 @@ import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {SignInEventService} from 'services/sign-in-event.service';
-import {EventEmitter} from '@angular/core';
 
 class MockWindowRef {
   nativeWindow = {
@@ -65,7 +63,7 @@ class MockWindowRef {
 }
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string>();
 }
 
 describe('SaveProgressModalComponent', () => {
@@ -86,12 +84,6 @@ describe('SaveProgressModalComponent', () => {
         UserService,
         LocalStorageService,
         I18nLanguageCodeService,
-        {
-          provide: SignInEventService,
-          useValue: {
-            onUserSignIn: new EventEmitter<string>(),
-          },
-        },
         {
           provide: NgbActiveModal,
           useValue: {

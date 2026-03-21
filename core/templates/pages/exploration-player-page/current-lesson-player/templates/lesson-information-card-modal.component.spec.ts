@@ -523,7 +523,7 @@ describe('Lesson Information card modal component', () => {
       localStorageService.updateUniqueProgressIdOfLoggedOutLearner
     ).toHaveBeenCalledWith('abcdef');
     expect(signInEventService.onUserSignIn.emit).toHaveBeenCalledWith(
-      'lessonInformationCard'
+      'lessonInformationCardModal'
     );
     expect(mockWindowRef.nativeWindow.location.href).toEqual(
       'https://oppia.org/login'
