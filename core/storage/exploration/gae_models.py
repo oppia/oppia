@@ -244,7 +244,10 @@ class ExplorationModel(base_models.VersionedModel):
     # A boolean indicating whether automatic text-to-speech is enabled in
     # this exploration.
     auto_tts_enabled = datastore_services.BooleanProperty(
-        default=True, indexed=True
+        # Automatic text-to-speech is deprecated. Default to False so that
+        # any exploration missing this field will not enable it.
+        default=False,
+        indexed=True,
     )
     # The next_content_id index to use for generation of new content ids.
     next_content_id_index = datastore_services.IntegerProperty(

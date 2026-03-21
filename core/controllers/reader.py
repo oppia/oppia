@@ -290,7 +290,9 @@ class ExplorationHandler(
                 'version': exploration.version,
                 'preferred_audio_language_code': preferred_audio_language_code,
                 'preferred_language_codes': preferred_language_codes,
-                'auto_tts_enabled': exploration.auto_tts_enabled,
+                # Automatic text-to-speech in exploration player is deprecated.
+                # Always disable for learners.
+                'auto_tts_enabled': False,
                 'record_playthrough_probability': (
                     platform_parameter_services.get_platform_parameter_value(
                         platform_parameter_list.ParamName.RECORD_PLAYTHROUGH_PROBABILITY.value

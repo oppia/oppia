@@ -54,7 +54,6 @@ const addTagsInputBox = 'input.e2e-test-chip-list-tags';
 const autoSaveIndicator = 'span.e2e-test-autosave-indicator';
 const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
 const dismissPreviewButton = 'button.e2e-test-close-preview-summary-modal';
-const textToSpeechToggle = 'label.e2e-test-on-off-switch';
 const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 const editRoleButton = '.e2e-test-edit-roles';
 const addUsernameInputBox = '#newMemberUsername';
@@ -3379,35 +3378,6 @@ export class ExplorationEditor extends BaseUser {
       showMessage('Preview summary is visible.');
     } else {
       throw new Error('Preview summary is not visible.');
-    }
-  }
-
-  /**
-   * Enables Automatic Text-to-Speech switch present in settings tab.
-   */
-  async enableAutomaticTextToSpeech(): Promise<void> {
-    await this.expandSettingsTabSection('Advanced Features');
-    await this.page.waitForSelector(textToSpeechToggle, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(textToSpeechToggle);
-    await this.expectAutomaticTextToSpeechToBeEnabled();
-  }
-
-  /**
-   * Checks whether the Automatic Text-to-Speech setting is enabled or disabled.
-   */
-  async expectAutomaticTextToSpeechToBeEnabled(): Promise<void> {
-    await this.page.waitForSelector('#text-speech-switch');
-    const autoTtsSwitch = await this.page.$('#text-speech-switch');
-    const autoTtsSwitchIsOn = await this.page.evaluate(
-      switchElement => switchElement.checked,
-      autoTtsSwitch
-    );
-    if (autoTtsSwitchIsOn) {
-      showMessage('Automatic Text-to-Speech is enabled.');
-    } else {
-      throw error('Automatic Text-to-Speech is disabled.');
     }
   }
 

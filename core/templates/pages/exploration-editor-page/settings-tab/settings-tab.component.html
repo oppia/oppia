@@ -242,34 +242,6 @@
           Explorations in a story cannot have parameters enabled.
         </span>
       </div>
-      <hr class="oppia-feature-separator">
-      <div>
-        <div>
-          <div role="form" class="form-horizontal">
-            <div class="oppia-features-header">
-              <label for="enableAutomaticTextToSpeech">
-                Automatic Text-to-speech
-              </label>
-              <div>
-                <div class="oppia-on-off-switch">
-                  <input type="checkbox" class="visually-hidden" *ngIf="isAutomaticTextToSpeechEnabled()" (click)="toggleAutomaticTextToSpeech()" aria-label="Automatic Text-to-speech" tabindex="0" (keydown.enter)="toggleAutomaticTextToSpeech()" checked>
-                  <input type="checkbox" *ngIf="isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()" checked>
-                  <input type="checkbox" class="visually-hidden" *ngIf="!isAutomaticTextToSpeechEnabled()" (click)="toggleAutomaticTextToSpeech()" aria-label="Automatic Text-to-speech" tabindex="0" (keydown.enter)="toggleAutomaticTextToSpeech()">
-                  <input type="checkbox" *ngIf="!isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()">
-                  <label class="oppia-on-off-switch-label e2e-test-on-off-switch" for="text-speech-switch">
-                    <span class="oppia-on-off-switch-inner"></span>
-                    <span class="oppia-on-off-switch-main"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <span class="form-text d-block secondary-info-text" tabindex="0">
-              Automatic text-to-speech generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
-            </span>
-          </div>
-        </div>
-      </div>
-      <hr class="oppia-feature-separator">
     </div>
   </mat-card>
 

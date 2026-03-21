@@ -106,7 +106,6 @@ import {EditableExplorationBackendApiService} from 'domain/exploration/editable-
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EventBusService} from 'app-events/event-bus.service';
-import {ExplorationAutomaticTextToSpeechService} from './services/exploration-automatic-text-to-speech.service';
 import {ExplorationCategoryService} from './services/exploration-category.service';
 import {ExplorationDataBackendApiService} from './services/exploration-data-backend-api.service';
 import {ExplorationDataService} from './services/exploration-data.service';
@@ -328,7 +327,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     EntityTranslationsService,
     EntityVoiceoversService,
     EventBusService,
-    ExplorationAutomaticTextToSpeechService,
     ExplorationCategoryService,
     ExplorationDataBackendApiService,
     ExplorationDataService,

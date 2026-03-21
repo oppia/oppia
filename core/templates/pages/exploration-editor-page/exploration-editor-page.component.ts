@@ -46,7 +46,6 @@ import {UserService} from 'services/user.service';
 import {ThreadDataBackendApiService} from './feedback-tab/services/thread-data-backend-api.service';
 import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
 import {ChangeListService} from './services/change-list.service';
-import {ExplorationAutomaticTextToSpeechService} from './services/exploration-automatic-text-to-speech.service';
 import {ExplorationCategoryService} from './services/exploration-category.service';
 import {ExplorationDataService} from './services/exploration-data.service';
 import {ExplorationInitStateNameService} from './services/exploration-init-state-name.service';
@@ -147,7 +146,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     public editabilityService: EditabilityService,
     private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
-    private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
     private explorationDataService: ExplorationDataService,
     private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
@@ -284,9 +282,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       );
       this.explorationParamChangesService.init(
         ParamChanges.createFromBackendList(explorationData.param_changes)
-      );
-      this.explorationAutomaticTextToSpeechService.init(
-        explorationData.auto_tts_enabled
       );
       this.explorationNextContentIdIndexService.init(
         explorationData.next_content_id_index

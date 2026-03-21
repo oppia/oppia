@@ -36,7 +36,6 @@ import {EditabilityService} from 'services/editability.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {UserService} from 'services/user.service';
 import {ChangeListService} from '../services/change-list.service';
-import {ExplorationAutomaticTextToSpeechService} from '../services/exploration-automatic-text-to-speech.service';
 import {ExplorationCategoryService} from '../services/exploration-category.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationEditsAllowedBackendApiService} from '../services/exploration-edits-allowed-backend-api.service';
@@ -144,7 +143,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     private pageContextService: PageContextService,
     public editabilityService: EditabilityService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
-    private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
     private explorationDataService: ExplorationDataService,
     private explorationEditsAllowedBackendApiService: ExplorationEditsAllowedBackendApiService,
@@ -453,14 +451,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   enableParameters(): void {
     this.explorationFeaturesService.enableParameters();
-  }
-
-  isAutomaticTextToSpeechEnabled(): boolean {
-    return this.explorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled();
-  }
-
-  toggleAutomaticTextToSpeech(): void {
-    return this.explorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech();
   }
 
   isExplorationEditable(): boolean {

@@ -840,13 +840,11 @@ def apply_change_list(
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExplorationPropertyAutoTtsEnabledCmd.
-                    edit_auto_tts_enabled_cmd = cast(
-                        exp_domain.EditExplorationPropertyAutoTtsEnabledCmd,
-                        change,
-                    )
-                    exploration.update_auto_tts_enabled(
-                        edit_auto_tts_enabled_cmd.new_value
-                    )
+                    # Automatic text-to-speech is deprecated in the
+                    # exploration editor and player. Ignore any change
+                    # requests for this property to ensure learners never
+                    # get the auto-generated speech.
+                    pass
                 elif change.property_name == 'next_content_id_index':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
@@ -3221,7 +3219,9 @@ def get_user_exploration_data(
     )
 
     editor_dict: UserExplorationDataDict = {
-        'auto_tts_enabled': exploration.auto_tts_enabled,
+        # Automatic text-to-speech is deprecated in the exploration editor.
+        # Always disable for the editor UI.
+        'auto_tts_enabled': False,
         'category': exploration.category,
         'draft_change_list_id': draft_change_list_id,
         'exploration_id': exploration_id,
@@ -4333,7 +4333,8 @@ def to_exploration_dict_for_android(
         'param_changes': exploration.param_change_dicts,
         'param_specs': exploration.param_specs_dict,
         'tags': exploration.tags,
-        'auto_tts_enabled': exploration.auto_tts_enabled,
+        # Automatic text-to-speech is deprecated. Always disable.
+        'auto_tts_enabled': False,
         'next_content_id_index': exploration.next_content_id_index,
         'edits_allowed': exploration.edits_allowed,
         'states': state_name_to_state_dict,

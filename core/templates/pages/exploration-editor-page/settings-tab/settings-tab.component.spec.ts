@@ -1083,13 +1083,6 @@ describe('Settings Tab Component', () => {
     expect(component.areParametersEnabled()).toBe(true);
   });
 
-  it('should evaluate when automatic text to speech is enabled', () => {
-    component.toggleAutomaticTextToSpeech();
-    expect(component.isAutomaticTextToSpeechEnabled()).toBe(true);
-    component.toggleAutomaticTextToSpeech();
-    expect(component.isAutomaticTextToSpeechEnabled()).toBe(false);
-  });
-
   it('should evaluate when edits are allowed', fakeAsync(() => {
     spyOn(eeabas, 'setEditsAllowed').and.callFake(
       async (unusedValue, unusedId, cb) => cb()

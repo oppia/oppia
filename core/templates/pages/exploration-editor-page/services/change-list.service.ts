@@ -118,7 +118,6 @@ export class ChangeListService {
     param_specs: true,
     tags: true,
     title: true,
-    auto_tts_enabled: true,
     next_content_id_index: true,
   };
 

@@ -93,10 +93,6 @@ describe('Exploration Editor', function () {
     await explorationEditor.closePreviewSummary();
   });
 
-  it('should be able to change advanced settings', async function () {
-    await explorationEditor.enableAutomaticTextToSpeech();
-  });
-
   it('should be able to change roles settings', async function () {
     await explorationEditor.assignUserToCollaboratorRole('guestUser1');
     await explorationEditor.assignUserToPlaytesterRole('guestUser2');

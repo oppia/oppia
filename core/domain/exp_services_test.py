@@ -8558,7 +8558,8 @@ title: Old Title
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
-        self.assertEqual(exploration.auto_tts_enabled, True)
+        # Automatic text-to-speech is deprecated and should not be updated.
+        self.assertEqual(exploration.auto_tts_enabled, False)
 
     def test_update_old_exploration_version_remains_editable(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
