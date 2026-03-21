@@ -18,6 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'background-banner',
@@ -33,10 +34,15 @@ export class BackgroundBannerComponent implements OnInit {
       'bannerC.svg',
       'bannerD.svg',
     ];
-    const bannerImageFilename: string =
+    let bannerImageFilename: string =
       possibleBannerFilenames[
         Math.floor(Math.random() * possibleBannerFilenames.length)
       ];
+
+    if (AppConstants.SCREENSHOT_CONSISTENCY) {
+      bannerImageFilename = 'bannerA.svg';
+    }
+
     this.bannerImageFileUrl = this.urlInterpolationService.getStaticImageUrl(
       '/background/' + bannerImageFilename
     );

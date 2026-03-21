@@ -957,6 +957,7 @@ def set_constants_to_default() -> None:
     modify_constants(
         prod_env=False,
         emulator_mode=True,
+        screenshot_consistency=False,
         maintenance_mode=False,
         version_info_must_be_set=False,
     )
@@ -965,6 +966,7 @@ def set_constants_to_default() -> None:
 def modify_constants(
     prod_env: bool = False,
     emulator_mode: bool = True,
+    screenshot_consistency: bool = False,
     maintenance_mode: bool = False,
     version_info_must_be_set: bool = True,
 ) -> None:
@@ -984,6 +986,17 @@ def modify_constants(
         dev_mode_variable,
         expected_number_of_replacements=1,
     )
+
+    screenshot_consistency_py_variable = 'SCREENSHOT_CONSISTENCY = %s' % str(
+        screenshot_consistency
+    )
+    inplace_replace_file(
+        FECONF_PATH,
+        r'SCREENSHOT_CONSISTENCY = (True|False)',
+        screenshot_consistency_py_variable,
+        expected_number_of_replacements=1,
+    )
+
     emulator_mode_variable = (
         '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false'
     )
@@ -991,6 +1004,17 @@ def modify_constants(
         CONSTANTS_FILE_PATH,
         r'"EMULATOR_MODE": (true|false)',
         emulator_mode_variable,
+        expected_number_of_replacements=1,
+    )
+    screenshot_consistency_variable = (
+        '"SCREENSHOT_CONSISTENCY": true'
+        if screenshot_consistency
+        else '"SCREENSHOT_CONSISTENCY": false'
+    )
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"SCREENSHOT_CONSISTENCY": (true|false)',
+        screenshot_consistency_variable,
         expected_number_of_replacements=1,
     )
 

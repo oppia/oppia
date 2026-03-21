@@ -1082,7 +1082,23 @@ export class BaseUser {
     const runningInCI = __dirname.startsWith('/home/runner');
 
     try {
+      await currentPage.evaluate(() => {
+        const devModeLabel = document.querySelector(
+          '.oppia-dev-mode'
+        ) as HTMLElement;
+        if (devModeLabel) {
+          devModeLabel.style.display = 'none';
+        }
+      });
       const screenshot = await currentPage.screenshot(screenshotOptions);
+      await currentPage.evaluate(() => {
+        const devModeLabel = document.querySelector(
+          '.oppia-dev-mode'
+        ) as HTMLElement;
+        if (devModeLabel) {
+          devModeLabel.style.display = '';
+        }
+      });
       expect(screenshot).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',

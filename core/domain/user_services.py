@@ -386,6 +386,9 @@ def get_gravatar_url(email: str) -> str:
     Returns:
         str. The gravatar url for the specified email.
     """
+    if feconf.SCREENSHOT_CONSISTENCY:
+        email = 'other@example.com'
+
     # The md5 accepts only bytes, so we first need to encode the email to bytes.
     return 'https://www.gravatar.com/avatar/%s?d=identicon&s=%s' % (
         hashlib.md5(email.encode('utf-8')).hexdigest(),

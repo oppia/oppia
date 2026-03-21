@@ -65,6 +65,10 @@ SUPPORTED_OBJ_TYPES = {
 DEBUG = False
 
 
+# Whether to render the frontend with consistent elements for screenshot testing.
+SCREENSHOT_CONSISTENCY = False
+
+
 def check_dev_mode_is_true() -> None:
     """When DEV_MODE is true check that we are running in development
     environment. The SERVER_SOFTWARE environment variable does not exist

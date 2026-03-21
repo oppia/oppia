@@ -122,8 +122,13 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
         compile_test_ts_files()
         if args.skip_build:
-            common.modify_constants(prod_env=args.prod_env)
+            common.modify_constants(
+                prod_env=args.prod_env, screenshot_consistency=True
+            )
         else:
+            common.modify_constants(
+                prod_env=args.prod_env, screenshot_consistency=True
+            )
             build.build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(common.set_constants_to_default)
 
