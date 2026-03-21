@@ -25,12 +25,7 @@ const ALL_VIDEOS = false;
 
 var suites = {
   full: [
-    './core/tests/webdriverio/**/*.js',
     './core/tests/webdriverio_desktop/**/*.js',
-  ],
-
-  collections: [
-    './core/tests/webdriverio_desktop/collections.js'
   ],
 
   contributorAdminDashboard: [
@@ -60,11 +55,6 @@ var suites = {
   explorationTranslationTab: [
     './core/tests/webdriverio_desktop/explorationTranslationTab.js'
   ],
-
-  learner: [
-    './core/tests/webdriverio/learnerFlow.js'
-  ],
-
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
   ],

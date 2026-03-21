@@ -203,9 +203,17 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                 return ['suiteC.js', 'suiteD.js']
             return []
 
-        os_listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        def mock_path_exists(path: str) -> bool:
+            # Return True for both webdriverio directories.
+            return path in [
+                webdriverio_files_path,
+                webdriverio_desktop_files_path,
+            ]
 
-        with os_listdir_swap:
+        os_listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        os_path_exists_swap = self.swap(os.path, 'exists', mock_path_exists)
+
+        with os_listdir_swap, os_path_exists_swap:
             e2e_test_modules = (
                 check_tests_are_captured_in_ci.get_e2e_test_modules_from_webdriverio_directory()
             )

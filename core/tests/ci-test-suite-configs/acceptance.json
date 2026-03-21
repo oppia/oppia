@@ -547,6 +547,14 @@
     {
       "name": "logged-out-user/select-and-play-topic-from-classroom-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
+    },
+    {
+      "name": "collection-creator/create-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/collection-creator/create-a-collection.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/view-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/view-a-collection.spec.ts"
     }
   ]
 }

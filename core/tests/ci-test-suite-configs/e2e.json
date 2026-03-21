@@ -1,10 +1,6 @@
 {
   "suites": [
     {
-      "name": "collections",
-      "module": "core/tests/webdriverio_desktop/collections.js"
-    },
-    {
       "name": "contributorAdminDashboard",
       "module": "core/tests/webdriverio_desktop/contributorAdminDashboard.js"
     },
@@ -31,10 +27,6 @@
     {
       "name": "explorationTranslationTab",
       "module": "core/tests/webdriverio_desktop/explorationTranslationTab.js"
-    },
-    {
-      "name": "learner",
-      "module": "core/tests/webdriverio/learnerFlow.js"
     },
     {
       "name": "navigation",

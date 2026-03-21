@@ -716,7 +716,6 @@
 /data/ @oppia/lace-backend-reviewers
 /core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
-/core/tests/webdriverio/ @oppia/dev-workflow-reviewers
 /core/tests/wdio.conf.js @oppia/dev-workflow-reviewers
 /extensions/interactions/*/webdriverio.js @oppia/dev-workflow-reviewers
 /extensions/interactions/webdriverio.js @oppia/dev-workflow-reviewers

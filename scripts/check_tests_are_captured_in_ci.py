@@ -115,8 +115,12 @@ def get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
     webdriverio_desktop_files = os.path.join(
         os.getcwd(), 'core', 'tests', 'webdriverio_desktop'
     )
-    for file_name in os.listdir(webdriverio_files):
-        webdriverio_test_suite_modules.append(file_name)
+    if os.path.exists(webdriverio_files):
+        # The webdriverio directory may not exist if all its test files have
+        # been migrated to Puppeteer acceptance tests. The os.path.exists
+        # check prevents os.listdir from raising a FileNotFoundError.
+        for file_name in os.listdir(webdriverio_files):
+            webdriverio_test_suite_modules.append(file_name)
     for file_name in os.listdir(webdriverio_desktop_files):
         webdriverio_test_suite_modules.append(file_name)
 
