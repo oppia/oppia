@@ -162,7 +162,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             )
         )
 
-        print('Servers have come up.\n')
+        print('\n[INFO] Servers have come up.\n')
 
         output_lines = []
         while True:
