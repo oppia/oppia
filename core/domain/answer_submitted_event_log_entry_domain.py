@@ -24,16 +24,10 @@ should therefore be independent of the specific storage models used.
 from __future__ import annotations
 
 from core import feconf
-from core.platform import models  # pylint: disable=invalid-import-from
 from core.domain import exp_fetchers
 from core.domain import (
     answer_submitted_event_log_entry_domain_errors as domain_errors,
 )
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
-(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
 class AnswerSubmittedEventLogEntry:

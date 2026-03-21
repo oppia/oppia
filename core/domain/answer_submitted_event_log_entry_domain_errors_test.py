@@ -31,15 +31,15 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         """Test InvalidExpIdError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidExpIdError,
-            'Expected exp_id to be a non-empty string',
+            'Expected exp_id to be a non-empty string, received exp_id_1',
         ):
-            raise domain_errors.InvalidExpIdError('')
+            raise domain_errors.InvalidExpIdError('exp_id_1')
 
     def test_invalid_exp_version_error(self) -> None:
         """Test InvalidExpVersionError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidExpVersionError,
-            'Expected exp_version to be an integer >= 1',
+            'Expected exp_version to be an integer >= 1, received 0',
         ):
             raise domain_errors.InvalidExpVersionError(0)
 
@@ -55,7 +55,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         """Test ExpVersionOutOfRangeError."""
         with self.assertRaisesRegex(
             domain_errors.ExpVersionOutOfRangeError,
-            'Expected exp_version <= current exploration version',
+            'Expected exp_version <= current exploration version 5, received 10',
         ):
             raise domain_errors.ExpVersionOutOfRangeError(5, 10)
 
@@ -63,7 +63,10 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         """Test InvalidStateNameError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidStateNameError,
-            'Expected state_name to be a valid state name',
+            (
+                'Expected state_name to be a valid state name as per '
+                'retrieved exploration by exp_id, received invalid_state'
+            ),
         ):
             raise domain_errors.InvalidStateNameError('invalid_state')
 
@@ -71,7 +74,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         """Test InvalidSessionIdError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidSessionIdError,
-            'Expected session_id to be a string',
+            'Expected session_id to be a string, received 123',
         ):
             raise domain_errors.InvalidSessionIdError(123)
 
@@ -79,7 +82,10 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         """Test InvalidTimeSpentError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidTimeSpentError,
-            'Expected time_spent_in_state_secs to be a non-negative float',
+            (
+                'Expected time_spent_in_state_secs to be a non-negative float, '
+                'received -1'
+            ),
         ):
             raise domain_errors.InvalidTimeSpentError(-1)
 
@@ -87,7 +93,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         """Test InvalidFeedbackUsefulError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidFeedbackUsefulError,
-            'Expected is_feedback_useful to be boolean',
+            'Expected is_feedback_useful to be boolean, received yes',
         ):
             raise domain_errors.InvalidFeedbackUsefulError('yes')
 
@@ -95,6 +101,6 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         """Test InvalidEventSchemaVersionError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidEventSchemaVersionError,
-            'Expected event_schema_version to be',
+            'Expected event_schema_version to be 1 and also integer, received 2',
         ):
             raise domain_errors.InvalidEventSchemaVersionError(1, 2)

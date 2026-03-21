@@ -45,12 +45,12 @@ def get_answer_submitted_event_log_entry_from_model(
 
 
 def create_answer_submitted_event_log_entry(
-    exploration_id,
-    exploration_version,
-    state_name,
-    session_id,
-    time_spent_in_secs,
-    feedback_is_useful,
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    session_id: str,
+    time_spent_in_secs: float,
+    feedback_is_useful: bool,
 ) -> answer_submitted_event_log_entry_domain.AnswerSubmittedEventLogEntry:
 
     answer_submitted_event_log_entry = (
@@ -65,7 +65,7 @@ def create_answer_submitted_event_log_entry(
         )
     )
 
-    # answer_submitted_event_log_entry.validate()
+    answer_submitted_event_log_entry.validate()
 
     stats_models.AnswerSubmittedEventLogEntryModel.create(
         exp_id=answer_submitted_event_log_entry.exp_id,

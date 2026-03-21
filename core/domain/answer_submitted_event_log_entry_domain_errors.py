@@ -24,6 +24,8 @@ from core import utils
 class AnswerSubmittedEventLogEntryDomainError(utils.ValidationError):
     """Base class for AnswerSubmittedEventLogEntry domain errors."""
 
+    pass
+
 
 class InvalidExpIdError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid exploration id."""

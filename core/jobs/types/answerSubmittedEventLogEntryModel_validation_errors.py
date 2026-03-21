@@ -62,6 +62,8 @@ class EntityIdModelMismatchError(base_validation_errors.BaseValidationError):
 class DomainValidationError(base_validation_errors.BaseValidationError):
     """Error class for domain validation failures."""
 
-    def __init__(self, model: base_models.BaseModel, error: Exception) -> None:
-        message = f'Domain validation failed with error: {error}'
+    def __init__(
+        self, error_message: str, model: base_models.BaseModel
+    ) -> None:
+        message = f'Domain validation failed with error: {error_message}'
         super().__init__(message, model)

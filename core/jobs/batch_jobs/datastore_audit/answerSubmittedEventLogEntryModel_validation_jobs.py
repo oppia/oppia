@@ -64,13 +64,19 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
 
     def get_validate_domain_object_fn(
         self,
-    ) -> Iterator[job_run_result.JobRunResult]:
+    ) -> Callable[
+        [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
+    ]:
         return self.validate_domain_object
 
     def validate_domain_object(
-        self, model
+        self, model: stats_models.AnswerSubmittedEventLogEntryModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Validates domain object."""
+        if not isinstance(
+            model, stats_models.AnswerSubmittedEventLogEntryModel
+        ):
+            return
 
         try:
             domain_object = answer_submitted_event_log_entry_domain.AnswerSubmittedEventLogEntry(
@@ -83,12 +89,13 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
                 event_schema_version=model.event_schema_version,
             )
 
-            domain_object.validate()
+            with datastore_services.get_ndb_context():
+                domain_object.validate()
 
         except Exception as e:
-            yield (
+            yield from (
                 answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
-                    model, str(e)
+                    str(e), model
                 )
             )
 
@@ -96,14 +103,11 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         self, model: stats_models.AnswerSubmittedEventLogEntryModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks if exp_id corresponds to a valid exploration."""
-        model_id = getattr(model, 'id', None)
-        if not model_id or ':' not in model_id:
-            yield (
-                answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
-                    model
-                )
-            )
+        if not isinstance(
+            model, stats_models.AnswerSubmittedEventLogEntryModel
+        ):
             return
+
         with datastore_services.get_ndb_context():
             exploration = exp_fetchers.get_exploration_by_id(model.exp_id)
 
@@ -119,6 +123,18 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks entity_id format '[timestamp]:[exp_id]:[session_id]'."""
 
+        if not isinstance(
+            model, stats_models.AnswerSubmittedEventLogEntryModel
+        ):
+            return
+
+        if not model.id:
+            yield (
+                answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
+                    model
+                )
+            )
+            return
         parts = model.id.split(':')
 
         if len(parts) != 3:
