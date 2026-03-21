@@ -32,15 +32,17 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
 
     def test_invalid_exploration_id_error(self):
         model = base_models.BaseModel(id='test_id')
+        model.exp_id = 'test_exp_id'
 
         error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
             model
         )
 
-        self.assertIn(
-            'does not correspond to a valid ExplorationModel', error.stderr
+        self.assertEqual(
+            'InvalidExplorationIdError in BaseModel(id="test_id"): '
+            'exp_id test_exp_id does not correspond to a valid ExplorationModel',
+            error.stderr,
         )
-        self.assertEqual(error.model, model)
 
     def test_invalid_entity_id_format_error(self):
         model = base_models.BaseModel(id='invalid_id')
@@ -49,8 +51,14 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             model
         )
 
-        self.assertIn('does not match required format', error.stderr)
-        self.assertEqual(error.model, model)
+        self.assertEqual(
+            (
+                'InvalidEntityIdFormatError in BaseModel(id="invalid_id"): '
+                'Entity id invalid_id does not match required format '
+                '"[timestamp]:[exp_id]:[session_id]"'
+            ),
+            error.stderr,
+        )
 
     def test_entity_id_model_mismatch_error(self):
         model = base_models.BaseModel(id='123:exp1:session2')
@@ -63,15 +71,26 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             model
         )
 
-        self.assertIn('does not match model fields', error.stderr)
-        self.assertEqual(error.model, model)
+        self.assertEqual(
+            (
+                'EntityIdModelMismatchError in BaseModel(id="123:exp1:session2"): '
+                'Entity id 123:exp1:session2 does not match model fields '
+                'exp_id=exp1, session_id=session1'
+            ),
+            error.stderr,
+        )
 
     def test_domain_validation_error(self):
         model = base_models.BaseModel(id='test_id')
 
         error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
-            model, Exception('test failure')
+            'test failure', model
         )
 
-        self.assertIn('Domain validation failed', error.stderr)
-        self.assertEqual(error.model, model)
+        self.assertEqual(
+            (
+                'DomainValidationError in BaseModel(id="test_id"): '
+                'Domain validation failed with error: test failure'
+            ),
+            error.stderr,
+        )

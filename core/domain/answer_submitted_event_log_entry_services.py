@@ -65,7 +65,7 @@ def create_answer_submitted_event_log_entry(
         )
     )
 
-    answer_submitted_event_log_entry.validate()
+    # answer_submitted_event_log_entry.validate()
 
     stats_models.AnswerSubmittedEventLogEntryModel.create(
         exp_id=answer_submitted_event_log_entry.exp_id,
