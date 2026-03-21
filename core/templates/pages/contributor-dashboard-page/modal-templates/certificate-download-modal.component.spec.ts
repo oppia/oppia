@@ -60,6 +60,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     to_date: '31 Oct 2022',
     team_lead: 'Test User',
     contribution_hours: 1.0,
+    contribution_word_count: 300,
     language: 'Hindi',
   };
   const certificateDataResponse: ContributorCertificateResponse = {

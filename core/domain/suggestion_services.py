@@ -4471,6 +4471,7 @@ def _generate_translation_contributor_certificate_data(
         to_date.strftime('%d %b %Y'),
         signature,
         str(hours_contributed),
+        words_count,
         language_description,
     )
 
@@ -4536,5 +4537,6 @@ def _generate_question_contributor_certificate_data(
         to_date.strftime('%d %b %Y'),
         signature,
         str(hours_contributed),
+        0,
         None,
     )

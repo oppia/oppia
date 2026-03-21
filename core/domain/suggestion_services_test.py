@@ -8781,6 +8781,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3),
         )
+        self.assertEqual(certificate_data['contribution_word_count'], 3)
         self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_rule_translation(
@@ -8823,6 +8824,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(4),
         )
+        self.assertEqual(certificate_data['contribution_word_count'], 4)
         self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_english(
@@ -8873,6 +8875,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3),
         )
+        self.assertEqual(certificate_data['contribution_word_count'], 3)
         self.assertEqual(certificate_data['language'], 'English')
 
     def test_create_question_contributor_certificate(self) -> None:
@@ -8939,6 +8942,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_question_contribution_hours(False),
         )
+        self.assertEqual(certificate_data['contribution_word_count'], 0)
 
     def test_create_question_contributor_certificate_with_image_content(
         self,
@@ -9008,6 +9012,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_question_contribution_hours(True),
         )
+        self.assertEqual(certificate_data['contribution_word_count'], 0)
 
     def test_create_certificate_returns_none_for_no_translation_suggestions(
         self,

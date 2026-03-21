@@ -290,6 +290,7 @@ describe('Contribution and review service', () => {
             from_date: '1 Nov 2022',
             to_date: '1 Dec 2022',
             contribution_hours: 1.0,
+            contribution_word_count: 300,
             team_lead: 'Test User',
             language: 'Hindi',
           },
@@ -314,6 +315,7 @@ describe('Contribution and review service', () => {
           expect(definedData.from_date).toEqual('1 Nov 2022');
           expect(definedData.to_date).toEqual('1 Dec 2022');
           expect(definedData.contribution_hours).toEqual(1.0);
+          expect(definedData.contribution_word_count).toEqual(300);
           expect(definedData.team_lead).toEqual('Test User');
           expect(definedData.language).toEqual('Hindi');
         });
