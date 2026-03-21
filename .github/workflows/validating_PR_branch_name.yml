@@ -1,0 +1,62 @@
+name: Validating branch name
+on:
+  pull_request:
+    types: 
+        - opened
+        - reopened
+permissions: read-all
+jobs:
+  validate_branch_name:
+    runs-on: ubuntu-24.04
+    permissions:
+        pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Close PR if branch name is invalid
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+
+            if (branch === "develop" ||
+                branch.startsWith("release-") ||
+                branch.startsWith("test-")
+            ) {
+                const pr = context.payload.pull_request;
+                const author = context.payload.pull_request.user;
+                let comment;
+                if (branch === "develop") {
+                    comment = `Hi @${author.login}, PRs made from the \`develop\` branch are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                } else if (branch.startsWith("release-")) {
+                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`release-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                } else if (branch.startsWith("test-")) {
+                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`test-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                }
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: comment
+                });
+
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  state: 'closed'
+                });
+            }
+        
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Validating branch name failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+
+                            
