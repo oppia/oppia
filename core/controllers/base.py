@@ -738,9 +738,7 @@ class BaseHandler(
                     'frame-ancestors \'none\''
                 )
             else:
-                raise Exception(
-                    'Invalid iframe restriction value: %s' % iframe_restriction
-                )
+                raise Exception("Something went wrong. Please try again or contact support.")
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
@@ -749,6 +747,7 @@ class BaseHandler(
                 filepath, template_is_aot_compiled=template_is_aot_compiled
             )
         )
+
 
     def _render_exception_json_or_html(
         self, return_type: str, values: ResponseValueDict
