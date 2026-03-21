@@ -378,7 +378,9 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 common,
                 'modify_constants',
                 lambda *_, **__: None,
-                expected_kwargs=[{'prod_env': False}],
+                expected_kwargs=[
+                    {'prod_env': False, 'screenshot_consistency': True}
+                ],
             )
         )
         self.exit_stack.enter_context(
