@@ -255,7 +255,11 @@ export class NewConversationSkinComponent {
           let nextCard = this.conversationFlowService.getNextStateCard();
           // Ensure the transition to a terminal state properly logs
           // the end of the exploration.
-          if (!this._editorPreviewMode && nextCard.isTerminal()) {
+          if (
+            !this._editorPreviewMode &&
+            !this.pageContextService.isInStoryEditorPreviewMode() &&
+            nextCard.isTerminal()
+          ) {
             const currentEngineService =
               this.currentEngineService.getCurrentEngineService();
             const completedChaptersCount =
