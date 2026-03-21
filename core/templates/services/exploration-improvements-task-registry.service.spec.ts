@@ -67,7 +67,7 @@ describe('Exploration improvements task registrar service', () => {
   const expVersion = 1;
 
   beforeEach(() => {
-    taskRegistryService = TestBed.get(
+    taskRegistryService = TestBed.inject(
       ExplorationImprovementsTaskRegistryService
     );
 
