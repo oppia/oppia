@@ -84,6 +84,7 @@ const mobileNavbarDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
+const mobileBackToStoryEditorButton = '.oppia-mobile-back-to-parent';
 
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
@@ -3531,6 +3532,26 @@ export class TopicManager extends BaseUser {
             2000
           );
           if (!onStoryEditorPage) {
+            const onChapterEditorPage = await this.isElementVisible(
+              chapterEditorContainerSelector,
+              true,
+              2000
+            );
+            if (onChapterEditorPage) {
+              await this.clickOnElementWithSelectorOrJs(
+                mobileBackToStoryEditorButton
+              );
+              await this.expectElementToBeVisible(storyEditorContainerSelector);
+            } else {
+              await this.openStoryEditor(storyName, topicName);
+            }
+          }
+          const storyEditorVisible = await this.isElementVisible(
+            storyEditorContainerSelector,
+            true,
+            2000
+          );
+          if (!storyEditorVisible) {
             await this.openStoryEditor(storyName, topicName);
           }
         }
