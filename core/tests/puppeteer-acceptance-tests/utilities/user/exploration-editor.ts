@@ -20,7 +20,6 @@ import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
 
