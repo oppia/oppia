@@ -78,7 +78,6 @@ describe('Logged-in User', function () {
       await loggedInUser.openExplorationInExplorationEditor(
         TEST_EXPLORATION.title
       );
-      await loggedInUser.dismissWelcomeModal();
       await loggedInUser.navigateToSettingsTab();
       await loggedInUser.updateTitleTo(TEST_EXPLORATION.editedTitle);
 
