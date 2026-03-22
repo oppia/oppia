@@ -73,6 +73,10 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         self, model: stats_models.AnswerSubmittedEventLogEntryModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Validates domain object."""
+        # BaseValidationJob calls datastore_services.query_everything()
+        # and passes every model through this function. Since the method
+        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
+        # only those instances.
         if not isinstance(
             model, stats_models.AnswerSubmittedEventLogEntryModel
         ):
@@ -93,7 +97,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
                 domain_object.validate()
 
         except Exception as e:
-            yield from (
+            yield (
                 answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
                     str(e), model
                 )
@@ -103,15 +107,26 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         self, model: stats_models.AnswerSubmittedEventLogEntryModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks if exp_id corresponds to a valid exploration."""
+        # BaseValidationJob calls datastore_services.query_everything()
+        # and passes every model through this function. Since the method
+        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
+        # only those instances.
         if not isinstance(
             model, stats_models.AnswerSubmittedEventLogEntryModel
         ):
             return
 
-        with datastore_services.get_ndb_context():
-            exploration = exp_fetchers.get_exploration_by_id(model.exp_id)
+        try:
+            with datastore_services.get_ndb_context():
+                exploration = exp_fetchers.get_exploration_by_id(model.exp_id)
 
-        if exploration is None:
+            if exploration is None:
+                yield (
+                    answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
+                        model
+                    )
+                )
+        except Exception as e:
             yield (
                 answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
                     model
@@ -123,18 +138,15 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks entity_id format '[timestamp]:[exp_id]:[session_id]'."""
 
+        # BaseValidationJob calls datastore_services.query_everything()
+        # and passes every model through this function. Since the method
+        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
+        # only those instances.
         if not isinstance(
             model, stats_models.AnswerSubmittedEventLogEntryModel
         ):
             return
 
-        if not model.id:
-            yield (
-                answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
-                    model
-                )
-            )
-            return
         parts = model.id.split(':')
 
         if len(parts) != 3:

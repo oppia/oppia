@@ -187,9 +187,10 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
-        return cls.get_new_id(
-            '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+        return '%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id,
         )
 
     @classmethod

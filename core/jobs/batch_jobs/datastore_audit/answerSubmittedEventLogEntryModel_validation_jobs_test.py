@@ -45,14 +45,12 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             'exp1', 'owner_id', title='Test Exploration'
         )
         model = stats_models.AnswerSubmittedEventLogEntryModel(
-            id='123:exp1:session1',
             exp_id='exp1',
             exp_version=1,
             state_name='Introduction',
             session_id='session1',
             time_spent_in_state_secs=10.0,
             is_feedback_useful=True,
-            event_schema_version=1,
         )
         model.put()
 
@@ -61,17 +59,14 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
     def test_invalid_exploration_id(self):
         """Test invalid exp_id."""
 
-        model = stats_models.AnswerSubmittedEventLogEntryModel(
-            id='123:expX:session1',
+        stats_models.AnswerSubmittedEventLogEntryModel.create(
             exp_id='expX',
             exp_version=1,
             state_name='Introduction',
             session_id='session1',
             time_spent_in_state_secs=10.0,
             is_feedback_useful=True,
-            event_schema_version=1,
         )
-        model.put()
 
         output = self.run_job_and_get_output(self.JOB_CLASS)
 
