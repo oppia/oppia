@@ -22,7 +22,10 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs.datastore_audit import (
     answerSubmittedEventLogEntryModel_validation_jobs,
 )
-from core.jobs.types import answerSubmittedEventLogEntryModel_validation_errors
+from core.jobs.types import (
+    answerSubmittedEventLogEntryModel_validation_errors,
+    job_run_result,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -44,35 +47,53 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         self.save_new_valid_exploration(
             'exp1', 'owner_id', title='Test Exploration'
         )
-        model = stats_models.AnswerSubmittedEventLogEntryModel(
+
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            id='1029301283:exp1:session1',
             exp_id='exp1',
             exp_version=1,
             state_name='Introduction',
             session_id='session1',
             time_spent_in_state_secs=10.0,
             is_feedback_useful=True,
+            event_schema_version=2,
         )
-        model.put()
+        self.put_multi([model])
 
-        self.assert_job_output_is_empty()
+        self.assert_job_output_is([])
 
     def test_invalid_exploration_id(self):
         """Test invalid exp_id."""
 
-        stats_models.AnswerSubmittedEventLogEntryModel.create(
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            id='1029301283:expX:session1',
             exp_id='expX',
             exp_version=1,
             state_name='Introduction',
             session_id='session1',
             time_spent_in_state_secs=10.0,
             is_feedback_useful=True,
+            event_schema_version=2,
         )
+        self.put_multi([model])
 
-        output = self.run_job_and_get_output(self.JOB_CLASS)
-
-        self.assertIn(
-            answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError.__name__,
-            output,
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'DomainValidationError: '
+                    + answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+                        'Exploration with id expX does not exist', model
+                    ).stderr
+                ),
+                job_run_result.JobRunResult.as_stderr(
+                    'InvalidExplorationIdError: '
+                    + answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
+                        model
+                    ).stderr
+                ),
+            ]
         )
 
     def test_invalid_entity_id_format(self):
@@ -82,7 +103,8 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             'exp1', 'owner_id', title='Test Exploration'
         )
 
-        model = stats_models.AnswerSubmittedEventLogEntryModel(
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
             id='invalid-format',
             exp_id='exp1',
             exp_version=1,
@@ -90,21 +112,29 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             session_id='session1',
             time_spent_in_state_secs=10.0,
             is_feedback_useful=True,
-            event_schema_version=1,
+            event_schema_version=2,
         )
-        model.put()
+        self.put_multi([model])
 
-        output = self.run_job_and_get_output(self.JOB_CLASS)
-
-        self.assertIn(
-            answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError.__name__,
-            output,
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'InvalidEntityIdFormatError: '
+                    + answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
+                        model
+                    ).stderr
+                ),
+            ]
         )
 
     def test_entity_id_mismatch(self):
         """Test entity_id mismatch with model fields."""
 
-        model = stats_models.AnswerSubmittedEventLogEntryModel(
+        self.save_new_valid_exploration(
+            'exp1', 'owner_id', title='Test Exploration'
+        )
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
             id='123:exp1:session999',
             exp_id='exp1',
             exp_version=1,
@@ -112,21 +142,29 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             session_id='session1',
             time_spent_in_state_secs=10.0,
             is_feedback_useful=True,
-            event_schema_version=1,
+            event_schema_version=2,
         )
-        model.put()
+        self.put_multi([model])
 
-        output = self.run_job_and_get_output(self.JOB_CLASS)
-
-        self.assertIn(
-            answerSubmittedEventLogEntryModel_validation_errors.EntityIdModelMismatchError.__name__,
-            output,
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'EntityIdModelMismatchError: '
+                    + answerSubmittedEventLogEntryModel_validation_errors.EntityIdModelMismatchError(
+                        model
+                    ).stderr
+                ),
+            ]
         )
 
     def test_domain_validation_error(self):
         """Test domain validation failure."""
 
-        model = stats_models.AnswerSubmittedEventLogEntryModel(
+        self.save_new_valid_exploration(
+            'exp1', 'owner_id', title='Test Exploration'
+        )
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
             id='123:exp1:session1',
             exp_id='exp1',
             exp_version=-1,
@@ -134,13 +172,18 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             session_id='session1',
             time_spent_in_state_secs=10.0,
             is_feedback_useful=True,
-            event_schema_version=1,
+            event_schema_version=2,
         )
-        model.put()
+        self.put_multi([model])
 
-        output = self.run_job_and_get_output(self.JOB_CLASS)
-
-        self.assertIn(
-            answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError.__name__,
-            output,
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'DomainValidationError: '
+                    + answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+                        'Expected exp_version to be an integer >= 1, received -1',
+                        model,
+                    ).stderr
+                )
+            ]
         )
