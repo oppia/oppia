@@ -22,6 +22,8 @@ from core.domain import answer_submitted_event_log_entry_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Any
+
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
@@ -30,8 +32,8 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.exp_id = "exp_1"
-        self.owner_id = "owner"
+        self.exp_id = 'exp_1'
+        self.owner_id = 'owner'
 
         self.exploration = self.save_new_valid_exploration(
             self.exp_id, self.owner_id
@@ -39,10 +41,10 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
 
     def test_get_answer_submitted_event_log_entry_from_model(self) -> None:
         model = stats_models.AnswerSubmittedEventLogEntryModel(
-            exp_id="exp_1",
+            exp_id='exp_1',
             exp_version=1,
-            state_name="Introduction",
-            session_id="session_1",
+            state_name='Introduction',
+            session_id='session_1',
             time_spent_in_state_secs=12.0,
             is_feedback_useful=True,
             event_schema_version=1,
@@ -52,10 +54,10 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
             model
         )
 
-        self.assertEqual(domain_obj.exp_id, "exp_1")
+        self.assertEqual(domain_obj.exp_id, 'exp_1')
         self.assertEqual(domain_obj.exp_version, 1)
-        self.assertEqual(domain_obj.state_name, "Introduction")
-        self.assertEqual(domain_obj.session_id, "session_1")
+        self.assertEqual(domain_obj.state_name, 'Introduction')
+        self.assertEqual(domain_obj.session_id, 'session_1')
         self.assertEqual(domain_obj.time_spent_in_state_secs, 12.0)
         self.assertTrue(domain_obj.is_feedback_useful)
         self.assertEqual(domain_obj.event_schema_version, 1)
@@ -63,14 +65,14 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
     def test_create_answer_submitted_event_log_entry(self) -> None:
         with self.swap(
             stats_models.AnswerSubmittedEventLogEntryModel,
-            "create",
+            'create',
             lambda *args, **kwargs: None,
         ):
             answer_submitted_event_log_entry_services.create_answer_submitted_event_log_entry(
                 exploration_id=self.exp_id,
                 exploration_version=self.exploration.version,
-                state_name="Introduction",
-                session_id="session_1",
+                state_name='Introduction',
+                session_id='session_1',
                 time_spent_in_secs=10.0,
                 feedback_is_useful=True,
             )
@@ -80,19 +82,21 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
     ) -> None:
         calls = []
 
-        def mock_create(**kwargs):
+        # Here we use type Any because mock_create function
+        # accept any type of arguments.
+        def mock_create(**kwargs: Any) -> None:
             calls.append(kwargs)
 
         with self.swap(
             stats_models.AnswerSubmittedEventLogEntryModel,
-            "create",
+            'create',
             mock_create,
         ):
             answer_submitted_event_log_entry_services.create_answer_submitted_event_log_entry(
                 exploration_id=self.exp_id,
                 exploration_version=self.exploration.version,
-                state_name="Introduction",
-                session_id="session_123",
+                state_name='Introduction',
+                session_id='session_123',
                 time_spent_in_secs=15.0,
                 feedback_is_useful=False,
             )

@@ -24,10 +24,10 @@ should therefore be independent of the specific storage models used.
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_fetchers
 from core.domain import (
     answer_submitted_event_log_entry_domain_errors as domain_errors,
 )
+from core.domain import exp_fetchers
 
 
 class AnswerSubmittedEventLogEntry:
@@ -72,8 +72,22 @@ class AnswerSubmittedEventLogEntry:
         the referenced exploration and state exist.
 
         Raises:
-            domain_errors.AnswerSubmittedEventLogEntryDomainError: If any attribute
-            of the AnswerSubmittedEventLogEntry domain object is invalid.
+            domain_errors.InvalidExpIdError: If exp_id is not a valid string.
+            domain_errors.InvalidExpVersionError: If exp_version is not a valid
+                positive integer.
+            domain_errors.ExplorationDoesNotExistError: If the exploration with
+                the given exp_id does not exist.
+            domain_errors.ExpVersionOutOfRangeError: If exp_version is greater
+                than the current exploration version.
+            domain_errors.InvalidStateNameError: If state_name is not a valid
+                state in the exploration.
+            domain_errors.InvalidSessionIdError: If session_id is not a string.
+            domain_errors.InvalidTimeSpentError: If time_spent_in_state_secs is
+                not a non-negative float.
+            domain_errors.InvalidFeedbackUsefulError: If is_feedback_useful is
+                not a boolean.
+            domain_errors.InvalidEventSchemaVersionError: If the event schema
+                version is invalid.
         """
         if not isinstance(self.exp_id, str) or not self.exp_id.strip():
             raise domain_errors.InvalidExpIdError(self.exp_id)

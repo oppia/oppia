@@ -158,13 +158,13 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
         )
         self.put_multi([model])
 
+        inconsistent_time_stamps_error = (
+            base_validation_errors.InconsistentTimestampsError(model).stderr
+        )
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    'InconsistentTimestampsError: '
-                    + base_validation_errors.InconsistentTimestampsError(
-                        model
-                    ).stderr
+                    f'InconsistentTimestampsError: {inconsistent_time_stamps_error}'
                 )
             ]
         )
@@ -176,13 +176,13 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([model])
 
+        validation_error = base_validation_errors.BaseValidationError(
+            'Mock validation error message', model
+        ).stderr
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    'BaseValidationError: '
-                    + base_validation_errors.BaseValidationError(
-                        'Mock validation error message', model
-                    ).stderr
+                    f'BaseValidationError: {validation_error}'
                 )
             ]
         )
@@ -207,21 +207,22 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([model1, model2, model3])
 
+        errors = '\n'.join(
+            [
+                base_validation_errors.BaseValidationError(
+                    'Mock validation error message', model1
+                ).stderr,
+                base_validation_errors.BaseValidationError(
+                    'Mock validation error message', model2
+                ).stderr,
+            ]
+        )
+
         with self.swap(base_validation_jobs, 'ERROR_TRUNCATION_LIMIT', 2):
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult.as_stderr(
-                        'BaseValidationError: '
-                        + '\n'.join(
-                            [
-                                base_validation_errors.BaseValidationError(
-                                    'Mock validation error message', model1
-                                ).stderr,
-                                base_validation_errors.BaseValidationError(
-                                    'Mock validation error message', model2
-                                ).stderr,
-                            ]
-                        )
+                        f'BaseValidationError: {errors}'
                     )
                 ]
             )

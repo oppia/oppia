@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
+from core.domain import answer_submitted_event_log_entry_domain, exp_fetchers
 from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
 from core.jobs.types import (
     answerSubmittedEventLogEntryModel_validation_errors,
     job_run_result,
 )
 from core.platform import models
-from core.domain import exp_fetchers, answer_submitted_event_log_entry_domain
 
 from typing import Callable, Iterator, List
 
@@ -70,7 +70,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         return self.validate_domain_object
 
     def validate_domain_object(
-        self, model: stats_models.AnswerSubmittedEventLogEntryModel
+        self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Validates domain object."""
         # BaseValidationJob calls datastore_services.query_everything()
@@ -104,7 +104,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
             )
 
     def validate_exploration_reference(
-        self, model: stats_models.AnswerSubmittedEventLogEntryModel
+        self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks if exp_id corresponds to a valid exploration."""
         # BaseValidationJob calls datastore_services.query_everything()
@@ -126,7 +126,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
                         model
                     )
                 )
-        except Exception as e:
+        except Exception:
             yield (
                 answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
                     model
@@ -134,7 +134,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
             )
 
     def validate_entity_id_format(
-        self, model: stats_models.AnswerSubmittedEventLogEntryModel
+        self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks entity_id format '[timestamp]:[exp_id]:[session_id]'."""
 

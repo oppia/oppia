@@ -28,11 +28,6 @@ from core.domain import (
 from core.tests import test_utils
 
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import answer_submitted_event_log_entry_domain
-
-
 class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
     """Tests for AnswerSubmittedEventLogEntry domain object."""
 
@@ -57,7 +52,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
             event_schema_version=self.schema_version,
         )
 
-        # Mock exploration object
+        # Mock exploration object.
         self.mock_exploration = mock.Mock()
         self.mock_exploration.version = 3
         self.mock_exploration.states = {
@@ -65,12 +60,12 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
             'End': mock.Mock(),
         }
 
-        # Patch exp_fetchers.get_exploration_by_id
+        # Patch exp_fetchers.get_exploration_by_id.
         patcher = mock.patch('core.domain.exp_fetchers.get_exploration_by_id')
         self.mock_get_exploration = patcher.start()
         self.addCleanup(patcher.stop)
 
-        # Return mocked exploration whenever the function is called
+        # Return mocked exploration whenever the function is called.
         self.mock_get_exploration.return_value = self.mock_exploration
 
     def test_validate_success(self) -> None:
@@ -78,7 +73,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         self.domain_obj.validate()
 
     def test_validate_invalid_exp_id_type(self) -> None:
-        self.domain_obj.exp_id = 5
+        # Here we use MyPy ignore because to test invalid
+        # datatype in exp_id.
+        self.domain_obj.exp_id = 5  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             domain_errors.AnswerSubmittedEventLogEntryDomainError,
@@ -96,7 +93,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
             self.domain_obj.validate()
 
     def test_validation_fails_invalid_exp_version_type(self) -> None:
-        self.domain_obj.exp_version = 'exp_version'
+        # Here we use MyPy ignore because to test invalid
+        # data type in exp_version.
+        self.domain_obj.exp_version = 'exp_version'  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             domain_errors.AnswerSubmittedEventLogEntryDomainError,
@@ -144,7 +143,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
             self.domain_obj.validate()
 
     def test_validate_invalid_state_name_type(self) -> None:
-        self.domain_obj.state_name = 123
+        # Here we use MyPy ignore because to test invalid
+        # state data.
+        self.domain_obj.state_name = 123  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             domain_errors.AnswerSubmittedEventLogEntryDomainError,
@@ -155,7 +156,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
             self.domain_obj.validate()
 
     def test_validate_invalid_session_id(self) -> None:
-        self.domain_obj.session_id = 123
+        # Here we use MyPy ignore because to test invalid
+        # in session_id.
+        self.domain_obj.session_id = 123  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             domain_errors.AnswerSubmittedEventLogEntryDomainError,
@@ -165,17 +168,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
             self.domain_obj.validate()
 
     def test_validation_fails_with_invalid_time_spent_type(self) -> None:
-        self.domain_obj.time_spent_in_state_secs = 1
-
-        with self.assertRaisesRegex(
-            domain_errors.AnswerSubmittedEventLogEntryDomainError,
-            'Expected time_spent_in_state_secs to be a non-negative float, '
-            'received %s' % self.domain_obj.time_spent_in_state_secs,
-        ):
-            self.domain_obj.validate()
-
-    def test_validation_fails_with_invalid_time_spent_type(self) -> None:
-        self.domain_obj.time_spent_in_state_secs = 'time_spent'
+        # Here we use MyPy ignore because to test invalid
+        # data in time_spent_in_state_secs.
+        self.domain_obj.time_spent_in_state_secs = 'time_spent'  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             domain_errors.AnswerSubmittedEventLogEntryDomainError,
@@ -195,7 +190,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
             self.domain_obj.validate()
 
     def test_validate_invalid_feedback_useful(self) -> None:
-        self.domain_obj.is_feedback_useful = 'yes'
+        # Here we use MyPy ignore because to test invalid
+        # datatype in is_feedback_useful.
+        self.domain_obj.is_feedback_useful = 'yes'  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             domain_errors.AnswerSubmittedEventLogEntryDomainError,

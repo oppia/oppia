@@ -41,7 +41,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         answerSubmittedEventLogEntryModel_validation_jobs.AnswerSubmittedEventLogEntryModelValidationJob
     )
 
-    def test_valid_model(self):
+    def test_valid_model(self) -> None:
         """Test that valid model produces no errors."""
 
         self.save_new_valid_exploration(
@@ -63,7 +63,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
 
         self.assert_job_output_is([])
 
-    def test_invalid_exploration_id(self):
+    def test_invalid_exploration_id(self) -> None:
         """Test invalid exp_id."""
 
         model = self.create_model(
@@ -79,24 +79,26 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
+        domain_error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+            'Exploration with id expX does not exist', model
+        ).stderr
+
+        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
+            model
+        ).stderr
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    'DomainValidationError: '
-                    + answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
-                        'Exploration with id expX does not exist', model
-                    ).stderr
+                    f'DomainValidationError: {domain_error}'
                 ),
                 job_run_result.JobRunResult.as_stderr(
-                    'InvalidExplorationIdError: '
-                    + answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-                        model
-                    ).stderr
+                    f'InvalidExplorationIdError: {invalid_exp_error}'
                 ),
             ]
         )
 
-    def test_invalid_entity_id_format(self):
+    def test_invalid_entity_id_format(self) -> None:
         """Test entity_id format error."""
 
         self.save_new_valid_exploration(
@@ -116,18 +118,19 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
+        invalid_entity_id_format_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
+            model
+        ).stderr
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    'InvalidEntityIdFormatError: '
-                    + answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
-                        model
-                    ).stderr
+                    f'InvalidEntityIdFormatError: {invalid_entity_id_format_error}'
                 ),
             ]
         )
 
-    def test_entity_id_mismatch(self):
+    def test_entity_id_mismatch(self) -> None:
         """Test entity_id mismatch with model fields."""
 
         self.save_new_valid_exploration(
@@ -146,18 +149,18 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
+        entity_id_model_mismatch_error = answerSubmittedEventLogEntryModel_validation_errors.EntityIdModelMismatchError(
+            model
+        ).stderr
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    'EntityIdModelMismatchError: '
-                    + answerSubmittedEventLogEntryModel_validation_errors.EntityIdModelMismatchError(
-                        model
-                    ).stderr
+                    f'EntityIdModelMismatchError: {entity_id_model_mismatch_error}'
                 ),
             ]
         )
 
-    def test_domain_validation_error(self):
+    def test_domain_validation_error(self) -> None:
         """Test domain validation failure."""
 
         self.save_new_valid_exploration(
@@ -176,14 +179,15 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
+        domain_error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+            'Expected exp_version to be an integer >= 1, received -1',
+            model,
+        ).stderr
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    'DomainValidationError: '
-                    + answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
-                        'Expected exp_version to be an integer >= 1, received -1',
-                        model,
-                    ).stderr
+                    f'DomainValidationError: {domain_error}'
                 )
             ]
         )

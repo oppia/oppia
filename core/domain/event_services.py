@@ -22,13 +22,13 @@ import logging
 
 from core import feconf
 from core.domain import (
+    answer_submitted_event_log_entry_services,
     exp_domain,
     exp_fetchers,
     feedback_services,
     stats_domain,
     stats_services,
     taskqueue_services,
-    answer_submitted_event_log_entry_services,
 )
 from core.platform import models
 

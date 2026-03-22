@@ -549,6 +549,12 @@
 /core/schema_utils*.py @oppia/lace-backend-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers
 /.rtlcssrc @oppia/lace-frontend-reviewers
+/core/domain/answer_submitted_event_log_entry_domain_errors_test.py @oppia/lace-backend-reviewers
+/core/domain/answer_submitted_event_log_entry_domain.py @oppia/lace-backend-reviewers
+/core/domain/answer_submitted_event_log_entry_domain_errors.py @oppia/lace-backend-reviewers
+/core/domain/answer_submitted_event_log_entry_domain_test.py @oppia/lace-backend-reviewers
+/core/domain/answer_submitted_event_log_entry_services_test.py @oppia/lace-backend-reviewers
+/core/domain/answer_submitted_event_log_entry_services.py @oppia/lace-backend-reviewers 
 
 
 # Python typing

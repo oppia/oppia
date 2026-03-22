@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import answer_submitted_event_log_entry_domain
 from core.platform import models
-from core import feconf
-
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,6 +32,17 @@ if MYPY:  # pragma: no cover
 def get_answer_submitted_event_log_entry_from_model(
     answer_submitted_event_log_entry: stats_models.AnswerSubmittedEventLogEntryModel,
 ) -> answer_submitted_event_log_entry_domain.AnswerSubmittedEventLogEntry:
+    """Creates a domain object from an AnswerSubmittedEventLogEntryModel.
+
+    Args:
+        answer_submitted_event_log_entry: AnswerSubmittedEventLogEntryModel.
+            The datastore model instance containing the answer submitted
+            event log entry data.
+
+    Returns:
+        AnswerSubmittedEventLogEntry. The corresponding domain object created
+        from the given model.
+    """
     return answer_submitted_event_log_entry_domain.AnswerSubmittedEventLogEntry(
         exp_id=answer_submitted_event_log_entry.exp_id,
         exp_version=answer_submitted_event_log_entry.exp_version,
@@ -51,7 +61,25 @@ def create_answer_submitted_event_log_entry(
     session_id: str,
     time_spent_in_secs: float,
     feedback_is_useful: bool,
-) -> answer_submitted_event_log_entry_domain.AnswerSubmittedEventLogEntry:
+) -> None:
+    """Creates and stores an AnswerSubmittedEventLogEntryModel.
+
+    This function constructs a domain object for an answer submitted
+    event log entry and persists it as a datastore model.
+
+    Args:
+        exploration_id: str. The ID of the exploration in which the
+            answer was submitted.
+        exploration_version: int. The version of the exploration at the
+            time the answer was submitted.
+        state_name: str. The name of the state where the answer was
+            submitted.
+        session_id: str. The ID of the learner session.
+        time_spent_in_secs: float. The time spent by the learner in the
+            state before submitting the answer.
+        feedback_is_useful: bool. Whether the learner marked the
+            feedback as useful.
+    """
 
     answer_submitted_event_log_entry = (
         answer_submitted_event_log_entry_domain.AnswerSubmittedEventLogEntry(

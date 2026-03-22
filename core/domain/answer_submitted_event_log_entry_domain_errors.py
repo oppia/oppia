@@ -30,6 +30,9 @@ class AnswerSubmittedEventLogEntryDomainError(utils.ValidationError):
 class InvalidExpIdError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid exploration id."""
 
+    # Here we use object because exp_id may receive values of any type during
+    # validation (e.g., None, int, or other unexpected types). The validation
+    # error message should display whatever value was provided.
     def __init__(self, exp_id: object) -> None:
         message = (
             'Expected exp_id to be a non-empty string, received %s' % exp_id
@@ -40,6 +43,9 @@ class InvalidExpIdError(AnswerSubmittedEventLogEntryDomainError):
 class InvalidExpVersionError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid exploration version."""
 
+    # Here we use object because exp_version may receive values of any type during
+    # validation (e.g., None, int, or other unexpected types). The validation
+    # error message should display whatever value was provided.
     def __init__(self, exp_version: object) -> None:
         message = (
             'Expected exp_version to be an integer >= 1, received %s'
@@ -70,6 +76,9 @@ class ExpVersionOutOfRangeError(AnswerSubmittedEventLogEntryDomainError):
 class InvalidStateNameError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid state name."""
 
+    # Here we use object because state_name may receive values of any type during
+    # validation (e.g., None, str, or other unexpected types). The validation
+    # error message should display whatever value was provided.
     def __init__(self, state_name: object) -> None:
         message = (
             'Expected state_name to be a valid state name as per '
@@ -81,6 +90,9 @@ class InvalidStateNameError(AnswerSubmittedEventLogEntryDomainError):
 class InvalidSessionIdError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid session id."""
 
+    # Here we use object because session_id may receive values of any type during
+    # validation (e.g., None, str, or other unexpected types). The validation
+    # error message should display whatever value was provided.
     def __init__(self, session_id: object) -> None:
         message = 'Expected session_id to be a string, received %s' % session_id
         super().__init__(message)
@@ -89,10 +101,13 @@ class InvalidSessionIdError(AnswerSubmittedEventLogEntryDomainError):
 class InvalidTimeSpentError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid time spent in state."""
 
-    def __init__(self, value: object) -> None:
+    # Here we use object because time_spent_in_state_secs may receive values
+    # of any type during validation (e.g., None, int, or other unexpected
+    # types). The validation error message should display whatever value was provided.
+    def __init__(self, time_spent_in_state_secs: object) -> None:
         message = (
             'Expected time_spent_in_state_secs to be a non-negative float, '
-            'received %s' % value
+            'received %s' % time_spent_in_state_secs
         )
         super().__init__(message)
 
@@ -100,9 +115,13 @@ class InvalidTimeSpentError(AnswerSubmittedEventLogEntryDomainError):
 class InvalidFeedbackUsefulError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid is_feedback_useful value."""
 
-    def __init__(self, value: object) -> None:
+    # Here we use object because is_feedback_useful may receive values
+    # of any type during validation (e.g., None, int, or other unexpected
+    # types). The validation error message should display whatever value was provided.
+    def __init__(self, is_feedback_useful: object) -> None:
         message = (
-            'Expected is_feedback_useful to be boolean, received %s' % value
+            'Expected is_feedback_useful to be boolean, received %s'
+            % is_feedback_useful
         )
         super().__init__(message)
 
@@ -110,6 +129,9 @@ class InvalidFeedbackUsefulError(AnswerSubmittedEventLogEntryDomainError):
 class InvalidEventSchemaVersionError(AnswerSubmittedEventLogEntryDomainError):
     """Error class for invalid event schema version."""
 
+    # Here we use object because received may receive values
+    # of any type during validation (e.g., None, int, or other unexpected
+    # types). The validation error message should display whatever value was provided.
     def __init__(self, expected: int, received: object) -> None:
         message = (
             'Expected event_schema_version to be %s and also integer, received %s'

@@ -21,18 +21,19 @@ from __future__ import annotations
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
-
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
+    from mypy_imports import stats_models
 
-(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
 class InvalidExplorationIdError(base_validation_errors.BaseValidationError):
     """Error class for invalid exploration reference."""
 
-    def __init__(self, model: base_models.BaseModel) -> None:
+    def __init__(
+        self, model: stats_models.AnswerSubmittedEventLogEntryModel
+    ) -> None:
         message = f'exp_id {model.exp_id} does not correspond to a valid ExplorationModel'
         super().__init__(message, model)
 
@@ -40,7 +41,9 @@ class InvalidExplorationIdError(base_validation_errors.BaseValidationError):
 class InvalidEntityIdFormatError(base_validation_errors.BaseValidationError):
     """Error class for incorrect entity id format."""
 
-    def __init__(self, model: base_models.BaseModel) -> None:
+    def __init__(
+        self, model: stats_models.AnswerSubmittedEventLogEntryModel
+    ) -> None:
         message = (
             f'Entity id {model.id} does not match required format '
             '"[timestamp]:[exp_id]:[session_id]"'
@@ -51,7 +54,9 @@ class InvalidEntityIdFormatError(base_validation_errors.BaseValidationError):
 class EntityIdModelMismatchError(base_validation_errors.BaseValidationError):
     """Error class when entity_id fields do not match model fields."""
 
-    def __init__(self, model: base_models.BaseModel) -> None:
+    def __init__(
+        self, model: stats_models.AnswerSubmittedEventLogEntryModel
+    ) -> None:
         message = (
             f'Entity id {model.id} does not match model fields '
             f'exp_id={model.exp_id}, session_id={model.session_id}'
@@ -63,7 +68,9 @@ class DomainValidationError(base_validation_errors.BaseValidationError):
     """Error class for domain validation failures."""
 
     def __init__(
-        self, error_message: str, model: base_models.BaseModel
+        self,
+        error_message: str,
+        model: stats_models.AnswerSubmittedEventLogEntryModel,
     ) -> None:
         message = f'Domain validation failed with error: {error_message}'
         super().__init__(message, model)
