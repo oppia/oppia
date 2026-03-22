@@ -14,17 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for exploration domain objects and methods defined on them."""
+"""Tests for the exploration domain objects and methods defined on them."""
+
 from __future__ import annotations
 
 import copy
 import json
 import os
 import textwrap
-from typing import Any, Dict, Final, List, Tuple, Union, cast
 from unittest import mock
-
-import yaml
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
@@ -42,6 +40,9 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
+
+import yaml
+from typing import Any, Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3152,7 +3153,8 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         state = list(exploration.states.values())[0]
 
         interaction = state.interaction
-        interaction.id = 15  # type: ignore[assignment]
+        interaction.id = 15
+        # Here we use MyPy ignore because interaction.id expects a string.
 
         self._assert_validation_error(
             exploration, 'Expected interaction id to be a string'
@@ -4077,7 +4079,7 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         It verifies whether the these objects are equal.
         """
         old_version_yaml_content: str = textwrap.dedent(
-            """\
+            """
         author_notes: ''
         auto_tts_enabled: false
         blurb: ''
