@@ -608,17 +608,23 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             logs, ['No email address was found for the user.']
         )
 
-    def test_payload_args_update_handler_args_successfully(self) -> None:
-        """Test that when a valid payload properly updates the handler args."""
-
+    def test_validate_and_normalize_args_with_empty_payload_string(
+        self,
+    ) -> None:
+        """Test argument normalization when payload is naturally None."""
         mock_request = mock.Mock()
         mock_request.environ = {'REQUEST_METHOD': 'POST'}
         mock_request.route_kwargs = {}
+        mock_request.arguments.return_value = ['payload', 'custom_key']
 
-        valid_json_payload = json.dumps({'custom_key': 'custom_value'})
-        mock_request.get.return_value = valid_json_payload
-        mock_request.arguments.return_value = ['payload']
+        def mock_get_side_effect(arg_name: str) -> Optional[str]:
+            if arg_name == 'payload':
+                return ''
+            if arg_name == 'custom_key':
+                return 'some_value'
+            return None
 
+        mock_request.get.side_effect = mock_get_side_effect
         handler = self.MockPostHandler(mock_request, mock.Mock())
 
         handler.validate_and_normalize_args()
