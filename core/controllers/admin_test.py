@@ -2609,6 +2609,26 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
+    def test_removing_nonexistent_role_from_user_raises_error(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={
+                'role': feconf.ROLE_ID_MODERATOR,
+                'username': username,
+            },
+            expected_status_int=500,
+        )
+        self.assertIn(
+            'The user does not have the given role.',
+            response['error'],
+        )
+
     def test_cannot_view_role_with_invalid_view_filter_criterion(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(

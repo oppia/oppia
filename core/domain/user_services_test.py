@@ -1231,6 +1231,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(user_settings_model.roles, user_settings.roles)
 
+    def test_remove_user_role_for_nonexistent_role_raises_error(self) -> None:
+        user_id = user_services.create_new_user(
+            'someUser', 'user@example.com'
+        ).user_id
+
+        with self.assertRaisesRegex(
+            Exception, 'The user does not have the given role.'
+        ):
+            user_services.remove_user_role(
+                user_id, feconf.ROLE_ID_BLOG_POST_EDITOR
+            )
+
     def test_remove_user_role_for_default_role_raises_error(self) -> None:
         user_id = user_services.create_new_user(
             'someUser', 'user@example.com'

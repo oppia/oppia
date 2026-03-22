@@ -1706,6 +1706,8 @@ def remove_user_role(user_id: str, role: str) -> None:
         raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Removing a default role is not allowed.')
+    if role not in user_settings.roles:
+        raise Exception('The user does not have the given role.')
 
     user_settings.roles.remove(role)
 
