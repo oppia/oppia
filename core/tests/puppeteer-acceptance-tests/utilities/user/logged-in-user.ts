@@ -4617,7 +4617,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} chapterName - The name of the lesson to check.
    */
   async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
-    const chapterCards = await this.page.$$('.e2e-test-chapter-title');
+    const chapterCards = await this.page.$$(chapterSelector);
 
     for (const titleHandle of chapterCards) {
       const titleText = await titleHandle.evaluate(el =>

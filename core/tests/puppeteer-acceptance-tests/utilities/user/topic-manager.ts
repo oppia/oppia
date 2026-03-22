@@ -4560,6 +4560,14 @@ export class TopicManager extends BaseUser {
     await this.publishStoryDraftSerialChapter();
   }
 
+  /**
+   * Drags a chapter from one position to another in the Story Editor chapter panel.
+   * @param storyName - The name of the story.
+   * @param topicName - The name of the topic under which the story exists.
+   * @param fromChapterName - The name of the chapter to be moved.
+   * @param toChapterName - The name of the target chapter where the dragged chapter will be placed.
+   */
+
   async dragChapterByName(
     storyName: string,
     topicName: string,
@@ -4567,14 +4575,7 @@ export class TopicManager extends BaseUser {
     toChapterName: string
   ): Promise<void> {
     await this.openStoryEditor(storyName, topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
-      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
-      if (elements.length < 2) {
-        throw new Error('Not enough elements collapsible headers found,');
-      }
-      await elements[1].click();
-    }
+
     await this.page.waitForSelector('tr.cdk-drag');
 
     const rows = await this.page.$$('tr.cdk-drag');

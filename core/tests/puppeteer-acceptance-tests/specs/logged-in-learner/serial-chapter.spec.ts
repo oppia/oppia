@@ -187,8 +187,6 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.navigateToGoalsSection();
       await loggedInLearner1.clickOnGoalCard('Place Values');
-      // Need deugging here as the test is failing due to the goal card not being found. The test is expected to click on the goal card and then check for the lesson card button label and lesson progress. But it seems that the goal card is not being found and hence the test is failing. We need to check if the goal card is being added to the redesigned learner dashboard and if it is being displayed correctly.
-      // await loggedInLearner1.addGoalInRedesignedLearnerDashboard('Place Values');
 
       await loggedInLearner1.expectLessonCardButtonLabel(
         'Find the Value of a Number',
