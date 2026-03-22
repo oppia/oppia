@@ -108,8 +108,8 @@ class BaseValidationJob(base_jobs.JobBase):
             | 'Extract Error Messages'
             >> beam.Map(
                 lambda group: job_run_result.JobRunResult.as_stderr(
-                    f"{group[0]}: "
-                    + "\n".join(
+                    f'{group[0]}: '
+                    f'\n'.join(
                         sorted([error.stderr for error in group[1]])[
                             :ERROR_TRUNCATION_LIMIT
                         ]
