@@ -91,6 +91,8 @@ EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 class SchemaValidationError(AssertionError):
     """Raised when schema validator checks fail during normalization."""
 
+    pass
+
 
 # Here we use type Any because the following schema can have a recursive
 # structure and mypy doesn't support recursive type currently.
@@ -118,6 +120,7 @@ def normalize_against_schema(
     Raises:
         Exception. The object fails to validate against the schema.
         AssertionError. The validation for schema validators fails.
+        SchemaValidationError. The schema validators fail.
     """
     # Here we use type Any because 'normalized_obj' can be of type int, str,
     # Dict, List and other types too.
