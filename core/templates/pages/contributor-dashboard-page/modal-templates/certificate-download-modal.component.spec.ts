@@ -124,6 +124,32 @@ describe('Contributor Certificate Download Modal Component', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should download translation submitter certificate with minutes', fakeAsync(() => {
+    const certificateDataWithMinutes: ContributorCertificateInfo = {
+      ...certificateData,
+      contribution_hours: 0.15,
+      contribution_word_count: 45,
+    };
+    const certificateDataWithMinutesResponse: ContributorCertificateResponse = {
+      certificate_data: certificateDataWithMinutes,
+    };
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataWithMinutesResponse));
+    spyOn(alertsService, 'addInfoMessage').and.stub();
+
+    component.downloadCertificate();
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBeFalse();
+    expect(
+      contributionAndReviewService.downloadContributorCertificateAsync
+    ).toHaveBeenCalled();
+  }));
+
   it('should download question submitter certificate when available', () => {
     component.fromDate = '2022/01/01';
     component.toDate = '2022/10/31';
