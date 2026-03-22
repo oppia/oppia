@@ -17,12 +17,12 @@
 """Tests for exploration domain objects and methods defined on them."""
 
 from __future__ import annotations
-
+import textwrap
 import copy
 import json
 import os
 from unittest import mock
-
+from core import feconf
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
@@ -3009,8 +3009,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             self.new_exploration.validate(strict=True)
 
-    # TODO(#20377): The validation tests below should be split into separate
-    # unit tests. Also, all validation errors should be covered in the tests.
+
+# TODO(#20377): The validation tests below should be split into separate
+# unit tests. Also, all validation errors should be covered in the tests.
+
+
+class ExplorationDomainValidationTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True,
+            )
+        }
+
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            entity_id='exp_id',
+            entity_type=feconf.TranslatableEntityType.EXPLORATION,
+            entity_version=1,
+            language_code='en',
+            translations=translation_dict,
+        )
 
     def test_validation_invalid_title(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3067,10 +3090,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(state, 'TextInput', content_id_generator)
         exploration.states = {'ABC': state}
         exploration.init_state_name = 'ABC'
+
         default_outcome = state.interaction.default_outcome
         assert default_outcome is not None
         default_outcome.dest = 'XYZ'
         state.update_interaction_default_outcome(default_outcome)
+
         self._assert_validation_error(
             exploration, 'Expected all content id indexes to be less than'
         )
@@ -3090,8 +3115,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 translation_domain.ContentType.DEFAULT_OUTCOME
             ),
         )
-        self.set_interaction_for_state(state, 'TextInput', content_id_generator)
 
+        self.set_interaction_for_state(state, 'TextInput', content_id_generator)
         exploration.states = {'ABC': state}
         exploration.init_state_name = 'ABC'
 
@@ -3114,13 +3139,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 tagged_skill_misconception_id=None,
             )
         )
-        answer_group = interaction.answer_groups[0]
 
-        rule_spec = answer_group.rule_specs[0]
+        rule_spec = interaction.answer_groups[0].rule_specs[0]
         rule_spec.inputs = {}
 
         self._assert_validation_error(
-            exploration, 'RuleSpec \'Equals\' is missing inputs'
+            exploration, "RuleSpec 'Equals' is missing inputs"
         )
 
     def test_validation_invalid_interaction(self) -> None:
@@ -3128,8 +3152,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state = list(exploration.states.values())[0]
 
         interaction = state.interaction
-        # Here we use MyPy ignore because this test intentionally assigns
-        # an invalid type to check validation errors.
         interaction.id = 15  # type: ignore[assignment]
 
         self._assert_validation_error(
@@ -3144,9 +3166,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_invalid_param_specs(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-
-        # Here we use MyPy ignore because we are assigning invalid type
-        # intentionally to test validation logic.
         exploration.param_specs = 'A string'  # type: ignore[assignment]
 
         self._assert_validation_error(exploration, 'param_specs to be a dict')
@@ -4057,123 +4076,62 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         the old version yaml convert to latest Exploration object.
         It verifies whether the these objects are equal.
         """
-        old_version_yaml_content: str = (
-            """author_notes: ''
-auto_tts_enabled: false
-blurb: ''
-category: Category
-edits_allowed: true
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 46
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - <p>Choice 1</p>
-            - <p>Choice 2</p>
-            - <p>Choice Invalid</p>
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - content_id: ca_choices_2
-            html: <p>Choice 1</p>
-          - content_id: ca_choices_3
-            html: <p>Choice 2</p>
-        maxAllowableSelectionCount:
-          value: 2
-        minAllowableSelectionCount:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
+        old_version_yaml_content: str = textwrap.dedent(
+            """\
+        author_notes: ''
+        auto_tts_enabled: false
+        blurb: ''
+        category: Category
+        title: Title
+        tags: []
+        edits_allowed: true
+        init_state_name: (untitled state)
+        language_code: en
+        objective: ''
         param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: ItemSelectionInput
-      solution:
-        answer_is_exclusive: true
-        correct_answer:
-          - <p>Choice 1</p>
-        explanation:
-          content_id: solution
-          html: This is <i>solution</i> for state1
-    next_content_id_index: 4
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        solution: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 41
-tags: []
-title: Title
-"""
+        param_specs: {}
+        schema_version: 46
+        states_schema_version: 46
+        states:
+          (untitled state):
+            linked_skill_id: null
+            classifier_model_id: null
+            card_is_checkpoint: true
+            solicit_answer_details: false
+            classifier_model_id: null
+            content:
+              content_id: content
+              html: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args:
+                choices:
+                  value:
+                   - content_id: ca_choices_0
+                     html: <p>Choice 1</p>
+                   - content_id: ca_choices_1
+                     html: <p>Choice 2</p>
+                showChoicesInShuffledOrder:
+                  value: false
+              default_outcome: null
+              hints: []
+              id: MultipleChoiceInput
+              solution: null
+            next_content_id_index: 0
+            param_changes: []
+            recorded_voiceovers:
+              voiceovers_mapping:
+                ca_choices_0: {}
+                ca_choices_1: {}
+                content: {}
+            solicit_answer_details: false
+            written_translations:
+              translations_mapping:
+                ca_choices_0: {}
+                ca_choices_1: {}
+                content: {}
+        """
         )
         mock_import_module.return_value = 'mocked_memcache_key'
         exploration_id = 'mocked_memcache_key'
