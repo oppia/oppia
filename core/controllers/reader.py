@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 import random
 
-from core import feconf, utils
+from core import feconf, schema_utils, utils
 from core.constants import constants
 from core.controllers import (
     acl_decorators,
@@ -731,7 +731,7 @@ class AnswerSubmittedEventHandler(
             normalized_answer = old_interaction_instance.normalize_answer(
                 answer
             )
-        except AssertionError as e:
+        except schema_utils.SchemaValidationError as e:
             raise self.InvalidInputException(
                 'Schema validation for \'answer\' failed: %s' % e
             ) from e
