@@ -56,7 +56,8 @@ describe('BackgroundBannerComponent', () => {
       'enabled',
     () => {
       // This throws "Cannot assign to 'SCREENSHOT_CONSISTENCY' because it is a
-      // read-only property." if we don't cast to any.
+      // read-only property.". We need to suppress this error because we
+      // need to modify this constant for testing purposes.
       // @ts-ignore
       AppConstants.SCREENSHOT_CONSISTENCY = true;
 
@@ -66,7 +67,9 @@ describe('BackgroundBannerComponent', () => {
         '/assets/images/background/bannerA.svg'
       );
 
-      // Reset the constant to avoid affecting other tests.
+      // This throws "Cannot assign to 'SCREENSHOT_CONSISTENCY' because it is a
+      // read-only property.". We need to suppress this error because we
+      // need to reset this constant after testing.
       // @ts-ignore
       AppConstants.SCREENSHOT_CONSISTENCY = false;
     }
