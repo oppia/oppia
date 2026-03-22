@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import collections
+import itertools
 
 from core import utils
 from core.constants import constants
@@ -40,6 +41,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     user_domain,
+    user_services,
 )
 from core.platform import models
 
@@ -112,10 +114,18 @@ class DisplayableCollectionSummaryDict(TypedDict):
     last_updated_msec: float
     created_on: float
     status: str
-    node_count: int
+    total_node_count: int
+    completed_node_count: int
     community_owned: bool
     thumbnail_icon_url: str
     thumbnail_bg_color: str
+
+
+class ExplorationCheckpointProgressDict(TypedDict):
+    """Checkpoint progress data for a single exploration."""
+
+    visited_checkpoints_count: int
+    total_checkpoints_count: int
 
 
 def _get_completed_activities_from_model(
@@ -2031,7 +2041,8 @@ def get_collection_summary_dicts(
                     collection_summary.collection_model_created_on
                 ),
                 'status': collection_summary.status,
-                'node_count': collection_summary.node_count,
+                'total_node_count': collection_summary.node_count,
+                'completed_node_count': 0,
                 'community_owned': collection_summary.community_owned,
                 'thumbnail_icon_url': (
                     utils.get_thumbnail_icon_url_for_category(
@@ -2660,3 +2671,58 @@ def get_exploration_progress(
         learner_progress_in_explorations,
         number_of_nonexistent_explorations,
     )
+
+
+def get_checkpoint_progress_for_explorations(
+    user_id: str, exploration_ids: List[str]
+) -> Dict[str, ExplorationCheckpointProgressDict]:
+    """Returns checkpoint progress data for each exploration ID.
+
+    Args:
+        user_id: str. The id of the learner.
+        exploration_ids: list(str). Exploration IDs to compute progress for.
+
+    Returns:
+        dict. Mapping from exploration ID to checkpoint progress counts.
+    """
+    if not exploration_ids:
+        return {}
+
+    exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(
+        exploration_ids, strict=False
+    )
+    user_id_exp_id_pairs = list(itertools.product([user_id], exploration_ids))
+    exp_user_data_models = user_models.ExplorationUserDataModel.get_multi(
+        user_id_exp_id_pairs
+    )
+
+    progress_by_exp_id: Dict[str, ExplorationCheckpointProgressDict] = {}
+    for index, exp_id in enumerate(exploration_ids):
+        exploration = exp_id_to_exp_map.get(exp_id)
+        if exploration is None:
+            continue
+
+        checkpoints_in_exp = user_services.get_checkpoints_in_order(
+            exploration.init_state_name, exploration.states
+        )
+        visited_checkpoints = 0
+        model = exp_user_data_models[index]
+        most_recently_visited_checkpoint = (
+            model.most_recently_reached_checkpoint_state_name
+            if model is not None
+            else None
+        )
+        if (
+            most_recently_visited_checkpoint is not None
+            and most_recently_visited_checkpoint in checkpoints_in_exp
+        ):
+            visited_checkpoints = (
+                checkpoints_in_exp.index(most_recently_visited_checkpoint) + 1
+            )
+
+        progress_by_exp_id[exp_id] = {
+            'visited_checkpoints_count': visited_checkpoints,
+            'total_checkpoints_count': len(checkpoints_in_exp),
+        }
+
+    return progress_by_exp_id

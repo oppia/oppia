@@ -288,6 +288,13 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
                     'removed does not exist.' % env_variable
                 )
             content = re.sub('  %s: ".*"\n' % env_variable, '', content)
+    # In app_dev.yaml, MathJax is served from the Angular dev build output
+    # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
+    # to the prod build output (dist/oppia-angular-prod/).
+    content = content.replace(
+        'static_dir: dist/oppia-angular/assets/mathjax',
+        'static_dir: dist/oppia-angular-prod/assets/mathjax',
+    )
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with open(APP_YAML_FILEPATH, 'w+', encoding='utf-8') as prod_yaml_file:
