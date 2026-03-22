@@ -20,6 +20,8 @@ import json
 import logging
 import traceback
 
+from typing import Callable, Dict
+
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
@@ -37,13 +39,9 @@ from core.domain import (
     wipeout_service,
 )
 
-from typing import Callable, Dict
 
-
-class UnsentFeedbackEmailHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler task of sending emails of feedback messages."""
+class UnsentFeedbackEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler task for sending emails of feedback messages."""
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
@@ -63,13 +61,11 @@ class UnsentFeedbackEmailHandler(
                 reference.thread_id, reference.message_id
             )
 
-            exploration = exp_fetchers.get_exploration_by_id(
-                reference.entity_id
-            )
+            exploration = exp_fetchers.get_exploration_by_id(reference.entity_id)
 
             message_text = message.text
             if len(message_text) > 200:
-                message_text = message_text[:200] + '...'
+                message_text = message_text[:200] + "..."
 
             if exploration.id in messages:
                 messages[exploration.id]['messages'].append(message_text)
@@ -89,31 +85,16 @@ class UnsentFeedbackEmailHandler(
 class ContributorDashboardAchievementEmailHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler task of sending email of contributor dashboard achievements."""
+    """Handler task for sending emails of contributor dashboard achievements."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'contributor_user_id': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'contribution_type': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'contribution_sub_type': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'language_code': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'rank_name': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
+            'contributor_user_id': {'schema': {'type': str}, 'default_value': None},
+            'contribution_type': {'schema': {'type': str}, 'default_value': None},
+            'contribution_sub_type': {'schema': {'type': str}, 'default_value': None},
+            'language_code': {'schema': {'type': str}, 'default_value': None},
+            'rank_name': {'schema': {'type': str}, 'default_value': None},
         }
     }
 
@@ -135,9 +116,7 @@ class ContributorDashboardAchievementEmailHandler(
             rank_name,
         )
 
-        email_manager.send_mail_to_notify_contributor_ranking_achievement(
-            email_info
-        )
+        email_manager.send_mail_to_notify_contributor_ranking_achievement(email_info)
         self.render_json({})
 
 
@@ -156,9 +135,7 @@ class InstantFeedbackMessageEmailHandler(
         message = feedback_services.get_message(
             reference_dict['thread_id'], reference_dict['message_id']
         )
-        exploration = exp_fetchers.get_exploration_by_id(
-            reference_dict['entity_id']
-        )
+        exploration = exp_fetchers.get_exploration_by_id(reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
 
         subject = 'New Oppia message in "%s"' % thread.subject
@@ -177,9 +154,7 @@ class InstantFeedbackMessageEmailHandler(
 class FeedbackThreadStatusChangeEmailHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handles task of sending email instantly when feedback thread status is
-    changed.
-    """
+    """Handles task of sending email instantly when feedback thread status changes."""
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
@@ -193,9 +168,7 @@ class FeedbackThreadStatusChangeEmailHandler(
         message = feedback_services.get_message(
             reference_dict['thread_id'], reference_dict['message_id']
         )
-        exploration = exp_fetchers.get_exploration_by_id(
-            reference_dict['entity_id']
-        )
+        exploration = exp_fetchers.get_exploration_by_id(reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
 
         text = 'changed status from %s to %s' % (old_status, new_status)
@@ -212,12 +185,8 @@ class FeedbackThreadStatusChangeEmailHandler(
         self.render_json({})
 
 
-class FlagExplorationEmailHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handles task of sending emails about flagged explorations
-    to moderators.
-    """
+class FlagExplorationEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles task of sending emails about flagged explorations to moderators."""
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
@@ -241,26 +210,11 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'sender_email': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'recipient_id': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'subject': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'html_body': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
-            'text_body': {
-                'schema': {'type': 'basestring'},
-                'default_value': None,
-            },
+            'sender_email': {'schema': {'type': str}, 'default_value': None},
+            'recipient_id': {'schema': {'type': str}, 'default_value': None},
+            'subject': {'schema': {'type': str}, 'default_value': None},
+            'html_body': {'schema': {'type': str}, 'default_value': None},
+            'text_body': {'schema': {'type': str}, 'default_value': None},
         }
     }
 
@@ -268,7 +222,8 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def post(self) -> None:
         """Attempts to resend an email.
 
-        If it fails, raises an error to trigger an automatic retry via Cloud Tasks.
+        Raises:
+            Exception: If sending fails, triggers automatic retry via Cloud Tasks.
         """
         payload = json.loads(self.request.body)
 
@@ -282,22 +237,6 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
         )
 
-        # Cloud tasks automatically increment this header on each retry.
-        # It starts at 0 for the first attempt.
-        #
-        # Note: We use X-AppEngine-TaskExecutionCount instead of
-        # X-AppEngine-TaskRetryCount because TaskRetryCount includes infrastructure
-        # failures (e.g., lack of available instances) where the task never
-        # actually reached this handler. TaskExecutionCount strictly counts how
-        # many times this handler actually executed and failed, which is the
-        # exact metric we want to limit against.
-        # Docs: <https://cloud.google.com/tasks/docs/creating-appengine-handlers>.
-
-        # TODO(#25307): Improve this retry mechanism by differentiating between
-        # 4xx client errors (which should be dropped immediately) and 5xx server
-        # errors (which should be retried). Until then, we enforce a hard limit
-        # of 3 retries for all errors to prevent infinite queues.
-
         if num_of_attempts_of_retry_made >= 3:
             logging.error('Failed sending email after three retries')
             self.render_json({})
@@ -308,24 +247,14 @@ class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 sender_email, recipient_id, subject, text_body, html_body
             )
         except Exception as e:
-            logging.error(
-                'Email retry failed for recipient %s: %s', recipient_id, e
-            )
+            logging.error('Email retry failed for recipient %s: %s', recipient_id, e)
             raise Exception('Failed to resend email: %s' % e) from e
 
         self.render_json({})
 
 
 class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """This task handler handles special tasks that make single asynchronous
-    function calls. For more complex tasks that require a large number of
-    function calls, the correct approach is to create a special url handler that
-    handles that specific task. However, it doesn't make sense to create a url
-    handler for single function calls. This handler handles those cases.
-
-    The convention of function ids and an explanation of the different queue
-    names exists in 'core/domain/taskqueue_services.py' file.
-    """
+    """Handler for executing single asynchronous deferred tasks."""
 
     fn_ids_to_names = feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS
 
@@ -345,9 +274,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         fn_ids_to_names['FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY']: (
             exp_services.regenerate_exploration_summary_with_new_contributor
         ),
-        fn_ids_to_names[
-            'FUNCTION_ID_UPDATE_STATS'
-        ]: stats_services.update_stats,
+        fn_ids_to_names['FUNCTION_ID_UPDATE_STATS']: stats_services.update_stats,
         fn_ids_to_names['FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS']: (
             question_services.untag_deleted_misconceptions
         ),
@@ -369,115 +296,65 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
-        """Defers tasks for execution in the background.
-
-        Raises:
-            Exception. This request cannot defer tasks because it does not
-                contain a function identifier attribute (fn_identifier).
-                Deferred tasks must contain a function_identifier in the
-                payload.
-        """
-        # The request body has bytes type, thus we need to decode it first.
+        """Executes deferred tasks based on fn_identifier in payload."""
         payload = json.loads(self.request.body.decode('utf-8'))
 
         if 'fn_identifier' not in payload:
             raise Exception(
                 'This request cannot defer tasks because it does not contain a '
-                'function identifier attribute (fn_identifier). Deferred tasks '
-                'must contain a function_identifier in the payload.'
+                'function identifier attribute (fn_identifier).'
             )
-        if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
-            raise Exception(
-                'The function id, %s, is not valid.' % payload['fn_identifier']
-            )
+
+        fn_identifier = payload['fn_identifier']
+        if fn_identifier not in self.DEFERRED_TASK_FUNCTIONS:
+            raise Exception('The function id, %s, is not valid.' % fn_identifier)
 
         if 'cloud_task_model_id' not in payload:
-            raise Exception(
-                'The payload must contain a cloud_task_model_id attribute.'
-            )
+            raise Exception('The payload must contain a cloud_task_model_id attribute.')
+
+        cloud_task_model_id = payload['cloud_task_model_id']
+        cloud_task_run_domain_instance = taskqueue_services.get_cloud_task_run_by_model_id(
+            cloud_task_model_id
+        )
+        assert cloud_task_run_domain_instance is not None
+        cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
+        taskqueue_services.update_cloud_task_run_model(cloud_task_run_domain_instance)
 
         try:
-            cloud_task_model_id = payload['cloud_task_model_id']
-            cloud_task_run_domain_instance = (
-                taskqueue_services.get_cloud_task_run_by_model_id(
-                    cloud_task_model_id
-                )
-            )
-            assert cloud_task_run_domain_instance is not None
-            cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
+            deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[fn_identifier]
 
-            taskqueue_services.update_cloud_task_run_model(
-                cloud_task_run_domain_instance
-            )
-
-            deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
-                payload['fn_identifier']
-            ]
-
-            # If the deferred task is a voiceover regeneration task, append the
-            # cloud task model ID to the arguments list.
-            if voiceover_cloud_task_services.is_voiceover_regeneration_task_function(
-                payload['fn_identifier']
-            ):
+            if voiceover_cloud_task_services.is_voiceover_regeneration_task_function(fn_identifier):
                 payload['args'].append(cloud_task_model_id)
 
             deferred_task_function(*payload['args'], **payload['kwargs'])
 
-            updated_cloud_task_run_domain_instance = (
-                taskqueue_services.get_cloud_task_run_by_model_id(
-                    cloud_task_model_id
-                )
+            updated_instance = taskqueue_services.get_cloud_task_run_by_model_id(
+                cloud_task_model_id
             )
-            assert updated_cloud_task_run_domain_instance is not None
+            assert updated_instance is not None
 
-            if (
-                updated_cloud_task_run_domain_instance.latest_job_state
-                == 'PERMANENTLY_FAILED'
-            ):
-                # If the task has permanently failed during its execution,
-                # we do not update its state to SUCCEEDED.
-                return
+            if updated_instance.latest_job_state != 'PERMANENTLY_FAILED':
+                updated_instance.latest_job_state = 'SUCCEEDED'
+                taskqueue_services.update_cloud_task_run_model(updated_instance)
 
-            updated_cloud_task_run_domain_instance.latest_job_state = (
-                'SUCCEEDED'
-            )
-
-            taskqueue_services.update_cloud_task_run_model(
-                updated_cloud_task_run_domain_instance
-            )
         except Exception as e:
-            assert cloud_task_run_domain_instance is not None
-            # The maximum number of retries is enforced only for voiceover
-            # regeneration tasks, as these depend on a cloud service. Retrying
-            # indefinitely without investigating failures could result in
-            # unnecessary resource usage.
+            # Retry mechanism for voiceover tasks
             if (
                 cloud_task_run_domain_instance.current_retry_attempt
                 == taskqueue_services.CLOUD_TASK_MAX_RETRIES
                 and cloud_task_run_domain_instance.queue_id
                 == taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION
             ):
-                cloud_task_run_domain_instance.latest_job_state = (
-                    'PERMANENTLY_FAILED'
-                )
+                cloud_task_run_domain_instance.latest_job_state = 'PERMANENTLY_FAILED'
             else:
                 cloud_task_run_domain_instance.current_retry_attempt += 1
-                cloud_task_run_domain_instance.latest_job_state = (
-                    'FAILED_AND_AWAITING_RETRY'
-                )
+                cloud_task_run_domain_instance.latest_job_state = 'FAILED_AND_AWAITING_RETRY'
 
             stack_trace = traceback.format_exc()
             error_message = '%s\n---------\n%s' % (str(e), stack_trace)
-            (
-                cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(
-                    error_message
-                )
-            )
+            cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(error_message)
 
-            taskqueue_services.update_cloud_task_run_model(
-                cloud_task_run_domain_instance
-            )
-
+            taskqueue_services.update_cloud_task_run_model(cloud_task_run_domain_instance)
             raise Exception('Error running deferred task: %s' % e) from e
 
         self.render_json({})
