@@ -14,6 +14,7 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {BackgroundBannerComponent} from './background-banner.component';
+import {AppConstants} from 'app.constants';
 
 /**
  * @fileoverview Unit tests for BackgroundBannerComponent.
@@ -49,4 +50,25 @@ describe('BackgroundBannerComponent', () => {
       '/assets/images/background/bannerB.svg'
     );
   });
+
+  it(
+    'should use a consistent banner image when screenshot consistency is ' +
+      'enabled',
+    () => {
+      // This throws "Cannot assign to 'SCREENSHOT_CONSISTENCY' because it is a
+      // read-only property." if we don't cast to any.
+      // @ts-ignore
+      AppConstants.SCREENSHOT_CONSISTENCY = true;
+
+      component.ngOnInit();
+
+      expect(component.bannerImageFileUrl).toBe(
+        '/assets/images/background/bannerA.svg'
+      );
+
+      // Reset the constant to avoid affecting other tests.
+      // @ts-ignore
+      AppConstants.SCREENSHOT_CONSISTENCY = false;
+    }
+  );
 });
