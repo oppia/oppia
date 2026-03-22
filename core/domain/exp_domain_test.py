@@ -3145,7 +3145,7 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         rule_spec.inputs = {}
 
         self._assert_validation_error(
-            exploration, "RuleSpec 'Equals' is missing inputs"
+            exploration, 'RuleSpec \'Equals\' is missing inputs'
         )
 
     def test_validation_invalid_interaction(self) -> None:
