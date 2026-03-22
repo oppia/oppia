@@ -723,7 +723,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         errors = [error1, error2, error3]
 
-        def mock_urlopen(_url, context):
+        def mock_urlopen(_url: str, context: ssl.SSLContext) -> Any:
             raise errors.pop(0)
 
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
