@@ -1008,8 +1008,9 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
     # in processing.
     batch_size = 8
 
-    voiceover_regeneration_task_batch_instances = []
     batch_counter = 0
+    child_cloud_task_model_ids = []
+
     for (
         language_code,
         content_ids_to_content_values,
@@ -1045,6 +1046,21 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
                     )
                 )
 
+                voiceover_regeneration_task_batch_instance = (
+                    cloud_task_domain.VoiceoverRegenerationTaskBatch(
+                        parent_cloud_task_run_id,
+                        child_cloud_task_model_id,
+                        exploration_id,
+                        exploration_version,
+                        language_accent_code,
+                        batch_content_ids_to_content_values,
+                    )
+                )
+
+                voiceover_cloud_task_services.create_voiceover_regeneration_task_batch_model(
+                    voiceover_regeneration_task_batch_instance
+                )
+
                 # Enqueue to Google cloud task queue.
                 taskqueue_services.defer_voiceover_regeneration_task_in_batches(
                     feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
@@ -1056,32 +1072,14 @@ def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
                     exploration_id,
                 )
 
-                voiceover_regeneration_task_batch_instance = (
-                    cloud_task_domain.VoiceoverRegenerationTaskBatch(
-                        parent_cloud_task_run_id,
-                        child_cloud_task_model_id,
-                        exploration_id,
-                        exploration_version,
-                        language_accent_code,
-                        batch_content_ids_to_content_values,
-                    )
-                )
-                voiceover_regeneration_task_batch_instances.append(
-                    voiceover_regeneration_task_batch_instance
-                )
+                child_cloud_task_model_ids.append(child_cloud_task_model_id)
 
-    voiceover_cloud_task_services.create_voiceover_regeneration_task_batch_models(
-        voiceover_regeneration_task_batch_instances
-    )
     logging.info(
         'Voiceover regeneration logs: Number of batches: %s, Parent Cloud Task Run ID: %s, Child Cloud Task Run IDs: %s'
         % (
             batch_counter,
             parent_cloud_task_run_id,
-            [
-                instance.child_cloud_task_run_id
-                for instance in voiceover_regeneration_task_batch_instances
-            ],
+            child_cloud_task_model_ids,
         )
     )
 
