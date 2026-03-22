@@ -15,14 +15,17 @@
 # limitations under the License.
 
 """Tests for exploration domain objects and methods defined on them."""
-
 from __future__ import annotations
-import textwrap
+
 import copy
 import json
 import os
+import textwrap
+from typing import Any, Dict, Final, List, Tuple, Union, cast
 from unittest import mock
-from core import feconf
+
+import yaml
+
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
@@ -39,9 +42,6 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
-
-import yaml
-from typing import Any, Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
