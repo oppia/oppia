@@ -693,6 +693,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             response = install_dependencies_json_packages.url_open(test_url)
 
         self.assertEqual(response.getcode(), 200)
+        self.assertEqual(call_count['count'], 2)
 
     def test_url_open_rate_limit_failure_cases(self) -> None:
         """Tests failure cases for rate limit handling."""
