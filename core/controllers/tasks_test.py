@@ -21,6 +21,7 @@ import uuid
 from core import feconf
 from core.domain import (
     cloud_task_domain,
+    email_services,
     exp_fetchers,
     exp_services,
     feedback_services,
