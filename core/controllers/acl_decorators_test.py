@@ -51,7 +51,7 @@ from core.tests import test_utils
 
 import webapp2
 import webtest
-from typing import Dict, Final, List, Union
+from typing import Any, Dict, Final, List, Mapping, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -7934,7 +7934,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
-        add_question_change_dict = {
+        add_question_change_dict: Dict[str, Any] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
