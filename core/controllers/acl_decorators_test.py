@@ -7968,7 +7968,10 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             add_question_change_dict,
             'description',
         )
-        suggestion_id = 'suggestion_id'
+        suggestion_id = '%s.%s.1' % (
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_123',
+        )
         with self.swap(
             suggestion_models.GeneralSuggestionModel,
             'get_by_id',
@@ -8008,7 +8011,10 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             self.change_dict,
             'description',
         )
-        suggestion_id = 'suggestion_id'
+        suggestion_id = '%s.%s.1' % (
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.exploration_id,
+        )
         with self.swap(
             suggestion_models.GeneralSuggestionModel,
             'get_by_id',
