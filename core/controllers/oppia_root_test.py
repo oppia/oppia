@@ -30,3 +30,24 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                     '/%s' % page['ROUTE'], expected_status_int=200
                 )
                 response.mustcontain('<oppia-root></oppia-root>')
+
+    def test_explore_and_embed_urls_render_with_no_iframe_restriction(
+        self,
+    ) -> None:
+        """Tests that explore and embed URLs hit the iframe restriction bypass."""
+
+        valid_route = ''
+        for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+            if 'MANUALLY_REGISTERED_WITH_BACKEND' not in page:
+                valid_route = page['ROUTE']
+                break
+
+        response_explore = self.get_html_response(
+            '/%s?explore=true' % valid_route, expected_status_int=200
+        )
+        response_explore.mustcontain('<oppia-root></oppia-root>')
+
+        response_embed = self.get_html_response(
+            '/%s?embed=true' % valid_route, expected_status_int=200
+        )
+        response_embed.mustcontain('<oppia-root></oppia-root>')
