@@ -3153,9 +3153,8 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         state = list(exploration.states.values())[0]
 
         interaction = state.interaction
-        interaction.id = 15
-        # Here we use MyPy ignore because interaction.id expects a string.
-
+        # Here we use MyPy ignore because we intentionally assign an invalid type to test validation.
+        interaction.id = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected interaction id to be a string'
         )
@@ -3168,6 +3167,7 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
 
     def test_validation_invalid_param_specs(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
+        # Here we use MyPy ignore because we intentionally assign an invalid type to test validation.
         exploration.param_specs = 'A string'  # type: ignore[assignment]
 
         self._assert_validation_error(exploration, 'param_specs to be a dict')
