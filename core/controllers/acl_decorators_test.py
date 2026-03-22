@@ -59,6 +59,7 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
