@@ -16,11 +16,11 @@
   <div *ngIf="!certificateDownloading">
     <div class="datepicker-container">
       <div class="date-label">From:</div>
-      <input class="datepicker" type="date" [(ngModel)]="fromDate" (change)="validateDate()">
+      <input class="datepicker" type="date" [max]="maxSelectableDate" [(ngModel)]="fromDate" (change)="validateDate()">
     </div>
     <div class="datepicker-container">
       <div class="date-label">To:</div>
-      <input class="datepicker" type="date"[(ngModel)]="toDate" (change)="validateDate()">
+      <input class="datepicker" type="date" [max]="maxSelectableDate" [(ngModel)]="toDate" (change)="validateDate()">
     </div>
     <div class="datepicker-container" *ngIf="errorsFound">
       <span class="date-range-error">{{errorMessage}}</span>
