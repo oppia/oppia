@@ -317,6 +317,13 @@ def synthesize_voiceover_for_html_string(
     Raises:
         Exception. Error encountered during automatic voiceover regeneration.
     """
+    # When voiceover regeneration is triggered through a Beam Dataflow job,
+    # the `oppia_project_id` is passed explicitly as an argument. This serves
+    # as a reliable indicator that the method is being invoked from a Beam job.
+    # Otherwise, the project ID is retrieved from the environment via
+    # `app_identity_service`.
+    is_called_from_beam_job = oppia_project_id is not None
+
     # Audio files are stored to the datastore in the dev env, and to GCS
     # in production.
     fs = fs_services.GcsFileSystem(
@@ -324,15 +331,7 @@ def synthesize_voiceover_for_html_string(
         exploration_id,
         oppia_project_id=oppia_project_id,
     )
-
     parsed_text = parse_html(content_html)
-
-    # If the voiceover regeneration is initiated via a Beam Dataflow job, the
-    # oppia_project_id is explicitly provided as an argument. In this setup,
-    # the empty voiceover audio file from assets isn’t accessible, so the
-    # regeneration step is skipped.
-    if parsed_text == '' and oppia_project_id is not None:
-        return []
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
@@ -389,8 +388,19 @@ def synthesize_voiceover_for_html_string(
         raise Exception(error_details)
 
     if not binary_audio_data:
-        binary_audio_data = empty_voiceover_raw_audio_data()
+        logging.info(
+            'Voiceover synthesis log: Empty voiceover generated for exploration ID: %s, content_html: %s'
+            % (exploration_id, content_html)
+        )
         audio_offset_list = []
+
+        # In the Beam environment, the default audio file for empty voiceovers
+        # cannot be accessed due to filesystem limitations. Since the binary
+        # data is empty in this scenario, it is safe to return an empty list.
+        if is_called_from_beam_job:
+            return audio_offset_list
+
+        binary_audio_data = empty_voiceover_raw_audio_data()
 
     with io.BytesIO(binary_audio_data) as tempbuffer:
         audio = mp3.MP3(tempbuffer)
