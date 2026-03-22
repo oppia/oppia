@@ -1,16 +1,20 @@
 category: Welcome
-next_skill_id: 1
+next_skill_id: 2
 nodes:
-- acquired_skill_ids:
-  - skill0
-  exploration_id: '24'
-  prerequisite_skill_ids: []
+  - acquired_skill_ids:
+      - skill0
+    exploration_id: '24'
+    prerequisite_skill_ids: []
+    node_title: "Introduction to Collections"
 language_code: en
-objective: To introduce collections using demo explorations.
+objective: "To introduce learners to collections and how to navigate them using demo explorations."
 schema_version: 4
 skills:
   skill0:
-    name: Dummy Exploration
+    name: "Dummy Exploration"
+    description: "Basic exploration to understand collections."
     question_ids: []
-tags: []
-title: Test Collection
+tags:
+  - collections
+  - demo
+title: "Test Collection"
