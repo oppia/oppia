@@ -139,7 +139,7 @@ jobs:
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
           set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=0
+          VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
           python -m scripts.run_e2e_tests --skip_install
           --skip_build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
