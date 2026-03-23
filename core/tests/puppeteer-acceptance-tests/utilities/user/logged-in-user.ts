@@ -4007,7 +4007,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies that the desktop sidebar is visible and the given tab is active.
+   * Verifies that the sidebar is visible and the given tab is active.
    * @param {('Home' | 'Goals' | 'Progress')} activeTab - The tab that should be active.
    */
   async expectSidebarTabToBeActiveAndContainButtonsInOrder(
@@ -4015,7 +4015,12 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(sidebarSelector, {visible: true});
 
-    await this.expectElementToBeVisible(sidebarSelectorPic, true);
+    const viewportWidth = await this.page.evaluate(() => window.innerWidth);
+    const shouldShowSidebarPic = viewportWidth > 768;
+    await this.expectElementToBeVisible(
+      sidebarSelectorPic,
+      shouldShowSidebarPic
+    );
     const buttonTexts = await this.page.$$eval(
       `${sidebarSelector} .oppia-learner-dash-sidebar_btn`,
       els => els.map(el => el.textContent?.trim() || '')
