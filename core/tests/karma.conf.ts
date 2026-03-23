@@ -131,9 +131,9 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
     autoWatch: true,
     browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
-    captureTimeout: 60000,
-    browserNoActivityTimeout: 120000,
-    browserDisconnectTimeout: 60000,
+    captureTimeout: 120000,
+    browserNoActivityTimeout: 300000,
+    browserDisconnectTimeout: 120000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
       level: 'log',

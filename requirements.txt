@@ -2151,7 +2151,6 @@ zstandard==0.23.0 \
     --hash=sha256:fe3b385d996ee0822fd46528d9f0443b880d4d05528fd26a9119a54ec3f91c69
     # via apache-beam
 
-# WARNING: The following packages were not pinned, but pip requires them to be
-# pinned when the requirements file includes hashes and the requirement is not
-# satisfied by a package already installed. Consider using the --allow-unsafe flag.
-# setuptools
+setuptools==80.9.0 \
+    --hash=sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922 \
+    --hash=sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c
