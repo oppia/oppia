@@ -42,6 +42,13 @@ handlers:
   static_dir: dist/
   secure: always
   expiration: "0"
+- url: /assets/mathjax
+  static_dir: dist/oppia-angular/assets/mathjax
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
 - url: /assets/audio
   static_dir: assets/audio
   secure: always

@@ -72,7 +72,7 @@ let guppyConfigurationService: GuppyConfigurationService;
 
 describe('GuppyConfigurationService', () => {
   beforeEach(() => {
-    guppyConfigurationService = TestBed.get(GuppyConfigurationService);
+    guppyConfigurationService = TestBed.inject(GuppyConfigurationService);
     window.Guppy = MockGuppy as unknown as Guppy;
   });
 
@@ -80,8 +80,13 @@ describe('GuppyConfigurationService', () => {
     it('should configure guppy if service is not initialized', () => {
       GuppyConfigurationService.serviceIsInitialized = false;
       spyOn(Guppy, 'remove_global_symbol');
+      spyOn(Guppy, 'configure');
       guppyConfigurationService.init();
       expect(Guppy.remove_global_symbol).toHaveBeenCalled();
+      expect(Guppy.configure).toHaveBeenCalledWith(
+        'empty_content',
+        '\\color{grey}{\\small \\text{Type a formula here.}}'
+      );
     });
 
     it('should not configure guppy if service is initialized', () => {
@@ -103,7 +108,7 @@ describe('GuppyConfigurationService', () => {
         imports: [HttpClientTestingModule],
         declarations: [MockComponentB],
       }).compileComponents();
-      guppyConfigurationService = TestBed.get(GuppyConfigurationService);
+      guppyConfigurationService = TestBed.inject(GuppyConfigurationService);
       window.Guppy = MockGuppy as unknown as Guppy;
     }));
     beforeEach(() => {

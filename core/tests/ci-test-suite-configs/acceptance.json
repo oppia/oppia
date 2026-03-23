@@ -1,6 +1,14 @@
 {
   "suites": [
     {
+      "name": "logged-in-learner/serial-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/serial-chapter.spec.ts"
+    },
+    {
+      "name": "topic-manager/track-upcoming-delayed-publish-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/track-upcoming-delayed-publish-chapter.spec.ts"
+    },
+    {
       "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts"
     },
@@ -11,6 +19,10 @@
     {
       "name": "interested-partner-organization/submit-a-partnership-application",
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts"
+    },
+    {
+      "name": "interested-partner-organization/view-the-blog",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts"
     },
     {
       "name": "interested-volunteer/apply-to-become-a-volunteer",
@@ -91,6 +103,18 @@
     {
       "name": "exploration-editor/submit-review-and-respond-to-feedback",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
+    },
+    {
+      "name": "lesson-creator/create-a-basic-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/modify-an-existing-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/modify-an-existing-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/save-and-publish-the-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/save-and-publish-the-exploration.spec.ts"
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
@@ -202,15 +226,15 @@
     },
     {
       "name": "topic-manager/create-and-delete-questions-in-skill-editor",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
     },
     {
       "name": "topic-manager/cannot-do-curriculum-admin-actions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
     },
     {
       "name": "topic-manager/edit-and-republish-story-with-mobile-supported-explorations",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/edit-and-republish-story-with-mobile-supported-explorations.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-story-with-mobile-supported-explorations.spec.ts"
     },
     {
       "name": "voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration",
