@@ -26,7 +26,6 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {showMessage} from '../../utilities/common/show-message';
-import {ThisTypeNode} from 'ts-morph';
 
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -197,7 +196,6 @@ describe('Logged-In Learner', function () {
         await curriculumAdmin.waitForElementToBeClickable(publishChapterButton);
         await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
       }
-
       await curriculumAdmin.clickOnElementWithSelector(
         chapterConfirmAndUnpublishButton
       );
