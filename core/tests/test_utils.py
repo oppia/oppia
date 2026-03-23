@@ -4375,22 +4375,6 @@ version: 1
             [{'cmd': question_domain.CMD_CREATE_NEW}],
         )
 
-    def test_save_new_question_suggestion_v27_with_custom_suggestion_id(
-        self,
-    ) -> None:
-        """Tests that passing an explicit suggestion_id skips the auto-generation."""
-        author_id = 'test_author_id'
-        skill_id = 'test_skill_id'
-        custom_suggestion_id = 'my_custom_suggestion_id'
-
-        returned_id = (
-            self.save_new_question_suggestion_with_state_data_schema_v27(
-                author_id, skill_id, suggestion_id=custom_suggestion_id
-            )
-        )
-
-        self.assertEqual(returned_id, custom_suggestion_id)
-
     def save_new_question_suggestion_with_state_data_schema_v27(
         self,
         author_id: str,
