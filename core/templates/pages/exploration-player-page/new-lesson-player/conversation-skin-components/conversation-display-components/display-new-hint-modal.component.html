@@ -1,7 +1,9 @@
 <p class="oppia-learner-hint-and-solution-modal-title">
-  {{ 'I18N_NEW_HINT_TITLE' | translate: { hintIndex: activeHintIndex + 1 } }}
+  <strong>
+    {{ 'I18N_NEW_HINT_TITLE' | translate: { hintIndex: activeHintIndex + 1 } }}
+  </strong>
 </p>
-
+<hr>
 <div class="modal-body">
   <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
     [rteString]="hint.html">
@@ -13,7 +15,7 @@
     {{ 'I18N_HINT_PREVIOUS_BUTTON_TEXT' | translate }}
   </button>
 
-  <p *ngIf="numHintsReleased > 1">
+  <p *ngIf="numHintsReleased > 1" style="font-weight: 500;">
     {{ 'I18N_HINTS_COUNT' | translate: {
       hintIndex: activeHintIndex + 1,
       totalHints: numHintsReleased
