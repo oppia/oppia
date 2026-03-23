@@ -2879,10 +2879,7 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES
   ): Promise<void> {
     const interactionTabs: Record<string, INTERACTION_TYPES[]> = {
-      [INTERACTION_TABS.PROGRAMMING]: [
-        INTERACTION_TYPES.CODE_EDITOR,
-        INTERACTION_TYPES.PENCIL_CODE_EDITOR,
-      ],
+      [INTERACTION_TABS.PROGRAMMING]: [INTERACTION_TYPES.CODE_EDITOR],
       [INTERACTION_TABS.MATHS]: [
         INTERACTION_TYPES.FRACTION_INPUT,
         INTERACTION_TYPES.GRAPH_THEORY,
@@ -2895,7 +2892,6 @@ export class ExplorationEditor extends BaseUser {
         INTERACTION_TYPES.RATIO_EXPRESSION_INPUT,
       ],
       [INTERACTION_TABS.GEOGRAPHY]: [INTERACTION_TYPES.WORLD_MAP],
-      [INTERACTION_TABS.MUSIC]: [INTERACTION_TYPES.MUSIC_NOTES_INPUT],
     };
 
     for (const interaction in interactionTabs) {

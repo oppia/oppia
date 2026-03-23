@@ -30,7 +30,6 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const CARD_NAMES = {
   FIRST: 'Introduction',
   SECOND: '2nd Card',
-  THIRD: '3rd Card',
 };
 
 describe('Exploration Editor', function () {
@@ -100,57 +99,6 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
-  });
-
-  it('should be able to preview "Music Notes Input" interaction', async function () {
-    // Add a music notes input interaction.
-    await explorationEditor.updateCardContent('Enter a music notes input.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.MUSIC_NOTES_INPUT);
-    await explorationEditor.updateMusicNotesInputLearnerAnswerInResponseModal(
-      'is equal to',
-      ['C4', 'E4', 'G4']
-    );
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.THIRD,
-      true,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-    // Add solution.
-    await explorationEditor.addHintToState('Only answer C4');
-    await explorationEditor.addMusicNotesInputSolutionToState(
-      ['C4', 'E4', 'G4'],
-      'as given in the question.'
-    );
-    await explorationEditor.expectToastMessage(
-      'The current solution does not lead to another card.'
-    );
-    await explorationEditor.saveExplorationDraft();
-
-    // Submit wrong answer.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitMusicNotesInputAnswer(['C4', 'E4', 'G4']);
-    await explorationEditor.expectResponseFeedbackToBe(
-      'Wrong Answer. Please try again'
-    );
-    // View Hint.
-    await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
-    // covered by navigation in mobile view.
-    if (!explorationEditor.isViewportAtMobileWidth()) {
-      await explorationEditor.viewHint();
-      await explorationEditor.expectHintInHintModalToContain('Only answer C4');
-      await explorationEditor.closeHintModal();
-    }
-    // TODO(#22998): The correct answer automatically changes to ['C4'].
-    // And even using C4 as awswer throws wrong answer feedback.
-
-    // Navigate to next card.
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
   });
 
   afterAll(async function () {

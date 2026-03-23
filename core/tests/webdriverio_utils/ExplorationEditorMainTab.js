@@ -735,8 +735,6 @@ var ExplorationEditorMainTab = function () {
       NumberWithUnits: 'math',
       RatioExpressionInput: 'math',
       CodeRepl: 'programming',
-      PencilCodeEditor: 'programming',
-      MusicNotesInput: 'music',
       InteractiveMap: 'geography',
     };
 
