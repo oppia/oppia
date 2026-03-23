@@ -832,7 +832,6 @@
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS": "اختر ما يصل إلى 5 مواضيع تهمك، ثم أكمل جميع الفصول المتعلقة بالموضوعات المحددة لتحقيق أهداف التعلم الخاصة بك.",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE": "الفصل <[number]>: <[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS": "<[current]> من <[total]> من الفصول المكتملة",
-  "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE": "<[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW": "<[topic]>:<[story]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "إلغاء",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING": "إضافة هدف أو تعديله",
