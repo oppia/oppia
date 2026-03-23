@@ -243,7 +243,6 @@ export class ConversationSkinComponent {
             !this.pageContextService.isInStoryEditorPreviewMode() &&
             nextCard.isTerminal()
           ) {
-            console.log('recordExplorationCompleted');
             const currentEngineService =
               this.currentEngineService.getCurrentEngineService();
             const completedChaptersCount =

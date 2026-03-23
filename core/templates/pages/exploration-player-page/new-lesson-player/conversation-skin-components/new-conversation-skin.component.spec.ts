@@ -818,6 +818,9 @@ describe('New Conversation skin component', () => {
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
+    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+      false
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', true)
@@ -1032,6 +1035,9 @@ describe('New Conversation skin component', () => {
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
+    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+      false
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', true)
@@ -1173,6 +1179,9 @@ describe('New Conversation skin component', () => {
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
+    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+      false
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', false)
@@ -1308,6 +1317,9 @@ describe('New Conversation skin component', () => {
         username: true,
       };
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
         false
       );
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
@@ -2472,6 +2484,9 @@ describe('New Conversation skin component', () => {
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
+    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+      false
+    );
     spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
       false
     );
@@ -2512,6 +2527,9 @@ describe('New Conversation skin component', () => {
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
       );
+      spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+        false
+      );
       spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
         false
       );
@@ -2541,6 +2559,10 @@ describe('New Conversation skin component', () => {
           capturedCallback = callback;
         }
       );
+    });
+
+    afterEach(() => {
+      window.sessionStorage.clear();
     });
 
     it('should validate unload conditions in the listener callback', fakeAsync(() => {
@@ -2605,4 +2627,84 @@ describe('New Conversation skin component', () => {
       expect(capturedCallback()).toBeFalse();
     }));
   });
+
+  it('should not record exploration completed in story editor preview mode', fakeAsync(() => {
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null
+    );
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+    spyOn(componentInstance, 'initializePage');
+
+    let mockOnPlayerStateChange = new EventEmitter();
+    let mockOnNewCardOpened = new EventEmitter();
+    let mockOnHintsExhausted = new EventEmitter();
+    let mockOnLearnerReallyStuck = new EventEmitter();
+    let mockOnLearnerGetsReallyStuck = new EventEmitter();
+    let mockOnHintConsumed = new EventEmitter();
+    let mockOnSolutionViewedEventEmitter = new EventEmitter();
+
+    spyOnProperty(
+      conversationFlowService,
+      'onPlayerStateChange'
+    ).and.returnValue(mockOnPlayerStateChange);
+    spyOnProperty(playerPositionService, 'onNewCardOpened').and.returnValue(
+      mockOnNewCardOpened
+    );
+    spyOnProperty(
+      hintsAndSolutionManagerService,
+      'onHintsExhausted'
+    ).and.returnValue(mockOnHintsExhausted);
+    spyOnProperty(
+      hintsAndSolutionManagerService,
+      'onLearnerReallyStuck'
+    ).and.returnValue(mockOnLearnerReallyStuck);
+    spyOnProperty(
+      conceptCardManagerService,
+      'onLearnerGetsReallyStuck'
+    ).and.returnValue(mockOnLearnerGetsReallyStuck);
+    spyOnProperty(
+      hintsAndSolutionManagerService,
+      'onHintConsumed'
+    ).and.returnValue(mockOnHintConsumed);
+    spyOnProperty(
+      hintsAndSolutionManagerService,
+      'onSolutionViewedEventEmitter'
+    ).and.returnValue(mockOnSolutionViewedEventEmitter);
+
+    const nextCard = new StateCard(
+      null,
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'EndExploration', null),
+      [],
+      '',
+      null
+    );
+    conversationFlowService.setNextStateCard(nextCard);
+    conversationFlowService.setHasInteractedAtLeastOnce(true);
+    conversationFlowService.setDisplayedCard(displayedCard);
+
+    componentInstance.ngOnInit();
+    mockOnPlayerStateChange.emit('End');
+    tick(100);
+
+    expect(
+      statsReportingService.recordExplorationCompleted
+    ).not.toHaveBeenCalled();
+    flush();
+  }));
 });
