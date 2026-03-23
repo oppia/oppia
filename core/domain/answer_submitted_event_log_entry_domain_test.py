@@ -68,11 +68,11 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         # Return mocked exploration whenever the function is called.
         self.mock_get_exploration.return_value = self.mock_exploration
 
-    def test_validate_success(self) -> None:
+    def test_validation_with_proper_model_data_raises_no_errors(self) -> None:
         self.mock_get_exploration.return_value = self.mock_exploration
         self.domain_obj.validate()
 
-    def test_validate_invalid_exp_id_type(self) -> None:
+    def test_validation_with_invalid_exp_id_type_raises_error(self) -> None:
         # Here we use MyPy ignore because to test invalid
         # datatype in exp_id.
         self.domain_obj.exp_id = 5  # type: ignore[assignment]
@@ -83,7 +83,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_fails_empty_string_exp_id(self) -> None:
+    def test_validation_with_empty_exp_id_string_raises_error(self) -> None:
         self.domain_obj.exp_id = ''
 
         with self.assertRaisesRegex(
@@ -92,7 +92,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_fails_invalid_exp_version_type(self) -> None:
+    def test_validation_with_invalid_exp_version_type_raises_error(
+        self,
+    ) -> None:
         # Here we use MyPy ignore because to test invalid
         # data type in exp_version.
         self.domain_obj.exp_version = 'exp_version'  # type: ignore[assignment]
@@ -103,7 +105,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_fails_negative_exp_version(self) -> None:
+    def test_validation_with_negative_exp_version_raises_error(self) -> None:
         self.domain_obj.exp_version = -1
 
         with self.assertRaisesRegex(
@@ -112,7 +114,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_fails_with_zero_exp_version(self) -> None:
+    def test_validation_with_zero_exp_version_raises_error(self) -> None:
         self.domain_obj.exp_version = 0
 
         with self.assertRaisesRegex(
@@ -121,7 +123,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validate_exploration_does_not_exist(self) -> None:
+    def test_validation_with_non_existent_exploration_raises_error(
+        self,
+    ) -> None:
         self.mock_get_exploration.side_effect = Exception('Not found')
 
         with self.assertRaisesRegex(
@@ -130,7 +134,20 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_with_exp_version_out_of_range(self) -> None:
+    def test_validation_with_exploration_returning_none_raises_error(
+        self,
+    ) -> None:
+        self.mock_get_exploration.return_value = None
+
+        with self.assertRaisesRegex(
+            domain_errors.ExplorationDoesNotExistError,
+            'Exploration with id %s does not exist' % (self.domain_obj.exp_id),
+        ):
+            self.domain_obj.validate()
+
+    def test_validation_with_exp_version_out_of_range_raises_error(
+        self,
+    ) -> None:
         self.mock_get_exploration.return_value = self.mock_exploration
 
         self.domain_obj.exp_version = 10
@@ -142,7 +159,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validate_invalid_state_name_type(self) -> None:
+    def test_validation_with_invalid_state_name_type_raises_error(self) -> None:
         # Here we use MyPy ignore because to test invalid
         # state data.
         self.domain_obj.state_name = 123  # type: ignore[assignment]
@@ -155,7 +172,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validate_invalid_session_id(self) -> None:
+    def test_validation_with_invalid_session_id_raises_error(self) -> None:
         # Here we use MyPy ignore because to test invalid
         # in session_id.
         self.domain_obj.session_id = 123  # type: ignore[assignment]
@@ -167,7 +184,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_fails_with_invalid_time_spent_type(self) -> None:
+    def test_validation_with_invalid_time_spent_type_raises_error(self) -> None:
         # Here we use MyPy ignore because to test invalid
         # data in time_spent_in_state_secs.
         self.domain_obj.time_spent_in_state_secs = 'time_spent'  # type: ignore[assignment]
@@ -179,7 +196,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_fails_with_time_spent_negative_value(self) -> None:
+    def test_validation_with_negative_time_spent_value_raises_error(
+        self,
+    ) -> None:
         self.domain_obj.time_spent_in_state_secs = -1.0
 
         with self.assertRaisesRegex(
@@ -189,7 +208,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validate_invalid_feedback_useful(self) -> None:
+    def test_validation_with_invalid_feedback_useful_type_raises_error(
+        self,
+    ) -> None:
         # Here we use MyPy ignore because to test invalid
         # datatype in is_feedback_useful.
         self.domain_obj.is_feedback_useful = 'yes'  # type: ignore[assignment]
@@ -201,7 +222,9 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validate_invalid_schema_version(self) -> None:
+    def test_validation_with_invalid_event_schema_version_raises_error(
+        self,
+    ) -> None:
         self.domain_obj.event_schema_version = -1
 
         with self.assertRaisesRegex(
@@ -214,7 +237,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validate_invalid_state_name(self) -> None:
+    def test_validation_with_unknown_state_name_raises_error(self) -> None:
         self.mock_get_exploration.return_value = self.mock_exploration
 
         self.domain_obj.state_name = 'UnknownState'

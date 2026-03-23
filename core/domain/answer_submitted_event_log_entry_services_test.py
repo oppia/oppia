@@ -39,7 +39,7 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
             self.exp_id, self.owner_id
         )
 
-    def test_get_answer_submitted_event_log_entry_from_model(self) -> None:
+    def test_conversion_with_valid_model_returns_domain_object(self) -> None:
         model = stats_models.AnswerSubmittedEventLogEntryModel(
             exp_id='exp_1',
             exp_version=1,
@@ -62,7 +62,7 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
         self.assertTrue(domain_obj.is_feedback_useful)
         self.assertEqual(domain_obj.event_schema_version, 1)
 
-    def test_create_answer_submitted_event_log_entry(self) -> None:
+    def test_creation_with_valid_parameters_returns_none(self) -> None:
         with self.swap(
             stats_models.AnswerSubmittedEventLogEntryModel,
             'create',
@@ -77,7 +77,7 @@ class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
                 feedback_is_useful=True,
             )
 
-    def test_create_answer_submitted_event_log_entry_calls_model_create(
+    def test_creation_with_valid_parameters_invokes_model_create(
         self,
     ) -> None:
         calls = []

@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs.datastore_audit import (
     answerSubmittedEventLogEntryModel_validation_jobs,
@@ -41,7 +43,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         answerSubmittedEventLogEntryModel_validation_jobs.AnswerSubmittedEventLogEntryModelValidationJob
     )
 
-    def test_valid_model(self) -> None:
+    def test_validation_with_proper_model_data_yields_no_errors(self) -> None:
         """Test that valid model produces no errors."""
 
         self.save_new_valid_exploration(
@@ -63,7 +65,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
 
         self.assert_job_output_is([])
 
-    def test_invalid_exploration_id(self) -> None:
+    def test_validation_with_invalid_exploration_id_yields_error(self) -> None:
         """Test invalid exp_id."""
 
         model = self.create_model(
@@ -98,7 +100,48 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             ]
         )
 
-    def test_invalid_entity_id_format(self) -> None:
+    @mock.patch('core.domain.exp_fetchers.get_exploration_by_id')
+    def test_validation_with_missing_exploration_in_datastore_yields_error(
+        self, mock_get_exploration_by_id: mock.MagicMock
+    ) -> None:
+        """Test retrieved exploration from datastore is None."""
+
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            id='1029301283:expX:session1',
+            exp_id='expX',
+            exp_version=1,
+            state_name='Introduction',
+            session_id='session1',
+            time_spent_in_state_secs=10.0,
+            is_feedback_useful=True,
+            event_schema_version=2,
+        )
+        self.put_multi([model])
+
+        domain_error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+            'Exploration with id expX does not exist', model
+        ).stderr
+
+        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
+            model
+        ).stderr
+
+        mock_get_exploration_by_id.return_value = None
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    f'DomainValidationError: {domain_error}'
+                ),
+                job_run_result.JobRunResult.as_stderr(
+                    f'InvalidExplorationIdError: {invalid_exp_error}'
+                ),
+            ]
+        )
+
+    def test_validation_with_invalid_entity_id_format_yields_error(
+        self,
+    ) -> None:
         """Test entity_id format error."""
 
         self.save_new_valid_exploration(
@@ -130,7 +173,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             ]
         )
 
-    def test_entity_id_mismatch(self) -> None:
+    def test_validation_with_entity_id_mismatch_yields_error(self) -> None:
         """Test entity_id mismatch with model fields."""
 
         self.save_new_valid_exploration(
@@ -160,7 +203,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             ]
         )
 
-    def test_domain_validation_error(self) -> None:
+    def test_validation_with_invalid_domain_logic_yields_error(self) -> None:
         """Test domain validation failure."""
 
         self.save_new_valid_exploration(

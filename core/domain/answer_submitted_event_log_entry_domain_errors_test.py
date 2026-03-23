@@ -27,7 +27,7 @@ from core.tests import test_utils
 class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
     """Tests for AnswerSubmittedEventLogEntry domain error classes."""
 
-    def test_invalid_exp_id_error(self) -> None:
+    def test_raising_with_invalid_exp_id_raises_error(self) -> None:
         """Test InvalidExpIdError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidExpIdError,
@@ -35,7 +35,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.InvalidExpIdError('exp_id_1')
 
-    def test_invalid_exp_version_error(self) -> None:
+    def test_raising_with_invalid_exp_version_raises_error(self) -> None:
         """Test InvalidExpVersionError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidExpVersionError,
@@ -43,7 +43,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.InvalidExpVersionError(0)
 
-    def test_exploration_does_not_exist_error(self) -> None:
+    def test_raising_with_non_existent_exploration_raises_error(self) -> None:
         """Test ExplorationDoesNotExistError."""
         with self.assertRaisesRegex(
             domain_errors.ExplorationDoesNotExistError,
@@ -51,7 +51,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.ExplorationDoesNotExistError('exp1')
 
-    def test_exp_version_out_of_range_error(self) -> None:
+    def test_raising_with_exp_version_out_of_range_raises_error(self) -> None:
         """Test ExpVersionOutOfRangeError."""
         with self.assertRaisesRegex(
             domain_errors.ExpVersionOutOfRangeError,
@@ -59,7 +59,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.ExpVersionOutOfRangeError(5, 10)
 
-    def test_invalid_state_name_error(self) -> None:
+    def test_raising_with_invalid_state_name_raises_error(self) -> None:
         """Test InvalidStateNameError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidStateNameError,
@@ -70,7 +70,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.InvalidStateNameError('invalid_state')
 
-    def test_invalid_session_id_error(self) -> None:
+    def test_raising_with_invalid_session_id_raises_error(self) -> None:
         """Test InvalidSessionIdError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidSessionIdError,
@@ -78,7 +78,7 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.InvalidSessionIdError(123)
 
-    def test_invalid_time_spent_error(self) -> None:
+    def test_raising_with_invalid_time_spent_raises_error(self) -> None:
         """Test InvalidTimeSpentError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidTimeSpentError,
@@ -89,7 +89,9 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.InvalidTimeSpentError(-1)
 
-    def test_invalid_feedback_useful_error(self) -> None:
+    def test_raising_with_invalid_feedback_useful_flag_raises_error(
+        self,
+    ) -> None:
         """Test InvalidFeedbackUsefulError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidFeedbackUsefulError,
@@ -97,7 +99,9 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.InvalidFeedbackUsefulError('yes')
 
-    def test_invalid_event_schema_version_error(self) -> None:
+    def test_raising_with_invalid_event_schema_version_raises_error(
+        self,
+    ) -> None:
         """Test InvalidEventSchemaVersionError."""
         with self.assertRaisesRegex(
             domain_errors.InvalidEventSchemaVersionError,

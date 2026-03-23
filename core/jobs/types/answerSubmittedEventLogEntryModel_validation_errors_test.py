@@ -30,7 +30,9 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
 ):
     """Tests for AnswerSubmittedEventLogEntryModel validation errors."""
 
-    def test_invalid_exploration_id_error(self) -> None:
+    def test_initialization_with_invalid_exploration_id_yields_correct_stderr(
+        self,
+    ) -> None:
         model = base_models.BaseModel(id='test_id')
         model.exp_id = 'test_exp_id'
 
@@ -44,7 +46,9 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             error.stderr,
         )
 
-    def test_invalid_entity_id_format_error(self) -> None:
+    def test_initialization_with_invalid_entity_id_format_yields_correct_stderr(
+        self,
+    ) -> None:
         model = base_models.BaseModel(id='invalid_id')
 
         error = answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
@@ -60,7 +64,9 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             error.stderr,
         )
 
-    def test_entity_id_model_mismatch_error(self) -> None:
+    def test_initialization_with_mismatched_model_attributes_yields_correct_stderr(
+        self,
+    ) -> None:
         model = base_models.BaseModel(id='123:exp1:session2')
 
         # Simulate attributes used by error message.
@@ -80,7 +86,9 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             error.stderr,
         )
 
-    def test_domain_validation_error(self) -> None:
+    def test_initialization_with_custom_domain_failure_message_yields_correct_stderr(
+        self,
+    ) -> None:
         model = base_models.BaseModel(id='test_id')
 
         error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
