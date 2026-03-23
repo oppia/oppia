@@ -38,7 +38,7 @@ from core.tests import test_utils
 
 import elasticsearch
 import webapp2
-from typing import Callable, Final, List, OrderedDict, Tuple
+from typing import Any, Callable, Dict, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 
@@ -477,6 +477,27 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         ):
             test_utils.FailingFunction(function, MockError, -1)
 
+    def test_failing_function_succeeds_after_num_tries(self) -> None:
+        """Test that the function successfully executes after failing
+        the specified number of times.
+        """
+
+        class MockError(Exception):
+            pass
+
+        function = lambda x: x**2
+        failing_func = test_utils.FailingFunction(
+            function, MockError('Dummy Exception'), 2
+        )
+        with self.assertRaisesRegex(MockError, 'Dummy Exception'):
+            failing_func(4)
+
+        with self.assertRaisesRegex(MockError, 'Dummy Exception'):
+            failing_func(4)
+
+        result = failing_func(4)
+        self.assertEqual(result, 16)
+
 
 class TestUtilsTests(test_utils.GenericTestBase):
 
@@ -521,6 +542,39 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', ['state_name'], []
             )
+
+    def test_raises_error_with_aot_compiled_true(self) -> None:
+        """Test that mock_load_template uses the src folder when
+        template_is_aot_compiled is True.
+        """
+        with self.assertRaisesRegex(
+            Exception, 'No file exists for the given file name'
+        ):
+            test_utils.mock_load_template(
+                'invalid_path', template_is_aot_compiled=True
+            )
+
+    def test_add_explorations_to_story_with_empty_list_does_nothing(
+        self,
+    ) -> None:
+        """Tests that passing an empty list of explorations skips the update."""
+        topic_id = 'topic_id_for_empty_test'
+        story_id = 'story_id_for_empty_test'
+        owner_id = 'owner@example.com'
+
+        self.save_new_topic(
+            topic_id,
+            owner_id,
+            name='Dummy Topic',
+            description='A topic for testing',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+        self.save_new_story(story_id, owner_id, topic_id)
+        self.add_explorations_to_story(topic_id, story_id, [])
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -922,6 +976,25 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
+
+    def test_search_with_documents_in_index_yields_results(self) -> None:
+        """Tests that mock_search correctly iterates over existing documents."""
+        stub = test_utils.ElasticSearchStub()
+        stub.mock_create_index('index1')
+        mock_db = {'index1': [{'id': 'doc_1', 'title': 'Test Document'}]}
+
+        with self.swap(stub, '_DB', mock_db):
+            # Here we use type Any because the mock_search function signature
+            # explicitly expects it for the dynamic Elasticsearch query body.
+            search_body: Dict[str, Dict[str, Dict[str, Any]]] = {
+                'query': {'bool': {'filter': [], 'must': []}}
+            }
+
+            response = stub.mock_search(
+                body=search_body, index='index1', size=10, from_=0
+            )
+
+        self.assertIsNotNone(response)
 
 
 class EmailMockTests(test_utils.EmailTestBase):
