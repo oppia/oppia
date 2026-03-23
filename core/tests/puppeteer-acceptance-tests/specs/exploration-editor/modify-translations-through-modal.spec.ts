@@ -78,22 +78,26 @@ describe('Exploration Editor', function () {
     );
 
     // Navigate to the creator dashboard and create a new exploration.
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      INTRODUCTION_CARD_CONTENT
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(
       CARD_NAME.MULTIPLE_CHOICE_QUESTION
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Enter a negative number greater than -100.'
     );
     await explorationEditor.addMultipleChoiceInteraction([
@@ -112,14 +116,14 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
-    await explorationEditor.addHintToState(
+    await explorationEditor.addHintToStateInExplorationEditor(
       'It is closer to zero but not a positive number.'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'What is the sign to represent negative numbers called?'
     );
     await explorationEditor.addTextInputInteraction();
@@ -133,34 +137,37 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       'minus',
       'Minus is the opposite of plus.',
       false
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We have practiced negative numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration',
-      'This is a test exploration.',
-      'Algebra'
-    );
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Test Exploration',
+        'This is a test exploration.',
+        'Algebra'
+      );
     if (!explorationId) {
       throw new Error('Error in publishing exploration successfully.');
     }
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
     topicId = await curriculumAdmin.createTopic(
       'Test Topic 1',
       'test-topic-one'
@@ -180,7 +187,10 @@ describe('Exploration Editor', function () {
       'Test Topic 1',
       false
     );
-    await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
+    await curriculumAdmin.createQuestionsForSkillInTopicManager(
+      'Test Skill 1',
+      3
+    );
     await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
       'Test Skill 1',
       'Test Subtopic 1',
@@ -191,7 +201,7 @@ describe('Exploration Editor', function () {
       'Test Topic 1'
     );
 
-    await curriculumAdmin.publishDraftTopic('Test Topic 1');
+    await curriculumAdmin.publishDraftTopicInTopicManager('Test Topic 1');
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story 1',
       'test-story-one',
@@ -216,7 +226,9 @@ describe('Exploration Editor', function () {
         'Content translation text'
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.updateCardContent('Content text.');
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'Content text.'
+      );
       await explorationEditor.openModifyExistingTranslationsModal();
       await explorationEditor.verifyTranslationInModifyTranslationsModal(
         'de',

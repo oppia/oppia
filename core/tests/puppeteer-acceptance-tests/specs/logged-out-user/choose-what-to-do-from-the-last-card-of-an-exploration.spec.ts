@@ -43,11 +43,11 @@ describe('Logged-out User', function () {
     );
 
     explorationId1 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'negative-numbers'
       );
     explorationId2 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'positive-numbers',
         'Algebra',
         false
@@ -78,7 +78,7 @@ describe('Logged-out User', function () {
       'Algebra Chapter 2',
       explorationId2 as string
     );
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInTopicManager();
     await curriculumAdmin.publishStoryDraft();
 
     loggedOutUser = await UserFactory.createLoggedOutUser();

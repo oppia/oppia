@@ -46,7 +46,7 @@ describe('Logged-Out Learner', function () {
 
       // Create explorations.
       explorationId =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
           'Fractions'
         );
 
@@ -63,15 +63,18 @@ describe('Logged-Out Learner', function () {
         'Fractions'
       );
       await curriculumAdmin.addChapter('Fractions 1', explorationId);
-      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.saveStoryDraftInTopicManager();
       await curriculumAdmin.publishStoryDraft();
 
-      await curriculumAdmin.createQuestionsForSkill('fractions', 7);
+      await curriculumAdmin.createQuestionsForSkillInTopicManager(
+        'fractions',
+        7
+      );
 
       // Enable the "Show practice tab to learners" in Topic Editor.
-      await curriculumAdmin.openTopicEditor('Fractions');
-      await curriculumAdmin.togglePracticeTabCheckbox();
-      await curriculumAdmin.saveTopicDraft('Fractions');
+      await curriculumAdmin.openTopicEditorInTopicManager('Fractions');
+      await curriculumAdmin.togglePracticeTabCheckboxInTopicManager();
+      await curriculumAdmin.saveTopicDraftInTopicManager('Fractions');
 
       // Create classroom.
       await curriculumAdmin.createAndPublishClassroom(
@@ -102,7 +105,7 @@ describe('Logged-Out Learner', function () {
 
     // Play full practice session.
     for (let i = 0; i < 10; i++) {
-      await loggedOutLearner.submitAnswer('3');
+      await loggedOutLearner.submitAnswerInLoggedOutUser('3');
       await loggedOutLearner.continueToNextPracticeQuestion();
     }
 

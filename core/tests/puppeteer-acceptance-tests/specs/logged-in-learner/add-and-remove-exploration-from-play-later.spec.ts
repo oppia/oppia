@@ -37,15 +37,15 @@ describe('Logged-in User', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+    await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
       'Positive Numbers'
     );
-    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+    await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
       'Negative Numbers',
       'Algebra',
       false
     );
-    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+    await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
       'Whole Numbers',
       'Algebra',
       false
@@ -88,7 +88,7 @@ describe('Logged-in User', function () {
 
   it('should be able to check play later in learner dashboard', async function () {
     // Navigate to the learner dashboard and play the lesson.
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToCommunityLessonsSection();
     await loggedInUser.verifyLessonPresenceInPlayLater(
       'Positive Numbers',
@@ -121,7 +121,7 @@ describe('Logged-in User', function () {
     );
 
     // Navigate back to the learner dashboard and check lesson is removed from play later.
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToCommunityLessonsSection();
 
     // Since the exploration played, it should have been automatically removed from the "play later" list.

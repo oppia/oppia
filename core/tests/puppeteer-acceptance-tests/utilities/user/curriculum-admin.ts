@@ -563,7 +563,7 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Navigate to the topic and skills dashboard page.
    */
-  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+  async navigateToTopicAndSkillsDashboardPageInCurriculumAdmin(): Promise<void> {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
@@ -644,7 +644,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string,
     addWorkedExample: boolean = false
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdmin(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(subtopicReassignHeader);
     }
@@ -660,7 +660,7 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Navigate to the question editor tab present in the skills tab.
    */
-  async navigateToSkillQuestionEditorTab(): Promise<void> {
+  async navigateToSkillQuestionEditorTabInCurriculumAdmin(): Promise<void> {
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillQuestionTab = isMobileWidth
       ? mobileSkillQuestionTab
@@ -690,20 +690,22 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Add any number of questions to a particular skill.
    */
-  async createQuestionsForSkill(
+  async createQuestionsForSkillInCurriculumAdmin(
     skillName: string,
     questionCount: number
   ): Promise<void> {
     for (let i = 0; i < questionCount; i++) {
-      await this.addBasicAlgebraQuestionToSkill(skillName);
+      await this.addBasicAlgebraQuestionToSkillInCurriculumAdmin(skillName);
     }
   }
 
   /**
    * Create a basic algebra question in the skill editor page.
    */
-  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
+  async addBasicAlgebraQuestionToSkillInCurriculumAdmin(
+    skillName: string
+  ): Promise<void> {
+    await this.openSkillEditorInCurriculumAdmin(skillName);
     await this.clickOnElementWithSelector(createQuestionButton);
     await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -777,7 +779,7 @@ export class CurriculumAdmin extends TopicManager {
    * Create a topic in the topics-and-skills dashboard.
    */
   async createTopic(name: string, urlFragment: string): Promise<string> {
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     const TopicSelectorElement = await this.page.$(desktopTopicSelector);
 
     if (!TopicSelectorElement || !this.isViewportAtMobileWidth()) {
@@ -806,12 +808,12 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(createTopicButton);
 
     await this.page.waitForSelector('.e2e-test-topics-table');
-    await this.openTopicEditor(name);
+    await this.openTopicEditorInCurriculumAdmin(name);
     await this.page.waitForSelector(topicMetaTagInput);
     await this.page.focus(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
-    await this.saveTopicDraft(name);
+    await this.saveTopicDraftInCurriculumAdmin(name);
     const topicUrl = this.page.url();
     let topicId = topicUrl
       .replace(/^.*\/topic_editor\//, '')
@@ -823,11 +825,11 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Open the topic editor page for a topic.
    */
-  async openTopicEditor(topicName: string): Promise<void> {
+  async openTopicEditorInCurriculumAdmin(topicName: string): Promise<void> {
     const topicNameSelector = this.isViewportAtMobileWidth()
       ? mobileTopicSelector
       : desktopTopicSelector;
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await this.clickOnElementWithSelector(topicsTab);
     await this.page.waitForSelector(topicNameSelector, {visible: true});
 
@@ -858,12 +860,12 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Open the skill editor page for a skill.
    */
-  async openSkillEditor(skillName: string): Promise<void> {
+  async openSkillEditorInCurriculumAdmin(skillName: string): Promise<void> {
     const skillSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
     await this.page.bringToFront();
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await this.clickOnElementWithSelector(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
 
@@ -895,7 +897,7 @@ export class CurriculumAdmin extends TopicManager {
    * Save a topic as a curriculum admin.
    * @param {string} topicName - The name of the Topic whose draft is to be saved.
    */
-  async saveTopicDraft(topicName?: string): Promise<void> {
+  async saveTopicDraftInCurriculumAdmin(topicName?: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
@@ -915,7 +917,7 @@ export class CurriculumAdmin extends TopicManager {
         hidden: true,
       });
       if (topicName) {
-        await this.openTopicEditor(topicName);
+        await this.openTopicEditorInCurriculumAdmin(topicName);
       }
     } else {
       await this.clickOnElementWithSelector(saveTopicButton);
@@ -945,7 +947,7 @@ export class CurriculumAdmin extends TopicManager {
     urlFragment: string,
     topicName: string
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdmin(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(subtopicReassignHeader);
     }
@@ -971,7 +973,7 @@ export class CurriculumAdmin extends TopicManager {
 
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOnElementWithSelector(createSubtopicButton);
-    await this.saveTopicDraft(topicName);
+    await this.saveTopicDraftInCurriculumAdmin(topicName);
     showMessage(`Subtopic ${title} is created.`);
   }
 
@@ -993,7 +995,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string,
     addWorkedExample: boolean = false
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdmin(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(subtopicReassignHeader);
     }
@@ -1161,7 +1163,7 @@ export class CurriculumAdmin extends TopicManager {
    * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
    * @param {boolean} expectWorkedExample - If the sections have a WorkedExample or not.
    */
-  async expectSubtopicStudyGuideToHaveTitleAndSections(
+  async expectSubtopicStudyGuideToHaveTitleAndSectionsInCurriculumAdmin(
     studyGuideTitle: string,
     studyGuideSections: string[][],
     expectWorkedExample: boolean
@@ -1331,7 +1333,7 @@ export class CurriculumAdmin extends TopicManager {
     subtopicName: string,
     topicName: string
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdmin(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(subtopicReassignHeader);
     }
@@ -1392,7 +1394,7 @@ export class CurriculumAdmin extends TopicManager {
     );
     await this.clickOnElementWithSelector(confirmSkillAssignationButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
-    await this.saveTopicDraft(topicName);
+    await this.saveTopicDraftInCurriculumAdmin(topicName);
   }
 
   /**
@@ -1400,7 +1402,10 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} difficulty - The difficulty level to update.
    * @param {string} explanation - The explanation to update.
    */
-  async updateRubric(difficulty: string, explanation: string): Promise<void> {
+  async updateRubricInCurriculumAdmin(
+    difficulty: string,
+    explanation: string
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(toggleSkillRubricsDropdown);
     }
@@ -1445,7 +1450,9 @@ export class CurriculumAdmin extends TopicManager {
    * Publishes an updated skill.
    * @param {string} updateMessage - The update message.
    */
-  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+  async publishUpdatedSkillInCurriculumAdmin(
+    updateMessage: string
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       if (
         !(await this.isElementVisible(navigationContainerSelector, true, 5000))
@@ -1493,7 +1500,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName?: string
   ): Promise<void> {
     if (topicName) {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInCurriculumAdmin(topicName);
     }
     await this.clickOnElementWithSelector(addDiagnosticTestSkillButton);
     await this.page.waitForSelector(diagnosticTestSkillSelector, {
@@ -1530,7 +1537,7 @@ export class CurriculumAdmin extends TopicManager {
       skillName,
       diagnosticTestSkillSelector
     );
-    await this.saveTopicDraft(topicName);
+    await this.saveTopicDraftInCurriculumAdmin(topicName);
   }
 
   /**
@@ -1644,7 +1651,7 @@ export class CurriculumAdmin extends TopicManager {
    * Function to navigate to exploration editor
    * @param explorationUrl - url of the exploration
    */
-  async navigateToExplorationEditor(
+  async navigateToExplorationEditorInCurriculumAdmin(
     explorationId: string | null
   ): Promise<void> {
     if (!explorationId) {
@@ -1658,7 +1665,7 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Function to navigate to exploration settings tab
    */
-  async navigateToExplorationSettingsTab(): Promise<void> {
+  async navigateToExplorationSettingsTabInCurriculumAdmin(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileNavToggleButton, {visible: true});
@@ -1701,7 +1708,9 @@ export class CurriculumAdmin extends TopicManager {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+  async dismissWelcomeModalInCurriculumAdmin(
+    failIfMissing: boolean = true
+  ): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
     await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
@@ -1710,7 +1719,7 @@ export class CurriculumAdmin extends TopicManager {
    * Function to open control dropdown so that delete exploration button is visible
    * in mobile view.
    */
-  async openExplorationControlDropdown(): Promise<void> {
+  async openExplorationControlDropdownInCurriculumAdmin(): Promise<void> {
     await this.page.waitForSelector(explorationControlsSettingsDropdown, {
       visible: true,
     });
@@ -1733,7 +1742,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName?: string
   ): Promise<void> {
     if (topicName) {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInCurriculumAdmin(topicName);
     }
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileStoryDropdown);
@@ -1764,7 +1773,7 @@ export class CurriculumAdmin extends TopicManager {
 
     await this.addChapter(chapterTitle, explorationId);
 
-    await this.saveStoryDraft();
+    await this.saveStoryDraftInCurriculumAdmin();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
@@ -1792,7 +1801,7 @@ export class CurriculumAdmin extends TopicManager {
     metaTag: string = 'meta',
     photoURL: string = curriculumAdminThumbnailImage
   ): Promise<string> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdmin(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileStoryDropdown);
     }
@@ -1819,7 +1828,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.focus(storyMetaTagInput);
     await this.page.type(storyMetaTagInput, metaTag);
     await this.page.keyboard.press('Tab');
-    await this.saveStoryDraft();
+    await this.saveStoryDraftInCurriculumAdmin();
 
     const url = new URL(this.page.url());
     const pathSegments = url.pathname.split('/');
@@ -1862,7 +1871,7 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Save a story.
    */
-  async saveStoryDraft(): Promise<void> {
+  async saveStoryDraftInCurriculumAdmin(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const isMobileSaveButtonVisible = await this.isElementVisible(
         mobileSaveStoryChangesButton
@@ -1934,7 +1943,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} topicName - The name of the topic to unpublish.
    */
   async unpublishTopic(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInCurriculumAdmin(topicName);
 
     const isMobileWidth = this.isViewportAtMobileWidth();
     if (isMobileWidth) {
@@ -2177,7 +2186,7 @@ export class CurriculumAdmin extends TopicManager {
    */
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
     try {
-      await this.openSkillEditor(skillName);
+      await this.openSkillEditorInCurriculumAdmin(skillName);
 
       const isMobileWidth = this.isViewportAtMobileWidth();
       const skillQuestionTab = isMobileWidth
@@ -2236,7 +2245,7 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Function for navigating to the classroom admin page.
    */
-  async navigateToClassroomAdminPage(): Promise<void> {
+  async navigateToClassroomAdminPageInCurriculumAdmin(): Promise<void> {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(classroomAdminUrl);
@@ -2246,7 +2255,7 @@ export class CurriculumAdmin extends TopicManager {
    * Function for opening the classroom tile in edit mode.
    */
   async editClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.page.waitForSelector(classroomTileSelector);
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
@@ -2285,7 +2294,7 @@ export class CurriculumAdmin extends TopicManager {
     classroomName: string,
     urlFragment: string
   ): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.clickOnElementWithSelector(createNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal);
     await this.page.type(newClassroomNameInputField, classroomName);
@@ -2314,7 +2323,7 @@ export class CurriculumAdmin extends TopicManager {
     thumbnailImage: string = curriculumAdminThumbnailImage,
     bannerImage: string = classroomBannerImage
   ): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.editClassroom(classroomName);
 
     await this.page.type(editClassroomTeaserTextInputField, teaserText);
@@ -2421,7 +2430,7 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string,
     prerequisiteTopics: string[] = []
   ): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.editClassroom(classroomName);
 
     await this.clickOnElementWithSelector(openTopicDropdownButton);
@@ -2471,7 +2480,7 @@ export class CurriculumAdmin extends TopicManager {
    * Function to check number of classrooms present in classroom-admin page.
    */
   async expectNumberOfClassroomsToBe(classroomsCount: number): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === classroomsCount) {
@@ -2488,7 +2497,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} classroomName - The name of the classroom.
    */
   async expectClassroomTileToBePresent(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     const classroomTiles = await this.page.$$(classroomTileNameSpan);
 
     let classroomTile: ElementHandle<Element> | null = null;
@@ -2512,7 +2521,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.editClassroom(classroomName);
     await this.clickOnElementWithSelector(publishClassroomButton);
     await this.clickOnElementWithSelector(saveClassroomButton);
@@ -2526,7 +2535,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} classroomName - The name of the classroom.
    */
   async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.editClassroom(classroomName);
     await this.clickOnElementWithSelector(enableDiagnosticTestButton);
     await this.clickOnElementWithSelector(saveClassroomButton);
@@ -2539,7 +2548,7 @@ export class CurriculumAdmin extends TopicManager {
    * Function for deleting a classroom.
    */
   async deleteClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.page.waitForSelector(classroomTileSelector);
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
@@ -2590,7 +2599,7 @@ export class CurriculumAdmin extends TopicManager {
     classroomName: string,
     numberOfTopics: number
   ): Promise<void> {
-    await this.navigateToClassroomAdminPage();
+    await this.navigateToClassroomAdminPageInCurriculumAdmin();
     await this.editClassroom(classroomName);
 
     await this.clickOnElementWithSelector(viewTopicGraphButton);
@@ -2634,7 +2643,7 @@ export class CurriculumAdmin extends TopicManager {
     );
 
     await this.createSkillForTopic(skillName, topicName, false);
-    await this.createQuestionsForSkill(skillName, 3);
+    await this.createQuestionsForSkillInCurriculumAdmin(skillName, 3);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
       subtopicName,
@@ -2642,7 +2651,7 @@ export class CurriculumAdmin extends TopicManager {
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
 
-    await this.publishDraftTopic(topicName);
+    await this.publishDraftTopicInCurriculumAdmin(topicName);
   }
 
   /**
@@ -2678,7 +2687,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.typeInInputField(richTextAreaField, reviewMaterial);
     await this.addWorkedExampleRteComponent('Type the number one', '1');
     await this.clickOnElementWithSelector(createSkillButton);
-    await this.openSkillEditor(description);
+    await this.openSkillEditorInCurriculumAdmin(description);
   }
 
   /**
@@ -2915,18 +2924,18 @@ export class CurriculumAdmin extends TopicManager {
       'To add two single-digit...',
       1
     );
-    await this.saveTopicDraft(topicName);
+    await this.saveTopicDraftInCurriculumAdmin(topicName);
 
     await this.createSkillForTopic(skillName, topicName);
-    await this.createQuestionsForSkill(skillName, 10);
+    await this.createQuestionsForSkillInCurriculumAdmin(skillName, 10);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
       subtopicName,
       topicName
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
-    await this.togglePracticeTabCheckbox();
-    await this.saveTopicDraft(topicName);
+    await this.togglePracticeTabCheckboxInCurriculumAdmin();
+    await this.saveTopicDraftInCurriculumAdmin(topicName);
 
     await this.createSubtopicWithStudyGuideForTopic(
       'Subtracting Numbers',
@@ -2936,7 +2945,7 @@ export class CurriculumAdmin extends TopicManager {
       topicName,
       true
     );
-    await this.saveTopicDraft(topicName);
+    await this.saveTopicDraftInCurriculumAdmin(topicName);
 
     await this.createSkillForTopic('Skill 2', topicName, false);
     await this.assignSkillToSubtopicInTopicEditor(
@@ -2945,13 +2954,13 @@ export class CurriculumAdmin extends TopicManager {
       topicName
     );
 
-    await this.publishDraftTopic(topicName);
+    await this.publishDraftTopicInCurriculumAdmin(topicName);
   }
 
   /**
    * Toggles the "Show practice tab to learners" in Topic Editor.
    */
-  async togglePracticeTabCheckbox(): Promise<void> {
+  async togglePracticeTabCheckboxInCurriculumAdmin(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
       await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
@@ -3013,7 +3022,7 @@ export class CurriculumAdmin extends TopicManager {
     const skillButtonSelector = this.isViewportAtMobileWidth()
       ? createNewSkillMobileButton
       : addNewSkillButton;
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
 
     await this.navigateToSkillsTab();
     await this.expectElementToBeVisible(skillButtonSelector);
@@ -3041,7 +3050,9 @@ export class CurriculumAdmin extends TopicManager {
    * To avoid unexpected behavior, ensure that any modifications here are also
    * made in topic-manager.ts.
    */
-  async expectToBeInTopicEditor(topicName?: string): Promise<void> {
+  async expectToBeInTopicEditorInCurriculumAdmin(
+    topicName?: string
+  ): Promise<void> {
     await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
 
     if (topicName) {
@@ -3057,8 +3068,8 @@ export class CurriculumAdmin extends TopicManager {
    * To avoid unexpected behavior, ensure that any modifications here are also
    * made in topic-manager.ts.
    */
-  async publishDraftTopic(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
+  async publishDraftTopicInCurriculumAdmin(topicName: string): Promise<void> {
+    await this.openTopicEditorInCurriculumAdmin(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
       await this.clickOnElementWithSelector(mobileSaveTopicDropdown);

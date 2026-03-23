@@ -18,7 +18,7 @@
 
 import {RTEEditor} from '../common/rte-editor';
 import {Contributor} from './contributor';
-import {INTERACTION_TYPES} from './exploration-editor';
+import {ExplorationEditor, INTERACTION_TYPES} from './exploration-editor';
 
 // Contributor Dashboard Selectors.
 const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
@@ -136,12 +136,16 @@ export class PracticeQuestionReviewer extends Contributor {
     await this.expectElementToBeVisible(editButtonSelector);
     await this.clickOnElementWithSelector(editButtonSelector);
 
-    await this.removeInteraction();
+    const editor = this as unknown as ExplorationEditor;
 
-    await this.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await editor.removeInteraction();
+
+    await editor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMERIC_INPUT
+    );
 
     // Add responses to the number input interaction.
-    await this.addResponsesToTheInteraction(
+    await editor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMBER_INPUT,
       '100',
       'Perfect!',
@@ -150,10 +154,10 @@ export class PracticeQuestionReviewer extends Contributor {
     );
 
     // Add hint.
-    await this.addHintToState('Test Hint');
+    await editor.addHintToStateInExplorationEditor('Test Hint');
 
     // Add a solution to the state.
-    await this.addSolutionToState(
+    await editor.addSolutionToStateInExplorationEditor(
       '100',
       'As said in the question itself.',
       true

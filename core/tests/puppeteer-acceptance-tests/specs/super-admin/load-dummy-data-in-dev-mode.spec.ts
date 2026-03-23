@@ -75,8 +75,8 @@ describe('Super Admin', function () {
         );
 
         await superAdmin.generateDummyBlogPost();
-        await superAdmin.navigateToBlogPage();
-        await superAdmin.expectBlogPostToBePresent('Education');
+        await superAdmin.navigateToBlogPageInSuperAdmin();
+        await superAdmin.expectBlogPostToBePresentInSuperAdmin('Education');
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );

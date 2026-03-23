@@ -47,7 +47,7 @@ describe('Logged-Out Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
     await curriculumAdmin.createSkillForTopic(
       'Math',
@@ -62,20 +62,24 @@ describe('Logged-Out Learner', function () {
 
     // Create a new exploration "What are the place values?" using the
     // exploration editor user.
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent('Introduction to Fractions');
-    await explorationEditor.addInteraction('Continue Button');
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Introduction to Fractions'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      'Continue Button'
+    );
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAMES.SECOND_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the second card and update its content.
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND_CARD);
     await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
-    await explorationEditor.saveExplorationDraft();
-    await explorationEditor.addInteraction('Fraction Input');
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    await explorationEditor.addInteractionInExplorationEditor('Fraction Input');
     await explorationEditor.addResponsesToTheInteraction(
       'Fraction Input',
       '2',
@@ -89,16 +93,19 @@ describe('Logged-Out Learner', function () {
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAMES.THIRD_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'I hope you enjoyed this exploration! '
     );
-    await explorationEditor.addInteraction('End Exploration');
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'What are the place values?',
-      'Learn about place values',
-      'Algorithms'
+    await explorationEditor.addInteractionInExplorationEditor(
+      'End Exploration'
     );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'What are the place values?',
+        'Learn about place values',
+        'Algorithms'
+      );
 
     if (!explorationId) {
       throw new Error('Exploration ID is null or undefined.');
@@ -132,7 +139,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLessonFromSearchResults(
       'What are the place values?'
     );
-    await loggedOutLearner.expectToBeOnPage(
+    await loggedOutLearner.expectToBeOnPageInLoggedOutUser(
       `http://localhost:8181/explore/${explorationId}`
     );
     await loggedOutLearner.waitForPageToFullyLoad();
@@ -140,7 +147,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectLessonInfoTextToBe('Lesson Info');
 
     // Continue to next card.
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
     await loggedOutLearner.expectGoBackToPreviousCardButton(true);
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
 

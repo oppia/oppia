@@ -40,14 +40,20 @@ describe('Lesson Creator', function () {
   it(
     'should discard the draft exploration',
     async function () {
-      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.dismissWelcomeModalInExplorationEditor();
 
-      await explorationEditor.updateCardContent('Old content');
-      await explorationEditor.saveExplorationDraft('First edit');
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'Old content'
+      );
+      await explorationEditor.saveExplorationDraftInExplorationEditor(
+        'First edit'
+      );
 
-      await explorationEditor.updateCardContent('New Content');
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'New Content'
+      );
       await explorationEditor.discardCurrentChanges();
       await explorationEditor.expectCardContentToBe('Old content');
     },
@@ -58,19 +64,27 @@ describe('Lesson Creator', function () {
     'should change the first card of the exploration',
     async function () {
       await explorationEditor.updateStateName('First');
-      await explorationEditor.saveExplorationDraft('Renamed initial card');
+      await explorationEditor.saveExplorationDraftInExplorationEditor(
+        'Renamed initial card'
+      );
 
       await explorationEditor.expectStateNameToBe('First');
 
-      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await explorationEditor.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.CONTINUE_BUTTON
+      );
       await explorationEditor.viewOppiaResponses();
       await explorationEditor.directLearnersToNewCard('Second');
       await explorationEditor.expectCurrentOutcomeDestinationToBe('Second');
 
       await explorationEditor.navigateToCard('Second');
-      await explorationEditor.updateCardContent('This is the second card.');
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'This is the second card.'
+      );
 
-      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await explorationEditor.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.CONTINUE_BUTTON
+      );
       await explorationEditor.viewOppiaResponses();
       await explorationEditor.directLearnersToNewCard('Final');
       await explorationEditor.expectCurrentOutcomeDestinationToBe('Final');
@@ -78,17 +92,21 @@ describe('Lesson Creator', function () {
       await explorationEditor.expectExplorationGraphToContainCard('Final');
 
       await explorationEditor.navigateToCard('Final');
-      await explorationEditor.updateCardContent('Final Card');
-      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'Final Card'
+      );
+      await explorationEditor.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.END_EXPLORATION
+      );
 
-      await explorationEditor.saveExplorationDraft(
+      await explorationEditor.saveExplorationDraftInExplorationEditor(
         'Created Second and Final cards'
       );
 
       await explorationEditor.expectExplorationGraphToContainCard('First');
       await explorationEditor.expectExplorationGraphToContainCard('Second');
       await explorationEditor.expectExplorationGraphToContainCard('Final');
-      await explorationEditor.navigateToSettingsTab();
+      await explorationEditor.navigateToSettingsTabInExplorationEditor();
       await explorationEditor.selectFirstCard('Second');
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToPreviewTab();
@@ -106,7 +124,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.navigateToEditorTab();
 
       await explorationEditor.deleteState('First');
-      await explorationEditor.saveExplorationDraft();
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
       await explorationEditor.expectExplorationGraphToNotContainCard('First');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

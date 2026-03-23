@@ -46,21 +46,27 @@ describe('Logged-In Learner', function () {
         [ROLES.CURRICULUM_ADMIN]
       );
 
-      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToCreatorDashboardPageInExplorationEditor();
       await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-      await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.updateCardContent('Introduction to Fractions');
-      await curriculumAdmin.addInteraction('Continue Button');
+      await curriculumAdmin.dismissWelcomeModalInExplorationEditor();
+      await curriculumAdmin.updateCardContentInExplorationEditor(
+        'Introduction to Fractions'
+      );
+      await curriculumAdmin.addInteractionInExplorationEditor(
+        'Continue Button'
+      );
 
       // Add a new card with a basic algebra problem.
       await curriculumAdmin.viewOppiaResponses();
       await curriculumAdmin.directLearnersToNewCard('Second Card');
-      await curriculumAdmin.saveExplorationDraft();
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
 
       // Navigate to the new card and update its content.
       await curriculumAdmin.navigateToCard('Second Card');
-      await curriculumAdmin.updateCardContent('Enter a negative number.');
-      await curriculumAdmin.addInteraction('Number Input');
+      await curriculumAdmin.updateCardContentInExplorationEditor(
+        'Enter a negative number.'
+      );
+      await curriculumAdmin.addInteractionInExplorationEditor('Number Input');
 
       await curriculumAdmin.addResponsesToTheInteraction(
         'Number Input',
@@ -72,30 +78,33 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
         'Wrong, try again!'
       );
-      await curriculumAdmin.addHintToState(
+      await curriculumAdmin.addHintToStateInExplorationEditor(
         'Remember that negative numbers are less than 0.'
       );
-      await curriculumAdmin.addSolutionToState(
+      await curriculumAdmin.addSolutionToStateInExplorationEditor(
         '-99',
         'The number -99 is a negative number.',
         true
       );
-      await curriculumAdmin.saveExplorationDraft();
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
 
       // Navigate to the new card and add Study Guide content.
       await curriculumAdmin.navigateToCard('Last Card');
-      await curriculumAdmin.updateCardContent(
+      await curriculumAdmin.updateCardContentInExplorationEditor(
         'Congratulations! You have completed the exploration.'
       );
-      await curriculumAdmin.addInteraction('End Exploration');
+      await curriculumAdmin.addInteractionInExplorationEditor(
+        'End Exploration'
+      );
 
       // Save the draft.
-      await curriculumAdmin.saveExplorationDraft();
-      explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-        'What is a Fraction?',
-        'Learn the basics of Fractions',
-        'Algebra'
-      );
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
+      explorationId =
+        await curriculumAdmin.publishExplorationWithMetadataInExplorationEditor(
+          'What is a Fraction?',
+          'Learn the basics of Fractions',
+          'Algebra'
+        );
 
       await curriculumAdmin.createAndPublishTopic(
         'Fractions',
@@ -124,7 +133,7 @@ describe('Logged-In Learner', function () {
   it('should be able to change the site language to an RTL language', async function () {
     await loggedInUser1.changeSiteLanguage('ar');
 
-    await loggedInUser1.navigateToLearnerDashboard();
+    await loggedInUser1.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser1.verifyPageIsRTL();
     await loggedInUser1.expectScreenshotToMatch(
       'RTLArabicLearnerDashboard',
@@ -157,8 +166,8 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.verifyPageIsRTL();
 
     // Check hints and lesson info are displayed in RTL.
-    await loggedInUser1.continueToNextCard();
-    await loggedInUser1.submitAnswer('1');
+    await loggedInUser1.continueToNextCardInExplorationEditor();
+    await loggedInUser1.submitAnswerInExplorationEditor('1');
 
     await loggedInUser1.viewHint();
     await loggedInUser1.verifyPageIsRTL();

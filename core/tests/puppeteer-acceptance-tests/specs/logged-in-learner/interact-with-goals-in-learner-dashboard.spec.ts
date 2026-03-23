@@ -109,7 +109,7 @@ describe('Logged-In Learner', function () {
       );
     }
 
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInTopicManager();
     await curriculumAdmin.publishStoryDraft();
     await UserFactory.closeBrowserForUser(curriculumAdmin);
     loggedInUser = await UserFactory.createNewUser(
@@ -121,7 +121,7 @@ describe('Logged-In Learner', function () {
   }, 6000000); // Setup taking longer than default timeout.
 
   it('should start and complete Chapter 1, then show updated progress (33%)', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
@@ -139,14 +139,14 @@ describe('Logged-In Learner', function () {
     await loggedInUser.clickLessonCardButton('What are the Place Values');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInExplorationEditor();
+    await loggedInUser.continueToNextCardInExplorationEditor();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 33);
 
@@ -157,21 +157,21 @@ describe('Logged-In Learner', function () {
   });
 
   it('should complete Chapter 2 and update progress to 66%', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.clickOnGoalCard('Place Values');
 
     await loggedInUser.clickLessonCardButton('Find the Value of a Number');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInExplorationEditor();
+    await loggedInUser.continueToNextCardInExplorationEditor();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 66);
@@ -183,7 +183,7 @@ describe('Logged-In Learner', function () {
   });
 
   it('should complete final chapter and move goal to Completed section', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.clickOnGoalCard('Place Values');
 
@@ -191,14 +191,14 @@ describe('Logged-In Learner', function () {
     await loggedInUser.clickLessonCardButton('Comparing Numbers');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInExplorationEditor();
+    await loggedInUser.continueToNextCardInExplorationEditor();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 100);
@@ -216,7 +216,7 @@ describe('Logged-In Learner', function () {
   it('should display correctly on mobile viewport', async function () {
     await loggedInUser.setMobileViewport();
 
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectGoalCardToBeVisible('Place Values');

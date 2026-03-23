@@ -64,21 +64,29 @@ describe('Logged-Out Learner', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent('Introduction to Algebra');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Introduction to Algebra'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.updateCardContent('Enter a negative number.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a negative number.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMERIC_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-1',
@@ -90,23 +98,26 @@ describe('Logged-Out Learner', function () {
       'Wrong, try again!'
     );
 
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We have practiced negative numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Algebra Basics',
-      'Learn the basics of Algebra',
-      'Algorithms'
-    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Algebra Basics',
+        'Learn the basics of Algebra',
+        'Algorithms'
+      );
 
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
@@ -114,8 +125,8 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to share the lesson using copy link', async function () {
-    await loggedOutUser.playExploration(explorationId);
-    await loggedOutUser.continueToNextCard();
+    await loggedOutUser.playExplorationInLoggedOutUser(explorationId);
+    await loggedOutUser.continueToNextCardInLoggedOutUser();
 
     await loggedOutUser.generateAttribution();
     await loggedOutUser.expectAttributionInHtmlSectionToBe(

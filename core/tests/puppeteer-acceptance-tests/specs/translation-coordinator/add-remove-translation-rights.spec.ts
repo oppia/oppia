@@ -58,7 +58,7 @@ describe('Translation Coordinator', function () {
 
   it('should be able to add translation rights in a language for a user', async function () {
     // Navigate to the contributor dashboard admin page.
-    await translationCoordinator.navigateToContributorDashboardAdminPage();
+    await translationCoordinator.navigateToContributorDashboardAdminPageInContributorAdmin();
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );

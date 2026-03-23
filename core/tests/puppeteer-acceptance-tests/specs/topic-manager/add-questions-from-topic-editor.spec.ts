@@ -87,19 +87,23 @@ describe('Topic Manager', function () {
   }, 600000);
 
   it('should be able to add questions to skills using the topic editor', async function () {
-    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.openTopicEditorInTopicManager('Arithmetic Operations');
     await topicManager.navigateToTabInTopicEditorPage('Questions Tab');
     await topicManager.selectSkillInQuestionsTab('Addition');
     await topicManager.expectQuestionToBeVisible('Add 1+2');
     await topicManager.clickOnAddQuestionButton();
 
     // Image Region.
-    await topicManager.updateCardContent('Select bottom half of the image');
+    await topicManager.updateCardContentInExplorationEditor(
+      'Select bottom half of the image'
+    );
     await topicManager.addImageInteraction();
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await topicManager.addHintToState('Select button half of the image.');
+    await topicManager.addHintToStateInExplorationEditor(
+      'Select button half of the image.'
+    );
     await topicManager.saveQuestion();
     await topicManager.expectQuestionToBeVisible(
       'Select bottom half of the image'
@@ -107,8 +111,13 @@ describe('Topic Manager', function () {
 
     // Item Selection.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Select any one correct option.');
-    await topicManager.addInteraction(INTERACTION_TYPES.ITEM_SELECTION, false);
+    await topicManager.updateCardContentInExplorationEditor(
+      'Select any one correct option.'
+    );
+    await topicManager.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.ITEM_SELECTION,
+      false
+    );
     await topicManager.customizeItemSelectionInteraction(
       ['Option 1', 'Option 2', 'Correct Option 1', 'Correct Option 2'],
       1,
@@ -126,7 +135,9 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await topicManager.addHintToState('Select the correct option.');
+    await topicManager.addHintToStateInExplorationEditor(
+      'Select the correct option.'
+    );
     await topicManager.saveQuestion();
     await topicManager.expectQuestionToBeVisible(
       'Select any one correct option.'
@@ -134,7 +145,9 @@ describe('Topic Manager', function () {
 
     // Multiple Choice Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Select the correct option.');
+    await topicManager.updateCardContentInExplorationEditor(
+      'Select the correct option.'
+    );
     await topicManager.addMultipleChoiceInteraction([
       'Option 1',
       'Option 2',
@@ -153,13 +166,17 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await topicManager.addHintToState('Select the correct option.');
+    await topicManager.addHintToStateInExplorationEditor(
+      'Select the correct option.'
+    );
     await topicManager.saveQuestion();
     await topicManager.expectQuestionToBeVisible('Select the correct option.');
 
     // Text Input Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Enter text input.');
+    await topicManager.updateCardContentInExplorationEditor(
+      'Enter text input.'
+    );
     await topicManager.addTextInputInteraction();
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.TEXT_INPUT,
@@ -173,8 +190,8 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
     );
-    await topicManager.addHintToState('Test Hint 3');
-    await topicManager.addSolutionToState(
+    await topicManager.addHintToStateInExplorationEditor('Test Hint 3');
+    await topicManager.addSolutionToStateInExplorationEditor(
       'Hello, Oppia!',
       'Test Solution 1',
       false
@@ -184,8 +201,10 @@ describe('Topic Manager', function () {
 
     // Drag and Drop Sort Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Drag and Drop Sort.');
-    await topicManager.addInteraction(
+    await topicManager.updateCardContentInExplorationEditor(
+      'Drag and Drop Sort.'
+    );
+    await topicManager.addInteractionInExplorationEditor(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
       false
     );
@@ -206,7 +225,7 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
     );
-    await topicManager.addHintToState('Test Hint 4');
+    await topicManager.addHintToStateInExplorationEditor('Test Hint 4');
     await topicManager.addDragAndDropSortSolution(
       ['First', 'Second', 'Third'],
       'As given in the question.'
@@ -216,8 +235,13 @@ describe('Topic Manager', function () {
 
     // Number Input Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Enter Number less than 100.');
-    await topicManager.addInteraction(INTERACTION_TYPES.NUMBER_INPUT, false);
+    await topicManager.updateCardContentInExplorationEditor(
+      'Enter Number less than 100.'
+    );
+    await topicManager.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      false
+    );
     await topicManager.customizeNumberInputInteraction(true);
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.NUMBER_INPUT,
@@ -231,8 +255,8 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
     );
-    await topicManager.addHintToState('Test Hint 5');
-    await topicManager.addSolutionToState(
+    await topicManager.addHintToStateInExplorationEditor('Test Hint 5');
+    await topicManager.addSolutionToStateInExplorationEditor(
       '100',
       'As said in the question itself.',
       true
@@ -242,8 +266,10 @@ describe('Topic Manager', function () {
 
     // Fraction Input Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Enter 1/2.');
-    await topicManager.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await topicManager.updateCardContentInExplorationEditor('Enter 1/2.');
+    await topicManager.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.FRACTION_INPUT
+    );
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.FRACTION_INPUT,
       '2'
@@ -256,8 +282,8 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
     );
-    await topicManager.addHintToState('Test Hint 6');
-    await topicManager.addSolutionToState(
+    await topicManager.addHintToStateInExplorationEditor('Test Hint 6');
+    await topicManager.addSolutionToStateInExplorationEditor(
       '1/2',
       'As given in the question.',
       true
@@ -267,12 +293,15 @@ describe('Topic Manager', function () {
 
     // Number with Units Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Enter 100km.');
-    await topicManager.addInteraction(
+    await topicManager.updateCardContentInExplorationEditor('Enter 100km.');
+    await topicManager.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
     );
-    await topicManager.fillValueInInteractionResponseModal('100km', 'input');
+    await topicManager.fillValueInInteractionResponseModalInExplorationEditor(
+      '100km',
+      'input'
+    );
     await topicManager.addResponseDetailsInResponseModal(
       'Great!',
       undefined,
@@ -281,8 +310,8 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
     );
-    await topicManager.addHintToState('Test Hint');
-    await topicManager.addSolutionToState(
+    await topicManager.addHintToStateInExplorationEditor('Test Hint');
+    await topicManager.addSolutionToStateInExplorationEditor(
       '100km',
       'As given in the question.',
       true

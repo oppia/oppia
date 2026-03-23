@@ -44,7 +44,7 @@ export class Moderator extends BaseUser {
   /**
    * Function to navigate to the moderator page.
    */
-  async navigateToModeratorPage(): Promise<void> {
+  async navigateToModeratorPageInModerator(): Promise<void> {
     await this.page.goto(moderatorPageUrl);
   }
 

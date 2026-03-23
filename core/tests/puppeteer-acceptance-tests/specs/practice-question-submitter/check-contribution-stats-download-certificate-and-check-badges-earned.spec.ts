@@ -66,13 +66,13 @@ describe('Practice Question Submitter', function () {
     );
 
     // Add submit question rights to the question submitter.
-    await questionAdmin.navigateToContributorDashboardAdminPage();
+    await questionAdmin.navigateToContributorDashboardAdminPageInContributorAdmin();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
     await questionAdmin.addReviewQuestionRights('questionReviewer');
 
     // Create a topic and add story with a chapter.
     const explorationId1 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Test Exploration 1'
       );
 
@@ -96,15 +96,26 @@ describe('Practice Question Submitter', function () {
     );
 
     // Update skill rubric.
-    await curriculumAdmin.openSkillEditor('Addition');
-    await curriculumAdmin.updateRubric('Hard', 'This is for hard questions');
-    await curriculumAdmin.updateRubric('Easy', 'This is for easy questions');
-    await curriculumAdmin.updateRubric(
+    await curriculumAdmin.openSkillEditorInTopicManager('Addition');
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Hard',
+      'This is for hard questions'
+    );
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Easy',
+      'This is for easy questions'
+    );
+    await curriculumAdmin.updateRubricInTopicManager(
       'Medium',
       'This is for medium questions'
     );
-    await curriculumAdmin.updateRubric('Hard', 'This is for hard questions');
-    await curriculumAdmin.publishUpdatedSkill('Added rubrics to skill');
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Hard',
+      'This is for hard questions'
+    );
+    await curriculumAdmin.publishUpdatedSkillInTopicManager(
+      'Added rubrics to skill'
+    );
 
     // Add topic the Math classroom.
     await curriculumAdmin.createAndPublishClassroom(

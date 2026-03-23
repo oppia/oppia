@@ -50,8 +50,8 @@ describe('Logged-Out Learner', function () {
         'Mathematics'
       );
 
-    await explorationEditor.playExploration(explorationId);
-    await explorationEditor.continueToNextCard();
+    await explorationEditor.playExplorationInLoggedOutUser(explorationId);
+    await explorationEditor.continueToNextCardInLoggedOutUser();
     await explorationEditor.rateExploration(
       5,
       'Excellent advanced Algebra course',

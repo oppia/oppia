@@ -88,13 +88,13 @@ describe('Topic Manager', function () {
   }, 600000);
 
   it('should be able to add and delete a subtopic in a topic', async function () {
-    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.openTopicEditorInTopicManager('Arithmetic Operations');
     await topicManager.createSubtopicForTopic(
       'Subtraction',
       'subtraction',
       'Arithmetic Operations'
     );
-    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.openTopicEditorInTopicManager('Arithmetic Operations');
     await topicManager.verifySubtopicPresenceInTopic('Subtraction');
 
     // Delete the subtopic.
@@ -102,8 +102,11 @@ describe('Topic Manager', function () {
       'Subtraction',
       'Arithmetic Operations'
     );
-    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
-    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.saveTopicDraftInTopicManager(
+      'Arithmetic Operations',
+      'Updated topic'
+    );
+    await topicManager.openTopicEditorInTopicManager('Arithmetic Operations');
     await topicManager.verifySubtopicPresenceInTopic('Addition');
     await topicManager.verifySubtopicPresenceInTopic(
       'Subtraction', // Subtopic Name.
@@ -125,7 +128,10 @@ describe('Topic Manager', function () {
       __dirname
     );
 
-    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
+    await topicManager.saveTopicDraftInTopicManager(
+      'Arithmetic Operations',
+      'Updated topic'
+    );
     await topicManager.expectToastMessageToBe('Changes Saved.');
 
     await topicManager.navigateToSubtopicPreviewTab(

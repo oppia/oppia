@@ -75,15 +75,15 @@ describe('Logged-In Learner', function () {
   it(
     'should be able to see community lessons in In Progress section if not completed fully',
     async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.navigateToCommunityLibraryOnNavbar();
       await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
       await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
       await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
 
-      await loggedInLearner.continueToNextCard();
-      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.continueToNextCardInExplorationEditor();
+      await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.expectScreenshotToMatch(
         'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1',
         __dirname
@@ -98,7 +98,7 @@ describe('Logged-In Learner', function () {
   );
 
   it('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToCommunityLibraryOnNavbar();
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
@@ -108,7 +108,7 @@ describe('Logged-In Learner', function () {
       "Successfully added to your 'Play Later' list."
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1AndExploreTitle2InLearnPlatLaterSection',
       __dirname
@@ -130,8 +130,8 @@ describe('Logged-In Learner', function () {
       'Lesson you saved for later',
       'Explore Title 2'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );

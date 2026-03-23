@@ -35,25 +35,31 @@ describe('Exploration Creator', function () {
       'exploration_editor@example.com'
     );
     // Navigate to the creator dashboard and create a new exploration.
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
 
-    await explorationEditor.createMinimalExploration(
+    await explorationEditor.createMinimalExplorationInExplorationEditor(
       'Content',
       INTERACTION_TYPES.END_EXPLORATION
     );
 
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    await explorationEditor.updateCardContent('Modified version 3 ');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Modified version 3 '
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    await explorationEditor.updateCardContent('Modified version 4 ');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Modified version 4 '
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    await explorationEditor.updateCardContent('Modified version 5 ');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Modified version 5 '
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -67,7 +73,7 @@ describe('Exploration Creator', function () {
       await explorationEditor.downloadExploration(5, false);
       await explorationEditor.downloadExploration(2, false);
       // Publish Exploration.
-      await explorationEditor.publishExplorationWithMetadata(
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
         'Publish with an interaction',
         'This is the goal of exploration.',
         'Algebra'

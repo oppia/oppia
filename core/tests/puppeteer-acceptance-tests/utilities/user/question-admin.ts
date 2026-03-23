@@ -59,7 +59,7 @@ export class QuestionAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
-  async navigateToContributorDashboardAdminPage(): Promise<void> {
+  async navigateToContributorDashboardAdminPageInQuestionAdmin(): Promise<void> {
     await this.goto(contributorDashboardAdminUrl);
   }
 

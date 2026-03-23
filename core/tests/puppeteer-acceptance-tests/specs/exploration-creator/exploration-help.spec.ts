@@ -39,9 +39,9 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
   });
 
   it('should be able to visit exploration help tab', async function () {

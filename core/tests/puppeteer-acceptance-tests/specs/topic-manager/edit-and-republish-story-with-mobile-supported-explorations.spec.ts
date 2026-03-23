@@ -42,19 +42,19 @@ describe('Topic Manager', function () {
 
     // Create two simple explorations.
     explorationId1 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Exploring Quadratic Equations',
         'Algebra',
         true
       );
 
     explorationId2 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Understanding Polynomial Functions'
       );
 
     // Create an exploration with Code Editor.
-    await curriculumAdmin.navigateToCreatorDashboardPage();
+    await curriculumAdmin.navigateToCreatorDashboardPageInExplorationEditor();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
 
     // Create an exlporation unsupported by mobile.
@@ -84,7 +84,7 @@ describe('Topic Manager', function () {
       explorationId1 as string
     );
 
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInTopicManager();
 
     // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
@@ -100,7 +100,7 @@ describe('Topic Manager', function () {
     'should be able to modify chapter details, preview the chapter card, add skills, and save the changes.',
     async function () {
       // Navigate to topics page.
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.navigateToTopicAndSkillsDashboardPageInTopicManager();
       await topicManager.openChapterEditor(
         'Quadratic Equations Basics',
         'Journey into Quadratic Equations',
@@ -114,7 +114,7 @@ describe('Topic Manager', function () {
         explorationId2 as string,
         testConstants.data.curriculumAdminThumbnailImage
       );
-      await topicManager.saveStoryDraft();
+      await topicManager.saveStoryDraftInTopicManager();
 
       // Check preview card and expect updated values.
       await topicManager.previewChapterCard();

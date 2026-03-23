@@ -31,7 +31,7 @@ describe('Interested Partner Organization', function () {
 
   it("should be able to learn about Oppia's partnership program", async function () {
     // Navigate to splash tab and veirfy it.
-    await partnerOrganizationUser.navigateToSplashPage();
+    await partnerOrganizationUser.navigateToSplashPageInLoggedOutUser();
     await partnerOrganizationUser.expectScreenshotToMatch(
       'homePage',
       __dirname

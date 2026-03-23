@@ -98,7 +98,7 @@ describe('Logged-in Learner', function () {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
     }
 
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInTopicManager();
     await curriculumAdmin.publishStoryDraft();
     await UserFactory.closeBrowserForUser(curriculumAdmin);
 
@@ -112,7 +112,7 @@ describe('Logged-in Learner', function () {
   it(
     'should display empty progress message when no lessons are in progress',
     async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
         'Home'
       );
@@ -132,13 +132,13 @@ describe('Logged-in Learner', function () {
   it(
     'should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math',
     async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.navigateToProgressSection();
       await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
         true
       );
       await loggedInLearner.navigateThroughClassroomButtonOnRLD();
-      await loggedInLearner.expectToBeOnPage('/learn/math');
+      await loggedInLearner.expectToBeOnPageInLoggedOutUser('/learn/math');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -149,9 +149,9 @@ describe('Logged-in Learner', function () {
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectScreenshotToMatch(
@@ -182,13 +182,13 @@ describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
     await loggedInLearner.expectScreenshotToMatch(
       'ProgressSectionInProgressWithOnlyChapter02',
@@ -198,7 +198,7 @@ describe('Logged-in Learner', function () {
   });
 
   it("should complete all the lessons of Place Value's Story and see Chapter 1 in the Completed Lessons section", async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectLessonCardProgressToBe(
@@ -217,13 +217,13 @@ describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
     await loggedInLearner.expectLessonCardProgressToBe(
       'Classroom Lessons',
@@ -241,13 +241,13 @@ describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectScreenshotToMatch(

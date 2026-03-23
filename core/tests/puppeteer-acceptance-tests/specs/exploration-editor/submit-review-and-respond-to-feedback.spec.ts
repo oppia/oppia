@@ -47,7 +47,7 @@ describe('Exploration Editor', function () {
     );
 
     explorationId =
-      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+      await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Feedback Test'
       );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
@@ -70,8 +70,8 @@ describe('Exploration Editor', function () {
       );
 
       // First user plays the exploration and gives non-anonymous feedback.
-      await loggedInVisitor.playExploration(explorationId);
-      await loggedInVisitor.giveFeedback(
+      await loggedInVisitor.playExplorationInLoggedOutUser(explorationId);
+      await loggedInVisitor.giveFeedbackInLoggedOutUser(
         'This is helpful non-anonymous feedback',
         false
       );
@@ -79,15 +79,15 @@ describe('Exploration Editor', function () {
       loggedOutVisitor = await UserFactory.createLoggedOutUser();
 
       // Anonymous logged-out user plays the exploration and gives feedback.
-      await loggedOutVisitor.playExploration(explorationId);
-      await loggedOutVisitor.giveFeedback(
+      await loggedOutVisitor.playExplorationInLoggedOutUser(explorationId);
+      await loggedOutVisitor.giveFeedbackInLoggedOutUser(
         'This is anonymous feedback from the first user',
         false
       );
 
       // Logged-in user gives anonymous feedback (testing both feedback types).
-      await loggedInVisitor.playExploration(explorationId);
-      await loggedInVisitor.giveFeedback(
+      await loggedInVisitor.playExplorationInLoggedOutUser(explorationId);
+      await loggedInVisitor.giveFeedbackInLoggedOutUser(
         'This is anonymous feedback from the second user',
         true
       );
@@ -106,8 +106,8 @@ describe('Exploration Editor', function () {
         showMessage('Test skipped in mobile viewport');
         return;
       }
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.openExplorationInExplorationEditor(
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
+      await explorationEditor.openExplorationInExplorationEditorInExplorationEditor(
         'Feedback Test'
       );
 
@@ -200,8 +200,8 @@ describe('Exploration Editor', function () {
         return;
       }
 
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.openExplorationInExplorationEditor(
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
+      await explorationEditor.openExplorationInExplorationEditorInExplorationEditor(
         'Feedback Test'
       );
       await explorationEditor.navigateToFeedbackTab();

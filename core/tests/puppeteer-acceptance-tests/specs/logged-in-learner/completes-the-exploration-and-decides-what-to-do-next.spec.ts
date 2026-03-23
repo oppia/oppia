@@ -52,8 +52,8 @@ describe('Logged-In Learner', function () {
   it(
     'should be able to rate the lesson',
     async function () {
-      await loggedInUser.playExploration(explorationId);
-      await loggedInUser.continueToNextCard();
+      await loggedInUser.playExplorationInExplorationEditor(explorationId);
+      await loggedInUser.continueToNextCardInExplorationEditor();
 
       // Rate exploration and give feedback.
       await loggedInUser.expectRatingStarsToBeVisible();

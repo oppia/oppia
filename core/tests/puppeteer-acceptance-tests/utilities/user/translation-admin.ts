@@ -61,7 +61,7 @@ export class TranslationAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
-  async navigateToContributorDashboardAdminPage(): Promise<void> {
+  async navigateToContributorDashboardAdminPageInTranslationAdmin(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
   }
 

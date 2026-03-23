@@ -42,23 +42,24 @@ describe('Site Moderator', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createMinimalExploration(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.createMinimalExplorationInExplorationEditor(
       'Test Exploration',
       'End Exploration'
     );
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration Title',
-      'Test Exploration Goal',
-      'Algebra'
-    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Test Exploration Title',
+        'Test Exploration Goal',
+        'Algebra'
+      );
   });
 
   it('should be able to add featured activities', async function () {
-    await siteModerator.navigateToModeratorPage();
+    await siteModerator.navigateToModeratorPageInLoggedOutUser();
     await siteModerator.navigateToFeaturedActivitiesTab();
     await siteModerator.expectScreenshotToMatch(
       'moderatorPageFeaturedActivitiesTab',

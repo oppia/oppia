@@ -48,7 +48,7 @@ describe('Curriculum Admin', function () {
       'enable_worked_examples_rte_component'
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
     // Setup taking longer than 300000 ms.
   }, 480000);
 

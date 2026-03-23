@@ -30,7 +30,7 @@ describe('Interested Donor', function () {
   });
 
   it('should be able to learn more about the organization', async function () {
-    await interestedDonor.navigateToSplashPage();
+    await interestedDonor.navigateToSplashPageInLoggedOutUser();
 
     // Visit "About" page.
     await interestedDonor.clickAboutButtonInAboutMenuOnNavbar();

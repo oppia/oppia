@@ -74,12 +74,12 @@ describe('Community Library Browser', function () {
       'Story 1',
       'Chapter 1'
     );
-    await communityLibraryBrowser.continueToNextCard();
+    await communityLibraryBrowser.continueToNextCardInExplorationEditor();
 
     // Subscribe to creator.
     await communityLibraryBrowser.openLessonInfoModal();
     await communityLibraryBrowser.clickOnProfileIconInLessonInfoModel();
-    await communityLibraryBrowser.subscribeToCreator();
+    await communityLibraryBrowser.subscribeToCreatorInLoggedOutUser();
 
     // Check subscribed creators in preferences page.
     await communityLibraryBrowser.navigateToPreferencesPageUsingProfileDropdown();

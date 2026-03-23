@@ -47,7 +47,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the learner dashboard.',
     async function () {
-      await loggedOutUser.navigateToLearnerDashboard(false);
+      await loggedOutUser.navigateToLearnerDashboardInLoggedOutUser(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -65,7 +65,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the moderator page.',
     async function () {
-      await loggedOutUser.navigateToModeratorPage(false);
+      await loggedOutUser.navigateToModeratorPageInLoggedOutUser(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -74,7 +74,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the preferences page.',
     async function () {
-      await loggedOutUser.navigateToPreferencesPage(false);
+      await loggedOutUser.navigateToPreferencesPageInLoggedOutUser(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -83,7 +83,9 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the topics and skills dashboard page.',
     async function () {
-      await loggedOutUser.navigateToTopicsAndSkillsDashboardPage(false);
+      await loggedOutUser.navigateToTopicsAndSkillsDashboardPageInLoggedOutUser(
+        false
+      );
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

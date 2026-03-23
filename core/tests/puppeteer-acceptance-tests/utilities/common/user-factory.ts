@@ -145,6 +145,30 @@ export class UserFactory {
       const rolePrototype = Object.getPrototypeOf(role);
 
       Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
+        if (
+          name !== 'constructor' &&
+          Object.prototype.hasOwnProperty.call(userPrototype, name)
+        ) {
+          const existingMethod = Object.getOwnPropertyDescriptor(
+            userPrototype,
+            name
+          )?.value;
+          const incomingMethod = Object.getOwnPropertyDescriptor(
+            rolePrototype,
+            name
+          )?.value;
+
+          if (
+            existingMethod &&
+            incomingMethod &&
+            existingMethod.toString() !== incomingMethod.toString()
+          ) {
+            throw new Error(
+              `Method '${name}' is already defined by another role and has a different implementation. Function name collision detected.`
+            );
+          }
+        }
+
         Object.defineProperty(
           userPrototype,
           name,
@@ -213,7 +237,7 @@ export class UserFactory {
           );
           break;
         case ROLES.TRANSLATION_REVIEWER:
-          await superAdminInstance.navigateToContributorDashboardAdminPage();
+          await superAdminInstance.navigateToContributorDashboardAdminPageInTranslationAdmin();
           if (typeof args === 'string') {
             args = [args];
           }

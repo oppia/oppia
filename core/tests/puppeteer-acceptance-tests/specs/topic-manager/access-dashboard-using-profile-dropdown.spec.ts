@@ -101,7 +101,7 @@ describe('Topic Manager', function () {
   });
 
   it('should be able to view the topic with no rights', async function () {
-    await topicManager.openTopicEditor('Whole Numbers');
+    await topicManager.openTopicEditorInTopicManager('Whole Numbers');
 
     // Verify that the breadcrumb contains read only text.
     if (!topicManager.isViewportAtMobileWidth()) {
@@ -114,7 +114,7 @@ describe('Topic Manager', function () {
 
   it('should be able to filter topics and skills', async function () {
     // Filter topics by status.
-    await topicManager.navigateToTopicsAndSkillsDashboardPage();
+    await topicManager.navigateToTopicsAndSkillsDashboardPageInLoggedOutUser();
     await topicManager.filterTopicsByStatus('Published');
     await topicManager.expectFilteredTopics(['Arithmetic Operations']);
     await topicManager.expectFilteredTopics(['Whole Numbers'], false);

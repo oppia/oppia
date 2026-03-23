@@ -108,7 +108,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
     }
 
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInTopicManager();
     await curriculumAdmin.publishStoryDraft();
     await UserFactory.closeBrowserForUser(curriculumAdmin);
 
@@ -122,7 +122,7 @@ describe('Logged-In Learner', function () {
   it(
     'should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button',
     async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
         'Home'
       );
@@ -160,7 +160,7 @@ describe('Logged-In Learner', function () {
     'should navigate directly to math classroom',
     async function () {
       await loggedInLearner.navigateToClassroomFromLearnerDashboard('math');
-      await loggedInLearner.expectToBeOnPage('learn/math');
+      await loggedInLearner.expectToBeOnPageInLoggedOutUser('learn/math');
       await loggedInLearner.expectScreenshotToMatch(
         'mathClassroomPage',
         __dirname
@@ -173,9 +173,11 @@ describe('Logged-In Learner', function () {
   it(
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.navigateToTopicPageByCard('Place Values');
-      await loggedInLearner.expectToBeOnPage('learn/math/place-values');
+      await loggedInLearner.expectToBeOnPageInLoggedOutUser(
+        'learn/math/place-values'
+      );
       await loggedInLearner.expectScreenshotToMatch(
         'placeValuesTopicPage',
         __dirname
@@ -186,15 +188,17 @@ describe('Logged-In Learner', function () {
   );
 
   it('should display in-progress and recommended lessons after starting a lesson', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToTopicPageByCard('Place Values');
-    await loggedInLearner.expectToBeOnPage('learn/math/place-values');
+    await loggedInLearner.expectToBeOnPageInLoggedOutUser(
+      'learn/math/place-values'
+    );
     await loggedInLearner.selectChapterWithinStoryToLearn(
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     // Did not finish the chapter,So still in  In-progress section.
     await loggedInLearner.expectElementsToBePresentInRLD(
       ['Continue where you left off', 'Learn Something New'],
@@ -232,18 +236,18 @@ describe('Logged-In Learner', function () {
   });
 
   it('should not recommend any lessons if currently on last lesson', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter2AndRecommendedForYouChapter3',
       __dirname
@@ -263,13 +267,13 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter3AndRecommendedForYouChapter4',
       __dirname
@@ -290,13 +294,13 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter4AndRecommendedForYouChapter5',
       __dirname
@@ -317,12 +321,12 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 4: Rounding Numbers part 1'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter5AndRecommendedForYouChapter6',
       __dirname
@@ -337,13 +341,13 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 5: Rounding Numbers part 2'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter6AndNoRecommendedForYouChapter',
       __dirname

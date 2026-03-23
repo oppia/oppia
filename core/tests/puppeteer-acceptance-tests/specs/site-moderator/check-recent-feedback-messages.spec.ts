@@ -40,40 +40,43 @@ describe('Site Moderator', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createMinimalExploration(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.createMinimalExplorationInExplorationEditor(
       'Test Exploration',
       'End Exploration'
     );
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration Title',
-      'Test Exploration Goal',
-      'Algebra'
-    );
-    await explorationEditor.playExploration(explorationId);
-    await explorationEditor.giveFeedback('It was good');
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Test Exploration Title',
+        'Test Exploration Goal',
+        'Algebra'
+      );
+    await explorationEditor.playExplorationInExplorationEditor(explorationId);
+    await explorationEditor.giveFeedbackInExplorationEditor('It was good');
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.createMinimalExploration(
+    await explorationEditor.createMinimalExplorationInExplorationEditor(
       'Test Exploration 2',
       'End Exploration'
     );
-    await explorationEditor.saveExplorationDraft();
-    await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
       'Test Exploration Title 2',
       'Test Exploration Goal 2',
       'Algebra'
     );
-    await explorationEditor.playExploration(explorationId);
-    await explorationEditor.giveFeedback('Needs some improvement');
+    await explorationEditor.playExplorationInExplorationEditor(explorationId);
+    await explorationEditor.giveFeedbackInExplorationEditor(
+      'Needs some improvement'
+    );
   });
 
   it('should be able to validate feedback entries', async function () {
-    await siteModerator.navigateToModeratorPage();
+    await siteModerator.navigateToModeratorPageInLoggedOutUser();
     await siteModerator.navigateToRecentFeedbackMessagesTab();
     await siteModerator.expectScreenshotToMatch(
       'moderatorPageRecentFeedbackMessagesTab',

@@ -59,19 +59,23 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
   });
 
   it('should be able to use "Continue Button" interaction', async function () {
     // Update the card content.
-    await explorationEditor.updateCardContent('Click on the button.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Click on the button.'
+    );
     await explorationEditor.expectCardContentToBe('Click on the button.');
     await explorationEditor.expectEditCardContentPencilButtonToBeVisible();
 
     // Add a new interaction.
-    await explorationEditor.addInteraction('Continue Button');
+    await explorationEditor.addInteractionInExplorationEditor(
+      'Continue Button'
+    );
     await explorationEditor.expectInteractionPreviewCardToBeVisible();
     await explorationEditor.expectRemoveInteractionButtonToBeVisible();
 
@@ -93,7 +97,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.clickOnElementWithText('Save Interaction');
 
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.expectSelfLoopWarningToBeVisible(false);
   });
 
@@ -101,7 +105,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
 
     // Update the card content.
-    await explorationEditor.updateCardContent('This is a multiple choice.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'This is a multiple choice.'
+    );
     await explorationEditor.expectCardContentToBe('This is a multiple choice.');
     // Add a multiple choice interaction. Also, checks if modal title is correct.
     await explorationEditor.addMultipleChoiceInteraction([
@@ -127,21 +133,25 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
-    await explorationEditor.addHintToState('Try Google Search.');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'Try Google Search.'
+    );
     await explorationEditor.expectHintsToConatin('Try Google Search.');
 
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
   });
 
   it('should be able to use "Number Input" interaction', async function () {
     await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
 
     // Update card content.
-    await explorationEditor.updateCardContent('Enter number 100.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter number 100.'
+    );
     await explorationEditor.expectCardContentToBe('Enter number 100.');
 
     // Add a number input interaction. Also, checks if modal title is correct.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMBER_INPUT,
       false
     );
@@ -163,7 +173,7 @@ describe('Exploration Editor', function () {
     );
 
     // Add a solution to the state.
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '100',
       'As said in the question itself.',
       true
@@ -173,18 +183,23 @@ describe('Exploration Editor', function () {
     );
 
     // Save the exploration draft and navigate to the next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
   });
 
   it('should be able to use "Text Input" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter text "Hello, Oppia!".');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter text "Hello, Oppia!".'
+    );
     await explorationEditor.expectCardContentToBe(
       'Enter text "Hello, Oppia!".'
     );
     // Add a text input interaction.
-    await explorationEditor.addInteraction(INTERACTION_TYPES.TEXT_INPUT, false);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.TEXT_INPUT,
+      false
+    );
     await explorationEditor.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Text Input)'
     );
@@ -211,13 +226,15 @@ describe('Exploration Editor', function () {
     );
 
     // Save the exploration draft and navigate to the next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
   });
 
   it('should be able to use "Image Region" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter an image region.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter an image region.'
+    );
     // Add an image region interaction. Also, check for all modals -- Choose Interaction,
     // Customize Interaction (Image Region), and Add Response.
     await explorationEditor.addImageInteraction('Great!', CARD_NAMES.SIXTH);
@@ -226,16 +243,18 @@ describe('Exploration Editor', function () {
       'Wrong.'
     );
     // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
   });
 
   it('should be able to use "Item Selection" interaction', async function () {
     // Add a item selection interaction.
-    await explorationEditor.updateCardContent('Select correct item.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Select correct item.'
+    );
     // Add Item Selection interaction. Also, check for modal "Choose Interaction"
     // and "Customize Interaction (Item Selection)".
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.ITEM_SELECTION,
       false
     );
@@ -266,16 +285,18 @@ describe('Exploration Editor', function () {
     );
 
     // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
   });
 
   it('should be able to use "Drag and Drop Sort" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Arrange in Ascending Order');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Arrange in Ascending Order'
+    );
     // Add Drag and Drop Sort interaction. Also, check for modals "Choose Interaction"
     // and "Customize Interaction (Drag and Drop Sort)".
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
       false
     );
@@ -318,10 +339,12 @@ describe('Exploration Editor', function () {
 
   it('should be able to use "Fraction Input" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a fraction: 1/2.'
+    );
     // Add Fraction Input interaction. Also, check for modal "Choose Interaction"
     // and "Customize Interaction (Fraction Input)".
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.FRACTION_INPUT,
       false
     );
@@ -349,22 +372,24 @@ describe('Exploration Editor', function () {
     );
 
     // Add Solution to the state.
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '1/2',
       'As given in the question.',
       true
     );
 
     // Save the exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
   });
 
   it('should be able to use "Graph Theory" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Create a star topology.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Create a star topology.'
+    );
     // Add Graph Interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.GRAPH_THEORY,
       false
     );
@@ -396,15 +421,20 @@ describe('Exploration Editor', function () {
     // modal is not visible.
 
     // Save the exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.TENTH);
   });
 
   it('should be able to use "Set Input" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a set.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a set.'
+    );
     // Add Set Input Interaction.
-    await explorationEditor.addInteraction(INTERACTION_TYPES.SET_INPUT, false);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.SET_INPUT,
+      false
+    );
     await explorationEditor.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Set Input)'
     );
@@ -434,15 +464,17 @@ describe('Exploration Editor', function () {
     );
 
     // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.ELEVENTH);
   });
 
   it('should be able to use "Numeric Expression" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a numeric expression.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a numeric expression.'
+    );
     // Add Numeric Expression interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMERIC_EXPRESSION,
       false
     );
@@ -478,15 +510,17 @@ describe('Exploration Editor', function () {
     );
 
     // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.TWELFTH);
   });
 
   it('should be able to use "Algebric Expression" intreaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a algebric expression.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a algebric expression.'
+    );
     // Add Algebric Expression interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.ALGEBRAIC_EXPRESSION,
       false
     );
@@ -523,15 +557,17 @@ describe('Exploration Editor', function () {
     );
 
     // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.THIRTEENTH);
   });
 
   it('should be able to use "Math Equation" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a math equation.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a math equation.'
+    );
     // Add Math Equation interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.MATH_EQUATION,
       false
     );
@@ -567,15 +603,17 @@ describe('Exploration Editor', function () {
     );
 
     // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTEENTH);
   });
 
   it('should be able to use "Number With Units" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a number with units.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a number with units.'
+    );
     // Add Number With Units interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
     );
@@ -597,22 +635,24 @@ describe('Exploration Editor', function () {
     );
 
     // Add solution.
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '100km',
       'As given in the question.',
       true
     );
 
     // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTEENTH);
   });
 
   it('should be able to use "Ratio Expression Input" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a ratio expression.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a ratio expression.'
+    );
     // Add Ratio Expression Input interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.RATIO_EXPRESSION_INPUT
     );
     await explorationEditor.expectModalTitleToBe('Add Response');
@@ -633,22 +673,24 @@ describe('Exploration Editor', function () {
     );
 
     // Add solution.
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '1:2',
       'As given in the question.',
       true
     );
 
     // Save Exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.SIXTEENTH);
   });
 
   it('should be able to use "Code Editor" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a code editor.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a code editor.'
+    );
     // Add Code Editor interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.CODE_EDITOR,
       false
     );
@@ -683,15 +725,17 @@ describe('Exploration Editor', function () {
     );
 
     // Save the exploration draft and navigate to the next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTEENTH);
   });
 
   it('should be able to use "Pencil Code Editor" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a pencil code editor.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a pencil code editor.'
+    );
     // Add Pencil Code Editor interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.PENCIL_CODE_EDITOR,
       false
     );
@@ -723,15 +767,17 @@ describe('Exploration Editor', function () {
     );
 
     // Save Exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.EIGHTEENTH);
   });
 
   it('should be able to use "Music Notes Input" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a music notes input.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a music notes input.'
+    );
     // Add Music Notes Input interaction.
-    await explorationEditor.addInteraction(
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.MUSIC_NOTES_INPUT,
       false
     );
@@ -776,15 +822,20 @@ describe('Exploration Editor', function () {
     );
 
     // Save the exploration draft and navigate to the next card.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.navigateToCard(CARD_NAMES.NINETEENTH);
   });
 
   it('should be able to use "World Map" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a world map.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a world map.'
+    );
     // Add World Map interaction.
-    await explorationEditor.addInteraction(INTERACTION_TYPES.WORLD_MAP, false);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.WORLD_MAP,
+      false
+    );
     await explorationEditor.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (World Map)'
     );
@@ -808,7 +859,7 @@ describe('Exploration Editor', function () {
     );
 
     // Save the exploration draft.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
   });
 
   afterAll(async function () {

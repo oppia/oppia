@@ -95,7 +95,7 @@ describe('Logged-in User', function () {
         );
       }
 
-      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.saveStoryDraftInTopicManager();
       await curriculumAdmin.publishStoryDraft();
 
       loggedInUser = await UserFactory.createNewUser(
@@ -123,7 +123,7 @@ describe('Logged-in User', function () {
   it(
     'should navigate to the new learner dashboard',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

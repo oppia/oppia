@@ -48,15 +48,19 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal(true);
+    await explorationEditor.dismissWelcomeModalInExplorationEditor(true);
   });
 
   it('should be able to preview "Fraction Input" interaction', async function () {
     // Add Fraction Input Interaction.
-    await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a fraction: 1/2.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.FRACTION_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
       '2',
@@ -67,13 +71,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState('The hint is 1/2');
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'The hint is 1/2'
+    );
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '1/2',
       'As given in the question.',
       true
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -110,8 +116,10 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Graph Theory" interaction', async function () {
     // Add a graph theory interaction.
-    await explorationEditor.updateCardContent('Create a star topology.');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Create a star topology.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.GRAPH_THEORY,
       false
     );
@@ -126,7 +134,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState(
+    await explorationEditor.addHintToStateInExplorationEditor(
       'Create a star topology using all 4 nodes.'
     );
 
@@ -163,8 +171,12 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Set Input" interaction', async function () {
     // Add Set Input Interaction.
-    await explorationEditor.updateCardContent('Enter a set.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.SET_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a set.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.SET_INPUT
+    );
     await explorationEditor.updateSetInputLearnerAnswerInResponseModal(
       'is equal to',
       ['1', '2', '3']
@@ -178,7 +190,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState('The hint is [1, 2, 3]');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'The hint is [1, 2, 3]'
+    );
     await explorationEditor.addSetInputSolutionToState(
       ['1', '2', '3'],
       'as given in the question.'
@@ -223,8 +237,10 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Numeric Expression" interaction', async function () {
     // Add a numeric expression interaction.
-    await explorationEditor.updateCardContent('Enter a numeric expression.');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a numeric expression.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMERIC_EXPRESSION
     );
     await explorationEditor.updateNumericExpressionLearnerAnswerInResponseModal(
@@ -240,13 +256,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState('The hint is sqrt2');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'The hint is sqrt2'
+    );
     // Add solution.
     await explorationEditor.addNumbericInteractionSolutionToState(
       'sqrt2',
       'as given in the question.'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -284,8 +302,10 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Algebric Expression" intreaction', async function () {
     // Add a algebric expression interaction.
-    await explorationEditor.updateCardContent('Enter a algebric expression.');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a algebric expression.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.ALGEBRAIC_EXPRESSION,
       false
     );
@@ -306,13 +326,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState('The hint is a+b');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'The hint is a+b'
+    );
     // Add solution.
     await explorationEditor.addAlgebricExpressionSolutionToState(
       'a+b',
       'as given in the question.'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -353,8 +375,12 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Math Equation" interaction', async function () {
     // Add a math equation interaction.
-    await explorationEditor.updateCardContent('Enter a math equation.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.MATH_EQUATION);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a math equation.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.MATH_EQUATION
+    );
     await explorationEditor.updateMathEquationLearnerAnswerInResponseModal(
       'matches exactly with',
       '5x=2+3'
@@ -368,13 +394,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState('The hint is 5x=2+3');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'The hint is 5x=2+3'
+    );
     // Add solution.
     await explorationEditor.addMathEquationSolutionToState(
       '5x=2+3',
       'as given in the question.'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -417,8 +445,10 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Number With Units" interaction', async function () {
     // Add a number with units input interaction.
-    await explorationEditor.updateCardContent('Enter a number with units.');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a number with units.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
     );
@@ -435,14 +465,16 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState('The hint is 100');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'The hint is 100'
+    );
     // Add solution.
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '100km',
       'As given in the question.',
       true
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -476,8 +508,10 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Ratio Expression Input" interaction', async function () {
     // Add a ratio expression input interaction.
-    await explorationEditor.updateCardContent('Enter a ratio expression.');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a ratio expression.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.RATIO_EXPRESSION_INPUT
     );
     await explorationEditor.updateRatioExpressionInputLearnerAnswerInResponseModal(
@@ -493,14 +527,16 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState('The hint is 1:2');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'The hint is 1:2'
+    );
     // Add solution.
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '1:2',
       'As given in the question.',
       true
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();

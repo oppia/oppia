@@ -42,15 +42,19 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
   });
 
   it('should be able to preview "Code Editor" interaction', async function () {
     // Add a code editor interaction.
-    await explorationEditor.updateCardContent('Enter a code editor.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CODE_EDITOR);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a code editor.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CODE_EDITOR
+    );
     await explorationEditor.updateCodeEditorLearnerAnswerInResponseModal(
       'has code that contains',
       'print("Hello, Oppia!")'
@@ -64,7 +68,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState(
+    await explorationEditor.addHintToStateInExplorationEditor(
       'The hint is print("Hello, Oppia!")'
     );
     // Add solution.
@@ -72,7 +76,7 @@ describe('Exploration Editor', function () {
       'print("Hello, Oppia!")',
       'As given in the question.'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -104,8 +108,12 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Music Notes Input" interaction', async function () {
     // Add a music notes input interaction.
-    await explorationEditor.updateCardContent('Enter a music notes input.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.MUSIC_NOTES_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a music notes input.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.MUSIC_NOTES_INPUT
+    );
     await explorationEditor.updateMusicNotesInputLearnerAnswerInResponseModal(
       'is equal to',
       ['C4', 'E4', 'G4']
@@ -120,7 +128,7 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     // Add solution.
-    await explorationEditor.addHintToState('Only answer C4');
+    await explorationEditor.addHintToStateInExplorationEditor('Only answer C4');
     await explorationEditor.addMusicNotesInputSolutionToState(
       ['C4', 'E4', 'G4'],
       'as given in the question.'
@@ -128,7 +136,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectToastMessage(
       'The current solution does not lead to another card.'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();

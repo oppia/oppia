@@ -38,7 +38,7 @@ describe('Question Submitter', function () {
     );
 
     // Create a skill and link it to a Topic.
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
     await curriculumAdmin.createSkillForTopic(
       'Test Skill 1',
@@ -47,15 +47,23 @@ describe('Question Submitter', function () {
     );
 
     // Add difficulty rubrics to the skill.
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.openSkillEditor('Test Skill 1');
-    await curriculumAdmin.updateRubric('Easy', 'This is for easy questions');
-    await curriculumAdmin.updateRubric(
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.openSkillEditorInTopicManager('Test Skill 1');
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Easy',
+      'This is for easy questions'
+    );
+    await curriculumAdmin.updateRubricInTopicManager(
       'Medium',
       'This is for medium questions'
     );
-    await curriculumAdmin.updateRubric('Hard', 'This is for hard questions');
-    await curriculumAdmin.publishUpdatedSkill('Added rubrics to skill');
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Hard',
+      'This is for hard questions'
+    );
+    await curriculumAdmin.publishUpdatedSkillInTopicManager(
+      'Added rubrics to skill'
+    );
 
     // Create a classroom and add the topic to it.
     await curriculumAdmin.createNewClassroom(
@@ -79,7 +87,7 @@ describe('Question Submitter', function () {
     );
 
     // Add submit question rights to the question submitter.
-    await questionAdmin.navigateToContributorDashboardAdminPage();
+    await questionAdmin.navigateToContributorDashboardAdminPageInContributorAdmin();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -101,7 +109,7 @@ describe('Question Submitter', function () {
 
       await questionSubmitter.addImageInteractionInQuestionEditor();
 
-      await questionSubmitter.addHintToState('Test Hint 1');
+      await questionSubmitter.addHintToStateInExplorationEditor('Test Hint 1');
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'
       );
@@ -140,7 +148,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'
       );
-      await questionSubmitter.addHintToState('Test Hint 2');
+      await questionSubmitter.addHintToStateInExplorationEditor('Test Hint 2');
       await questionSubmitter.submitQuestionSuggestion();
 
       await questionSubmitter.expectQuestionSuggestionInContributorDashboard(
@@ -171,8 +179,8 @@ describe('Question Submitter', function () {
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'
       );
-      await questionSubmitter.addHintToState('Test Hint 3');
-      await questionSubmitter.addSolutionToState(
+      await questionSubmitter.addHintToStateInExplorationEditor('Test Hint 3');
+      await questionSubmitter.addSolutionToStateInExplorationEditor(
         'Answer',
         'Test Solution 1',
         false

@@ -49,21 +49,29 @@ describe('Logged-In Learner', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorPage();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent('Introduction to Algebra');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Introduction to Algebra'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Algebra Basics');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard('Algebra Basics');
-    await explorationEditor.updateCardContent('Enter a negative number.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a negative number.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMERIC_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-1',
@@ -75,20 +83,22 @@ describe('Logged-In Learner', function () {
       'Wrong, try again!'
     );
 
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard('Final Card');
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We have practiced negative numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard('Introduction');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     explorationId =
-      (await explorationEditor.publishExplorationWithMetadata(
+      (await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
         'Algebra Basics',
         'Learn the basics of Algebra',
         'Algorithms'
@@ -109,7 +119,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToCommunityLibraryPage();
     await loggedInLearner.searchForLessonInSearchBar('Algebra Basics');
     await loggedInLearner.playLessonFromSearchResults('Algebra Basics');
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInExplorationEditor();
 
     // Report Exploration.
     await loggedInLearner.reportExploration('It is an ad');

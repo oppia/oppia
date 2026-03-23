@@ -41,7 +41,7 @@ describe('Release Coordinator', function () {
   });
 
   it('should be able to visit release coordinator page', async function () {
-    await releaseCoordinator.navigateToReleaseCoordinatorPage();
+    await releaseCoordinator.navigateToReleaseCoordinatorPageInReleaseCoordinator();
     await releaseCoordinator.expectScreenshotToMatch(
       'releaseCoordinatorPage',
       __dirname

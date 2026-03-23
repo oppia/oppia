@@ -71,13 +71,13 @@ describe('Practice Question Submitter', function () {
     );
 
     // Add submit question rights to the question submitter.
-    await questionAdmin.navigateToContributorDashboardAdminPage();
+    await questionAdmin.navigateToContributorDashboardAdminPageInContributorAdmin();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
     await questionAdmin.addReviewQuestionRights('questionReviewer');
 
     // Create a topic and add story with a chapter.
     const explorationId1 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Test Exploration 1'
       );
 
@@ -101,15 +101,26 @@ describe('Practice Question Submitter', function () {
     );
 
     // Update skill rubric.
-    await curriculumAdmin.openSkillEditor('Addition');
-    await curriculumAdmin.updateRubric('Hard', 'This is for hard questions');
-    await curriculumAdmin.updateRubric('Easy', 'This is for easy questions');
-    await curriculumAdmin.updateRubric(
+    await curriculumAdmin.openSkillEditorInTopicManager('Addition');
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Hard',
+      'This is for hard questions'
+    );
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Easy',
+      'This is for easy questions'
+    );
+    await curriculumAdmin.updateRubricInTopicManager(
       'Medium',
       'This is for medium questions'
     );
-    await curriculumAdmin.updateRubric('Hard', 'This is for hard questions');
-    await curriculumAdmin.publishUpdatedSkill('Added rubrics to skill');
+    await curriculumAdmin.updateRubricInTopicManager(
+      'Hard',
+      'This is for hard questions'
+    );
+    await curriculumAdmin.publishUpdatedSkillInTopicManager(
+      'Added rubrics to skill'
+    );
 
     // Add topic the Math classroom.
     await curriculumAdmin.createAndPublishClassroom(
@@ -161,7 +172,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState('1 + 2 = 3');
+    await questionSubmitter.addHintToStateInExplorationEditor('1 + 2 = 3');
     await questionSubmitter.submitQuestionSuggestion();
 
     // Submit a medium question.
@@ -182,7 +193,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState('1 + 2 = 3');
+    await questionSubmitter.addHintToStateInExplorationEditor('1 + 2 = 3');
     await questionSubmitter.submitQuestionSuggestion();
 
     // Submit a hard question.
@@ -203,7 +214,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState('1 + 2 = 3');
+    await questionSubmitter.addHintToStateInExplorationEditor('1 + 2 = 3');
     await questionSubmitter.submitQuestionSuggestion();
 
     // Verify that the questions are submitted successfully.
@@ -272,7 +283,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer.'
     );
-    await questionSubmitter.addHintToState(
+    await questionSubmitter.addHintToStateInExplorationEditor(
       'Select area in the bottom of the image.'
     );
     await questionSubmitter.submitQuestionSuggestion();
@@ -286,7 +297,7 @@ describe('Practice Question Submitter', function () {
       'Medium'
     );
     await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
-    await questionSubmitter.addInteraction(
+    await questionSubmitter.addInteractionInExplorationEditor(
       INTERACTION_TYPES.ITEM_SELECTION,
       false
     );
@@ -306,7 +317,9 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer. Please try again'
     );
-    await questionSubmitter.addHintToState('Select the correct option.');
+    await questionSubmitter.addHintToStateInExplorationEditor(
+      'Select the correct option.'
+    );
     await questionSubmitter.submitQuestionSuggestion();
 
     // Multiple Choice Interaction.
@@ -335,7 +348,9 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer. Please try again'
     );
-    await questionSubmitter.addHintToState('Select the correct option.');
+    await questionSubmitter.addHintToStateInExplorationEditor(
+      'Select the correct option.'
+    );
     await questionSubmitter.submitQuestionSuggestion();
 
     // Text Input Interaction.
@@ -353,8 +368,8 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState('Test Hint 3');
-    await questionSubmitter.addSolutionToState(
+    await questionSubmitter.addHintToStateInExplorationEditor('Test Hint 3');
+    await questionSubmitter.addSolutionToStateInExplorationEditor(
       'Correct Answer',
       'Test Solution 1',
       false
@@ -370,7 +385,7 @@ describe('Practice Question Submitter', function () {
       'Hard'
     );
     await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
-    await questionSubmitter.addInteraction(
+    await questionSubmitter.addInteractionInExplorationEditor(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
       false
     );
@@ -390,7 +405,9 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Try Again!'
     );
-    await questionSubmitter.addHintToState('Arrage in ascending order');
+    await questionSubmitter.addHintToStateInExplorationEditor(
+      'Arrage in ascending order'
+    );
     await questionSubmitter.addDragAndDropSortSolution(
       ['First', 'Second', 'Third'],
       'As given in the question.'
@@ -406,12 +423,15 @@ describe('Practice Question Submitter', function () {
       'Hard'
     );
     await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
-    await questionSubmitter.addInteraction(
+    await questionSubmitter.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMBER_INPUT,
       false
     );
     await questionSubmitter.customizeNumberInputInteraction(true);
-    await questionSubmitter.fillValueInInteractionResponseModal('100', 'input');
+    await questionSubmitter.fillValueInInteractionResponseModalInExplorationEditor(
+      '100',
+      'input'
+    );
     await questionSubmitter.addResponseDetailsInQuestionResponseModal(
       'Perfect!'
     );
@@ -419,8 +439,8 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState('Test Hint 3');
-    await questionSubmitter.addSolutionToState(
+    await questionSubmitter.addHintToStateInExplorationEditor('Test Hint 3');
+    await questionSubmitter.addSolutionToStateInExplorationEditor(
       '100',
       'As said in the question itself.',
       true
@@ -439,19 +459,22 @@ describe('Practice Question Submitter', function () {
       'Hard'
     );
     await questionSubmitter.seedTextToQuestion('What is 10/11?');
-    await questionSubmitter.addInteraction(
+    await questionSubmitter.addInteractionInExplorationEditor(
       INTERACTION_TYPES.FRACTION_INPUT,
       true
     );
-    await questionSubmitter.fillValueInInteractionResponseModal('2', 'input');
+    await questionSubmitter.fillValueInInteractionResponseModalInExplorationEditor(
+      '2',
+      'input'
+    );
     await questionSubmitter.addResponseDetailsInQuestionResponseModal(
       'Perfect!'
     );
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState('Test Hint');
-    await questionSubmitter.addSolutionToState(
+    await questionSubmitter.addHintToStateInExplorationEditor('Test Hint');
+    await questionSubmitter.addSolutionToStateInExplorationEditor(
       '1/2',
       'As given in the question.',
       true
@@ -467,11 +490,11 @@ describe('Practice Question Submitter', function () {
       'Hard'
     );
     await questionSubmitter.seedTextToQuestion('What is 10km + 11km?');
-    await questionSubmitter.addInteraction(
+    await questionSubmitter.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
     );
-    await questionSubmitter.fillValueInInteractionResponseModal(
+    await questionSubmitter.fillValueInInteractionResponseModalInExplorationEditor(
       '21km',
       'input'
     );
@@ -481,8 +504,8 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState('Test Hint');
-    await questionSubmitter.addSolutionToState(
+    await questionSubmitter.addHintToStateInExplorationEditor('Test Hint');
+    await questionSubmitter.addSolutionToStateInExplorationEditor(
       '21km',
       'As given in the question.',
       true

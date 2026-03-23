@@ -78,7 +78,7 @@ describe('Logged-in User', function () {
   it(
     'should navigate to the new learner dashboard',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToLearnerDashboardInLoggedOutUser();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

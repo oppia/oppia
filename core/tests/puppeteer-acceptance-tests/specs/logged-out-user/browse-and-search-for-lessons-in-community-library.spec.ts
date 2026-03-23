@@ -39,24 +39,24 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     explorationId1 =
-      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+      await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Algebra I'
       );
     explorationId2 =
-      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+      await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Algebra II',
         'Algorithms',
         false
       );
 
-    await explorationEditor.playExploration(explorationId1);
+    await explorationEditor.playExplorationInLoggedOutUser(explorationId1);
     await explorationEditor.rateExploration(
       5,
       'Excellent advanced Algebra course',
       false
     );
 
-    await explorationEditor.playExploration(explorationId2);
+    await explorationEditor.playExplorationInLoggedOutUser(explorationId2);
     await explorationEditor.rateExploration(
       4,
       'Excellent advanced Algebra course',

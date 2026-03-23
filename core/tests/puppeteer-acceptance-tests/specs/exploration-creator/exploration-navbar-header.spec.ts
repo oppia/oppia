@@ -35,14 +35,18 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
   });
 
   it('should be able to save draft', async function () {
-    await explorationEditor.updateCardContent('Hello, World!');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Hello, World!'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     await explorationEditor.clickOnSaveDraftButton();
     await explorationEditor.expectSaveDraftModalTitleToBe('Save Draft');
@@ -52,19 +56,22 @@ describe('Exploration Editor', function () {
 
     await explorationEditor.expectSaveDraftButtonToBeDisabled();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Exploration 1',
-      'Goal of the the exploration is to test recommendations',
-      'Algebra'
-    );
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Exploration 1',
+        'Goal of the the exploration is to test recommendations',
+        'Algebra'
+      );
   });
 
   it('should be able to publish an exploration', async function () {
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
-    await explorationEditor.updateCardContent('Hello, World!');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Hello, World!'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.END_EXPLORATION,
       false
     );

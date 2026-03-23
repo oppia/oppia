@@ -75,7 +75,7 @@ export class VoiceoverAdmin extends BaseUser {
   /**
    * Function to navigate to exploration settings tab.
    */
-  async navigateToExplorationSettingsTab(): Promise<void> {
+  async navigateToExplorationSettingsTabInVoiceoverAdmin(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
@@ -135,7 +135,9 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+  async dismissWelcomeModalInVoiceoverAdmin(
+    failIfMissing: boolean = true
+  ): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
     await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
@@ -145,18 +147,18 @@ export class VoiceoverAdmin extends BaseUser {
    * the modal may or may not appear due to race conditions or when it has
    * already been dismissed earlier in the test flow.
    */
-  async dismissWelcomeModalIfPresent(): Promise<void> {
-    // The existing dismissWelcomeModal() in this class already handles the
+  async dismissWelcomeModalIfPresentInVoiceoverAdmin(): Promise<void> {
+    // The existing dismissWelcomeModalInVoiceoverAdmin() in this class already handles the
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
-    await this.dismissWelcomeModal(false);
+    await this.dismissWelcomeModalInVoiceoverAdmin(false);
   }
 
   /**
    * Function to navigate to exploration editor.
    * @param explorationUrl - url of the exploration.
    */
-  async navigateToExplorationEditor(
+  async navigateToExplorationEditorInVoiceoverAdmin(
     explorationId: string | null
   ): Promise<void> {
     if (!explorationId) {
@@ -280,9 +282,9 @@ export class VoiceoverAdmin extends BaseUser {
     explorationId: string,
     voiceArtistUsername: string
   ): Promise<void> {
-    await this.navigateToExplorationEditor(explorationId);
-    await this.dismissWelcomeModal(false);
-    await this.navigateToExplorationSettingsTab();
+    await this.navigateToExplorationEditorInVoiceoverAdmin(explorationId);
+    await this.dismissWelcomeModalInVoiceoverAdmin(false);
+    await this.navigateToExplorationSettingsTabInVoiceoverAdmin();
     await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);
   }
 

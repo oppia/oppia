@@ -45,37 +45,45 @@ describe('Logged-out User', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We will be learning numbers today.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with concept content.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.CONCEPT_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and add concept content.
     await explorationEditor.navigateToCard(CARD_NAME.CONCEPT_CARD);
-    await explorationEditor.updateCardContent(CONCEPT_CARD_CONTENT_EN);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      CONCEPT_CARD_CONTENT_EN
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We have learnt positive numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -105,12 +113,12 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       // Check if the content of the card is in the original language (en).
       await loggedOutUser.expectCardContentToMatch(CONCEPT_CARD_CONTENT_EN);
 
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'इस पाठ को पूरा करने के लिए बधाई! अब आप अगली बार जब वापस आएंगे तो पाठ को शुरू से ' +
           'शुरू करेंगे।'

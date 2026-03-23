@@ -32,24 +32,34 @@ describe('Exploration Editor', function () {
         'exploration_editor@example.com'
       );
 
-      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.dismissWelcomeModalInExplorationEditor();
 
-      await explorationEditor.updateCardContent('Introduction to Fractions');
-      await explorationEditor.addInteraction('Continue Button');
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'Introduction to Fractions'
+      );
+      await explorationEditor.addInteractionInExplorationEditor(
+        'Continue Button'
+      );
       await explorationEditor.viewOppiaResponses();
       await explorationEditor.directLearnersToNewCard('Second Card');
-      await explorationEditor.saveExplorationDraft();
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
 
       await explorationEditor.navigateToCard('Second Card');
-      await explorationEditor.updateCardContent('Thanks for playing!');
-      await explorationEditor.addInteraction('End Exploration');
-      await explorationEditor.saveExplorationDraft();
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'Thanks for playing!'
+      );
+      await explorationEditor.addInteractionInExplorationEditor(
+        'End Exploration'
+      );
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
 
       for (let i = 0; i < 15; i++) {
-        await explorationEditor.updateCardContent(`Thanks for playing! ${i}`);
-        await explorationEditor.saveExplorationDraft();
+        await explorationEditor.updateCardContentInExplorationEditor(
+          `Thanks for playing! ${i}`
+        );
+        await explorationEditor.saveExplorationDraftInExplorationEditor();
       }
     },
     // Test takes more time than default timeout.
