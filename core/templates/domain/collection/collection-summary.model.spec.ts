@@ -32,7 +32,7 @@ describe('Collection summary model', () => {
       status: 'public',
       category: 'Algebra',
       title: 'Test Title',
-      node_count: 0,
+      total_node_count: 0,
     };
 
     let collectionSummaryObject =
