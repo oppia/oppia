@@ -34,3 +34,4 @@ requests==2.32.5
 requests-mock==1.12.1
 result==0.17.0
 webapp2==3.0.0b1
+setuptools==80.9.0

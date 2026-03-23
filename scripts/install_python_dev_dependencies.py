@@ -150,6 +150,7 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
             '--quiet',
             '--strip-extras',
             '--generate-hashes',
+            '--allow-unsafe',
             requirements_path,
             '--output-file',
             compiled_path,
