@@ -27,6 +27,14 @@ describe('ErrorPageComponent', () => {
   let fixture: ComponentFixture<ErrorPageComponent>;
 
   beforeEach(() => {
+    try {
+      if (window && window.sessionStorage) {
+        window.sessionStorage.clear();
+      }
+    } catch (error) {
+      // sessionStorage can throw in restricted environments; ignore safely.
+    }
+
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       declarations: [ErrorPageComponent],

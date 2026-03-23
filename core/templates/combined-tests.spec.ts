@@ -65,18 +65,6 @@ getTestBed().initTestEnvironment(
   platformBrowserDynamicTesting()
 );
 
-// Ensure each spec starts with a clean sessionStorage to avoid
-// cross-test leakage of error messages or other state.
-beforeEach(() => {
-  try {
-    if (window && window.sessionStorage) {
-      window.sessionStorage.clear();
-    }
-  } catch (error) {
-    // sessionStorage can throw in restricted environments; ignore safely.
-  }
-});
-
 jasmine.getEnv().addReporter({
   specDone: function (result) {
     // Specs that are being excluded when using fit or fdescribe will not
