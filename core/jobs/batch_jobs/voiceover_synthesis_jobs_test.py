@@ -529,6 +529,50 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
 
             self.assert_job_output_is(expected_output)
 
+    def test_should_handle_empty_strings_during_voiceover_regneration(
+        self,
+    ) -> None:
+
+        def mock_synthesize_voiceover_for_html_string(
+            _exploration_id: str,
+            _content_html: str,
+            _language_accent_code: str,
+            _voiceover_filename: str,
+            _oppia_project_id: str,
+        ) -> List[Dict[str, Union[str, float]]]:
+            return []
+
+        self._create_data_for_testing()
+
+        expected_output_1 = (
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-en-US.\n'
+            'Total content IDs processed: 4. Total characters processed: 0.\n'
+            'EntityVoiceovers ID: exploration-exploration_id_1-2-hi-IN.\n'
+            'Total content IDs processed: 1. Total characters processed: 0.\n'
+        )
+        expected_output_2 = (
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-en-US.\n'
+            'Total content IDs processed: 4. Total characters processed: 0.\n'
+            'EntityVoiceovers ID: exploration-exploration_id_2-2-pt-BR.\n'
+            'Total content IDs processed: 1. Total characters processed: 0.\n'
+        )
+
+        with self.swap(
+            voiceover_regeneration_services,
+            'synthesize_voiceover_for_html_string',
+            mock_synthesize_voiceover_for_html_string,
+        ):
+            expected_output = [
+                job_run_result.JobRunResult(
+                    stdout=expected_output_1, stderr=''
+                ),
+                job_run_result.JobRunResult(
+                    stdout=expected_output_2, stderr=''
+                ),
+            ]
+
+            self.assert_job_output_is(expected_output)
+
 
 class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
 
