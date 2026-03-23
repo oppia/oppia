@@ -136,8 +136,13 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
-    this.languageAccentCode =
+    const storedAccent =
       this.localStorageService.getLastSelectedLanguageAccentCode() as string;
+
+    this.languageAccentCode =
+      storedAccent && storedAccent !== 'undefined'
+        ? storedAccent
+        : this.translationLanguageService.getActiveLanguageAccentCode() || 'en-US';
     this.languageAccentCodeIsSelected = this.languageAccentCode !== 'undefined';
     this.voiceoverAdminConfigIsLoading = true;
 
