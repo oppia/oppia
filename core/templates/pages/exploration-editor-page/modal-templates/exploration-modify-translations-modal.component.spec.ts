@@ -39,11 +39,9 @@ import {PageContextService} from 'services/page-context.service';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {FormsModule} from '@angular/forms';
-import {ModifyTranslationOpportunity} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
-
 class MockNgbModalRef {
   componentInstance = {
-    modifyTranslationOpportunity: ModifyTranslationOpportunity,
+    modifyTranslationOpportunity: null,
   };
 }
 
@@ -151,12 +149,12 @@ describe('Modify Translations Modal Component', function () {
     component.contentId = 'content1';
     component.ngOnInit();
 
-    expect(component.isSetOfStringDataFormat()).toBeFalse();
+    expect(component.isSetOfStringDataFormat()).toBe(false);
 
     component.contentId = 'rule1';
     component.ngOnInit();
 
-    expect(component.isSetOfStringDataFormat()).toBeTrue();
+    expect(component.isSetOfStringDataFormat()).toBe(true);
   }));
 
   it('should handle translations being removed', () => {
@@ -294,13 +292,13 @@ describe('Modify Translations Modal Component', function () {
         needs_update: false,
       }),
     };
-    expect(component.translationsHaveLoaded).toBeFalse();
+    expect(component.translationsHaveLoaded).toBe(false);
 
     component.updateTranslationDisplayContent();
 
     expect(component.languageIsCheckedStatusDict).toEqual({
       hi: false,
     });
-    expect(component.translationsHaveLoaded).toBeTrue();
+    expect(component.translationsHaveLoaded).toBe(true);
   });
 });

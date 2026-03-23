@@ -43,31 +43,19 @@ describe('Admin dev mode activities tab', () => {
   let adminDataService: AdminDataService;
   let adminTaskManagerService: AdminTaskManagerService;
   let windowRef: WindowRef;
-  let adminDataObject = {
+  let adminDataObject: AdminPageData = {
     demoExplorationIds: ['expId'],
     demoExplorations: [['0', 'welcome.yaml']],
     demoCollections: [['collectionId']],
-    skillList: [
-      {
-        id: 'Fg6LbD9h2Eg4',
-        description: 'Skill1',
-      },
-    ],
-    topicSummaries: [
-      {
-        id: 'topid_id',
-        name: 'topic_name',
-        description: 'description',
-      },
-    ],
-    storyList: [
-      {
-        id: 'story_id',
-        title: 'story_title',
-        description: 'description',
-      },
-    ],
-  } as AdminPageData;
+    updatableRoles: [],
+    roleToActions: {},
+    viewableRoles: [],
+    humanReadableRoles: {},
+    topicSummaries: [],
+    platformParameters: [],
+    skillList: [],
+    storyList: [],
+  };
   let mockConfirmResult: (val: boolean) => void;
 
   beforeEach(async(() => {

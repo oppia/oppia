@@ -221,7 +221,6 @@ describe('Translation Modal Component', () => {
       })
     );
     windowRef = TestBed.inject(WindowRef);
-    mockWindow = windowRef.nativeWindow;
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -247,13 +246,13 @@ describe('Translation Modal Component', () => {
   it('should expand the content area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
     // The content area is contracted by default.
-    expect(component.isContentExpanded).toBeFalse();
+    expect(component.isContentExpanded).toBe(false);
 
     // The content area should expand when the users clicks
     // on the 'View More' button.
     component.toggleExpansionState(ExpansionTabType.CONTENT);
 
-    expect(component.isContentExpanded).toBeTrue();
+    expect(component.isContentExpanded).toBe(true);
   });
 
   it('should contract the content area', () => {
@@ -264,19 +263,19 @@ describe('Translation Modal Component', () => {
     // on the 'View Less' button.
     component.toggleExpansionState(ExpansionTabType.CONTENT);
 
-    expect(component.isContentExpanded).toBeFalse();
+    expect(component.isContentExpanded).toBe(false);
   });
 
   it('should expand the translation area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
     // The translation area is contracted by default.
-    expect(component.isTranslationExpanded).toBeTrue();
+    expect(component.isTranslationExpanded).toBe(true);
 
     // The translation area should expand when the users clicks
     // on the 'View More' button.
     component.toggleExpansionState(ExpansionTabType.TRANSLATION);
 
-    expect(component.isTranslationExpanded).toBeFalse();
+    expect(component.isTranslationExpanded).toBe(false);
   });
 
   it('should contract the translation area', () => {
@@ -287,13 +286,13 @@ describe('Translation Modal Component', () => {
     // on the 'View Less' button.
     component.toggleExpansionState(ExpansionTabType.TRANSLATION);
 
-    expect(component.isTranslationExpanded).toBeTrue();
+    expect(component.isTranslationExpanded).toBe(true);
   });
 
   it('should correctly determine whether the content data is overflowing', fakeAsync(() => {
     // Pre-check.
     // The default values for the overflow states are false.
-    expect(component.isContentOverflowing).toBeFalse();
+    expect(component.isContentOverflowing).toBe(false);
 
     // Setup.
     component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
@@ -304,7 +303,7 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isContentOverflowing).toBeFalse();
+    expect(component.isContentOverflowing).toBe(false);
     // Change panel height to simulate changing of the modal data.
     component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
 
@@ -313,13 +312,13 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isContentOverflowing).toBeTrue();
+    expect(component.isContentOverflowing).toBe(true);
   }));
 
   it('should correctly determine whether the editor is overflowing', fakeAsync(() => {
     // Pre-check.
     // The default values for the overflow states are false.
-    expect(component.isTranslationOverflowing).toBeFalse();
+    expect(component.isTranslationOverflowing).toBe(false);
 
     // Setup.
     spyOn(wds, 'getHeight').and.returnValue(100);
@@ -330,7 +329,7 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isTranslationOverflowing).toBeFalse();
+    expect(component.isTranslationOverflowing).toBe(false);
     // Change panel height to simulate changing of the modal data.
     component.translationContainer.nativeElement.offsetHeight = 300;
 
@@ -339,7 +338,7 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isTranslationOverflowing).toBeTrue();
+    expect(component.isTranslationOverflowing).toBe(true);
   }));
 
   afterEach(() => {
@@ -357,7 +356,7 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback()
+          (expId: string, languageCode: string, successCallback: () => void) => successCallback()
         );
         component.ngOnInit();
       }));
@@ -373,7 +372,7 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('es');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback()
+          (expId: string, languageCode: string, successCallback: () => void) => successCallback()
         );
         component.ngOnInit();
       }));
@@ -399,7 +398,7 @@ describe('Translation Modal Component', () => {
       pageContextService.removeCustomEntityContext();
       pageContextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) => successCallback()
       );
       component.ngOnInit();
       expect(pageContextService.getEntityType()).toBe(
@@ -437,7 +436,7 @@ describe('Translation Modal Component', () => {
         'getPreviousTextToTranslate'
       ).and.callThrough();
       component.ngOnInit();
-      expect(component.loadingData).toBeTrue();
+      expect(component.loadingData).toBe(true);
       expect(translateTextService.init).toHaveBeenCalled();
 
       const sampleStateWiseContentMapping = {
@@ -454,11 +453,11 @@ describe('Translation Modal Component', () => {
         version: 1,
       });
       flushMicrotasks();
-      expect(component.loadingData).toBeFalse();
+      expect(component.loadingData).toBe(false);
       expect(translateTextService.getTextToTranslate).toHaveBeenCalled();
 
       expect(component.textToTranslate).toBe('text1');
-      expect(component.moreAvailable).toBeTrue();
+      expect(component.moreAvailable).toBe(true);
       component.skipActiveTranslation();
       component.returnToPreviousTranslation();
       expect(
@@ -469,13 +468,13 @@ describe('Translation Modal Component', () => {
       // is viewing a previous translation. If the value is false, the
       // 'save and close' button is shown. This should happen only on the
       // last translation.
-      expect(component.moreAvailable).toBeTrue();
+      expect(component.moreAvailable).toBe(true);
     }));
 
     it('should set the schema constant based on the active language', fakeAsync(() => {
       translationLanguageService.setActiveLanguageCode('ar');
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) => successCallback()
       );
       component.ngOnInit();
       expect(component.getHtmlSchema().ui_config.language).toBe('ar');
@@ -508,7 +507,10 @@ describe('Translation Modal Component', () => {
         textToTranslate: 'Current content in English.',
         currentContentTranslation: translationContent,
       };
-      component.opportunity = null;
+      Object.defineProperty(component, 'opportunity', {
+        value: undefined,
+        writable: true,
+      });
 
       component.ngOnInit();
 
@@ -534,7 +536,7 @@ describe('Translation Modal Component', () => {
     beforeEach(fakeAsync(() => {
       paragraphTarget = document.createElement('p');
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) => successCallback()
       );
       broadcastSpy = spyOn(
         ckEditorCopyContentService,
@@ -611,7 +613,7 @@ describe('Translation Modal Component', () => {
 
       it('should retrieve remaining text and availability', () => {
         expect(component.textToTranslate).toBe('text2');
-        expect(component.moreAvailable).toBeFalse();
+        expect(component.moreAvailable).toBe(false);
       });
     });
   });
@@ -1233,23 +1235,18 @@ describe('Translation Modal Component', () => {
         translationLanguageService.setActiveLanguageCode('es');
       });
 
-      it('should have beforeUnloadHandler initialized as a function returning undefined', () => {
+      it('should have beforeUnloadHandler initialized as a function returning undefined', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
         const mockEvent = {
           preventDefault: () => {},
           returnValue: '',
         } as BeforeUnloadEvent;
-
-        interface ComponentWithPrivateMembers
-          extends TranslationModalComponent {
-          beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined;
-        }
-
-        const componentWithPrivateAccess =
-          component as ComponentWithPrivateMembers;
-        expect(
-          componentWithPrivateAccess.beforeUnloadHandler(mockEvent)
-        ).toBeUndefined();
-      });
+        const handler = mockWindow.addEventListener.calls.argsFor(0)[1] as (
+          e: BeforeUnloadEvent
+        ) => string | undefined;
+        expect(handler(mockEvent)).toBeUndefined();
+      }));
 
       it('should initialize beforeUnloadHandler to return undefined by default', fakeAsync(() => {
         component.ngOnInit();
