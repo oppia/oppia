@@ -22,6 +22,7 @@ import ast
 import collections
 import contextlib
 import io
+import json
 import os
 import pathlib
 import re
@@ -1303,6 +1304,92 @@ class BuildTests(test_utils.GenericTestBase):
                 AssertionError, 'angular generated bundle should be non-empty'
             ):
                 build.build_using_ng()
+
+    def test_inject_angular_css_hashes_with_missing_dist_dir_fails(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                with self.assertRaisesRegex(
+                    RuntimeError,
+                    'dist/oppia-angular-prod does not exist. '
+                    'Angular CLI build may have failed.',
+                ):
+                    build.inject_angular_css_hashes()
+            finally:
+                os.chdir(old_working_dir)
+
+    def test_inject_angular_css_hashes_updates_both_hashes_together(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                os.makedirs('dist/oppia-angular-prod', exist_ok=True)
+                pathlib.Path(
+                    'dist/oppia-angular-prod/styles.abc123.css'
+                ).touch()
+                pathlib.Path(
+                    'dist/oppia-angular-prod/vendor-styles.def456.css'
+                ).touch()
+
+                os.makedirs('backend_prod_files/webpack_bundles', exist_ok=True)
+                html_file_path = os.path.join(
+                    'backend_prod_files',
+                    'webpack_bundles',
+                    'test.mainpage.html',
+                )
+                with open(html_file_path, 'w', encoding='utf-8') as f:
+                    f.write(
+                        '<link rel="stylesheet" '
+                        'href="/dist/oppia-angular-prod/vendor-styles.css">\n'
+                        '<link rel="stylesheet" '
+                        'href="/dist/oppia-angular-prod/styles.css">\n'
+                    )
+
+                os.makedirs('assets', exist_ok=True)
+                with open(
+                    build.HASHES_JSON_FILEPATH, 'w', encoding='utf-8'
+                ) as f:
+                    f.write(json.dumps({'existing_hash': '123'}))
+
+                updated_hashes: List[Dict[str, str]] = []
+
+                def mock_write_hashes_json_file(hashes: Dict[str, str]) -> None:
+                    updated_hashes.append(dict(hashes))
+
+                write_hashes_swap = self.swap(
+                    common,
+                    'write_hashes_json_file',
+                    mock_write_hashes_json_file,
+                )
+
+                with write_hashes_swap:
+                    build.inject_angular_css_hashes()
+
+                self.assertEqual(len(updated_hashes), 1)
+                self.assertEqual(updated_hashes[0]['existing_hash'], '123')
+                self.assertEqual(updated_hashes[0]['angular_styles'], 'abc123')
+                self.assertEqual(
+                    updated_hashes[0]['angular_vendor_styles'], 'def456'
+                )
+
+                with open(html_file_path, 'r', encoding='utf-8') as f:
+                    updated_html_content = f.read()
+
+                self.assertIn(
+                    '/dist/oppia-angular-prod/styles.abc123.css',
+                    updated_html_content,
+                )
+                self.assertIn(
+                    '/dist/oppia-angular-prod/vendor-styles.def456.css',
+                    updated_html_content,
+                )
+            finally:
+                os.chdir(old_working_dir)
 
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):

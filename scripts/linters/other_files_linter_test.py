@@ -44,7 +44,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.verbose_mode_enabled = False
-        self.dependencies_file = io.StringIO('{"dependencies":{"frontend":{}}}')
         self.package_file = io.StringIO(
             '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2",'
             '"guppy-dev":"git+https://github.com/oppia/guppy#f509e",'
@@ -63,11 +62,9 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             _: List[str],
             encoding: str = 'utf-8',  # pylint: disable=unused-argument
         ) -> io.StringIO:
-            if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
-                file = self.dependencies_file
-            elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
-                file = self.package_file
-            return file
+            if path == other_files_linter.PACKAGE_JSON_FILE_PATH:
+                return self.package_file
+            raise ValueError('Unexpected file path: %s' % path)
 
         def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
@@ -209,6 +206,36 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             in error_messages.get_report()[0]
         )
         self.assertEqual('App dev file', error_messages.name)
+        self.assertTrue(error_messages.failed)
+
+    def test_check_multiple_invalid_patterns_in_app_dev_yaml(self) -> None:
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Third party files:',
+                '- third_party/static/bootstrap-5.3/',
+                '- third_party/static/jquery-3/',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+        self.assertEqual(len(error_messages.get_report()), 3)
+        self.assertTrue(
+            'Pattern on line 2 doesn\'t match any file or directory'
+            in error_messages.get_report()[0]
+        )
+        self.assertTrue(
+            'Pattern on line 3 doesn\'t match any file or directory'
+            in error_messages.get_report()[1]
+        )
         self.assertTrue(error_messages.failed)
 
     def test_check_valid_pattern(self) -> None:

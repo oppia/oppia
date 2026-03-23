@@ -4,15 +4,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
 
-<!-- Font Awesome webfonts — preload paths must match the relative URLs in vendor-styles.css -->
-<% if (webpackConfig.mode === 'production') { %>
-  <link rel="preload" href="/dist/oppia-angular-prod/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/dist/oppia-angular-prod/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
-<% } else { %>
-  <link rel="preload" href="/dist/oppia-angular/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/dist/oppia-angular/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
-<% } %>
-
 <link rel="preload"
       media="screen"
       href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
@@ -30,6 +21,9 @@
 <!-- This replaces the old third_party.css from dependencies.json. -->
 <!-- Loaded synchronously so Bootstrap CSS is applied before Angular initializes -->
 <!-- and before Puppeteer tests interact with Bootstrap modals. -->
+<!-- NOTE: In production, these paths are updated to styles.{hash}.css and -->
+<!-- vendor-styles.{hash}.css by inject_angular_css_hashes() in -->
+<!-- scripts/build.py after Angular CLI build completes. -->
 <% if (webpackConfig.mode === 'production') { %>
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/vendor-styles.css">
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/styles.css">

@@ -54,12 +54,8 @@ WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
 
 APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
-DEPENDENCIES_JSON_FILE_PATH: Final = os.path.join(
-    os.getcwd(), 'dependencies.json'
-)
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
-_DEPENDENCY_SOURCE_DEPENDENCIES_JSON: Final = 'dependencies.json'
 _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
 WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
@@ -154,7 +150,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 )
                 error_messages.append(error_message)
                 failed = True
-                break
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages

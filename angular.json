@@ -120,6 +120,11 @@
                 "glob": "**/*",
                 "input": "node_modules/mathjax",
                 "output": "/assets/mathjax"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@fortawesome/fontawesome-free/webfonts",
+                "output": "assets/webfonts"
               }
             ],
             "styles": [

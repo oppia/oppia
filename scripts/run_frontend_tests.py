@@ -176,7 +176,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
 
-        build.main(args=['--prod_env', '--minify_third_party_libs_only'])
+        build.main(args=['--prod_env'])
 
         cmd.append('--prodEnv')
     else:
