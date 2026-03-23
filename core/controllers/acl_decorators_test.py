@@ -8002,19 +8002,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_user_without_review_rights_cannot_update_translation_suggestion(
         self,
     ) -> None:
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            self.exploration_id,
-            1,
-            self.author_id,
-            self.change_dict,
-            'description',
-        )
-        suggestion_id = '%s.%s.1' % (
-            feconf.ENTITY_TYPE_EXPLORATION,
-            self.exploration_id,
-        )
+        suggestion_id = self.translation_suggestion_id
         with self.swap(
             suggestion_models.GeneralSuggestionModel,
             'get_by_id',
