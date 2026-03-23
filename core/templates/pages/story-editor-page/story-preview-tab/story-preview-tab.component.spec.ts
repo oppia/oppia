@@ -166,11 +166,11 @@ describe('Story Preview tab', () => {
     component.ngOnInit();
     let node = story.getStoryContents().getNodes()[0];
     expect(component.getExplorationUrl(node)).toEqual(
-      '/explore/exp_1?story_id=storyId_0&node_id=node_1'
+      '/explore/exp_1?story_id=storyId_0&node_id=node_1&story_editor_page=true'
     );
     node = story.getStoryContents().getNodes()[1];
     expect(component.getExplorationUrl(node)).toEqual(
-      '/explore/exp_2?story_id=storyId_0&node_id=node_2'
+      '/explore/exp_2?story_id=storyId_0&node_id=node_2&story_editor_page=true'
     );
   });
 

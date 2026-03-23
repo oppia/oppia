@@ -625,4 +625,24 @@ describe('PageContext service', () => {
       expect(ecs.getExplorationId()).toBe('456');
     });
   });
+
+  describe('isInStoryEditorPreviewMode', () => {
+    beforeEach(() => {
+      ecs = TestBed.inject(PageContextService);
+      urlService = TestBed.inject(UrlService);
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should return true when story_editor_page param is true', () => {
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        story_editor_page: 'true',
+      });
+      expect(ecs.isInStoryEditorPreviewMode()).toBe(true);
+    });
+
+    it('should return false when story_editor_page param is absent', () => {
+      spyOn(urlService, 'getUrlParams').and.returnValue({});
+      expect(ecs.isInStoryEditorPreviewMode()).toBe(false);
+    });
+  });
 });
