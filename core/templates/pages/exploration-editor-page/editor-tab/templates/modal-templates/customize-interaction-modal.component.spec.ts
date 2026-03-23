@@ -467,9 +467,9 @@ describe('Customize Interaction Modal Component', () => {
       const deprecatedInteractions = ['PencilCodeEditor', 'MusicNotesInput'];
       const expectedCategories =
         AppConstants.ALLOWED_INTERACTION_CATEGORIES.map(category => ({
-          ...category,
-          interaction_ids: category.interaction_ids.filter(
-            id => !deprecatedInteractions.includes(id)
+          name: category.name,
+          interaction_ids: ([...category.interaction_ids] as string[]).filter(
+            (id: string) => !deprecatedInteractions.includes(id)
           ),
         })).filter(category => category.interaction_ids.length > 0);
       expect(component.isinteractionOpen).toBe(true);
