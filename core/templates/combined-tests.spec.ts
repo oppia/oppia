@@ -68,8 +68,12 @@ getTestBed().initTestEnvironment(
 // Ensure each spec starts with a clean sessionStorage to avoid
 // cross-test leakage of error messages or other state.
 beforeEach(() => {
-  if (window && window.sessionStorage) {
-    window.sessionStorage.clear();
+  try {
+    if (window && window.sessionStorage) {
+      window.sessionStorage.clear();
+    }
+  } catch (error) {
+    // sessionStorage can throw in restricted environments; ignore safely.
   }
 });
 
