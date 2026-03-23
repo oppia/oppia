@@ -304,6 +304,10 @@
 /core/templates/domain/promo_bar/ @oppia/lace-frontend-reviewers
 /core/templates/filters/ @oppia/lace-frontend-reviewers
 /core/templates/services/attribution.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component.css @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner-module.ts  @oppia/lace-frontend-reviewers
 
 
 # Global frontend services

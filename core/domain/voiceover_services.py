@@ -1328,7 +1328,7 @@ def wrap_up_voiceover_regeneration_task(
         get_language_accent_codes_to_descriptions()
     )
     language_accent_descriptions_used_for_regeneration = [
-        language_accent_codes_to_descriptions.get(language_accent_code)
+        language_accent_codes_to_descriptions.get(language_accent_code, '')
         for language_accent_code in language_accent_codes
     ]
 
