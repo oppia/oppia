@@ -32,7 +32,7 @@ describe('ErrorPageComponent', () => {
         window.sessionStorage.clear();
       }
     } catch (error) {
-      // sessionStorage can throw in restricted environments; ignore safely.
+      // SessionStorage can throw in restricted environments; ignore safely.
     }
 
     TestBed.configureTestingModule({
