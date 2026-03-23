@@ -106,7 +106,6 @@ describe('Translation Modal Component', () => {
   let wds: WindowDimensionsService;
   let ngbModal: NgbModal;
   let mockModalRef: MockConfirmTranslationExitModal;
-  let windowRef: WindowRef;
   let mockWindow: {
     addEventListener: jasmine.Spy;
     removeEventListener: jasmine.Spy;
@@ -220,7 +219,6 @@ describe('Translation Modal Component', () => {
         can_review_questions: false,
       })
     );
-    windowRef = TestBed.inject(WindowRef);
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -356,7 +354,8 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId: string, languageCode: string, successCallback: () => void) => successCallback()
+          (expId: string, languageCode: string, successCallback: () => void) =>
+            successCallback()
         );
         component.ngOnInit();
       }));
@@ -372,7 +371,8 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('es');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId: string, languageCode: string, successCallback: () => void) => successCallback()
+          (expId: string, languageCode: string, successCallback: () => void) =>
+            successCallback()
         );
         component.ngOnInit();
       }));
@@ -398,7 +398,8 @@ describe('Translation Modal Component', () => {
       pageContextService.removeCustomEntityContext();
       pageContextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
-        (expId: string, languageCode: string, successCallback: () => void) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) =>
+          successCallback()
       );
       component.ngOnInit();
       expect(pageContextService.getEntityType()).toBe(
@@ -474,7 +475,8 @@ describe('Translation Modal Component', () => {
     it('should set the schema constant based on the active language', fakeAsync(() => {
       translationLanguageService.setActiveLanguageCode('ar');
       spyOn(translateTextService, 'init').and.callFake(
-        (expId: string, languageCode: string, successCallback: () => void) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) =>
+          successCallback()
       );
       component.ngOnInit();
       expect(component.getHtmlSchema().ui_config.language).toBe('ar');
@@ -536,7 +538,8 @@ describe('Translation Modal Component', () => {
     beforeEach(fakeAsync(() => {
       paragraphTarget = document.createElement('p');
       spyOn(translateTextService, 'init').and.callFake(
-        (expId: string, languageCode: string, successCallback: () => void) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) =>
+          successCallback()
       );
       broadcastSpy = spyOn(
         ckEditorCopyContentService,
