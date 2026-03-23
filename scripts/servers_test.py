@@ -626,6 +626,9 @@ class ManagedProcessTests(test_utils.TestBase):
             self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
         )
         self.exit_stack.enter_context(
+            self.swap_to_always_return(common, 'is_port_in_use', value=True)
+        )
+        self.exit_stack.enter_context(
             self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
         )
         self.exit_stack.enter_context(
@@ -674,6 +677,9 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
             self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+        )
+        self.exit_stack.enter_context(
+            self.swap_to_always_return(common, 'is_port_in_use', value=True)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
