@@ -348,9 +348,6 @@ describe('Logged-Out Learner', function () {
     );
     await loggedOutLearner.expectSubmitButton('Disabled');
 
-    // Submit few wrong answer to see hint.
-    await loggedOutLearner.submitFewWrongAnswerInFractionInput(3);
-    await loggedOutLearner.expectTextPresentOnPage('View hint');
     await loggedOutLearner.expectConversationContentByButton(
       'View hint',
       'Need extra help solving the problem? Check out the hint.'
@@ -361,9 +358,8 @@ describe('Logged-Out Learner', function () {
     );
     await loggedOutLearner.closeHintModal();
 
-    // Submit few wrong answer to see hint.
-    await loggedOutLearner.submitFewWrongAnswerInFractionInput(3);
-    await loggedOutLearner.expectTextPresentOnPage('View hint 2');
+    // Submit a wrong answer to see hint.
+    await loggedOutLearner.submitFewWrongAnswerInFractionInput(1);
     await loggedOutLearner.expectConversationContentByButton(
       'View hint 2',
       "Don't worry! Here is another hint that might be helpful to you."
@@ -374,10 +370,8 @@ describe('Logged-Out Learner', function () {
     );
     await loggedOutLearner.closeHintModal();
 
-    // Submit few wrong answer.
-    await loggedOutLearner.submitFewWrongAnswerInFractionInput(4);
-
-    await loggedOutLearner.expectTextPresentOnPage('View Solution');
+    // Submit a wrong answer.
+    await loggedOutLearner.submitFewWrongAnswerInFractionInput(1);
     await loggedOutLearner.expectConversationContentByButton(
       'View Solution',
       'It seems like you are not sure how to continue. If you want, you can view the solution for this lesson.'

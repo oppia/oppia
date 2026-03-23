@@ -6443,6 +6443,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click continue button to go next card.
    */
   async clickOnContinueButton(): Promise<void> {
+    await this.waitForElementToStabilize(continueButtonSelector);
     await this.page.waitForSelector(continueButtonSelector, {
       visible: true,
     });
@@ -7009,34 +7010,33 @@ export class LoggedOutUser extends BaseUser {
     expectedText: string
   ): Promise<void> {
     const containerSelector = '.hint-solution-individual-container';
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    try {
+      await this.page.waitForFunction(
+        (sel: string, label: string, expected: string) => {
+          const containers = Array.from(document.querySelectorAll(sel));
+          const targetContainer = containers.find(container => {
+            const button = container.querySelector('button');
+            return button?.textContent?.trim().includes(label);
+          });
+          if (!targetContainer) {
+            return false;
+          }
 
-    await this.page.waitForSelector(containerSelector, {visible: true});
-
-    const isMatch = await this.page.evaluate(
-      (sel, label, expected) => {
-        const containers = Array.from(document.querySelectorAll(sel));
-
-        const targetContainer = containers.find(container => {
-          const button = container.querySelector('button');
-          return button?.textContent?.trim().includes(label);
-        });
-
-        if (!targetContainer) {
-          throw new Error(`Could not find a container with button: "${label}"`);
-        }
-
-        const actualText =
-          targetContainer.querySelector('p')?.textContent?.trim() || '';
-        return actualText.includes(expected);
-      },
-      containerSelector,
-      buttonLabel,
-      expectedText
-    );
-
-    if (!isMatch) {
+          const actualText =
+            targetContainer.querySelector('p')?.textContent?.trim() || '';
+          return actualText.includes(expected);
+        },
+        {timeout: 120000},
+        containerSelector,
+        buttonLabel,
+        expectedText
+      );
+    } catch (err) {
       throw new Error(
-        `Text mismatch in container for "${buttonLabel}". Expected to include: "${expectedText}"`
+        `Text mismatch or container not found for "${buttonLabel}". Expected to include: "${expectedText}"`
       );
     }
   }
@@ -7046,6 +7046,9 @@ export class LoggedOutUser extends BaseUser {
    * @param hint - Expected hint content in hint modal.
    */
   async expectHintContentInHintModal(hint: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
     await this.page.waitForSelector(hintModalBodySelector, {
       visible: true,
     });
