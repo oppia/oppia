@@ -81,4 +81,23 @@ describe('Populate Rule Content Ids Service', () => {
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
     expect(rule.inputs).toEqual({y: 1});
   });
+
+  it('should return early when rule type is null', () => {
+    let rule = new Rule(
+      'Equals',
+      {
+        x: {
+          contentId: null,
+          normalizedStrSet: [],
+        },
+      },
+      {x: 'TranslatableSetOfNormalizedString'}
+    );
+    (rule as unknown as {type: string | null}).type = null;
+    spyOn(generateContentIdService, 'getNextStateId');
+
+    populateRuleContentIdsService.populateNullRuleContentIds(rule);
+
+    expect(generateContentIdService.getNextStateId).not.toHaveBeenCalled();
+  });
 });
