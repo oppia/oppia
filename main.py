@@ -1593,6 +1593,10 @@ URLS.extend(
             tasks.FeedbackThreadStatusChangeEmailHandler,
         ),
         get_redirect_route(
+            r'%s' % feconf.TASK_URL_RETRY_FAILED_EMAIL,
+            tasks.RetryEmailHandler,
+        ),
+        get_redirect_route(
             r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler
         ),
     )
