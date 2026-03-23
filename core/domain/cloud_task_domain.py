@@ -302,6 +302,22 @@ class VoiceoverRegenerationJob:
                     feconf.VoiceoverRegenerationState.SUCCEEDED.value
                 )
 
+    def update_remaining_content_status_as_succeeded(self) -> None:
+        """Updates the content-status map for a given language-accent code by
+        marking all content IDs which are still GENERATING as SUCCEEDED.
+        """
+        for (
+            content_status_map
+        ) in self.language_accent_to_content_status_map.values():
+            for content_id, regeneration_status in content_status_map.items():
+                if (
+                    regeneration_status
+                    == feconf.VoiceoverRegenerationState.GENERATING.value
+                ):
+                    content_status_map[content_id] = (
+                        feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                    )
+
     def update_final_content_status(
         self, language_accent_code: str, failed_content_ids: List[str]
     ) -> None:

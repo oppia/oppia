@@ -342,6 +342,55 @@ class VoiceoverRegenerationJobTests(test_utils.GenericTestBase):
             expected_language_accent_to_content_status_map,
         )
 
+    def test_should_update_remaining_content_status_as_succeeded(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+        language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'GENERATING',
+                'content_1': 'FAILED',
+                'content_2': 'SUCCEEDED',
+            },
+            'hi-IN': {
+                'content_3': 'GENERATING',
+            },
+        }
+
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationJob(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        self.assertFalse(
+            voiceover_regeneration_task_mapping.are_all_voiceovers_attempted()
+        )
+
+        (
+            voiceover_regeneration_task_mapping.update_remaining_content_status_as_succeeded()
+        )
+
+        expected_language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'SUCCEEDED',
+                'content_1': 'FAILED',
+                'content_2': 'SUCCEEDED',
+            },
+            'hi-IN': {
+                'content_3': 'SUCCEEDED',
+            },
+        }
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
+            expected_language_accent_to_content_status_map,
+        )
+        self.assertTrue(
+            voiceover_regeneration_task_mapping.are_all_voiceovers_attempted()
+        )
+
 
 class VoiceoverRegenerationTaskBatchTests(test_utils.GenericTestBase):
     """Unit tests for VoiceoverRegenerationTaskBatch domain object."""
