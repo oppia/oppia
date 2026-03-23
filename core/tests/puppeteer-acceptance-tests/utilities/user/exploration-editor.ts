@@ -41,7 +41,7 @@ const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
-const mathInteractionsTab = '.e2e-test-interaction-tab-math';
+
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
@@ -131,8 +131,7 @@ const toastMessage = '.e2e-test-toast-message';
 const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
 const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
 const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
-const addHintButton = 'button.e2e-test-oppia-add-hint-button';
-const saveHintButton = 'button.e2e-test-save-hint';
+
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
 const solutionInputTextArea =

@@ -20,16 +20,15 @@ import {BaseUser} from './puppeteer-utils';
 
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const addInteractionModalSelector = 'customize-interaction-body-container';
-const richTextEditorWrapperSelector = 'oppia-ck-editor-wrapper';
+
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const defaultResponseFeedbackInput = 'oppia-rte-editor';
 const saveDefaultResponseFeedbackButton =
   'button.e2e-test-save-default-response-feedback';
 const defaultResponseTab = 'div.e2e-test-default-response-tab';
-const addResponseButton = 'button.e2e-test-open-add-response-modal';
-const answerInputSelector = '.e2e-test-answer-input';
+
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
-const stateContentInputField = '.e2e-test-state-content-editor';
+
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
