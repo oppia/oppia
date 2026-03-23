@@ -37,19 +37,19 @@ describe('Logged-in Learner', function () {
 
   // The logged-in user cannot access the moderator page.
   it('should be restricted from accessing the moderator page', async function () {
-    await loggedInUser.navigateToModeratorPageInLoggedOutUser();
+    await loggedInUser.navigateToModeratorPageInLoggedInUser();
     await loggedInUser.expectErrorPage(401); // Expect a 401 Unauthorized error.
   });
 
   // The logged-in user cannot access the topics and skills dashboard.
   it('should be restricted from accessing the topics and skills dashboard', async function () {
-    await loggedInUser.navigateToTopicsAndSkillsDashboardPageInLoggedOutUser();
+    await loggedInUser.navigateToTopicsAndSkillsDashboardPageInLoggedInUser();
     await loggedInUser.expectErrorPage(401); // Expect a 401 Unauthorized error.
   });
 
   // The logged-in user cannot access the release coordinator page.
   it('should be restricted from accessing the release coordinator page', async function () {
-    await loggedInUser.navigateToReleaseCoordinatorPageInReleaseCoordinator();
+    await loggedInUser.navigateToReleaseCoordinatorPageInLoggedInUser();
     await loggedInUser.expectErrorPage(404); // Expect a 404 Not Found error.
   });
 

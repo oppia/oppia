@@ -197,7 +197,7 @@ describe('Logged-In Learner', function () {
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     // Did not finish the chapter,So still in  In-progress section.
     await loggedInLearner.expectElementsToBePresentInRLD(
@@ -241,8 +241,8 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -267,8 +267,8 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -294,8 +294,8 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -321,8 +321,8 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 4: Rounding Numbers part 1'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -341,8 +341,8 @@ describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 5: Rounding Numbers part 2'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );

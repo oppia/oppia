@@ -69,7 +69,7 @@ describe('Site Moderator', function () {
   });
 
   it('should be able verify display of recent commits table', async function () {
-    await siteModerator.navigateToModeratorPageInLoggedOutUser();
+    await siteModerator.navigateToModeratorPageInModerator();
     await siteModerator.expectScreenshotToMatch('siteModeratorPage', __dirname);
 
     await siteModerator.expectNumberOfRecentCommits(2);

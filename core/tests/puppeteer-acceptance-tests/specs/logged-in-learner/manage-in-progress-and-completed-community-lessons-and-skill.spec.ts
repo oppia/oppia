@@ -79,7 +79,7 @@ describe('Logged-in Learner', function () {
 
       await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
       await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
-      await loggedInLearner.continueToNextCardInExplorationEditor();
+      await loggedInLearner.continueToNextCardInLoggedOutUser();
       await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.navigateToProgressSection();
       await loggedInLearner.expectScreenshotToMatch(
@@ -103,7 +103,7 @@ describe('Logged-in Learner', function () {
 
     await loggedInLearner.searchForLessonInSearchBar('Explore Title 2');
     await loggedInLearner.playLessonFromSearchResults('Explore Title 2');
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
 
@@ -111,7 +111,7 @@ describe('Logged-in Learner', function () {
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
     await loggedInLearner.searchForLessonInSearchBar('Explore Title 3');
     await loggedInLearner.playLessonFromSearchResults('Explore Title 3');
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
 
@@ -119,7 +119,7 @@ describe('Logged-in Learner', function () {
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
     await loggedInLearner.searchForLessonInSearchBar('Explore Title 4');
     await loggedInLearner.playLessonFromSearchResults('Explore Title 4');
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
 
@@ -127,7 +127,7 @@ describe('Logged-in Learner', function () {
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
     await loggedInLearner.searchForLessonInSearchBar('Explore Title 5');
     await loggedInLearner.playLessonFromSearchResults('Explore Title 5');
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
 
@@ -135,7 +135,7 @@ describe('Logged-in Learner', function () {
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
     await loggedInLearner.searchForLessonInSearchBar('Explore Title 6');
     await loggedInLearner.playLessonFromSearchResults('Explore Title 6');
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
     await loggedInLearner.expectScreenshotToMatch(
@@ -192,8 +192,8 @@ describe('Logged-in Learner', function () {
       'Explore Title 6',
       'In Progress'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );

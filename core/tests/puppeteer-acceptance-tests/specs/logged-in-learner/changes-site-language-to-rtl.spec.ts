@@ -166,8 +166,8 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.verifyPageIsRTL();
 
     // Check hints and lesson info are displayed in RTL.
-    await loggedInUser1.continueToNextCardInExplorationEditor();
-    await loggedInUser1.submitAnswerInExplorationEditor('1');
+    await loggedInUser1.continueToNextCardInLoggedOutUser();
+    await loggedInUser1.submitAnswerInLoggedOutUser('1');
 
     await loggedInUser1.viewHint();
     await loggedInUser1.verifyPageIsRTL();

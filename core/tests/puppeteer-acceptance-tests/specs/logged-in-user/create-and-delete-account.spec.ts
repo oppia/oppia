@@ -71,14 +71,14 @@ describe('Logged-in User', function () {
       await loggedInUser2.signInWithUsername('loggedInUser2');
 
       // Delete the account.
-      await loggedInUser2.navigateToPreferencesPageInLoggedOutUser();
+      await loggedInUser2.navigateToPreferencesPageInLoggedInUser();
       await loggedInUser2.deleteAccount();
       // Initiating account deletion from /preferences page redirects to /delete-account page.
-      await loggedInUser2.expectToBeOnPageInLoggedOutUser('delete account');
+      await loggedInUser2.expectToBeOnPageInLoggedInUser('delete account');
       await loggedInUser2.confirmAccountDeletion('loggedInUser2');
 
       // After confirmation of account deletion, user is redirected to /pending-account-deletion page.
-      await loggedInUser2.expectToBeOnPageInLoggedOutUser(
+      await loggedInUser2.expectToBeOnPageInLoggedInUser(
         'pending account deletion'
       );
       // Calling closeBrowser since we didn't call createNewUser for loggedInUser2, so loggedInUser2 is not in the array activeUsers.

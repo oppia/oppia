@@ -66,9 +66,9 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser1.navigateToCreatorDashboard();
       await loggedInUser1.navigateToExplorationEditorPageFromCreatorDashboard();
-      await loggedInUser1.dismissWelcomeModalInExplorationEditor();
+      await loggedInUser1.dismissWelcomeModalInLoggedInUser();
       await loggedInUser1.updateCardContentWithConceptCard('hello ');
-      await loggedInUser1.saveExplorationDraftInExplorationEditor();
+      await loggedInUser1.saveExplorationDraftInLoggedOutUser();
       await loggedInUser1.navigateToExplorationEditorPreviewTab();
       await loggedInUser1.clickOnSkillReviewComponent();
       await loggedInUser1.checkConceptCardWithWorkedExampleIsInserted(

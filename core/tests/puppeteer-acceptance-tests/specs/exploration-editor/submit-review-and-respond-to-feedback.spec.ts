@@ -70,8 +70,8 @@ describe('Exploration Editor', function () {
       );
 
       // First user plays the exploration and gives non-anonymous feedback.
-      await loggedInVisitor.playExplorationInLoggedOutUser(explorationId);
-      await loggedInVisitor.giveFeedbackInLoggedOutUser(
+      await loggedInVisitor.playExplorationInLoggedInUser(explorationId);
+      await loggedInVisitor.giveFeedbackInLoggedInUser(
         'This is helpful non-anonymous feedback',
         false
       );
@@ -86,8 +86,8 @@ describe('Exploration Editor', function () {
       );
 
       // Logged-in user gives anonymous feedback (testing both feedback types).
-      await loggedInVisitor.playExplorationInLoggedOutUser(explorationId);
-      await loggedInVisitor.giveFeedbackInLoggedOutUser(
+      await loggedInVisitor.playExplorationInLoggedInUser(explorationId);
+      await loggedInVisitor.giveFeedbackInLoggedInUser(
         'This is anonymous feedback from the second user',
         true
       );

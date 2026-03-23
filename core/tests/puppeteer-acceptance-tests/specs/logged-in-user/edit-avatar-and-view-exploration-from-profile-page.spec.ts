@@ -63,7 +63,7 @@ describe('Logged-in User', function () {
     'should display created explorations on profile page',
     async function () {
       await loggedInUser.navigateToProfilePageUsingProfileDropdown();
-      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitleInLoggedOutUser(
+      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitleInLoggedInUser(
         TEST_EXPLORATION.title
       );
     },
@@ -74,19 +74,19 @@ describe('Logged-in User', function () {
   it(
     'should display edited explorations on profile page',
     async function () {
-      await loggedInUser.navigateToCreatorDashboardPageInExplorationEditor();
-      await loggedInUser.openExplorationInExplorationEditorInExplorationEditor(
+      await loggedInUser.navigateToCreatorDashboardPageInLoggedInUser();
+      await loggedInUser.openExplorationInExplorationEditorInLoggedInUser(
         TEST_EXPLORATION.title
       );
-      await loggedInUser.navigateToSettingsTabInExplorationEditor();
-      await loggedInUser.updateTitleToInExplorationEditor(
+      await loggedInUser.navigateToSettingsTabInLoggedInUser();
+      await loggedInUser.updateTitleToInLoggedInUser(
         TEST_EXPLORATION.editedTitle
       );
 
-      await loggedInUser.saveExplorationDraftInExplorationEditor();
+      await loggedInUser.saveExplorationDraftInLoggedOutUser();
 
       await loggedInUser.navigateToProfilePageUsingProfileDropdown();
-      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitleInLoggedOutUser(
+      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitleInLoggedInUser(
         TEST_EXPLORATION.editedTitle
       );
     },

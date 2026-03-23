@@ -149,7 +149,7 @@ describe('Logged-in Learner', function () {
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
 
     await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
     await loggedInLearner.navigateToProgressSection();
@@ -182,8 +182,8 @@ describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -217,8 +217,8 @@ describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -241,8 +241,8 @@ describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );

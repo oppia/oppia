@@ -120,9 +120,9 @@ describe('Logged-in User', function () {
     await loggedInUser.playLessonFromSearchResults('Positive Numbers');
 
     // Continue to the next card and submit an answer.
-    await loggedInUser.continueToNextCardInExplorationEditor();
-    await loggedInUser.submitAnswerInExplorationEditor('-25');
-    await loggedInUser.continueToNextCardInExplorationEditor();
+    await loggedInUser.continueToNextCardInLoggedOutUser();
+    await loggedInUser.submitAnswerInLoggedOutUser('-25');
+    await loggedInUser.continueToNextCardInLoggedOutUser();
 
     // Verify that the checkpoint modal appears and reload the page.
     await loggedInUser.verifyCheckpointModalAppears();
@@ -134,7 +134,7 @@ describe('Logged-in User', function () {
     await loggedInUser.expectProgressReminder(true);
     await loggedInUser.chooseActionInProgressRemainder('Resume');
 
-    await loggedInUser.continueToNextCardInExplorationEditor();
+    await loggedInUser.continueToNextCardInLoggedOutUser();
     await loggedInUser.expectCardContentToMatch(
       'Lesson completed successfully. We have practiced negative numbers.'
     );
@@ -148,9 +148,9 @@ describe('Logged-in User', function () {
     // Continue the exploration from where they left off.
     await loggedInUser.chooseActionInProgressRemainder('Restart');
 
-    await loggedInUser.continueToNextCardInExplorationEditor();
-    await loggedInUser.submitAnswerInExplorationEditor('-99');
-    await loggedInUser.continueToNextCardInExplorationEditor();
+    await loggedInUser.continueToNextCardInLoggedOutUser();
+    await loggedInUser.submitAnswerInLoggedOutUser('-99');
+    await loggedInUser.continueToNextCardInLoggedOutUser();
   });
 
   afterAll(async function () {

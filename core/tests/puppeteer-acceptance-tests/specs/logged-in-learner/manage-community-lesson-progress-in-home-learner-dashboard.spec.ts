@@ -82,7 +82,7 @@ describe('Logged-In Learner', function () {
       await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
       await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
 
-      await loggedInLearner.continueToNextCardInExplorationEditor();
+      await loggedInLearner.continueToNextCardInLoggedOutUser();
       await loggedInLearner.navigateToLearnerDashboardInLoggedOutUser();
       await loggedInLearner.expectScreenshotToMatch(
         'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1',
@@ -130,8 +130,8 @@ describe('Logged-In Learner', function () {
       'Lesson you saved for later',
       'Explore Title 2'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );

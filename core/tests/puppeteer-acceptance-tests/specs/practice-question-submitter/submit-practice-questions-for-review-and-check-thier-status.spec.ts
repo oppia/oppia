@@ -71,7 +71,7 @@ describe('Practice Question Submitter', function () {
     );
 
     // Add submit question rights to the question submitter.
-    await questionAdmin.navigateToContributorDashboardAdminPageInContributorAdmin();
+    await questionAdmin.navigateToContributorDashboardAdminPageInQuestionAdmin();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
     await questionAdmin.addReviewQuestionRights('questionReviewer');
 

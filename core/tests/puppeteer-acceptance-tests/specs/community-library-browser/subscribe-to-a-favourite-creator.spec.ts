@@ -74,7 +74,7 @@ describe('Community Library Browser', function () {
       'Story 1',
       'Chapter 1'
     );
-    await communityLibraryBrowser.continueToNextCardInExplorationEditor();
+    await communityLibraryBrowser.continueToNextCardInLoggedOutUser();
 
     // Subscribe to creator.
     await communityLibraryBrowser.openLessonInfoModal();

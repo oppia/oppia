@@ -87,7 +87,7 @@ describe('Question Submitter', function () {
     );
 
     // Add submit question rights to the question submitter.
-    await questionAdmin.navigateToContributorDashboardAdminPageInContributorAdmin();
+    await questionAdmin.navigateToContributorDashboardAdminPageInQuestionAdmin();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 

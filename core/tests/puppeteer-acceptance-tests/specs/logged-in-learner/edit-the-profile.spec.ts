@@ -162,7 +162,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.playLessonFromSearchResults(
       'Solving problems without calculator'
     );
-    await loggedInLearner.continueToNextCardInExplorationEditor();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
 
     await loggedInLearner.openLessonInfoModal();
     await loggedInLearner.clickOnProfileIconInLessonInfoModel();

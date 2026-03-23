@@ -49,14 +49,14 @@ describe('Logged-out User', function () {
         false
       );
 
-    await explorationEditor.playExplorationInLoggedOutUser(explorationId1);
+    await explorationEditor.playExplorationInLoggedInUser(explorationId1);
     await explorationEditor.rateExploration(
       5,
       'Excellent advanced Algebra course',
       false
     );
 
-    await explorationEditor.playExplorationInLoggedOutUser(explorationId2);
+    await explorationEditor.playExplorationInLoggedInUser(explorationId2);
     await explorationEditor.rateExploration(
       4,
       'Excellent advanced Algebra course',

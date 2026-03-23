@@ -76,7 +76,7 @@ describe('Site Moderator', function () {
   });
 
   it('should be able to validate feedback entries', async function () {
-    await siteModerator.navigateToModeratorPageInLoggedOutUser();
+    await siteModerator.navigateToModeratorPageInModerator();
     await siteModerator.navigateToRecentFeedbackMessagesTab();
     await siteModerator.expectScreenshotToMatch(
       'moderatorPageRecentFeedbackMessagesTab',

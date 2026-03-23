@@ -152,7 +152,7 @@ describe('Curriculum Admin', function () {
 
   it('should preview a study guide.', async function () {
     await curriculumAdmin.previewStudyGuide();
-    await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSectionsInLoggedOutUser(
+    await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSectionsInCurriculumAdmin(
       'subtopic1',
       [
         ['abcd', '1234567'],

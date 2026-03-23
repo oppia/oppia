@@ -114,7 +114,7 @@ describe('Topic Manager', function () {
 
   it('should be able to filter topics and skills', async function () {
     // Filter topics by status.
-    await topicManager.navigateToTopicsAndSkillsDashboardPageInLoggedOutUser();
+    await topicManager.navigateToTopicsAndSkillsDashboardPageInLoggedInUser();
     await topicManager.filterTopicsByStatus('Published');
     await topicManager.expectFilteredTopics(['Arithmetic Operations']);
     await topicManager.expectFilteredTopics(['Whole Numbers'], false);

@@ -82,11 +82,11 @@ describe('Voiceover Admin', function () {
   });
 
   it('should be able to add voiceover artist to an exploration', async function () {
-    await voiceoverAdmin.navigateToExplorationEditorInExplorationEditor(
+    await voiceoverAdmin.navigateToExplorationEditorInVoiceoverAdmin(
       explorationId
     );
-    await voiceoverAdmin.dismissWelcomeModalInExplorationEditor();
-    await voiceoverAdmin.navigateToExplorationSettingsTabInCurriculumAdmin();
+    await voiceoverAdmin.dismissWelcomeModalInVoiceoverAdmin();
+    await voiceoverAdmin.navigateToExplorationSettingsTabInVoiceoverAdmin();
     await voiceoverAdmin.expectVoiceoverArtistsListToBeEmpty();
 
     // Add invalid user as a voiceover artist.
