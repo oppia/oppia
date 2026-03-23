@@ -1,0 +1,36 @@
+Metadata-Version: 2.1
+Name: azure-cognitiveservices-speech
+Version: 1.41.1
+Summary: Microsoft Cognitive Services Speech SDK for Python
+Author: Microsoft
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.7
+License-File: licensefiles/speech/REDIST.txt
+License-File: licensefiles/speech/ThirdPartyNotices.md
+License-File: licensefiles/speech/LICENSE.md
+
+
+For an introduction to this package, have a look at `the quickstart
+article <https://learn.microsoft.com/azure/cognitive-services/speech-service/get-started-speech-to-text?pivots=programming-language-python>`_.
+
+For information about the Speech Service, please refer to `its
+website <https://learn.microsoft.com/azure/cognitive-services/speech-service/>`_.
+
+Documentation
+-------------
+
+API documentation for this package can be found `here <https://aka.ms/csspeech/pythonref>`_.
+
+License information
+-------------------
+
+- `Microsoft Software License Terms for the Speech SDK <https://aka.ms/csspeech/license/>`_
+- `Third party notices <https://aka.ms/csspeech/toctpn/>`_

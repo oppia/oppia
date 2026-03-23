@@ -1,0 +1,13 @@
+# Stubs for requests_mock.exceptions
+
+from typing import Any
+
+from requests import Request
+
+class MockException(Exception): ...
+
+class NoMockAddress(MockException):
+    request: Any = ...
+    def __init__(self, request: Request) -> None: ...
+
+class InvalidRequest(MockException): ...

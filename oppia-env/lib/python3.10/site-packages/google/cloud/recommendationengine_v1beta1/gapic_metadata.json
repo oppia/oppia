@@ -1,0 +1,215 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.recommendationengine_v1beta1",
+  "protoPackage": "google.cloud.recommendationengine.v1beta1",
+  "schema": "1.0",
+  "services": {
+    "CatalogService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "CatalogServiceClient",
+          "rpcs": {
+            "CreateCatalogItem": {
+              "methods": [
+                "create_catalog_item"
+              ]
+            },
+            "DeleteCatalogItem": {
+              "methods": [
+                "delete_catalog_item"
+              ]
+            },
+            "GetCatalogItem": {
+              "methods": [
+                "get_catalog_item"
+              ]
+            },
+            "ImportCatalogItems": {
+              "methods": [
+                "import_catalog_items"
+              ]
+            },
+            "ListCatalogItems": {
+              "methods": [
+                "list_catalog_items"
+              ]
+            },
+            "UpdateCatalogItem": {
+              "methods": [
+                "update_catalog_item"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "CatalogServiceAsyncClient",
+          "rpcs": {
+            "CreateCatalogItem": {
+              "methods": [
+                "create_catalog_item"
+              ]
+            },
+            "DeleteCatalogItem": {
+              "methods": [
+                "delete_catalog_item"
+              ]
+            },
+            "GetCatalogItem": {
+              "methods": [
+                "get_catalog_item"
+              ]
+            },
+            "ImportCatalogItems": {
+              "methods": [
+                "import_catalog_items"
+              ]
+            },
+            "ListCatalogItems": {
+              "methods": [
+                "list_catalog_items"
+              ]
+            },
+            "UpdateCatalogItem": {
+              "methods": [
+                "update_catalog_item"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "PredictionApiKeyRegistry": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "PredictionApiKeyRegistryClient",
+          "rpcs": {
+            "CreatePredictionApiKeyRegistration": {
+              "methods": [
+                "create_prediction_api_key_registration"
+              ]
+            },
+            "DeletePredictionApiKeyRegistration": {
+              "methods": [
+                "delete_prediction_api_key_registration"
+              ]
+            },
+            "ListPredictionApiKeyRegistrations": {
+              "methods": [
+                "list_prediction_api_key_registrations"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "PredictionApiKeyRegistryAsyncClient",
+          "rpcs": {
+            "CreatePredictionApiKeyRegistration": {
+              "methods": [
+                "create_prediction_api_key_registration"
+              ]
+            },
+            "DeletePredictionApiKeyRegistration": {
+              "methods": [
+                "delete_prediction_api_key_registration"
+              ]
+            },
+            "ListPredictionApiKeyRegistrations": {
+              "methods": [
+                "list_prediction_api_key_registrations"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "PredictionService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "PredictionServiceClient",
+          "rpcs": {
+            "Predict": {
+              "methods": [
+                "predict"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "PredictionServiceAsyncClient",
+          "rpcs": {
+            "Predict": {
+              "methods": [
+                "predict"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "UserEventService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "UserEventServiceClient",
+          "rpcs": {
+            "CollectUserEvent": {
+              "methods": [
+                "collect_user_event"
+              ]
+            },
+            "ImportUserEvents": {
+              "methods": [
+                "import_user_events"
+              ]
+            },
+            "ListUserEvents": {
+              "methods": [
+                "list_user_events"
+              ]
+            },
+            "PurgeUserEvents": {
+              "methods": [
+                "purge_user_events"
+              ]
+            },
+            "WriteUserEvent": {
+              "methods": [
+                "write_user_event"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "UserEventServiceAsyncClient",
+          "rpcs": {
+            "CollectUserEvent": {
+              "methods": [
+                "collect_user_event"
+              ]
+            },
+            "ImportUserEvents": {
+              "methods": [
+                "import_user_events"
+              ]
+            },
+            "ListUserEvents": {
+              "methods": [
+                "list_user_events"
+              ]
+            },
+            "PurgeUserEvents": {
+              "methods": [
+                "purge_user_events"
+              ]
+            },
+            "WriteUserEvent": {
+              "methods": [
+                "write_user_event"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

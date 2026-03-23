@@ -1,0 +1,373 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.pubsublite_v1",
+  "protoPackage": "google.cloud.pubsublite.v1",
+  "schema": "1.0",
+  "services": {
+    "AdminService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "AdminServiceClient",
+          "rpcs": {
+            "CreateReservation": {
+              "methods": [
+                "create_reservation"
+              ]
+            },
+            "CreateSubscription": {
+              "methods": [
+                "create_subscription"
+              ]
+            },
+            "CreateTopic": {
+              "methods": [
+                "create_topic"
+              ]
+            },
+            "DeleteReservation": {
+              "methods": [
+                "delete_reservation"
+              ]
+            },
+            "DeleteSubscription": {
+              "methods": [
+                "delete_subscription"
+              ]
+            },
+            "DeleteTopic": {
+              "methods": [
+                "delete_topic"
+              ]
+            },
+            "GetReservation": {
+              "methods": [
+                "get_reservation"
+              ]
+            },
+            "GetSubscription": {
+              "methods": [
+                "get_subscription"
+              ]
+            },
+            "GetTopic": {
+              "methods": [
+                "get_topic"
+              ]
+            },
+            "GetTopicPartitions": {
+              "methods": [
+                "get_topic_partitions"
+              ]
+            },
+            "ListReservationTopics": {
+              "methods": [
+                "list_reservation_topics"
+              ]
+            },
+            "ListReservations": {
+              "methods": [
+                "list_reservations"
+              ]
+            },
+            "ListSubscriptions": {
+              "methods": [
+                "list_subscriptions"
+              ]
+            },
+            "ListTopicSubscriptions": {
+              "methods": [
+                "list_topic_subscriptions"
+              ]
+            },
+            "ListTopics": {
+              "methods": [
+                "list_topics"
+              ]
+            },
+            "SeekSubscription": {
+              "methods": [
+                "seek_subscription"
+              ]
+            },
+            "UpdateReservation": {
+              "methods": [
+                "update_reservation"
+              ]
+            },
+            "UpdateSubscription": {
+              "methods": [
+                "update_subscription"
+              ]
+            },
+            "UpdateTopic": {
+              "methods": [
+                "update_topic"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "AdminServiceAsyncClient",
+          "rpcs": {
+            "CreateReservation": {
+              "methods": [
+                "create_reservation"
+              ]
+            },
+            "CreateSubscription": {
+              "methods": [
+                "create_subscription"
+              ]
+            },
+            "CreateTopic": {
+              "methods": [
+                "create_topic"
+              ]
+            },
+            "DeleteReservation": {
+              "methods": [
+                "delete_reservation"
+              ]
+            },
+            "DeleteSubscription": {
+              "methods": [
+                "delete_subscription"
+              ]
+            },
+            "DeleteTopic": {
+              "methods": [
+                "delete_topic"
+              ]
+            },
+            "GetReservation": {
+              "methods": [
+                "get_reservation"
+              ]
+            },
+            "GetSubscription": {
+              "methods": [
+                "get_subscription"
+              ]
+            },
+            "GetTopic": {
+              "methods": [
+                "get_topic"
+              ]
+            },
+            "GetTopicPartitions": {
+              "methods": [
+                "get_topic_partitions"
+              ]
+            },
+            "ListReservationTopics": {
+              "methods": [
+                "list_reservation_topics"
+              ]
+            },
+            "ListReservations": {
+              "methods": [
+                "list_reservations"
+              ]
+            },
+            "ListSubscriptions": {
+              "methods": [
+                "list_subscriptions"
+              ]
+            },
+            "ListTopicSubscriptions": {
+              "methods": [
+                "list_topic_subscriptions"
+              ]
+            },
+            "ListTopics": {
+              "methods": [
+                "list_topics"
+              ]
+            },
+            "SeekSubscription": {
+              "methods": [
+                "seek_subscription"
+              ]
+            },
+            "UpdateReservation": {
+              "methods": [
+                "update_reservation"
+              ]
+            },
+            "UpdateSubscription": {
+              "methods": [
+                "update_subscription"
+              ]
+            },
+            "UpdateTopic": {
+              "methods": [
+                "update_topic"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "CursorService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "CursorServiceClient",
+          "rpcs": {
+            "CommitCursor": {
+              "methods": [
+                "commit_cursor"
+              ]
+            },
+            "ListPartitionCursors": {
+              "methods": [
+                "list_partition_cursors"
+              ]
+            },
+            "StreamingCommitCursor": {
+              "methods": [
+                "streaming_commit_cursor"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "CursorServiceAsyncClient",
+          "rpcs": {
+            "CommitCursor": {
+              "methods": [
+                "commit_cursor"
+              ]
+            },
+            "ListPartitionCursors": {
+              "methods": [
+                "list_partition_cursors"
+              ]
+            },
+            "StreamingCommitCursor": {
+              "methods": [
+                "streaming_commit_cursor"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "PartitionAssignmentService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "PartitionAssignmentServiceClient",
+          "rpcs": {
+            "AssignPartitions": {
+              "methods": [
+                "assign_partitions"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "PartitionAssignmentServiceAsyncClient",
+          "rpcs": {
+            "AssignPartitions": {
+              "methods": [
+                "assign_partitions"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "PublisherService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "PublisherServiceClient",
+          "rpcs": {
+            "Publish": {
+              "methods": [
+                "publish"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "PublisherServiceAsyncClient",
+          "rpcs": {
+            "Publish": {
+              "methods": [
+                "publish"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "SubscriberService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "SubscriberServiceClient",
+          "rpcs": {
+            "Subscribe": {
+              "methods": [
+                "subscribe"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "SubscriberServiceAsyncClient",
+          "rpcs": {
+            "Subscribe": {
+              "methods": [
+                "subscribe"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "TopicStatsService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "TopicStatsServiceClient",
+          "rpcs": {
+            "ComputeHeadCursor": {
+              "methods": [
+                "compute_head_cursor"
+              ]
+            },
+            "ComputeMessageStats": {
+              "methods": [
+                "compute_message_stats"
+              ]
+            },
+            "ComputeTimeCursor": {
+              "methods": [
+                "compute_time_cursor"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "TopicStatsServiceAsyncClient",
+          "rpcs": {
+            "ComputeHeadCursor": {
+              "methods": [
+                "compute_head_cursor"
+              ]
+            },
+            "ComputeMessageStats": {
+              "methods": [
+                "compute_message_stats"
+              ]
+            },
+            "ComputeTimeCursor": {
+              "methods": [
+                "compute_time_cursor"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

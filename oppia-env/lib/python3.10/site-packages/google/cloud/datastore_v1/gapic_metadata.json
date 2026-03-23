@@ -1,0 +1,148 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.datastore_v1",
+  "protoPackage": "google.datastore.v1",
+  "schema": "1.0",
+  "services": {
+    "Datastore": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "DatastoreClient",
+          "rpcs": {
+            "AllocateIds": {
+              "methods": [
+                "allocate_ids"
+              ]
+            },
+            "BeginTransaction": {
+              "methods": [
+                "begin_transaction"
+              ]
+            },
+            "Commit": {
+              "methods": [
+                "commit"
+              ]
+            },
+            "Lookup": {
+              "methods": [
+                "lookup"
+              ]
+            },
+            "ReserveIds": {
+              "methods": [
+                "reserve_ids"
+              ]
+            },
+            "Rollback": {
+              "methods": [
+                "rollback"
+              ]
+            },
+            "RunAggregationQuery": {
+              "methods": [
+                "run_aggregation_query"
+              ]
+            },
+            "RunQuery": {
+              "methods": [
+                "run_query"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "DatastoreAsyncClient",
+          "rpcs": {
+            "AllocateIds": {
+              "methods": [
+                "allocate_ids"
+              ]
+            },
+            "BeginTransaction": {
+              "methods": [
+                "begin_transaction"
+              ]
+            },
+            "Commit": {
+              "methods": [
+                "commit"
+              ]
+            },
+            "Lookup": {
+              "methods": [
+                "lookup"
+              ]
+            },
+            "ReserveIds": {
+              "methods": [
+                "reserve_ids"
+              ]
+            },
+            "Rollback": {
+              "methods": [
+                "rollback"
+              ]
+            },
+            "RunAggregationQuery": {
+              "methods": [
+                "run_aggregation_query"
+              ]
+            },
+            "RunQuery": {
+              "methods": [
+                "run_query"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "DatastoreClient",
+          "rpcs": {
+            "AllocateIds": {
+              "methods": [
+                "allocate_ids"
+              ]
+            },
+            "BeginTransaction": {
+              "methods": [
+                "begin_transaction"
+              ]
+            },
+            "Commit": {
+              "methods": [
+                "commit"
+              ]
+            },
+            "Lookup": {
+              "methods": [
+                "lookup"
+              ]
+            },
+            "ReserveIds": {
+              "methods": [
+                "reserve_ids"
+              ]
+            },
+            "Rollback": {
+              "methods": [
+                "rollback"
+              ]
+            },
+            "RunAggregationQuery": {
+              "methods": [
+                "run_aggregation_query"
+              ]
+            },
+            "RunQuery": {
+              "methods": [
+                "run_query"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

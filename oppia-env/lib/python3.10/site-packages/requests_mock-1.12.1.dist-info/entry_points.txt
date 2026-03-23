@@ -1,0 +1,2 @@
+[pytest11]
+requests_mock = requests_mock.contrib._pytest_plugin

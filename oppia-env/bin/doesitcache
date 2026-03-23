@@ -1,0 +1,8 @@
+#!/bin/sh
+'''exec' "/home/krishnavasnani/Documents/gsoc repo/oppia/oppia-env/bin/python3.10" "$0" "$@"
+' '''
+import sys
+from cachecontrol._cmd import main
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(main())

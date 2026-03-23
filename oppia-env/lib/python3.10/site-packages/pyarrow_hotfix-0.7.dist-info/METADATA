@@ -1,0 +1,116 @@
+Metadata-Version: 2.4
+Name: pyarrow-hotfix
+Version: 0.7
+Project-URL: Documentation, https://github.com/pitrou/pyarrow-hotfix#readme
+Project-URL: Issues, https://github.com/pitrou/pyarrow-hotfix/issues
+Project-URL: Source, https://github.com/pitrou/pyarrow-hotfix
+Author-email: Antoine Pitrou <antoine@python.org>
+License: Apache License, Version 2.0
+License-File: LICENSE.txt
+Classifier: Development Status :: 4 - Beta
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Python: >=3.5
+Description-Content-Type: text/x-rst
+
+PyArrow Hotfix
+==============
+
+.. image:: https://img.shields.io/pypi/v/pyarrow-hotfix.svg
+   :alt: pyarrow_hotfix package on PyPI
+   :target: https://pypi.org/project/pyarrow-hotfix
+
+.. image:: https://img.shields.io/pypi/pyversions/pyarrow-hotfix.svg
+   :alt: pyarrow_hotfix supported Python versions
+   :target: https://pypi.org/project/pyarrow-hotfix
+
+.. image:: https://github.com/pitrou/pyarrow-hotfix/actions/workflows/tests.yml/badge.svg
+   :alt: latest unit test results
+   :target: https://github.com/pitrou/pyarrow-hotfix/actions/workflows/tests.yml
+
+
+Description
+-----------
+
+This is a hotfix for the PyArrow security vulnerability
+`CVE-2023-47248 <https://www.cve.org/CVERecord?id=CVE-2023-47248>`__.
+
+We generally recommend upgrading to PyArrow 14.0.1 or later, but if you
+cannot upgrade, this package disables the vulnerability on older versions.
+
+Installation
+------------
+
+Use ``pip`` to install:
+
+.. code-block:: console
+
+   pip install pyarrow_hotfix
+
+.. note::
+   Both ``pyarrow-hotfix`` and ``pyarrow_hotfix`` are accepted and point to
+   the same package.
+
+Usage
+-----
+
+``pyarrow_hotfix`` must be imported in your application or library code for
+it to take effect:
+
+.. code-block:: python
+
+   import pyarrow_hotfix
+
+Supported versions
+------------------
+
+``pyarrow_hotfix`` supports all Python versions starting from Python 3.5,
+and all PyArrow versions starting from 0.14.0.
+
+Dependencies
+------------
+
+``pyarrow_hotfix`` is a pure Python package that does not have any explicit
+dependencies, and assumes you have installed ``pyarrow`` through other means
+(such as ``pip`` or ``conda``).
+
+Example
+-------
+
+.. code-block:: pycon
+
+   >>> import pyarrow as pa
+   >>> import pyarrow_hotfix
+   >>>
+   >>> pa.ipc.open_file('data.arrow')
+   Traceback (most recent call last):
+     [ ... ]
+   RuntimeError: forbidden deserialization of 'arrow.py_extension_type': storage_type = null, serialized = b"\x80\x03cbuiltins\neval\nq\x00X\x15\x00\x00\x00print('hello world!')q\x01\x85q\x02Rq\x03.", pickle disassembly:
+       0: \x80 PROTO      3
+       2: c    GLOBAL     'builtins eval'
+      17: q    BINPUT     0
+      19: X    BINUNICODE "print('hello world!')"
+      45: q    BINPUT     1
+      47: \x85 TUPLE1
+      48: q    BINPUT     2
+      50: R    REDUCE
+      51: q    BINPUT     3
+      53: .    STOP
+   highest protocol among opcodes = 2
+
+
+License
+-------
+
+Like ``pyarrow``, ``pyarrow_hotfix`` is distributed under the terms of the
+`Apache License, version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>`_.

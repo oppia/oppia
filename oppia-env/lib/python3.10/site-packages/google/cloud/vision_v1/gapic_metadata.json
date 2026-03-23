@@ -1,0 +1,392 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.vision_v1",
+  "protoPackage": "google.cloud.vision.v1",
+  "schema": "1.0",
+  "services": {
+    "ImageAnnotator": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "ImageAnnotatorClient",
+          "rpcs": {
+            "AsyncBatchAnnotateFiles": {
+              "methods": [
+                "async_batch_annotate_files"
+              ]
+            },
+            "AsyncBatchAnnotateImages": {
+              "methods": [
+                "async_batch_annotate_images"
+              ]
+            },
+            "BatchAnnotateFiles": {
+              "methods": [
+                "batch_annotate_files"
+              ]
+            },
+            "BatchAnnotateImages": {
+              "methods": [
+                "batch_annotate_images"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "ImageAnnotatorAsyncClient",
+          "rpcs": {
+            "AsyncBatchAnnotateFiles": {
+              "methods": [
+                "async_batch_annotate_files"
+              ]
+            },
+            "AsyncBatchAnnotateImages": {
+              "methods": [
+                "async_batch_annotate_images"
+              ]
+            },
+            "BatchAnnotateFiles": {
+              "methods": [
+                "batch_annotate_files"
+              ]
+            },
+            "BatchAnnotateImages": {
+              "methods": [
+                "batch_annotate_images"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "ImageAnnotatorClient",
+          "rpcs": {
+            "AsyncBatchAnnotateFiles": {
+              "methods": [
+                "async_batch_annotate_files"
+              ]
+            },
+            "AsyncBatchAnnotateImages": {
+              "methods": [
+                "async_batch_annotate_images"
+              ]
+            },
+            "BatchAnnotateFiles": {
+              "methods": [
+                "batch_annotate_files"
+              ]
+            },
+            "BatchAnnotateImages": {
+              "methods": [
+                "batch_annotate_images"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "ProductSearch": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "ProductSearchClient",
+          "rpcs": {
+            "AddProductToProductSet": {
+              "methods": [
+                "add_product_to_product_set"
+              ]
+            },
+            "CreateProduct": {
+              "methods": [
+                "create_product"
+              ]
+            },
+            "CreateProductSet": {
+              "methods": [
+                "create_product_set"
+              ]
+            },
+            "CreateReferenceImage": {
+              "methods": [
+                "create_reference_image"
+              ]
+            },
+            "DeleteProduct": {
+              "methods": [
+                "delete_product"
+              ]
+            },
+            "DeleteProductSet": {
+              "methods": [
+                "delete_product_set"
+              ]
+            },
+            "DeleteReferenceImage": {
+              "methods": [
+                "delete_reference_image"
+              ]
+            },
+            "GetProduct": {
+              "methods": [
+                "get_product"
+              ]
+            },
+            "GetProductSet": {
+              "methods": [
+                "get_product_set"
+              ]
+            },
+            "GetReferenceImage": {
+              "methods": [
+                "get_reference_image"
+              ]
+            },
+            "ImportProductSets": {
+              "methods": [
+                "import_product_sets"
+              ]
+            },
+            "ListProductSets": {
+              "methods": [
+                "list_product_sets"
+              ]
+            },
+            "ListProducts": {
+              "methods": [
+                "list_products"
+              ]
+            },
+            "ListProductsInProductSet": {
+              "methods": [
+                "list_products_in_product_set"
+              ]
+            },
+            "ListReferenceImages": {
+              "methods": [
+                "list_reference_images"
+              ]
+            },
+            "PurgeProducts": {
+              "methods": [
+                "purge_products"
+              ]
+            },
+            "RemoveProductFromProductSet": {
+              "methods": [
+                "remove_product_from_product_set"
+              ]
+            },
+            "UpdateProduct": {
+              "methods": [
+                "update_product"
+              ]
+            },
+            "UpdateProductSet": {
+              "methods": [
+                "update_product_set"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "ProductSearchAsyncClient",
+          "rpcs": {
+            "AddProductToProductSet": {
+              "methods": [
+                "add_product_to_product_set"
+              ]
+            },
+            "CreateProduct": {
+              "methods": [
+                "create_product"
+              ]
+            },
+            "CreateProductSet": {
+              "methods": [
+                "create_product_set"
+              ]
+            },
+            "CreateReferenceImage": {
+              "methods": [
+                "create_reference_image"
+              ]
+            },
+            "DeleteProduct": {
+              "methods": [
+                "delete_product"
+              ]
+            },
+            "DeleteProductSet": {
+              "methods": [
+                "delete_product_set"
+              ]
+            },
+            "DeleteReferenceImage": {
+              "methods": [
+                "delete_reference_image"
+              ]
+            },
+            "GetProduct": {
+              "methods": [
+                "get_product"
+              ]
+            },
+            "GetProductSet": {
+              "methods": [
+                "get_product_set"
+              ]
+            },
+            "GetReferenceImage": {
+              "methods": [
+                "get_reference_image"
+              ]
+            },
+            "ImportProductSets": {
+              "methods": [
+                "import_product_sets"
+              ]
+            },
+            "ListProductSets": {
+              "methods": [
+                "list_product_sets"
+              ]
+            },
+            "ListProducts": {
+              "methods": [
+                "list_products"
+              ]
+            },
+            "ListProductsInProductSet": {
+              "methods": [
+                "list_products_in_product_set"
+              ]
+            },
+            "ListReferenceImages": {
+              "methods": [
+                "list_reference_images"
+              ]
+            },
+            "PurgeProducts": {
+              "methods": [
+                "purge_products"
+              ]
+            },
+            "RemoveProductFromProductSet": {
+              "methods": [
+                "remove_product_from_product_set"
+              ]
+            },
+            "UpdateProduct": {
+              "methods": [
+                "update_product"
+              ]
+            },
+            "UpdateProductSet": {
+              "methods": [
+                "update_product_set"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "ProductSearchClient",
+          "rpcs": {
+            "AddProductToProductSet": {
+              "methods": [
+                "add_product_to_product_set"
+              ]
+            },
+            "CreateProduct": {
+              "methods": [
+                "create_product"
+              ]
+            },
+            "CreateProductSet": {
+              "methods": [
+                "create_product_set"
+              ]
+            },
+            "CreateReferenceImage": {
+              "methods": [
+                "create_reference_image"
+              ]
+            },
+            "DeleteProduct": {
+              "methods": [
+                "delete_product"
+              ]
+            },
+            "DeleteProductSet": {
+              "methods": [
+                "delete_product_set"
+              ]
+            },
+            "DeleteReferenceImage": {
+              "methods": [
+                "delete_reference_image"
+              ]
+            },
+            "GetProduct": {
+              "methods": [
+                "get_product"
+              ]
+            },
+            "GetProductSet": {
+              "methods": [
+                "get_product_set"
+              ]
+            },
+            "GetReferenceImage": {
+              "methods": [
+                "get_reference_image"
+              ]
+            },
+            "ImportProductSets": {
+              "methods": [
+                "import_product_sets"
+              ]
+            },
+            "ListProductSets": {
+              "methods": [
+                "list_product_sets"
+              ]
+            },
+            "ListProducts": {
+              "methods": [
+                "list_products"
+              ]
+            },
+            "ListProductsInProductSet": {
+              "methods": [
+                "list_products_in_product_set"
+              ]
+            },
+            "ListReferenceImages": {
+              "methods": [
+                "list_reference_images"
+              ]
+            },
+            "PurgeProducts": {
+              "methods": [
+                "purge_products"
+              ]
+            },
+            "RemoveProductFromProductSet": {
+              "methods": [
+                "remove_product_from_product_set"
+              ]
+            },
+            "UpdateProduct": {
+              "methods": [
+                "update_product"
+              ]
+            },
+            "UpdateProductSet": {
+              "methods": [
+                "update_product_set"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

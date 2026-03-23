@@ -1,0 +1,176 @@
+Metadata-Version: 2.4
+Name: pymilvus
+Version: 2.5.15
+Summary: Python Sdk for Milvus
+Author-email: Milvus Team <milvus-team@zilliz.com>
+Project-URL: repository, https://github.com/milvus-io/pymilvus
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: License :: OSI Approved :: Apache Software License
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: setuptools>69
+Requires-Dist: setuptools<70.1; python_version <= "3.8"
+Requires-Dist: protobuf>=3.20.0
+Requires-Dist: grpcio!=1.68.0,!=1.68.1,!=1.69.0,!=1.70.0,!=1.70.1,!=1.71.0,!=1.72.1,!=1.73.0,>=1.49.1
+Requires-Dist: python-dotenv<2.0.0,>=1.0.1
+Requires-Dist: ujson>=2.0.0
+Requires-Dist: pandas>=1.2.4
+Requires-Dist: numpy<1.25.0; python_version <= "3.8"
+Requires-Dist: milvus-lite>=2.4.0; sys_platform != "win32"
+Provides-Extra: bulk-writer
+Requires-Dist: requests; extra == "bulk-writer"
+Requires-Dist: minio>=7.0.0; extra == "bulk-writer"
+Requires-Dist: pyarrow>=12.0.0; extra == "bulk-writer"
+Requires-Dist: azure-storage-blob; extra == "bulk-writer"
+Requires-Dist: urllib3; extra == "bulk-writer"
+Provides-Extra: model
+Requires-Dist: pymilvus.model>=0.3.0; extra == "model"
+Provides-Extra: dev
+Requires-Dist: grpcio==1.62.2; extra == "dev"
+Requires-Dist: grpcio-tools==1.62.2; extra == "dev"
+Requires-Dist: grpcio-testing==1.62.2; extra == "dev"
+Requires-Dist: pytest>=5.3.4; extra == "dev"
+Requires-Dist: pytest-cov>=2.8.1; extra == "dev"
+Requires-Dist: pytest-timeout>=1.3.4; extra == "dev"
+Requires-Dist: ruff>0.4.0; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Dynamic: license-file
+
+# Milvus Python SDK
+
+[![version](https://img.shields.io/pypi/v/pymilvus.svg?color=blue)](https://pypi.org/project/pymilvus/)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/pymilvus?logo=python&logoColor=blue)](https://pypi.org/project/pymilvus/)
+[![Downloads](https://static.pepy.tech/badge/pymilvus)](https://pepy.tech/project/pymilvus)
+[![Downloads](https://static.pepy.tech/badge/pymilvus/month)](https://pepy.tech/project/pymilvus)
+[![Downloads](https://static.pepy.tech/badge/pymilvus/week)](https://pepy.tech/project/pymilvus)
+
+[![license](https://img.shields.io/hexpm/l/plug.svg?color=green)](https://github.com/milvus-io/pymilvus/blob/master/LICENSE)
+[![Mergify Status][mergify-status]][mergify]
+![Static Badge](https://img.shields.io/badge/slack-%23py--milvus-blue?style=social&logo=slack&link=https%3A%2F%2Fmilvusio.slack.com%2Farchives%2FC024XTWMT4L)
+
+[mergify]: https://mergify.com
+[mergify-status]: https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/milvus-io/pymilvus&style=flat
+
+Python SDK for [Milvus](https://github.com/milvus-io/milvus). To contribute code to this project, please read our [contribution guidelines](https://github.com/milvus-io/milvus/blob/master/CONTRIBUTING.md) first. If you have some ideas or encounter a problem, you can find us in the Slack channel [#py-milvus](https://milvusio.slack.com/archives/C024XTWMT4L).
+
+
+## Compatibility
+The following collection shows Milvus versions and recommended PyMilvus versions:
+
+|Milvus version| Recommended PyMilvus version |
+|:-----:|:-----:|
+| 1.0.\* | 1.0.1 |
+| 1.1.\* | 1.1.2 |
+| 2.0.\* | 2.0.2 |
+| 2.1.\* | 2.1.3 |
+| 2.2.\* | 2.2.15 |
+| 2.3.\* | 2.3.7 |
+| 2.4.\* | 2.4.10 |
+| 2.5.\* | 2.5.0 |
+
+
+## Installation
+
+You can install PyMilvus via `pip` or `pip3` for Python 3.8+:
+
+```shell
+$ pip3 install pymilvus
+$ pip3 install pymilvus[model] # for milvus-model
+$ pip3 install pymilvus[bulk_writer] # for bulk_writer
+```
+
+You can install a specific version of PyMilvus by:
+
+```shell
+$ pip3 install pymilvus==2.4.10
+```
+
+You can upgrade PyMilvus to the latest version by:
+
+```shell
+$ pip3 install --upgrade pymilvus
+```
+
+## FAQ
+Q1. How to get submodules?
+
+A1. The following command will get the protos matching to the generated files, for protos of certain version, see
+[milvus-proto](https://github.com/milvus-io/milvus-proto#usage) for details.
+```shell
+$ git submodule update --init
+```
+
+Q2. How to generate python files from milvus-proto?
+
+A2.
+```shell
+$ make gen_proto
+```
+
+Q3. How to use the local PyMilvus repository for Milvus server?
+
+A3.
+```shell
+$ make install
+```
+
+Q4. How to check coding styles?
+
+A4.
+```shell
+make lint
+```
+
+Q5. How to fix the coding styles?
+
+A5
+```shell
+make format
+```
+
+Q6. How to run unittests?
+
+A6
+```shell
+$ pip install ".[dev]"
+$ make unittest
+```
+Q7. `zsh: no matches found: pymilvus[model]`, how do I solve this?
+
+A7
+```shell
+$ pip install "pymilvus[model]"
+```
+
+## Documentation
+
+Documentation is available online: https://milvus.io/api-reference/pymilvus/v2.4.x/About.md
+
+## Developing package releases
+
+The commits on the development branch of each version will be packaged and uploaded to [Test PyPI](https://test.pypi.org/).
+
+The package name generated by the development branch is x.y.z.rc<dist>, where <dist> is the number of commits that differ from the most recent release.
+
+- For example, after the release of **2.3.4**, two commits were submitted on the 2.3 branch.
+The version number of the latest commit of 2.3 branch is **2.3.5.rc2**.
+
+- For example, after the release of **2.3.4**, 10 commits were submitted on the master branch.
+The version number of the latest commit of master branch is **2.4.0.rc10**.
+
+
+To install the package on Test PyPi, you need to append `--extra-index-url` after pip, for example:
+```shell
+$ python3 -m pip install --extra-index-url https://test.pypi.org/simple/ pymilvus==2.1.0.dev66
+```
+
+
+## License
+[Apache License 2.0](LICENSE)

@@ -1,0 +1,3 @@
+[console_scripts]
+hdfscli = hdfs.__main__:main
+hdfscli-avro = hdfs.ext.avro.__main__:main

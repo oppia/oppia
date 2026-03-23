@@ -1,0 +1,150 @@
+Metadata-Version: 2.1
+Name: google-cloud-pubsublite
+Version: 1.11.0
+Summary: Google Cloud Pubsublite API client library
+Home-page: https://github.com/googleapis/python-pubsublite
+Author: Google LLC
+Author-email: googleapis-packages@google.com
+License: Apache 2.0
+Platform: Posix; MacOS X; Windows
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Internet
+Requires-Python: >=3.8
+License-File: LICENSE
+Requires-Dist: google-cloud-pubsub <3.0.0dev,>=2.10.0
+Requires-Dist: grpcio <2.0.0dev,>=1.38.1
+Requires-Dist: grpcio-status <2.0.0dev,>=1.38.1
+Requires-Dist: overrides <8.0.0,>=6.0.1
+Requires-Dist: google-api-core[grpc] !=2.0.*,!=2.1.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,<3.0.0dev,>=1.33.2
+Requires-Dist: overrides <8.0.0,>=7.0.1 ; python_version >= "3.12"
+
+Python Client for Pub/Sub Lite API
+==================================
+
+|stable| |pypi| |versions|
+
+`Pub/Sub Lite API`_: is designed to provide reliable,
+many-to-many, asynchronous messaging between applications. Publisher
+applications can send messages to a topic and other applications can
+subscribe to that topic to receive the messages. By decoupling senders and
+receivers, Google Cloud Pub/Sub allows developers to communicate between
+independently written applications.
+
+Compared to Google Pub/Sub, Pub/Sub Lite provides partitioned zonal data
+storage with predefined capacity. Both products present a similar API, but
+Pub/Sub Lite has more usage caveats.
+
+See the [Google Pub/Sub Lite docs](https://cloud.google.com/pubsub/quickstart-console#before-you-begin) for more details on how to activate
+Pub/Sub Lite for your project, as well as guidance on how to choose between
+Cloud Pub/Sub and Pub/Sub Lite.
+
+- `Client Library Documentation`_
+- `Product Documentation`_
+
+.. |stable| image:: https://img.shields.io/badge/support-stable-gold.svg
+   :target: https://github.com/googleapis/google-cloud-python/blob/main/README.rst#stability-levels
+.. |pypi| image:: https://img.shields.io/pypi/v/google-cloud-pubsublite.svg
+   :target: https://pypi.org/project/google-cloud-pubsublite/
+.. |versions| image:: https://img.shields.io/pypi/pyversions/google-cloud-pubsublite.svg
+   :target: https://pypi.org/project/google-cloud-pubsublite/
+.. _Pub/Sub Lite API: https://cloud.google.com/pubsub/lite
+.. _Client Library Documentation: https://cloud.google.com/python/docs/reference/pubsublite/latest
+.. _Product Documentation:  https://cloud.google.com/pubsub/lite
+
+Quick Start
+-----------
+
+In order to use this library, you first need to go through the following steps:
+
+1. `Select or create a Cloud Platform project.`_
+2. `Enable billing for your project.`_
+3. `Enable the Pub/Sub Lite API.`_
+4. `Setup Authentication.`_
+
+.. _Select or create a Cloud Platform project.: https://console.cloud.google.com/project
+.. _Enable billing for your project.: https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project
+.. _Enable the Pub/Sub Lite API.:  https://cloud.google.com/pubsub/lite
+.. _Setup Authentication.: https://googleapis.dev/python/google-api-core/latest/auth.html
+
+Installation
+~~~~~~~~~~~~
+
+Install this library in a `virtualenv`_ using pip. `virtualenv`_ is a tool to
+create isolated Python environments. The basic problem it addresses is one of
+dependencies and versions, and indirectly permissions.
+
+With `virtualenv`_, it's possible to install this library without needing system
+install permissions, and without clashing with the installed system
+dependencies.
+
+.. _`virtualenv`: https://virtualenv.pypa.io/en/latest/
+
+
+Code samples and snippets
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Code samples and snippets live in the `samples/` folder.
+
+
+Supported Python Versions
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Our client libraries are compatible with all current `active`_ and `maintenance`_ versions of
+Python.
+
+Python >= 3.7
+
+.. _active: https://devguide.python.org/devcycle/#in-development-main-branch
+.. _maintenance: https://devguide.python.org/devcycle/#maintenance-branches
+
+Unsupported Python Versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Python <= 3.6
+
+If you are using an `end-of-life`_
+version of Python, we recommend that you update as soon as possible to an actively supported version.
+
+.. _end-of-life: https://devguide.python.org/devcycle/#end-of-life-branches
+
+Mac/Linux
+^^^^^^^^^
+
+.. code-block:: console
+
+    pip install virtualenv
+    virtualenv <your-env>
+    source <your-env>/bin/activate
+    <your-env>/bin/pip install google-cloud-pubsublite
+
+
+Windows
+^^^^^^^
+
+.. code-block:: console
+
+    pip install virtualenv
+    virtualenv <your-env>
+    <your-env>\Scripts\activate
+    <your-env>\Scripts\pip.exe install google-cloud-pubsublite
+
+Next Steps
+~~~~~~~~~~
+
+-  Read the `Client Library Documentation`_ for Pub/Sub Lite API
+   to see other available methods on the client.
+-  Read the `Pub/Sub Lite API Product documentation`_ to learn
+   more about the product and see How-to Guides.
+-  View this `README`_ to see the full list of Cloud
+   APIs that we cover.
+
+.. _Pub/Sub Lite API Product documentation:  https://cloud.google.com/pubsub/lite
+.. _README: https://github.com/googleapis/google-cloud-python/blob/main/README.rst
