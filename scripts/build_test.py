@@ -1024,10 +1024,15 @@ class BuildTests(test_utils.GenericTestBase):
         clean_swap = self.swap_with_checks(
             build, 'clean', lambda: None, expected_args=[()]
         )
+        inject_angular_css_hashes_swap = self.swap_with_checks(
+            build, 'inject_angular_css_hashes', lambda: None, expected_args=[()]
+        )
 
         with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
             with modify_constants_swap, build_using_ng_swap:
-                with generate_python_package_swap:
+                with (
+                    generate_python_package_swap
+                ), inject_angular_css_hashes_swap:
                     build.main(args=['--prod_env'])
 
     def test_build_with_prod_source_maps(self) -> None:
@@ -1070,12 +1075,16 @@ class BuildTests(test_utils.GenericTestBase):
         install_third_party_libs_swap = self.swap_with_checks(
             install_third_party_libs, 'main', lambda: None, expected_args=[()]
         )
+        inject_angular_css_hashes_swap = self.swap_with_checks(
+            build, 'inject_angular_css_hashes', lambda: None, expected_args=[()]
+        )
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
                 with clean_swap, install_python_dev_dependencies_swap:
                     with build_using_ng_swap, install_third_party_libs_swap:
-                        build.main(args=['--prod_env', '--source_maps'])
+                        with inject_angular_css_hashes_swap:
+                            build.main(args=['--prod_env', '--source_maps'])
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
