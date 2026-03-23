@@ -79,7 +79,7 @@ describe('Community Library Browser', function () {
     // Subscribe to creator.
     await communityLibraryBrowser.openLessonInfoModal();
     await communityLibraryBrowser.clickOnProfileIconInLessonInfoModel();
-    await communityLibraryBrowser.subscribeToCreatorInLoggedOutUser();
+    await communityLibraryBrowser.subscribeToCreatorInLoggedOutUser('currAdm');
 
     // Check subscribed creators in preferences page.
     await communityLibraryBrowser.navigateToPreferencesPageUsingProfileDropdown();

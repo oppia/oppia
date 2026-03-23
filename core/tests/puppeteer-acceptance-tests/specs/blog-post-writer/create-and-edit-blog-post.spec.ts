@@ -208,8 +208,8 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.clickOnElementWithText(LABELS.PUBLISH_BUTTON);
     await blogPostWriter.expectScreenshotToMatch('blogPostPublish', __dirname);
     await blogPostWriter.clickOnElementWithText(LABELS.CONFIRM_PUBLISH_BUTTON);
-    await blogPostWriter.navigateToBlogPageInBlogPostEditor();
-    await blogPostWriter.expectBlogPostToBePresentInBlogPostEditor(
+    await blogPostWriter.navigateToBlogPageInLoggedOutUser();
+    await blogPostWriter.expectBlogPostToBePresentInLoggedOutUser(
       'Test Blog Post Title'
     );
   });

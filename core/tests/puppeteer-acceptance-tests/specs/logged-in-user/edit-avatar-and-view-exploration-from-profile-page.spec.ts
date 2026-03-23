@@ -83,7 +83,7 @@ describe('Logged-in User', function () {
         TEST_EXPLORATION.editedTitle
       );
 
-      await loggedInUser.saveExplorationDraftInLoggedOutUser();
+      await loggedInUser.saveExplorationDraftInLoggedInUser();
 
       await loggedInUser.navigateToProfilePageUsingProfileDropdown();
       await loggedInUser.expectExplorationToBePresentInProfilePageWithTitleInLoggedInUser(
