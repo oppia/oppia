@@ -121,7 +121,9 @@ export class BlogHomePageComponent implements OnInit {
         this.filterWasUsed = true;
 
         this.searchQuery = params.q || '';
-        this.selectedTags = params.tags ? params.tags.split(',') : [];
+        this.selectedTags = params.tags
+          ? params.tags.replace(/[()"]/g, '').split(' OR ')
+          : [];
 
         this.loadPage();
       } else {
@@ -258,7 +260,7 @@ export class BlogHomePageComponent implements OnInit {
       if (this.selectedTags.length > 0) {
         params.set(
           'tags',
-          '(' + this.selectedTags.map(tag => `"${tag}"`).join(',') + ')'
+          '(' + this.selectedTags.map(tag => `"${tag}"`).join(' OR ') + ')'
         );
       }
       params.set('offset', offset.toString());
@@ -388,7 +390,12 @@ export class BlogHomePageComponent implements OnInit {
         this.router.navigate(['/blog/search/find'], {
           queryParams: {
             q: this.searchQuery,
-            tags: this.selectedTags.join(','),
+            tags:
+              this.selectedTags.length > 0
+                ? '(' +
+                  this.selectedTags.map(tag => `"${tag}"`).join(' OR ') +
+                  ')'
+                : '',
             page: pageToUse,
           },
         });

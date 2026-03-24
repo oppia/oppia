@@ -343,6 +343,30 @@ describe('Blog home page component', () => {
     });
   });
 
+  it('should correctly format selectedTags into OR query string', () => {
+    component.searchQuery = 'test';
+    component.selectedTags = ['news', 'learners'];
+
+    spyOn(searchService, 'executeSearchQuery').and.callFake(
+      (_q, _t, successCallback) => {
+        successCallback();
+      }
+    );
+
+    const navigateSpy = spyOn(router, 'navigate');
+
+    component.onSearchQueryChangeExec();
+
+    expect(navigateSpy).toHaveBeenCalledWith(
+      ['/blog/search/find'],
+      jasmine.objectContaining({
+        queryParams: jasmine.objectContaining({
+          tags: '("news" OR "learners")',
+        }),
+      })
+    );
+  });
+
   it(
     'should display alert when fetching search results fail during search' +
       'query execution',
