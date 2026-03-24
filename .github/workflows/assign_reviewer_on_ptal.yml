@@ -47,9 +47,9 @@ jobs:
               core.setFailed(`Invalid repo (${repo}) or owner (${owner})`);
               return;
             }
-            const comment = (context.payload.comment?.body || '').trim();
+            const commentBody = (context.payload.comment?.body || '').trim();
             const reviewerPattern = /((?:@[\w-]+[\s,]*)+)\s+(ptal|take\s+a\s+pass|please\s+review)\b/i;
-            const match = comment.match(reviewerPattern);
+            const match = commentBody.match(reviewerPattern);
             if (!match) {
               console.log('No PTAL pattern found');
               return;
