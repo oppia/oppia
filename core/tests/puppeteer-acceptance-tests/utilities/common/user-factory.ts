@@ -151,9 +151,11 @@ export class UserFactory {
 
         if (Object.getOwnPropertyDescriptor(userPrototype, name)) {
           throw new Error(
-            `Method collision in composeUserWithRoles: "${name}" is already ` +
-              `defined on the user prototype. Check your role utility files for ` +
-              `duplicate method names and rename one of them.`
+            "Method collision in composeUserWithRoles: '" +
+              name +
+              "' is already " +
+              'defined on the user prototype. Check your role utility files for ' +
+              'duplicate method names and rename one of them.'
           );
         }
 
