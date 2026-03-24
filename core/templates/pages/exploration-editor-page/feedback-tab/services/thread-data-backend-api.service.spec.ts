@@ -31,10 +31,12 @@ import {
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('retrieving threads service', () => {
+  let alertsService: AlertsService;
   let httpTestingController: HttpTestingController;
   let pageContextService: PageContextService;
   let csrfTokenService: CsrfTokenService;
@@ -143,6 +145,7 @@ describe('retrieving threads service', () => {
   });
 
   beforeEach(() => {
+    alertsService = TestBed.inject(AlertsService);
     pageContextService = TestBed.inject(PageContextService);
     csrfTokenService = TestBed.inject(CsrfTokenService);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
@@ -333,15 +336,22 @@ describe('retrieving threads service', () => {
   }));
 
   it('should use reject handler when creating a new thread fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning').and.callThrough();
     expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
     threadDataBackendApiService.createNewThreadAsync('Subject', 'Text');
 
     let req = httpTestingController.expectOne('/threadlisthandler/exp1');
     expect(req.request.method).toEqual('POST');
-    req.flush(null, {status: 500, statusText: ''});
+    req.flush(
+      {error: 'Thread subject should be at most 500 characters.'},
+      {status: 400, statusText: 'Bad Request'}
+    );
 
     flushMicrotasks();
     expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Thread subject should be at most 500 characters.'
+    );
   }));
 
   it('should successfully mark thread as seen', fakeAsync(() => {

@@ -17,6 +17,7 @@
  */
 
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {By} from '@angular/platform-browser';
 import {AlertsService} from 'services/alerts.service';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {CreateFeedbackThreadModalComponent} from './create-feedback-thread-modal.component';
@@ -94,6 +95,30 @@ describe('Create Feedback Thread Modal Controller', function () {
     expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
+  it('should not close modal when new thread subject is too long', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+
+    component.newThreadSubject =
+      'a'.repeat(component.MAX_FEEDBACK_THREAD_SUBJECT_LENGTH + 1);
+    component.newThreadText = 'text';
+    fixture.detectChanges();
+
+    const errorElement = fixture.debugElement.query(By.css('.oppia-form-error'));
+    const createButton = fixture.debugElement.query(
+      By.css('.e2e-test-create-new-feedback-btn')
+    );
+
+    expect(component.isThreadSubjectTooLong()).toBeTrue();
+    expect(errorElement.nativeElement.textContent).toContain(
+      `Thread subject should be at most ${component.MAX_FEEDBACK_THREAD_SUBJECT_LENGTH} characters.`
+    );
+    expect(createButton.nativeElement.disabled).toBeTrue();
+
+    component.create(component.newThreadSubject, component.newThreadText);
+
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+  });
+
   it(
     'should close modal when both new thread subject and new thread text are' +
       ' valid',
@@ -110,4 +135,19 @@ describe('Create Feedback Thread Modal Controller', function () {
       });
     }
   );
+
+  it('should allow creating a thread with a 500 character subject', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+
+    let newThreadSubject = 'a'.repeat(
+      component.MAX_FEEDBACK_THREAD_SUBJECT_LENGTH
+    );
+    let newThreadText = 'text';
+    component.create(newThreadSubject, newThreadText);
+
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      newThreadSubject: newThreadSubject,
+      newThreadText: newThreadText,
+    });
+  });
 });

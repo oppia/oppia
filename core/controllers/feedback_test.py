@@ -257,6 +257,46 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_thread_subject_with_500_characters_is_accepted(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
+            {
+                'subject': 'a' * 500,
+                'text': 'Thread Text Â¡unicode!',
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID)
+        )
+        threadlist = response_dict['feedback_thread_dicts']
+        self.assertEqual(len(threadlist), 1)
+        self.assertEqual(threadlist[0]['subject'], 'a' * 500)
+
+    def test_thread_subject_longer_than_500_characters_raises_400(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.post_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
+            {
+                'subject': 'a' * 501,
+                'text': 'Thread Text Â¡unicode!',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'At \'http://localhost/threadlisthandler/0\' '
+            'these errors are happening:\n'
+            'Thread subject should be at most 500 characters.',
+        )
+        self.logout()
+
     def test_post_message_to_existing_thread(self) -> None:
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()

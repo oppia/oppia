@@ -29,6 +29,9 @@ from core.domain import (
 from typing import Dict, List, Optional, TypedDict
 
 
+MAX_FEEDBACK_THREAD_SUBJECT_LENGTH = 500
+
+
 class UpdatedLastMessageAuthorFeedbackThreadDict(TypedDict):
     """Dict representation of FeedbackThread domain object with
     updated author_username and last_nonempty_message_author keys.
@@ -263,6 +266,11 @@ class ThreadListHandler(
         assert self.normalized_payload is not None
         subject = self.normalized_payload['subject']
         text = self.normalized_payload['text']
+        if len(subject) > MAX_FEEDBACK_THREAD_SUBJECT_LENGTH:
+            raise self.InvalidInputException(
+                'Thread subject should be at most %d characters.'
+                % MAX_FEEDBACK_THREAD_SUBJECT_LENGTH
+            )
 
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,

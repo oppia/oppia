@@ -4,12 +4,18 @@
 
 <div class="modal-body">
   <p>Thread subject: <input aria-label="Thread subject" class="oppia-feedback-modal-input oppia-autofocus" type="text" [(ngModel)]="newThreadSubject"></p>
+  <p
+    class="oppia-form-error"
+    [hidden]="!isThreadSubjectTooLong()">
+    Thread subject should be at most
+    {{ MAX_FEEDBACK_THREAD_SUBJECT_LENGTH }} characters.
+  </p>
   <p>Message text <textarea aria-label="Message text" class="oppia-feedback-modal-textarea" [(ngModel)]="newThreadText" rows="6"></textarea></p>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary e2e-test-cancel-new-feedback-btn" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success e2e-test-create-new-feedback-btn" (click)="create(newThreadSubject, newThreadText)" [disabled]="!newThreadSubject || !newThreadText">Create Thread</button>
+  <button class="btn btn-success e2e-test-create-new-feedback-btn" (click)="create(newThreadSubject, newThreadText)" [disabled]="!newThreadSubject || !newThreadText || isThreadSubjectTooLong()">Create Thread</button>
 </div>
 
 <style>

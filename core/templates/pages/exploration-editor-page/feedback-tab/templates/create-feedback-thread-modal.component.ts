@@ -18,6 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {AlertsService} from 'services/alerts.service';
 
@@ -40,10 +41,21 @@ export class CreateFeedbackThreadModalComponent
 
   newThreadSubject = '';
   newThreadText = '';
+  MAX_FEEDBACK_THREAD_SUBJECT_LENGTH =
+    AppConstants.MAX_FEEDBACK_THREAD_SUBJECT_LENGTH;
+
+  isThreadSubjectTooLong(): boolean {
+    return (
+      this.newThreadSubject.length > this.MAX_FEEDBACK_THREAD_SUBJECT_LENGTH
+    );
+  }
 
   create(newThreadSubject: string, newThreadText: string): void {
     if (!newThreadSubject) {
       this.alertsService.addWarning('Please specify a thread subject.');
+      return;
+    }
+    if (newThreadSubject.length > this.MAX_FEEDBACK_THREAD_SUBJECT_LENGTH) {
       return;
     }
     if (!newThreadText) {

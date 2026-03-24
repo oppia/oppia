@@ -18,7 +18,7 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 
 import {AppConstants} from 'app.constants';
 import {
@@ -63,6 +63,16 @@ export class ThreadDataBackendApiService {
   feedbackThreads: FeedbackThread[] | undefined;
   countOfOpenFeedbackThreads = 0;
   _feedbackThreadsInitializedEventEmitter = new EventEmitter();
+
+  private getThreadCreationErrorMessage(error: HttpErrorResponse): string {
+    if (typeof error.error?.error === 'string') {
+      return error.error.error;
+    }
+    if (typeof error.error === 'string' && error.error.length > 0) {
+      return error.error;
+    }
+    return 'Error creating new thread.';
+  }
 
   constructor(
     private alertsService: AlertsService,
@@ -223,7 +233,7 @@ export class ThreadDataBackendApiService {
         },
         error => {
           this.alertsService.addWarning(
-            'Error creating new thread: ' + error + '.'
+            this.getThreadCreationErrorMessage(error)
           );
         }
       );
