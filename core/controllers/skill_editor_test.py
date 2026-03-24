@@ -179,7 +179,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.NEW_USER_EMAIL)
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
-        self.assertEqual(self.skill_id, json_response['skill']['id'])
+        self.assertEqual(self.skill_id, json_response['skill_dict']['id'])
         self.assertEqual(
             json_response['assigned_skill_topic_data_dict']['Name'], 'Subtopic1'
         )
@@ -211,7 +211,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         url = '%s/%s' % (feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
 
         json_response = self.get_json(url)
-        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(skill_id, json_response['skill_dict']['id'])
         self.assertIsNone(
             json_response['assigned_skill_topic_data_dict']['TopicName1']
         )
@@ -229,7 +229,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         url = '%s/%s' % (feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
 
         json_response = self.get_json(url)
-        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(skill_id, json_response['skill_dict']['id'])
         self.assertEqual(json_response['assigned_skill_topic_data_dict'], {})
         self.assertEqual(
             1, len(json_response['grouped_skill_summaries']['Name'])
@@ -283,7 +283,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         url = '%s/%s' % (feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
 
         json_response = self.get_json(url)
-        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(skill_id, json_response['skill_dict']['id'])
         self.assertEqual(
             2, len(json_response['assigned_skill_topic_data_dict'])
         )
@@ -313,9 +313,9 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         json_response = self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token
         )
-        self.assertEqual(self.skill_id, json_response['skill']['id'])
+        self.assertEqual(self.skill_id, json_response['skill_dict']['id'])
         self.assertEqual(
-            'New Description', json_response['skill']['description']
+            'New Description', json_response['skill_dict']['description']
         )
         self.logout()
 
