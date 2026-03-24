@@ -298,7 +298,6 @@ html {
   */
   scroll-behavior: auto !important;
 }
-/* Override Bootstrap 5's .row rule */
 @media (max-width: 768px) {
   .container {
     max-width: 100% !important;
@@ -314,7 +313,6 @@ html {
     overflow-x: hidden;
   }
 }
-
 .row > * {
   margin-top: revert;
   padding-left: revert;
