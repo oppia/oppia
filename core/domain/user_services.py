@@ -1737,20 +1737,36 @@ def mark_user_for_deletion(user_id: str) -> None:
 
 
 def save_deleted_username(normalized_username: str) -> None:
-    """Save the username of deleted user.
-
-    Args:
-        normalized_username: str. Normalized version of the username to be
-            saved.
-    """
+    """Save the username of deleted user."""
     hashed_normalized_username = utils.convert_to_hash(
         normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
     )
-    deleted_user_model = user_models.DeletedUsernameModel(
-        id=hashed_normalized_username
+
+    deleted_username = user_domain.DeletedUsername(
+        username_hash=hashed_normalized_username
+    )
+
+    deleted_user_model = get_deleted_username_model_from_domain_object(
+        deleted_username
     )
     deleted_user_model.update_timestamps()
     deleted_user_model.put()
+
+
+def get_deleted_username_from_model(
+    deleted_username_model: user_models.DeletedUsernameModel,
+) -> user_domain.DeletedUsername:
+    """Converts DeletedUsernameModel to DeletedUsername domain object."""
+
+    return user_domain.DeletedUsername(username_hash=deleted_username_model.id)
+
+
+def get_deleted_username_model_from_domain_object(
+    deleted_username: user_domain.DeletedUsername,
+) -> user_models.DeletedUsernameModel:
+    """Converts DeletedUsername domain object to DeletedUsernameModel."""
+
+    return user_models.DeletedUsernameModel(id=deleted_username.username_hash)
 
 
 def get_human_readable_user_ids(

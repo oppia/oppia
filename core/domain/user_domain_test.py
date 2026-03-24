@@ -25,9 +25,10 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
 from core.platform import models
+from core.storage.user import gae_models as user_models
 from core.tests import test_utils
 
-from typing import List, Optional, TypedDict
+from typing import List, Optional, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1956,3 +1957,69 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_contribution_rights.can_submit_at_least_one_item()
         )
+
+
+class DeletedUsernameTests(test_utils.GenericTestBase):
+    """Tests for DeletedUsername domain object."""
+
+    def test_validate_with_valid_hash(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='a' * 32)
+        deleted_username.validate()
+
+    def test_validate_with_empty_hash(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='')
+        with self.assertRaisesRegex(utils.ValidationError, 'empty'):
+            deleted_username.validate()
+
+    def test_validate_with_invalid_length(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='a' * 33)
+        with self.assertRaisesRegex(utils.ValidationError, '32'):
+            deleted_username.validate()
+
+    def test_validate_with_invalid_characters(self) -> None:
+        deleted_username = user_domain.DeletedUsername(username_hash='!' * 32)
+        with self.assertRaisesRegex(utils.ValidationError, 'hexadecimal'):
+            deleted_username.validate()
+
+    def test_validate_with_non_string(self) -> None:
+        # Here we use cast because we intentionally pass a non-string value
+        # to test validation logic for incorrect types.
+        deleted_username = user_domain.DeletedUsername(
+            username_hash=cast(str, 123)
+        )
+        with self.assertRaisesRegex(utils.ValidationError, 'string'):
+            deleted_username.validate()
+
+
+class DeletedUsernameServicesTests(test_utils.GenericTestBase):
+
+    def test_get_deleted_username_from_model(self) -> None:
+        model = user_models.DeletedUsernameModel(id='a' * 32)
+        obj = user_services.get_deleted_username_from_model(model)
+
+        self.assertIsInstance(obj, user_domain.DeletedUsername)
+        self.assertEqual(obj.username_hash, 'a' * 32)
+        self.assertTrue(obj.username_hash.isalnum())
+        obj.validate()
+
+    def test_get_model_from_domain_object(self) -> None:
+        domain_obj = user_domain.DeletedUsername(username_hash='a' * 32)
+
+        model = user_services.get_deleted_username_model_from_domain_object(
+            domain_obj
+        )
+
+        self.assertEqual(model.id, 'a' * 32)
+
+    def test_save_deleted_username(self) -> None:
+        normalized_username = 'testuser'
+
+        user_services.save_deleted_username(normalized_username)
+
+        model = user_models.DeletedUsernameModel.get_by_id(
+            utils.convert_to_hash(
+                normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
+            )
+        )
+
+        self.assertIsNotNone(model)

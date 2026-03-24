@@ -23,6 +23,7 @@ import re
 
 from core import feconf, utils
 from core.constants import constants
+from core.storage.user import gae_models as user_models
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -1850,3 +1851,34 @@ class TranslationCoordinatorStats:
             'coordinator_ids': self.coordinator_ids,
             'coordinators_count': self.coordinators_count,
         }
+
+
+class DeletedUsername:
+    """Domain object for DeletedUsernameModel."""
+
+    def __init__(self, username_hash: str) -> None:
+        self.username_hash = username_hash
+
+    def validate(self) -> None:
+        """Validates the username_hash."""
+        if not isinstance(self.username_hash, str):
+            raise utils.ValidationError(
+                f'Expected username_hash to be a string, received {type(self.username_hash)}'
+            )
+
+        if len(self.username_hash) == 0:
+            raise utils.ValidationError('username_hash cannot be empty.')
+
+        if (
+            len(self.username_hash)
+            != user_models.DeletedUsernameModel.ID_LENGTH
+        ):
+            raise utils.ValidationError(
+                'username_hash must be exactly %d characters long.'
+                % (user_models.DeletedUsernameModel.ID_LENGTH)
+            )
+
+        if not re.match(r'^[A-Za-z0-9]+$', self.username_hash):
+            raise utils.ValidationError(
+                'username_hash must contain only hexadecimal characters.'
+            )
