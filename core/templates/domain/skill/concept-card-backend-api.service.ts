@@ -100,7 +100,6 @@ export class ConceptCardBackendApiService {
     return new Promise((resolve, reject) => {
       var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
       const conceptCards: ConceptCard[] = [];
-
       if (uncachedSkillIds.length !== 0) {
         // Case where only part (or none) of the concept cards are cached
         // locally.

@@ -33,6 +33,8 @@ from core.domain import (
     opportunity_services,
     rights_domain,
     role_services,
+    skill_domain,
+    skill_fetchers,
     state_domain,
     story_domain,
     story_fetchers,
@@ -117,6 +119,28 @@ def _create_topic(
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     topic.version += 1
     generate_topic_summary(topic.id)
+
+
+def does_topic_have_skill_with_superseding_skill(
+    topic: topic_domain.Topic,
+) -> Optional[skill_domain.Skill]:
+    """Checks if the topic has a skill with a superseding skill.
+
+    Args:
+        topic: Topic. The topic to be checked.
+
+    Returns:
+        Skill or None. The domain object of the skill containing
+        the superseding skill, or None if it does not exist.
+    """
+    all_skill_ids = topic.get_all_skill_ids()
+    all_skills = skill_fetchers.get_multi_skills(all_skill_ids, strict=False)
+    for skill in all_skills:
+        if skill is None:
+            continue
+        if skill.superseding_skill_id is not None:
+            return skill
+    return None
 
 
 def does_topic_with_name_exist(topic_name: str) -> bool:
@@ -1037,6 +1061,12 @@ def _save_topic(
         )
     topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=True)
     topic.validate(strict=topic_rights.topic_is_published)
+    skill = does_topic_have_skill_with_superseding_skill(topic)
+    if skill is not None:
+        raise utils.ValidationError(
+            'The skill \'%s\' has a superseding skill \'%s\''
+            % (skill.id, skill.superseding_skill_id)
+        )
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=True)
 

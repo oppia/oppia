@@ -610,9 +610,6 @@ class NewSkillHandler(
             for topic in topics:
                 if topic is None:
                     raise self.InvalidInputException
-                topic_services.add_uncategorized_skill(
-                    self.user_id, topic.id, new_skill_id
-                )
 
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(
@@ -628,6 +625,12 @@ class NewSkillHandler(
         image_filenames = skill_services.get_image_filenames_from_skill(skill)
 
         skill_services.save_new_skill(self.user_id, skill)
+        if linked_topic_ids is not None:
+            for topic in topics:
+                assert topic is not None
+                topic_services.add_uncategorized_skill(
+                    self.user_id, topic.id, new_skill_id
+                )
 
         for filename in image_filenames:
             base64_image = files[filename]
@@ -709,6 +712,9 @@ class MergeSkillHandler(
 
         skill_services.replace_skill_id_in_all_topics(
             self.user_id, old_skill_id, new_skill_id
+        )
+        skill_services.replace_prerequisite_skill_id_from_all_skills(
+            old_skill_id, new_skill_id
         )
         question_services.replace_skill_id_for_all_questions(
             old_skill_id, old_skill.description, new_skill_id

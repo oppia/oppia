@@ -29,6 +29,8 @@ from core.domain import (
     fs_services,
     question_domain,
     rights_manager,
+    skill_domain,
+    skill_services,
     story_domain,
     story_fetchers,
     story_services,
@@ -3251,6 +3253,41 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Name should be a string.'):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name'
+            )
+
+    def test_does_not_add_skill_with_superseding_skill_to_topic(self) -> None:
+        self.save_new_skill('supersede', self.user_id)
+        self.save_new_skill('has_superseding', self.user_id)
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'supersede',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id, 'has_superseding', changelist, 'Merging skill.'
+        )
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='topic-supersede',
+            description='desc',
+            url_fragment='topic-url-frag',
+            uncategorized_skill_ids=[],
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'The skill \'has_superseding\' has a superseding skill \'supersede\'',
+        ):  # pylint:disable=line-too-long
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic_id, 'has_superseding'
             )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the

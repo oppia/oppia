@@ -108,18 +108,29 @@ def get_skill_by_id(
     if cached_skill is not None:
         return cached_skill
     else:
-        skill_model = skill_models.SkillModel.get(
-            skill_id, strict=strict, version=version
-        )
-        if skill_model:
-            skill = get_skill_from_model(skill_model)
-            caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_SKILL,
-                sub_namespace,
-                {skill_id: skill},
+        # Using a try except here is necessary as SkillModel.get()
+        # returns either a SkillModel or raises an EntityNotFound
+        # Exception.
+        try:
+            skill_model = skill_models.SkillModel.get(
+                skill_id, strict=strict, version=version
             )
-            return skill
-        else:
+            # We use an if else block here in addition to the try
+            # except as MyPy checks fail without it. The else block
+            # will never get executed as if no skill model is found,
+            # an EntityNotFound Exception will be raised, getting
+            # caught by the except block and returning None.
+            if skill_model:
+                skill = get_skill_from_model(skill_model)
+                caching_services.set_multi(
+                    caching_services.CACHE_NAMESPACE_SKILL,
+                    sub_namespace,
+                    {skill_id: skill},
+                )
+                return skill
+            else:
+                return None
+        except Exception:
             return None
 
 
