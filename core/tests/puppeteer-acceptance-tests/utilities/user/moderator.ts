@@ -277,7 +277,7 @@ export class Moderator extends BaseUser {
         hidden: true,
       });
     } catch (error) {
-      // Welcome Modal not found, we can continue.
+      showMessage('Welcome modal not found or already dismissed.');
     }
   }
 
@@ -367,7 +367,6 @@ export class Moderator extends BaseUser {
       await this.page
         .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
         .catch(() => {});
-      // We click the anchor tag directly inside the tab to be more precise.
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }

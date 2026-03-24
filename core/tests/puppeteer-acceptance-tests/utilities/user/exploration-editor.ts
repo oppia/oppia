@@ -27,7 +27,6 @@ import path from 'path';
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
-import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -96,7 +95,7 @@ const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const currentCardNameContainerSelector = '.e2e-test-state-name-container';
 
-const previewTabButton = '.e2e-test-preview-tab a';
+const previewTabButton = '.e2e-test-preview-tab';
 const previewTabContainer = '.e2e-test-preview-tab-container';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const mainTabButton = '.e2e-test-main-tab';
@@ -141,7 +140,7 @@ const oppiaFeebackEditorContainerSelector = '.e2e-test-response-body-default';
 
 const dismissTranslationWelcomeModalSelector =
   'button.e2e-test-translation-tab-dismiss-welcome-modal';
-const translationTabButton = '.e2e-test-translation-tab a';
+const translationTabButton = '.e2e-test-translation-tab';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 
 const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
@@ -230,7 +229,7 @@ const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
-const feedBackButtonTab = '.e2e-test-feedback-tab a';
+const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
@@ -239,7 +238,7 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
-const historyTabButton = '.e2e-test-history-tab a';
+const historyTabButton = '.e2e-test-history-tab';
 const historyListContent = '.e2e-test-history-list-item';
 const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
 const totalPlaysSelector = '.e2e-test-oppia-total-plays';
@@ -2528,16 +2527,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToSettingsTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
-    await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-      .catch(() => {});
-
     if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarDropdown);
-      // If the element is not present, it means the mobile navigation bar is not expanded.
-      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
-      // which expands the mobile navigation bar.
-      if (!element) {
+      if (!(await this.isElementVisible(mobileNavbarDropdown))) {
         await this.page.waitForSelector(mobileOptionsButtonSelector, {
           visible: true,
         });
@@ -2758,13 +2749,17 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToFeedbackTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
-    await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-      .catch(() => {});
+    await this.closeAnyOpenModal();
+    const isModalVisible = await this.isElementVisible('.modal-backdrop');
 
+    if (isModalVisible) {
+      await this.page.waitForSelector('.modal-backdrop', {
+        hidden: true,
+        timeout: 10000,
+      });
+    }
     if (this.isViewportAtMobileWidth()) {
-      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
-      if (!mobileNavbarElement) {
+      if (!(await this.isElementVisible(mobileNavbarOptions))) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
@@ -2772,13 +2767,15 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
       await this.clickOnElementWithSelector(feedBackButtonTab);
-      await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
-        visible: true,
-      });
+      await this.waitForNetworkIdle();
     }
-
+    await this.waitForNetworkIdle();
     await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
       visible: true,
+    });
+    await this.page.waitForSelector(feedbackSubjectSelector, {
+      visible: true,
+      timeout: 30000,
     });
   }
 
@@ -2802,11 +2799,21 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    const explorationEditor = new ExplorationEditorModal(this);
-    await explorationEditor.dismissWelcomeModal(failIfMissing);
-  }
+  // async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
+  //   const explorationEditor = new ExplorationEditorModal(this);
+  //   await explorationEditor.dismissWelcomeModal(failIfMissing);
+  // }
 
+  async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
+    const selector = 'button.e2e-test-dismiss-welcome-modal';
+    if (await this.isElementVisible(selector)) {
+      await this.clickOnElementWithSelector(selector);
+      await this.page.waitForSelector(selector, {hidden: true}).catch(() => {});
+      showMessage('Welcome modal closed.');
+    } else if (failIfMissing) {
+      throw new Error('Welcome modal expected but not found.');
+    }
+  }
   /**
    * Function to dismiss welcome modal if it is present. This is useful when
    * the modal may or may not appear due to race conditions or when it has
@@ -2824,26 +2831,14 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss the feedback prompt modal if it is present.
    */
   async dismissFeedbackPromptModalIfPresent(): Promise<void> {
-    try {
-      const modalElement = await this.page.waitForSelector(
-        stayInEditorButtonSelector,
-        {
-          visible: true,
-          timeout: 5000,
-        }
-      );
-      if (modalElement) {
-        await modalElement.click();
-        await this.page.waitForSelector(stayInEditorButtonSelector, {
-          hidden: true,
-        });
-        await this.page
-          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-          .catch(() => {});
-        showMessage('Feedback prompt modal closed successfully.');
-      }
-    } catch (error) {
-      // Modal didn't appear or already dismissed.
+    if (await this.isElementVisible(stayInEditorButtonSelector)) {
+      await this.clickOnElementWithSelector(stayInEditorButtonSelector);
+      await this.page
+        .waitForSelector('.modal-backdrop', {hidden: true})
+        .catch(() => {});
+      showMessage('Feedback modal closed.');
+    } else {
+      showMessage('Feedback modal not found.');
     }
   }
 
@@ -2895,9 +2890,24 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
+
+    // 🔥 ADD THIS BLOCK (fix)
+    await this.page.waitForFunction(
+      () => {
+        return (
+          !document.querySelector('.modal.show') &&
+          !document.querySelector('.modal-content')
+        );
+      },
+      {timeout: 15000}
+    );
+
+    await this.page.waitForTimeout(500);
+
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
     await this.typeInInputField(stateContentInputField, `${content}`);
@@ -4309,10 +4319,6 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToPreviewTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
-    await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-      .catch(() => {});
-
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
       const element = await this.page.$(mobileNavbarOptions);
@@ -4358,15 +4364,33 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForPageToFullyLoad();
   }
 
+  async closeAnyOpenModal(): Promise<void> {
+    try {
+      const modal = await this.page.$('.e2e-test-stay-in-editor-button');
+
+      if (modal) {
+        const button = await this.page.$(
+          '.modal-content button, .modal-content .btn'
+        );
+
+        if (button) {
+          await button.click();
+        }
+        await this.page.waitForSelector('.modal-backdrop', {
+          hidden: true,
+          timeout: 10000,
+        });
+      }
+    } catch (e) {
+      console.warn('Could not close modal:', e);
+    }
+  }
+
   /**
    * Function to navigate to the history tab.
    */
   async navigateToHistoryTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
-    await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-      .catch(() => {});
-
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileHistoryTabButton);
@@ -4497,10 +4521,6 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToTranslationsTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
-    await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-      .catch(() => {});
-
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -4521,8 +4541,6 @@ export class ExplorationEditor extends BaseUser {
         navigationDropdownInMobileVisibleSelector
       );
       if (isVisible) {
-        // We are using page.click as this button might be overlapped by the
-        // dropdown. Thus, it will fail with onClick.
         await this.page.click(dropdownToggleIcon);
       }
     } else {
@@ -4531,7 +4549,6 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickAndWaitForNavigation(translationTabButton, true);
     }
-
     await this.expectElementToBeVisible(translationTabContainer);
   }
 
@@ -4540,10 +4557,6 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToEditorTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
-    await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
-      .catch(() => {});
-
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -4564,15 +4577,13 @@ export class ExplorationEditor extends BaseUser {
         navigationDropdownInMobileVisibleSelector
       );
       if (isVisible) {
-        // We are using page.click as this button might be overlapped by the
-        // dropdown. Thus, it will fail with onClick.
         await this.page.click(dropdownToggleIcon);
       }
     } else {
-      await this.page.waitForSelector(`${mainTabButton}`, {
+      await this.page.waitForSelector(mainTabButton, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(`${mainTabButton}`);
+      await this.clickOnElementWithSelector(mainTabButton);
     }
 
     await this.expectElementToBeVisible(mainTabContainerSelector);
@@ -4964,7 +4975,12 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to play.
    */
   async playExploration(explorationId: string): Promise<void> {
-    await this.goto(`${baseUrl}/explore/${explorationId}`);
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.goto(`${baseUrl}/explore/${explorationId}`),
+    ]);
+
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -5711,12 +5727,13 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedThread - The 1-indexed position of the expected thread.
    */
   async viewFeedbackThread(expectedThread: number): Promise<void> {
+    await this.reloadPage();
     await this.navigateToFeedbackTab();
-    await this.page.waitForSelector(feedbackSubjectSelector, {
-      visible: true,
-      timeout: 30000,
-    });
     const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (feedbackSubjects.length === 0) {
+      throw new Error('No feedback threads found.');
+    }
 
     if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
       await feedbackSubjects[expectedThread - 1].click();
