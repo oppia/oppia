@@ -831,7 +831,6 @@
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS": "Elija hasta 5 temas de tu interés y luego completa todos los capítulos sobre los temas seleccionados para lograr sus objetivos de aprendizaje.",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE": "Capítulo <[number]>: <[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS": "<[current]> DE <[total]> CAPÍTULOS COMPLETADOS",
-  "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE": "<[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "Cancelar",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING": "Agregar o editar un objetivo",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_INSTRUCTIONS": "Puedes seleccionar hasta 5 objetivos a la vez",

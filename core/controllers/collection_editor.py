@@ -112,7 +112,7 @@ class EditableCollectionDataHandler(
             collection_id, self.user, allow_invalid_explorations=True
         )
 
-        self.values.update({'collection': collection_dict})
+        self.values.update({'collection_dict': collection_dict})
 
         self.render_json(self.values)
 
@@ -144,7 +144,7 @@ class EditableCollectionDataHandler(
         )
 
         # Send the updated collection back to the frontend.
-        self.values.update({'collection': collection_dict})
+        self.values.update({'collection_dict': collection_dict})
 
         self.render_json(self.values)
 
