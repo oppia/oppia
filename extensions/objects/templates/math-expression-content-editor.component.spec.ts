@@ -194,7 +194,6 @@ describe('MathExpressionContentEditorComponent', () => {
       // 'HTMLCollectionOf<Element>': item, namedItem."
       // We need to suppress this error because we need to return a mock element
       // for testing purposes.
-      // @ts-expect-error
       .and.returnValue([svgElement]);
     component.alwaysEditable = true;
   });
@@ -215,7 +214,7 @@ describe('MathExpressionContentEditorComponent', () => {
 
       // eslint-disable-next-line dot-notation
       spyOn(component['insertScriptService'], 'loadScript').and.callFake(
-        (script, onLoadCb) => {
+        (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
           if (onLoadCb) {
             onLoadCb();
           }
@@ -260,9 +259,10 @@ describe('MathExpressionContentEditorComponent', () => {
   it('should close editor if the expression is not editable on initialisation', fakeAsync(() => {
     spyOn(component, 'closeEditor');
     const loadScriptSpy = spyOn(
-      component.insertScriptService,
+      (component as unknown as {insertScriptService: {loadScript: Function}})
+        .insertScriptService,
       'loadScript'
-    ).and.callFake((script, callback) => {
+    ).and.callFake((script: KNOWN_SCRIPTS, callback: () => void) => {
       if (script === KNOWN_SCRIPTS.MATHJAX) {
         callback();
       }
