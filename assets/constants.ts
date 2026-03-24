@@ -14,7 +14,7 @@
  */
 
 /**
- * @fileoverview Initializes constants for the Oppia codebase.
+ * @fileoverview Initialines constants for the Oppia codebase.
  */
 
 export default {
