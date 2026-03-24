@@ -698,8 +698,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_url_open_rate_limit_failure_cases(self) -> None:
         """Tests failure cases for rate limit handling."""
         test_url = 'https://example.com/test'
+        headers0 = email.message.Message()
         error0 = urllib.error.HTTPError(
-            url=test_url, code=500, msg='server error', hdrs=None, fp=None
+            url=test_url, code=500, msg='server error', hdrs=headers0, fp=None
         )
 
         headers1 = email.message.Message()
