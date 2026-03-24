@@ -23,6 +23,7 @@ import {PartnershipsPageRootComponent} from './partnerships-page-root.component'
 import {CommonModule} from '@angular/common';
 import {PartnershipsPageRoutingModule} from './partnerships-page-routing.module';
 import {NgbCarouselModule} from '@ng-bootstrap/ng-bootstrap';
+import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import {NgbCarouselModule} from '@ng-bootstrap/ng-bootstrap';
     SharedComponentsModule,
     PartnershipsPageRoutingModule,
     NgbCarouselModule,
+    CampaignBannerModule,
   ],
   declarations: [PartnershipsPageComponent, PartnershipsPageRootComponent],
   entryComponents: [PartnershipsPageComponent, PartnershipsPageRootComponent],
