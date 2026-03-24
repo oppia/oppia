@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import fnmatch
 import json
 import multiprocessing
 import os
@@ -261,9 +262,11 @@ def get_all_test_targets_from_path(
         'core/tests/data',
         'core/tests/build_sources',
         '.direnv',
+        'oppia_beam_job-*',
+        '*.egg-info',
     ]
     for root in os.listdir(base_path):
-        if any(s in root for s in excluded_dirs):
+        if any(fnmatch.fnmatch(root, s) for s in excluded_dirs):
             continue
         if root.endswith('_test.py'):
             paths.append(os.path.join(base_path, root))

@@ -13,3 +13,5 @@ tmpcompiledjs*
 dist/*
 local_compiled_js/*
 local_compiled_js_for_test/*
+oppia_beam_job-*
+*.egg-info
