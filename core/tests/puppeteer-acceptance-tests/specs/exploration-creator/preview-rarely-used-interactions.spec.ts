@@ -25,15 +25,10 @@
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 describe('Exploration Editor', function () {
-  let explorationEditor: ExplorationEditor & LoggedInUser & LoggedOutUser;
-
   beforeAll(async function () {
-    explorationEditor = await UserFactory.createNewUser(
+    await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
     );
