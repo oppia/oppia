@@ -1430,9 +1430,9 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    expect(
-      component.tempClassroomData.getDiagnosticTestIsEnabled()
-    ).toBe(false);
+    expect(component.tempClassroomData.getDiagnosticTestIsEnabled()).toBe(
+      false
+    );
 
     component.toggleDiagnosticTestStatus();
 

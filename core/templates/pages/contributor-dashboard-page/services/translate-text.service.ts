@@ -34,12 +34,12 @@ import {
 export interface TranslatableItem {
   translation: string | string[];
   status: Status;
-  text: string | string[];
+  text: string | string[] | null;
   more: boolean;
-  dataFormat: string;
-  contentType: string;
-  interactionId?: string;
-  ruleType?: string;
+  dataFormat?: string;
+  contentType?: string;
+  interactionId?: string | null;
+  ruleType?: string | null;
 }
 
 export type Status = 'pending' | 'submitted';
@@ -72,18 +72,18 @@ export class TranslateTextService {
   activeIndex = this.STARTING_INDEX;
   activeExpId: string = '';
   activeExpVersion: string = '';
-  activeContentId: string = '';
-  activeStateName: string = '';
-  activeContentText: string | string[] = '';
+  activeContentId: string | null = null;
+  activeStateName: string | null = null;
+  activeContentText: string | string[] | null = null;
   activeContentStatus: Status = this.PENDING;
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
   ) {}
 
-  private _getNextText(): string | string[] {
+  private _getNextText(): string | string[] | null {
     if (this.stateAndContent.length === 0) {
-      return '';
+      return null;
     }
     this.activeIndex += 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
@@ -92,9 +92,9 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] {
+  private _getPreviousText(): string | string[] | null {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
-      return '';
+      return null;
     }
     this.activeIndex -= 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
@@ -122,7 +122,7 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-    text: string | string[],
+    text: string | string[] | null,
     more: boolean,
     status: Status,
     translation: string | string[]
@@ -146,10 +146,10 @@ export class TranslateTextService {
         dataFormat !== undefined && this._isSetDataFormat(dataFormat)
           ? []
           : translation,
-      dataFormat: dataFormat ?? '',
-      contentType: contentType ?? '',
-      interactionId: interactionId ?? undefined,
-      ruleType: ruleType ?? undefined,
+      dataFormat: dataFormat,
+      contentType: contentType,
+      interactionId: interactionId,
+      ruleType: ruleType,
     };
   }
 
@@ -158,9 +158,9 @@ export class TranslateTextService {
     this.stateNamesList = [];
     this.stateAndContent = [];
     this.activeIndex = this.STARTING_INDEX;
-    this.activeContentId = '';
-    this.activeStateName = '';
-    this.activeContentText = '';
+    this.activeContentId = null;
+    this.activeStateName = null;
+    this.activeContentText = null;
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.translateTextBackendApiService
@@ -242,7 +242,11 @@ export class TranslateTextService {
     successCallback: () => void,
     errorCallback: (reason: string) => void
   ): void {
-    const activeStateContentMapping = this.stateWiseContents[this.activeStateName];
+    if (this.activeStateName === null || this.activeContentId === null) {
+      return;
+    }
+    const activeStateContentMapping =
+      this.stateWiseContents[this.activeStateName];
     const activeContent = activeStateContentMapping?.[this.activeContentId];
     if (!activeContent) {
       return;

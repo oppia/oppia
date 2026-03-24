@@ -370,13 +370,11 @@ describe('Teach Oppia Modal Component', () => {
       spyOn(
         trainingModalService,
         'openTrainUnresolvedAnswerModal'
-      ).and.callFake(
-        function (
-          interactionAnswer: InteractionAnswer,
-          interactionId: string,
-          answerIndex: number
-        ) {}
-      );
+      ).and.callFake(function (
+        interactionAnswer: InteractionAnswer,
+        interactionId: string,
+        answerIndex: number
+      ) {});
 
       component.openTrainUnresolvedAnswerModal(0);
 
