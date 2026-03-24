@@ -145,6 +145,18 @@ export class UserFactory {
       const rolePrototype = Object.getPrototypeOf(role);
 
       Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
+        if (name === 'constructor') {
+          return;
+        }
+
+        if (Object.getOwnPropertyDescriptor(userPrototype, name)) {
+          throw new Error(
+            `Method collision in composeUserWithRoles: "${name}" is already ` +
+              `defined on the user prototype. Check your role utility files for ` +
+              `duplicate method names and rename one of them.`
+          );
+        }
+
         Object.defineProperty(
           userPrototype,
           name,
