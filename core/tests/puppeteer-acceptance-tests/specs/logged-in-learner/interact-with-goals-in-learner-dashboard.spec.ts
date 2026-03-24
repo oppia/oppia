@@ -109,7 +109,7 @@ describe('Logged-In Learner', function () {
       );
     }
 
-    await curriculumAdmin.saveStoryDraftInTopicManager();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
     await curriculumAdmin.publishStoryDraft();
     await UserFactory.closeBrowserForUser(curriculumAdmin);
     loggedInUser = await UserFactory.createNewUser(

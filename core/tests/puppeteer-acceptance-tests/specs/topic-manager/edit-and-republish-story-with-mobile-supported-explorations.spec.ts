@@ -84,7 +84,7 @@ describe('Topic Manager', function () {
       explorationId1 as string
     );
 
-    await curriculumAdmin.saveStoryDraftInTopicManager();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
 
     // Create topic Manager.
     topicManager = await UserFactory.createNewUser(

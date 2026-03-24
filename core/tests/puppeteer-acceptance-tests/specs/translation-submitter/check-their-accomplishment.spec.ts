@@ -60,7 +60,7 @@ describe('Translation Submitter', function () {
     const explorationId =
       await curriculumAdm.createAndPublishExplorationWithCards('Fair Share');
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',

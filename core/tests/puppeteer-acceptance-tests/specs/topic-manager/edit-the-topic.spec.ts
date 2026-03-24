@@ -103,7 +103,10 @@ describe('Topic Manager', function () {
     await topicManager.expectToastMessageToBe('Changes Saved.');
 
     // Enable practice tab.
-    await curriculumAdmin.createQuestionsForSkillInTopicManager('Addition', 10);
+    await curriculumAdmin.createQuestionsForSkillInCurriculumAdmin(
+      'Addition',
+      10
+    );
     await topicManager.openTopicEditorInTopicManager('AO 101');
     await topicManager.togglePracticeTabCheckboxInTopicManager();
     await topicManager.expectSaveChangesButtonInTopicEditorToBe('enabled');

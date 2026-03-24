@@ -63,18 +63,18 @@ describe('Logged-Out Learner', function () {
         'Fractions'
       );
       await curriculumAdmin.addChapter('Fractions 1', explorationId);
-      await curriculumAdmin.saveStoryDraftInTopicManager();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.publishStoryDraft();
 
-      await curriculumAdmin.createQuestionsForSkillInTopicManager(
+      await curriculumAdmin.createQuestionsForSkillInCurriculumAdmin(
         'fractions',
         7
       );
 
       // Enable the "Show practice tab to learners" in Topic Editor.
-      await curriculumAdmin.openTopicEditorInTopicManager('Fractions');
-      await curriculumAdmin.togglePracticeTabCheckboxInTopicManager();
-      await curriculumAdmin.saveTopicDraftInTopicManager('Fractions');
+      await curriculumAdmin.openTopicEditorInCurriculumAdmin('Fractions');
+      await curriculumAdmin.togglePracticeTabCheckboxInCurriculumAdmin();
+      await curriculumAdmin.saveTopicDraftInCurriculumAdmin('Fractions');
 
       // Create classroom.
       await curriculumAdmin.createAndPublishClassroom(

@@ -51,7 +51,7 @@ describe('Curriculum Admin', function () {
       'enable_worked_examples_rte_component'
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createTopic('Addition and Subtraction', 'addsub');
 
     // Setup taking longer than 300000 ms.
@@ -70,7 +70,7 @@ describe('Curriculum Admin', function () {
       'subtopicWithSingleSection',
       __dirname
     );
-    await curriculumAdmin.saveTopicDraftInTopicManager(
+    await curriculumAdmin.saveTopicDraftInCurriculumAdmin(
       'Addition and Subtraction'
     );
     await curriculumAdmin.checkAddSectionModalShowsLengthError();
@@ -145,7 +145,7 @@ describe('Curriculum Admin', function () {
       }
     );
     await curriculumAdmin.deleteStudyGuideSection(1);
-    await curriculumAdmin.saveTopicDraftInTopicManager(
+    await curriculumAdmin.saveTopicDraftInCurriculumAdmin(
       'Addition and Subtraction'
     );
   });

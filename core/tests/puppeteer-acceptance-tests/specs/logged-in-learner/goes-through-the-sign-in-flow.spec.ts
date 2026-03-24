@@ -82,7 +82,7 @@ describe('Logged In Learner', function () {
       'Test Topic'
     );
     await curriculumAdmin.addChapter('Chapter 1', explorationId);
-    await curriculumAdmin.saveStoryDraftInTopicManager();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
     await curriculumAdmin.publishStoryDraft();
   }, 600000);
 

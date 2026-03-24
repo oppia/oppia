@@ -127,7 +127,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.addChapter('Exploration 2', explorationId2);
 
       // Save draft.
-      await curriculumAdmin.saveStoryDraftInTopicManager();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.publishStoryDraft();
     },
     // Test setup is heavy and can exceed the previous timeout in CI.

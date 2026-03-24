@@ -95,7 +95,7 @@ describe('Logged-in User', function () {
         );
       }
 
-      await curriculumAdmin.saveStoryDraftInTopicManager();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.publishStoryDraft();
 
       loggedInUser = await UserFactory.createNewUser(

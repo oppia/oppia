@@ -96,24 +96,24 @@ describe('Practice Question Reviewer', function () {
     );
 
     // Update skill rubric.
-    await curriculumAdmin.openSkillEditorInTopicManager('Addition');
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.openSkillEditorInCurriculumAdmin('Addition');
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Hard',
       'This is for hard questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Easy',
       'This is for easy questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Medium',
       'This is for medium questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Hard',
       'This is for hard questions'
     );
-    await curriculumAdmin.publishUpdatedSkillInTopicManager(
+    await curriculumAdmin.publishUpdatedSkillInCurriculumAdmin(
       'Added rubrics to skill'
     );
 
@@ -199,9 +199,9 @@ describe('Practice Question Reviewer', function () {
     await questionReviewer.submitReview('accept', 'Test Review Message');
 
     // Checks if questions are visible in question skill editor.
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
-    await curriculumAdmin.openSkillEditorInTopicManager('Addition');
-    await curriculumAdmin.navigateToSkillQuestionEditorTabInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
+    await curriculumAdmin.openSkillEditorInCurriculumAdmin('Addition');
+    await curriculumAdmin.navigateToSkillQuestionEditorTabInCurriculumAdmin();
     await curriculumAdmin.expectQuestionToBePresent('Updated Question');
     // TODO(#23345): Currently, the wrong question gets rejected instead of the correct one.
     // Once fixed, replace the 'What is 231 + 12?' with '12 + 4'.

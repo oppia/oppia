@@ -66,7 +66,7 @@ describe('Logged-out User', function () {
   it(
     'should be redirected to a classroom page if we have 1 public classroom.',
     async function () {
-      await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
       await curriculumAdmin.createNewClassroom('Math', 'math');
       await curriculumAdmin.updateClassroom(
         'Math',
@@ -86,7 +86,7 @@ describe('Logged-out User', function () {
   it(
     'should show classrooms page with classroom cards.',
     async function () {
-      await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
       await curriculumAdmin.createNewClassroom('Science', 'science');
       await curriculumAdmin.updateClassroom(
         'Science',

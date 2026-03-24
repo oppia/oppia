@@ -57,9 +57,11 @@ describe('Curriculum Admin', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it('should be able to create a topic.', async function () {
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-    await curriculumAdmin.expectToBeInTopicEditorInTopicManager('Test Topic 1');
+    await curriculumAdmin.expectToBeInTopicEditorInCurriculumAdmin(
+      'Test Topic 1'
+    );
   });
 
   it('should be able to publish a topic', async function () {
@@ -76,7 +78,7 @@ describe('Curriculum Admin', function () {
       'Test Topic 1',
       false
     );
-    await curriculumAdmin.createQuestionsForSkillInTopicManager(
+    await curriculumAdmin.createQuestionsForSkillInCurriculumAdmin(
       'Test Skill 1',
       3
     );
@@ -91,7 +93,7 @@ describe('Curriculum Admin', function () {
     );
 
     // Publish topic.
-    await curriculumAdmin.publishDraftTopicInTopicManager('Test Topic 1');
+    await curriculumAdmin.publishDraftTopicInCurriculumAdmin('Test Topic 1');
     await curriculumAdmin.expectToBeInTopicAndSkillsDashboardPage();
     await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
       'Test Topic 1',
@@ -100,12 +102,12 @@ describe('Curriculum Admin', function () {
       1 // Skill added.
     );
 
-    await curriculumAdmin.openTopicEditorInTopicManager('Test Topic 1');
+    await curriculumAdmin.openTopicEditorInCurriculumAdmin('Test Topic 1');
     await curriculumAdmin.expectUnpublishTopicButtonToBeVisible();
   });
 
   it('should be able to create a skill', async function () {
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.navigateToSkillsTab();
 
     await curriculumAdmin.clickOnCreateNewSkillButtonInSkillDashboard();
@@ -132,7 +134,7 @@ describe('Curriculum Admin', function () {
   it('should be able to delete a skill', async function () {
     // Navigate to the skill editor page and copy the URL to check for 404
     // error afterwards.
-    await curriculumAdmin.openSkillEditorInTopicManager('Test Skill 1');
+    await curriculumAdmin.openSkillEditorInCurriculumAdmin('Test Skill 1');
     const pageURL = curriculumAdmin.page.url();
     // User must remove all questions from the skill before deleting it.
     await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');

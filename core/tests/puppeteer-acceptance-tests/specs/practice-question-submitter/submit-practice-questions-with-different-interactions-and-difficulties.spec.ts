@@ -38,7 +38,7 @@ describe('Question Submitter', function () {
     );
 
     // Create a skill and link it to a Topic.
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
     await curriculumAdmin.createSkillForTopic(
       'Test Skill 1',
@@ -47,21 +47,21 @@ describe('Question Submitter', function () {
     );
 
     // Add difficulty rubrics to the skill.
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
-    await curriculumAdmin.openSkillEditorInTopicManager('Test Skill 1');
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
+    await curriculumAdmin.openSkillEditorInCurriculumAdmin('Test Skill 1');
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Easy',
       'This is for easy questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Medium',
       'This is for medium questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Hard',
       'This is for hard questions'
     );
-    await curriculumAdmin.publishUpdatedSkillInTopicManager(
+    await curriculumAdmin.publishUpdatedSkillInCurriculumAdmin(
       'Added rubrics to skill'
     );
 

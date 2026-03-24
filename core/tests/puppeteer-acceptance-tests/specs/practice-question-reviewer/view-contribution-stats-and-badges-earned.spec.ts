@@ -96,24 +96,24 @@ describe('Practice Question Reviewer', function () {
     );
 
     // Update skill rubric.
-    await curriculumAdmin.openSkillEditorInTopicManager('Addition');
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.openSkillEditorInCurriculumAdmin('Addition');
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Hard',
       'This is for hard questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Easy',
       'This is for easy questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Medium',
       'This is for medium questions'
     );
-    await curriculumAdmin.updateRubricInTopicManager(
+    await curriculumAdmin.updateRubricInCurriculumAdmin(
       'Hard',
       'This is for hard questions'
     );
-    await curriculumAdmin.publishUpdatedSkillInTopicManager(
+    await curriculumAdmin.publishUpdatedSkillInCurriculumAdmin(
       'Added rubrics to skill'
     );
 

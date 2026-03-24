@@ -36,7 +36,7 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createTopic('Mathematics', 'math');
     await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics', false);
 

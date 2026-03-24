@@ -43,7 +43,7 @@ describe('Curriculum Admin', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
     await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
@@ -56,7 +56,7 @@ describe('Curriculum Admin', function () {
       'Test Topic 1',
       false
     );
-    await curriculumAdmin.createQuestionsForSkillInTopicManager(
+    await curriculumAdmin.createQuestionsForSkillInCurriculumAdmin(
       'Test Skill 1',
       3
     );
@@ -70,7 +70,7 @@ describe('Curriculum Admin', function () {
       'Test Topic 1'
     );
 
-    await curriculumAdmin.publishDraftTopicInTopicManager('Test Topic 1');
+    await curriculumAdmin.publishDraftTopicInCurriculumAdmin('Test Topic 1');
 
     await curriculumAdmin.createAndPublishTopic(
       'Intro to Programming',

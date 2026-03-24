@@ -52,7 +52,7 @@ describe('Blog Editor and curriculum admin', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createSkillFromTopicsAndSkillsDashboard(
       'Test skill',
       ''

@@ -98,7 +98,7 @@ describe('Logged-in Learner', function () {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
     }
 
-    await curriculumAdmin.saveStoryDraftInTopicManager();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
     await curriculumAdmin.publishStoryDraft();
     await UserFactory.closeBrowserForUser(curriculumAdmin);
 

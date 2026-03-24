@@ -64,7 +64,7 @@ describe('Translation Submitter', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
@@ -127,7 +127,7 @@ describe('Translation Submitter', function () {
         'States of Matter'
       );
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
-      await curriculumAdm.saveStoryDraftInTopicManager();
+      await curriculumAdm.saveStoryDraftInCurriculumAdmin();
     }
   }, 2100000);
 

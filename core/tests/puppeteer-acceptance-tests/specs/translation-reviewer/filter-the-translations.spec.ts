@@ -74,7 +74,7 @@ describe('Translation Reviewer', function () {
         'Exploration 3'
       );
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
@@ -89,7 +89,7 @@ describe('Translation Reviewer', function () {
     );
     await curriculumAdm.openStoryEditor('The Picnic Problem', 'Fractions');
     await curriculumAdm.addChapter('Trading Slices', explorationId2);
-    await curriculumAdm.saveStoryDraftInTopicManager();
+    await curriculumAdm.saveStoryDraftInCurriculumAdmin();
 
     await curriculumAdm.createAndPublishTopic(
       'States of Matter',

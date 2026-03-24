@@ -78,7 +78,7 @@ describe('Logged-out User', function () {
       'Algebra Chapter 2',
       explorationId2 as string
     );
-    await curriculumAdmin.saveStoryDraftInTopicManager();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
     await curriculumAdmin.publishStoryDraft();
 
     loggedOutUser = await UserFactory.createLoggedOutUser();

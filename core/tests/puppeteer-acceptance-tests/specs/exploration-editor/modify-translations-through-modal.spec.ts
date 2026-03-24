@@ -167,7 +167,7 @@ describe('Exploration Editor', function () {
       throw new Error('Error in publishing exploration successfully.');
     }
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInTopicManager();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     topicId = await curriculumAdmin.createTopic(
       'Test Topic 1',
       'test-topic-one'
@@ -187,7 +187,7 @@ describe('Exploration Editor', function () {
       'Test Topic 1',
       false
     );
-    await curriculumAdmin.createQuestionsForSkillInTopicManager(
+    await curriculumAdmin.createQuestionsForSkillInCurriculumAdmin(
       'Test Skill 1',
       3
     );
@@ -201,7 +201,7 @@ describe('Exploration Editor', function () {
       'Test Topic 1'
     );
 
-    await curriculumAdmin.publishDraftTopicInTopicManager('Test Topic 1');
+    await curriculumAdmin.publishDraftTopicInCurriculumAdmin('Test Topic 1');
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story 1',
       'test-story-one',

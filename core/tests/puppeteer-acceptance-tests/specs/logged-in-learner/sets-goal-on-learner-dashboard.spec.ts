@@ -102,7 +102,7 @@ describe('Logged-In Learner', function () {
         'Test Chapter 2',
         explorationId2 as string
       );
-      await curriculumAdmin.saveStoryDraftInTopicManager();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.publishStoryDraft();
     },
     // Test takes longer than default timeout.
