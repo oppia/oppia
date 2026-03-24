@@ -100,6 +100,10 @@ export class MathInteractionsService {
         emptyFunctionNames.join(', ') +
         ' function(s) cannot be empty. Please enter a variable/number in it.';
     }
+    if (errorMessage === 'Not a prefix operator.') {
+      errorMessage =
+        'The entered symbol is not a valid prefix operator. Please check your input.';
+    }
     return errorMessage;
   }
 
