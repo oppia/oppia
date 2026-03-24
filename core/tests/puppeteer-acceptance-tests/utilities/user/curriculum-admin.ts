@@ -2428,7 +2428,11 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
+    await this.page.waitForSelector(topicSelector, {visible: true});
+    await this.waitForElementToStabilize(topicSelector);
     await this.clickOnElementWithSelector(topicSelector);
+    await this.page.waitForSelector(topicSelector, {hidden: true});
+
     await this.page.waitForSelector(openTopicDropdownButton);
 
     // Wait for the topic to appear in the classroom before adding prerequisites.
