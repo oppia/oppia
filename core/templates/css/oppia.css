@@ -299,8 +299,20 @@ html {
   scroll-behavior: auto !important;
 }
 /* Override Bootstrap 5's .row rule */
-.container {
-  max-width: 1140px !important;
+@media (max-width: 768px) {
+  .container {
+    max-width: 100% !important;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
 }
 
 .row > * {
