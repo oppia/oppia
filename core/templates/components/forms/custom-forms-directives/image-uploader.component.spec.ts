@@ -173,14 +173,14 @@ describe('ImageUploaderComponent', () => {
     expect(component.isImageInPortraitMode()).toBeTrue();
     component.ngOnInit();
     expect(component.placeholderImageUrl).toContain(
-      '/icons/story-image-icon.png'
+      '/icons/story-image-icon.webp'
     );
 
     component.imageUploaderParameters.orientation = 'landscape';
     expect(component.isImageInPortraitMode()).toBeFalse();
     component.ngOnInit();
     expect(component.placeholderImageUrl).toContain(
-      '/icons/story-image-icon-landscape.png'
+      '/icons/story-image-icon-landscape.webp'
     );
   }));
 
