@@ -3107,17 +3107,15 @@ export class LoggedOutUser extends BaseUser {
 
           // Click the summary tile's anchor link to navigate to the
           // exploration.
-          await Promise.all([
-            this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-            this.page.evaluate((tileSelector: string) => {
-              const anchor = document.querySelector(
-                `${tileSelector} a`
-              ) as HTMLElement;
-              if (anchor) {
-                anchor.click();
-              }
-            }, collectionPreviewTileSelector),
-          ]);
+          await this.page.evaluate((tileSelector: string) => {
+            const anchor = document.querySelector(
+              `${tileSelector} a`
+            ) as HTMLElement;
+            if (anchor) {
+              anchor.click();
+            }
+          }, collectionPreviewTileSelector);
+          await this.expectElementToBeVisible(stateConversationContent);
           showMessage(`Playing exploration: "${explorationName}".`);
           return;
         }
@@ -3133,10 +3131,8 @@ export class LoggedOutUser extends BaseUser {
       for (const link of explorationLinks) {
         const text = await link.evaluate(el => el.textContent?.trim());
         if (text && text.includes(explorationName)) {
-          await Promise.all([
-            this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-            link.click(),
-          ]);
+          await link.click();
+          await this.expectElementToBeVisible(stateConversationContent);
           showMessage(`Playing exploration: "${explorationName}".`);
           return;
         }
@@ -3155,6 +3151,9 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(backToCollectionLinkSelector);
     await this.clickOnElementWithSelector(backToCollectionLinkSelector);
     await this.waitForPageToFullyLoad();
+
+    // Post-check: verify navigation back to the collection player page.
+    await this.expectElementToBeVisible(collectionPlayerTitleSelector);
     showMessage('Clicked "Back to Collection".');
   }
 
