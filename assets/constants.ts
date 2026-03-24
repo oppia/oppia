@@ -7854,4 +7854,3 @@ export default {
     "hi": "।!?"
   }
 } as const;
-
