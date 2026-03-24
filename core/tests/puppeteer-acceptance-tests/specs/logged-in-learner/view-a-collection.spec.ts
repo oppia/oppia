@@ -29,7 +29,7 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-out Learner viewing a collection', function () {
+describe('Logged-in Learner viewing a collection', function () {
   let collectionEditor: CollectionEditor & ExplorationEditor;
   let viewerUser: LoggedOutUser & LoggedInUser & ExplorationEditor;
 

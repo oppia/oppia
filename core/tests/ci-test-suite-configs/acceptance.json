@@ -553,8 +553,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/collection-creator/create-a-collection.spec.ts"
     },
     {
-      "name": "logged-out-learner/view-a-collection",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/view-a-collection.spec.ts"
+      "name": "logged-in-learner/view-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/view-a-collection.spec.ts"
     }
   ]
 }
