@@ -17,20 +17,17 @@
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
  * EC.EE. Preview rarely used interactions.
+ *
+ * NOTE: All interactions that were previously tested here
+ * (PencilCodeEditor, MusicNotesInput, CodeRepl, GraphInput, InteractiveMap)
+ * have been deprecated and hidden from the frontend as part of issue #24968.
+ * This file is kept as a placeholder for future non-deprecated rare interactions.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../utilities/user/exploration-editor';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-
-const CARD_NAMES = {
-  FIRST: 'Introduction',
-  SECOND: '2nd Card',
-};
 
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor & LoggedInUser & LoggedOutUser;
@@ -40,65 +37,6 @@ describe('Exploration Editor', function () {
       'explorationEditor',
       'exploration_editor@example.com'
     );
-
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-  });
-
-  it('should be able to preview "Code Editor" interaction', async function () {
-    // Add a code editor interaction.
-    await explorationEditor.updateCardContent('Enter a code editor.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CODE_EDITOR);
-    await explorationEditor.updateCodeEditorLearnerAnswerInResponseModal(
-      'has code that contains',
-      'print("Hello, Oppia!")'
-    );
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.SECOND,
-      true,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-    await explorationEditor.addHintToState(
-      'The hint is print("Hello, Oppia!")'
-    );
-    // Add solution.
-    await explorationEditor.addCodeEditorSolutionToState(
-      'print("Hello, Oppia!")',
-      'As given in the question.'
-    );
-    await explorationEditor.saveExplorationDraft();
-
-    // Submit wrong answer.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitCodeEditorAnswer('print("Hello!")');
-    await explorationEditor.expectResponseFeedbackToBe(
-      'Wrong Answer. Please try again'
-    );
-    // Check code output.
-    await explorationEditor.expectCodeOutputToBe('Hello!');
-    // View Hint.
-    await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
-    // covered by navigation in mobile view.
-    if (!explorationEditor.isViewportAtMobileWidth()) {
-      await explorationEditor.viewHint();
-      await explorationEditor.expectHintInHintModalToContain(
-        'The hint is print("Hello, Oppia!")'
-      );
-      await explorationEditor.closeHintModal();
-    }
-    // Submit correct answer.
-    await explorationEditor.submitCodeEditorAnswer('print("Hello, Oppia!")');
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
-
-    // Navigate to next card.
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
   });
 
   afterAll(async function () {

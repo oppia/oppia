@@ -464,7 +464,13 @@ describe('Customize Interaction Modal Component', () => {
       component.ngOnInit();
       tick();
 
-      const deprecatedInteractions = ['PencilCodeEditor', 'MusicNotesInput'];
+      const deprecatedInteractions = [
+        'PencilCodeEditor',
+        'MusicNotesInput',
+        'CodeRepl',
+        'GraphInput',
+        'InteractiveMap',
+      ];
       const expectedCategories =
         AppConstants.ALLOWED_INTERACTION_CATEGORIES.map(category => ({
           name: category.name,

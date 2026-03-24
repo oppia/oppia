@@ -734,8 +734,6 @@ var ExplorationEditorMainTab = function () {
       NumericExpressionInput: 'math',
       NumberWithUnits: 'math',
       RatioExpressionInput: 'math',
-      CodeRepl: 'programming',
-      InteractiveMap: 'geography',
     };
 
     var interactionTabButton = interactionTab(

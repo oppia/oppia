@@ -472,7 +472,13 @@ export class CustomizeInteractionModalComponent
       ];
     }
 
-    const deprecatedInteractions = ['PencilCodeEditor', 'MusicNotesInput'];
+    const deprecatedInteractions = [
+      'PencilCodeEditor',
+      'MusicNotesInput',
+      'CodeRepl',
+      'GraphInput',
+      'InteractiveMap',
+    ];
     this.allowedInteractionCategories = this.allowedInteractionCategories
       .map(category => ({
         ...category,

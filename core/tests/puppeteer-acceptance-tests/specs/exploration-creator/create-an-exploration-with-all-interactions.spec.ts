@@ -37,17 +37,12 @@ const CARD_NAMES = {
   SEVENTH: '7th Card',
   EIGHTH: '8th Card',
   NINTH: '9th Card',
-  TENTH: '10th Card',
   ELEVENTH: '11th Card',
   TWELFTH: '12th Card',
   THIRTEENTH: '13th Card',
   FOURTEENTH: '14th Card',
   FIFTEENTH: '15th Card',
   SIXTEENTH: '16th Card',
-  SEVENTEENTH: '17th Card',
-  EIGHTEENTH: '18th Card',
-  NINETEENTH: '19th Card',
-  TWENTIETH: '20th Card',
 };
 
 describe('Exploration Editor', function () {
@@ -360,47 +355,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
   });
 
-  it('should be able to use "Graph Theory" interaction', async function () {
-    // Update card content.
-    await explorationEditor.updateCardContent('Create a star topology.');
-    // Add Graph Interaction.
-    await explorationEditor.addInteraction(
-      INTERACTION_TYPES.GRAPH_THEORY,
-      false
-    );
-    await explorationEditor.expectCustomizeInteractionTitleToBe(
-      'Customize Interaction (Graph Theory)'
-    );
-    // Customize Graph Theory Interaction.
-    await explorationEditor.customizeGraphTheoryInteraction();
-    await explorationEditor.expectModalTitleToBe('Add Response');
-    // Node can be added, moved and removed.
-    await explorationEditor.expectGraphNodeCanBeAdded('response modal');
-    await explorationEditor.expectGraphNodeCanBeMoved('response modal');
-    await explorationEditor.expectGraphNodeCanBeRemoved('response modal');
-    // Add feedback for correct answer.
-    await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal();
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.TENTH,
-      true,
-      true
-    );
-    // Add default feedback for other responses.
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-
-    // Add solution.
-    // TODO(#22978): While adding solution, the graph viz in the solution
-    // modal is not visible.
-
-    // Save the exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
-    await explorationEditor.navigateToCard(CARD_NAMES.TENTH);
-  });
-
   it('should be able to use "Set Input" interaction', async function () {
+    await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
     // Update card content.
     await explorationEditor.updateCardContent('Enter a set.');
     // Add Set Input Interaction.
@@ -639,82 +595,7 @@ describe('Exploration Editor', function () {
       true
     );
 
-    // Save Exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
-    await explorationEditor.navigateToCard(CARD_NAMES.SIXTEENTH);
-  });
-
-  it('should be able to use "Code Editor" interaction', async function () {
-    // Update card content.
-    await explorationEditor.updateCardContent('Enter a code editor.');
-    // Add Code Editor interaction.
-    await explorationEditor.addInteraction(
-      INTERACTION_TYPES.CODE_EDITOR,
-      false
-    );
-    await explorationEditor.expectCustomizeInteractionTitleToBe(
-      'Customize Interaction (Code Editor)'
-    );
-    // Customize Code Editor interaction.
-    await explorationEditor.customizeCodeEditorInteraction(
-      '# print("Hello, Oppia!")'
-    );
-    await explorationEditor.expectModalTitleToBe('Add Response');
-    // Add feedback for correct response.
-    await explorationEditor.updateCodeEditorLearnerAnswerInResponseModal(
-      'has code that contains',
-      'print("Hello, Oppia!")'
-    );
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.SEVENTEENTH,
-      true,
-      true
-    );
-    // Add default feedback for other responses.
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-
-    // Add solution.
-    await explorationEditor.addCodeEditorSolutionToState(
-      'print("Hello, Oppia!")',
-      'As given in the question.'
-    );
-
-    // Save the exploration draft and navigate to the next card.
-    await explorationEditor.saveExplorationDraft();
-    await explorationEditor.navigateToCard(CARD_NAMES.SEVENTEENTH);
-  });
-
-  it('should be able to use "World Map" interaction', async function () {
-    // Update card content.
-    await explorationEditor.updateCardContent('Enter a world map.');
-    // Add World Map interaction.
-    await explorationEditor.addInteraction(INTERACTION_TYPES.WORLD_MAP, false);
-    await explorationEditor.expectCustomizeInteractionTitleToBe(
-      'Customize Interaction (World Map)'
-    );
-    // Customize World Map interaction.
-    await explorationEditor.customizeWorldMapInteraction(0, 0, 0);
-    await explorationEditor.expectModalTitleToBe('Add Response');
-    // Add feedback for correct response.
-    await explorationEditor.updateWorldMapLearnerAnswerInResponseModal(
-      'is within ... km of ...',
-      100
-    );
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.TWENTIETH,
-      true,
-      true
-    );
-    // Add default feedback for other responses.
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-
-    // Save the exploration draft.
+    // Save Exploration draft.
     await explorationEditor.saveExplorationDraft();
   });
 
