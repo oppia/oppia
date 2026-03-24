@@ -30,7 +30,6 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const CARD_NAMES = {
   FIRST: 'Introduction',
   SECOND: '2nd Card',
-  THIRD: '3rd Card',
   FOURTH: '4th Card',
   FIFTH: '5th Card',
   SIXTH: '6th Card',
@@ -108,59 +107,6 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
   });
 
-  it('should be able to preview "Graph Theory" interaction', async function () {
-    // Add a graph theory interaction.
-    await explorationEditor.updateCardContent('Create a star topology.');
-    await explorationEditor.addInteraction(
-      INTERACTION_TYPES.GRAPH_THEORY,
-      false
-    );
-    await explorationEditor.customizeGraphTheoryInteraction();
-    await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal();
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.THIRD,
-      true,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-    await explorationEditor.addHintToState(
-      'Create a star topology using all 4 nodes.'
-    );
-
-    // Move node.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.expectGraphNodeCanBeMoved();
-    // Remove and add node.
-    await explorationEditor.expectGraphNodeCanBeRemoved();
-    await explorationEditor.expectGraphNodeCanBeAdded();
-    // Submit worng answer.
-    await explorationEditor.submitGraphStarNetworkSolution(3);
-    await explorationEditor.expectResponseFeedbackToBe(
-      'Wrong Answer. Please try again'
-    );
-    // View Hint.
-    await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
-    // covered by navigation in mobile view.
-    if (!explorationEditor.isViewportAtMobileWidth()) {
-      await explorationEditor.viewHint();
-      await explorationEditor.expectHintInHintModalToContain(
-        'Create a star topology using all 4 nodes.'
-      );
-      await explorationEditor.closeHintModal();
-    }
-    // Submit a correct answer.
-    await explorationEditor.submitGraphStarNetworkSolution(4);
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
-
-    // Navigate to next card.
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
-  });
-
   it('should be able to preview "Set Input" interaction', async function () {
     // Add Set Input Interaction.
     await explorationEditor.updateCardContent('Enter a set.');
@@ -187,7 +133,7 @@ describe('Exploration Editor', function () {
     // Preview tab.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAMES.THIRD,
+      CARD_NAMES.SECOND,
       'Enter a set.'
     );
     // Submit wrong answer. Also, verifies clicking on "Add Item" adds new item.

@@ -4721,7 +4721,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.createMinimalExploration(
       'This is a test Programming Exploration',
-      INTERACTION_TYPES.CODE_EDITOR
+      INTERACTION_TYPES.TEXT_INPUT
     );
 
     const lastInteraction = 'Last Card';

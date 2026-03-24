@@ -26,12 +26,12 @@
 
 import {UserFactory} from '../../utilities/common/user-factory';
 
+// TODO(#24968): Add tests for any new non-deprecated rare interactions here.
 describe('Exploration Editor', function () {
-  beforeAll(async function () {
-    await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
-    );
+  it('placeholder: no rare interactions are available', function () {
+    // All previously tested interactions have been deprecated (#24968).
+    // This placeholder keeps the test suite valid until new ones are added.
+    expect(true).toBe(true);
   });
 
   afterAll(async function () {
