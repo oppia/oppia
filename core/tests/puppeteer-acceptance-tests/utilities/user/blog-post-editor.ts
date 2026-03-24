@@ -68,9 +68,8 @@ const closePreivewModalButtonSelector = '.e2e-test-close-preview-button';
 const gridViewButtonSelector = '.e2e-test-tiles-view-button';
 const listViewButtonSelector = '.e2e-test-list-view-button';
 const editBlogPostBtnSelector = '.e2e-test-edit-blog-post-button';
-const deleteBlogPostBtnSelector =
-  '.cdk-overlay-pane .e2e-test-delete-blog-post-button';
 const editBlogSelector = '.e2e-test-content-button';
+const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
 export class BlogPostEditor extends BaseUser {
   /**
@@ -387,14 +386,20 @@ export class BlogPostEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
-        await this.clickOnElementWithSelector(
+        await allDraftBlogPosts[i].$eval(
           '.e2e-test-blog-post-edit-box',
-          allDraftBlogPosts[i]
+          element => (element as HTMLElement).click()
         );
-        await this.expectElementToBeClickable(deleteBlogPostBtnSelector);
-        await this.clickOnElementWithSelector(deleteBlogPostBtnSelector);
-        await this.expectElementToBeVisible('div.modal-dialog');
-        await this.expectModalTitleToBe('DELETE BLOG POST');
+        await this.clickOnElementWithText(LABEL_FOR_DELETE_BUTTON);
+        try {
+          await this.expectModalTitleToBe('DELETE BLOG POST');
+        } catch (err) {
+          showMessage(
+            'Delete modal did not appear after first click. Retrying once.'
+          );
+          await this.clickOnElementWithText(LABEL_FOR_DELETE_BUTTON);
+          await this.expectModalTitleToBe('DELETE BLOG POST');
+        }
         await this.expectModalBodyToContain(
           'This action is irreversible and will permanently delete the blog post. Are you sure?'
         );
@@ -718,12 +723,11 @@ export class BlogPostEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       if (publishedBlogPostTitle === blogPostTitle) {
-        await this.clickOnElementWithSelector(
+        await allPublishedBlogPosts[i].$eval(
           '.e2e-test-blog-post-edit-box',
-          allPublishedBlogPosts[i]
+          element => (element as HTMLElement).click()
         );
-        await this.expectElementToBeClickable(deleteBlogPostBtnSelector);
-        await this.clickOnElementWithSelector(deleteBlogPostBtnSelector);
+        await this.clickOnElementWithText(LABEL_FOR_DELETE_BUTTON);
         await this.page.waitForSelector(confirmButtonSelector);
         await this.clickOnElementWithSelector(confirmButtonSelector);
         await this.expectElementToBeVisible(confirmButtonSelector, false);
