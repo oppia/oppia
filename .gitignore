@@ -85,3 +85,5 @@ debug.log
 jest-runtime-config.json
 
 oppia-env/
+
+skulpt-dist/

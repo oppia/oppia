@@ -84,10 +84,11 @@ describe('Community Library Browser', function () {
     // Check subscribed creators in preferences page.
     await communityLibraryBrowser.navigateToPreferencesPageUsingProfileDropdown();
     await communityLibraryBrowser.expectSubscribedCreatorsToContain('currAdm');
+    throw new Error('Intentional failure to test CI rerun behavior');
   });
 
   afterAll(async function () {
-    // Close browsers intentionally disabled to reproduce leftover process issue.
-    // Await UserFactory.closeAllBrowsers();
+    // Intentionally not closing browsers to simulate leftover processes and test CI rerun behavior.
+    // await UserFactory.closeAllBrowsers();
   });
 });
