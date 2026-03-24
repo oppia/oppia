@@ -365,16 +365,14 @@ export class TranslationModalComponent {
   }
 
   updateActiveState(translatableItem: TranslatableItem): void {
-    ({
-      text: this.textToTranslate,
-      more: this.moreAvailable,
-      status: this.activeStatus,
-      translation: this.activeWrittenTranslation,
-      dataFormat: this.activeDataFormat,
-    } = translatableItem);
     const {contentType, ruleType, interactionId} = translatableItem;
+    this.textToTranslate = translatableItem.text ?? '';
+    this.moreAvailable = translatableItem.more;
+    this.activeStatus = translatableItem.status;
+    this.activeWrittenTranslation = translatableItem.translation;
+    this.activeDataFormat = translatableItem.dataFormat ?? '';
     this.activeContentType = this.getFormattedContentType(
-      contentType,
+      contentType ?? '',
       interactionId
     );
     this.activeRuleDescription = this.getRuleDescription(
@@ -465,7 +463,7 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
     contentType: string,
-    interactionId: string | undefined
+    interactionId: string | null | undefined
   ): string {
     switch (contentType) {
       case 'interaction':
@@ -480,7 +478,10 @@ export class TranslationModalComponent {
     return contentType;
   }
 
-  getRuleDescription(ruleType?: string, interactionId?: string): string {
+  getRuleDescription(
+    ruleType?: string | null,
+    interactionId?: string | null
+  ): string {
     if (!ruleType || !interactionId) {
       return '';
     }

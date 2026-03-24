@@ -31,6 +31,9 @@ import {
   AdminBackendApiService,
   AdminPageData,
 } from 'domain/admin/admin-backend-api.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {Story} from 'domain/story/story.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminDataService} from '../services/admin-data.service';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
@@ -51,10 +54,10 @@ describe('Admin dev mode activities tab', () => {
     roleToActions: {},
     viewableRoles: [],
     humanReadableRoles: {},
-    topicSummaries: [],
+    topicSummaries: [{id: 'topic_id'} as CreatorTopicSummary],
     platformParameters: [],
-    skillList: [],
-    storyList: [],
+    skillList: [{id: 'skill_id'} as SkillSummary],
+    storyList: [{_id: 'story_id'} as Story],
   };
   let mockConfirmResult: (val: boolean) => void;
 
