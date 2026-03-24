@@ -391,7 +391,7 @@ export class PageContextService {
   }
 
   isInStoryEditorPreviewMode(): boolean {
-    return this.urlService.getUrlParams()['story_editor_page'] === 'true';
+    return this.urlService.getUrlParams().story_editor_page === 'true';
   }
 
   canAddOrEditComponents(): boolean {
