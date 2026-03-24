@@ -180,7 +180,9 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       .then(
         messages => {
           this._resetFeedbackMessageFields();
-          this.activeThread.messages = messages;
+          if (this.activeThread) {
+            this.activeThread.messages = messages;
+          }
           this.messageSendingInProgress = false;
         },
         () => {
