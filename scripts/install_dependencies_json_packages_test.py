@@ -698,6 +698,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_url_open_rate_limit_failure_cases(self) -> None:
         """Tests failure cases for rate limit handling."""
         test_url = 'https://example.com/test'
+        error0 = urllib.error.HTTPError(
+            url=test_url, code=500, msg='server error', hdrs=None, fp=None
+        )
 
         headers1 = email.message.Message()
         headers1.add_header('x-ratelimit-remaining', '5')
@@ -721,8 +724,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             url=test_url, code=403, msg='rate limit', hdrs=headers3, fp=None
         )
 
-        errors = [error1, error2, error3]
+        errors = [error0, error1, error2, error3]
 
+        # Here we use type Any because the function may raise an HTTPError or return a mock response object.
         def mock_urlopen(_url: str, context: ssl.SSLContext) -> Any:
             raise errors.pop(0)
 
@@ -731,10 +735,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         with urlopen_swap:
             with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
                 install_dependencies_json_packages.url_open(test_url)
-
             with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
                 install_dependencies_json_packages.url_open(test_url)
-
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
             with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
                 install_dependencies_json_packages.url_open(test_url)
 
