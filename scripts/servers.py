@@ -704,7 +704,7 @@ def managed_portserver() -> Iterator[psutil.Process]:
         os.remove(common.PORTSERVER_SOCKET_FILEPATH)
 
     portserver_args = [
-        'python',
+        common.CURRENT_PYTHON_BIN,
         '-m',
         'scripts.run_portserver',
         '--portserver_unix_socket_address',
