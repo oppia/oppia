@@ -55,6 +55,9 @@ const searchInput = '.e2e-test-search-input';
 const collectionSummaryTile = '.e2e-test-collection-summary-tile';
 const collectionSummaryTileTitle = '.e2e-test-collection-summary-tile-title';
 
+// Collection player selectors.
+const collectionPlayerTitle = '.oppia-collection-player-title-font';
+
 export class CollectionEditor extends BaseUser {
   /**
    * Navigates to the Community Library page.
@@ -88,10 +91,9 @@ export class CollectionEditor extends BaseUser {
     await this.page.waitForSelector(`${addExplorationButton}:not([disabled])`, {
       timeout: 10000,
     });
-    await this.clickOnElementWithSelector(addExplorationButton);
-
-    // Wait for the new node to appear in the editor.
+    // Capture node count before clicking to avoid race conditions.
     const nodeCountBefore = (await this.page.$$(collectionEditorNode)).length;
+    await this.clickOnElementWithSelector(addExplorationButton);
     await this.page.waitForFunction(
       (selector: string, expectedCount: number) => {
         return document.querySelectorAll(selector).length > expectedCount;
@@ -255,12 +257,10 @@ export class CollectionEditor extends BaseUser {
    * Verifies the current page is the collection editor page.
    */
   async expectToBeOnCollectionEditorPage(): Promise<void> {
-    const url = this.page.url();
-    if (!url.includes('/collection_editor/')) {
-      throw new Error(
-        `Expected to be on collection editor page, but current URL is: ${url}`
-      );
-    }
+    await this.page.waitForFunction(
+      () => window.location.href.includes('/collection_editor/'),
+      {timeout: 10000}
+    );
     showMessage('Verified that we are on the collection editor page.');
   }
 
@@ -283,7 +283,23 @@ export class CollectionEditor extends BaseUser {
         `Cannot shift node at index ${index}. Only ${shiftLeftButtons.length} nodes exist.`
       );
     }
+    const titlesBefore = await this.getNodeTitles();
     await this.clickOnElement(shiftLeftButtons[index]);
+
+    // Post-check: wait for the node order to change.
+    await this.page.waitForFunction(
+      (nodeSelector: string, titleSelector: string, before: string) => {
+        const nodes = document.querySelectorAll(nodeSelector);
+        const current = Array.from(nodes).map(
+          n => n.querySelector(titleSelector)?.textContent?.trim() || ''
+        );
+        return current.join(',') !== before;
+      },
+      {timeout: 10000},
+      collectionEditorNode,
+      collectionEditorNodeTitle,
+      titlesBefore.join(',')
+    );
     showMessage(`Shifted node at index ${index} to the left.`);
   }
 
@@ -298,7 +314,23 @@ export class CollectionEditor extends BaseUser {
         `Cannot shift node at index ${index}. Only ${shiftRightButtons.length} nodes exist.`
       );
     }
+    const titlesBefore = await this.getNodeTitles();
     await this.clickOnElement(shiftRightButtons[index]);
+
+    // Post-check: wait for the node order to change.
+    await this.page.waitForFunction(
+      (nodeSelector: string, titleSelector: string, before: string) => {
+        const nodes = document.querySelectorAll(nodeSelector);
+        const current = Array.from(nodes).map(
+          n => n.querySelector(titleSelector)?.textContent?.trim() || ''
+        );
+        return current.join(',') !== before;
+      },
+      {timeout: 10000},
+      collectionEditorNode,
+      collectionEditorNodeTitle,
+      titlesBefore.join(',')
+    );
     showMessage(`Shifted node at index ${index} to the right.`);
   }
 
@@ -400,6 +432,19 @@ export class CollectionEditor extends BaseUser {
     await this.expectElementToBeVisible(commitMessageInput);
     await this.clearAllTextFrom(commitMessageInput);
     await this.typeInInputField(commitMessageInput, message);
+
+    // Post-check: verify the input contains the expected message.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const input = document.querySelector(selector) as
+          | HTMLTextAreaElement
+          | HTMLInputElement;
+        return input && input.value === expected;
+      },
+      {timeout: 10000},
+      commitMessageInput,
+      message
+    );
     showMessage('Set commit message.');
   }
 
@@ -464,6 +509,17 @@ export class CollectionEditor extends BaseUser {
   async setCategory(category: string): Promise<void> {
     await this.clickOnElementWithSelector(categoryFilterDropdown);
     await this.selectMatOption(category);
+
+    // Post-check: verify the dropdown displays the selected category.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.textContent?.trim().includes(expected);
+      },
+      {timeout: 10000},
+      categoryFilterDropdown,
+      category
+    );
     showMessage(`Set collection category to "${category}".`);
   }
 
@@ -531,6 +587,9 @@ export class CollectionEditor extends BaseUser {
         if (title === collectionName) {
           await this.clickOnElement(tile);
           await this.waitForPageToFullyLoad();
+
+          // Post-check: verify navigation to the collection player page.
+          await this.expectElementToBeVisible(collectionPlayerTitle);
           showMessage(`Playing collection: "${collectionName}".`);
           return;
         }
