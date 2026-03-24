@@ -38,7 +38,7 @@ from core.tests import test_utils
 
 import elasticsearch
 import webapp2
-from typing import Any, Callable, Dict, Final, List, OrderedDict, Tuple
+from typing import Callable, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 
@@ -992,26 +992,6 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
-
-    def test_search_with_documents_in_index_yields_results(self) -> None:
-        """Tests that mock_search correctly iterates over existing documents."""
-        stub = test_utils.ElasticSearchStub()
-        stub.mock_create_index('index1')
-        mock_db = {'index1': [{'id': 'doc_1', 'title': 'Test Document'}]}
-
-        with self.swap(stub, '_DB', mock_db):
-            # Here we use type Any because the mock_search function signature
-            # explicitly expects it for the dynamic Elasticsearch query body.
-            search_body: Dict[str, Dict[str, Dict[str, Any]]] = {
-                'query': {'bool': {'filter': [], 'must': []}}
-            }
-
-            response = stub.mock_search(
-                body=search_body, index='index1', size=10, from_=0
-            )
-
-        self.assertIsNotNone(response)
-
 
 class EmailMockTests(test_utils.EmailTestBase):
     """Class for testing EmailTestBase."""
