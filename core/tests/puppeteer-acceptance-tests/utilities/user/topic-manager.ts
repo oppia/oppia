@@ -95,6 +95,8 @@ const chapterEditorBreadcrumbChapterNameSelector =
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
+const toastWarningContainerSelector = '.e2e-test-toast-warning';
+const closeToastMessageButtonSelector = 'button.e2e-test-close-toast-warning';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
 const removeQuestionConfirmationButtonSelector =
@@ -614,6 +616,24 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Closes the currently visible toast warning.
+   */
+  async closeToastMessage(): Promise<void> {
+    const toastVisible = await this.isElementVisible(
+      toastWarningContainerSelector,
+      true,
+      3000
+    );
+    if (!toastVisible) {
+      showMessage('No toast warning is visible to close.');
+      return;
+    }
+
+    await this.clickOnElementWithSelector(closeToastMessageButtonSelector);
+    await this.expectElementToBeVisible(toastWarningContainerSelector, false);
+  }
+
+  /**
    * Removes the attached skill from the current state card.
    */
   async removeSkillFromState(): Promise<void> {
@@ -765,8 +785,7 @@ export class TopicManager extends BaseUser {
       // TODO(#23302): Currently, changing the URL fragment throws some
       // unexpected warnings. Once fixed, remove the three lines below.
       await this.page.keyboard.press('Tab');
-      const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
-      await this.clickOnElementWithSelector(closeToastMessageButton);
+      await this.clickOnElementWithSelector(closeToastMessageButtonSelector);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.typeInInputField(updateTopicWebFragmentField, titleFragments);
@@ -3107,10 +3126,10 @@ export class TopicManager extends BaseUser {
       await this.waitForSaveStoryButtonToBeEnabled(
         mobileSaveStoryChangesButton
       );
-      await this.clickOnElementWithSelectorOrJs(mobileSaveStoryChangesButton);
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesButton);
     } else {
       await this.waitForSaveStoryButtonToBeEnabled(saveStoryButton);
-      await this.clickOnElementWithSelectorOrJs(saveStoryButton);
+      await this.clickOnElementWithSelector(saveStoryButton);
     }
     const saveModalVisible = await this.isElementVisible(
       saveChangesMessageInput,
@@ -3125,9 +3144,9 @@ export class TopicManager extends BaseUser {
         if (!isMobileSaveButtonVisible) {
           await this.clickOnElementWithSelector(mobileOptionsSelector);
         }
-        await this.clickOnElementWithSelectorOrJs(mobileSaveStoryChangesButton);
+        await this.clickOnElementWithSelector(mobileSaveStoryChangesButton);
       } else {
-        await this.clickOnElementWithSelectorOrJs(saveStoryButton);
+        await this.clickOnElementWithSelector(saveStoryButton);
       }
       await this.page.waitForSelector(saveChangesMessageInput, {
         visible: true,
@@ -3139,7 +3158,7 @@ export class TopicManager extends BaseUser {
       'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await this.clickOnElementWithSelectorOrJs(closeSaveModalButton);
+    await this.clickOnElementWithSelector(closeSaveModalButton);
     const modalHidden = await this.isElementVisible(modalDiv, false, 30000);
     if (!modalHidden) {
       await this.page.keyboard.press('Escape');
@@ -3163,10 +3182,8 @@ export class TopicManager extends BaseUser {
       showMessage('Discard option disabled; no changes to discard.');
       return;
     }
-    await this.clickOnElementWithSelectorOrJs(showDiscardOptionButtonSelector);
-    await this.clickOnElementWithSelectorOrJs(
-      discardStoryChangesButtonSelector
-    );
+    await this.clickOnElementWithSelector(showDiscardOptionButtonSelector);
+    await this.clickOnElementWithSelector(discardStoryChangesButtonSelector);
     await this.waitForPageToFullyLoad();
 
     // Post-check: The save story button should be disabled after discarding changes.
@@ -3176,98 +3193,13 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Clicks an element using standard click, with a JS click fallback.
-   */
-  async clickOnElementWithSelectorOrJs(selector: string): Promise<void> {
-    const elements = await this.page.$$(selector);
-    if (!elements.length) {
-      throw new Error(`Element not found for selector ${selector}`);
-    }
-
-    let targetElement: ElementHandle<Element> | null = null;
-    for (const element of elements) {
-      const box = await element.boundingBox();
-      if (!box) {
-        continue;
-      }
-      const isDisabled = await element.evaluate(el =>
-        Boolean((el as HTMLButtonElement).disabled)
-      );
-      if (isDisabled) {
-        continue;
-      }
-      targetElement = element;
-      break;
-    }
-
-    if (!targetElement) {
-      // Fall back to first visible element (if any), otherwise first match.
-      for (const element of elements) {
-        const box = await element.boundingBox();
-        if (box) {
-          targetElement = element;
-          break;
-        }
-      }
-    }
-
-    targetElement = targetElement ?? elements[0];
-
-    try {
-      await this.clickOnElement(targetElement);
-    } catch (error) {
-      await targetElement.evaluate(el => {
-        el.scrollIntoView({block: 'center'});
-        (el as HTMLElement).click();
-      });
-    }
-  }
-
-  /**
    * Waits for the save story button to become enabled.
    */
   async waitForSaveStoryButtonToBeEnabled(selector: string): Promise<void> {
-    await this.page.waitForSelector(selector, {timeout: 15000});
-    try {
-      await this.page.waitForFunction(
-        sel => {
-          const elements = Array.from(
-            document.querySelectorAll(sel)
-          ) as HTMLButtonElement[];
-          return elements.some(element => {
-            const style = window.getComputedStyle(element);
-            const isVisible =
-              style.display !== 'none' &&
-              style.visibility !== 'hidden' &&
-              element.getClientRects().length > 0;
-            return isVisible && element.disabled === false;
-          });
-        },
-        {timeout: 15000},
-        selector
-      );
-    } catch (error) {
-      const debugState = await this.page
-        .evaluate(sel => {
-          return Array.from(document.querySelectorAll(sel)).map(element => {
-            const el = element as HTMLButtonElement;
-            const style = window.getComputedStyle(el);
-            return {
-              text: el.textContent?.trim() || '',
-              disabled: el.disabled ?? null,
-              display: style.display,
-              visibility: style.visibility,
-              rects: el.getClientRects().length,
-            };
-          });
-        }, selector)
-        .catch(() => null);
-      throw new Error(
-        `Save story button did not become enabled. Selector: ${selector}. Details: ${JSON.stringify(
-          debugState
-        )}`
-      );
-    }
+    await this.page.waitForSelector(`${selector}:not([disabled])`, {
+      visible: true,
+      timeout: 15000,
+    });
   }
 
   /**
@@ -3343,7 +3275,7 @@ export class TopicManager extends BaseUser {
    * Returns to the story editor from the mobile chapter editor.
    */
   async returnToStoryEditorInMobile(): Promise<void> {
-    await this.clickOnElementWithSelectorOrJs(mobileBackToStoryEditorButton);
+    await this.clickOnElementWithSelector(mobileBackToStoryEditorButton);
     await this.page.waitForFunction(() => {
       const hash = (window.location.hash || '').replace(/\/+$/, '');
       return hash === '' || hash === '#';
@@ -3637,6 +3569,8 @@ export class TopicManager extends BaseUser {
         if (!this.isViewportAtMobileWidth()) {
           await this.openStoryEditor(storyName, topicName);
         } else {
+          // In mobile, stay within the current story editor flow whenever
+          // possible to avoid reloading the topic editor between chapter edits.
           const currentStoryName = await this.getCurrentStoryNameInStoryFlow();
           const activeTab = await this.getStoryEditorActiveTab();
 
@@ -4261,7 +4195,7 @@ export class TopicManager extends BaseUser {
 
     let warningVisible = await waitForWarningText();
     if (!warningVisible) {
-      await this.clickOnElementWithSelectorOrJs(warningIndicatorSelector);
+      await this.clickOnElementWithSelector(warningIndicatorSelector);
       warningVisible = await waitForWarningText();
     }
     if (!warningVisible) {

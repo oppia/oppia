@@ -4736,10 +4736,10 @@ export class ExplorationEditor extends BaseUser {
     const lastInteraction = 'Last Card';
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
-    await this.page.waitForSelector(addStateInput, {visible: true});
+    await this.expectElementToBeVisible(addStateInput);
     await this.typeInInputField(addStateInput, lastInteraction);
     await this.clickOnElementWithSelector(addNewResponseButton);
-    await this.page.waitForTimeout(500);
+    await this.expectElementToBeVisible(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
 
     await this.editDefaultResponseFeedbackInExplorationEditorPage(

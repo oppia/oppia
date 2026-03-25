@@ -246,14 +246,7 @@ describe('Topic Manager', function () {
       await topicManager.expectToastMessageToBe(
         'The given skill id is already a prerequisite skill.'
       );
-      await topicManager.discardStoryChanges();
-
-      // Re-open chapter editor.
-      await topicManager.openChapterEditor(
-        'New Title',
-        'The Broken Calculator',
-        'Arithmetic Operations'
-      );
+      await topicManager.closeToastMessage();
 
       // Add aquired skill.
       await topicManager.addAcquiredSkill('Subtraction');
@@ -269,7 +262,6 @@ describe('Topic Manager', function () {
             'list in .*'
         )
       );
-      await topicManager.discardStoryChanges();
 
       // Re-open chapter editor.
       await topicManager.openChapterEditor(
@@ -286,6 +278,7 @@ describe('Topic Manager', function () {
         'The Broken Calculator',
         'Arithmetic Operations'
       );
+      await topicManager.removePrerequisiteSkillFromChapter('Addition');
       await topicManager.removeAcquiredSkill('Subtraction');
       await topicManager.saveStoryDraft();
 
