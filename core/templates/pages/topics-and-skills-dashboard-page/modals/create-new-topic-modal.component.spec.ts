@@ -189,4 +189,26 @@ describe('Create new topic modal', () => {
     );
     expect(componentInstance.onTopicUrlFragmentChange).toHaveBeenCalled();
   });
+
+  it('should update thumbnail data on onImageSave', () => {
+    const mockImageData = {
+      filename: 'test-thumbnail.svg',
+      bg_color: '#FF5733',
+      image_data: new Blob(['<svg></svg>'], {type: 'image/svg+xml'}),
+    };
+
+    componentInstance.onImageSave(mockImageData);
+
+    expect(componentInstance.thumbnailImage).toBe(mockImageData.image_data);
+    expect(componentInstance.thumbnailFilename).toBe(mockImageData.filename);
+    expect(componentInstance.thumbnailBgColor).toBe(mockImageData.bg_color);
+  });
+
+  it('should update isValid when thumbnail image is set', () => {
+    expect(componentInstance.isValid()).toBeFalse();
+
+    componentInstance.thumbnailImage = new Blob(['test'], {type: 'image/svg+xml'});
+
+    expect(componentInstance.isValid()).toBeTrue();
+  });
 });
