@@ -46,46 +46,6 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             error.stderr,
         )
 
-    def test_initialization_with_invalid_entity_id_format_yields_correct_stderr(
-        self,
-    ) -> None:
-        model = base_models.BaseModel(id='invalid_id')
-
-        error = answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
-            model
-        )
-
-        self.assertEqual(
-            (
-                'InvalidEntityIdFormatError in BaseModel(id="invalid_id"): '
-                'Entity id invalid_id does not match required format '
-                '"[timestamp]:[exp_id]:[session_id]"'
-            ),
-            error.stderr,
-        )
-
-    def test_initialization_with_mismatched_model_attributes_yields_correct_stderr(
-        self,
-    ) -> None:
-        model = base_models.BaseModel(id='123:exp1:session2')
-
-        # Simulate attributes used by error message.
-        model.exp_id = 'exp1'
-        model.session_id = 'session1'
-
-        error = answerSubmittedEventLogEntryModel_validation_errors.EntityIdModelMismatchError(
-            model
-        )
-
-        self.assertEqual(
-            (
-                'EntityIdModelMismatchError in BaseModel(id="123:exp1:session2"): '
-                'Entity id 123:exp1:session2 does not match model fields '
-                'exp_id=exp1, session_id=session1'
-            ),
-            error.stderr,
-        )
-
     def test_initialization_with_custom_domain_failure_message_yields_correct_stderr(
         self,
     ) -> None:
@@ -99,6 +59,43 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             (
                 'DomainValidationError in BaseModel(id="test_id"): '
                 'Domain validation failed with error: test failure'
+            ),
+            error.stderr,
+        )
+
+    def test_initialization_with_out_of_range_exp_version_yields_correct_stderr(
+        self,
+    ) -> None:
+        model = base_models.BaseModel(id='test_id')
+        model.exp_version = 10
+
+        error = answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
+            1, model
+        )
+
+        self.assertEqual(
+            (
+                'ExpVersionOutOfRangeError in BaseModel(id="test_id"): '
+                'Expected 1 <= exp_version <= current exploration version 1, received 10'
+            ),
+            error.stderr,
+        )
+
+    def test_initialization_with_invalid_state_name_yields_correct_stderr(
+        self,
+    ) -> None:
+        model = base_models.BaseModel(id='test_id')
+        model.state_name = 'Introduction'
+
+        error = answerSubmittedEventLogEntryModel_validation_errors.InvalidStateNameError(
+            model
+        )
+
+        self.assertEqual(
+            (
+                'InvalidStateNameError in BaseModel(id="test_id"): '
+                'Expected state_name to be a valid state name as per '
+                'retrieved exploration by exp_id, received Introduction'
             ),
             error.stderr,
         )

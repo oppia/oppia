@@ -123,42 +123,6 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
         ):
             self.domain_obj.validate()
 
-    def test_validation_with_non_existent_exploration_raises_error(
-        self,
-    ) -> None:
-        self.mock_get_exploration.side_effect = Exception('Not found')
-
-        with self.assertRaisesRegex(
-            domain_errors.AnswerSubmittedEventLogEntryDomainError,
-            'Exploration with id %s does not exist' % (self.domain_obj.exp_id),
-        ):
-            self.domain_obj.validate()
-
-    def test_validation_with_exploration_returning_none_raises_error(
-        self,
-    ) -> None:
-        self.mock_get_exploration.return_value = None
-
-        with self.assertRaisesRegex(
-            domain_errors.ExplorationDoesNotExistError,
-            'Exploration with id %s does not exist' % (self.domain_obj.exp_id),
-        ):
-            self.domain_obj.validate()
-
-    def test_validation_with_exp_version_out_of_range_raises_error(
-        self,
-    ) -> None:
-        self.mock_get_exploration.return_value = self.mock_exploration
-
-        self.domain_obj.exp_version = 10
-
-        with self.assertRaisesRegex(
-            domain_errors.AnswerSubmittedEventLogEntryDomainError,
-            'Expected exp_version <= current exploration version %s, received %s'
-            % (self.mock_exploration.version, self.domain_obj.exp_version),
-        ):
-            self.domain_obj.validate()
-
     def test_validation_with_invalid_state_name_type_raises_error(self) -> None:
         # Here we use MyPy ignore because to test invalid
         # state data.
@@ -166,8 +130,7 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             domain_errors.AnswerSubmittedEventLogEntryDomainError,
-            'Expected state_name to be a valid state name as per'
-            ' retrieved exploration by exp_id, received %s'
+            'Expected state_name to be a string, received %s'
             % self.domain_obj.state_name,
         ):
             self.domain_obj.validate()
@@ -234,18 +197,5 @@ class AnswerSubmittedEventLogEntryDomainTest(test_utils.GenericTestBase):
                 feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
                 self.domain_obj.event_schema_version,
             ),
-        ):
-            self.domain_obj.validate()
-
-    def test_validation_with_unknown_state_name_raises_error(self) -> None:
-        self.mock_get_exploration.return_value = self.mock_exploration
-
-        self.domain_obj.state_name = 'UnknownState'
-
-        with self.assertRaisesRegex(
-            domain_errors.AnswerSubmittedEventLogEntryDomainError,
-            'Expected state_name to be a valid state name as per'
-            ' retrieved exploration by exp_id, received %s'
-            % self.domain_obj.state_name,
         ):
             self.domain_obj.validate()

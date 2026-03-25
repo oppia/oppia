@@ -38,29 +38,13 @@ class InvalidExplorationIdError(base_validation_errors.BaseValidationError):
         super().__init__(message, model)
 
 
-class InvalidEntityIdFormatError(base_validation_errors.BaseValidationError):
-    """Error class for incorrect entity id format."""
+class ExplorationDoesNotExistError(base_validation_errors.BaseValidationError):
+    """Error class for invalid exploration reference."""
 
     def __init__(
         self, model: stats_models.AnswerSubmittedEventLogEntryModel
     ) -> None:
-        message = (
-            f'Entity id {model.id} does not match required format '
-            '"[timestamp]:[exp_id]:[session_id]"'
-        )
-        super().__init__(message, model)
-
-
-class EntityIdModelMismatchError(base_validation_errors.BaseValidationError):
-    """Error class when entity_id fields do not match model fields."""
-
-    def __init__(
-        self, model: stats_models.AnswerSubmittedEventLogEntryModel
-    ) -> None:
-        message = (
-            f'Entity id {model.id} does not match model fields '
-            f'exp_id={model.exp_id}, session_id={model.session_id}'
-        )
+        message = f'exp_id {model.exp_id} does not correspond to a valid ExplorationModel'
         super().__init__(message, model)
 
 
@@ -73,4 +57,33 @@ class DomainValidationError(base_validation_errors.BaseValidationError):
         model: stats_models.AnswerSubmittedEventLogEntryModel,
     ) -> None:
         message = f'Domain validation failed with error: {error_message}'
+        super().__init__(message, model)
+
+
+class ExpVersionOutOfRangeError(base_validation_errors.BaseValidationError):
+    """Error class when exp_version field is out of range."""
+
+    def __init__(
+        self,
+        current_exp_version: int,
+        model: stats_models.AnswerSubmittedEventLogEntryModel,
+    ) -> None:
+        message = (
+            'Expected 1 <= exp_version <= current exploration version %s, received %s'
+            % (current_exp_version, model.exp_version)
+        )
+        super().__init__(message, model)
+
+
+class InvalidStateNameError(base_validation_errors.BaseValidationError):
+    """Error class for invalid state name."""
+
+    def __init__(
+        self,
+        model: stats_models.AnswerSubmittedEventLogEntryModel,
+    ) -> None:
+        message = (
+            'Expected state_name to be a valid state name as per '
+            'retrieved exploration by exp_id, received %s' % model.state_name
+        )
         super().__init__(message, model)

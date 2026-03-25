@@ -54,36 +54,14 @@ class InvalidExpVersionError(AnswerSubmittedEventLogEntryDomainError):
         super().__init__(message)
 
 
-class ExplorationDoesNotExistError(AnswerSubmittedEventLogEntryDomainError):
-    """Error class when exploration does not exist."""
-
-    def __init__(self, exp_id: str) -> None:
-        message = 'Exploration with id %s does not exist' % exp_id
-        super().__init__(message)
-
-
-class ExpVersionOutOfRangeError(AnswerSubmittedEventLogEntryDomainError):
-    """Error class for exploration version outside valid range."""
-
-    def __init__(self, current_version: int, exp_version: int) -> None:
-        message = (
-            'Expected exp_version <= current exploration version %s, received %s'
-            % (current_version, exp_version)
-        )
-        super().__init__(message)
-
-
-class InvalidStateNameError(AnswerSubmittedEventLogEntryDomainError):
-    """Error class for invalid state name."""
+class InvalidStateNameTypeError(AnswerSubmittedEventLogEntryDomainError):
+    """Error class for invalid state name type."""
 
     # Here we use object because state_name may receive values of any type during
     # validation (e.g., None, str, or other unexpected types). The validation
     # error message should display whatever value was provided.
     def __init__(self, state_name: object) -> None:
-        message = (
-            'Expected state_name to be a valid state name as per '
-            'retrieved exploration by exp_id, received %s' % state_name
-        )
+        message = 'Expected state_name to be a string, received %s' % state_name
         super().__init__(message)
 
 

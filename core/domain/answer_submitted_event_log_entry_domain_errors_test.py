@@ -43,32 +43,13 @@ class AnswerSubmittedEventLogEntryDomainErrorsTest(test_utils.GenericTestBase):
         ):
             raise domain_errors.InvalidExpVersionError(0)
 
-    def test_raising_with_non_existent_exploration_raises_error(self) -> None:
-        """Test ExplorationDoesNotExistError."""
-        with self.assertRaisesRegex(
-            domain_errors.ExplorationDoesNotExistError,
-            'Exploration with id exp1 does not exist',
-        ):
-            raise domain_errors.ExplorationDoesNotExistError('exp1')
-
-    def test_raising_with_exp_version_out_of_range_raises_error(self) -> None:
-        """Test ExpVersionOutOfRangeError."""
-        with self.assertRaisesRegex(
-            domain_errors.ExpVersionOutOfRangeError,
-            'Expected exp_version <= current exploration version 5, received 10',
-        ):
-            raise domain_errors.ExpVersionOutOfRangeError(5, 10)
-
     def test_raising_with_invalid_state_name_raises_error(self) -> None:
-        """Test InvalidStateNameError."""
+        """Test InvalidStateNameTypeError."""
         with self.assertRaisesRegex(
-            domain_errors.InvalidStateNameError,
-            (
-                'Expected state_name to be a valid state name as per '
-                'retrieved exploration by exp_id, received invalid_state'
-            ),
+            domain_errors.InvalidStateNameTypeError,
+            ('Expected state_name to be a string, received invalid_state'),
         ):
-            raise domain_errors.InvalidStateNameError('invalid_state')
+            raise domain_errors.InvalidStateNameTypeError('invalid_state')
 
     def test_raising_with_invalid_session_id_raises_error(self) -> None:
         """Test InvalidSessionIdError."""

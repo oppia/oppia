@@ -59,7 +59,8 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
 
         return [
             self.validate_exploration_reference,
-            self.validate_entity_id_format,
+            self.validate_state_name_according_exploration,
+            self.validate_range_of_exp_version,
         ]
 
     def get_validate_domain_object_fn(
@@ -92,9 +93,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
                 is_feedback_useful=model.is_feedback_useful,
                 event_schema_version=model.event_schema_version,
             )
-
-            with datastore_services.get_ndb_context():
-                domain_object.validate()
+            domain_object.validate()
 
         except Exception as e:
             yield (
@@ -118,7 +117,9 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
 
         try:
             with datastore_services.get_ndb_context():
-                exploration = exp_fetchers.get_exploration_by_id(model.exp_id)
+                exploration = exp_fetchers.get_exploration_by_id(
+                    exploration_id=model.exp_id, version=model.exp_version
+                )
 
             if exploration is None:
                 yield (
@@ -133,10 +134,10 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
                 )
             )
 
-    def validate_entity_id_format(
+    def validate_state_name_according_exploration(
         self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
-        """Checks entity_id format '[timestamp]:[exp_id]:[session_id]'."""
+        """Checks state_name should be valid key in states of exploration."""
 
         # BaseValidationJob calls datastore_services.query_everything()
         # and passes every model through this function. Since the method
@@ -147,21 +148,57 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         ):
             return
 
-        parts = model.id.split(':')
+        try:
+            with datastore_services.get_ndb_context():
+                exploration = exp_fetchers.get_exploration_by_id(
+                    exploration_id=model.exp_id, version=model.exp_version
+                )
+            assert exploration is not None
 
-        if len(parts) != 3:
+            if model.state_name not in exploration.states:
+                yield (
+                    answerSubmittedEventLogEntryModel_validation_errors.InvalidStateNameError(
+                        model
+                    )
+                )
+        except Exception:
             yield (
-                answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
+                answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
                     model
                 )
             )
+
+    def validate_range_of_exp_version(
+        self, model: base_models.BaseModel
+    ) -> Iterator[job_run_result.JobRunResult]:
+        """Checks exp_version should be in valid range i.e.
+        1 <= exp_version <= current exploration version.
+        """
+        # BaseValidationJob calls datastore_services.query_everything()
+        # and passes every model through this function. Since the method
+        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
+        # only those instances.
+        if not isinstance(
+            model, stats_models.AnswerSubmittedEventLogEntryModel
+        ):
             return
 
-        _, exp_id, session_id = parts
+        try:
+            with datastore_services.get_ndb_context():
+                exploration = exp_fetchers.get_exploration_by_id(
+                    exploration_id=model.exp_id
+                )
+            assert exploration is not None
 
-        if exp_id != model.exp_id or session_id != model.session_id:
+            if model.exp_version < 1 or model.exp_version > exploration.version:
+                yield (
+                    answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
+                        exploration.version, model
+                    )
+                )
+        except Exception:
             yield (
-                answerSubmittedEventLogEntryModel_validation_errors.EntityIdModelMismatchError(
+                answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
                     model
                 )
             )

@@ -81,10 +81,6 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
-        domain_error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
-            'Exploration with id expX does not exist', model
-        ).stderr
-
         invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
             model
         ).stderr
@@ -92,10 +88,13 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    f'DomainValidationError: {domain_error}'
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    f'InvalidExplorationIdError: {invalid_exp_error}'
+                    '\n'.join(
+                        [
+                            f'InvalidExplorationIdError: {invalid_exp_error}',
+                            invalid_exp_error,
+                            invalid_exp_error,
+                        ]
+                    )
                 ),
             ]
         )
@@ -119,10 +118,6 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
-        domain_error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
-            'Exploration with id expX does not exist', model
-        ).stderr
-
         invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
             model
         ).stderr
@@ -131,74 +126,13 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    f'DomainValidationError: {domain_error}'
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    f'InvalidExplorationIdError: {invalid_exp_error}'
-                ),
-            ]
-        )
-
-    def test_validation_with_invalid_entity_id_format_yields_error(
-        self,
-    ) -> None:
-        """Test entity_id format error."""
-
-        self.save_new_valid_exploration(
-            'exp1', 'owner_id', title='Test Exploration'
-        )
-
-        model = self.create_model(
-            stats_models.AnswerSubmittedEventLogEntryModel,
-            id='invalid-format',
-            exp_id='exp1',
-            exp_version=1,
-            state_name='Introduction',
-            session_id='session1',
-            time_spent_in_state_secs=10.0,
-            is_feedback_useful=True,
-            event_schema_version=2,
-        )
-        self.put_multi([model])
-
-        invalid_entity_id_format_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidEntityIdFormatError(
-            model
-        ).stderr
-
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stderr(
-                    f'InvalidEntityIdFormatError: {invalid_entity_id_format_error}'
-                ),
-            ]
-        )
-
-    def test_validation_with_entity_id_mismatch_yields_error(self) -> None:
-        """Test entity_id mismatch with model fields."""
-
-        self.save_new_valid_exploration(
-            'exp1', 'owner_id', title='Test Exploration'
-        )
-        model = self.create_model(
-            stats_models.AnswerSubmittedEventLogEntryModel,
-            id='123:exp1:session999',
-            exp_id='exp1',
-            exp_version=1,
-            state_name='Introduction',
-            session_id='session1',
-            time_spent_in_state_secs=10.0,
-            is_feedback_useful=True,
-            event_schema_version=2,
-        )
-        self.put_multi([model])
-
-        entity_id_model_mismatch_error = answerSubmittedEventLogEntryModel_validation_errors.EntityIdModelMismatchError(
-            model
-        ).stderr
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stderr(
-                    f'EntityIdModelMismatchError: {entity_id_model_mismatch_error}'
+                    '\n'.join(
+                        [
+                            f'InvalidExplorationIdError: {invalid_exp_error}',
+                            invalid_exp_error,
+                            invalid_exp_error,
+                        ]
+                    )
                 ),
             ]
         )
@@ -227,10 +161,102 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             model,
         ).stderr
 
+        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
+            model
+        ).stderr
+
+        exp_version_error = answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
+            1, model
+        ).stderr
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
+                    '\n'.join(
+                        [
+                            f'InvalidExplorationIdError: {invalid_exp_error}',
+                            invalid_exp_error,
+                        ]
+                    )
+                ),
+                job_run_result.JobRunResult.as_stderr(
                     f'DomainValidationError: {domain_error}'
-                )
+                ),
+                job_run_result.JobRunResult.as_stderr(
+                    f'ExpVersionOutOfRangeError: {exp_version_error}'
+                ),
+            ]
+        )
+
+    def test_validation_with_invalid_state_name_yields_error(self) -> None:
+        """Test invalid state_name according to retrieved exploration."""
+
+        self.save_new_valid_exploration(
+            'exp1', 'owner_id', title='Test Exploration'
+        )
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            id='123:exp1:session1',
+            exp_id='exp1',
+            exp_version=1,
+            state_name='Invalid_state_name',
+            session_id='session1',
+            time_spent_in_state_secs=10.0,
+            is_feedback_useful=True,
+            event_schema_version=2,
+        )
+        self.put_multi([model])
+
+        invalid_state_name_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidStateNameError(
+            model
+        ).stderr
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    f'InvalidStateNameError: {invalid_state_name_error}'
+                ),
+            ]
+        )
+
+    def test_validation_with_out_of_range_exp_version_yields_error(
+        self,
+    ) -> None:
+        """Test domain validation failure."""
+
+        self.save_new_valid_exploration(
+            'exp1', 'owner_id', title='Test Exploration'
+        )
+        model = self.create_model(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            id='123:exp1:session1',
+            exp_id='exp1',
+            exp_version=10,
+            state_name='Introduction',
+            session_id='session1',
+            time_spent_in_state_secs=10.0,
+            is_feedback_useful=True,
+            event_schema_version=2,
+        )
+        self.put_multi([model])
+
+        exp_version_range_error = answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
+            1, model
+        ).stderr
+        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
+            model
+        ).stderr
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    '\n'.join(
+                        [
+                            f'InvalidExplorationIdError: {invalid_exp_error}',
+                            invalid_exp_error,
+                        ]
+                    )
+                ),
+                job_run_result.JobRunResult.as_stderr(
+                    f'ExpVersionOutOfRangeError: {exp_version_range_error}'
+                ),
             ]
         )

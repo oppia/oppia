@@ -27,7 +27,6 @@ from core import feconf
 from core.domain import (
     answer_submitted_event_log_entry_domain_errors as domain_errors,
 )
-from core.domain import exp_fetchers
 
 
 class AnswerSubmittedEventLogEntry:
@@ -75,10 +74,6 @@ class AnswerSubmittedEventLogEntry:
             domain_errors.InvalidExpIdError: If exp_id is not a valid string.
             domain_errors.InvalidExpVersionError: If exp_version is not a valid
                 positive integer.
-            domain_errors.ExplorationDoesNotExistError: If the exploration with
-                the given exp_id does not exist.
-            domain_errors.ExpVersionOutOfRangeError: If exp_version is greater
-                than the current exploration version.
             domain_errors.InvalidStateNameError: If state_name is not a valid
                 state in the exploration.
             domain_errors.InvalidSessionIdError: If session_id is not a string.
@@ -95,23 +90,8 @@ class AnswerSubmittedEventLogEntry:
         if not isinstance(self.exp_version, int) or (self.exp_version < 1):
             raise domain_errors.InvalidExpVersionError(self.exp_version)
 
-        try:
-            retrieved_exploration = exp_fetchers.get_exploration_by_id(
-                self.exp_id
-            )
-        except Exception as e:
-            raise domain_errors.ExplorationDoesNotExistError(self.exp_id) from e
-
-        if not retrieved_exploration:
-            raise domain_errors.ExplorationDoesNotExistError(self.exp_id)
-
-        if self.exp_version > retrieved_exploration.version:
-            raise domain_errors.ExpVersionOutOfRangeError(
-                retrieved_exploration.version, self.exp_version
-            )
-
         if not isinstance(self.state_name, str):
-            raise domain_errors.InvalidStateNameError(self.state_name)
+            raise domain_errors.InvalidStateNameTypeError(self.state_name)
 
         if not isinstance(self.session_id, str):
             raise domain_errors.InvalidSessionIdError(self.session_id)
@@ -128,14 +108,12 @@ class AnswerSubmittedEventLogEntry:
                 self.is_feedback_useful
             )
 
-        if not isinstance(self.event_schema_version, int) or (
-            self.event_schema_version
-            != feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
+        if not isinstance(self.event_schema_version, int) or not (
+            1
+            <= self.event_schema_version
+            <= feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ):
             raise domain_errors.InvalidEventSchemaVersionError(
                 feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
                 self.event_schema_version,
             )
-
-        if self.state_name not in retrieved_exploration.states:
-            raise domain_errors.InvalidStateNameError(self.state_name)

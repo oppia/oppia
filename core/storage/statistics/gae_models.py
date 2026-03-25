@@ -184,13 +184,12 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
-        '[timestamp]:[exp_id]:[session_id]'.
+        'hash([timestamp]:[exp_id]:[session_id] + random number)'.
         """
         timestamp = datetime.datetime.utcnow()
-        return '%s:%s:%s' % (
-            utils.get_time_in_millisecs(timestamp),
-            exp_id,
-            session_id,
+        return cls.get_new_id(
+            '%s:%s:%s'
+            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     @classmethod
