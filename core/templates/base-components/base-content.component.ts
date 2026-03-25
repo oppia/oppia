@@ -91,7 +91,6 @@ export class BaseContentComponent {
         this.changeDetectorRef.detectChanges();
       })
     );
-    this.keyboardShortcutService.bindNavigationShortcuts();
     this.keyboardShortcutService.bindLibraryPageShortcuts();
 
     // TODO(sll): Use 'touchstart' for mobile.

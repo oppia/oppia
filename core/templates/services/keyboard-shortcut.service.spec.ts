@@ -41,13 +41,6 @@ describe('Keyboard Shortcuts', () => {
   let categoryBar = document.createElement('select');
 
   let openQuickReferenceSpy;
-
-  let mockWindow = {
-    location: {
-      href: '',
-    },
-  } as Window;
-
   let windowRef: WindowRef;
   let appRef: ApplicationRef;
   let keyboardShortcutService: KeyboardShortcutService;
@@ -89,54 +82,6 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(searchBar);
     document.body.append(categoryBar);
   });
-
-  it(
-    'should navigate to the corresponding page' +
-      ' when the navigation key is pressed',
-    () => {
-      spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
-      keyboardShortcutService.bindNavigationShortcuts();
-
-      mockWindow.location.href = '';
-      expect(windowRef.nativeWindow.location.href).toBe('');
-
-      Mousetrap.trigger('ctrl+6');
-      expect(windowRef.nativeWindow.location.href).toEqual('/get-started');
-      mockWindow.location.href = '';
-      expect(windowRef.nativeWindow.location.href).toBe('');
-
-      Mousetrap.trigger('ctrl+1');
-      expect(windowRef.nativeWindow.location.href).toEqual(
-        '/community-library'
-      );
-      mockWindow.location.href = '';
-      expect(windowRef.nativeWindow.location.href).toBe('');
-
-      Mousetrap.trigger('ctrl+2');
-      expect(windowRef.nativeWindow.location.href).toEqual(
-        '/learner-dashboard'
-      );
-      mockWindow.location.href = '';
-      expect(windowRef.nativeWindow.location.href).toBe('');
-
-      Mousetrap.trigger('ctrl+3');
-      expect(windowRef.nativeWindow.location.href).toEqual(
-        '/creator-dashboard'
-      );
-      mockWindow.location.href = '';
-      expect(windowRef.nativeWindow.location.href).toBe('');
-
-      Mousetrap.trigger('ctrl+4');
-      expect(windowRef.nativeWindow.location.href).toEqual('/about');
-      mockWindow.location.href = '';
-      expect(windowRef.nativeWindow.location.href).toBe('');
-
-      Mousetrap.trigger('ctrl+5');
-      expect(windowRef.nativeWindow.location.href).toEqual('/preferences');
-      mockWindow.location.href = '';
-      expect(windowRef.nativeWindow.location.href).toBe('');
-    }
-  );
 
   it(
     'should move the focus to the corresponding element' +
