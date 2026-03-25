@@ -89,7 +89,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/domain/topic/topic-creation-backend-api.service.spec.ts',
     'core/templates/domain/topic/topic-update.service.spec.ts',
     'core/templates/domain/topic/topic-update.service.ts',
-    'core/templates/domain/voiceover/voiceover-backend-api.service.spec.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.spec.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.ts',
     'core/templates/pages/classroom-page/classroom-page.module.ts',

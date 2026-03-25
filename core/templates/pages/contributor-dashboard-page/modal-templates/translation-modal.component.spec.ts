@@ -546,6 +546,10 @@ describe('Translation Modal Component', () => {
     expect(component.activeRuleDescription).toBe('');
   });
 
+  it('should return empty rule description when interaction id is null', () => {
+    expect(component.getRuleDescription('Contains', null)).toBe('');
+  });
+
   describe('when clicking on the translatable content', () => {
     const nonParagraphTarget: HTMLElement = document.createElement('div');
     const mathTarget: HTMLElement = document.createElement(

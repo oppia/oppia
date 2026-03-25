@@ -407,7 +407,7 @@ describe('Voiceover backend API service', function () {
 
     let automaticVoiceoverRegenerationRecords = [
       {
-        id: '123',
+        task_run_id: '123',
         cloud_task_name: 'Test Task',
         latest_job_state: 'RUNNING',
         function_id: 'function_456',
