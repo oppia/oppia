@@ -46,7 +46,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX
         )
-        collection_dict = response_dict['collection']
+        collection_dict = response_dict['collection_dict']
 
         # Verify the collection was properly loaded.
         self.assertEqual(
@@ -75,7 +75,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX
         )
-        collection_dict = response_dict['collection']
+        collection_dict = response_dict['collection_dict']
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(playthrough_dict['next_exploration_id'], '20')
@@ -88,7 +88,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX
         )
-        collection_dict = response_dict['collection']
+        collection_dict = response_dict['collection_dict']
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(playthrough_dict['next_exploration_id'], '21')
@@ -104,7 +104,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX
         )
-        collection_dict = response_dict['collection']
+        collection_dict = response_dict['collection_dict']
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(playthrough_dict['next_exploration_id'], '0')
@@ -119,7 +119,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX
         )
-        collection_dict = response_dict['collection']
+        collection_dict = response_dict['collection_dict']
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(playthrough_dict['next_exploration_id'], None)
