@@ -26,9 +26,11 @@ import {
   StateAndContent,
   TranslateTextService,
 } from 'pages/contributor-dashboard-page/services/translate-text.service';
+import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
 
 describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
+  let translateTextBackendApiService: TranslateTextBackendApiService;
   let stateContent: StateAndContent;
   let httpTestingController: HttpTestingController;
   const getTranslatableItem = (text: string) => {
@@ -47,6 +49,9 @@ describe('TranslateTextService', () => {
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     translateTextService = TestBed.inject(TranslateTextService);
+    translateTextBackendApiService = TestBed.inject(
+      TranslateTextBackendApiService
+    );
     stateContent = new StateAndContent(
       'stateName',
       'contentId',
@@ -214,6 +219,53 @@ describe('TranslateTextService', () => {
 
       expect(textAndAvailability).toEqual(textAndPreviousAvailability);
     }));
+  });
+
+  describe('suggestTranslatedText', () => {
+    it('should not call backend api if active state or content id is null', () => {
+      const suggestTranslatedTextAsyncSpy = spyOn(
+        translateTextBackendApiService,
+        'suggestTranslatedTextAsync'
+      ).and.returnValue(Promise.resolve());
+
+      translateTextService.activeStateName = null;
+      translateTextService.activeContentId = null;
+
+      translateTextService.suggestTranslatedText(
+        'texto',
+        'es',
+        [],
+        'html',
+        () => {},
+        () => {}
+      );
+
+      expect(suggestTranslatedTextAsyncSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not call backend api if active content is missing', () => {
+      const suggestTranslatedTextAsyncSpy = spyOn(
+        translateTextBackendApiService,
+        'suggestTranslatedTextAsync'
+      ).and.returnValue(Promise.resolve());
+
+      translateTextService.activeStateName = 'stateName1';
+      translateTextService.activeContentId = 'contentId1';
+      translateTextService.stateWiseContents = {
+        stateName1: {},
+      };
+
+      translateTextService.suggestTranslatedText(
+        'texto',
+        'es',
+        [],
+        'html',
+        () => {},
+        () => {}
+      );
+
+      expect(suggestTranslatedTextAsyncSpy).not.toHaveBeenCalled();
+    });
   });
 
   // Testing setters and getters of StateAndContent class.

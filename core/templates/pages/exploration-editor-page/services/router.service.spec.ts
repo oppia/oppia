@@ -175,6 +175,22 @@ describe('Router Service', () => {
     discardPeriodicTasks();
   }));
 
+  it('should set active state when navigating to translation tab with state', () => {
+    const setActiveStateNameSpy = spyOn(
+      stateEditorService,
+      'setActiveStateName'
+    );
+    const actuallyNavigateSpy = spyOn(routerService, '_actuallyNavigate');
+
+    routerService.navigateToTranslationTab('Introduction');
+
+    expect(setActiveStateNameSpy).toHaveBeenCalledWith('Introduction');
+    expect(actuallyNavigateSpy).toHaveBeenCalledWith(
+      'translation',
+      'Introduction'
+    );
+  });
+
   it('should navigate to translation tab', fakeAsync(() => {
     window.location.hash = '/translation/Start/ca_buttonText_6';
     routerService._changeTab('/translation/Start/ca_buttonText_6');
@@ -380,6 +396,29 @@ describe('Router Service', () => {
     flush();
     discardPeriodicTasks();
   }));
+
+  it('should navigate to main tab when current location state is null', () => {
+    const service = routerService as unknown as {
+      _savePendingChanges: () => void;
+      _getCurrentStateFromLocationPath: () => string | null;
+      _actuallyNavigate: (slug: string, state: string | null) => void;
+      _activeTabName: string;
+      TABS: {MAIN: {name: string}};
+      SLUG_GUI: string;
+      navigateToMainTab: (state: string | null) => void;
+    };
+
+    spyOn(service, '_savePendingChanges');
+    spyOn(service, '_getCurrentStateFromLocationPath').and.returnValue(null);
+    spyOn(document, 'querySelector').and.returnValue(null);
+    const navigateSpy = spyOn(service, '_actuallyNavigate');
+    service._activeTabName = service.TABS.MAIN.name;
+
+    service.navigateToMainTab('newState');
+
+    expect(service._savePendingChanges).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
+  });
 
   it('should not navigate to main tab', () => {
     spyOn(routerService, '_getCurrentStateFromLocationPath').and.returnValue(

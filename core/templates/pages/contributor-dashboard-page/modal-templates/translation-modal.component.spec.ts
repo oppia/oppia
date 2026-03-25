@@ -47,7 +47,10 @@ import {
 } from 'services/image-local-storage.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
-import {TranslateTextService} from '../services/translate-text.service';
+import {
+  TranslatableItem,
+  TranslateTextService,
+} from '../services/translate-text.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
@@ -525,6 +528,22 @@ describe('Translation Modal Component', () => {
       );
       expect(component.activeDataFormat).toBe('html');
     });
+  });
+
+  it('should set defaults when active item has null text fields', () => {
+    const translatableItem: TranslatableItem = {
+      text: null,
+      more: false,
+      status: 'pending',
+      translation: '',
+    };
+
+    component.updateActiveState(translatableItem);
+
+    expect(component.textToTranslate).toBe('');
+    expect(component.activeDataFormat).toBe('');
+    expect(component.activeContentType).toBe('');
+    expect(component.activeRuleDescription).toBe('');
   });
 
   describe('when clicking on the translatable content', () => {
