@@ -68,7 +68,7 @@ ListOfContributorDashboardStatsDictTypes = Sequence[
 
 
 class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
-    """A dictionary representation of client side SkillOpportunity object."""
+    """A dictionary representation of client-side SkillOpportunity object."""
 
     topic_name: str
 
@@ -88,7 +88,7 @@ class ContributionOpportunitiesHandler(
         Dict[str, str], ContributionOpportunitiesHandlerNormalizedRequestDict
     ]
 ):
-    """Provides data for opportunities available in different categories."""
+    """ Provides data for opportunities available in different categories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -139,7 +139,9 @@ class ContributionOpportunitiesHandler(
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
             topic_name = self.normalized_request.get('topic_name')
             if language_code is None:
-                raise self.InvalidInputException
+                raise self.InvalidInputException(
+                    "language_code is required for translation oppurtunities."
+                )
             translation_opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
                     language_code, topic_name, search_cursor
@@ -183,10 +185,10 @@ class ContributionOpportunitiesHandler(
         """
         # We want to focus attention on lessons that are part of a classroom.
         # See issue #12221.
-        classroom_topic_ids: List[str] = []
+        classroom_topic_ids: set[str] = []
         classrooms = classroom_config_services.get_all_classrooms()
         for classroom in classrooms:
-            classroom_topic_ids.extend(classroom.get_topic_ids())
+            classroom_topic_ids.update(classroom.get_topic_ids())
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
         # TODO(#8912): Associate each skill/skill opportunity with all linked
@@ -203,7 +205,7 @@ class ContributionOpportunitiesHandler(
         )
         opportunities: List[ClientSideSkillOpportunityDict] = []
         # Fetch opportunities until we have at least a page's worth that
-        # correspond to a classroom or there are no more opportunities.
+        # corresponds to a classroom, or there are no more opportunities.
         while len(opportunities) < constants.OPPORTUNITIES_PAGE_SIZE:
             for skill_opportunity in skill_opportunities:
                 if (
