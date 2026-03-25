@@ -2732,7 +2732,9 @@ export class ExplorationEditor extends BaseUser {
     try {
       return await confirmPublish();
     } catch (error) {
-      showMessage('Failed to publish the exploration.\n' + error.stack);
+      showMessage(
+        'Failed to publish the exploration.\n' + (error as Error).stack
+      );
 
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
@@ -3191,7 +3193,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error('The goal does not match the expected goal.');
       }
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error('Error:', (error as Error).message);
       throw error;
     }
   }
@@ -3782,9 +3784,10 @@ export class ExplorationEditor extends BaseUser {
         showMessage(`Unable to navigate to the card ${cardName}. Retrying...`);
         await this.navigateToCard(cardName, false);
       } else {
-        error.message =
-          `Unable to navigate to the card ${cardName}.\n` + error.message;
-        throw error;
+        const typedError = error as Error;
+        typedError.message =
+          `Unable to navigate to the card ${cardName}.\n` + typedError.message;
+        throw typedError;
       }
     }
   }
@@ -4310,7 +4313,16 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(previewTabContainer);
+
+    // Wait for the Angular router to complete navigation to the preview route
+    // before checking page load state.
+    await this.page.waitForFunction(() =>
+      window.location.href.includes('#/preview/')
+    );
     await this.waitForPageToFullyLoad();
+    // Extra stabilization: give Angular time to finish broadcasting backend
+    // data to the preview component and avoid 'getInteraction' errors.
+    await this.page.waitForTimeout(2000);
   }
 
   /**
@@ -4546,7 +4558,7 @@ export class ExplorationEditor extends BaseUser {
     } catch (error) {
       throw new Error(
         `Card content ${matchCase ? 'did not' : 'did'} match expected content.\n` +
-          `Original Error: ${error.stack}`
+          `Original Error: ${(error as Error).stack}`
       );
     }
   }

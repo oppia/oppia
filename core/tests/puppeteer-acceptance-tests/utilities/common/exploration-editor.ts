@@ -45,21 +45,25 @@ export class ExplorationEditorModal {
       await this.userInstance.clickOnElementWithSelector(
         dismissWelcomeModalSelector
       );
+      // WAIT FOR DETACHMENT: Use smart hidden logic from expectElementToBeVisible.
       await this.userInstance.expectElementToBeVisible(
         dismissWelcomeModalSelector,
         false
       );
+      // STABILIZE: Give Angular a moment to re-render the editor underneath.
+      await this.userInstance.waitForPageToFullyLoad();
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
+      const errorMessage = (error as Error).message;
       if (!failIfMissing) {
         showMessage(
           'Welcome Modal not found, but test can be continued.\n' +
-            `Error: ${error.message}`
+            `Error: ${errorMessage}`
         );
         return;
       }
       throw new Error(
-        'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
+        'Welcome Modal not found.\n' + 'Actual Error:\n' + errorMessage
       );
     }
   }
