@@ -4713,15 +4713,15 @@ export class ExplorationEditor extends BaseUser {
    * Ends at same page, after adding programming interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string> {
+  async createSimpleUnsupportedExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
 
     await this.createMinimalExploration(
-      'This is a test Programming Exploration',
-      INTERACTION_TYPES.TEXT_INPUT
+      'This is a test Math Exploration',
+      INTERACTION_TYPES.SET_INPUT
     );
 
     const lastInteraction = 'Last Card';
@@ -4742,7 +4742,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.saveExplorationDraft();
     const explorationId = await this.publishExplorationWithMetadata(
-      'Simple Code Editor',
+      'Simple Math Exploration',
       'This is goal here',
       'Algebra'
     );
