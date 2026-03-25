@@ -118,9 +118,9 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     """
     redis_full_profile = get_oppia_redis_client().memory_stats()
     memory_stats = caching_domain.MemoryCacheStats(
-        redis_full_profile['total.allocated'],
-        redis_full_profile['peak.allocated'],
-        redis_full_profile['keys.count'],
+        redis_full_profile.get('total.allocated', 0),
+        redis_full_profile.get('peak.allocated', 0),
+        redis_full_profile.get('keys.count', 0),
     )
 
     return memory_stats
