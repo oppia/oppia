@@ -1248,7 +1248,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             def _created_on_for_sorting(
                 suggestion: GeneralSuggestionModel,
             ) -> datetime.datetime:
-                # Here use cast because `created_on` is inherited from the base
+                # Here we use cast because `created_on` is inherited from the base
                 # model and is not narrowly typed as `datetime.datetime`, while
                 # sorting this list requires a concrete datetime sort key.
                 return cast(datetime.datetime, suggestion.created_on)
