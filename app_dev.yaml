@@ -42,15 +42,15 @@ handlers:
   static_dir: dist/
   secure: always
   expiration: "0"
-- url: /assets/ckeditor
-  static_dir: dist/oppia-angular/assets/ckeditor
+- url: /third_party/ckeditor
+  static_dir: dist/oppia-angular/third_party/ckeditor
   secure: always
   http_headers:
     # This is replaced by a specific origin when doing a deployment.
     Access-Control-Allow-Origin: "*"
   expiration: "0"
-- url: /assets/ckeditor-bootstrapck
-  static_dir: dist/oppia-angular/assets/ckeditor-bootstrapck
+- url: /third_party/ckeditor-bootstrapck
+  static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck
   secure: always
   http_headers:
     # This is replaced by a specific origin when doing a deployment.
