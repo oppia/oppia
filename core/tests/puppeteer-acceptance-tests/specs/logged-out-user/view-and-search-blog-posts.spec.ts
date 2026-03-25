@@ -69,7 +69,7 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await loggedOutUser.navigateToBlogPage();
+    await loggedOutUser.navigateToBlogPageInLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(

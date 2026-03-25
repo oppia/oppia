@@ -45,18 +45,24 @@ describe('Logged-Out Learner', function () {
       );
 
       // Create explorations.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToCreatorDashboardPageInExplorationEditor();
       await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-      await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.updateCardContent('Hello, World! This is a test.');
-      await curriculumAdmin.addInteraction('Continue Button');
+      await curriculumAdmin.dismissWelcomeModalInCurriculumAdmin();
+      await curriculumAdmin.updateCardContentInExplorationEditor(
+        'Hello, World! This is a test.'
+      );
+      await curriculumAdmin.addInteractionInExplorationEditor(
+        'Continue Button'
+      );
       await curriculumAdmin.viewOppiaResponses();
       await curriculumAdmin.directLearnersToNewCard('Second Card');
-      await curriculumAdmin.saveExplorationDraft();
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
 
       await curriculumAdmin.navigateToCard('Second Card');
       await curriculumAdmin.setTheStateAsCheckpoint();
-      await curriculumAdmin.updateCardContent('Hello, World!');
+      await curriculumAdmin.updateCardContentInExplorationEditor(
+        'Hello, World!'
+      );
       await curriculumAdmin.addTextInputInteraction();
       await curriculumAdmin.addResponsesToTheInteraction(
         'Text Input',
@@ -68,27 +74,30 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
         'Wrong Answer. Please try again.'
       );
-      await curriculumAdmin.addSolutionToState(
+      await curriculumAdmin.addSolutionToStateInExplorationEditor(
         'Hello, Oppia!',
         'If you are reading this, you have successfully created an exploration.',
         false
       );
-      await curriculumAdmin.saveExplorationDraft();
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
 
       // Navigate to the new card and update its content.
       await curriculumAdmin.navigateToCard('Last Card');
-      await curriculumAdmin.updateCardContent(
+      await curriculumAdmin.updateCardContentInExplorationEditor(
         'You have successfully created an exploration.'
       );
-      await curriculumAdmin.addInteraction('End Exploration');
-      await curriculumAdmin.saveExplorationDraft();
-
-      explorationId1 = await curriculumAdmin.publishExplorationWithMetadata(
-        'Exploration 1',
-        'This is Exploration 1.',
-        'Algebra',
-        'growth'
+      await curriculumAdmin.addInteractionInExplorationEditor(
+        'End Exploration'
       );
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
+
+      explorationId1 =
+        await curriculumAdmin.publishExplorationWithMetadataInExplorationEditor(
+          'Exploration 1',
+          'This is Exploration 1.',
+          'Algebra',
+          'growth'
+        );
 
       explorationId2 =
         await curriculumAdmin.createAndPublishExplorationWithCards(
@@ -118,7 +127,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.addChapter('Exploration 2', explorationId2);
 
       // Save draft.
-      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.publishStoryDraft();
     },
     // Test setup is heavy and can exceed the previous timeout in CI.
@@ -140,10 +149,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectCardContentToMatch(
       'Hello, World! This is a test.'
     );
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.submitAnswerInTextArea('Hello, Oppia!');
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
 
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
@@ -194,7 +203,7 @@ describe('Logged-Out Learner', function () {
     // Progress Info.
     await loggedOutLearner.expectNoSaveProgressBeforeCheckpointInfo();
     await loggedOutLearner.closeLessonInfoModal();
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.openLessonInfoModal();
     await loggedOutLearner.saveProgress();
@@ -209,7 +218,7 @@ describe('Logged-Out Learner', function () {
 
   it('should be able to go to the next lesson', async function () {
     await loggedOutLearner.submitAnswerInTextArea('Hello, Oppia!');
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
 
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'

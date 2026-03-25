@@ -40,23 +40,29 @@ describe('Logged-in User', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorPage();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We will be learning positive numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Test Question');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard('Test Question');
-    await explorationEditor.updateCardContent('Enter a negative number.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a negative number.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMERIC_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-1',
@@ -67,31 +73,35 @@ describe('Logged-in User', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong, try again!'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and Study Guide content.
     await explorationEditor.navigateToCard('Study Guide');
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Positive numbers are greater than zero.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Final Card');
     await explorationEditor.setTheStateAsCheckpoint();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard('Final Card');
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Lesson completed successfully. We have practiced negative numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard('Introduction');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra',
@@ -110,9 +120,9 @@ describe('Logged-in User', function () {
     await loggedInUser.playLessonFromSearchResults('Positive Numbers');
 
     // Continue to the next card and submit an answer.
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.submitAnswer('-25');
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInLoggedOutUser();
+    await loggedInUser.submitAnswerInLoggedOutUser('-25');
+    await loggedInUser.continueToNextCardInLoggedOutUser();
 
     // Verify that the checkpoint modal appears and reload the page.
     await loggedInUser.verifyCheckpointModalAppears();
@@ -124,7 +134,7 @@ describe('Logged-in User', function () {
     await loggedInUser.expectProgressReminder(true);
     await loggedInUser.chooseActionInProgressRemainder('Resume');
 
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInLoggedOutUser();
     await loggedInUser.expectCardContentToMatch(
       'Lesson completed successfully. We have practiced negative numbers.'
     );
@@ -138,9 +148,9 @@ describe('Logged-in User', function () {
     // Continue the exploration from where they left off.
     await loggedInUser.chooseActionInProgressRemainder('Restart');
 
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.submitAnswer('-99');
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInLoggedOutUser();
+    await loggedInUser.submitAnswerInLoggedOutUser('-99');
+    await loggedInUser.continueToNextCardInLoggedOutUser();
   });
 
   afterAll(async function () {

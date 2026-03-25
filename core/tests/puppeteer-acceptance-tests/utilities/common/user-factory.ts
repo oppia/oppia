@@ -149,7 +149,14 @@ export class UserFactory {
           return;
         }
 
-        if (Object.getOwnPropertyDescriptor(userPrototype, name)) {
+        const existingProp = Object.getOwnPropertyDescriptor(
+          userPrototype,
+          name
+        );
+        const roleProp = Object.getOwnPropertyDescriptor(rolePrototype, name);
+
+        // This prevents the trap from crashing on idempotent (identical) function bindings!
+        if (existingProp && existingProp.value !== roleProp?.value) {
           throw new Error(
             "Method collision in composeUserWithRoles: '" +
               name +
@@ -162,8 +169,7 @@ export class UserFactory {
         Object.defineProperty(
           userPrototype,
           name,
-          Object.getOwnPropertyDescriptor(rolePrototype, name) ||
-            Object.create(null)
+          roleProp || Object.create(null)
         );
       });
     }
@@ -227,7 +233,7 @@ export class UserFactory {
           );
           break;
         case ROLES.TRANSLATION_REVIEWER:
-          await superAdminInstance.navigateToContributorDashboardAdminPage();
+          await superAdminInstance.navigateToContributorDashboardAdminPageInTranslationAdmin();
           if (typeof args === 'string') {
             args = [args];
           }

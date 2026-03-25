@@ -531,7 +531,7 @@ export class ExplorationEditor extends BaseUser {
    * Click on the submit answer button.
    * @param skipVerification - If true, skips verification that the button is visible.
    */
-  async clickOnSubmitAnswerButton(): Promise<void> {
+  async clickOnSubmitAnswerButtonInExplorationEditor(): Promise<void> {
     const feedbackSelector = '.e2e-test-conversation-feedback-latest';
 
     await this.expectElementToBeClickable(submitAnswerButton);
@@ -625,7 +625,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Option ${option} not found.`);
     }
     await this.page.waitForNetworkIdle({idleTime: 1000});
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -960,7 +960,7 @@ export class ExplorationEditor extends BaseUser {
     );
     await this.page.click(interactiveMap);
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -2026,7 +2026,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -2152,7 +2152,7 @@ export class ExplorationEditor extends BaseUser {
       await nodeSelectElement.select(note);
     }
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -2425,7 +2425,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     if (submitAnswer) {
-      await this.clickOnSubmitAnswerButton();
+      await this.clickOnSubmitAnswerButtonInExplorationEditor();
     }
   }
 
@@ -2443,7 +2443,7 @@ export class ExplorationEditor extends BaseUser {
       await this.typeInInputField(`${solutionModal} ${textInputField}`, option);
     }
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -2478,7 +2478,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
    */
-  async navigateToCreatorDashboardPage(): Promise<void> {
+  async navigateToCreatorDashboardPageInExplorationEditor(): Promise<void> {
     await this.goto(creatorDashboardPage);
     showMessage('Creator dashboard page is opened successfully.');
   }
@@ -2513,12 +2513,12 @@ export class ExplorationEditor extends BaseUser {
    * @param content - content of the exploration
    * @param interaction - the interaction to be added to the exploration
    */
-  async createMinimalExploration(
+  async createMinimalExplorationInExplorationEditor(
     content: string,
     interaction: string
   ): Promise<void> {
-    await this.updateCardContent(content);
-    await this.addInteraction(interaction);
+    await this.updateCardContentInExplorationEditor(content);
+    await this.addInteractionInExplorationEditor(interaction);
     showMessage('A simple exploration is created.');
   }
 
@@ -2526,7 +2526,7 @@ export class ExplorationEditor extends BaseUser {
    * Open settings tab.(Note->It also opens all the dropdowns present
    * in the setting tab for mobile view port.)
    */
-  async navigateToSettingsTab(): Promise<void> {
+  async navigateToSettingsTabInExplorationEditor(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2609,7 +2609,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to open control dropdown so that delete exploration button is visible
    * in mobile view.
    */
-  async openExplorationControlDropdown(): Promise<void> {
+  async openExplorationControlDropdownInExplorationEditor(): Promise<void> {
     await this.page.waitForSelector(explorationControlsSettingsDropdown, {
       visible: true,
     });
@@ -2662,7 +2662,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} category - The category of the exploration.,
    * @param {string} tags - The tags of the exploration.
    */
-  async publishExplorationWithMetadata(
+  async publishExplorationWithMetadataInExplorationEditor(
     title: string,
     goal: string,
     category: string,
@@ -2790,7 +2790,9 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+  async dismissWelcomeModalInExplorationEditor(
+    failIfMissing: boolean = true
+  ): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
     await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
@@ -2800,11 +2802,11 @@ export class ExplorationEditor extends BaseUser {
    * the modal may or may not appear due to race conditions or when it has
    * already been dismissed earlier in the test flow.
    */
-  async dismissWelcomeModalIfPresent(): Promise<void> {
+  async dismissWelcomeModalIfPresentInExplorationEditor(): Promise<void> {
     // The existing dismissWelcomeModal() in this class already handles the
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
-    await this.dismissWelcomeModal(false);
+    await this.dismissWelcomeModalInExplorationEditor(false);
   }
 
   /**
@@ -2854,7 +2856,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to add content to a card.
    * @param {string} content - The content to be added to the card.
    */
-  async updateCardContent(content: string): Promise<void> {
+  async updateCardContentInExplorationEditor(content: string): Promise<void> {
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -2917,7 +2919,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
    */
-  async addInteraction(
+  async addInteractionInExplorationEditor(
     interactionToAdd: string,
     skipInteractionCustoization: boolean = true
   ): Promise<void> {
@@ -3030,7 +3032,9 @@ export class ExplorationEditor extends BaseUser {
    * Adds a math interaction to the current exploration.
    * @param {string} interactionToAdd - The interaction type to add to the exploration.
    */
-  async addMathInteraction(interactionToAdd: string): Promise<void> {
+  async addMathInteractionInExplorationEditor(
+    interactionToAdd: string
+  ): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -3096,7 +3100,7 @@ export class ExplorationEditor extends BaseUser {
    * Deletes the previous written title and updates the new title.
    * @param {string} title - The new title to be added to the exploration.
    */
-  async updateTitleTo(title: string): Promise<void> {
+  async updateTitleToInExplorationEditor(title: string): Promise<void> {
     await this.page.waitForSelector(addTitleBar, {
       visible: true,
     });
@@ -3527,7 +3531,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to save an exploration draft.
    * @param commitMessage - The commit message text to be saved.
    */
-  async saveExplorationDraft(
+  async saveExplorationDraftInExplorationEditor(
     commitMessage: string = 'Testing Testing'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -3866,7 +3870,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} answerExplanation - The explanation for this state card's solution.
    * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
    */
-  async addSolutionToState(
+  async addSolutionToStateInExplorationEditor(
     answer: string,
     answerExplanation: string,
     isSolutionNumericInput: boolean
@@ -3874,7 +3878,7 @@ export class ExplorationEditor extends BaseUser {
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
-    await this.page.waitForSelector(stateSolutionTab, {visible: true});
+    await this.expectElementToBeVisible(addSolutionButton);
     await this.clickOnElementWithSelector(addSolutionButton);
     await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.typeInInputField(solutionSelector, answer);
@@ -3970,7 +3974,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to add a hint for a state card.
    * @param {string} hint - The hint to be added for the current card.
    */
-  async addHintToState(hint: string): Promise<void> {
+  async addHintToStateInExplorationEditor(hint: string): Promise<void> {
     await this.page.waitForSelector(addHintButton, {
       visible: true,
     });
@@ -4555,7 +4559,9 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the next card in the preview tab.
    * @param skipVerification - Whether to skip verification of the card content.
    */
-  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
+  async continueToNextCardInExplorationEditor(
+    skipVerification: boolean = false
+  ): Promise<void> {
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOnElementWithSelector(nextCardButton);
@@ -4582,7 +4588,7 @@ export class ExplorationEditor extends BaseUser {
    * Currently, it only supports 'text', 'number', and 'float' input types. If the input type is anything else, it throws an error.
    * @param {string} answer - The answer to submit.
    */
-  async submitAnswer(answer: string): Promise<void> {
+  async submitAnswerInExplorationEditor(answer: string): Promise<void> {
     await this.waitForElementToBeClickable(floatFormInput);
     const inputType = await this.getInputType(floatFormInput);
 
@@ -4597,7 +4603,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Unsupported input type: ${inputType}`);
     }
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -4610,7 +4616,7 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(textAreaInputSelector, answer);
     await this.expectElementValueToBe(textAreaInputSelector, answer);
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -4694,20 +4700,20 @@ export class ExplorationEditor extends BaseUser {
    * Function for creating an exploration with only EndExploration interaction with given title.
    * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
-  async createAndPublishAMinimalExplorationWithTitle(
+  async createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
     title: string,
     category: string = 'Algebra',
     flag: boolean = false
   ): Promise<string> {
-    await this.navigateToCreatorDashboardPage();
+    await this.navigateToCreatorDashboardPageInExplorationEditor();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.dismissWelcomeModal(flag);
-    await this.createMinimalExploration(
+    await this.dismissWelcomeModalInExplorationEditor(flag);
+    await this.createMinimalExplorationInExplorationEditor(
       'Exploration intro text',
       'End Exploration'
     );
-    await this.saveExplorationDraft();
-    return await this.publishExplorationWithMetadata(
+    await this.saveExplorationDraftInExplorationEditor();
+    return await this.publishExplorationWithMetadataInExplorationEditor(
       title,
       'This is Goal here.',
       category
@@ -4726,7 +4732,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
 
-    await this.createMinimalExploration(
+    await this.createMinimalExplorationInExplorationEditor(
       'This is a test Programming Exploration',
       INTERACTION_TYPES.CODE_EDITOR
     );
@@ -4742,17 +4748,18 @@ export class ExplorationEditor extends BaseUser {
       'Wrong Answer. Please try again'
     );
     await this.navigateToCard(lastInteraction);
-    await this.createMinimalExploration(
+    await this.createMinimalExplorationInExplorationEditor(
       'This is last card',
       INTERACTION_TYPES.END_EXPLORATION
     );
 
-    await this.saveExplorationDraft();
-    const explorationId = await this.publishExplorationWithMetadata(
-      'Simple Code Editor',
-      'This is goal here',
-      'Algebra'
-    );
+    await this.saveExplorationDraftInExplorationEditor();
+    const explorationId =
+      await this.publishExplorationWithMetadataInExplorationEditor(
+        'Simple Code Editor',
+        'This is goal here',
+        'Algebra'
+      );
 
     // Check if publish button is disabled (post-check)
     const publishButton = await this.page.$(saveChangesButton);
@@ -4785,28 +4792,35 @@ export class ExplorationEditor extends BaseUser {
     numberOfCards: number = 2,
     expectedWelcomeModal: boolean = false
   ): Promise<string> {
-    await this.navigateToCreatorDashboardPage();
+    await this.navigateToCreatorDashboardPageInExplorationEditor();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.dismissWelcomeModal(expectedWelcomeModal);
+    await this.dismissWelcomeModalInExplorationEditor(expectedWelcomeModal);
 
     for (let i = 0; i < numberOfCards - 1; i++) {
-      await this.updateCardContent(`Content ${i}`);
-      await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await this.updateCardContentInExplorationEditor(`Content ${i}`);
+      await this.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.CONTINUE_BUTTON
+      );
       await this.viewOppiaResponses();
       await this.directLearnersToNewCard(`Card ${i + 1}`);
-      await this.saveExplorationDraft();
+      await this.saveExplorationDraftInExplorationEditor();
       await this.navigateToCard(`Card ${i + 1}`);
     }
 
-    await this.updateCardContent(`Content ${numberOfCards - 1}`);
-    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await this.saveExplorationDraft();
-
-    const explorationId = await this.publishExplorationWithMetadata(
-      explorationTitle,
-      `This is ${explorationTitle}\`s goals.`,
-      category
+    await this.updateCardContentInExplorationEditor(
+      `Content ${numberOfCards - 1}`
     );
+    await this.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+    await this.saveExplorationDraftInExplorationEditor();
+
+    const explorationId =
+      await this.publishExplorationWithMetadataInExplorationEditor(
+        explorationTitle,
+        `This is ${explorationTitle}\`s goals.`,
+        category
+      );
 
     if (explorationId) {
       showMessage('Exploration published successfully');
@@ -4826,7 +4840,7 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < n; i++) {
       const explorationTitle = `Quick Exploration ${i + 1}`;
       const explorationId =
-        await this.createAndPublishAMinimalExplorationWithTitle(
+        await this.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
           explorationTitle,
           'Algebra',
           false
@@ -4863,7 +4877,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async openSubscribersTab(): Promise<void> {
     if (this.page.url() !== creatorDashboardPage) {
-      await this.navigateToCreatorDashboardPage();
+      await this.navigateToCreatorDashboardPageInExplorationEditor();
     }
 
     await this.clickOnElementWithSelector(subscriberTabButton);
@@ -4903,7 +4917,9 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the exploration page and starts playing the exploration.
    * @param {string} explorationId - The ID of the exploration to play.
    */
-  async playExploration(explorationId: string): Promise<void> {
+  async playExplorationInExplorationEditor(
+    explorationId: string
+  ): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
       this.goto(`${baseUrl}/explore/${explorationId}`),
@@ -4914,7 +4930,10 @@ export class ExplorationEditor extends BaseUser {
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
    */
-  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
+  async giveFeedbackInExplorationEditor(
+    feedback: string,
+    stayAnonymous?: boolean
+  ): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
@@ -5323,13 +5342,13 @@ export class ExplorationEditor extends BaseUser {
    * Function to create and save a new untitled exploration containing only the EndExploration interaction.
    */
   async createAndSaveAMinimalExploration(): Promise<void> {
-    await this.navigateToCreatorDashboardPage();
+    await this.navigateToCreatorDashboardPageInExplorationEditor();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.createMinimalExploration(
+    await this.createMinimalExplorationInExplorationEditor(
       'Exploration intro text',
       'End Exploration'
     );
-    await this.saveExplorationDraft();
+    await this.saveExplorationDraftInExplorationEditor();
   }
 
   /**
@@ -5470,7 +5489,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -5603,7 +5622,7 @@ export class ExplorationEditor extends BaseUser {
    * Opens an exploration in the editor.
    * @param {string} explorationName - The name of the exploration.
    */
-  async openExplorationInExplorationEditor(
+  async openExplorationInExplorationEditorInExplorationEditor(
     explorationName: string
   ): Promise<void> {
     await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
@@ -6222,7 +6241,9 @@ export class ExplorationEditor extends BaseUser {
    * Verifies that the modal title is as expected.
    * @param {string} expectedTitle - The expected title.
    */
-  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+  async expectModalTitleToBeInExplorationEditor(
+    expectedTitle: string
+  ): Promise<void> {
     await this.expectElementToBeVisible(commonModalTitleSelector);
     await this.expectTextContentToContain(
       commonModalTitleSelector,
@@ -6390,7 +6411,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clearAllTextFrom('input');
     await this.typeInInputField('input', answer);
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -6408,7 +6429,7 @@ export class ExplorationEditor extends BaseUser {
     await inputField.click();
     await this.page.keyboard.type(answer);
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   async submitPencilCodeEditorAnswer(answer: string): Promise<void> {
@@ -6430,7 +6451,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Backspace');
     await this.page.type(codeEditorInSolutionModal, answer);
 
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInExplorationEditor();
   }
 
   /**
@@ -6543,7 +6564,7 @@ export class ExplorationEditor extends BaseUser {
    * @param tabContents - A list of tab contents to add.
    */
   async addTabContentsRTE(tabContents: TabContent[] = []): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert tabs');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Insert tabs');
 
     await this.waitForNetworkIdle();
     const helperModel = await this.page.$(rteHelperModalSelector);
@@ -6602,19 +6623,19 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(stateEditSelector);
 
     // Add Bold text.
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Bold');
     await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Bold');
 
     // Add Italic text.
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Italic');
     await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Italic');
 
     // Add Numbered List.
-    await this.clickOnRTEOptionWithTitle('Numbered List');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Numbered List');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
@@ -6622,7 +6643,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Add Bulleted List.
-    await this.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Bulleted List');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
@@ -6630,16 +6651,16 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Add Pre formatted Text.
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Pre');
     await this.typeInInputField(stateContentInputField, 'Pre formatted text');
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Pre');
     await this.page.keyboard.press('Enter');
 
     // Add Block Quote.
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Block Quote');
     await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Block Quote');
 
     // Add Image.
     await this.addImageRTE(
@@ -6652,7 +6673,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Math Formula.
-    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor(
+      'Insert mathematical formula'
+    );
     await this.waitForNetworkIdle();
     const textareaElement = await this.page.$(
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
@@ -6663,7 +6686,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Concept Card.
-    await this.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor(
+      'Insert Concept Card Link'
+    );
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
     await skillSearchElement?.type('Math');
@@ -6687,19 +6712,19 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(stateEditSelector);
 
     // Add Bold text.
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Bold');
     await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Bold');
 
     // Add Italic text.
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Italic');
     await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Italic');
 
     // Add Numbered List.
-    await this.clickOnRTEOptionWithTitle('Numbered List');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Numbered List');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
@@ -6707,7 +6732,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Add Bulleted List.
-    await this.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Bulleted List');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
@@ -6715,16 +6740,16 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Add Pre formatted Text.
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Pre');
     await this.typeInInputField(stateContentInputField, 'Pre formatted text');
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Pre');
     await this.page.keyboard.press('Enter');
 
     // Add Block Quote.
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Block Quote');
     await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Block Quote');
 
     // Add Collapsible Block.
     await this.addCollapsibleBlockRTE();
@@ -6752,7 +6777,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Math Formula.
-    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor(
+      'Insert mathematical formula'
+    );
     await this.waitForNetworkIdle();
     const textareaElement = await this.page.$(
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
@@ -6763,7 +6790,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Concept Card.
-    await this.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor(
+      'Insert Concept Card Link'
+    );
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
     await skillSearchElement?.type('Math');
@@ -6785,7 +6814,9 @@ export class ExplorationEditor extends BaseUser {
    * Clicks on the RTE option with the given title.
    * @param title - The title of RTE option.
    */
-  async clickOnRTEOptionWithTitle(title: string): Promise<void> {
+  async clickOnRTEOptionWithTitleInExplorationEditor(
+    title: string
+  ): Promise<void> {
     const optionSelector = `a.cke_button[title*="${title}"]`;
     await this.page.waitForSelector(optionSelector);
     const optionElement = await this.page.$(optionSelector);
@@ -6796,7 +6827,9 @@ export class ExplorationEditor extends BaseUser {
    * Adds a default collapsible block RTE element.
    */
   async addCollapsibleBlockRTE(): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('collapsible block');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor(
+      'collapsible block'
+    );
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
@@ -6807,7 +6840,7 @@ export class ExplorationEditor extends BaseUser {
    * @param url - The URL to which the text should redirect to.
    */
   async addTextWithLinkRTE(text: string, url: string): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert link');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Insert link');
     await this.waitForNetworkIdle();
 
     const helperModel = await this.page.$(rteHelperModalSelector);
@@ -6839,7 +6872,7 @@ export class ExplorationEditor extends BaseUser {
     imageDescription: string,
     imageCaption: string | null
   ): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert image');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Insert image');
 
     await this.waitForNetworkIdle();
     const helperModel = await this.page.$(rteHelperModalSelector);
@@ -6870,7 +6903,7 @@ export class ExplorationEditor extends BaseUser {
    * @param videoUrl - Youtube Video URL
    */
   async addVideoRTE(videoUrl: string): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert video');
+    await this.clickOnRTEOptionWithTitleInExplorationEditor('Insert video');
 
     await this.expectElementToBeVisible(rteHelperModalSelector);
     const helperModel = await this.page.$(rteHelperModalSelector);
@@ -6895,7 +6928,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to exploration editor.
    * @param explorationUrl - url of the exploration.
    */
-  async navigateToExplorationEditor(
+  async navigateToExplorationEditorInExplorationEditor(
     explorationId: string | null
   ): Promise<void> {
     if (!explorationId) {
@@ -6933,7 +6966,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {'input' | 'textarea'} inputType - The type of the input.
    * @param {number} index - The index of the input.
    */
-  async fillValueInInteractionResponseModal(
+  async fillValueInInteractionResponseModalInExplorationEditor(
     value: string,
     inputType: 'input' | 'textarea',
     index: number = 0
@@ -7433,7 +7466,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Navigates to creator dashboard using profile dropdown.
    */
-  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+  async navigateToCreatorDashboardUsingProfileDropdownInExplorationEditor(): Promise<void> {
     await this.expectElementToBeVisible(profileDropdown);
     await this.clickOnElementWithSelector(profileDropdown);
 

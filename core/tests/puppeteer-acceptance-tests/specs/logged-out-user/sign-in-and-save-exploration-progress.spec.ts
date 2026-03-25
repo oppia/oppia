@@ -53,23 +53,29 @@ describe('Logged-out User', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We will be learning positive numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Test Question');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-    await explorationEditor.updateCardContent('Enter a negative number.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a negative number.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMERIC_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-1',
@@ -80,31 +86,35 @@ describe('Logged-out User', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong, try again!'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and Study Guide content.
     await explorationEditor.navigateToCard(CARD_NAME.STUDY_GUIDE);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Positive numbers are greater than zero.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.setTheStateAsCheckpoint();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Lesson completed successfully. We have practiced negative numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -119,11 +129,11 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       // Make some progress in the exploration.
-      await loggedOutUser.submitAnswer('-25');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.submitAnswerInLoggedOutUser('-25');
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
       await loggedOutUser.verifyCheckpointModalAppears();
 
       // Choose to sign up at this point.
@@ -134,9 +144,9 @@ describe('Logged-out User', function () {
 
       // Rest of the action is done being logged-in in the same window as the same logged-out user needs to login to check if the progress if moved to permanent mode.
 
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('-50');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
+      await loggedOutUser.submitAnswerInLoggedOutUser('-50');
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
       await loggedOutUser.verifyCheckpointModalAppears();
 
       // Reloading from the current progress.
@@ -146,16 +156,16 @@ describe('Logged-out User', function () {
       // Continue the exploration from where they left off.
       await loggedOutUser.chooseActionInProgressRemainder('Restart');
 
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('-99');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
+      await loggedOutUser.submitAnswerInLoggedOutUser('-99');
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
       await loggedOutUser.reloadPage();
       await loggedOutUser.expectProgressReminder(true);
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
       await loggedOutUser.expectCardContentToMatch(
         'Lesson completed successfully. We have practiced negative numbers.'
       );

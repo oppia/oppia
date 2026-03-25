@@ -46,35 +46,36 @@ describe('Exploration Creator', function () {
   it(
     'should draft, discard and publish the changes',
     async function () {
-      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.dismissWelcomeModalInExplorationEditor();
 
-      await explorationEditor.createMinimalExploration(
+      await explorationEditor.createMinimalExplorationInExplorationEditor(
         'Exploration intro text',
         INTERACTION_TYPES.END_EXPLORATION
       );
 
-      await explorationEditor.saveExplorationDraft();
-      explorationId = await explorationEditor.publishExplorationWithMetadata(
-        'Old Title',
-        'This is the goal of exploration.',
-        'Algebra'
-      );
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
+      explorationId =
+        await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+          'Old Title',
+          'This is the goal of exploration.',
+          'Algebra'
+        );
 
       await explorationVisitor.expectExplorationToBeAccessibleByUrl(
         explorationId
       );
 
-      await explorationEditor.navigateToSettingsTab();
+      await explorationEditor.navigateToSettingsTabInExplorationEditor();
 
-      await explorationEditor.updateTitleTo('New Title');
+      await explorationEditor.updateTitleToInExplorationEditor('New Title');
       await explorationEditor.discardCurrentChanges();
       await explorationEditor.expandSettingsTabSection('Basic Settings');
       await explorationEditor.expectTitleToBe('Old Title');
 
-      await explorationEditor.updateTitleTo('New Title');
-      await explorationEditor.saveExplorationDraft();
+      await explorationEditor.updateTitleToInExplorationEditor('New Title');
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
       await explorationEditor.expectTitleToBe('New Title');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

@@ -116,7 +116,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
     }
 
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
   }, 6000000);
 
   it(
@@ -146,7 +146,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.clickOnElementWithSelector(finalizeOutlineCheckbox);
       await curriculumAdmin.addAcquiredSkill('Place Values skills');
 
-      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.clickReadyToPublishButton();
       await curriculumAdmin.scrollToTopOfPage();
       await curriculumAdmin.expectScreenshotToMatch(
@@ -247,7 +247,7 @@ describe('Logged-In Learner', function () {
         }
       }
       await curriculumAdmin.setNodePlannedPublicationDate();
-      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.clickReadyToPublishButton();
 
       await curriculumAdmin.readyToPublish(

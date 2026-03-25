@@ -30,7 +30,7 @@ describe('Interested Volunteer', function () {
   });
 
   it('should be able to apply to become a volunteer', async function () {
-    await interestedVolunteer.navigateToSplashPage();
+    await interestedVolunteer.navigateToSplashPageInLoggedOutUser();
 
     // Navigate to Volunteer Page.
     await interestedVolunteer.clickVolunteerButtonInGetInvolvedMenuOnNavbar();

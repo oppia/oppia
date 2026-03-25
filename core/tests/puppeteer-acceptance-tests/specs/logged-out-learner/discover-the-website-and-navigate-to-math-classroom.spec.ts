@@ -62,17 +62,20 @@ describe('Logged-Out Learner', function () {
       'Algebra',
       'fractions'
     );
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
 
-    await curriculumAdmin.openSkillEditor('fractions');
-    await curriculumAdmin.navigateToSkillQuestionEditorTab();
+    await curriculumAdmin.openSkillEditorInCurriculumAdmin('fractions');
+    await curriculumAdmin.navigateToSkillQuestionEditorTabInCurriculumAdmin();
 
-    await curriculumAdmin.createQuestionsForSkill('fractions', 7);
+    await curriculumAdmin.createQuestionsForSkillInCurriculumAdmin(
+      'fractions',
+      7
+    );
 
     // Enable the "Show practice tab to learners" in Topic Editor.
-    await curriculumAdmin.openTopicEditor('Fractions');
-    await curriculumAdmin.togglePracticeTabCheckbox();
-    await curriculumAdmin.saveTopicDraft('Fractions');
+    await curriculumAdmin.openTopicEditorInCurriculumAdmin('Fractions');
+    await curriculumAdmin.togglePracticeTabCheckboxInCurriculumAdmin();
+    await curriculumAdmin.saveTopicDraftInCurriculumAdmin('Fractions');
 
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
@@ -91,12 +94,12 @@ describe('Logged-Out Learner', function () {
     await curriculumAdmin.addChapter('Fractions 2', explorationId2);
 
     // Save draft.
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
     await curriculumAdmin.publishStoryDraft();
   }, 600000);
 
   it('should be able to find list of subjects to learn', async function () {
-    await loggedOutLearner.navigateToSplashPage();
+    await loggedOutLearner.navigateToSplashPageInLoggedOutUser();
     await loggedOutLearner.expectHomePageTitleToBe(
       'Free Education for Everyone'
     );

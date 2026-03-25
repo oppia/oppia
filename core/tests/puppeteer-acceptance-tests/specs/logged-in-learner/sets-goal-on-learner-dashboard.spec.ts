@@ -65,12 +65,12 @@ describe('Logged-In Learner', function () {
 
       // Create explorations.
       explorationId1 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
           'Negative Numbers'
         );
 
       explorationId2 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
           'Positive Numbers',
           'Algebra',
           false
@@ -102,7 +102,7 @@ describe('Logged-In Learner', function () {
         'Test Chapter 2',
         explorationId2 as string
       );
-      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.publishStoryDraft();
     },
     // Test takes longer than default timeout.

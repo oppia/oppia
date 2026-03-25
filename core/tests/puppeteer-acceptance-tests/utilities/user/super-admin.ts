@@ -160,7 +160,7 @@ export class SuperAdmin extends BaseUser {
   /**
    * Navigates to the blog page.
    */
-  async navigateToBlogPage(): Promise<void> {
+  async navigateToBlogPageInSuperAdmin(): Promise<void> {
     await this.goto(testConstants.URLs.Blog);
   }
 
@@ -806,8 +806,10 @@ export class SuperAdmin extends BaseUser {
    * Checks if the blog post is present.
    * @param {string} expectedBlog - the title of the expected blog post.
    */
-  async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
-    await this.navigateToBlogPage();
+  async expectBlogPostToBePresentInSuperAdmin(
+    expectedBlog: string
+  ): Promise<void> {
+    await this.navigateToBlogPageInSuperAdmin();
 
     await this.expectElementToBeVisible(blogPostTitleSelector);
     const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>

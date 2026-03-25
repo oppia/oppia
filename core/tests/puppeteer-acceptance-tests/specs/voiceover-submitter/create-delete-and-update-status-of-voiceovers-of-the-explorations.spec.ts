@@ -73,8 +73,10 @@ describe('Voiceover Submitter', function () {
 
   it('should be able to add and remove voiceovers to explorations', async function () {
     // Navigate to the exploration editor.
-    await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
-    await voiceoverSubmitter.dismissWelcomeModal();
+    await voiceoverSubmitter.navigateToExplorationEditorInExplorationEditor(
+      explorationId
+    );
+    await voiceoverSubmitter.dismissWelcomeModalInExplorationEditor();
 
     // Navigate to translation tab.
     await voiceoverSubmitter.navigateToTranslationsTab();
@@ -110,7 +112,7 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.expectVoiceoverIsPlayableInTranslationTab();
 
     // Check voiceover is visible in the preivew tab.
-    await voiceoverSubmitter.saveExplorationDraft();
+    await voiceoverSubmitter.saveExplorationDraftInExplorationEditor();
     await voiceoverSubmitter.navigateToPreviewTab();
     await voiceoverSubmitter.expectAudioExpandButtonToBeVisible();
     await voiceoverSubmitter.expandVoiceoverBar();
@@ -122,7 +124,7 @@ describe('Voiceover Submitter', function () {
     // Remove voiceover.
     await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.deleteVoiceoverInCurrentCard();
-    await voiceoverSubmitter.saveExplorationDraft();
+    await voiceoverSubmitter.saveExplorationDraftInExplorationEditor();
     await voiceoverSubmitter.navigateToPreviewTab();
     await voiceoverSubmitter.expandVoiceoverBar();
     await voiceoverSubmitter.expectVoiceoverPlayButtonToBe('disabled');

@@ -43,7 +43,7 @@ describe('Logged-Out Learner', function () {
     );
 
     explorationId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Addition'
       );
 
@@ -57,14 +57,14 @@ describe('Logged-Out Learner', function () {
     const wrongExplorationId =
       explorationId?.slice(5) ?? '' + explorationId?.slice(0, 5);
 
-    await loggedOutLearner.playExploration(wrongExplorationId);
+    await loggedOutLearner.playExplorationInLoggedOutUser(wrongExplorationId);
     await loggedOutLearner.expectToBeOnErrorPage(404);
   });
 
   it('should be able to access existent lesson', async function () {
     // Navigate to exploration, verify URL, and match screenshot.
-    await loggedOutLearner.playExploration(explorationId);
-    await loggedOutLearner.expectToBeOnPage('/explore/');
+    await loggedOutLearner.playExplorationInLoggedOutUser(explorationId);
+    await loggedOutLearner.expectToBeOnPageInLoggedOutUser('/explore/');
 
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'

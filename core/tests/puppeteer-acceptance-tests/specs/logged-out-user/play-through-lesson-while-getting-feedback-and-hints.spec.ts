@@ -63,21 +63,29 @@ describe('Logged-out User', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent('Introduction to Algebra');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Introduction to Algebra'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a basic algebra problem.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.updateCardContent('Enter a negative number.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a negative number.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMERIC_INPUT
+    );
 
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
@@ -89,20 +97,22 @@ describe('Logged-out User', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong, try again!'
     );
-    await explorationEditor.addHintToState(
+    await explorationEditor.addHintToStateInExplorationEditor(
       'Remember that negative numbers are less than 0.'
     );
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '-99',
       'The number -99 is a negative number.',
       true
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and add a fraction conversion problem.
     await explorationEditor.navigateToCard('Fraction Con...');
-    await explorationEditor.updateCardContent('Express 50% as a fraction.');
-    await explorationEditor.addMathInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Express 50% as a fraction.'
+    );
+    await explorationEditor.addMathInteractionInExplorationEditor(
       INTERACTION_TYPES.FRACTION_INPUT
     );
     await explorationEditor.addResponsesToTheInteraction(
@@ -119,38 +129,45 @@ describe('Logged-out User', function () {
       CARD_NAME.STUDY_GUIDE
     );
 
-    await explorationEditor.addHintToState(
+    await explorationEditor.addHintToStateInExplorationEditor(
       'Remember that 50% is the same as 1/2.'
     );
     await explorationEditor.setTheStateAsCheckpoint();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and add Study Guide content.
     await explorationEditor.navigateToCard(CARD_NAME.STUDY_GUIDE);
-    await explorationEditor.updateCardContent(STUDY_GUIDE_CONTENT);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      STUDY_GUIDE_CONTENT
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToAlreadyExistingCard(
       CARD_NAME.FINAL_CARD
     );
 
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Congratulations! You have completed the exploration.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Algebra Basics',
-      'Learn the basics of Algebra',
-      'Algorithms'
-    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Algebra Basics',
+        'Learn the basics of Algebra',
+        'Algorithms'
+      );
 
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
@@ -163,49 +180,49 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
       await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       // Wrong answer is submitted number of times to get to see hints.
-      await loggedOutUser.submitAnswer('40');
+      await loggedOutUser.submitAnswerInLoggedOutUser('40');
       await loggedOutUser.expectOppiaFeedbackToBe('Wrong, try again!');
-      await loggedOutUser.submitAnswer('5');
+      await loggedOutUser.submitAnswerInLoggedOutUser('5');
       await loggedOutUser.viewHint();
       await loggedOutUser.closeHintModal();
 
       // Again wrong answer is submitted number of times to get stuck and get to see the solution.
-      await loggedOutUser.submitAnswer('69');
-      await loggedOutUser.submitAnswer('39');
+      await loggedOutUser.submitAnswerInLoggedOutUser('69');
+      await loggedOutUser.submitAnswerInLoggedOutUser('39');
       await loggedOutUser.simulateDelayToAvoidFatigueDetection();
-      await loggedOutUser.submitAnswer('59');
+      await loggedOutUser.submitAnswerInLoggedOutUser('59');
       await loggedOutUser.viewSolution();
       await loggedOutUser.closeSolutionModal();
 
-      await loggedOutUser.submitAnswer('-39');
+      await loggedOutUser.submitAnswerInLoggedOutUser('-39');
       await loggedOutUser.expectOppiaFeedbackToBe('Perfect!');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
       await loggedOutUser.verifyCheckpointModalAppears();
       await loggedOutUser.goBackToPreviousCard();
       await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       // Wrong answer is submitted to get to see hints.
-      await loggedOutUser.submitAnswer('1/4');
-      await loggedOutUser.submitAnswer('1/3');
+      await loggedOutUser.submitAnswerInLoggedOutUser('1/4');
+      await loggedOutUser.submitAnswerInLoggedOutUser('1/3');
       await loggedOutUser.viewHint();
       await loggedOutUser.closeHintModal();
 
       // Again wrong answer is submitted number of times to get stuck and navigate to Study Guide.
-      await loggedOutUser.submitAnswer('1/3');
-      await loggedOutUser.submitAnswer('1/4');
+      await loggedOutUser.submitAnswerInLoggedOutUser('1/3');
+      await loggedOutUser.submitAnswerInLoggedOutUser('1/4');
       await loggedOutUser.simulateDelayToAvoidFatigueDetection();
-      await loggedOutUser.submitAnswer('1/5');
+      await loggedOutUser.submitAnswerInLoggedOutUser('1/5');
       await loggedOutUser.viewPreviousResponses();
       await loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5);
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       // Verifying if navigated to the expected card after getting stuck.
       await loggedOutUser.expectCardContentToMatch(STUDY_GUIDE_CONTENT);
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'

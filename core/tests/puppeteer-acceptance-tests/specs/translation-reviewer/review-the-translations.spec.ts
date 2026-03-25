@@ -68,7 +68,7 @@ describe('Translation Reviewer', function () {
     const explorationId2 =
       await curriculumAdm.createAndPublishExplorationWithCards('Exploration 2');
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
@@ -83,7 +83,7 @@ describe('Translation Reviewer', function () {
     );
     await curriculumAdm.openStoryEditor('The Picnic Problem', 'Fractions');
     await curriculumAdm.addChapter('Trading Slices', explorationId2);
-    await curriculumAdm.saveStoryDraft();
+    await curriculumAdm.saveStoryDraftInCurriculumAdmin();
 
     // Translate an exploration.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();

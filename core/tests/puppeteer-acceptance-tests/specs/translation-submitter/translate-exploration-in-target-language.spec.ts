@@ -64,7 +64,7 @@ describe('Translation Submitter', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdm.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
       'Fraction Foundations',
@@ -72,29 +72,34 @@ describe('Translation Submitter', function () {
     );
 
     // Create an exploration.
-    await curriculumAdm.navigateToCreatorDashboardPage();
+    await curriculumAdm.navigateToCreatorDashboardPageInExplorationEditor();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdm.dismissWelcomeModal();
+    await curriculumAdm.dismissWelcomeModalInCurriculumAdmin();
     await curriculumAdm.addExplorationDescriptionContainingBasicRTEComponents();
 
-    await curriculumAdm.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await curriculumAdm.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
     await curriculumAdm.viewOppiaResponses();
     await curriculumAdm.directLearnersToNewCard('Last Card');
-    await curriculumAdm.saveExplorationDraft();
+    await curriculumAdm.saveExplorationDraftInExplorationEditor();
     await curriculumAdm.navigateToCard('Last Card');
-    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await curriculumAdm.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
     await curriculumAdm.addImageRTEToCardContent(
       testConstants.data.profilePicture,
       'Profile Photo',
       'Profile Photo'
     );
 
-    await curriculumAdm.saveExplorationDraft();
-    const explorationId = await curriculumAdm.publishExplorationWithMetadata(
-      'Fair Shares',
-      'Learn dividing a birthday cake into equal parts',
-      'Mathematics'
-    );
+    await curriculumAdm.saveExplorationDraftInExplorationEditor();
+    const explorationId =
+      await curriculumAdm.publishExplorationWithMetadataInExplorationEditor(
+        'Fair Shares',
+        'Learn dividing a birthday cake into equal parts',
+        'Mathematics'
+      );
 
     await curriculumAdm.createAndPublishStoryWithChapter(
       'The Picnic Problem',
@@ -122,7 +127,7 @@ describe('Translation Submitter', function () {
         'States of Matter'
       );
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
-      await curriculumAdm.saveStoryDraft();
+      await curriculumAdm.saveStoryDraftInCurriculumAdmin();
     }
   }, 2100000);
 

@@ -136,7 +136,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.saveChangesInPreferencesPage();
 
     await loggedInLearner.waitForNetworkIdle();
-    await loggedInLearner.navigateToSplashPage(
+    await loggedInLearner.navigateToSplashPageInLoggedInUser(
       'http://localhost:8181/creator-dashboard'
     );
   });
@@ -162,11 +162,11 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.playLessonFromSearchResults(
       'Solving problems without calculator'
     );
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardInLoggedOutUser();
 
     await loggedInLearner.openLessonInfoModal();
     await loggedInLearner.clickOnProfileIconInLessonInfoModel();
-    await loggedInLearner.subscribeToCreator('explorationEditor');
+    await loggedInLearner.subscribeToCreatorInLoggedInUser('explorationEditor');
   });
 
   afterAll(async function () {

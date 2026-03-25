@@ -39,28 +39,29 @@ describe('Site Moderator', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createMinimalExploration(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.createMinimalExplorationInExplorationEditor(
       'Test Exploration',
       'End Exploration'
     );
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration Title',
-      'Test Exploration Goal',
-      'Algebra'
-    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Test Exploration Title',
+        'Test Exploration Goal',
+        'Algebra'
+      );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.createMinimalExploration(
+    await explorationEditor.createMinimalExplorationInExplorationEditor(
       'Test Exploration 2',
       'End Exploration'
     );
-    await explorationEditor.saveExplorationDraft();
-    await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
       'Test Exploration Title 2',
       'Test Exploration Goal 2',
       'Algebra'
@@ -68,7 +69,7 @@ describe('Site Moderator', function () {
   });
 
   it('should be able verify display of recent commits table', async function () {
-    await siteModerator.navigateToModeratorPage();
+    await siteModerator.navigateToModeratorPageInModerator();
     await siteModerator.expectScreenshotToMatch('siteModeratorPage', __dirname);
 
     await siteModerator.expectNumberOfRecentCommits(2);

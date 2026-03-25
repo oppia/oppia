@@ -35,7 +35,7 @@ describe('Release Coordinator', function () {
   });
 
   it('should be able to flush the memory cache', async function () {
-    await releaseCoordinator.navigateToReleaseCoordinatorPage();
+    await releaseCoordinator.navigateToReleaseCoordinatorPageInReleaseCoordinator();
     await releaseCoordinator.navigateToMiscTab();
     await releaseCoordinator.getMemoryCacheProfile();
     await releaseCoordinator.expectTotalKeysStoredToBeInRange(undefined, 10); // Min value is 10.

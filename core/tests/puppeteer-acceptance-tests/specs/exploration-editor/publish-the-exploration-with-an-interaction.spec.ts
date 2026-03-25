@@ -53,10 +53,12 @@ describe('Exploration Creator', function () {
     'should draft, discard and publish the changes',
     async function () {
       // Navigate to the creator dashboard and create a new exploration.
-      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
-      await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
+      await explorationEditor.dismissWelcomeModalInExplorationEditor();
+      await explorationEditor.updateCardContentInExplorationEditor(
+        INTRODUCTION_CARD_CONTENT
+      );
       await explorationEditor.addImageInteraction(
         'Correct!',
         CARD_NAME.LAST_CARD
@@ -64,21 +66,28 @@ describe('Exploration Creator', function () {
       await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
         'Wrong.'
       );
-      await explorationEditor.addHintToState('Initial coordinate');
-      await explorationEditor.saveExplorationDraft();
+      await explorationEditor.addHintToStateInExplorationEditor(
+        'Initial coordinate'
+      );
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
 
       // Add a new card with an end interaction.
       await explorationEditor.navigateToCard(CARD_NAME.LAST_CARD);
-      await explorationEditor.updateCardContent('Congratulations!');
-      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-      await explorationEditor.saveExplorationDraft();
-
-      explorationId = await explorationEditor.publishExplorationWithMetadata(
-        'Publish with an interaction',
-        'This is the goal of exploration.',
-        'Algebra'
+      await explorationEditor.updateCardContentInExplorationEditor(
+        'Congratulations!'
       );
+      await explorationEditor.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.END_EXPLORATION
+      );
+
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
+
+      explorationId =
+        await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+          'Publish with an interaction',
+          'This is the goal of exploration.',
+          'Algebra'
+        );
 
       await explorationVisitor.expectExplorationToBeAccessibleByUrl(
         explorationId

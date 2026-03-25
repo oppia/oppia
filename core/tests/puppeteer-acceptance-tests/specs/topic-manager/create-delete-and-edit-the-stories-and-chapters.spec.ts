@@ -75,7 +75,7 @@ describe('Topic Manager', function () {
   }, 600000);
 
   it('should be able to create and remove a story in a topic', async function () {
-    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.openTopicEditorInTopicManager('Arithmetic Operations');
     await topicManager.addStoryToTopic(
       'The Broken Calculator',
       'the-broken-calculator',
@@ -84,16 +84,19 @@ describe('Topic Manager', function () {
       testConstants.data.profilePicture
     );
     await topicManager.addChapter('Solving Problems', explorationId);
-    await topicManager.saveStoryDraft();
+    await topicManager.saveStoryDraftInTopicManager();
     await topicManager.expectScreenshotToMatch('storyEditor', __dirname);
 
     // Check if the story is present in the stories list.
-    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.openTopicEditorInTopicManager('Arithmetic Operations');
     await topicManager.expectStoriesListToContain('The Broken Calculator');
 
     // Delete the story.
     await topicManager.deleteStory('The Broken Calculator');
-    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
+    await topicManager.saveTopicDraftInTopicManager(
+      'Arithmetic Operations',
+      'Updated topic'
+    );
     await topicManager.expectStoriesListToBeEmpty();
   });
 
@@ -109,7 +112,7 @@ describe('Topic Manager', function () {
       'New Meta Tag',
       'new-url-fragment'
     );
-    await topicManager.saveStoryDraft();
+    await topicManager.saveStoryDraftInTopicManager();
     await topicManager.clickOnElementWithText('Expand Preview');
     await topicManager.expectPreviewCardToBeVisible(
       'New Story Title',
@@ -126,16 +129,16 @@ describe('Topic Manager', function () {
       'the-broken-calculator'
     );
     await topicManager.addChapter('Solving problems', explorationId);
-    await topicManager.saveStoryDraft();
+    await topicManager.saveStoryDraftInTopicManager();
 
     // Create and publish a new explorations.
     const simpleExplorationId =
-      await topicManager.createAndPublishAMinimalExplorationWithTitle(
+      await topicManager.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Simple Exploration',
         'Algebra'
       );
 
-    await topicManager.navigateToCreatorDashboardPage();
+    await topicManager.navigateToCreatorDashboardPageInExplorationEditor();
     await topicManager.navigateToExplorationEditorFromCreatorDashboard();
     const programmingExplorationId =
       await topicManager.createSimpleProgrammingExploration();
@@ -146,7 +149,7 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
     await topicManager.addChapter('Simple Exploration', simpleExplorationId);
-    await topicManager.saveStoryDraft();
+    await topicManager.saveStoryDraftInTopicManager();
     await topicManager.openChapterEditor('Simple Exploration');
     await topicManager.previewChapterCard();
     await topicManager.expectPreviewCardToBeVisible('Simple Exploration');
@@ -175,7 +178,7 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
     await topicManager.addAcquiredSkill('Addition');
-    await topicManager.saveStoryDraft();
+    await topicManager.saveStoryDraftInTopicManager();
 
     await topicManager.openChapterEditor(
       'Simple Exploration',
@@ -188,7 +191,7 @@ describe('Topic Manager', function () {
       'New Meta Tag',
       testConstants.data.curriculumAdminThumbnailImage
     );
-    await topicManager.saveStoryDraft();
+    await topicManager.saveStoryDraftInTopicManager();
     await topicManager.previewChapterCard();
     await topicManager.expectPreviewCardToBeVisible(
       'New Title',

@@ -39,7 +39,7 @@ describe('Logged-in User', function () {
     );
 
     // Create and publish exploration.
-    await loggedInUser.createAndPublishAMinimalExplorationWithTitle(
+    await loggedInUser.createAndPublishAMinimalExplorationWithTitleInLoggedInUser(
       TEST_EXPLORATION.title,
       TEST_EXPLORATION.category
     );
@@ -63,7 +63,7 @@ describe('Logged-in User', function () {
     'should display created explorations on profile page',
     async function () {
       await loggedInUser.navigateToProfilePageUsingProfileDropdown();
-      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitle(
+      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitleInLoggedInUser(
         TEST_EXPLORATION.title
       );
     },
@@ -74,17 +74,19 @@ describe('Logged-in User', function () {
   it(
     'should display edited explorations on profile page',
     async function () {
-      await loggedInUser.navigateToCreatorDashboardPage();
-      await loggedInUser.openExplorationInExplorationEditor(
+      await loggedInUser.navigateToCreatorDashboardPageInLoggedInUser();
+      await loggedInUser.openExplorationInExplorationEditorInLoggedInUser(
         TEST_EXPLORATION.title
       );
-      await loggedInUser.navigateToSettingsTab();
-      await loggedInUser.updateTitleTo(TEST_EXPLORATION.editedTitle);
+      await loggedInUser.navigateToSettingsTabInLoggedInUser();
+      await loggedInUser.updateTitleToInLoggedInUser(
+        TEST_EXPLORATION.editedTitle
+      );
 
-      await loggedInUser.saveExplorationDraft();
+      await loggedInUser.saveExplorationDraftInLoggedInUser();
 
       await loggedInUser.navigateToProfilePageUsingProfileDropdown();
-      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitle(
+      await loggedInUser.expectExplorationToBePresentInProfilePageWithTitleInLoggedInUser(
         TEST_EXPLORATION.editedTitle
       );
     },

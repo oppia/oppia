@@ -59,7 +59,7 @@ describe('Logged In Learner', function () {
 
     // Create exploration for chapter.
     explorationId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Test Exploration'
       );
 
@@ -82,7 +82,7 @@ describe('Logged In Learner', function () {
       'Test Topic'
     );
     await curriculumAdmin.addChapter('Chapter 1', explorationId);
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
     await curriculumAdmin.publishStoryDraft();
   }, 600000);
 

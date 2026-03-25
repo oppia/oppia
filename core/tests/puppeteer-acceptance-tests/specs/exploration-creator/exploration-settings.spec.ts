@@ -44,29 +44,39 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
 
-    await explorationEditor.updateCardContent('Introduction to Fractions');
-    await explorationEditor.addInteraction('Continue Button');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Introduction to Fractions'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      'Continue Button'
+    );
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Second Card');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     await explorationEditor.navigateToCard('Second Card');
-    await explorationEditor.updateCardContent('Thanks for playing!');
-    await explorationEditor.addInteraction('End Exploration');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Thanks for playing!'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      'End Exploration'
+    );
 
     // Save the draft.
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
   });
 
   it('should be able to change basic settings', async function () {
-    await explorationEditor.navigateToSettingsTab();
-    await explorationEditor.openExplorationControlDropdown();
+    await explorationEditor.navigateToSettingsTabInExplorationEditor();
+    await explorationEditor.openExplorationControlDropdownInExplorationEditor();
 
-    await explorationEditor.updateTitleTo('A Simple Exploration');
+    await explorationEditor.updateTitleToInExplorationEditor(
+      'A Simple Exploration'
+    );
     await explorationEditor.expectTitleToBe('A Simple Exploration');
 
     await explorationEditor.updateGoalTo('Goal Here');
@@ -103,7 +113,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to change exploration control settings', async function () {
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
     await explorationEditor.clickOnDeleteExplorationButton();
     await explorationEditor.isTextPresentOnPage('Delete Exploration');
     await explorationEditor.confirmDeleteExplorationButton();

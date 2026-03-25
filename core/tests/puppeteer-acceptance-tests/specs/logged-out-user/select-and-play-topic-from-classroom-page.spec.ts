@@ -51,7 +51,7 @@ describe('Logged-out User', function () {
     );
 
     explorationId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
         'Negative Numbers'
       );
 

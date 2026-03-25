@@ -36,7 +36,7 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createTopic('Mathematics', 'math');
     await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics', false);
 
@@ -54,12 +54,12 @@ describe('Topic Manager', function () {
       // TODO(#20590): Once the issue is resolved, please ensure to add a check for
       // this scenario (linking and unlinking a skill to a question) in the acceptance test.
       // See: https://github.com/oppia/oppia/issues/20590
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.navigateToTopicAndSkillsDashboardPageInTopicManager();
 
-      await topicManager.openSkillEditor('Addition');
-      await topicManager.navigateToSkillQuestionEditorTab();
+      await topicManager.openSkillEditorInTopicManager('Addition');
+      await topicManager.navigateToSkillQuestionEditorTabInTopicManager();
 
-      await topicManager.createQuestionsForSkill('Addition', 1);
+      await topicManager.createQuestionsForSkillInTopicManager('Addition', 1);
       await topicManager.expectToastMessageToBe(
         'Question created successfully.'
       );
@@ -69,7 +69,7 @@ describe('Topic Manager', function () {
       await topicManager.expectPreviewQuestionText(questionText);
       await topicManager.expectPreviewInteractionType('Numeric Input');
 
-      await topicManager.navigateToSkillQuestionEditorTab();
+      await topicManager.navigateToSkillQuestionEditorTabInTopicManager();
       await topicManager.deleteQuestion(questionText);
       await topicManager.expectToastMessageToBe('Question Removed');
     },

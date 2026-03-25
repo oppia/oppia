@@ -39,7 +39,7 @@ export class ContributorAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
-  async navigateToContributorDashboardAdminPage(): Promise<void> {
+  async navigateToContributorDashboardAdminPageInContributorAdmin(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
     const newDashVisible = await this.isElementVisible(
       newContributorAdminDashboardPageSelector

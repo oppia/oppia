@@ -30,7 +30,7 @@ describe('Interested Parent', function () {
   });
 
   it('should be able to download the mobile app', async function () {
-    await interestedParent.navigateToSplashPage();
+    await interestedParent.navigateToSplashPageInLoggedOutUser();
     await interestedParent.clickGetAndroidAppButtonInSplashPage();
 
     await interestedParent.clickOnPlayStoreImageInAndroidPageAndVerifyNavigation();

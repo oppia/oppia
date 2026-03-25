@@ -85,7 +85,7 @@ describe('Topic Manager', function () {
 
   it('should be able to edit and republish the skill', async function () {
     // Add worked example to the skill.
-    await topicManager.openSkillEditor('Subtraction');
+    await topicManager.openSkillEditorInTopicManager('Subtraction');
     // TODO(#23231): Add worked example and save.
     // Also, uncomment the below line.
     // await this.expectSaveChangesInSkillEditorToBe('enabled');
@@ -93,7 +93,7 @@ describe('Topic Manager', function () {
 
     // Add a misconception to the skill.
     // TODO(#23231): Uncomment the below line, once the issue is fixed.
-    // await topicManager.publishUpdatedSkill('Added worked example to the skill');
+    // await topicManager.publishUpdatedSkillInTopicManager('Added worked example to the skill');
     await topicManager.addMisconception(
       "You can't subtract a fraction from a whole number.",
       'We have practiced subtracting fractions from whole numbers.',
@@ -103,12 +103,19 @@ describe('Topic Manager', function () {
     await topicManager.expectSaveChangesInSkillEditorToBe('enabled');
 
     // Add explaination for a difficulty rubric.
-    await topicManager.publishUpdatedSkill('Added misconception to the skill');
-    await topicManager.updateRubric('Easy', 'This is for easy questions.');
+    await topicManager.publishUpdatedSkillInTopicManager(
+      'Added misconception to the skill'
+    );
+    await topicManager.updateRubricInTopicManager(
+      'Easy',
+      'This is for easy questions.'
+    );
     await topicManager.expectSaveChangesInSkillEditorToBe('enabled');
 
     // Add prerequisite skill.
-    await topicManager.publishUpdatedSkill('Added difficulty rubric.');
+    await topicManager.publishUpdatedSkillInTopicManager(
+      'Added difficulty rubric.'
+    );
     await topicManager.addPrerequisiteSkillInSkillEditor('Addition');
     await topicManager.expectSaveChangesInSkillEditorToBe('enabled');
   });

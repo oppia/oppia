@@ -35,15 +35,15 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+    await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
       'Rational Numbers'
     );
-    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+    await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
       'Real Numbers',
       'Algebra',
       false
     );
-    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+    await explorationEditor.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
       'Fractions',
       'Algebra',
       false
@@ -69,7 +69,7 @@ describe('Exploration Editor', function () {
       );
       await loggedInUser.rateExploration(3, 'Nice!', false);
 
-      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
       await explorationEditor.expectAverageRatingAndUsersToBe(3, 1);
       await explorationEditor.expectTotalPlaysToBe(1);
       await explorationEditor.expectOpenFeedbacksToBe(1);

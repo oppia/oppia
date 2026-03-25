@@ -105,7 +105,7 @@ describe('Logged-out User', function () {
       }
       // Pagination shows 10 blogs per page. Since 12 blogs exist,
       // page 1 should display 10 blogs and page 2 should display the remaining 2.
-      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.navigateToBlogPageInLoggedOutUser();
       await interestedPartnerOrg.expectNumberOfBlogPostsOnPageToBe(10);
 
       await interestedPartnerOrg.clickNextBlogPage();
@@ -143,19 +143,19 @@ describe('Logged-out User', function () {
   it(
     'should be able to search and filter blog posts',
     async function () {
-      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.navigateToBlogPageInLoggedOutUser();
       await interestedPartnerOrg.filterBlogPostsByTag('International');
       await interestedPartnerOrg.expectBlogSearchResultsToHaveTag(
         'International'
       );
 
-      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.navigateToBlogPageInLoggedOutUser();
       await interestedPartnerOrg.filterBlogPostsByKeyword('International');
       await interestedPartnerOrg.expectBlogSearchResultsToContain(
         'International'
       );
 
-      await interestedPartnerOrg.navigateToBlogPage();
+      await interestedPartnerOrg.navigateToBlogPageInLoggedOutUser();
       await interestedPartnerOrg.filterBlogPostsByKeyword('fashion');
       await interestedPartnerOrg.expectNoBlogPostsMessageToBeVisible(
         'Sorry, there are no blog posts matching this query.'

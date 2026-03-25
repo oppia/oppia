@@ -57,7 +57,7 @@ describe('Practice Question Coordinator', function () {
 
   it('should be able to add question submitter rights', async function () {
     // Navigate to the contributor dashboard admin page.
-    await questionCoordinator.navigateToContributorDashboardAdminPage();
+    await questionCoordinator.navigateToContributorDashboardAdminPageInContributorAdmin();
 
     // Add translation rights.
     await questionCoordinator.clickOnAddReviewerOrSubmitterButton();

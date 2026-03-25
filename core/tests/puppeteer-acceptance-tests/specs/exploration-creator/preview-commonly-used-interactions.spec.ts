@@ -47,15 +47,19 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
   });
 
   it('should be able to preview "Continue Button" interaction', async function () {
-    await explorationEditor.updateCardContent('Click on the button.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Click on the button.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the preview tab and check the content of the first card.
     await explorationEditor.navigateToPreviewTab();
@@ -64,7 +68,7 @@ describe('Exploration Editor', function () {
       'Click on the button.'
     );
     // It should display the same card as next card isn't created.
-    await explorationEditor.continueToNextCard(true);
+    await explorationEditor.continueToNextCardInExplorationEditor(true);
     await explorationEditor.expectPreviewCardContentToBe(
       CARD_NAMES.FIRST,
       'Click on the button.'
@@ -75,7 +79,7 @@ describe('Exploration Editor', function () {
 
     // It should change the card content when new card is created.
     await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.continueToNextCard();
+    await explorationEditor.continueToNextCardInExplorationEditor();
     await explorationEditor.expectPreviewCardContentToBe(
       CARD_NAMES.SECOND,
       'Click on the button.',
@@ -101,7 +105,9 @@ describe('Exploration Editor', function () {
     // Add a multiple choice interaction.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
-    await explorationEditor.updateCardContent('This is a multiple choice.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'This is a multiple choice.'
+    );
     await explorationEditor.addMultipleChoiceInteraction([
       'Option 1',
       'Option 2',
@@ -118,8 +124,10 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer.'
     );
-    await explorationEditor.addHintToState('Try Google Search.');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'Try Google Search.'
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
@@ -151,8 +159,12 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Number Input" interaction', async function () {
     // Add a number input interaction.
-    await explorationEditor.updateCardContent('Enter number less than 0.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter number less than 0.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMBER_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMBER_INPUT,
       '0',
@@ -163,25 +175,25 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.addHintToState(
+    await explorationEditor.addHintToStateInExplorationEditor(
       'All negative numbers are less than 0.'
     );
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '-10',
       'As said in the question itself.',
       true
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
     // Submit wrong answer.
-    await explorationEditor.submitAnswer('10');
+    await explorationEditor.submitAnswerInExplorationEditor('10');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     // Submit a blank answer.
-    await explorationEditor.submitAnswer('');
+    await explorationEditor.submitAnswerInExplorationEditor('');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Enter a number to continue'
     );
@@ -196,7 +208,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.closeHintModal();
     }
     // Submit a correct answer.
-    await explorationEditor.submitAnswer('-10');
+    await explorationEditor.submitAnswerInExplorationEditor('-10');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
     // Navigate to next card.
@@ -206,8 +218,13 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Text Input" interaction', async function () {
     // Add a text input interaction.
-    await explorationEditor.updateCardContent('Enter text "Hello, Oppia!".');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.TEXT_INPUT, false);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter text "Hello, Oppia!".'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.TEXT_INPUT,
+      false
+    );
     await explorationEditor.customizeTextInputInteraction(
       'Hello, there!',
       '2',
@@ -223,7 +240,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'No write "Hello, Oppia!"'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
@@ -248,12 +265,14 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Image Region" interaction', async function () {
     // Add an image region interaction.
-    await explorationEditor.updateCardContent('Enter an image region.');
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter an image region.'
+    );
     await explorationEditor.addImageInteraction('Perfect!', CARD_NAMES.SIXTH);
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Select a wrong point.
     await explorationEditor.navigateToPreviewTab();
@@ -270,8 +289,10 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Item Selection" interaction', async function () {
     // Add an item selection interaction.
-    await explorationEditor.updateCardContent('Select correct item.');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Select correct item.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.ITEM_SELECTION,
       false
     );
@@ -293,7 +314,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Choose a wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -301,7 +322,7 @@ describe('Exploration Editor', function () {
       'Option 1',
       'Option 2',
     ]);
-    await explorationEditor.clickOnSubmitAnswerButton();
+    await explorationEditor.clickOnSubmitAnswerButtonInExplorationEditor();
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
@@ -310,7 +331,7 @@ describe('Exploration Editor', function () {
       'Correct Option 1',
       'Correct Option 2',
     ]);
-    await explorationEditor.clickOnSubmitAnswerButton();
+    await explorationEditor.clickOnSubmitAnswerButtonInExplorationEditor();
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
     // Navigate to next card.
@@ -320,8 +341,10 @@ describe('Exploration Editor', function () {
 
   it('should be able to preview "Drag and Drop Sort" interaction', async function () {
     // Add Drag and Drop Sort Interaction.
-    await explorationEditor.updateCardContent('Arrange in Ascending Order');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Arrange in Ascending Order'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
       false
     );
@@ -343,8 +366,10 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Try Again!'
     );
-    await explorationEditor.addHintToState('Arrange in Ascending Order');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'Arrange in Ascending Order'
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Sort items in wrong order.
     await explorationEditor.navigateToPreviewTab();

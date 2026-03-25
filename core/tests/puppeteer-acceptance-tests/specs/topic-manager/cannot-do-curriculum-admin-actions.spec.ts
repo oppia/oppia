@@ -68,9 +68,9 @@ describe('Topic Manager', function () {
   it(
     'should not be able to edit topics and stories not owned.',
     async function () {
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.navigateToTopicAndSkillsDashboardPageInTopicManager();
 
-      await topicManager.openTopicEditor('Subtraction');
+      await topicManager.openTopicEditorInTopicManager('Subtraction');
       // Topic "Subtraction" is not owned by the topic manager as it is not assigned to them during the setup.
       await topicManager.expectTopicNameFieldDisabled();
 
@@ -84,7 +84,7 @@ describe('Topic Manager', function () {
   it(
     'should not be able to create and delete topics and skills.',
     async function () {
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.navigateToTopicAndSkillsDashboardPageInTopicManager();
 
       await topicManager.expectCreateTopicButtonNotPresent();
       await topicManager.verifyAbsenceOfDeleteTopicButtonInTopic('Addition');
@@ -102,7 +102,7 @@ describe('Topic Manager', function () {
   it(
     'should not be able to access the classroom-admin page.',
     async function () {
-      await topicManager.navigateToClassroomAdminPage();
+      await topicManager.navigateToClassroomAdminPageInTopicManager();
       await topicManager.expectError401Unauthorized();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

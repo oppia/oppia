@@ -478,7 +478,7 @@ export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
    */
-  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+  async navigateToTopicAndSkillsDashboardPageInTopicManager(): Promise<void> {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
@@ -506,7 +506,7 @@ export class TopicManager extends BaseUser {
   /**
    * Navigate to the skill's question editor tab.
    */
-  async navigateToSkillQuestionEditorTab(): Promise<void> {
+  async navigateToSkillQuestionEditorTabInTopicManager(): Promise<void> {
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillQuestionTab = isMobileWidth
       ? mobileSkillQuestionTab
@@ -567,7 +567,7 @@ export class TopicManager extends BaseUser {
   /**
    * Function to navigate to classroom admin page.
    */
-  async navigateToClassroomAdminPage(): Promise<void> {
+  async navigateToClassroomAdminPageInTopicManager(): Promise<void> {
     await this.goto(testConstants.URLs.ClassroomAdmin);
   }
 
@@ -665,11 +665,11 @@ export class TopicManager extends BaseUser {
   /**
    * Open the topic editor page for a topic.
    */
-  async openTopicEditor(topicName: string): Promise<void> {
+  async openTopicEditorInTopicManager(topicName: string): Promise<void> {
     const topicNameSelector = this.isViewportAtMobileWidth()
       ? mobileTopicSelector
       : desktopTopicSelector;
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await this.clickOnElementWithSelector(topicsTab);
     await this.page.waitForSelector(topicNameSelector, {visible: true});
 
@@ -706,7 +706,9 @@ export class TopicManager extends BaseUser {
    * To avoid unexpected behavior, ensure that any modifications here are also
    * made in curriculum-admin.ts.
    */
-  async expectToBeInTopicEditor(topicName?: string): Promise<void> {
+  async expectToBeInTopicEditorInTopicManager(
+    topicName?: string
+  ): Promise<void> {
     await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
 
     if (topicName) {
@@ -731,7 +733,7 @@ export class TopicManager extends BaseUser {
     topicName?: string,
     urlFragment?: string
   ): Promise<void> {
-    await this.expectToBeInTopicEditor();
+    await this.expectToBeInTopicEditorInTopicManager();
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.typeInInputField(topicNameField, topicName);
@@ -778,12 +780,12 @@ export class TopicManager extends BaseUser {
   /**
    * Add any number of questions to a particular skill.
    */
-  async createQuestionsForSkill(
+  async createQuestionsForSkillInTopicManager(
     skillName: string,
     questionCount: number
   ): Promise<void> {
     for (let i = 0; i < questionCount; i++) {
-      await this.addBasicAlgebraQuestionToSkill(skillName);
+      await this.addBasicAlgebraQuestionToSkillInTopicManager(skillName);
     }
   }
 
@@ -807,8 +809,10 @@ export class TopicManager extends BaseUser {
   /**
    * Create a basic algebra question in the skill editor page.
    */
-  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
+  async addBasicAlgebraQuestionToSkillInTopicManager(
+    skillName: string
+  ): Promise<void> {
+    await this.openSkillEditorInTopicManager(skillName);
     await this.clickOnElementWithSelector(createQuestionButton);
     await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -897,7 +901,10 @@ export class TopicManager extends BaseUser {
    * @param {string} topicName - name of the topic to be saved.
    * @param {string} description - description of the topic to be saved.
    */
-  async saveTopicDraft(topicName: string, description?: string): Promise<void> {
+  async saveTopicDraftInTopicManager(
+    topicName: string,
+    description?: string
+  ): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
@@ -939,7 +946,7 @@ export class TopicManager extends BaseUser {
     status: 'Published' | 'Not Published' | 'All'
   ): Promise<void> {
     try {
-      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
       }
@@ -966,7 +973,7 @@ export class TopicManager extends BaseUser {
    */
   async filterTopicsByClassroom(classroom: string): Promise<void> {
     try {
-      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
       }
@@ -993,7 +1000,7 @@ export class TopicManager extends BaseUser {
    */
   async filterTopicsByKeyword(keyword: string): Promise<void> {
     try {
-      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
       }
@@ -1057,7 +1064,7 @@ export class TopicManager extends BaseUser {
       | 'Oldest Created'
   ): Promise<void> {
     try {
-      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
       }
@@ -1156,7 +1163,7 @@ export class TopicManager extends BaseUser {
   /**
    * Toggles the "Show practice tab to learners" in Topic Editor.
    */
-  async togglePracticeTabCheckbox(): Promise<void> {
+  async togglePracticeTabCheckboxInTopicManager(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
     }
@@ -1243,7 +1250,7 @@ export class TopicManager extends BaseUser {
    *     topic editor.
    */
   async navigateToTopicPreviewTabOfTopic(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
+    await this.openTopicEditorInTopicManager(topicName);
     await this.navigateToTopicPreviewTab();
   }
 
@@ -1402,12 +1409,12 @@ export class TopicManager extends BaseUser {
   /**
    * Open the skill editor page for a skill.
    */
-  async openSkillEditor(skillName: string): Promise<void> {
+  async openSkillEditorInTopicManager(skillName: string): Promise<void> {
     const skillSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
     await this.page.bringToFront();
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await this.clickOnElementWithSelector(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
 
@@ -1451,7 +1458,7 @@ export class TopicManager extends BaseUser {
       : unassignSkillButtonDesktop;
     const skillOptions = isMobileWidth ? mobileSkillsOption : skillEditBox;
 
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await this.navigateToSkillsTab();
 
     const skillItem = await this.getSkillElementFromSelection(skillName);
@@ -1577,7 +1584,7 @@ export class TopicManager extends BaseUser {
       ? assignSkillButtonMobile
       : assignSkillButtonDesktop;
 
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await this.navigateToSkillsTab();
 
     const skillItem = await this.getSkillElementFromSelection(skillName);
@@ -1745,7 +1752,7 @@ export class TopicManager extends BaseUser {
       ? mergeSkillsButtonMobile
       : mergeSkillsButtonDesktop;
 
-    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await this.navigateToSkillsTab();
 
     const skillItem1 = await this.getSkillElementFromSelection(skillName);
@@ -1901,7 +1908,7 @@ export class TopicManager extends BaseUser {
    */
   async filterSkillsByStatus(status: string): Promise<void> {
     try {
-      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
       await this.navigateToSkillsTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
@@ -1928,7 +1935,7 @@ export class TopicManager extends BaseUser {
    */
   async filterSkillsByKeyword(keyword: string): Promise<void> {
     try {
-      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
       await this.navigateToSkillsTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
@@ -1961,7 +1968,7 @@ export class TopicManager extends BaseUser {
    */
   async sortSkills(sortOption: string): Promise<void> {
     try {
-      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToTopicAndSkillsDashboardPageInTopicManager();
       await this.navigateToSkillsTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
@@ -2626,7 +2633,10 @@ export class TopicManager extends BaseUser {
    * @param {string} difficulty - The difficulty level to update.
    * @param {string} explanation - The explanation to update.
    */
-  async updateRubric(difficulty: string, explanation: string): Promise<void> {
+  async updateRubricInTopicManager(
+    difficulty: string,
+    explanation: string
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(toggleSkillRubricsDropdown);
     }
@@ -2659,7 +2669,9 @@ export class TopicManager extends BaseUser {
    * Publishes an updated skill.
    * @param {string} updateMessage - The update message.
    */
-  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+  async publishUpdatedSkillInTopicManager(
+    updateMessage: string
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       if (
         !(await this.isElementVisible(navigationContainerSelector, true, 5000))
@@ -2768,7 +2780,7 @@ export class TopicManager extends BaseUser {
     topicName?: string
   ): Promise<void> {
     if (topicName) {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInTopicManager(topicName);
     }
 
     // Expand subtopic list if it is not expanded.
@@ -2863,7 +2875,7 @@ export class TopicManager extends BaseUser {
     topicName: string
   ): Promise<void> {
     try {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInTopicManager(topicName);
       await this.waitForStaticAssetsToLoad();
 
       if (this.isViewportAtMobileWidth()) {
@@ -2928,7 +2940,7 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     // Navigate to topic editor if topic name is provided.
     if (topicName) {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInTopicManager(topicName);
       await this.waitForStaticAssetsToLoad();
 
       if (this.isViewportAtMobileWidth()) {
@@ -3048,7 +3060,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(subtopicAssignmentContainer, {
         hidden: true,
       });
-      await this.saveTopicDraft(topicName);
+      await this.saveTopicDraftInTopicManager(topicName);
     } catch (error) {
       const newError = new Error(
         `Failed to change subtopic assignments. Original error: ${error.message}`
@@ -3082,7 +3094,7 @@ export class TopicManager extends BaseUser {
   /**
    * Save a story as a topic manager.
    */
-  async saveStoryDraft(): Promise<void> {
+  async saveStoryDraftInTopicManager(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const isMobileSaveButtonVisible = await this.isElementVisible(
         mobileSaveStoryChangesButton
@@ -3111,7 +3123,7 @@ export class TopicManager extends BaseUser {
   async openStoryEditor(storyName: string, topicName?: string): Promise<void> {
     // If topic name is given, navigate to topic.
     if (topicName) {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInTopicManager(topicName);
     }
 
     try {
@@ -3173,7 +3185,7 @@ export class TopicManager extends BaseUser {
     shouldExist: boolean
   ): Promise<void> {
     try {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInTopicManager(topicName);
       await this.waitForStaticAssetsToLoad();
 
       if (this.isViewportAtMobileWidth()) {
@@ -3228,7 +3240,7 @@ export class TopicManager extends BaseUser {
     topicName: string
   ): Promise<void> {
     try {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInTopicManager(topicName);
       await this.waitForStaticAssetsToLoad();
 
       if (this.isViewportAtMobileWidth()) {
@@ -4357,11 +4369,11 @@ export class TopicManager extends BaseUser {
    * To avoid unexpected behavior, ensure that any modifications here are also
    * made in curriculum-admin.ts.
    */
-  async publishDraftTopic(topicName?: string): Promise<void> {
+  async publishDraftTopicInTopicManager(topicName?: string): Promise<void> {
     if (topicName) {
-      await this.openTopicEditor(topicName);
+      await this.openTopicEditorInTopicManager(topicName);
     } else {
-      await this.expectToBeInTopicEditor();
+      await this.expectToBeInTopicEditorInTopicManager();
     }
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
@@ -4460,7 +4472,7 @@ export class TopicManager extends BaseUser {
     await this.clickOnElementWithSelector(finalizeOutlineCheckbox);
     await this.addAcquiredSkill('Place Values skills');
 
-    await this.saveStoryDraft();
+    await this.saveStoryDraftInTopicManager();
     await this.clickReadyToPublishButton();
     showMessage(`Chapter ${chapterName} marked as ready to publish.`);
   }

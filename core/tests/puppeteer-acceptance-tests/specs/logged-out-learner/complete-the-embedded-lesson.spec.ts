@@ -80,7 +80,7 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
     'should be able to complete the embedded lesson, but not rate the exploration',
     async function () {
       // Complete the exploration and expect completion toast message.
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );

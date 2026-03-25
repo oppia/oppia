@@ -31,7 +31,7 @@ describe('Interested Parent', function () {
 
   it('should be able to learn about the organization', async function () {
     // Visit splash page.
-    await parentUser.navigateToSplashPage();
+    await parentUser.navigateToSplashPageInLoggedOutUser();
     await parentUser.expectScreenshotToMatch('homePage', __dirname);
 
     // Visit the About Page.

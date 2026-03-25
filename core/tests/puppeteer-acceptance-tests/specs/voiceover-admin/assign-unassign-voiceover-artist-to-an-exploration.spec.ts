@@ -59,20 +59,21 @@ describe('Voiceover Admin', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
 
-    await explorationEditor.createMinimalExploration(
+    await explorationEditor.createMinimalExplorationInExplorationEditor(
       'Exploration one',
       INTERACTION_TYPES.END_EXPLORATION
     );
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Exploration one',
-      'Exploration one',
-      'Algebra'
-    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Exploration one',
+        'Exploration one',
+        'Algebra'
+      );
 
     await UserFactory.createNewUser(
       'voiceoverartist',
@@ -81,9 +82,11 @@ describe('Voiceover Admin', function () {
   });
 
   it('should be able to add voiceover artist to an exploration', async function () {
-    await voiceoverAdmin.navigateToExplorationEditor(explorationId);
-    await voiceoverAdmin.dismissWelcomeModal();
-    await voiceoverAdmin.navigateToExplorationSettingsTab();
+    await voiceoverAdmin.navigateToExplorationEditorInVoiceoverAdmin(
+      explorationId
+    );
+    await voiceoverAdmin.dismissWelcomeModalInVoiceoverAdmin();
+    await voiceoverAdmin.navigateToExplorationSettingsTabInVoiceoverAdmin();
     await voiceoverAdmin.expectVoiceoverArtistsListToBeEmpty();
 
     // Add invalid user as a voiceover artist.

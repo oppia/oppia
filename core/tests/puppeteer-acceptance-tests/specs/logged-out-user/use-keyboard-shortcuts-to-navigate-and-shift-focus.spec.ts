@@ -49,36 +49,44 @@ describe('Logged-out User', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We will be learning numbers today.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.CONCEPT_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and add concept content.
     await explorationEditor.navigateToCard(CARD_NAME.CONCEPT_CARD);
-    await explorationEditor.updateCardContent(CONCEPT_CARD_CONTENT_EN);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      CONCEPT_CARD_CONTENT_EN
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We have learnt positive numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -92,27 +100,27 @@ describe('Logged-out User', function () {
     async function () {
       // Navigate to the Get Started page using the ‘Ctrl+6’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit6');
-      await loggedOutUser.expectToBeOnPage('get started');
+      await loggedOutUser.expectToBeOnPageInLoggedOutUser('get started');
 
       // Navigate to the About page using the ‘Ctrl+4’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit4');
-      await loggedOutUser.expectToBeOnPage('about');
+      await loggedOutUser.expectToBeOnPageInLoggedOutUser('about');
 
       // Navigate to the Preferences page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+5’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit5');
-      await loggedOutUser.expectToBeOnPage('login');
+      await loggedOutUser.expectToBeOnPageInLoggedOutUser('login');
 
       // Navigate to the learner-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+2’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit2');
-      await loggedOutUser.expectToBeOnPage('login');
+      await loggedOutUser.expectToBeOnPageInLoggedOutUser('login');
 
       // Navigate to the creator-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+3’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit3');
-      await loggedOutUser.expectToBeOnPage('login');
+      await loggedOutUser.expectToBeOnPageInLoggedOutUser('login');
 
       // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
-      await loggedOutUser.expectToBeOnPage('community library');
+      await loggedOutUser.expectToBeOnPageInLoggedOutUser('community library');
 
       // Expects the focus to be on Search bar in the Community Library page.
       await loggedOutUser.verifyFocusAfterShortcut('/');
@@ -129,7 +137,7 @@ describe('Logged-out User', function () {
       // Skips to the main content.
       await loggedOutUser.verifyFocusAfterShortcut('s');
 
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
 
       // Expects the focus to be on the back button in lesson player.
       await loggedOutUser.verifyFocusAfterShortcut('j');

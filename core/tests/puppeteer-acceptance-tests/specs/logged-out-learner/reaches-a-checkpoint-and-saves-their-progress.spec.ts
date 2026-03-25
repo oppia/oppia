@@ -47,26 +47,30 @@ describe('Logged-out User', function () {
 
     loggedOutLearner = await UserFactory.createLoggedOutUser();
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Welcome, to the Place Values Exploration.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a basic algebra problem.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.SECOND_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.SECOND_CARD);
     await explorationEditor.setTheStateAsCheckpoint();
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Give fraction with denominator 2.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.FRACTION_INPUT
+    );
 
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
@@ -78,36 +82,43 @@ describe('Logged-out User', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong, try again!'
     );
-    await explorationEditor.addHintToState('We can have any numerator.');
-    await explorationEditor.addHintToState('Numerator is the number on top.');
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'We can have any numerator.'
+    );
+    await explorationEditor.addHintToStateInExplorationEditor(
+      'Numerator is the number on top.'
+    );
 
-    await explorationEditor.addSolutionToState(
+    await explorationEditor.addSolutionToStateInExplorationEditor(
       '1/2',
       '1/2 here 1 is the numerator and 2 is the denominator.',
       true
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'Congratulations! You have completed the exploration.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'What are the Place Values?',
-      'Learn basic Mathematics including Place Values',
-      'Algebra'
-    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'What are the Place Values?',
+        'Learn basic Mathematics including Place Values',
+        'Algebra'
+      );
   });
 
   it('should be able to resume progress using 72-hour link.', async function () {
-    await loggedOutLearner.playExploration(explorationId);
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.playExplorationInLoggedOutUser(explorationId);
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
 
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.openLessonInfoModal();

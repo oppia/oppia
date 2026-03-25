@@ -37,7 +37,7 @@ describe('Release Coordinator', function () {
   });
 
   it('should be able to view feature flags', async function () {
-    await releaseCoordinator.navigateToReleaseCoordinatorPage();
+    await releaseCoordinator.navigateToReleaseCoordinatorPageInReleaseCoordinator();
     await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagToBePresent(dummyFeatureFlagName);
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(

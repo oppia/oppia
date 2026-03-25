@@ -138,7 +138,9 @@ export class PracticeQuestionReviewer extends Contributor {
 
     await this.removeInteraction();
 
-    await this.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await this.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMERIC_INPUT
+    );
 
     // Add responses to the number input interaction.
     await this.addResponsesToTheInteraction(
@@ -150,10 +152,10 @@ export class PracticeQuestionReviewer extends Contributor {
     );
 
     // Add hint.
-    await this.addHintToState('Test Hint');
+    await this.addHintToStateInExplorationEditor('Test Hint');
 
     // Add a solution to the state.
-    await this.addSolutionToState(
+    await this.addSolutionToStateInExplorationEditor(
       '100',
       'As said in the question itself.',
       true

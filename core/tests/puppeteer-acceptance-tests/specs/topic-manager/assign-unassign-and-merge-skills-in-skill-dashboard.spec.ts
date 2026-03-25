@@ -84,7 +84,7 @@ describe('Topic Manager', function () {
   }, 600000);
 
   it('should be able to assign a skill to topic', async function () {
-    await topicManager.navigateToTopicAndSkillsDashboardPage();
+    await topicManager.navigateToTopicAndSkillsDashboardPageInTopicManager();
     await topicManager.navigateToSkillsTab();
     await topicManager.assignSkillToTopic(
       'Subtraction',

@@ -42,21 +42,29 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
     // Navigate to the creator dashboard and create a new exploration.
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      INTRODUCTION_CARD_CONTENT
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Test Question');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-    await explorationEditor.updateCardContent('Enter a negative number.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Enter a negative number.'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMBER_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMBER_INPUT,
       '-1',
@@ -64,18 +72,20 @@ describe('Exploration Editor', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We have practiced negative numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -89,9 +99,9 @@ describe('Exploration Editor', function () {
       );
 
       // Continue to the next card, enter an answer, and submit it.
-      await explorationEditor.continueToNextCard();
-      await explorationEditor.submitAnswer('-40');
-      await explorationEditor.continueToNextCard();
+      await explorationEditor.continueToNextCardInExplorationEditor();
+      await explorationEditor.submitAnswerInExplorationEditor('-40');
+      await explorationEditor.continueToNextCardInExplorationEditor();
 
       // Check the completion message and restart the exploration.
       await explorationEditor.expectPreviewCompletionToastMessage(

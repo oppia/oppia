@@ -36,10 +36,10 @@ describe('Lesson Creator', function () {
   it(
     'should create a new exploration',
     async function () {
-      await explorationEditor.navigateToCreatorDashboardUsingProfileDropdown();
+      await explorationEditor.navigateToCreatorDashboardUsingProfileDropdownInExplorationEditor();
       await explorationEditor.expectToBeInCreatorDashboard();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.dismissWelcomeModalInExplorationEditor();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,13 +48,17 @@ describe('Lesson Creator', function () {
     'should generate warning message if card height limit is exceeded',
     async function () {
       await explorationEditor.updateStateName('1 - Intro');
-      await explorationEditor.saveExplorationDraft('Renamed initial card');
+      await explorationEditor.saveExplorationDraftInExplorationEditor(
+        'Renamed initial card'
+      );
 
       await explorationEditor.expectStateNameToBe('1 - Intro');
       await explorationEditor.expectExplorationGraphToContainCard('1 - Intro');
 
       const questionText = 'What is the capital of France?';
-      await explorationEditor.updateCardContent(questionText);
+      await explorationEditor.updateCardContentInExplorationEditor(
+        questionText
+      );
       await explorationEditor.expectCardContentToBe(questionText);
 
       await explorationEditor.navigateToPreviewTab();
@@ -71,7 +75,7 @@ describe('Lesson Creator', function () {
         (_, i) => `Line ${i + 1}`
       ).join('\n');
 
-      await explorationEditor.updateCardContent(longContent);
+      await explorationEditor.updateCardContentInExplorationEditor(longContent);
 
       await explorationEditor.expectCardHeightLimitWarningToBeVisible();
     },
@@ -81,10 +85,12 @@ describe('Lesson Creator', function () {
   it(
     'should show warning when there are 50 unsaved changes',
     async function () {
-      await explorationEditor.saveExplorationDraft();
+      await explorationEditor.saveExplorationDraftInExplorationEditor();
 
       for (let i = 1; i <= 50; i++) {
-        await explorationEditor.updateCardContent(`Content ${i}`);
+        await explorationEditor.updateCardContentInExplorationEditor(
+          `Content ${i}`
+        );
       }
 
       await explorationEditor.expectSaveRecommendationModalToBeVisible();

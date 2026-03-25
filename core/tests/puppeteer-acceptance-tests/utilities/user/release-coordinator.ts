@@ -82,7 +82,7 @@ export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
    */
-  async navigateToReleaseCoordinatorPage(): Promise<void> {
+  async navigateToReleaseCoordinatorPageInReleaseCoordinator(): Promise<void> {
     await this.goto(releaseCoordinatorUrl);
   }
 
@@ -715,7 +715,7 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {boolean} enabled - Expected status of the Dummy Handler.
    */
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
-    await this.navigateToReleaseCoordinatorPage();
+    await this.navigateToReleaseCoordinatorPageInReleaseCoordinator();
     await this.navigateToFeaturesTab();
 
     try {

@@ -73,23 +73,27 @@ describe('Logged-Out Learner', function () {
       await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
       // Navigate to Exploration Editor.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToCreatorDashboardPageInExplorationEditor();
       await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
 
       // Add Interaction Cards.
-      await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.updateCardContent(
+      await curriculumAdmin.dismissWelcomeModalInCurriculumAdmin();
+      await curriculumAdmin.updateCardContentInExplorationEditor(
         'Welcome, to the Place Values Exploration.'
       );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await curriculumAdmin.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.CONTINUE_BUTTON
+      );
       await curriculumAdmin.viewOppiaResponses();
       await curriculumAdmin.directLearnersToNewCard('Second Card');
 
       await curriculumAdmin.navigateToCard('Second Card');
-      await curriculumAdmin.updateCardContent(
+      await curriculumAdmin.updateCardContentInExplorationEditor(
         "What is 3/6 equal to in it's simplest form?"
       );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+      await curriculumAdmin.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.FRACTION_INPUT
+      );
       await curriculumAdmin.addResponsesToTheInteraction(
         INTERACTION_TYPES.FRACTION_INPUT,
         '2',
@@ -102,16 +106,19 @@ describe('Logged-Out Learner', function () {
       );
 
       await curriculumAdmin.navigateToCard('Final Card');
-      await curriculumAdmin.updateCardContent(
+      await curriculumAdmin.updateCardContentInExplorationEditor(
         'You have successfully completed the lesson!'
       );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-      await curriculumAdmin.saveExplorationDraft();
-      explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-        'What are the Place Values?',
-        'Learn basic Mathematics including Place Values',
-        'Mathematics'
+      await curriculumAdmin.addInteractionInExplorationEditor(
+        INTERACTION_TYPES.END_EXPLORATION
       );
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
+      explorationId =
+        await curriculumAdmin.publishExplorationWithMetadataInExplorationEditor(
+          'What are the Place Values?',
+          'Learn basic Mathematics including Place Values',
+          'Mathematics'
+        );
 
       await curriculumAdmin.createAndPublishTopic(
         'Place Values',
@@ -134,7 +141,9 @@ describe('Logged-Out Learner', function () {
       );
 
       // Add Translations.
-      await curriculumAdmin.navigateToExplorationEditor(explorationId);
+      await curriculumAdmin.navigateToExplorationEditorInCurriculumAdmin(
+        explorationId
+      );
       await curriculumAdmin.navigateToCard('Second Card');
       await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.dismissTranslationTabWelcomeModal();
@@ -187,7 +196,7 @@ describe('Logged-Out Learner', function () {
         CONTINUE_INTERACTION_VOICEOVER_IN_HI
       );
 
-      await curriculumAdmin.saveExplorationDraft();
+      await curriculumAdmin.saveExplorationDraftInExplorationEditor();
     },
     // Setup takes more time than default.
     1000000
@@ -216,7 +225,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectVoiceoverIsPlayable(false);
 
     // Check audio (voiceover) avaibility in next card.
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
     await loggedOutLearner.expectVoiceoverIsPlayable();
 
     // Play Voiceovers.
@@ -227,17 +236,17 @@ describe('Logged-Out Learner', function () {
 
   it('should be able to change the audio language', async function () {
     // Play voiceovers in Hindi.
-    await loggedOutLearner.playExploration(explorationId);
+    await loggedOutLearner.playExplorationInLoggedOutUser(explorationId);
     await loggedOutLearner.changeLessonLanguage('hi');
 
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
     await loggedOutLearner.expectVoiceoverIsPlayable();
   });
 
   it('should be able to skip some parts of audio', async function () {
     await loggedOutLearner.reloadPage();
     await loggedOutLearner.changeLessonLanguage('hi');
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardInLoggedOutUser();
 
     await loggedOutLearner.expectVoiceoverIsSkippable();
   });

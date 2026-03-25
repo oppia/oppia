@@ -93,32 +93,39 @@ describe('Exploration Editor', function () {
     );
 
     // Navigate to the creator dashboard and create a new exploration.
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      INTRODUCTION_CARD_CONTENT
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add the final card.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
+    await explorationEditor.updateCardContentInExplorationEditor(
       'We have practiced negative numbers.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration',
-      'This is a test exploration.',
-      'Algebra'
-    );
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Test Exploration',
+        'This is a test exploration.',
+        'Algebra'
+      );
     if (!explorationId) {
       throw new Error('Error in publishing exploration successfully.');
     }
@@ -189,7 +196,7 @@ describe('Exploration Editor', function () {
       );
 
       await loggedOutUser.startVoiceover();
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCardInLoggedOutUser();
       await loggedOutUser.verifyVoiceoverIsPlaying(true);
 
       // Pausing the voiceover and restarting it to confirm that voiceover can be started on any state/card.

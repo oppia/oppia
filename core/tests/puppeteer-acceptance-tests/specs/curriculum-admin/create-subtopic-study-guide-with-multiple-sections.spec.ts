@@ -51,7 +51,7 @@ describe('Curriculum Admin', function () {
       'enable_worked_examples_rte_component'
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPageInCurriculumAdmin();
     await curriculumAdmin.createTopic('Addition and Subtraction', 'addsub');
 
     // Setup taking longer than 300000 ms.
@@ -70,7 +70,9 @@ describe('Curriculum Admin', function () {
       'subtopicWithSingleSection',
       __dirname
     );
-    await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
+    await curriculumAdmin.saveTopicDraftInCurriculumAdmin(
+      'Addition and Subtraction'
+    );
     await curriculumAdmin.checkAddSectionModalShowsLengthError();
     await curriculumAdmin.scrollToBottomOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
@@ -143,12 +145,14 @@ describe('Curriculum Admin', function () {
       }
     );
     await curriculumAdmin.deleteStudyGuideSection(1);
-    await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
+    await curriculumAdmin.saveTopicDraftInCurriculumAdmin(
+      'Addition and Subtraction'
+    );
   });
 
   it('should preview a study guide.', async function () {
     await curriculumAdmin.previewStudyGuide();
-    await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSections(
+    await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSectionsInCurriculumAdmin(
       'subtopic1',
       [
         ['abcd', '1234567'],

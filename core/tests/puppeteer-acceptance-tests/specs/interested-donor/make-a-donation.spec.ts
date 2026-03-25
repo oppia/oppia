@@ -34,7 +34,7 @@ describe('Interested Donor', function () {
     await interestedDonor.isDonorBoxVisbleOnDonatePage();
     await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);
 
-    await interestedDonor.navigateToSplashPage();
+    await interestedDonor.navigateToSplashPageInLoggedOutUser();
     await interestedDonor.clickDonateButtonOnNavbar();
     await interestedDonor.isDonorBoxVisbleOnDonatePage();
     await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);

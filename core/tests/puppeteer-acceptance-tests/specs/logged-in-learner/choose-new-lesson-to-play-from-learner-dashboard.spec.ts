@@ -65,12 +65,12 @@ describe('Logged-In Learner', function () {
 
       // Create explorations.
       explorationId1 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
           'Negative Numbers'
         );
 
       explorationId2 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitleInExplorationEditor(
           'Positive Numbers',
           'Algebra',
           false
@@ -102,7 +102,7 @@ describe('Logged-In Learner', function () {
         'Test Chapter 2',
         explorationId2 as string
       );
-      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
       await curriculumAdmin.publishStoryDraft();
     },
     // Test takes longer than default timeout.
@@ -138,7 +138,7 @@ describe('Logged-In Learner', function () {
     );
     await loggedInLearner.waitForNetworkIdle();
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardInLoggedInUser();
     // TODO(#20869): A flaky behaviour is observed due to issue in the backend.
     // Even after completing the lesson, the node isn't marked as completed.
     // Once fixed, uncomment the below code.
@@ -151,8 +151,8 @@ describe('Logged-In Learner', function () {
     // await loggedInLearner.resumeLessonFromLearnerDashboard(
     //   'Chapter 2: Test Chapter 2'
     // );
-    // await loggedInLearner.continueToNextCard();
-    // await loggedInLearner.navigateToLearnerDashboard();
+    // await loggedInLearner.continueToNextCardInLoggedOutUser();
+    // await loggedInLearner.navigateToLearnerDashboardInLoggedInUser();
 
     // await loggedInLearner.expectLearnSomethingNewInLDToBeEmpty()
     // await loggedInLearner.expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(

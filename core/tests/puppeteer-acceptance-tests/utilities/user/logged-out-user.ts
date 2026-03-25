@@ -948,7 +948,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the classrooms page.
    */
-  async navigateToClassroomsPage(verifyURL: boolean = true): Promise<void> {
+  async navigateToClassroomsPageInLoggedOutUser(
+    verifyURL: boolean = true
+  ): Promise<void> {
     if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
@@ -959,7 +961,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the splash page.
    * @param expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
-  async navigateToSplashPage(
+  async navigateToSplashPageInLoggedOutUser(
     expectedURL: string = `${baseUrl}/`
   ): Promise<void> {
     // We explicitly check for expected URL instead of verifying it through
@@ -972,7 +974,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the blog page
    */
-  async navigateToBlogPage(): Promise<void> {
+  async navigateToBlogPageInLoggedOutUser(): Promise<void> {
     await this.goto(blogUrl);
   }
 
@@ -1620,7 +1622,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
    */
-  async navigateToProfilePage(username: string): Promise<void> {
+  async navigateToProfilePageInLoggedOutUser(username: string): Promise<void> {
     const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
     if (this.page.url() === profilePageUrl) {
       return;
@@ -1631,11 +1633,11 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to subscribe to a creator with the given username.
    */
-  async subscribeToCreator(username: string): Promise<void> {
+  async subscribeToCreatorInLoggedOutUser(username: string): Promise<void> {
     const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
 
     if (this.page.url() !== profilePageUrl) {
-      await this.navigateToProfilePage(username);
+      await this.navigateToProfilePageInLoggedOutUser(username);
     }
 
     await this.clickOnElementWithSelector(subscribeButton);
@@ -1646,7 +1648,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks whether the exploration with the given title is authored by the creator.
    */
-  async expectExplorationToBePresentInProfilePageWithTitle(
+  async expectExplorationToBePresentInProfilePageWithTitleInLoggedOutUser(
     title: string
   ): Promise<void> {
     await this.page.waitForSelector(explorationCard);
@@ -3298,7 +3300,7 @@ export class LoggedOutUser extends BaseUser {
    * Click on the submit answer button.
    * @param skipVerification - If true, skips verification that the button is visible.
    */
-  async clickOnSubmitAnswerButton(): Promise<void> {
+  async clickOnSubmitAnswerButtonInLoggedOutUser(): Promise<void> {
     const feedbackSelector = '.e2e-test-conversation-feedback-latest';
 
     await this.expectElementToBeClickable(submitAnswerButton);
@@ -3397,7 +3399,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the next card in the preview tab.
    */
-  async continueToNextCard(): Promise<void> {
+  async continueToNextCardInLoggedOutUser(): Promise<void> {
     const currentCardContentSelector = `${stateConversationContent} p`;
     await this.page.waitForSelector(currentCardContentSelector);
     const currentCardContent = await this.page.$eval(
@@ -3441,13 +3443,13 @@ export class LoggedOutUser extends BaseUser {
    * Function to submit an answer to a form input field.
    * @param {string} answer - The answer to submit.
    */
-  async submitAnswer(answer: string): Promise<void> {
+  async submitAnswerInLoggedOutUser(answer: string): Promise<void> {
     // Allow input elements to be rendered and ready for interaction.
     await this.page.waitForTimeout(1000);
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.typeInInputField(submitResponseToInteractionInput, answer);
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInLoggedOutUser();
   }
 
   /**
@@ -3457,7 +3459,7 @@ export class LoggedOutUser extends BaseUser {
   async submitAnswerInTextArea(answer: string): Promise<void> {
     await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
     await this.typeInInputField(submitResponseToInteractionTextArea, answer);
-    await this.clickOnSubmitAnswerButton();
+    await this.clickOnSubmitAnswerButtonInLoggedOutUser();
   }
 
   /**
@@ -3565,21 +3567,25 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the Moderator Page.
    */
-  async navigateToModeratorPage(verifyURL: boolean = true): Promise<void> {
+  async navigateToModeratorPageInLoggedOutUser(
+    verifyURL: boolean = true
+  ): Promise<void> {
     await this.goto(moderatorPageUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Preferences Page.
    */
-  async navigateToPreferencesPage(verifyURL: boolean = true): Promise<void> {
+  async navigateToPreferencesPageInLoggedOutUser(
+    verifyURL: boolean = true
+  ): Promise<void> {
     await this.goto(preferencesPageUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Topics and Skills Dashboard Page.
    */
-  async navigateToTopicsAndSkillsDashboardPage(
+  async navigateToTopicsAndSkillsDashboardPageInLoggedOutUser(
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(topicsAndSkillsDashboardUrl, verifyURL);
@@ -3596,7 +3602,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the Learner Dashboard.
    */
-  async navigateToLearnerDashboard(verifyURL: boolean = true): Promise<void> {
+  async navigateToLearnerDashboardInLoggedOutUser(
+    verifyURL: boolean = true
+  ): Promise<void> {
     await this.goto(learnerDashboardUrl, verifyURL);
   }
 
@@ -4347,7 +4355,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string[][]} studyGuideSections - The expected sections of the study guide.
    * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
    */
-  async expectSubtopicStudyGuideToHaveTitleAndSections(
+  async expectSubtopicStudyGuideToHaveTitleAndSectionsInLoggedOutUser(
     studyGuideTitle: string,
     studyGuideSections: string[][]
   ): Promise<void> {
@@ -4513,7 +4521,10 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} feedback - The feedback to give on the exploration.
    * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
    */
-  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
+  async giveFeedbackInLoggedOutUser(
+    feedback: string,
+    stayAnonymous?: boolean
+  ): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
@@ -5483,7 +5494,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Verifies that the current page URL includes the expected page pathname.
    */
-  async expectToBeOnPage(expectedPage: string): Promise<void> {
+  async expectToBeOnPageInLoggedOutUser(expectedPage: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     const url = this.page.url();
 
@@ -5776,7 +5787,9 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to and plays an exploration by its ID.
    * @param {string | null} explorationId - The ID of the exploration to play.
    */
-  async playExploration(explorationId: string | null): Promise<void> {
+  async playExplorationInLoggedOutUser(
+    explorationId: string | null
+  ): Promise<void> {
     await this.goto(`${baseUrl}/explore/${explorationId as string}`);
   }
 
@@ -7030,8 +7043,10 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the blog post is present.
    * @param {string} expectedBlog - the title of the expected blog post.
    */
-  async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
-    await this.navigateToBlogPage();
+  async expectBlogPostToBePresentInLoggedOutUser(
+    expectedBlog: string
+  ): Promise<void> {
+    await this.navigateToBlogPageInLoggedOutUser();
 
     await this.expectElementToBeVisible(blogPostTitleSelector);
     const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
@@ -7112,7 +7127,7 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       // On mobile, navigate directly to blog URL since there's no blog button in sidebar.
       // Todo(#25094): Add blog button to mobile sidebar and remove this direct navigation.
-      await this.navigateToBlogPage();
+      await this.navigateToBlogPageInLoggedOutUser();
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
         visible: true,

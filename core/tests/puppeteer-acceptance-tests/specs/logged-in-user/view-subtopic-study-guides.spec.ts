@@ -81,7 +81,7 @@ describe('Logged-in User', function () {
       await loggedInUser1.selectAndOpenTopic('Addition and Subtraction');
       await loggedInUser1.navigateToStudyTab();
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
-      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
+      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSectionsInLoggedOutUser(
         'Adding Numbers',
         [
           ['Adding With Your Fingers', 'One way to add is using your...'],
@@ -98,19 +98,19 @@ describe('Logged-in User', function () {
         __dirname
       );
       await loggedInUser1.clickOnNextStudyGuideButton();
-      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
+      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSectionsInLoggedOutUser(
         'Subtracting Numbers',
         [['Common Mistakes', 'Some common mistakes students make are...']]
       );
       await loggedInUser1.clickOnStudyGuideMenuButton();
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnPracticeButton();
-      await loggedInUser1.expectToBeOnPage('practice');
+      await loggedInUser1.expectToBeOnPageInLoggedInUser('practice');
       await loggedInUser1.navigateToPracticeTabUsingURL('addition-and-subtrac');
       await loggedInUser1.navigateToStudyTab();
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnBackToTopicButton();
-      await loggedInUser1.expectToBeOnPage('story');
+      await loggedInUser1.expectToBeOnPageInLoggedInUser('story');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

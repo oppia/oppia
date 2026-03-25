@@ -432,7 +432,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
    */
-  async navigateToProfilePage(
+  async navigateToProfilePageInLoggedInUser(
     username: string,
     verifyURL: boolean = true
   ): Promise<void> {
@@ -447,7 +447,7 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the splash page.
    * @param expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
-  async navigateToSplashPage(
+  async navigateToSplashPageInLoggedInUser(
     expectedURL: string = learnerDashboardUrl
   ): Promise<void> {
     // We explicitly check for expected URL instead of verifying it through
@@ -460,7 +460,9 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the classrooms page.
    */
-  async navigateToClassroomsPage(verifyURL: boolean = true): Promise<void> {
+  async navigateToClassroomsPageInLoggedInUser(
+    verifyURL: boolean = true
+  ): Promise<void> {
     if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
@@ -507,10 +509,10 @@ export class LoggedInUser extends BaseUser {
    *     If not provided, the function will subscribe to the creator of the
    *     current page.
    */
-  async subscribeToCreator(username?: string): Promise<void> {
+  async subscribeToCreatorInLoggedInUser(username?: string): Promise<void> {
     // Navigate to user's profile if username is given.
     if (username) {
-      await this.navigateToProfilePage(username);
+      await this.navigateToProfilePageInLoggedInUser(username);
     }
 
     await this.clickOnElementWithSelector(subscribeButton);
@@ -523,7 +525,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the learner dashboard.
    */
-  async navigateToLearnerDashboard(): Promise<void> {
+  async navigateToLearnerDashboardInLoggedInUser(): Promise<void> {
     await this.goto(learnerDashboardUrl);
   }
 
@@ -688,7 +690,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Checks whether the exploration with the given title is authored by the creator.
    */
-  async expectExplorationToBePresentInProfilePageWithTitle(
+  async expectExplorationToBePresentInProfilePageWithTitleInLoggedInUser(
     title: string
   ): Promise<void> {
     await this.page.waitForSelector(explorationCard);
@@ -713,7 +715,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to preference page.
    */
-  async navigateToPreferencesPage(): Promise<void> {
+  async navigateToPreferencesPageInLoggedInUser(): Promise<void> {
     await this.goto(PreferencesPageUrl);
   }
 
@@ -741,7 +743,9 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the exploration page and starts playing the exploration.
    * @param {string} explorationId - The ID of the exploration to play.
    */
-  async playExploration(explorationId: string | null): Promise<void> {
+  async playExplorationInLoggedInUser(
+    explorationId: string | null
+  ): Promise<void> {
     await this.goto(`${baseUrl}/explore/${explorationId as string}`);
   }
 
@@ -1018,7 +1022,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Verifies that the current page URL includes the expected page pathname.
    */
-  async expectToBeOnPage(expectedPage: string): Promise<void> {
+  async expectToBeOnPageInLoggedInUser(expectedPage: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     const url = this.page.url();
 
@@ -2218,21 +2222,21 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Topics and Skills Dashboard page.
    */
-  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+  async navigateToTopicsAndSkillsDashboardPageInLoggedInUser(): Promise<void> {
     await this.goto(topicsAndSkillsDashboardUrl);
   }
 
   /**
    * Navigates to the Moderator page.
    */
-  async navigateToModeratorPage(): Promise<void> {
+  async navigateToModeratorPageInLoggedInUser(): Promise<void> {
     await this.goto(moderatorPageUrl);
   }
 
   /**
    * Navigates to the Release Coordinator page.
    */
-  async navigateToReleaseCoordinatorPage(): Promise<void> {
+  async navigateToReleaseCoordinatorPageInLoggedInUser(): Promise<void> {
     await this.goto(releaseCoordinatorPageUrl);
   }
 
@@ -2253,7 +2257,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
    */
-  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+  async navigateToCreatorDashboardUsingProfileDropdownInLoggedInUser(): Promise<void> {
     await this.page.waitForSelector(profileDropdown, {
       visible: true,
     });
@@ -2320,7 +2324,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Deletes the previous written title and updates the new title.
    */
-  async updateTitleTo(title: string): Promise<void> {
+  async updateTitleToInLoggedInUser(title: string): Promise<void> {
     await this.page.waitForSelector(addTitleBar, {
       visible: true,
     });
@@ -2345,7 +2349,7 @@ export class LoggedInUser extends BaseUser {
    * Open settings tab.(Note->It also opens all the dropdowns present
    * in the setting tab for mobile view port.)
    */
-  async navigateToSettingsTab(): Promise<void> {
+  async navigateToSettingsTabInLoggedInUser(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2377,7 +2381,7 @@ export class LoggedInUser extends BaseUser {
    * Function to navigate to exploration editor.
    * @param explorationUrl - url of the exploration.
    */
-  async navigateToExplorationEditor(
+  async navigateToExplorationEditorInLoggedInUser(
     explorationId: string | null
   ): Promise<void> {
     if (!explorationId) {
@@ -2392,7 +2396,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to Creator Dashboard Page
    */
-  async navigateToCreatorDashboardPage(): Promise<void> {
+  async navigateToCreatorDashboardPageInLoggedInUser(): Promise<void> {
     await this.goto(CreatorDashboardUrl);
     showMessage('Creator dashboard page is opened successfully.');
   }
@@ -2414,7 +2418,9 @@ export class LoggedInUser extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+  async dismissWelcomeModalInLoggedInUser(
+    failIfMissing: boolean = true
+  ): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
     await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
@@ -2423,7 +2429,7 @@ export class LoggedInUser extends BaseUser {
    * Function to add content to a card.
    * @param {string} content - The content to be added to the card.
    */
-  async updateCardContent(content: string): Promise<void> {
+  async updateCardContentInLoggedInUser(content: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
@@ -2522,7 +2528,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
-  async addInteraction(interactionToAdd: string): Promise<void> {
+  async addInteractionInLoggedInUser(interactionToAdd: string): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -2542,12 +2548,12 @@ export class LoggedInUser extends BaseUser {
    * @param content - content of the exploration
    * @param interaction - the interaction to be added to the exploration
    */
-  async createMinimalExploration(
+  async createMinimalExplorationInLoggedInUser(
     content: string,
     interaction: string
   ): Promise<void> {
-    await this.updateCardContent(content);
-    await this.addInteraction(interaction);
+    await this.updateCardContentInLoggedInUser(content);
+    await this.addInteractionInLoggedInUser(interaction);
     showMessage('A simple exploration is created.');
   }
 
@@ -2555,7 +2561,7 @@ export class LoggedInUser extends BaseUser {
    * Function to save an exploration draft.
    * @param {string} commitMessage - The commit message to be used for the commit.
    */
-  async saveExplorationDraft(
+  async saveExplorationDraftInLoggedInUser(
     commitMessage: string = 'Testing Testing'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -2598,7 +2604,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} category - The category of the exploration.,
    * @param {string} tags - The tags of the exploration.
    */
-  async publishExplorationWithMetadata(
+  async publishExplorationWithMetadataInLoggedInUser(
     title: string,
     goal: string,
     category: string,
@@ -2680,20 +2686,20 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function for creating an exploration with only EndExploration interaction with given title.
    */
-  async createAndPublishAMinimalExplorationWithTitle(
+  async createAndPublishAMinimalExplorationWithTitleInLoggedInUser(
     title: string,
     category: string = 'Algebra',
     expectedWelcomeModal: boolean = false
   ): Promise<string | null> {
-    await this.navigateToCreatorDashboardPage();
+    await this.navigateToCreatorDashboardPageInLoggedInUser();
     await this.navigateToExplorationEditorPageFromCreatorDashboard();
-    await this.dismissWelcomeModal(expectedWelcomeModal);
-    await this.createMinimalExploration(
+    await this.dismissWelcomeModalInLoggedInUser(expectedWelcomeModal);
+    await this.createMinimalExplorationInLoggedInUser(
       'Exploration intro text',
       'End Exploration'
     );
-    await this.saveExplorationDraft();
-    return await this.publishExplorationWithMetadata(
+    await this.saveExplorationDraftInLoggedInUser();
+    return await this.publishExplorationWithMetadataInLoggedInUser(
       title,
       'This is Goal here.',
       category
@@ -2704,7 +2710,7 @@ export class LoggedInUser extends BaseUser {
    * Opens an exploration in the editor.
    * @param {string} explorationName - The name of the exploration.
    */
-  async openExplorationInExplorationEditor(
+  async openExplorationInExplorationEditorInLoggedInUser(
     explorationName: string
   ): Promise<void> {
     await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
@@ -2877,7 +2883,10 @@ export class LoggedInUser extends BaseUser {
    * @param {string} feedback - The feedback text to submit.
    * @param {boolean} stayAnonymous - Whether to submit the feedback anonymously.
    */
-  async giveFeedback(feedback: string, stayAnonymous: boolean): Promise<void> {
+  async giveFeedbackInLoggedInUser(
+    feedback: string,
+    stayAnonymous: boolean
+  ): Promise<void> {
     await this.page.waitForSelector(feedbackTextareaSelector);
     await this.typeInInputField(feedbackTextareaSelector, feedback);
     if (stayAnonymous) {

@@ -117,7 +117,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
     }
 
-    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
 
     await curriculumAdmin.readyToPublish(
       'What are the Place Values',
@@ -148,7 +148,7 @@ describe('Logged-In Learner', function () {
   it(
     'should set goal, select topic with all chapter types and play published chapter successfully',
     async function () {
-      await loggedInLearner1.navigateToLearnerDashboard();
+      await loggedInLearner1.navigateToLearnerDashboardInLoggedInUser();
 
       await loggedInLearner1.navigateToGoalsSection();
       await loggedInLearner1.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
@@ -183,7 +183,7 @@ describe('Logged-In Learner', function () {
       //   'Find the Value of a Number' , false
       // );
 
-      await loggedInLearner1.navigateToLearnerDashboard();
+      await loggedInLearner1.navigateToLearnerDashboardInLoggedInUser();
       await loggedInLearner1.expectScreenshotToMatch(
         'Chap2ContinueWhereYouLeftOff',
         __dirname
@@ -319,7 +319,7 @@ describe('Logged-In Learner', function () {
       //   'Find the Value of a Number'
       // );
 
-      await loggedInLearner1.navigateToLearnerDashboard();
+      await loggedInLearner1.navigateToLearnerDashboardInLoggedInUser();
 
       await loggedInLearner1.expectScreenshotToMatch(
         'Chap2InProgressSectionChap3InRecommendedSection',

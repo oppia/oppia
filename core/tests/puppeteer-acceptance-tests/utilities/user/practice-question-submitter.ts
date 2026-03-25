@@ -232,7 +232,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    * Function to add a hint to the current state card.
    * @param {string} hint - The hint to be added to the current state card.
    */
-  async addHintToState(hint: string): Promise<void> {
+  async addHintToStateInPracticeQuestionSubmitter(hint: string): Promise<void> {
     await this.expectElementToBeVisible(addHintButton);
     await this.clickOnElementWithSelector(addHintButton);
     await this.typeInInputField(stateContentInputField, hint);
@@ -247,7 +247,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    * @param {string} answerExplanation - The explanation for this state card's solution.
    * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
    */
-  async addSolutionToState(
+  async addSolutionToStateInPracticeQuestionSubmitter(
     answer: string,
     answerExplanation: string,
     isSolutionNumericInput: boolean
@@ -466,7 +466,9 @@ export class PracticeQuestionSubmitter extends Contributor {
    * Adds a math interaction to the current exploration.
    * @param {string} interactionToAdd - The interaction type to add to the exploration.
    */
-  async addMathInteraction(interactionToAdd: string): Promise<void> {
+  async addMathInteractionInPracticeQuestionSubmitter(
+    interactionToAdd: string
+  ): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOnElementWithSelector(addInteractionButton);
     await this.clickOnElementWithSelector(mathInteractionsTab);
@@ -622,7 +624,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    * @param {'input' | 'textarea'} inputType - The type of the input field.
    * @param {number} index - The index of the input field.
    */
-  async fillValueInInteractionResponseModal(
+  async fillValueInInteractionResponseModalInPracticeQuestionSubmitter(
     value: string,
     inputType: 'input' | 'textarea',
     index: number = 0
@@ -680,7 +682,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.editDefaultResponseFeedbackInQuestionEditorPage(
       defaultResponseFeedback ?? 'Wrong Answer'
     );
-    await this.addHintToState(
+    await this.addHintToStateInPracticeQuestionSubmitter(
       hint ??
         'If you have 2 apples and someone gives you 3 apples, how many apples do you have?'
     );
