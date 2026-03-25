@@ -952,7 +952,7 @@ class UserSubmittedSuggestionsHandler(
             'limit': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 }
             },
             'offset': {
@@ -1033,9 +1033,6 @@ class UserSubmittedSuggestionsHandler(
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
-        if limit == 0:
-            self._render_suggestions(target_type, [], offset)
-            return
         topic_name = self.normalized_request.get('topic_name')
         language_code = self.normalized_request.get('language_code')
         if language_code == '':

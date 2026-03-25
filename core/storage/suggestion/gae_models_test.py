@@ -1622,6 +1622,54 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 0)
         self.assertEqual(offset, 0)
 
+    def test_user_created_suggestions_by_offset_with_more_than_30_target_ids(
+        self,
+    ) -> None:
+        user_id = 'author_over_30'
+        target_ids = [f'exp_{index}' for index in range(35)]
+        for index, target_id in enumerate(target_ids):
+            suggestion_models.GeneralSuggestionModel.create(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                target_id,
+                self.target_version_at_submission,
+                suggestion_models.STATUS_IN_REVIEW,
+                user_id,
+                'reviewer_2',
+                self.change_cmd,
+                self.score_category,
+                f'exploration.{target_id}.thread_{index}',
+                self.translation_language_code,
+            )
+
+        first_page_results, first_page_offset = (
+            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+                limit=20,
+                offset=0,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                target_ids=target_ids,
+            )
+        )
+        assert first_page_results is not None
+        self.assertEqual(len(first_page_results), 20)
+        self.assertEqual(first_page_offset, 20)
+
+        second_page_results, second_page_offset = (
+            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+                limit=20,
+                offset=20,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                target_ids=target_ids,
+            )
+        )
+        assert second_page_results is not None
+        self.assertEqual(len(second_page_results), 15)
+        self.assertEqual(second_page_offset, 35)
+
     def test_get_translation_suggestions_in_review_with_exp_id_with_invalid_exp(
         self,
     ) -> None:

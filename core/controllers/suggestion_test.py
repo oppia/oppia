@@ -3602,21 +3602,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(response, {})
 
-    def test_handler_returns_empty_for_zero_limit(self) -> None:
-        self.login(self.AUTHOR_EMAIL)
-
-        response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_question',
-            {
-                'limit': 0,
-                'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
-            },
-        )
-        self.assertEqual(response['suggestions'], [])
-        self.assertEqual(response['target_id_to_opportunity_dict'], {})
-        self.assertEqual(response['next_offset'], 0)
-
     def test_question_suggestions_returns_empty_for_topic_without_skills(
         self,
     ) -> None:

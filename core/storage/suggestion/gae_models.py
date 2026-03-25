@@ -72,6 +72,8 @@ REVIEW_OUTCOME_CHOICES: Final = [
 # suggestion recommendations.
 MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS: Final = 30
 MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS: Final = 30
+# Datastore IN filters can accept up to 30 values.
+MAX_VALUES_PER_IN_FILTER: Final = 30
 
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
@@ -1234,6 +1236,45 @@ class GeneralSuggestionModel(base_models.BaseModel):
         if target_ids is not None and len(target_ids) == 0:
             return ([], offset)
 
+        if (
+            target_ids is not None
+            and len(target_ids) > MAX_VALUES_PER_IN_FILTER
+        ):
+            fetched_suggestions: List[GeneralSuggestionModel] = []
+            seen_suggestion_ids = set()
+            for start in range(0, len(target_ids), MAX_VALUES_PER_IN_FILTER):
+                target_id_chunk = target_ids[
+                    start : start + MAX_VALUES_PER_IN_FILTER
+                ]
+                suggestion_query = (
+                    cls.get_all()
+                    .filter(
+                        datastore_services.all_of(
+                            cls.suggestion_type == suggestion_type,
+                            cls.author_id == user_id,
+                        )
+                    )
+                    .filter(cls.target_id.IN(target_id_chunk))
+                )
+                if language_code:
+                    suggestion_query = suggestion_query.filter(
+                        cls.language_code == language_code
+                    )
+                chunk_suggestions = suggestion_query.fetch()
+                for suggestion in chunk_suggestions:
+                    if suggestion.id not in seen_suggestion_ids:
+                        seen_suggestion_ids.add(suggestion.id)
+                        fetched_suggestions.append(suggestion)
+
+            if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+                fetched_suggestions.sort(
+                    key=lambda suggestion: suggestion.created_on, reverse=True
+                )
+
+            results = fetched_suggestions[offset : offset + limit]
+            next_offset = offset + len(results)
+            return (results, next_offset)
+
         suggestion_query = cls.get_all().filter(
             datastore_services.all_of(
                 cls.suggestion_type == suggestion_type, cls.author_id == user_id
@@ -1253,9 +1294,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             suggestion_query = suggestion_query.order(-cls.created_on)
 
-        results: Sequence[GeneralSuggestionModel] = suggestion_query.fetch(
-            limit, offset=offset
-        )
+        results = suggestion_query.fetch(limit, offset=offset)
         next_offset = offset + len(results)
 
         return (results, next_offset)
