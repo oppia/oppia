@@ -57,15 +57,18 @@ class UnsentFeedbackEmailHandler(
 
         feedback_services.update_feedback_email_retries_transactional(user_id)
 
+        unique_exp_ids = list({ref.entity_id for ref in references})
+        explorations_by_id = exp_fetchers.get_multiple_explorations_by_id(
+            unique_exp_ids
+        )
+
         messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
         for reference in references:
             message = feedback_services.get_message(
                 reference.thread_id, reference.message_id
             )
 
-            exploration = exp_fetchers.get_exploration_by_id(
-                reference.entity_id
-            )
+            exploration = explorations_by_id[reference.entity_id]
 
             message_text = message.text
             if len(message_text) > 200:
