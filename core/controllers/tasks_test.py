@@ -17,9 +17,11 @@
 from __future__ import annotations
 
 import uuid
+from unittest import mock
 
 from core import feconf
 from core.domain import (
+    email_manager,
     email_services,
     exp_fetchers,
     exp_services,
@@ -257,7 +259,56 @@ class TasksTests(test_utils.EmailTestBase):
             'The Oppia Contributor Dashboard Team'
         )
         self.assertEqual(messages[0].html, expected_email_html_body)
-        self.assertEqual(messages[0].subject, expected_email_subject)
+
+    self.assertEqual(messages[0].subject, expected_email_subject)
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com',
+            ),
+        ]
+    )
+    def test_unsent_feedback_email_drops_task_on_permanent_error(self) -> None:
+        """Test that permanent 4xx errors return 200 OK to drop the task."""
+        with self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.exploration.id,
+                self.user_id_a,
+                'a subject',
+                'some text',
+            )
+            threadlist = feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False
+            )
+            thread_id = threadlist.id
+            feedback_services.create_message(
+                thread_id, self.user_id_b, None, None, 'user b message'
+            )
+
+            mock_send_email = mock.Mock(
+                side_effect=email_services.PermanentEmailSendingError(
+                    'Fake 400 error'
+                )
+            )
+
+            with self.swap(
+                email_manager, 'send_feedback_message_email', mock_send_email
+            ):
+                self.process_and_flush_pending_tasks()
 
     @test_utils.set_platform_parameters(
         [
