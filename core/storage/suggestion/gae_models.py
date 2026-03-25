@@ -30,8 +30,8 @@ from typing import (
     Literal,
     Mapping,
     Optional,
-    Set,
     Sequence,
+    Set,
     Tuple,
     TypedDict,
     Union,
@@ -1248,6 +1248,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             def _created_on_for_sorting(
                 suggestion: GeneralSuggestionModel,
             ) -> datetime.datetime:
+                # Here use cast because `created_on` is inherited from the base
+                # model and is not narrowly typed as `datetime.datetime`, while
+                # sorting this list requires a concrete datetime sort key.
                 return cast(datetime.datetime, suggestion.created_on)
 
             for start in range(0, len(target_ids), MAX_VALUES_PER_IN_FILTER):
