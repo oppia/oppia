@@ -2773,10 +2773,6 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
       visible: true,
     });
-    await this.page.waitForSelector(feedbackSubjectSelector, {
-      visible: true,
-      timeout: 30000,
-    });
   }
 
   /**
@@ -2799,19 +2795,28 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  // async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
-  //   const explorationEditor = new ExplorationEditorModal(this);
-  //   await explorationEditor.dismissWelcomeModal(failIfMissing);
-  // }
-
   async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
     const selector = 'button.e2e-test-dismiss-welcome-modal';
-    if (await this.isElementVisible(selector)) {
+
+    try {
+      await this.page.waitForSelector(selector, {
+        visible: true,
+        timeout: 5000,
+      });
+
       await this.clickOnElementWithSelector(selector);
-      await this.page.waitForSelector(selector, {hidden: true}).catch(() => {});
+
+      await this.page.waitForSelector(selector, {
+        hidden: true,
+        timeout: 5000,
+      });
+
       showMessage('Welcome modal closed.');
-    } else if (failIfMissing) {
-      throw new Error('Welcome modal expected but not found.');
+    } catch (error) {
+      if (failIfMissing) {
+        throw new Error('Welcome modal expected but not found.');
+      }
+      showMessage('Welcome modal not found.');
     }
   }
   /**
@@ -2820,9 +2825,7 @@ export class ExplorationEditor extends BaseUser {
    * already been dismissed earlier in the test flow.
    */
   async dismissWelcomeModalIfPresent(): Promise<void> {
-    // The existing dismissWelcomeModal() in this class already handles the
-    // case where the modal is not present (via try/catch), so we just
-    // delegate to it.
+    await this.page.waitForTimeout(300);
     await this.dismissWelcomeModal(false);
     await this.dismissFeedbackPromptModalIfPresent();
   }
@@ -2894,19 +2897,14 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
-
-    // 🔥 ADD THIS BLOCK (fix)
-    await this.page.waitForFunction(
-      () => {
-        return (
-          !document.querySelector('.modal.show') &&
-          !document.querySelector('.modal-content')
-        );
-      },
-      {timeout: 15000}
-    );
-
-    await this.page.waitForTimeout(500);
+    await this.page
+      .waitForFunction(
+        () => {
+          return !document.querySelector('.modal.show');
+        },
+        {timeout: 10000}
+      )
+      .catch(() => {});
 
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);

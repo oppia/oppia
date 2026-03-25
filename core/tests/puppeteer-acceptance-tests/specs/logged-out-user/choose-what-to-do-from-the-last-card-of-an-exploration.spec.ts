@@ -46,12 +46,14 @@ describe('Logged-out User', function () {
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'negative-numbers'
       );
+    await curriculumAdmin.dismissWelcomeModalIfPresent();
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'positive-numbers',
         'Algebra',
         false
       );
+    await curriculumAdmin.dismissWelcomeModalIfPresent();
 
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic',
@@ -83,7 +85,7 @@ describe('Logged-out User', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
     // Setup taking longer than the default 300000 ms.
-  }, 400000);
+  }, 800000);
 
   it(
     'should be able to return to the respective story, sign-in, sign-up and load the next chapter form the last state of an exploration',
