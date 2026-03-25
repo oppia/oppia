@@ -218,7 +218,7 @@ class EditableSkillDataHandler(
 
         self.values.update(
             {
-                'skill': skill.to_dict(),
+                'skill_dict': skill.to_dict(),
                 'assigned_skill_topic_data_dict': assigned_skill_topic_data_dict,
                 'grouped_skill_summaries': grouped_skill_summary_dicts,
             }
@@ -270,7 +270,7 @@ class EditableSkillDataHandler(
 
         skill_dict = skill_fetchers.get_skill_by_id(skill_id).to_dict()
 
-        self.values.update({'skill': skill_dict})
+        self.values.update({'skill_dict': skill_dict})
 
         self.render_json(self.values)
 

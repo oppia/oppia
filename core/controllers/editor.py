@@ -767,7 +767,7 @@ class ExplorationModeratorRightsHandler(
 
         self.render_json(
             {
-                'rights': exp_rights.to_dict(),
+                'rights_dict': exp_rights.to_dict(),
             }
         )
 
@@ -838,7 +838,7 @@ class UserExplorationEmailsHandler(
             )
         )
         self.render_json(
-            {'email_preferences': exploration_email_preferences.to_dict()}
+            {'email_preferences_dict': exploration_email_preferences.to_dict()}
         )
 
 
