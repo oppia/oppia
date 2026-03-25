@@ -39,6 +39,7 @@ export class BackgroundBannerComponent implements OnInit {
         Math.floor(Math.random() * possibleBannerFilenames.length)
       ];
 
+    // Use a deterministic banner only for acceptance screenshot tests.
     if (AppConstants.SCREENSHOT_CONSISTENCY) {
       bannerImageFilename = 'bannerA.svg';
     }

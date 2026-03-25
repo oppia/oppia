@@ -386,7 +386,10 @@ def get_gravatar_url(email: str) -> str:
     Returns:
         str. The gravatar url for the specified email.
     """
-    if feconf.SCREENSHOT_CONSISTENCY:
+    if (
+        feconf.SCREENSHOT_CONSISTENCY
+        and not feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+    ):
         email = 'other@example.com'
 
     # The md5 accepts only bytes, so we first need to encode the email to bytes.
