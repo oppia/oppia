@@ -2429,10 +2429,6 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
 
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.keyboard.press('Enter');
-    }
-
     await this.page.waitForSelector(topicSelector, {visible: true});
     const options = await this.page.$$(topicSelector);
     let foundOption = false;
@@ -2448,10 +2444,6 @@ export class CurriculumAdmin extends TopicManager {
 
     if (!foundOption) {
       throw new Error(`Could not find topic option matching: ${topicName}`);
-    }
-
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.keyboard.press('Escape');
     }
 
     await this.page.waitForSelector(openTopicDropdownButton);
