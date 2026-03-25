@@ -30,10 +30,12 @@ from typing import (
     Literal,
     Mapping,
     Optional,
+    Set,
     Sequence,
     Tuple,
     TypedDict,
     Union,
+    cast,
 )
 
 MYPY = False
@@ -1241,7 +1243,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
             and len(target_ids) > MAX_VALUES_PER_IN_FILTER
         ):
             fetched_suggestions: List[GeneralSuggestionModel] = []
-            seen_suggestion_ids = set()
+            seen_suggestion_ids: Set[str] = set()
+
+            def _created_on_for_sorting(
+                suggestion: GeneralSuggestionModel,
+            ) -> datetime.datetime:
+                return cast(datetime.datetime, suggestion.created_on)
+
             for start in range(0, len(target_ids), MAX_VALUES_PER_IN_FILTER):
                 target_id_chunk = target_ids[
                     start : start + MAX_VALUES_PER_IN_FILTER
@@ -1260,7 +1268,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_query = suggestion_query.filter(
                         cls.language_code == language_code
                     )
-                chunk_suggestions = suggestion_query.fetch()
+                chunk_suggestions: Sequence[GeneralSuggestionModel] = (
+                    suggestion_query.fetch()
+                )
                 for suggestion in chunk_suggestions:
                     if suggestion.id not in seen_suggestion_ids:
                         seen_suggestion_ids.add(suggestion.id)
@@ -1268,12 +1278,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
             if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
                 fetched_suggestions.sort(
-                    key=lambda suggestion: suggestion.created_on, reverse=True
+                    key=_created_on_for_sorting, reverse=True
                 )
 
-            results = fetched_suggestions[offset : offset + limit]
-            next_offset = offset + len(results)
-            return (results, next_offset)
+            paginated_results: Sequence[GeneralSuggestionModel] = (
+                fetched_suggestions[offset : offset + limit]
+            )
+            next_offset = offset + len(paginated_results)
+            return (paginated_results, next_offset)
 
         suggestion_query = cls.get_all().filter(
             datastore_services.all_of(
@@ -1294,7 +1306,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             suggestion_query = suggestion_query.order(-cls.created_on)
 
-        results = suggestion_query.fetch(limit, offset=offset)
+        results: Sequence[GeneralSuggestionModel] = suggestion_query.fetch(
+            limit, offset=offset
+        )
         next_offset = offset + len(results)
 
         return (results, next_offset)
