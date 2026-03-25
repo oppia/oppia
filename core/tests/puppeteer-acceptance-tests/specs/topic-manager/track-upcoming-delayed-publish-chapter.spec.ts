@@ -39,8 +39,6 @@ const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
 const cancelUnpublishModalButton = '.e2e-test-cancel-unpublish-modal-button';
 const chapterConfirmAndUnpublishButton =
   '.e2e-test-confirm-unpublish-modal-button';
-const mobileSaveStoryChangesDropdown =
-  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
 const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const publishUptoChaptersDropdownSelector =
