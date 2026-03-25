@@ -35,6 +35,7 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
     ) -> None:
         model = base_models.BaseModel(id='test_id')
         model.exp_id = 'test_exp_id'
+        model.exp_version = 2
 
         error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
             model
@@ -42,7 +43,7 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
 
         self.assertEqual(
             'InvalidExplorationIdError in BaseModel(id="test_id"): '
-            'exp_id test_exp_id does not correspond to a valid ExplorationModel',
+            'exp_id=test_exp_id with exp_version=2 does not correspond to a valid ExplorationModel',
             error.stderr,
         )
 

@@ -34,7 +34,7 @@ class InvalidExplorationIdError(base_validation_errors.BaseValidationError):
     def __init__(
         self, model: stats_models.AnswerSubmittedEventLogEntryModel
     ) -> None:
-        message = f'exp_id {model.exp_id} does not correspond to a valid ExplorationModel'
+        message = f'exp_id={model.exp_id} with exp_version={model.exp_version} does not correspond to a valid ExplorationModel'
         super().__init__(message, model)
 
 
