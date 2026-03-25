@@ -2428,31 +2428,36 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
-    await this.clickOnElementWithSelector(topicSelector);
-    const targetOptionHandle = (await this.page.waitForFunction(
-      (selector: string, expectedName: string) => {
-        const options = Array.from(document.querySelectorAll(selector));
-        return options.find(
-          option => option.textContent?.trim() === expectedName
-        );
-      },
-      {timeout: 10000},
-      topicSelector,
-      topicName
-    )) as ElementHandle;
 
-    await this.page.evaluate(
-      (el: HTMLElement) =>
-        el.scrollIntoView({behavior: 'instant', block: 'center'}),
-      targetOptionHandle
-    );
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.keyboard.press('Enter');
+    }
 
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await this.page.waitForSelector(topicSelector, {visible: true});
+    const options = await this.page.$$(topicSelector);
+    let foundOption = false;
 
-    await targetOptionHandle.click();
+    for (const option of options) {
+      const text = await option.evaluate(el => el.textContent?.trim());
+      if (text === topicName) {
+        await this.clickOnElement(option);
+        foundOption = true;
+        break;
+      }
+    }
+
+    if (!foundOption) {
+      throw new Error(`Could not find topic option matching: ${topicName}`);
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.keyboard.press('Escape');
+    }
+
     await this.page.waitForSelector(openTopicDropdownButton);
 
-    // Wait for the topic to appear in the classroom before adding prerequisites.
+    await this.waitForNetworkIdle(); // Wait for the topic to appear in the classroom before adding prerequisites.
+
     // Increased timeout to 60s because addTopicId makes an async API call that can take time.
     await this.page.waitForFunction(
       (
