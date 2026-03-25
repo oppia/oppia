@@ -17,10 +17,10 @@
  */
 
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {AlertsService} from 'services/alerts.service';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {CreateFeedbackThreadModalComponent} from './create-feedback-thread-modal.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgForm} from '@angular/forms';
 
 class MockActiveModal {
   close(): void {
@@ -35,8 +35,15 @@ class MockActiveModal {
 describe('Create Feedback Thread Modal Controller', function () {
   let component: CreateFeedbackThreadModalComponent;
   let fixture: ComponentFixture<CreateFeedbackThreadModalComponent>;
-  let alertsService: AlertsService;
   let ngbActiveModal: NgbActiveModal;
+  const buildMockForm = (invalid: boolean): NgForm => {
+    return {
+      invalid: invalid,
+      form: {
+        markAllAsTouched: jasmine.createSpy('markAllAsTouched'),
+      },
+    } as unknown as NgForm;
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -56,8 +63,6 @@ describe('Create Feedback Thread Modal Controller', function () {
     component = fixture.componentInstance;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    alertsService = TestBed.inject(AlertsService);
-
     fixture.detectChanges();
   });
 
@@ -66,48 +71,132 @@ describe('Create Feedback Thread Modal Controller', function () {
     expect(component.newThreadText).toEqual('');
   });
 
-  it('should not close modal when new thread subject is empty', function () {
-    spyOn(alertsService, 'addWarning').and.callThrough();
+  it('should not close modal when form is invalid', function () {
     spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(true);
+    component.newThreadSubject = 'Subject 123';
+    component.newThreadText = 'Message text 12345';
 
-    let newThreadSubject = '';
-    let newThreadText = 'text';
-    component.create(newThreadSubject, newThreadText);
+    component.create(mockForm);
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Please specify a thread subject.'
-    );
+    expect(mockForm.form.markAllAsTouched).toHaveBeenCalled();
     expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
-  it('should not close modal when new thread text is empty', function () {
-    spyOn(alertsService, 'addWarning').and.callThrough();
+  it('should close modal when form is valid', function () {
     spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = 'Subject 123';
+    component.newThreadText = 'Message text 12345';
 
-    let newThreadSubject = 'subject';
-    let newThreadText = '';
-    component.create(newThreadSubject, newThreadText);
+    component.create(mockForm);
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Please specify a message.'
-    );
+    expect(mockForm.form.markAllAsTouched).not.toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      newThreadSubject: 'Subject 123',
+      newThreadText: 'Message text 12345',
+    });
+  });
+
+  it('should trim subject and message before closing modal', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = '  Subject 123  ';
+    component.newThreadText = '\nMessage text 12345   ';
+
+    component.create(mockForm);
+
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      newThreadSubject: 'Subject 123',
+      newThreadText: 'Message text 12345',
+    });
+  });
+
+  it('should not close modal when subject length exceeds limit', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = 'a'.repeat(component.SUBJECT_MAX_CHARS + 1);
+    component.newThreadText = 'Message text 12345';
+
+    component.create(mockForm);
+
+    expect(mockForm.form.markAllAsTouched).toHaveBeenCalled();
     expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
-  it(
-    'should close modal when both new thread subject and new thread text are' +
-      ' valid',
-    function () {
-      spyOn(ngbActiveModal, 'close').and.callThrough();
+  it('should not close modal when message length exceeds limit', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = 'Subject 123';
+    component.newThreadText = 'a'.repeat(component.MESSAGE_MAX_CHARS + 1);
 
-      let newThreadSubject = 'subject';
-      let newThreadText = 'text';
-      component.create(newThreadSubject, newThreadText);
+    component.create(mockForm);
 
-      expect(ngbActiveModal.close).toHaveBeenCalledWith({
-        newThreadSubject: 'subject',
-        newThreadText: 'text',
-      });
-    }
-  );
+    expect(mockForm.form.markAllAsTouched).toHaveBeenCalled();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+  });
+
+  it('should not close modal when subject shorter than limit', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = 'ab';
+    component.newThreadText = 'Message text 12345';
+
+    component.create(mockForm);
+
+    expect(mockForm.form.markAllAsTouched).toHaveBeenCalled();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+  });
+
+  it('should not close modal when message shorter than limit', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = 'Subject 123';
+    component.newThreadText = '123456789';
+
+    component.create(mockForm);
+
+    expect(mockForm.form.markAllAsTouched).toHaveBeenCalled();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+  });
+
+  it('should activate subject validation flag when subject invalid', function () {
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = 'ab';
+    component.newThreadText = 'Message text 12345';
+
+    component.create(mockForm);
+
+    expect(component.subjectValidationActive).toBeTrue();
+    expect(component.messageValidationActive).toBeFalse();
+  });
+
+  it('should clear subject validation flag after fixing value', function () {
+    component.subjectValidationActive = true;
+    component.newThreadSubject = 'Valid subject';
+
+    component.onSubjectInputChange();
+
+    expect(component.subjectValidationActive).toBeFalse();
+  });
+
+  it('should activate message validation flag when message invalid', function () {
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = 'Subject 123';
+    component.newThreadText = '123456789';
+
+    component.create(mockForm);
+
+    expect(component.messageValidationActive).toBeTrue();
+    expect(component.subjectValidationActive).toBeFalse();
+  });
+
+  it('should clear message validation flag after fixing value', function () {
+    component.messageValidationActive = true;
+    component.newThreadText = 'Message text 12345';
+
+    component.onMessageInputChange();
+
+    expect(component.messageValidationActive).toBeFalse();
+  });
 });
