@@ -547,6 +547,14 @@
     {
       "name": "logged-out-user/select-and-play-topic-from-classroom-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
+    },
+    {
+      "name": "translation-submitter/check-contribution-stats-download-certificate-and-badges",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-contribution-stats-download-certificate-and-badges.spec.ts"
+    },
+    {
+      "name": "translation-reviewer/check-contribution-stats-download-certificate-and-badges",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/check-contribution-stats-download-certificate-and-badges.spec.ts"
     }
   ]
 }

@@ -44,6 +44,8 @@ const badgeSelector = '.e2e-test-badge';
 const badgeValueSelector = '.e2e-test-badge-value';
 const badgeCaptionSelector = '.e2e-test-badge-caption';
 const badgeLanguageSelector = '.e2e-test-badge-language';
+const lockedBadgeContainerSelector = '.locked-badge-container';
+const popoverBodySelector = '.popover-body';
 
 const topicSelector = '.e2e-test-topic-selector';
 const selectedTopicSelector = '.e2e-test-topic-selector-selected';
@@ -337,6 +339,89 @@ export class Contributor extends ExplorationEditor {
     }
     if (!badge) {
       throw new Error('Badge not found.');
+    }
+  }
+
+  /**
+   * Hovers over the first locked badge in the badge panel and verifies the
+   * ngbPopover tooltip text matches the expected string.
+   * @param {string} expectedText - The expected popover text.
+   */
+  async expectLockedBadgeTooltipText(expectedText: string): Promise<void> {
+    const viewBasedBadgeContainerSelector = this.isViewportAtMobileWidth()
+      ? `${mobileBadgeContainerSelector} ${lockedBadgeContainerSelector}`
+      : `${desktopBadgeContainerSelector} ${lockedBadgeContainerSelector}`;
+    await this.expectElementToBeVisible(viewBasedBadgeContainerSelector);
+    // Hover over the first locked badge to trigger the ngbPopover.
+    const lockedBadge = await this.page.$(viewBasedBadgeContainerSelector);
+    if (!lockedBadge) {
+      throw new Error('No locked badge found.');
+    }
+    // Use page.mouse.move() for more reliable hover triggering in headless mode.
+    const boundingBox = await lockedBadge.boundingBox();
+    if (!boundingBox) {
+      throw new Error('Could not get bounding box for locked badge.');
+    }
+    await this.page.mouse.move(
+      boundingBox.x + boundingBox.width / 2,
+      boundingBox.y + boundingBox.height / 2
+    );
+    // Wait for the popover to appear (ngbPopover may take a moment to render).
+    await this.page.waitForSelector(popoverBodySelector, {
+      visible: true,
+      timeout: 60000,
+    });
+    const popoverText = await this.page.$eval(popoverBodySelector, el =>
+      el.textContent?.trim()
+    );
+    expect(popoverText).toBe(expectedText);
+  }
+
+  /**
+   * Selects a language from the language dropdown in the badges panel.
+   * Only applies to the desktop view; on mobile, the selectBadgeTypeInMobileView
+   * selects the language separately.
+   * @param {string} language - Display name of the language to select, e.g. 'العربية'.
+   */
+  async selectBadgeLanguageInPanel(language: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // In mobile view, use the mobile language selector (also uses
+      // topicOptionSelector / topicSelector).
+      await this.clickOnElementWithSelector(topicSelector);
+      await this.expectElementToBeVisible(topicOptionSelector);
+      const optionXPath = `//*[contains(@class, 'e2e-test-topic-selector-option') and contains(text(), '${language}')]`;
+      const optionEl = await this.page.waitForXPath(optionXPath);
+      if (!optionEl) {
+        throw new Error(
+          `Language option '${language}' not found in mobile panel.`
+        );
+      }
+      await optionEl.click();
+    } else {
+      // Desktop view: the language selector in the badge panel is inside
+      // `.e2e-test-desktop-badge-container`. We scope the selector to it
+      // to avoid accidentally clicking a hidden mobile element.
+      const desktopBadgeSelector = `${desktopBadgeContainerSelector} .e2e-test-topic-selector-selected`;
+      await this.waitForElementToStabilize(desktopBadgeSelector);
+      const languageSelectorEl = await this.page.$(desktopBadgeSelector);
+      if (!languageSelectorEl) {
+        throw new Error('No selector found for language in badge panel.');
+      }
+      await languageSelectorEl.click();
+      await this.expectElementToBeVisible(topicOptionSelector);
+      const options = await this.page.$$(topicOptionSelector);
+      let found = false;
+      for (const option of options) {
+        const text = await option.evaluate(el => el.textContent?.trim());
+        if (text === language) {
+          await option.click();
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        throw new Error(`Language '${language}' not found in badge panel.`);
+      }
     }
   }
 

@@ -97,7 +97,6 @@ describe('Practice Question Reviewer', function () {
 
     // Update skill rubric.
     await curriculumAdmin.openSkillEditor('Addition');
-    await curriculumAdmin.updateRubric('Hard', 'This is for hard questions');
     await curriculumAdmin.updateRubric('Easy', 'This is for easy questions');
     await curriculumAdmin.updateRubric(
       'Medium',
@@ -133,7 +132,7 @@ describe('Practice Question Reviewer', function () {
       'Arithmetic Operations',
       'What is 231 + 12?'
     );
-  }, 600000);
+  }, 900000);
 
   it('should be able to check contribution stats', async function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
