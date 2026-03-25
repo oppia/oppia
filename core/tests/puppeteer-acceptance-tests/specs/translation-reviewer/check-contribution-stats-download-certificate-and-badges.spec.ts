@@ -40,13 +40,11 @@ describe('Translation Reviewer', function () {
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
   beforeAll(async function () {
-    // Create all users.
     translationSubmitter = await UserFactory.createNewUser(
       'translationsubmitter',
       'translationsubmitter@example.com'
     );
 
-    // Translation reviewer is given Arabic review rights.
     translationReviewer = await UserFactory.createNewUser(
       'translationreviewer',
       'translationreviewer@example.com',
@@ -60,13 +58,11 @@ describe('Translation Reviewer', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Create and publish an exploration with 2 cards.
     const explorationId =
       await curriculumAdm.createAndPublishExplorationWithCards(
         'First Exploration'
       );
 
-    // Set up topic, skill, story, chapter, and classroom.
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
       'Test Topic',
@@ -87,7 +83,6 @@ describe('Translation Reviewer', function () {
       'Test Topic'
     );
 
-    // Translation submitter submits translations in Arabic.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -106,7 +101,6 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE('محتوى البطاقة 1');
     await translationSubmitter.clickOnElementWithText('Save and close');
 
-    // Translation reviewer reviews and accepts the submitted translations.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'First Chapter',
@@ -116,7 +110,7 @@ describe('Translation Reviewer', function () {
       'محتوى البطاقة 0',
       'Test Topic / Test Story'
     );
-    // Accept both card translations.
+
     await translationReviewer.submitTranslationReview('accept');
     await translationReviewer.submitTranslationReview('accept');
 
@@ -126,7 +120,6 @@ describe('Translation Reviewer', function () {
   }, 900000);
 
   it('should be able to check contribution stats', async function () {
-    // Navigate to Contribution Stats and select Translation Reviews.
     await translationReviewer.navigateToTabInMyContributions(
       'Contribution Stats'
     );
@@ -134,16 +127,13 @@ describe('Translation Reviewer', function () {
       'Translation Reviews'
     );
 
-    // Verify the stats table row contains the expected data.
-    // Column order for translation reviews: Date | Topic | Reviewed Cards |
-    // Reviewed Word Count | Accepted Cards | Accepted Word Count.
     await translationReviewer.expectContributionTableToContainRow([
-      null, // Date — changes every run.
-      'Test Topic', // Topic.
-      '2', // Reviewed cards (both cards submitted were reviewed).
-      null, // Reviewed word count can vary by card content.
-      '2', // Accepted cards (both cards were accepted).
-      null, // Accepted word count can vary by card content.
+      null,
+      'Test Topic',
+      '2',
+      null,
+      '2',
+      null,
     ]);
   });
 
@@ -157,13 +147,8 @@ describe('Translation Reviewer', function () {
 
   it('should be able to check badges earned', async function () {
     await translationReviewer.navigateToTabInMyContributions('Badges');
-    // Select Translation type in mobile view (desktop shows all badges).
     await translationReviewer.selectBadgeTypeInMobileView('Translation');
-    // Should show a badge for 2 translation reviews (both cards accepted).
-    // The badge value '1' is the threshold level of the first badge.
     await translationReviewer.expectBadgesToContain('1', 'Review', 'العربية');
-    // Verify the tooltip on the first locked (next achievable) badge.
-    // With 2 reviews done and next threshold at 10: 10 - 2 = 8 more needed.
     await translationReviewer.expectLockedBadgeTooltipText(
       '8 more reviews to achieve this badge'
     );
