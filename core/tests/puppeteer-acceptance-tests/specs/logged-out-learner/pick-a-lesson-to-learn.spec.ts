@@ -121,8 +121,8 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.saveStoryDraft();
       await curriculumAdmin.publishStoryDraft();
     },
-    // Test takes longer than default timeout.
-    500000
+    // Test setup is heavy and can exceed the previous timeout in CI.
+    700000
   );
 
   it('should be able to find a lesson to start learning', async function () {
