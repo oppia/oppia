@@ -505,7 +505,7 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
             rule_spec_index=1,
             classification_categorization=category,
             session_id=session_id,
-            time_spent_in_secs=2,
+            time_spent_in_secs=2.0,
             params={},
             normalized_answer='answer_submitted',
         )
