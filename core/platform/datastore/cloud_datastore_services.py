@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import time
 
 from core import utils
 from core.platform import models
@@ -132,6 +133,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
             return ndb.get_multi(keys)
         except Exception as e:
             logging.exception('Exception raised: %s', e)
+            time.sleep(0.01)
             continue
     raise Exception('get_multi failed after %s retries' % MAX_GET_RETRIES)
 

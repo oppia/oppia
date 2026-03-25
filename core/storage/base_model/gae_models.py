@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import enum
 import re
+import time
 
 from core import feconf, utils
 from core.constants import constants
@@ -531,6 +532,7 @@ class BaseModel(datastore_services.Model):
             )
             if not cls.get_by_id(new_id):
                 return new_id
+            time.sleep(0.01)
 
         raise Exception('New id generator is producing too many collisions.')
 
