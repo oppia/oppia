@@ -155,7 +155,7 @@ export class UserFactory {
         );
         const roleProp = Object.getOwnPropertyDescriptor(rolePrototype, name);
 
-        // This prevents the trap from crashing on idempotent (identical) function bindings!
+        // This prevents the trap from crashing on idempotent (identical) function bindings.
         if (existingProp && existingProp.value !== roleProp?.value) {
           throw new Error(
             "Method collision in composeUserWithRoles: '" +
