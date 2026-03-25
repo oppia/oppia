@@ -993,6 +993,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
 
+
 class EmailMockTests(test_utils.EmailTestBase):
     """Class for testing EmailTestBase."""
 
