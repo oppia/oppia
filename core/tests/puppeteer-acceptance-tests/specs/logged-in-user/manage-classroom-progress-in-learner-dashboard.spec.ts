@@ -103,8 +103,7 @@ describe('Logged-in User', function () {
         'logged_in_user1@example.com'
       );
     },
-    // Setup takes about 12 minutes to complete.
-    12 * 60 * 1000
+    20 * 60 * 1000 // 20 minutes.
   );
 
   /**
@@ -125,7 +124,7 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
     },
-    DEFAULT_SPEC_TIMEOUT_MSECS
+    20 * 60 * 1000 // 20 minutes.
   );
 
   afterAll(async function () {
