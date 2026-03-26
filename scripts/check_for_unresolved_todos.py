@@ -64,9 +64,11 @@ def check_if_todo_is_associated_with_issue(
     todo: todo_finder.TodoDict, issue_number: int
 ) -> bool:
     """Checks if the todo is associated with the issue.
+
     Args:
         todo: TodoDict. The todo to check.
         issue_number: int. The issue number to check for.
+
     Returns:
         bool. Whether the todo is associated with the issue.
     """
@@ -84,6 +86,7 @@ def append_todos_to_file(
 ) -> None:
     """Appends to the todo list file with the todos information and the github
     perma link for the line.
+
     Args:
         repository_path: str. The path to the repository.
         todos: List[TodoDict]. The todos to generate the file with.
@@ -113,6 +116,7 @@ def log_unresolved_todos_failure(
     repository_path: str, todos: List[todo_finder.TodoDict], issue_number: int
 ) -> None:
     """Logs the unresolved todos to the console.
+
     Args:
         repository_path: str. The path to the repository.
         todos: List[TodoDict]. The todos to log.

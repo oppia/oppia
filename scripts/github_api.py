@@ -46,9 +46,11 @@ class GitHubCommentDict(TypedDict):
 def deep_get(data: Optional[Dict[str, Any]], keys: List[str]) -> Any:
     """Gets a value from a nested dictionary. If the key is not found, it
     returns None.
+
     Args:
         data: dict. The dictionary to get the value from.
         keys: List[str]. The keys to traverse the dictionary.
+
     Returns:
         Any. The value from the nested dictionary.
     """
@@ -59,8 +61,10 @@ def deep_get(data: Optional[Dict[str, Any]], keys: List[str]) -> Any:
 
 def get_github_auth_token() -> str:
     """Gets the GitHub auth token from the environment.
+
     Returns:
         str. The GitHub auth token.
+
     Raises:
         RuntimeError. GitHub CLI is not installed.
         RuntimeError. Failed to get GitHub auth token.
@@ -102,10 +106,13 @@ def get_github_api_authorization_header() -> str:
 # is in the form of Dict[str, Any]
 def run_graphql_query(query: str) -> Dict[str, Any]:
     """Runs a GraphQL query on the Oppia repository.
+
     Args:
         query: str. The query to run.
+
     Returns:
         str. The response from the GraphQL query in JSON.
+
     Raises:
         RuntimeError. Failed to run GraphQL query due to a request error.
         RuntimeError. Failed to run GraphQL query due to an API error.
@@ -154,10 +161,13 @@ def fetch_linked_issues_for_pull_request(
     pull_request: int,
 ) -> List[GitHubIssueDict]:
     """Fetches the linked issues for a pull request.
+
     Args:
         pull_request: int. The pull request number.
+
     Returns:
         List[GitHubIssueDict]. The linked issues for the pull request.
+
     Raises:
         Exception. The pull request does not exist.
     """
@@ -191,10 +201,13 @@ def fetch_latest_comment_for_issue(
     issue_number: int,
 ) -> Optional[GitHubCommentDict]:
     """Fetches the latest comment from an issue.
+
     Args:
         issue_number: int. The issue number.
+
     Returns:
         str. The latest comment from the issue.
+
     Raises:
         Exception. The issue does not exist.
     """
@@ -225,10 +238,13 @@ def fetch_latest_comment_from_pull_request(
     pull_request: int,
 ) -> Optional[GitHubCommentDict]:
     """Fetches the latest comment from a pull request.
+
     Args:
         pull_request: int. The pull request number.
+
     Returns:
         str. The latest comment from the pull request.
+
     Raises:
         Exception. The pull request does not exist.
     """
