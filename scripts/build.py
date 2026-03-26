@@ -298,6 +298,7 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
     content = content.replace(
         'static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck\n',
         'static_dir: dist/oppia-angular-prod/third_party/ckeditor-bootstrapck\n',
+    )
     # In app_dev.yaml, MathJax is served from the Angular dev build output
     # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
     # to the prod build output (dist/oppia-angular-prod/).
