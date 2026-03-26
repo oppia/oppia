@@ -352,6 +352,17 @@ describe('Translation Modal Component', () => {
     expect(activeModal.close).toHaveBeenCalled();
   });
 
+  it('should initialize beforeUnloadHandler with a no-op callback', () => {
+    const handler = (
+      component as unknown as {
+        beforeUnloadHandler: (event: BeforeUnloadEvent) => string | undefined;
+      }
+    ).beforeUnloadHandler;
+    const event = new Event('beforeunload') as BeforeUnloadEvent;
+
+    expect(handler(event)).toBeUndefined();
+  });
+
   describe('when initialized', () => {
     describe('with an rtl language', () => {
       beforeEach(fakeAsync(() => {
