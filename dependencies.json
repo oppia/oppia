@@ -60,6 +60,7 @@
       "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
       "rootDirPrefix": "MathJax-",
       "targetDirPrefix": "MathJax-"
+    },
     "ckeditor": {
       "version": "4.12.1",
       "downloadFormat": "zip",
