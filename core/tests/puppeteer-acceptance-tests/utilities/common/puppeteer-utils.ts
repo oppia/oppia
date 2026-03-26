@@ -504,7 +504,11 @@ export class BaseUser {
     // Simple retry for transient non-clickable state (max 2 tries)
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        await this.page.waitForFunction(isElementClickable, {}, element);
+        await this.page.waitForFunction(
+          isElementClickable,
+          {timeout: 90000},
+          element
+        );
         return;
       } catch (error) {
         if (attempt === 1) {
@@ -669,6 +673,7 @@ export class BaseUser {
     useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
+      timeout: 90000,
     }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
