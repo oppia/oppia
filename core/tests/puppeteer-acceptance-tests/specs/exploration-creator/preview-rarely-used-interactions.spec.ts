@@ -25,13 +25,19 @@
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 // TODO(#24968): Add tests for any new non-deprecated rare interactions here.
 describe('Exploration Editor', function () {
-  it('should pass as a placeholder until new rare interactions are added', function () {
+  it('should pass as a placeholder until new rare interactions are added', async function () {
     // All previously tested interactions have been deprecated (#24968).
-    // This placeholder keeps the test suite valid until new ones are added.
-    expect(true).toBe(true);
+    // This placeholder minimally opens a browser to ensure video recordings are
+    // generated for CI artifacts, preventing the 'ls' step from failing.
+    const loggedInUser = (await UserFactory.createNewUser(
+      'placeholderUser',
+      'placeholder_user@example.com'
+    )) as ExplorationEditor;
+    await loggedInUser.navigateToCreatorDashboardPage();
   });
 
   afterAll(async function () {
