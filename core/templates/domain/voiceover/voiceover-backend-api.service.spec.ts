@@ -31,7 +31,7 @@ import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
 interface VoiceAdminResponse {
   languageAccentMasterList: Record<string, Record<string, string>>;
   languageCodesMapping: Record<string, Record<string, boolean>>;
-  autoGenerateableLanguageAccentCodes: string[];
+  autoGeneratableLanguageAccentCodes: string[];
 }
 
 describe('Voiceover backend API service', function () {
@@ -78,7 +78,7 @@ describe('Voiceover backend API service', function () {
     let voiceoverAdminDataResponse: VoiceAdminResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
-      autoGenerateableLanguageAccentCodes: ['en-US', 'hi-IN'],
+      autoGeneratableLanguageAccentCodes: ['en-US', 'hi-IN'],
     };
 
     req.flush({
