@@ -37,6 +37,12 @@ if MYPY:  # pragma: no cover
 (cloud_task_models,) = models.Registry.import_models([models.Names.CLOUD_TASK])
 datastore_services = models.Registry.import_datastore_services()
 
+# CloudTaskRunModel and VoiceoverRegenerationTaskMappingModel entries that remain
+# in RUNNING or PENDING states beyond the allowed threshold are considered stale.
+# Such entries are likely stuck due to unforeseen issues, so they are transitioned
+# to PERMANENTLY_FAILED and FAILED respectively to ensure accurate tracking and recovery.
+STALE_TASK_THRESHOLD_DAYS = 3
+
 
 class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
     """One-off job to mark CloudTaskRunModel entries as PERMANENTLY_FAILED if they
@@ -70,7 +76,9 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
             cloud_task_run_model.exception_messages_for_failed_runs.append(
                 exception_message
             )
-            cloud_task_run_model.last_updated = datetime.datetime.utcnow()
+            cloud_task_run_model.last_updated = datetime.datetime.now(
+                datetime.timezone.utc
+            ).replace(tzinfo=None)
 
         logging.info(
             'Marking the state of CloudTaskRunModel with id %s as PERMANENTLY_FAILED.'
@@ -104,8 +112,11 @@ class MarkStaleCloudTaskRunModelsAsFailedJob(base_jobs.JobBase):
                         cloud_task_models.CloudTaskState.RUNNING.value,
                     ]
                     and (
-                        datetime.datetime.utcnow()
-                        >= model.last_updated + datetime.timedelta(days=3)
+                        datetime.datetime.now(datetime.timezone.utc).replace(
+                            tzinfo=None
+                        )
+                        >= model.last_updated
+                        + datetime.timedelta(days=STALE_TASK_THRESHOLD_DAYS)
                     )
                 )
             )
@@ -206,7 +217,9 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
                         counter += 1
 
             voiceover_regeneration_task_mapping_model.last_updated = (
-                datetime.datetime.utcnow()
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
             )
 
         logging.info(
@@ -237,8 +250,11 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJob(base_jobs.JobBase):
             | 'Filter VoiceoverRegenerationTaskMappingModels which was last updated more than three days ago'
             >> beam.Filter(
                 lambda model: (
-                    datetime.datetime.utcnow()
-                    >= model.last_updated + datetime.timedelta(days=3)
+                    datetime.datetime.now(datetime.timezone.utc).replace(
+                        tzinfo=None
+                    )
+                    >= model.last_updated
+                    + datetime.timedelta(days=STALE_TASK_THRESHOLD_DAYS)
                 )
             )
         )

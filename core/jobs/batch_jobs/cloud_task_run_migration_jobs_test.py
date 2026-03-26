@@ -65,7 +65,9 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
-            last_updated=datetime.datetime.utcnow(),
+            last_updated=datetime.datetime.now(datetime.timezone.utc).replace(
+                tzinfo=None
+            ),
         )
 
         # Create a model in SUCCEEDED state (should not be updated).
@@ -79,8 +81,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         self.put_multi([recent_model, succeeded_model])
@@ -126,8 +132,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=2,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         self.put_multi([stale_running_model])
@@ -177,8 +187,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=5),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=5)
+            ),
         )
 
         self.put_multi([stale_pending_model])
@@ -229,8 +243,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=1,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         stale_pending_model = self.create_model(
@@ -243,8 +261,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=6),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=6)
+            ),
         )
 
         # Create a non-stale model that should not be updated.
@@ -258,8 +280,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(hours=12),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(hours=12)
+            ),
         )
 
         self.put_multi([stale_running_model, stale_pending_model, fresh_model])
@@ -323,8 +349,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[existing_exception_message],
             current_retry_attempt=3,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         self.put_multi([stale_model_with_exceptions])
@@ -378,8 +408,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=3),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=3)
+            ),
         )
 
         self.put_multi([exactly_three_days_old_model])
@@ -410,7 +444,9 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
             last_updated=(
-                datetime.datetime.utcnow()
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
                 - datetime.timedelta(days=3)
                 + datetime.timedelta(minutes=1)
             ),
@@ -453,8 +489,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=['Failed but will retry'],
             current_retry_attempt=1,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=5),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=5)
+            ),
         )
 
         self.put_multi([failed_and_awaiting_retry_model])
@@ -494,8 +534,12 @@ class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=['Already failed permanently'],
             current_retry_attempt=3,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=10),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=10)
+            ),
         )
 
         self.put_multi([permanently_failed_model])
@@ -554,8 +598,12 @@ class MarkStaleCloudTaskRunModelsAsFailedAuditJobTests(
             function_id='regenerate_voiceovers_on_exploration_update',
             exception_messages_for_failed_runs=[],
             current_retry_attempt=0,
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         self.put_multi([stale_model])
@@ -620,8 +668,12 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
                     )
                 }
             },
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=2),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=2)
+            ),
         )
 
         self.put_multi([fresh_model])
@@ -676,8 +728,12 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
                     )
                 },
             },
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         self.put_multi([stale_model])
@@ -731,8 +787,12 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
                     )
                 }
             },
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=5),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=5)
+            ),
         )
 
         stale_model_2 = self.create_model(
@@ -747,8 +807,12 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
                     )
                 }
             },
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         fresh_model = self.create_model(
@@ -763,8 +827,12 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
                     )
                 }
             },
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(hours=23),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(hours=23)
+            ),
         )
 
         self.put_multi([stale_model_1, stale_model_2, fresh_model])
@@ -845,8 +913,12 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
                     )
                 }
             },
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=3),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=3)
+            ),
         )
 
         self.put_multi([exactly_three_days_old_model])
@@ -901,8 +973,12 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJobTests(
                     ),
                 }
             },
-            last_updated=datetime.datetime.utcnow()
-            - datetime.timedelta(days=4),
+            last_updated=(
+                datetime.datetime.now(datetime.timezone.utc).replace(
+                    tzinfo=None
+                )
+                - datetime.timedelta(days=4)
+            ),
         )
 
         self.put_multi([stale_model])
