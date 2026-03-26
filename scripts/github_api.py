@@ -23,8 +23,12 @@ import urllib.request
 
 from typing import Any, Dict, List, Optional, TypedDict
 
-REPOSITORY_OWNER = 'oppia'
-REPOSITORY_NAME = 'oppia'
+REPOSITORY_OWNER = os.environ.get('GITHUB_REPOSITORY', 'oppia/oppia').split(
+    '/'
+)[0]
+REPOSITORY_NAME = os.environ.get('GITHUB_REPOSITORY', 'oppia/oppia').split('/')[
+    1
+]
 GITHUB_API_URL = 'https://api.github.com'
 
 
