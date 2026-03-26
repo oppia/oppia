@@ -28,11 +28,11 @@ import {EntityVoiceovers} from './entity-voiceovers.model';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
 
-type VoiceAdminResponse = {
+interface VoiceAdminResponse {
   languageAccentMasterList: Record<string, Record<string, string>>;
-  languageCodeMapping: Record<string, Record<string, boolean>>;
+  languageCodesMapping: Record<string, Record<string, boolean>>;
   autoGenerateableLanguageAccentCodes: string[];
-};
+}
 
 describe('Voiceover backend API service', function () {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
