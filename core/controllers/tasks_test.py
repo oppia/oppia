@@ -209,6 +209,78 @@ class TasksTests(test_utils.EmailTestBase):
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
+        ]
+    )
+    def test_feedback_email_groups_messages_from_multiple_explorations(
+        self,
+    ) -> None:
+        """Tests that UnsentFeedbackEmailHandler correctly groups messages
+        from multiple explorations into a single email, verifying the
+        batch-fetch path where references span more than one exploration.
+        """
+        exploration_b = self.save_new_default_exploration(
+            'B', self.editor_id, title='Title B'
+        )
+
+        with self.can_send_feedback_email_ctx:
+            # Create one feedback thread on each exploration from user A.
+            feedback_services.create_thread(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.exploration.id,
+                self.user_id_a,
+                'subject for A',
+                'message in A',
+            )
+            feedback_services.create_thread(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_b.id,
+                self.user_id_a,
+                'subject for B',
+                'message in B',
+            )
+
+            # No email sent yet before tasks run.
+            mock_email_messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL
+            )
+            self.assertEqual(len(mock_email_messages), 0)
+
+            # Flush the pending email tasks.
+            self.process_and_flush_pending_tasks()
+            mock_email_messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL
+            )
+
+            # Both messages should be grouped into one email to the editor.
+            self.assertEqual(len(mock_email_messages), 1)
+            expected_message = (
+                'Hi editor,\n\nYou\'ve received 2 new messages on your'
+                ' Oppia explorations:\n- Title:\n- message in A'
+                '\n- Title B:\n- message in B'
+                '\nYou can view and reply to your messages from your'
+                ' dashboard.\n\nThanks, and happy teaching!\n\nBest'
+                ' wishes,\nThe Oppia Team\n\nYou can change your email'
+                ' preferences via the Preferences page.'
+            )
+            self.assertEqual(mock_email_messages[0].body, expected_message)
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com',
+            ),
             (
                 platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
                 'http://localhost:8181',
