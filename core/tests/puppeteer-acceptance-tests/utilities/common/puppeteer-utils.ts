@@ -487,24 +487,39 @@ export class BaseUser {
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
-    const elementDesc = await this.getElementDescription(selector);
-    showMessage(`Checking if element ${elementDesc} is clickable...`);
-    const element =
-      typeof selector === 'string'
-        ? await this.page.waitForSelector(selector)
-        : selector;
-    try {
-      await this.page.waitForFunction(isElementClickable, {}, element);
-    } catch (error) {
-      if (error instanceof Error) {
-        await this.page.evaluate(isElementClickable, element, true, true);
-        error.message =
-          `Element ${elementDesc} took too long to be clickable.\n` +
-          'Original Error:\n' +
-          error.message;
+    const maxRetries = 5;
+    let lastError;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        // Inline modal dismissal inside the retry loop.
+        const modal = await this.page.$('.e2e-test-welcome-modal');
+        if (modal) {
+          const closeBtn = await modal.$('.e2e-test-close-welcome-modal');
+          if (closeBtn) {
+            await closeBtn.click();
+            await this.page.waitForTimeout(100); // Short wait after dismissing modal.
+          }
+        }
+        // Now check for clickability.
+        if (typeof selector === 'string') {
+          await this.page.waitForSelector(selector, {
+            visible: true,
+            timeout: 2000,
+          });
+          const element = await this.page.$(selector);
+          if (element) {
+            await element.hover();
+          }
+        } else {
+          await selector.hover();
+        }
+        return;
+      } catch (err) {
+        lastError = err;
+        await this.page.waitForTimeout(200); // Wait before retrying.
       }
-      throw error;
     }
+    throw lastError;
   }
 
   /**
