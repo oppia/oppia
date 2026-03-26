@@ -265,23 +265,18 @@ describe('Topic Manager', function () {
       await topicManager.removePrerequisiteSkillFromChapter('Subtraction');
       await topicManager.saveStoryDraft();
 
-      // Re-open chapter editor.
+      // Delete prerequisite and acquired skills from the current chapter
+      // before removing the dependent skill from the earlier chapter.
+      await topicManager.removePrerequisiteSkillFromChapter('Addition');
+      await topicManager.removeAcquiredSkill('Subtraction');
+      await topicManager.saveStoryDraft();
+
       await topicManager.openChapterEditor(
         'Solving problems',
         'The Broken Calculator',
         'Arithmetic Operations'
       );
-
-      // Delete prerequisite and acquired skills.
       await topicManager.removeAcquiredSkill('Addition');
-      await topicManager.saveStoryDraft();
-      await topicManager.openChapterEditor(
-        'New Title',
-        'The Broken Calculator',
-        'Arithmetic Operations'
-      );
-      await topicManager.removePrerequisiteSkillFromChapter('Addition');
-      await topicManager.removeAcquiredSkill('Subtraction');
       await topicManager.saveStoryDraft();
 
       await topicManager.openChapterEditor(
