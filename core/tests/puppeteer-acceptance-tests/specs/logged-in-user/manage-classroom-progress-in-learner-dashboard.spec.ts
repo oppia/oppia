@@ -26,6 +26,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-in User', function () {
@@ -123,7 +124,7 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
     },
-    20 * 60 * 1000 // 20 minutes.
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
