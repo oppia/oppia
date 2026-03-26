@@ -570,7 +570,7 @@ describe('Topic Editor Navbar', () => {
 
   it('should save topic when user saves topic changes', fakeAsync(() => {
     const modalspy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: any, opt: any) => {
+      (dlg: boolean, opt: boolean) => {
         return {
           componentInstance: {
             topicIsPublished: true,
@@ -609,7 +609,7 @@ describe('Topic Editor Navbar', () => {
 
   it('should close save topic modal when user clicks cancel', fakeAsync(() => {
     const modalspy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: any, opt: any) => {
+      (dlg: boolean, opt: boolean) => {
         return {
           componentInstance: {
             topicIsPublished: true,
@@ -844,7 +844,7 @@ describe('Topic Editor Navbar', () => {
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg: any, opt: any) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: boolean, opt: boolean) => {
         return {
           result: Promise.resolve('success'),
         } as NgbModalRef;
