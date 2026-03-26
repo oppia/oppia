@@ -30,7 +30,6 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 import {AdminMiscTabComponent} from './admin-misc-tab.component';
-import {boolean} from 'yargs';
 
 class MockWindowRef {
   nativeWindow: {
