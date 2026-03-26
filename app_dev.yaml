@@ -51,6 +51,8 @@ handlers:
   expiration: "0"
 - url: /third_party/ckeditor-bootstrapck
   static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck
+- url: /assets/mathjax
+  static_dir: dist/oppia-angular/assets/mathjax
   secure: always
   http_headers:
     # This is replaced by a specific origin when doing a deployment.
