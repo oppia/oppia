@@ -40,7 +40,7 @@ import {AlertsService} from 'services/alerts.service';
 import {TopicManagerRoleEditorModalComponent} from './topic-manager-role-editor-modal.component';
 import {TranslationCoordinatorRoleEditorModalComponent} from './translation-coordinator-role-editor-modal.component';
 
-describe('Admin roles tab component ', function () {
+describe('Admin roles tab component ', () => {
   let component: AdminRolesTabComponent;
   let fixture: ComponentFixture<AdminRolesTabComponent>;
 
@@ -145,7 +145,7 @@ describe('Admin roles tab component ', function () {
     expect(component.userIsBanned).toEqual(false);
   });
 
-  describe('on startEditing', function () {
+  describe('on startEditing', () => {
     let successPromise: Promise<UserRolesBackendResponse>;
 
     beforeEach(function () {
@@ -206,7 +206,7 @@ describe('Admin roles tab component ', function () {
     }));
   });
 
-  describe('on calling markUserBanned', function () {
+  describe('on calling markUserBanned', () => {
     it('should enable bannedStatusChangeInProgress until user is banned', fakeAsync(() => {
       spyOn(adminBackendApiService, 'markUserBannedAsync').and.returnValue(
         Promise.resolve()
@@ -248,8 +248,8 @@ describe('Admin roles tab component ', function () {
     }));
   });
 
-  describe('on calling unmarkUserBanned', function () {
-    beforeEach(function () {
+  describe('on calling unmarkUserBanned', () => {
+    beforeEach(() => {
       spyOn(adminBackendApiService, 'unmarkUserBannedAsync').and.returnValue(
         Promise.resolve()
       );
@@ -276,8 +276,8 @@ describe('Admin roles tab component ', function () {
     }));
   });
 
-  describe('on calling removeRole', function () {
-    beforeEach(function () {
+  describe('on calling removeRole', () => {
+    beforeEach(() => {
       spyOn(adminBackendApiService, 'removeUserRoleAsync').and.returnValue(
         Promise.resolve()
       );
@@ -319,7 +319,7 @@ describe('Admin roles tab component ', function () {
     );
   });
 
-  describe('on calling addNewRole', function () {
+  describe('on calling addNewRole', () => {
     beforeEach(function () {
       spyOn(adminBackendApiService, 'addUserRoleAsync').and.returnValue(
         Promise.resolve()
@@ -361,20 +361,20 @@ describe('Admin roles tab component ', function () {
     );
   });
 
-  describe('on calling openTopicManagerRoleEditor', function () {
+  describe('on calling openTopicManagerRoleEditor', () => {
     let ngbModal: NgbModal;
 
     class MockNgbModalRef {
-      componentInstance!: {};
+      componentInstance!: Record<string, unknown>;
     }
 
-    beforeEach(function () {
+    beforeEach(() => {
       ngbModal = TestBed.inject(NgbModal);
       component.topicSummaries = [sampleTopicSummary];
     });
 
     it('should open the TopicManagerRoleEditorModal', fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      let modalSpy: jasmine.Spy = spyOn(ngbModal, 'open').and.callFake(() => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(['topic_id_1']),
@@ -395,7 +395,7 @@ describe('Admin roles tab component ', function () {
     }));
 
     it('should not read topic manager role if user is already a manager', fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      let modalSpy: jasmine.Spy = spyOn(ngbModal, 'open').and.callFake(() => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(['topic_id_1']),
@@ -416,7 +416,7 @@ describe('Admin roles tab component ', function () {
     }));
   });
 
-  describe('on calling openTranslationCoordinatorRoleEditor', function () {
+  describe('on calling openTranslationCoordinatorRoleEditor', () => {
     let ngbModal: NgbModal;
 
     class MockNgbModalRef {
@@ -428,7 +428,7 @@ describe('Admin roles tab component ', function () {
     });
 
     it('should open the TranslationCoordinatorRoleEditor', fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      let modalSpy: jasmine.Spy = spyOn(ngbModal, 'open').and.callFake(() => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(['en']),
@@ -455,7 +455,7 @@ describe('Admin roles tab component ', function () {
       'should not read translation coordinator role if user is already a' +
         ' coordinator',
       fakeAsync(() => {
-        let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        let modalSpy: jasmine.Spy = spyOn(ngbModal, 'open').and.callFake(() => {
           return {
             componentInstance: MockNgbModalRef,
             result: Promise.resolve(['en']),
@@ -480,7 +480,7 @@ describe('Admin roles tab component ', function () {
     );
   });
 
-  describe('on calling showNewRoleSelector', function () {
+  describe('on calling showNewRoleSelector', () => {
     it('should enable roleSelectorIsShown', () => {
       component.roleSelectorIsShown = false;
       component.userRoles = ['FULL_USER', 'MODERATOR'];
