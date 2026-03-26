@@ -1,2 +1,0 @@
-The following TODOs are unresolved for this issue #1:
-https://github.com/oppia/oppia/blob/HEAD/scripts/check_for_unresolved_todos.py#L25
