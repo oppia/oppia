@@ -103,14 +103,6 @@ export class VoiceoverAdmin extends BaseUser {
         // dropdown. Thus, it will fail with onClick.
         this.page.click(mobileNavbarDropdown);
       }
-
-      // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      await this.clickOnElementWithSelector(basicSettingsDropdown);
-      await this.clickOnElementWithSelector(advanceSettingsDropdown);
-      await this.clickOnElementWithSelector(rolesSettingsDropdown);
-      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
-      await this.clickOnElementWithSelector(permissionSettingsDropdown);
-      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
@@ -252,6 +244,10 @@ export class VoiceoverAdmin extends BaseUser {
    * @param voiceArtistUsername - The username of the voiceover artist to remove.
    */
   async removeVoiceoverArtist(voiceArtistUsername: string): Promise<void> {
+    if (!(await this.isElementVisible(voiceArtistSectionBodySelector))) {
+      await this.clickOnElementWithSelector(voiceArtistSectionHeaderSelector);
+      await this.expectElementToBeVisible(voiceArtistSectionBodySelector);
+    }
     const removeVoiceoverArtistBtnSelector =
       '.e2e-test-remove-voice-artist-button';
     await this.expectElementToBeVisible(editVoiceoverArtistButton);

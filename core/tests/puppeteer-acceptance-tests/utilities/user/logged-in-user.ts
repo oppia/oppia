@@ -2887,7 +2887,10 @@ export class LoggedInUser extends BaseUser {
     feedback: string,
     stayAnonymous: boolean
   ): Promise<void> {
-    await this.page.waitForSelector(feedbackTextareaSelector);
+    await this.clickOnElementWithSelector(
+      '.e2e-test-exploration-feedback-popup'
+    );
+    await this.page.waitForSelector(feedbackTextareaSelector, {visible: true});
     await this.typeInInputField(feedbackTextareaSelector, feedback);
     if (stayAnonymous) {
       await this.clickOnElementWithSelector(anonymousCheckboxSelector);

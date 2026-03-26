@@ -66,7 +66,7 @@ export class PracticeQuestionReviewer extends Contributor {
 
       await reviewButton.click();
     }
-    await this.expectModalTitleToBe(skill);
+    await this.expectModalTitleToBeInExplorationEditor(skill);
   }
 
   /**
