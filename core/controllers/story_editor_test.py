@@ -491,7 +491,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         json_response = self.get_json(
             '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id)
         )
-        self.assertEqual(self.story_id, json_response['story']['id'])
+        self.assertEqual(self.story_id, json_response['story_dict']['id'])
         self.assertEqual('Name', json_response['topic_name'])
         self.assertEqual(len(json_response['skill_summaries']), 0)
         self.logout()
@@ -518,9 +518,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             change_cmd,
             csrf_token=csrf_token,
         )
-        self.assertEqual(self.story_id, json_response['story']['id'])
+        self.assertEqual(self.story_id, json_response['story_dict']['id'])
         self.assertEqual(
-            'New Description', json_response['story']['description']
+            'New Description', json_response['story_dict']['description']
         )
         self.logout()
 
