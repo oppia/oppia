@@ -568,7 +568,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -586,7 +586,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -604,7 +604,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -730,7 +730,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -753,7 +753,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -776,7 +776,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -1077,7 +1077,7 @@ class TopicEditorTests(
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         json_response = self.get_json(
             '%s/%s/%s'
@@ -1105,7 +1105,7 @@ class TopicEditorTests(
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
 
         # Test if the corresponding study guides were created.
@@ -1126,7 +1126,7 @@ class TopicEditorTests(
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 

@@ -446,10 +446,13 @@ describe('Topic Editor Navbar', () => {
     "should not send email when user who doesn't have publishing rights" +
       " clicks the 'publish' button and then cancels",
     fakeAsync(() => {
+      componentInstance.topicId = 'topic_1';
+      componentInstance.topic = topic;
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
       spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
         result: Promise.reject(),
       } as NgbModalRef);
       spyOn(alertsService, 'addSuccessMessage');
@@ -708,6 +711,7 @@ describe('Topic Editor Navbar', () => {
   });
 
   it("should unpublish topic when user clicks the 'Unpublish' button", fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
@@ -716,7 +720,11 @@ describe('Topic Editor Navbar', () => {
     });
     componentInstance.showTopicEditOptions = true;
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: false,
+        manager_ids: [],
+      })
     );
     spyOn(topicEditorStateService, 'setTopicRights');
 
@@ -736,6 +744,7 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should not unpublish topic if topic has not been published', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: false,
       can_publish_topic: false,
@@ -743,7 +752,11 @@ describe('Topic Editor Navbar', () => {
       can_edit_question: true,
     });
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: false,
+        manager_ids: [],
+      })
     );
 
     componentInstance.unpublishTopic();
@@ -753,6 +766,7 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should not unpublish topic if topic is assigned to a classroom', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
@@ -787,8 +801,14 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it("should publish topic when user clicks the 'publish' button", fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
+    componentInstance.topic = topic;
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: true,
+        manager_ids: [],
+      })
     );
     spyOn(alertsService, 'addSuccessMessage');
     componentInstance.topicRights = TopicRights.createFromBackendDict({
@@ -815,6 +835,8 @@ describe('Topic Editor Navbar', () => {
     "should send email when user who doesn't have publishing rights" +
       " clicks the 'publish' button",
     fakeAsync(() => {
+      componentInstance.topicId = 'topic_1';
+      componentInstance.topic = topic;
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
@@ -847,12 +869,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToPreview' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -870,12 +895,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToPreview' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -893,12 +921,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -916,12 +947,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -952,5 +986,59 @@ describe('Topic Editor Navbar', () => {
     componentInstance.topic = topic;
     componentInstance._validateTopic();
     expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
+  });
+
+  it('should return early from _navigateToPreview when classroomUrlFragment is null', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and.returnValue(
+      null
+    );
+    componentInstance.topic = topic;
+    spyOn(windowRef.nativeWindow, 'open');
+
+    componentInstance.openTopicViewer();
+
+    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
+  });
+
+  it('should publish already published topic without redirecting to dashboard', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
+    componentInstance.topic = topic;
+    spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: true,
+        manager_ids: [],
+      })
+    );
+    spyOn(alertsService, 'addSuccessMessage');
+    // Topic is already published.
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: true,
+      can_publish_topic: true,
+      can_edit_topic: true,
+    });
+
+    componentInstance.publishTopic();
+    tick(100);
+
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Topic published.',
+      1000
+    );
+    expect(componentInstance.topicRights.isPublished()).toBeTrue();
+    // Should not redirect to dashboard since topic was already published.
+    expect(windowRef.nativeWindow.location.href).not.toBe(
+      '/topics-and-skills-dashboard'
+    );
+  }));
+
+  it('should return default Editor text for unknown active tab in getMobileNavigatorText', () => {
+    let routingSpy = spyOn(topicEditorRoutingService, 'getActiveTabName');
+    routingSpy.and.returnValue('unknown_tab');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
   });
 });
