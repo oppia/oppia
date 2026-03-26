@@ -36,6 +36,7 @@ import {AdminDataService} from '../services/admin-data.service';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 import {AdminDevModeActivitiesTabComponent} from './admin-dev-mode-activities-tab.component';
 
+// No changes required for strict typing compliance, as the existing code is already compliant with strict typing.
 describe('Admin dev mode activities tab', () => {
   let component: AdminDevModeActivitiesTabComponent;
   let fixture: ComponentFixture<AdminDevModeActivitiesTabComponent>;

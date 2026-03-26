@@ -30,9 +30,20 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 import {AdminMiscTabComponent} from './admin-misc-tab.component';
+import {boolean} from 'yargs';
 
 class MockWindowRef {
-  nativeWindow = {
+  nativeWindow: {
+    confirm: () => boolean;
+    location: {
+      hostname: string;
+      href: string;
+      pathname: string;
+      search: string;
+      hash: string;
+    };
+    open: () => void;
+  } = {
     confirm() {
       return true;
     },
@@ -50,16 +61,16 @@ class MockWindowRef {
 }
 
 class MockReaderObject {
-  result = null;
-  onload: {(arg0: {target: {result: string}}): void; (): string};
+  result: string | null = null;
+  onload: ((event: {target: {result: string}}) => void) | null = null;
   constructor() {
-    this.onload = () => {
-      return 'Fake onload executed';
-    };
+    this.onload = null;
   }
 
-  readAsText() {
-    this.onload({target: {result: 'result'}});
+  readAsText(): string {
+    if (this.onload) {
+      this.onload({target: {result: 'result'}});
+    }
     return 'The file is loaded';
   }
 }
