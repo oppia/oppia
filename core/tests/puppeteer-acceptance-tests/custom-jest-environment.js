@@ -26,14 +26,37 @@ const NodeEnvironment = require('jest-environment-node');
 
 const CONFIG_FILE = path.resolve(__dirname, 'jest-runtime-config.json');
 
+// These suites contain tests that should be skipped after the first failure.
+const SKIP_AFTER_FAIL_SUITES = [
+  'specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts',
+];
+
 class CustomJestEnvironment extends NodeEnvironment {
+  constructor(config, context) {
+    super(config, context);
+    this.skipSuite = false;
+    this.isSkipAfterFailSuite = SKIP_AFTER_FAIL_SUITES.some(p =>
+      context.testPath.endsWith(p)
+    );
+  }
+
   async handleTestEvent(event) {
+    if (event.name === 'test_start' && this.skipSuite) {
+      // If a previous test in the suite failed, skip the current test.
+      event.test.mode = 'skip';
+    }
+
     if (event.name === 'test_done' && event.test.errors.length > 0) {
       showMessage('Test failed: Capturing screenshots...');
       fs.writeFileSync(
         CONFIG_FILE,
         JSON.stringify({testFailureDetected: true})
       );
+
+      if (this.isSkipAfterFailSuite) {
+        // Record that a test has failed in this suite so following tests can be skipped.
+        this.skipSuite = true;
+      }
     }
   }
 }
