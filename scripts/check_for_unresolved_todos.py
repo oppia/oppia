@@ -17,10 +17,10 @@ from __future__ import annotations
 
 import argparse
 import os
-from typing import List, Optional
 
-from scripts import github_api
-from scripts import todo_finder
+from scripts import github_api, todo_finder
+
+from typing import List, Optional
 
 UNRESOLVED_TODOS_PRESENT_INDICATOR = (
     'THERE ARE TODOS ASSOCIATED WITH THE PROVIDED ISSUES.'

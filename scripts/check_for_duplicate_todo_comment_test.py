@@ -20,10 +20,11 @@ import os
 import shutil
 import sys
 import textwrap
-from typing import Optional
 
 from core.tests import test_utils
 from scripts import github_api
+
+from typing import Optional
 
 from . import check_for_duplicate_todo_comment
 
