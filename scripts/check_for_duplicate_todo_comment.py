@@ -16,8 +16,9 @@
 from __future__ import annotations
 
 import argparse
-from scripts import github_api
 from typing import List, Optional
+
+from scripts import github_api
 
 COMMIT_SHA_HASH_LENGTH = 40
 NEW_COMMENT_SHOULD_BE_POSTED = 'NEW TODO COMMENT SHOULD BE POSTED'

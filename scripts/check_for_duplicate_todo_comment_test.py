@@ -20,9 +20,11 @@ import os
 import shutil
 import sys
 import textwrap
+from typing import Optional
+
 from core.tests import test_utils
 from scripts import github_api
-from typing import Optional
+
 from . import check_for_duplicate_todo_comment
 
 DUMMY_SHA_ONE = '51ab6a0341cfb86d95a387438fc993b5eb977b83'

@@ -19,10 +19,12 @@ import contextlib
 import json
 import subprocess
 import textwrap
-from unittest import mock
 import urllib.request as urlrequest
-from core.tests import test_utils
+from unittest import mock
 from typing import Any, Dict, Iterator, List
+
+from core.tests import test_utils
+
 from . import github_api
 
 

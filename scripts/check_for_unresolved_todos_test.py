@@ -20,9 +20,11 @@ import os
 import shutil
 import sys
 import textwrap
+from typing import List
+
 from core.tests import test_utils
 from scripts import github_api
-from typing import List
+
 from . import check_for_unresolved_todos
 
 
