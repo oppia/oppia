@@ -724,7 +724,10 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
-            with self.assertRaisesRegex((AssertionError, KeyError), error_msg):
+            with self.assertRaisesRegex(
+                (AssertionError, KeyError, utils.InvalidInputException),
+                error_msg,
+            ):
                 validate_schema(schemas)  # type: ignore[arg-type]
 
     def test_normalize_against_schema_raises_exception(self) -> None:
