@@ -17,9 +17,10 @@ from __future__ import annotations
 
 import argparse
 import os
-from typing import List, Optional
 
 from scripts import github_api, todo_finder
+
+from typing import List, Optional
 
 # TODO(#1): Temporary workflow test.
 
