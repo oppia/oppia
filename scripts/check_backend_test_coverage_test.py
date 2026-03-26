@@ -88,7 +88,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
     def test_failure_to_execute_coverage_command_throws_error(self) -> None:
         class MockProcess:
             returncode = 1
-            stdout = 'Some error occured.'
+            stdout = 'Some error occurred.'
             stderr = 'Some error.'
 
         def mock_subprocess_run(  # pylint: disable=unused-argument
@@ -114,7 +114,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError,
             'Failed to calculate coverage because subprocess failed. '
-            '\nOUTPUT: Some error occured.\nERROR: Some error.',
+            '\nOUTPUT: Some error occurred.\nERROR: Some error.',
         ):
             check_backend_test_coverage.main()
 

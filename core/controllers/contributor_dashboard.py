@@ -712,7 +712,7 @@ class MachineTranslationStateTextsHandler(
             dict('translated_texts': dict(str, str|None))
 
             A dictionary containing the translated texts stored as a mapping
-                from content ID to the translated text. If an error occured
+                from content ID to the translated text. If an error occurred
                 during retrieval of some content translations, but not others,
                 failed translations are mapped to None.
 

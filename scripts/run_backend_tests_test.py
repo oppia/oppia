@@ -190,7 +190,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             def communicate(  # pylint: disable=missing-docstring
                 self,
             ) -> Tuple[bytes, bytes]:
-                return (b'', b'Error XYZ occured.')
+                return (b'', b'Error XYZ occurred.')
 
         def mock_popen(  # pylint: disable=unused-argument
             cmd_tokens: List[str], **unsued_kwargs: str
@@ -205,7 +205,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
         with swap_popen, self.swap_logs:
             with self.assertRaisesRegex(
-                Exception, 'Error 1\nError XYZ occured.'
+                Exception, 'Error 1\nError XYZ occurred.'
             ):
                 run_backend_tests.run_shell_cmd(self.coverage_exc_list)
 
@@ -703,7 +703,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_failure_in_test_execution_throws_error(self) -> None:
 
         def mock_execute_tasks(*_: str) -> None:
-            raise Exception('XYZ error occured.')
+            raise Exception('XYZ error occurred.')
 
         self.swap_execute_task = self.swap(
             concurrent_task_utils, 'execute_tasks', mock_execute_tasks

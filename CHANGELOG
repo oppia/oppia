@@ -5465,7 +5465,7 @@ Bug fixes
 * Fix part of #6159: Fix revert exploration method (#6575)
 * Fix few translation tab related issues. (#6571)
 * Fix #6538: Adds a proper title for landing pages. (#6539)
-* Fix #6181:Removed the exception which occured during clearing search index (#6518)
+* Fix #6181:Removed the exception which occurred during clearing search index (#6518)
 * Fix issues with New Structures (#6506)
 * Fix #6383: Added regex to validate return_url in signup page (#6498)
 * Fix #6426: Added regex check for exploration id & nodes now can be saved with null exploration ids. (#6470)
