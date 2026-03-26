@@ -263,6 +263,7 @@ describe('Topic Manager', function () {
         )
       );
       await topicManager.removePrerequisiteSkillFromChapter('Subtraction');
+      await topicManager.saveStoryDraft();
 
       // Re-open chapter editor.
       await topicManager.openChapterEditor(
