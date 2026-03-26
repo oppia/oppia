@@ -75,10 +75,10 @@ describe('Voiceover backend API service', function () {
     );
     expect(req.request.method).toEqual('GET');
 
-    let voiceoverAdminDataResponse = {
+    let voiceoverAdminDataResponse: VoiceAdminResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
-      autoGeneratableLanguageAccentCodes: ['en-US', 'hi-IN'],
+      autoGenerateableLanguageAccentCodes: ['en-US', 'hi-IN'],
     };
 
     req.flush({
