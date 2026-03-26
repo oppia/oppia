@@ -47,6 +47,22 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
             error.stderr,
         )
 
+    def test_initialization_with_empty_exploration_reference_yields_correct_stderr(
+        self,
+    ) -> None:
+        model = base_models.BaseModel(id='test_id')
+        model.exp_id = 'test_exp_id'
+
+        error = answerSubmittedEventLogEntryModel_validation_errors.ExplorationDoesNotExistError(
+            model
+        )
+
+        self.assertEqual(
+            'ExplorationDoesNotExistError in BaseModel(id="test_id"): '
+            'exp_id test_exp_id does not correspond to a valid ExplorationModel',
+            error.stderr,
+        )
+
     def test_initialization_with_custom_domain_failure_message_yields_correct_stderr(
         self,
     ) -> None:
