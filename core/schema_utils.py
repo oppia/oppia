@@ -88,12 +88,6 @@ ALL_SCHEMAS: Dict[str, type] = {
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
-class SchemaValidationError(AssertionError):
-    """Raised when schema validator checks fail during normalization."""
-
-    pass
-
-
 # Here we use type Any because the following schema can have a recursive
 # structure and mypy doesn't support recursive type currently.
 # See: https://github.com/python/mypy/issues/731
@@ -120,7 +114,7 @@ def normalize_against_schema(
     Raises:
         Exception. The object fails to validate against the schema.
         AssertionError. The validation for schema validators fails.
-        SchemaValidationError. The schema validators fail.
+        InvalidInputException. The schema validators fail.
     """
     # Here we use type Any because 'normalized_obj' can be of type int, str,
     # Dict, List and other types too.
@@ -326,7 +320,7 @@ def normalize_against_schema(
                     not validator_func(normalized_obj, **kwargs)
                     and not expect_invalid_default_value
                 ):
-                    raise SchemaValidationError(
+                    raise utils.InvalidInputException(
                         'Validation failed: %s (%s) for object %s'
                         % (validator['id'], kwargs, normalized_obj)
                     )
