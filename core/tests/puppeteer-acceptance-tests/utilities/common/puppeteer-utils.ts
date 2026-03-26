@@ -492,12 +492,27 @@ export class BaseUser {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         // Inline modal dismissal inside the retry loop.
-        const modal = await this.page.$('.e2e-test-welcome-modal');
-        if (modal) {
-          const closeBtn = await modal.$('.e2e-test-close-welcome-modal');
+        // 1. Dismiss welcome modal if present.
+        const welcomeModal = await this.page.$('.e2e-test-welcome-modal');
+        if (welcomeModal) {
+          const closeBtn = await welcomeModal.$(
+            '.e2e-test-close-welcome-modal'
+          );
           if (closeBtn) {
             await closeBtn.click();
-            await this.page.waitForTimeout(100); // Short wait after dismissing modal.
+            await this.page.waitForTimeout(100);
+          }
+        }
+        // 2. Dismiss any generic modal-content with a close button if present.
+        const modals = await this.page.$$('.modal-content');
+        for (const modal of modals) {
+          // Try common close button selectors.
+          const closeBtn = await modal.$(
+            '.close, [aria-label="Close"], button[aria-label="Close"]'
+          );
+          if (closeBtn) {
+            await closeBtn.click();
+            await this.page.waitForTimeout(100);
           }
         }
         // Now check for clickability.
@@ -516,7 +531,7 @@ export class BaseUser {
         return;
       } catch (err) {
         lastError = err;
-        await this.page.waitForTimeout(200); // Wait before retrying.
+        await this.page.waitForTimeout(200);
       }
     }
     throw lastError;
