@@ -20,6 +20,7 @@ import os
 import subprocess
 import textwrap
 import urllib.request
+
 from typing import Any, Dict, List, Optional, TypedDict
 
 REPOSITORY_OWNER = 'oppia'

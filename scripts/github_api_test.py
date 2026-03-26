@@ -21,9 +21,10 @@ import subprocess
 import textwrap
 import urllib.request as urlrequest
 from unittest import mock
-from typing import Any, Dict, Iterator, List
 
 from core.tests import test_utils
+
+from typing import Any, Dict, Iterator, List
 
 from . import github_api
 
