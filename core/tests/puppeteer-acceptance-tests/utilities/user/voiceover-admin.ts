@@ -57,14 +57,7 @@ const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
 const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
 const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
-const basicSettingsDropdown = 'h3.e2e-test-settings-container';
-const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
-const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
-const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
-const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
-('h3.e2e-test-controls-bar-settings-container');
+
 const settingsContainerSelector =
   '.oppia-editor-card.oppia-settings-card-container';
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
