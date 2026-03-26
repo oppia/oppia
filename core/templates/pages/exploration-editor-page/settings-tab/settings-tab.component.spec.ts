@@ -605,9 +605,9 @@ describe('Settings Tab Component', () => {
         {} as SubtitledHtml,
         {} as Interaction,
         [],
-        {} as RecordedVoiceovers,
         false,
-        false
+        false,
+        []
       )
     );
     spyOn(explorationInitStateNameService, 'saveDisplayedValue');
@@ -1092,7 +1092,7 @@ describe('Settings Tab Component', () => {
 
   it('should evaluate when edits are allowed', fakeAsync(() => {
     spyOn(eeabas, 'setEditsAllowed').and.callFake(
-      async (unusedValue, unusedId, cb) => cb()
+      async (unusedValue: boolean, unusedId: string, cb: () => void) => cb()
     );
     spyOn(editabilityService, 'lockExploration');
     component.enableEdits();
@@ -1104,7 +1104,7 @@ describe('Settings Tab Component', () => {
 
   it('should evaluate when edits are not allowed', fakeAsync(() => {
     spyOn(eeabas, 'setEditsAllowed').and.callFake(
-      async (unusedValue, unusedId, cb) => cb()
+      async (unusedValue: boolean, unusedId: string, cb: () => void) => cb()
     );
     spyOn(editabilityService, 'lockExploration');
     component.disableEdits();
@@ -1387,13 +1387,13 @@ describe('Settings Tab Component', () => {
       'fetchMetadataVersionHistoryAsync'
     ).and.resolveTo(null);
 
-    expect(component.validationErrorIsShown).toBeFalse();
+    expect(component.validationErrorIsShown).toBe(false);
 
     component.updateMetadataVersionHistory();
     tick();
     flushMicrotasks();
 
-    expect(component.validationErrorIsShown).toBeTrue();
+    expect(component.validationErrorIsShown).toBe(true);
   }));
 
   it(

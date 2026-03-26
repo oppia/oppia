@@ -131,18 +131,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-save.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/exploration-states.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-states.service.ts',
-    'core/templates/pages/exploration-editor-page/services/exploration-warnings.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/history-tab-yaml-conversion.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/parameter-metadata.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/router.service.ts',
-    'core/templates/pages/exploration-editor-page/services/version-history.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/versioned-exploration-caching.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/settings-tab/settings-tab.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/services/translation-status.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.component.spec.ts',
@@ -297,6 +287,11 @@ _PARSER.add_argument(
     help='optional; if specified, compiles typescript using strict config.',
     action='store_true',
 )
+_PARSER.add_argument(
+    '--files_to_check',
+    help='optional; if specified, only these files will be checked.',
+    nargs='*',
+)
 
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
@@ -442,6 +437,54 @@ def compile_and_check_typescript(config_path: str) -> None:
             print('Compilation successful!')
 
 
+def compile_and_check_specific_files(
+    config_path: str, files_to_check: List[str]
+) -> None:
+    """Compiles specific typescript files and checks the compilation errors.
+
+    Args:
+        config_path: str. The config that should be used to run the typescript
+            checks.
+        files_to_check: List[str]. The list of files to check.
+    """
+    common.write_hashes_json_file({})
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f)
+        config['include'] = files_to_check + ['typings']
+
+    temp_config_path = 'temp-' + config_path
+    with open(temp_config_path, 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2, sort_keys=True)
+        f.write('\n')
+
+    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+    validate_compiled_js_dir()
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
+    print('Compiling and testing specific typescript files...')
+    cmd = ['./node_modules/typescript/bin/tsc', '--project', temp_config_path]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+
+    assert process.stdout is not None
+    error_messages = list(iter(process.stdout.readline, ''))
+
+    if os.path.exists(temp_config_path):
+        os.remove(temp_config_path)
+
+    if error_messages:
+        print('Errors found during compilation\n')
+        print('\n'.join(error_messages))
+        print(
+            '%s Errors found.'
+            % len([x for x in error_messages if x.startswith(PREFIXES)])
+        )
+        sys.exit(1)
+    else:
+        print('Compilation successful!')
+
+
 def run_typescript_type_tests() -> None:
     """Runs the TypeScript type tests in typings/tests."""
     print('Running TypeScript type tests.')
@@ -479,11 +522,21 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     run_typescript_type_tests()
 
     # Then run the main TypeScript compilation checks.
-    compile_and_check_typescript(
-        STRICT_TSCONFIG_FILEPATH
-        if parsed_args.strict_checks
-        else TSCONFIG_FILEPATH
-    )
+    if parsed_args.files_to_check:
+        compile_and_check_specific_files(
+            (
+                STRICT_TSCONFIG_FILEPATH
+                if parsed_args.strict_checks
+                else TSCONFIG_FILEPATH
+            ),
+            parsed_args.files_to_check,
+        )
+    else:
+        compile_and_check_typescript(
+            STRICT_TSCONFIG_FILEPATH
+            if parsed_args.strict_checks
+            else TSCONFIG_FILEPATH
+        )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

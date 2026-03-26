@@ -66,7 +66,6 @@ describe('Ratings and recommendations component', () => {
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
   let signInEventService: SignInEventService;
-  let windowRef: WindowRef;
 
   const mockNgbPopover = jasmine.createSpyObj('NgbPopover', [
     'close',
@@ -156,7 +155,6 @@ describe('Ratings and recommendations component', () => {
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     signInEventService = TestBed.inject(SignInEventService);
-    windowRef = TestBed.inject(WindowRef);
   });
 
   it(
