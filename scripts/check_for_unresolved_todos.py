@@ -20,6 +20,8 @@ import os
 
 from scripts import github_api, todo_finder
 
+# TODO(#4): Temporary workflow test.
+
 from typing import List, Optional
 
 # TODO(#1): Temporary workflow test for PR comment proof.
