@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+import os
 import subprocess
 import textwrap
 import urllib.request as urlrequest
@@ -194,6 +195,16 @@ class GithubApiTests(test_utils.GenericTestBase):
             RuntimeError, error_message
         ):
             github_api.get_github_auth_token()
+
+    def test_get_github_auth_token_uses_env_var(self) -> None:
+        def mock_subprocess_run(*_: str, **__: str) -> MockProcessOutput:
+            raise Exception('subprocess.run should not be called')
+
+        with self.swap(os, 'environ', {'GH_TOKEN': 'env_token'}):
+            with self.swap(subprocess, 'run', mock_subprocess_run):
+                self.assertEqual(
+                    github_api.get_github_auth_token(), 'env_token'
+                )
 
     def test_get_github_api_authorization_header(self) -> None:
         with self.swap_to_successful_gh_subprocess_run():

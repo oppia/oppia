@@ -23,12 +23,8 @@ import urllib.request
 
 from typing import Any, Dict, List, Optional, TypedDict
 
-REPOSITORY_OWNER = os.environ.get('GITHUB_REPOSITORY', 'oppia/oppia').split(
-    '/'
-)[0]
-REPOSITORY_NAME = os.environ.get('GITHUB_REPOSITORY', 'oppia/oppia').split('/')[
-    1
-]
+REPOSITORY_OWNER = 'oppia'
+REPOSITORY_NAME = 'oppia'
 GITHUB_API_URL = 'https://api.github.com'
 
 
@@ -65,7 +61,7 @@ def deep_get(data: Optional[Dict[str, Any]], keys: List[str]) -> Any:
 
 
 def get_github_auth_token() -> str:
-    """Gets the GitHub auth token from the environment.
+    """Gets the GitHub auth token.
 
     Returns:
         str. The GitHub auth token.
@@ -75,6 +71,15 @@ def get_github_auth_token() -> str:
         RuntimeError. Failed to get GitHub auth token.
     """
     env = os.environ.copy()
+    # Prefer environment variables (used by GitHub Actions + can be set locally)
+    # and fall back to GitHub CLI token resolution.
+    #
+    # Note: GitHub CLI also respects GH_TOKEN, but we read it explicitly so
+    # this script works even when GitHub CLI is unavailable.
+    github_token = env.get('GH_TOKEN') or env.get('GITHUB_TOKEN')
+    if github_token:
+        return github_token
+
     process = subprocess.run(
         ['gh', 'help'],
         env=env,
