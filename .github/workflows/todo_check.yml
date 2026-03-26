@@ -23,40 +23,33 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10.16'
-          architecture: 'x64'
-      - name: Generate a JWT token for github app
-        id: generate_jwt_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.OPPIA_GITHUB_APP_ID }}
-          private-key: ${{ secrets.OPPIA_GITHUB_APP_PRIVATE_KEY }}
-      - name: Check for unresolved todos
+          architecture: 'x64'- name: Check for unresolved todos
         id: check_for_unresolved_todos
         env:
-          GH_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
-          GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue=${{ github.event.issue.number }} --commit_sha=${{ github.sha }} --generate_github_file
       - name: Reopen issue
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
         env:
-          GH_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
-          GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue reopen ${{ github.event.issue.number }}
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
         env:
-          GH_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
-          GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --issue=${{ github.event.issue.number }} --new_comment_file=unresolved_todo_list.txt
       - name: Add Comment
         if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
         env:
-          GH_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
-          GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue comment ${{ github.event.issue.number }} -F $(pwd)/unresolved_todo_list.txt
 
@@ -73,32 +66,26 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10.16'
-          architecture: 'x64'
-      - name: Generate a JWT token for github app
-        id: generate_jwt_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.OPPIA_GITHUB_APP_ID }}
-          private-key: ${{ secrets.OPPIA_GITHUB_APP_PRIVATE_KEY }}
-      - name: Check for unresolved todos
+          architecture: 'x64'- name: Check for unresolved todos
         id: check_for_unresolved_todos
         env:
-          GH_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
-          GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --commit_sha=${{ github.event.pull_request.head.sha }} --generate_github_file
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure' && steps.check_for_unresolved_todos.outputs.unresolved_todos_found == 'true'
         env:
-          GH_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
-          GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --new_comment_file=unresolved_todo_list.txt
       - name: Add Comment
         if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure' && steps.check_for_unresolved_todos.outputs.unresolved_todos_found == 'true'
         env:
-          GH_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
-          GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr comment ${{ github.event.pull_request.number }} -F $(pwd)/unresolved_todo_list.txt
+
