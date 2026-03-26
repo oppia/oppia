@@ -415,7 +415,8 @@ export class CkEditor4RteComponent
       extraAllowedContent: extraAllowedContentRules,
       forcePasteAsPlainText: true,
       sharedSpaces: sharedSpaces,
-      skin: 'bootstrapck,' + '/assets/ckeditor-bootstrapck/skins/bootstrapck/',
+      skin:
+        'bootstrapck,' + '/third_party/ckeditor-bootstrapck/skins/bootstrapck/',
       toolbar: [
         {
           name: 'basicstyles',
@@ -627,7 +628,7 @@ export class CkEditor4RteComponent
     // Add external plugins.
     CKEDITOR.plugins.addExternal(
       'sharedspace',
-      '/assets/ckeditor/plugins/sharedspace/',
+      '/third_party/ckeditor/plugins/sharedspace/',
       'plugin.js'
     );
     // Pre plugin is not available for 4.12.1 version of CKEditor. This is
