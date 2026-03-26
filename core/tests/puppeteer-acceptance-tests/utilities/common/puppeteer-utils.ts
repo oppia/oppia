@@ -1155,7 +1155,7 @@ export class BaseUser {
           : path.join(testPath, dirName, 'new-snapshots'),
       });
     } catch (error) {
-      var errorMessage = (error as Error).message;
+      var errorMessage = error.message;
       if (runningInCI) {
         errorMessage +=
           '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the difference between the old screenshot(s)' +
@@ -1194,7 +1194,7 @@ export class BaseUser {
     try {
       await page.waitForNetworkIdle(options);
     } catch (error) {
-      if ((error as Error).message.includes('Timeout')) {
+      if (error.message.includes('Timeout')) {
         showMessage(
           'Network did not become idle within the specified timeout, but we can continue.'
         );
@@ -1384,7 +1384,7 @@ export class BaseUser {
   }
 
   /**
-   * Verify that element is visible or not.
+   * Verify that element is visilbe or not.
    * @param {string} selector - The selector of the element to get text from.
    * @param {boolean} visibility - Whether the element should be visible or not.
    * @param {Page} context - The page on which the selector should be verified.
@@ -1395,10 +1395,8 @@ export class BaseUser {
     context: Page = this.page
   ): Promise<void> {
     if (visibility) {
-      // Standard visibility check.
       await context.waitForSelector(selector, {visible: true});
     } else {
-      // SMART HIDDEN CHECK: Wait for DOM detachment or CSS hidden.
       try {
         await context.waitForFunction(
           (sel: string) => {
@@ -1409,7 +1407,6 @@ export class BaseUser {
           selector
         );
       } catch (error) {
-        // Final fallback to standard Puppeteer hidden check.
         await context.waitForSelector(selector, {hidden: true, timeout: 5000});
       }
     }
@@ -1466,7 +1463,6 @@ export class BaseUser {
 
       showMessage(`Text content of "${selector}" is "${text}".`);
     } catch (error) {
-      const typedError = error as Error;
       const actualTextContent = await this.page.evaluate(
         (selector: string, context: HTMLElement | null) => {
           const element = context
@@ -1480,13 +1476,13 @@ export class BaseUser {
         selector,
         context
       );
-      typedError.message =
+      error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
         `Expected: "${text}"\n` +
         `Actual: "${actualTextContent}"\n` +
         'Original Error:\n' +
-        typedError.message;
-      throw typedError;
+        error.message;
+      throw error;
     }
   }
 
@@ -1537,15 +1533,14 @@ export class BaseUser {
         text
       );
     } catch (error) {
-      const typedError = error as Error;
       const actualText = await this.page.evaluate((selector: string) => {
         const element = document.querySelector(selector);
         return element?.textContent?.trim();
       }, selector);
-      typedError.message =
+      error.message =
         `Element ${selector} does not contain "${text}". It contains "${actualText}".\n` +
-        typedError.message;
-      throw typedError;
+        error.message;
+      throw error;
     }
   }
 
@@ -1596,7 +1591,7 @@ export class BaseUser {
       throw new Error(
         `Element ${selector} does not have the expected value "${value}". ` +
           `Found "${await selector.evaluate(el => (el as HTMLInputElement).value)}".\n` +
-          `Original Error: ${(error as Error).stack}`
+          `Original Error: ${error.stack}`
       );
     }
   }
@@ -1810,7 +1805,7 @@ export class BaseUser {
       await this.expectTextContentToBe(selector, value);
     } catch (error) {
       const newError = new Error(`Failed to update mat-option: ${error}`);
-      newError.stack = (error as Error).stack;
+      newError.stack = error.stack;
       throw newError;
     }
   }
