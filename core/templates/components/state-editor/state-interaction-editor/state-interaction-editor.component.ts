@@ -320,7 +320,8 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.interactionIsDisabled = false;
-    this.DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
+    this.DEFAULT_TERMINAL_STATE_CONTENT =
+      '<p>Congratulations, you have finished!</p>';
 
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionEditorIsShown = true;

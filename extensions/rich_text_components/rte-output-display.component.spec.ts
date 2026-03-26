@@ -290,7 +290,7 @@ describe('RTE display component', () => {
   it('should correctly wrap html content inside span tag for highlighting', fakeAsync(() => {
     let rteString = '<p>Hi<em>Hello</em>Hello</p>';
     let expectedOutputWrappedString =
-      '<p><span id="highlightBlock1">Hi<em>Hello</em>Hello</span></p>';
+      '<p><span class="highlightBlock1">Hi<em>Hello</em>Hello</span></p>';
 
     spyOn(
       localStorageService,
@@ -304,9 +304,9 @@ describe('RTE display component', () => {
   it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
     let rteString = '<p>Hi world! I am a content creator.</p>';
     let expectedOutputWrappedString =
-      '<p><span id="highlightBlock1">Hi world!</span>' +
+      '<p><span class="highlightBlock1">Hi world!</span>' +
       '<span> </span>' +
-      '<span id="highlightBlock2">I am a content creator.</span></p>';
+      '<span class="highlightBlock2">I am a content creator.</span></p>';
 
     spyOn(
       localStorageService,
@@ -607,25 +607,32 @@ describe('RTE display component', () => {
         'getCurrentSentenceIdToHighlight'
       ).and.returnValue('highlightBlock2');
 
-      spyOn(document, 'getElementById').and.callFake((id: string) => {
-        if (id === 'highlightBlock1') {
-          return previousElement;
-        } else if (id === 'highlightBlock2') {
-          return currentElement;
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'getUnmodifiedSentenceByHighlightId'
+      ).and.returnValue('New element');
+
+      spyOn(document, 'getElementsByClassName').and.callFake(
+        (className: string) => {
+          if (className === 'highlightBlock1') {
+            return [previousElement];
+          } else if (className === 'highlightBlock2') {
+            return [currentElement];
+          }
+          return null;
         }
-        return null;
-      });
+      );
 
       component.highlightSentenceDuringVoiceoverPlay();
 
       expect(
-        (document.getElementById('highlightBlock1') as HTMLElement).style
-          .backgroundColor
+        (document.getElementsByClassName('highlightBlock1')[0] as HTMLElement)
+          .style.backgroundColor
       ).toBe('');
 
       expect(
-        (document.getElementById('highlightBlock2') as HTMLElement).style
-          .backgroundColor
+        (document.getElementsByClassName('highlightBlock2')[0] as HTMLElement)
+          .style.backgroundColor
       ).toBe('rgb(243, 209, 64)');
       expect(component.previousHighlightedElementId).toBe('highlightBlock2');
     })
@@ -654,13 +661,15 @@ describe('RTE display component', () => {
       'getCurrentSentenceIdToHighlight'
     ).and.returnValue('highlightBlock1');
 
-    spyOn(document, 'getElementById').and.returnValue(previousElement);
+    spyOn(document, 'getElementsByClassName').and.returnValue([
+      previousElement,
+    ]);
 
     component.highlightSentenceDuringVoiceoverPlay();
 
     expect(
-      (document.getElementById('highlightBlock1') as HTMLElement).style
-        .backgroundColor
+      (document.getElementsByClassName('highlightBlock1')[0] as HTMLElement)
+        .style.backgroundColor
     ).toBe('');
   }));
 

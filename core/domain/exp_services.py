@@ -476,6 +476,97 @@ def export_states_to_yaml(
     return exploration_dict
 
 
+def get_content_updates_from_cmd_edit_state_property_change(
+    change: exp_domain.ExplorationChange,
+) -> Dict[str, str]:
+    """Extracts content ids and content values from CMD_EDIT_STATE_PROPERTY.
+
+    Args:
+        change: ExplorationChange. The exploration change object.
+
+    Returns:
+        dict(str, str). A mapping from content_id to content html.
+    """
+    content_id_to_content_value: Dict[str, str] = {}
+
+    if change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
+        return content_id_to_content_value
+
+    def add_subtitled_html_or_unicode_from_dict(
+        subtitled_html_or_unicode: Dict[str, str],
+    ) -> None:
+        """Adds a mapping from a subtitled html or unicode dict, if valid."""
+        if not isinstance(subtitled_html_or_unicode, dict):
+            return
+        conten_id = subtitled_html_or_unicode.get('content_id')
+        content_value = None
+        if subtitled_html_or_unicode.get('html'):
+            content_value = subtitled_html_or_unicode.get('html')
+        elif subtitled_html_or_unicode.get('unicode_str'):
+            content_value = subtitled_html_or_unicode.get('unicode_str')
+
+        if isinstance(conten_id, str) and isinstance(content_value, str):
+            content_id_to_content_value[conten_id] = content_value
+
+    # These changes may clear fields (e.g. default outcome), so we ignore
+    # None payloads.
+    if change.new_value is None:
+        return content_id_to_content_value
+
+    if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+        add_subtitled_html_or_unicode_from_dict(change.new_value)
+    elif (
+        change.property_name
+        == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+    ):
+        if isinstance(change.new_value, dict):
+            add_subtitled_html_or_unicode_from_dict(
+                change.new_value.get('feedback')
+            )
+    elif (
+        change.property_name
+        == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+    ):
+        if isinstance(change.new_value, list):
+            for answer_group in change.new_value:
+                if isinstance(answer_group, dict):
+                    outcome = answer_group.get('outcome')
+                    if isinstance(outcome, dict):
+                        add_subtitled_html_or_unicode_from_dict(
+                            outcome.get('feedback')
+                        )
+    elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS:
+        if isinstance(change.new_value, list):
+            for hint in change.new_value:
+                if isinstance(hint, dict):
+                    add_subtitled_html_or_unicode_from_dict(
+                        hint.get('hint_content')
+                    )
+    elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION:
+        if isinstance(change.new_value, dict):
+            add_subtitled_html_or_unicode_from_dict(
+                change.new_value.get('explanation')
+            )
+    elif (
+        change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+    ):
+        if isinstance(change.new_value, dict):
+            for cust_arg_value in change.new_value.values():
+                for sub_value in cust_arg_value.values():
+                    if isinstance(sub_value, dict) and sub_value.get(
+                        'content_id'
+                    ):
+                        add_subtitled_html_or_unicode_from_dict(sub_value)
+                    elif isinstance(sub_value, list):
+                        for item in sub_value:
+                            if isinstance(item, dict) and item.get(
+                                'content_id'
+                            ):
+                                add_subtitled_html_or_unicode_from_dict(item)
+
+    return content_id_to_content_value
+
+
 # Repository SAVE and DELETE methods.
 def apply_change_list(
     exploration_id: str, change_list: Sequence[exp_domain.ExplorationChange]

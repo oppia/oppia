@@ -33,6 +33,10 @@ interface SentenceHighlightInterval {
   providedIn: 'root',
 })
 export class AutomaticVoiceoverHighlightService {
+  // Grace period to account for coarse polling intervals while checking
+  // current audio time (for example 100ms polling for short 50ms tokens).
+  private static readonly HIGHLIGHT_MATCH_TOLERANCE_SECS = 0.08;
+
   public languageCode!: string;
   public activeContentId!: string;
 
@@ -68,6 +72,10 @@ export class AutomaticVoiceoverHighlightService {
   }): void {
     this.highlightIdToSentenceMap = highlightIdToSentenceMap;
     this.removeSpacesAndTransformMathSymbols();
+  }
+
+  getUnmodifiedSentenceByHighlightId(highlightId: string): string {
+    return this.highlightIdToSentenceMap[highlightId];
   }
 
   removeSpacesAndTransformMathSymbols(): void {
@@ -301,6 +309,24 @@ export class AutomaticVoiceoverHighlightService {
         );
       }
     );
+
+    // Fallback path for tiny intervals that can be skipped by polling.
+    // For example, a 50ms token checked at 100ms intervals can be missed
+    // without a small tolerance after the sentence end time.
+    if (!currentsentenceIdAndInterval) {
+      currentsentenceIdAndInterval = this.sentenceHighlightIntervalList.find(
+        sentenceIdAndInterval => {
+          return (
+            currentAudioPlayerTimeInSecs >=
+              sentenceIdAndInterval.startTimeInSecs &&
+            currentAudioPlayerTimeInSecs <=
+              sentenceIdAndInterval.endTimeInSecs +
+                AutomaticVoiceoverHighlightService.HIGHLIGHT_MATCH_TOLERANCE_SECS
+          );
+        }
+      );
+    }
+
     return currentsentenceIdAndInterval?.highlightSentenceId;
   }
 }
