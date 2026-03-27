@@ -2754,8 +2754,8 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
         'caption-with-value="&quot;&quot;"\n        filepath-with-value="'
         '&quot;abc.png&quot;"></oppia-noninteractive-image>'
     )
-        SAMPLE_YAML_CONTENT: str = (
-                """author_notes: ''
+    SAMPLE_YAML_CONTENT: str = (
+        """author_notes: ''
 blurb: ''
 category: Algebra
 edits_allowed: true
@@ -2771,72 +2771,72 @@ states:
         card_is_checkpoint: true
         classifier_model_id: null
         content:
-      content_id: content_0
-      html: ''
-    inapplicable_skill_misconception_ids: []
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        catchMisspellings:
-          value: false
-        placeholder:
-          value:
-            content_id: ca_placeholder_2
-            unicode_str: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: %s
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome_1
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
+            content_id: content_0
+            html: ''
+        inapplicable_skill_misconception_ids: []
+        interaction:
+            answer_groups: []
+            confirmed_unclassified_answers: []
+            customization_args:
+                catchMisspellings:
+                    value: false
+                placeholder:
+                    value:
+                        content_id: ca_placeholder_2
+                        unicode_str: ''
+                rows:
+                    value: 1
+            default_outcome:
+                dest: %s
+                dest_if_really_stuck: null
+                feedback:
+                    content_id: default_outcome_1
+                    html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+            hints: []
+            id: TextInput
+            solution: null
+        linked_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    linked_skill_id: null
-    param_changes: []
-    solicit_answer_details: false
-  New state:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content_3
-      html: %s
-    inapplicable_skill_misconception_ids: []
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        catchMisspellings:
-          value: false
-        placeholder:
-          value:
-            content_id: ca_placeholder_5
-            unicode_str: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: New state
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome_4
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
+        solicit_answer_details: false
+    New state:
+        card_is_checkpoint: false
+        classifier_model_id: null
+        content:
+            content_id: content_3
+            html: %s
+        inapplicable_skill_misconception_ids: []
+        interaction:
+            answer_groups: []
+            confirmed_unclassified_answers: []
+            customization_args:
+                catchMisspellings:
+                    value: false
+                placeholder:
+                    value:
+                        content_id: ca_placeholder_5
+                        unicode_str: ''
+                rows:
+                    value: 1
+            default_outcome:
+                dest: New state
+                dest_if_really_stuck: null
+                feedback:
+                    content_id: default_outcome_4
+                    html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+            hints: []
+            id: TextInput
+            solution: null
+        linked_skill_id: null
         param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    linked_skill_id: null
-    param_changes: []
-    solicit_answer_details: false
+        solicit_answer_details: false
 states_schema_version: %d
 tags: []
 title: A title
