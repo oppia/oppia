@@ -13023,3 +13023,13 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             exploration_dict_with_voiceovers, expected_exploration_dict
         )
+
+    def test_get_updated_version_history_model_returns_none(self) -> None:
+        exploration = self.save_new_default_exploration('exp_id_2', 'owner_id')
+        with self.swap(
+            exp_models.ExplorationVersionHistoryModel, 'get', lambda *args, **kwargs: None
+        ):
+            result = exp_services.get_updated_version_history_model(
+                exploration, [], 'committer_id', {}, exploration.get_metadata()
+            )
+        self.assertIsNone(result)
