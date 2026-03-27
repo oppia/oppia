@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -39,6 +39,7 @@ import {PageContextService} from '../../../../services/page-context.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
+import {SignInEventService} from '../../../../services/sign-in-event.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {LearnerViewInfoComponent} from './learner-view-info.component';
@@ -67,6 +68,12 @@ describe('Learner view info component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

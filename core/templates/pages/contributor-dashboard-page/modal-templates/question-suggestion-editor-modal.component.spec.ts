@@ -34,6 +34,8 @@ import {Skill} from 'domain/skill/skill.model';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
+
 import {State} from 'domain/state/state.model';
 
 class MockNgbModalRef {
@@ -146,8 +148,10 @@ describe('Question Suggestion Editor Modal Component', () => {
         CsrfTokenService,
         QuestionUndoRedoService,
         SiteAnalyticsService,
+        SignInEventService,
         StateEditorService,
       ],
+
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

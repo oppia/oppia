@@ -74,6 +74,7 @@ class MockSiteAnalyticsService {
   registerPracticeSessionStartEvent = jasmine.createSpy(
     'registerPracticeSessionStartEvent'
   );
+  onUserSignIn = new EventEmitter();
 }
 
 describe('Subtopic viewer page', function () {

@@ -28,7 +28,9 @@ import {ContributionOpportunitiesBackendApiService} from 'pages/contributor-dash
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {Skill} from 'domain/skill/skill.model';
+
 import {UserService} from 'services/user.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
@@ -73,7 +75,9 @@ describe('Question opportunities component', () => {
         },
         AlertsService,
         SiteAnalyticsService,
+        SignInEventService,
         UserService,
+
         ContributionOpportunitiesBackendApiService,
         ContributionOpportunitiesService,
         QuestionUndoRedoService,

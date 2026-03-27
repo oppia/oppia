@@ -18,6 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
@@ -53,6 +54,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -378,6 +380,12 @@ describe('Exploration engine service ', () => {
         {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
+        },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
         },
       ],
     });

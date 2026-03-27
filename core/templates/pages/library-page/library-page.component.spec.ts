@@ -260,6 +260,12 @@ describe('Library Page Component', () => {
           useClass: MockTranslateService,
         },
         ClassroomBackendApiService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

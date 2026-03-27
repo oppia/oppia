@@ -33,6 +33,7 @@ import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-su
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {ValidatorsService} from 'services/validators.service';
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 import {CollectionLinearizerService} from '../services/collection-linearizer.service';
@@ -75,6 +76,7 @@ describe('Collection node creator component', () => {
         ExplorationSummaryBackendApiService,
         SearchExplorationsBackendApiService,
         SiteAnalyticsService,
+        SignInEventService,
         ValidatorsService,
         NormalizeWhitespacePipe,
       ],

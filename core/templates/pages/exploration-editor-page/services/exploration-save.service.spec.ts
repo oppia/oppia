@@ -135,18 +135,15 @@ describe(
             useClass: MockrouterService,
           },
           {
-            provide: PlatformFeatureService,
-            useClass: MockPlatformFeatureService,
+            provide: TranslationTranslationService,
+            useValue: {
+              onTranslationTabRefresh: new EventEmitter(),
+            },
           },
           {
-            provide: WindowRef,
+            provide: SignInEventService,
             useValue: {
-              nativeWindow: {
-                location: {
-                  reload() {},
-                },
-                gtag: () => {},
-              },
+              onUserSignIn: new EventEmitter<string>(),
             },
           },
         ],

@@ -90,6 +90,7 @@ import {CardAnimationService} from '../../services/card-animation.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {AuthService} from 'services/auth.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -105,7 +106,7 @@ class MockWindowRef {
 }
 
 class MockAuthService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string>();
 }
 
 describe('New Conversation skin component', () => {
@@ -456,6 +457,12 @@ describe('New Conversation skin component', () => {
         {
           provide: AuthService,
           useClass: MockAuthService,
+        },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
         },
         PreventPageUnloadEventService,
       ],

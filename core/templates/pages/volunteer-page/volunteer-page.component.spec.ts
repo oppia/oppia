@@ -65,6 +65,12 @@ describe('Volunteer page', () => {
             getWidth: () => 0,
           },
         },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

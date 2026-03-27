@@ -31,7 +31,9 @@ import {RouterModule} from '@angular/router';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {EventEmitter} from '@angular/core';
 import {SideNavigationBarComponent} from './side-navigation-bar.component';
 import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -78,6 +80,12 @@ describe('Side Navigation Bar Component', () => {
       ],
       declarations: [SideNavigationBarComponent, MockTranslatePipe],
       providers: [
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         {
           provide: WindowRef,
           useValue: mockWindowRef,

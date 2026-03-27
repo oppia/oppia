@@ -62,6 +62,7 @@ import {UrlInterpolationService} from '../../../../domain/utilities/url-interpol
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {CheckpointCelebrationUtilityService} from '../../services/checkpoint-celebration-utility.service';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
+import {SignInEventService} from '../../../../services/sign-in-event.service';
 
 class MockCheckpointCelebrationUtilityService {
   private _openLessonInformationModalEmitter = new EventEmitter<void>();
@@ -179,6 +180,12 @@ describe('ExplorationFooterComponent', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef,
+        },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
         },
         {
           provide: TranslateService,

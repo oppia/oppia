@@ -40,6 +40,7 @@ import {PageContextService} from '../../../../services/page-context.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
+import {SignInEventService} from '../../../../services/sign-in-event.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {PlayerHeaderComponent} from './player-header.component';
@@ -127,6 +128,12 @@ describe('Lesson player header component', () => {
         PageContextService,
         ReadOnlyExplorationBackendApiService,
         SiteAnalyticsService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         StatsReportingService,
         UrlInterpolationService,
         UrlService,

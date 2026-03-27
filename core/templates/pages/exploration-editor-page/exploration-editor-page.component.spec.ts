@@ -291,6 +291,12 @@ describe('Exploration editor page component', () => {
         LoaderService,
         RouterService,
         SiteAnalyticsService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         StateEditorRefreshService,
         StateEditorService,
         StateTopAnswersStatsBackendApiService,

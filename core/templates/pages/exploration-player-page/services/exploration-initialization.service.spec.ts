@@ -18,6 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
 import {ExplorationInitializationService} from './exploration-initialization.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {EditableExplorationBackendApiService} from '../../../domain/exploration/editable-exploration-backend-api.service';
@@ -38,6 +39,7 @@ import {ReadOnlyExplorationBackendApiService} from '../../../domain/exploration/
 import {PretestQuestionBackendApiService} from '../../../domain/question/pretest-question-backend-api.service';
 import {CurrentEngineService} from './current-engine.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {SignInEventService} from '../../../services/sign-in-event.service';
 
 class MockQuestion {
   constructor(private backendDict: QuestionBackendDict) {}
@@ -76,6 +78,12 @@ describe('ExplorationInitializationService', () => {
         ReadOnlyExplorationBackendApiService,
         PretestQuestionBackendApiService,
         CurrentEngineService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         {
           provide: Question,
           useValue: {

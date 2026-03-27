@@ -99,6 +99,12 @@ describe('Splash Page', () => {
           },
         },
         SiteAnalyticsService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         UrlInterpolationService,
         {
           provide: WindowRef,

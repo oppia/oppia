@@ -54,6 +54,14 @@ describe('Stats reporting service ', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
+      ],
     });
 
     pageContextService = TestBed.inject(PageContextService);

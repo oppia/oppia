@@ -101,6 +101,12 @@ describe('Teach Page', () => {
           },
         },
         SiteAnalyticsService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         UrlInterpolationService,
       ],
       schemas: [NO_ERRORS_SCHEMA],

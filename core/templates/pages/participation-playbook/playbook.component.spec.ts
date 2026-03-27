@@ -60,6 +60,7 @@ class MockSiteAnalyticsService {
   registerApplyToTeachWithOppiaEvent(): void {
     return;
   }
+  onUserSignIn = new EventEmitter();
 }
 
 describe('Playbook Page', () => {

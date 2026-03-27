@@ -195,6 +195,12 @@ describe('Diagnostic test player component', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

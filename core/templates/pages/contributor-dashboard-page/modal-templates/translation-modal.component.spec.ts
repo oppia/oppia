@@ -46,7 +46,9 @@ import {
   ImagesData,
 } from 'services/image-local-storage.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
+
 import {TranslateTextService} from '../services/translate-text.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 // This throws "TS2307". We need to
@@ -172,7 +174,9 @@ describe('Translation Modal Component', () => {
           provide: ImageLocalStorageService,
           useClass: MockImageLocalStorageService,
         },
+        SignInEventService,
       ],
+
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     OppiaAngularRootComponent.pageContextService =

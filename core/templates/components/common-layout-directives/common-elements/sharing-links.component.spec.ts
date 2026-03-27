@@ -18,6 +18,8 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationEmbedButtonModalComponent} from 'components/button-directives/exploration-embed-button-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
+import {EventEmitter} from '@angular/core';
 import {SharingLinksComponent} from './sharing-links.component';
 
 /**
@@ -59,7 +61,15 @@ describe('SharingLinksComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SharingLinksComponent],
-      providers: [{provide: WindowRef, useValue: windowRef}],
+      providers: [
+        {provide: WindowRef, useValue: windowRef},
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
+      ],
     }).compileComponents();
   }));
 

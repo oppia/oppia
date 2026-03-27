@@ -31,6 +31,8 @@ import {ClassroomNavigationLinksComponent} from './classroom-navigation-links.co
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SignInEventService} from 'services/sign-in-event.service';
+import {EventEmitter} from '@angular/core';
 
 describe('ClassroomNavigationLinksComponent', () => {
   let component: ClassroomNavigationLinksComponent;
@@ -99,6 +101,12 @@ describe('ClassroomNavigationLinksComponent', () => {
               location: {pathname: '/learn'},
               gtag: jasmine.createSpy('gtag'),
             },
+          },
+        },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
           },
         },
       ],

@@ -36,7 +36,9 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {EventEmitter} from '@angular/core';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
 
@@ -73,6 +75,12 @@ describe('OppiaFooterComponent', () => {
       imports: [HttpClientTestingModule, FormsModule],
       declarations: [OppiaFooterComponent, MockTranslatePipe],
       providers: [
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
         {
           provide: Router,
           useClass: MockRouter,

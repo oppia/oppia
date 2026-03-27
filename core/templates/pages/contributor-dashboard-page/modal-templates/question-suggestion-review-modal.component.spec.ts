@@ -46,6 +46,8 @@ import {PageContextService} from 'services/page-context.service';
 import {Question} from 'domain/question/question.model';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import cloneDeep from 'lodash/cloneDeep';
+import { SignInEventService } from 'services/sign-in-event.service';
+
 
 class MockActiveModal {
   close(): void {
@@ -333,7 +335,9 @@ describe('Question Suggestion Review Modal component', () => {
           useClass: MockActiveModal,
         },
         PageContextService,
+        SignInEventService,
       ],
+
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

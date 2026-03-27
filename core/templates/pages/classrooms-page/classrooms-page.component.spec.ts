@@ -77,6 +77,12 @@ describe('Classrooms Page Component', () => {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
         },
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

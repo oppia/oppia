@@ -33,7 +33,9 @@ import {AlertsService} from 'services/alerts.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+
 import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {OverlayModule} from '@angular/cdk/overlay';
@@ -99,6 +101,8 @@ describe('Translation Suggestion Review Modal Component', function () {
         SiteAnalyticsService,
         ThreadDataBackendApiService,
         UserService,
+        SignInEventService,
+
         {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef,

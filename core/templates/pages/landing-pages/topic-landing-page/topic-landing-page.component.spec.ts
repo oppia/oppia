@@ -69,6 +69,7 @@ class MockSiteAnalyticsService {
   registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
     return;
   }
+  onUserSignIn = new EventEmitter();
 }
 
 let component: TopicLandingPageComponent;

@@ -81,6 +81,12 @@ describe('Sign up page component', () => {
         SignupPageBackendApiService,
         SiteAnalyticsService,
         UrlService,
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

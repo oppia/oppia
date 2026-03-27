@@ -123,7 +123,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.classroom_id = classroom_config_services.get_new_classroom_id()
         self.save_new_valid_classroom(
             classroom_id=self.classroom_id,
-            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: [],
+                self.topic_id_1: [],
+            },
         )
 
         self.expected_skill_opportunity_dict_0 = {
@@ -193,7 +196,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_skill_opportunity_data_returns_non_classroom_topics(
+    def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
         self,
     ) -> None:
         classroom_config_services.delete_classroom(self.classroom_id)
@@ -202,14 +205,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL, params={}
         )
 
-        self.assertEqual(
-            response['opportunities'],
-            [
-                self.expected_skill_opportunity_dict_0,
-                self.expected_skill_opportunity_dict_1,
-                self.expected_skill_opportunity_dict_2,
-            ],
-        )
+        self.assertEqual(response['opportunities'], [])
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
@@ -3030,6 +3026,7 @@ class SkillOpportunitySortingTest(test_utils.GenericTestBase):
             topic_id_to_prerequisite_topic_ids={
                 self.topic_id_1: [],
                 self.topic_id_2: [],
+                self.topic_id_3: [],
             },
             is_published=True,
         )

@@ -38,6 +38,7 @@ import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voi
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 
 describe('NewAudioBarComponent', () => {
@@ -64,7 +65,14 @@ describe('NewAudioBarComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [NewAudioBarComponent, MockTranslatePipe],
-      providers: [],
+      providers: [
+        {
+          provide: SignInEventService,
+          useValue: {
+            onUserSignIn: new EventEmitter<string>(),
+          },
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

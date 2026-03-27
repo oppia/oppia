@@ -38,6 +38,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ClassroomPageComponent} from './classroom-page.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -107,6 +108,7 @@ describe('Classroom Page Component', () => {
         LoaderService,
         PageTitleService,
         SiteAnalyticsService,
+        SignInEventService,
         UrlInterpolationService,
         UrlService,
       ],
