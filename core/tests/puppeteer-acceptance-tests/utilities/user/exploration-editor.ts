@@ -459,8 +459,6 @@ const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
 const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
 const saveRecommendationModalSaveButtonSelector =
   'button.e2e-test-recommendation-prompt-save-button';
-const profileDropdown = '.e2e-test-profile-dropdown';
-const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -2649,25 +2647,6 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
     showMessage('Creator dashboard page is opened successfully.');
-  }
-
-  /**
-   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
-   */
-  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(profileDropdown);
-
-    await this.page.waitForSelector(creatorDashboardMenuLink, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
-
-    await this.page.waitForSelector(creatorDashboardContainerSelector, {
-      visible: true,
-    });
   }
 
   /**
