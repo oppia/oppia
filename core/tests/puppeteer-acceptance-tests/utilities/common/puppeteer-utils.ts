@@ -44,8 +44,7 @@ const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 const oskContainerSelector = '.e2e-test-osk-container';
 const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
-const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
-const chapterTitleSelector = '.e2e-test-chapter-title';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -132,7 +131,6 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
-        this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
 
         if (mobile) {
@@ -405,7 +403,6 @@ export class BaseUser {
         )
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     this.setupDebugTools();
   }
 
@@ -487,54 +484,24 @@ export class BaseUser {
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
-    const maxRetries = 5;
-    let lastError;
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        // Inline modal dismissal inside the retry loop.
-        // 1. Dismiss welcome modal if present.
-        const welcomeModal = await this.page.$('.e2e-test-welcome-modal');
-        if (welcomeModal) {
-          const closeBtn = await welcomeModal.$(
-            '.e2e-test-close-welcome-modal'
-          );
-          if (closeBtn) {
-            await closeBtn.click();
-            await this.page.waitForTimeout(100);
-          }
-        }
-        // 2. Dismiss any generic modal-content with a close button if present.
-        const modals = await this.page.$$('.modal-content');
-        for (const modal of modals) {
-          // Try common close button selectors.
-          const closeBtn = await modal.$(
-            '.close, [aria-label="Close"], button[aria-label="Close"]'
-          );
-          if (closeBtn) {
-            await closeBtn.click();
-            await this.page.waitForTimeout(100);
-          }
-        }
-        // Now check for clickability.
-        if (typeof selector === 'string') {
-          await this.page.waitForSelector(selector, {
-            visible: true,
-            timeout: 2000,
-          });
-          const element = await this.page.$(selector);
-          if (element) {
-            await element.hover();
-          }
-        } else {
-          await selector.hover();
-        }
-        return;
-      } catch (err) {
-        lastError = err;
-        await this.page.waitForTimeout(200);
+    const elementDesc = await this.getElementDescription(selector);
+    showMessage(`Checking if element ${elementDesc} is clickable...`);
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    try {
+      await this.page.waitForFunction(isElementClickable, {}, element);
+    } catch (error) {
+      if (error instanceof Error) {
+        await this.page.evaluate(isElementClickable, element, true, true);
+        error.message =
+          `Element ${elementDesc} took too long to be clickable.\n` +
+          'Original Error:\n' +
+          error.message;
       }
+      throw error;
     }
-    throw lastError;
   }
 
   /**
@@ -779,47 +746,6 @@ export class BaseUser {
     await this.waitForElementToStabilize(selector);
 
     await element.type(text);
-  }
-
-  /**
-   * This function converts a given date string into ISO format (YYYY-MM-DD).
-   */
-  private toISODate(dateString: string): string {
-    const date = new Date(dateString);
-
-    if (isNaN(date.getTime())) {
-      throw new Error(`Invalid date string: ${dateString}`);
-    }
-
-    return date.toISOString().split('T')[0];
-  }
-
-  /**
-   * This function set publication date for chapter.
-   */
-  async setNodePlannedPublicationDate(): Promise<void> {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 3);
-    const dateString = futureDate.toLocaleDateString('en-US');
-    const isoDate = this.toISODate(dateString);
-    await this.page.$eval(
-      plannedPublicationDateInput,
-      (el, value) => {
-        const input = el as HTMLInputElement;
-        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-          window.HTMLInputElement.prototype,
-          'value'
-        )?.set;
-
-        nativeInputValueSetter?.call(input, value);
-
-        input.dispatchEvent(new Event('input', {bubbles: true}));
-        input.dispatchEvent(new Event('change', {bubbles: true}));
-        input.dispatchEvent(new Event('blur', {bubbles: true}));
-      },
-      isoDate
-    );
-    showMessage('Planned publication date is set to: ' + isoDate);
   }
 
   /**
@@ -1320,7 +1246,6 @@ export class BaseUser {
 
     await newPage.bringToFront();
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     return newPage;
   }
 
@@ -1624,43 +1549,6 @@ export class BaseUser {
         ? await this.page.waitForSelector(selector)
         : selector;
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
-  }
-
-  /**
-   * Retrieves a chapter element by its name.
-   * @param {string} chapterName - The name of the chapter to search for.
-   */
-  private async getChapterByName(
-    chapterName: string
-  ): Promise<ElementHandle<Element>> {
-    const chapters = await this.page.$$(chapterTitleSelector);
-
-    for (const chapter of chapters) {
-      const text = await this.page.evaluate(
-        el => el.textContent?.trim(),
-        chapter
-      );
-
-      if (text?.includes(chapterName)) {
-        return chapter;
-      }
-    }
-
-    throw new Error(`Chapter with name "${chapterName}" not found`);
-  }
-
-  /**
-   * Verifies whether a chapter is clickable or not.
-   * @param {string} chapterName - The name of the chapter.
-   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
-   */
-  async expectChapterToBeClickable(
-    chapterName: string,
-    shouldBeClickable: boolean = true
-  ): Promise<void> {
-    const chapterElement = await this.getChapterByName(chapterName);
-
-    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
   }
 
   /**
@@ -2274,15 +2162,6 @@ export class BaseUser {
     await this.expectElementToBeVisible(hideOSKButtonSelector);
     await this.clickOnElementWithSelector(hideOSKButtonSelector);
     await this.expectElementToBeVisible(hideOSKButtonSelector, false);
-  }
-
-  /**
-   * Logs every navigation event on the page.
-   */
-  attachNavigationLogs(page: Page): void {
-    page.on('framenavigated', frame => {
-      showMessage('NAVIGATED: ' + frame.url());
-    });
   }
 }
 
