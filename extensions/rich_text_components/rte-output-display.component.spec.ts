@@ -610,7 +610,14 @@ describe('RTE display component', () => {
       spyOn(
         automaticVoiceoverHighlightService,
         'getUnmodifiedSentenceByHighlightId'
-      ).and.returnValue('New element');
+      ).and.callFake((className: string) => {
+        if (className === 'highlightBlock1') {
+          return 'Hello world';
+        } else if (className === 'highlightBlock2') {
+          return 'New element';
+        }
+        return null;
+      });
 
       spyOn(document, 'getElementsByClassName').and.callFake(
         (className: string) => {
