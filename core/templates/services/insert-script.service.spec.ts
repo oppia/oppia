@@ -64,20 +64,33 @@ describe('InsertScriptService', () => {
   });
 
   it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
-    spyOn(
-      rendererFactory.createRenderer(null, null),
-      'createElement'
-    ).and.callThrough();
+    let createdScript!: HTMLScriptElement;
 
-    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
-      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
-        false
-      );
-      done();
+    const renderer = (insertScriptService as any).renderer;
+
+    spyOn(renderer, 'createElement').and.callFake(() => {
+      createdScript = document.createElement('script');
+      return createdScript;
     });
 
-    const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
-    expect(result).toBe(true);
+    spyOn(renderer, 'appendChild').and.callFake(() => {});
+
+    const result1 = insertScriptService.loadScript(
+      KNOWN_SCRIPTS.DONORBOX,
+      () => {
+        expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
+          false
+        );
+        done();
+      }
+    );
+
+    expect(result1).toBe(true);
+
+    const result2 = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+    expect(result2).toBe(true);
+
+    createdScript.onload!(new Event('load'));
   });
 
   it('should handle script load error correctly', (done: jasmine.DoneFn) => {
@@ -151,14 +164,30 @@ describe('InsertScriptService', () => {
   });
 
   it('should insert script into html', (done: jasmine.DoneFn) => {
+    let createdScript!: HTMLScriptElement;
+
+    const renderer = (insertScriptService as any).renderer;
+
+    spyOn(renderer, 'createElement').and.callFake(() => {
+      createdScript = document.createElement('script');
+      return createdScript;
+    });
+
+    spyOn(renderer, 'appendChild').and.callFake(() => {});
+
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
+
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
         false
       );
+
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN)).toBe(false);
+
       done();
     });
+
+    createdScript.onload!(new Event('load'));
   });
 });
