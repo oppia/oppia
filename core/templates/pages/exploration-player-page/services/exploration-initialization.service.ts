@@ -191,7 +191,6 @@ export class ExplorationInitializationService {
     );
     this.explorationEngineService.init(
       {
-        auto_tts_enabled: returnDict.auto_tts_enabled,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: returnDict.exploration.init_state_name,
@@ -207,7 +206,6 @@ export class ExplorationInitializationService {
       },
       returnDict.version,
       returnDict.preferred_audio_language_code,
-      returnDict.auto_tts_enabled,
       returnDict.preferred_language_codes,
       returnDict.displayable_language_codes,
       arePretestsAvailable ? () => {} : callback

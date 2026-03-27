@@ -129,7 +129,6 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_1])
@@ -222,7 +221,6 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_2])

@@ -129,7 +129,6 @@ class UserExplorationDataDict(TypedDict):
     param_specs: Dict[str, param_domain.ParamSpecDict]
     param_changes: List[param_domain.ParamChangeDict]
     version: int
-    auto_tts_enabled: bool
     edits_allowed: bool
     draft_change_list_id: int
     rights: rights_domain.ActivityRightsDict
@@ -836,15 +835,7 @@ def apply_change_list(
                     exploration.update_init_state_name(
                         edit_init_state_name_cmd.new_value
                     )
-                elif change.property_name == 'auto_tts_enabled':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyAutoTtsEnabledCmd.
-                    # Automatic text-to-speech is deprecated in the
-                    # exploration editor and player. Ignore any change
-                    # requests for this property to ensure learners never
-                    # get the auto-generated speech.
-                    pass
+                
                 elif change.property_name == 'next_content_id_index':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
@@ -931,7 +922,6 @@ def populate_exp_model_fields(
     }
     exp_model.param_specs = exploration.param_specs_dict
     exp_model.param_changes = exploration.param_change_dicts
-    exp_model.auto_tts_enabled = exploration.auto_tts_enabled
     exp_model.edits_allowed = exploration.edits_allowed
     exp_model.next_content_id_index = exploration.next_content_id_index
 
@@ -1448,7 +1438,6 @@ def _create_exploration(
         },
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
-        auto_tts_enabled=exploration.auto_tts_enabled,
         next_content_id_index=exploration.next_content_id_index,
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
@@ -3220,8 +3209,7 @@ def get_user_exploration_data(
 
     editor_dict: UserExplorationDataDict = {
         # Automatic text-to-speech is deprecated in the exploration editor.
-        # Always disable for the editor UI.
-        'auto_tts_enabled': False,
+        # Field removed: do not include in editor dict.
         'category': exploration.category,
         'draft_change_list_id': draft_change_list_id,
         'exploration_id': exploration_id,
@@ -4333,8 +4321,7 @@ def to_exploration_dict_for_android(
         'param_changes': exploration.param_change_dicts,
         'param_specs': exploration.param_specs_dict,
         'tags': exploration.tags,
-        # Automatic text-to-speech is deprecated. Always disable.
-        'auto_tts_enabled': False,
+        # Automatic text-to-speech is deprecated. Field removed from payload.
         'next_content_id_index': exploration.next_content_id_index,
         'edits_allowed': exploration.edits_allowed,
         'states': state_name_to_state_dict,

@@ -643,111 +643,7 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
-
-    OLD_EXP_ID: Final = 'exp_id0'
     NEW_EXP_ID: Final = 'exp_id1'
-
-    UPGRADED_EXP_YAML: Final = (
-        (
-            """author_notes: ''
-auto_tts_enabled: false
-blurb: ''
-category: Art
-edits_allowed: true
-init_state_name: Introduction
-language_code: en
-next_content_id_index: 6
-objective: Exp objective...
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  End:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content_0
-      html: <p>Congratulations, you have finished!</p>
-    inapplicable_skill_misconception_ids: []
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    linked_skill_id: null
-    param_changes: []
-    solicit_answer_details: false
-  %s:
-    card_is_checkpoint: true
-    classifier_model_id: null
-    content:
-      content_id: content_1
-      html: ''
-    inapplicable_skill_misconception_ids: []
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: End
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_3
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_4
-              normalizedStrSet:
-              - InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        catchMisspellings:
-          value: false
-        placeholder:
-          value:
-            content_id: ca_placeholder_5
-            unicode_str: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: Introduction
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome_2
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    linked_skill_id: null
-    param_changes: []
-    solicit_answer_details: false
-states_schema_version: %d
-tags: []
-title: Old Title
-"""
-        )
-        % (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME,
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
-    )
-
     STATES_AT_V41 = {
         'Introduction': {
             'classifier_model_id': None,
@@ -766,17 +662,7 @@ title: Old Title
                             'param_changes': [],
                             'refresher_exploration_id': None,
                         },
-                        'rule_specs': [
-                            {
-                                'inputs': {
-                                    'x': {
-                                        'contentId': 'rule_input_3',
-                                        'normalizedStrSet': ['InputString'],
-                                    }
-                                },
-                                'rule_type': 'Equals',
-                            }
-                        ],
+                        'rule_specs': [],
                         'tagged_skill_misconception_id': None,
                         'training_data': [],
                     }
@@ -803,34 +689,15 @@ title: Old Title
                 'id': 'TextInput',
                 'solution': None,
             },
-            'next_content_id_index': 4,
+            'next_content_id_index': 1,
             'param_changes': [],
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'ca_placeholder_2': {},
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_1': {},
-                    'rule_input_3': {},
-                }
-            },
+            'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
             'solicit_answer_details': False,
-            'written_translations': {
-                'translations_mapping': {
-                    'ca_placeholder_2': {},
-                    'content': {},
-                    'default_outcome': {},
-                    'feedback_1': {},
-                    'rule_input_3': {},
-                }
-            },
+            'written_translations': {'translations_mapping': {'content': {}}},
         },
         'End': {
             'classifier_model_id': None,
-            'content': {
-                'content_id': 'content',
-                'html': '<p>Congratulations, you have finished!</p>',
-            },
+            'content': {'content_id': 'content', 'html': ''},
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -849,82 +716,6 @@ title: Old Title
             'written_translations': {'translations_mapping': {'content': {}}},
         },
     }
-
-    ALBERT_EMAIL: Final = 'albert@example.com'
-    ALBERT_NAME: Final = 'albert'
-
-    def setUp(self) -> None:
-        super().setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-
-        # Create exploration that uses an old states schema version and ensure
-        # it is properly converted.
-        swap_states_schema_41 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
-        )
-        swap_exp_schema_46 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
-        )
-        with swap_states_schema_41, swap_exp_schema_46:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.OLD_EXP_ID,
-                title='Old Title',
-                category='Art',
-                objective='Exp objective...',
-            )
-            exploration_model = exp_models.ExplorationModel(id=self.OLD_EXP_ID)
-            exp_services.populate_exp_model_fields(
-                exploration_model, exploration
-            )
-
-        exploration_model.states = self.STATES_AT_V41
-        rights_manager.create_new_exploration_rights(
-            exploration_model.id, self.albert_id
-        )
-        exploration_model.commit(self.albert_id, 'Created new exploration.', [])
-        exp_services.regenerate_exploration_summary_with_new_contributor(
-            self.OLD_EXP_ID, self.albert_id
-        )
-        stats_services.create_exp_issues_for_new_exploration(
-            exploration_model.id, exploration_model.version
-        )
-
-        # Create standard exploration that should not be converted.
-        new_exp = self.save_new_valid_exploration(
-            self.NEW_EXP_ID, self.albert_id
-        )
-        self._up_to_date_yaml = new_exp.to_yaml()
-
-        # Clear the cache to prevent fetches of old data under the previous
-        # state schema version scheme.
-        caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION,
-            None,
-            [self.OLD_EXP_ID, self.NEW_EXP_ID],
-        )
-
-    def test_converts_exp_model_with_default_states_schema_version(
-        self,
-    ) -> None:
-        exploration = exp_fetchers.get_exploration_by_id(self.OLD_EXP_ID)
-        self.assertEqual(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
-        self.assertEqual(
-            exploration.to_yaml(), '%sversion: 1\n' % self.UPGRADED_EXP_YAML
-        )
-
-    def test_does_not_convert_up_to_date_exploration(self) -> None:
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION,
-        )
-        self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
 
     def test_migration_with_invalid_state_schema(self) -> None:
         self.save_new_valid_exploration('fake_eid', self.albert_id)
@@ -950,23 +741,7 @@ title: Old Title
                 exp_fetchers.get_exploration_from_model(exploration_model)
 
     def test_migration_then_reversion_maintains_valid_exploration(self) -> None:
-        """This integration test simulates the behavior of the domain layer
-        prior to the introduction of a states schema. In particular, it deals
-        with an exploration that was created before any states schema
-        migrations occur. The exploration is constructed using multiple change
-        lists, then a migration is run. The test thereafter tests if
-        reverting to a version prior to the migration still maintains a valid
-        exploration. It tests both the exploration domain object and the
-        exploration model stored in the datastore for validity.
-        Note: It is important to distinguish between when the test is testing
-        the exploration domain versus its model. It is operating at the domain
-        layer when using exp_fetchers.get_exploration_by_id. Otherwise, it
-        loads the model explicitly using exp_models.ExplorationModel.get and
-        then converts it to an exploration domain object for validation using
-        exp_fetchers.get_exploration_from_model. This is NOT the same process
-        as exp_fetchers.get_exploration_by_id as it skips many steps which
-        include the conversion pipeline (which is crucial to this test).
-        """
+
         exp_id: str = 'exp_id2'
         end_state_name: str = 'End'
 

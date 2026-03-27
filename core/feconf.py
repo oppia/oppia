@@ -383,9 +383,7 @@ INVALID_CONTENT_ID = 'invalid_content_id'
 DEFAULT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
-# by default.
-# Deprecated: automatic text-to-speech in the exploration player is disabled.
-DEFAULT_AUTO_TTS_ENABLED = False
+# by default. (Deprecated and removed.)
 
 # Default value for next_content_id_index in exploration/question.
 DEFUALT_NEXT_CONTENT_ID_INDEX = 0

@@ -259,7 +259,6 @@ describe('Exploration engine service ', () => {
           },
         },
       },
-      auto_tts_enabled: true,
       version: 2,
       param_specs: {
         x: {
@@ -289,7 +288,6 @@ describe('Exploration engine service ', () => {
         init_state_name: 'Introduction',
         param_specs: {},
         param_changes: [],
-        auto_tts_enabled: false,
         edits_allowed: true,
       },
     };
@@ -329,7 +327,6 @@ describe('Exploration engine service ', () => {
         init_state_name: 'state_name',
         param_specs: {},
         param_changes: [],
-        auto_tts_enabled: false,
         edits_allowed: true,
       },
       exploration_id: 'test_id',
@@ -338,7 +335,6 @@ describe('Exploration engine service ', () => {
       version: 1,
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
-      auto_tts_enabled: false,
       displayable_language_codes: [],
       record_playthrough_probability: 1,
       has_viewed_lesson_info_modal_once: false,

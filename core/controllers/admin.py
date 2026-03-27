@@ -176,7 +176,6 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(
         'param_changes': [],
         'param_specs': {},
         'tags': ['exploration'],
-        'auto_tts_enabled': False,
         'next_content_id_index': 2,
         'edits_allowed': True,
         'states': {

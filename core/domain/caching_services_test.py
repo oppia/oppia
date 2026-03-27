@@ -54,7 +54,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
         'category': '',
-        'auto_tts_enabled': True,
+        
         'states': {
             'Introduction': {
                 'card_is_checkpoint': True,
@@ -143,7 +143,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     # The correct json encoded version of the above exploration containing
     # unicode characters that is set to the memory cache.
     json_encoded_string_representing_an_exploration = (
-        '{"param_changes": [], "category": "", "auto_tts_enabled": true, '
+        '{"param_changes": [], "category": "", '
         '"next_content_id_index": 7, "tags"'
         ': [], "states_schema_version": 57, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'

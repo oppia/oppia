@@ -203,7 +203,6 @@ describe('Exploration editor page component', () => {
     tags: [],
     param_specs: [],
     param_changes: [],
-    auto_tts_enabled: {},
     edits_allowed: true,
     user: {},
     version: '1',

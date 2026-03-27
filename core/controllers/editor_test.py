@@ -687,8 +687,8 @@ solicit_answer_details: false
                 exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'auto_tts_enabled',
-                        'new_value': True,
+                        'property_name': 'blurb',
+                        'new_value': 'Updated blurb',
                     }
                 ),
                 exp_domain.ExplorationChange(

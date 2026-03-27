@@ -241,14 +241,6 @@ class ExplorationModel(base_models.VersionedModel):
     param_changes = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )
-    # A boolean indicating whether automatic text-to-speech is enabled in
-    # this exploration.
-    auto_tts_enabled = datastore_services.BooleanProperty(
-        # Automatic text-to-speech is deprecated. Default to False so that
-        # any exploration missing this field will not enable it.
-        default=False,
-        indexed=True,
-    )
     # The next_content_id index to use for generation of new content ids.
     next_content_id_index = datastore_services.IntegerProperty(
         required=True, default=0, indexed=True
@@ -295,7 +287,6 @@ class ExplorationModel(base_models.VersionedModel):
                 'states': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'param_specs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'correctness_feedback_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE,

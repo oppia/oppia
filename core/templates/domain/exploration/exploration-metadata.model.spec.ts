@@ -50,7 +50,6 @@ describe('Exploration metadata object factory', () => {
         },
       ],
       param_specs: {},
-      auto_tts_enabled: false,
       edits_allowed: true,
     };
   });

@@ -103,7 +103,7 @@ describe('Preview Tab Component', () => {
   let stateName = 'State1';
   let changeObjectName = 'change';
   let exploration = {
-    auto_tts_enabled: false,
+    
     draft_changes: [],
     is_version_of_draft_valid: false,
     init_state_name: stateName,
@@ -125,7 +125,6 @@ describe('Preview Tab Component', () => {
       init_state_name: 'Introduction',
       param_specs: {},
       param_changes: [],
-      auto_tts_enabled: false,
       edits_allowed: true,
     },
     next_content_id_index: 5,

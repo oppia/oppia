@@ -207,7 +207,6 @@ class EntityTranslationsModelGenerationOneOffJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange(
@@ -333,7 +332,6 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange(

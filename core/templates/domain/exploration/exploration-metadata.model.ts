@@ -32,7 +32,6 @@ export interface ExplorationMetadataBackendDict {
   init_state_name: string;
   param_specs: ParamSpecsBackendDict;
   param_changes: ParamChangeBackendDict[];
-  auto_tts_enabled: boolean;
   edits_allowed: boolean;
 }
 
@@ -54,7 +53,6 @@ export class ExplorationMetadata {
   _initStateName: string;
   _paramSpecs: ParamSpecs;
   _paramChanges: ParamChange[];
-  _autoTtsEnabled: boolean;
   _editsAllowed: boolean;
 
   constructor(
@@ -69,7 +67,6 @@ export class ExplorationMetadata {
     initStateName: string,
     paramSpecs: ParamSpecs,
     paramChanges: ParamChange[],
-    autoTtsEnabled: boolean,
     editsAllowed: boolean
   ) {
     this._title = title;
@@ -83,7 +80,6 @@ export class ExplorationMetadata {
     this._initStateName = initStateName;
     this._paramSpecs = paramSpecs;
     this._paramChanges = paramChanges;
-    this._autoTtsEnabled = autoTtsEnabled;
     this._editsAllowed = editsAllowed;
   }
 
@@ -102,7 +98,6 @@ export class ExplorationMetadata {
       param_changes: this._paramChanges.map(paramChange =>
         paramChange.toBackendDict()
       ),
-      auto_tts_enabled: this._autoTtsEnabled,
       edits_allowed: this._editsAllowed,
     };
   }
@@ -129,7 +124,6 @@ export class ExplorationMetadata {
       explorationMetadataBackendDict.init_state_name,
       paramSpecs,
       paramChanges,
-      explorationMetadataBackendDict.auto_tts_enabled,
       explorationMetadataBackendDict.edits_allowed
     );
   }

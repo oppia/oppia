@@ -68,7 +68,6 @@ if MYPY:  # pragma: no cover
 EXP_V46_DICT = utils.dict_from_yaml(
     """
 author_notes: ''
-auto_tts_enabled: true
 blurb: ''
 category: Art
 edits_allowed: true
@@ -278,7 +277,7 @@ class MigrateExplorationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            # ...existing code...
         )
         rights_manager.create_new_exploration_rights(
             self.EXP_ID_TWO, feconf.SYSTEM_COMMITTER_ID
@@ -379,7 +378,7 @@ class MigrateExplorationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            # ...existing code...
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -512,7 +511,7 @@ class MigrateExplorationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -599,7 +598,6 @@ class MigrateExplorationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -849,7 +847,6 @@ class AuditExplorationMigrationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -972,7 +969,6 @@ class AuditExplorationMigrationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -1316,7 +1312,6 @@ class ExpSnapshotsMigrationAuditJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -1412,7 +1407,6 @@ class ExpSnapshotsMigrationAuditJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -1728,7 +1722,6 @@ class ExpSnapshotsMigrationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -1941,8 +1934,7 @@ class ExpSnapshotsMigrationJobTests(
             author_notes=EXP_V46_DICT['author_notes'],
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+                states=EXP_V46_DICT['states'],
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID

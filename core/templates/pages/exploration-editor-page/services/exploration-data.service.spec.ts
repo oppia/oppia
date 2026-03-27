@@ -45,7 +45,6 @@ describe('Exploration data service', function () {
   let sampleDataResults: ExplorationBackendDict = {
     draft_change_list_id: 3,
     version: 1,
-    auto_tts_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     next_content_id_index: 1,
@@ -67,7 +66,6 @@ describe('Exploration data service', function () {
       init_state_name: 'Introduction',
       param_specs: {},
       param_changes: [],
-      auto_tts_enabled: false,
       edits_allowed: true,
     },
   };
@@ -98,7 +96,6 @@ describe('Exploration data service', function () {
     session_id: '1',
     version: 1,
     preferred_audio_language_code: 'en',
-    auto_tts_enabled: true,
     record_playthrough_probability: 1,
   } as unknown as FetchExplorationBackendResponse;
   class MockEditableExplorationBackendApiService {
@@ -196,7 +193,6 @@ describe('Exploration data service', function () {
     let dataResults: ExplorationBackendDict = {
       draft_change_list_id: 3,
       version: undefined,
-      auto_tts_enabled: false,
       draft_changes: [],
       is_version_of_draft_valid: true,
       init_state_name: 'init',
@@ -218,7 +214,6 @@ describe('Exploration data service', function () {
         init_state_name: 'Introduction',
         param_specs: {},
         param_changes: [],
-        auto_tts_enabled: false,
         edits_allowed: true,
       },
     };

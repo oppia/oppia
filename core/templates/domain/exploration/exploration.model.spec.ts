@@ -146,7 +146,6 @@ describe('Exploration', () => {
         init_state_name: 'Introduction',
         param_specs: {},
         param_changes: [],
-        auto_tts_enabled: true,
         edits_allowed: true,
       },
       exploration_id: '1',
@@ -155,7 +154,6 @@ describe('Exploration', () => {
       version: 0,
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
-      auto_tts_enabled: true,
       record_playthrough_probability: 1,
       draft_change_list_id: 1,
       has_viewed_lesson_info_modal_once: false,
@@ -170,7 +168,6 @@ describe('Exploration', () => {
       title: 'My Title',
       init_state_name: 'Introduction',
       language_code: 'en',
-      auto_tts_enabled: false,
       states: {
         'first state': firstState,
         'second state': secondState,
@@ -194,7 +191,6 @@ describe('Exploration', () => {
         init_state_name: 'Introduction',
         param_specs: {},
         param_changes: [],
-        auto_tts_enabled: false,
         edits_allowed: true,
       },
     };

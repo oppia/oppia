@@ -50,7 +50,6 @@ export interface FetchExplorationBackendResponse {
   version: number;
   preferred_audio_language_code: string;
   preferred_language_codes: string[];
-  auto_tts_enabled: boolean;
   record_playthrough_probability: number;
   draft_change_list_id: number;
   has_viewed_lesson_info_modal_once: boolean;

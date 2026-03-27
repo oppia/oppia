@@ -159,7 +159,6 @@ const dummyExplorationMetadata = {
   init_state_name: 'Introduction',
   param_specs: {},
   param_changes: [],
-  auto_tts_enabled: false,
   edits_allowed: true,
 };
 
@@ -173,7 +172,6 @@ const dummyExplorationBackendResponse = {
   version: 1,
   preferred_audio_language_code: 'en',
   preferred_language_codes: ['en'],
-  auto_tts_enabled: false,
   record_playthrough_probability: 1.0,
   draft_change_list_id: 1,
   has_viewed_lesson_info_modal_once: false,

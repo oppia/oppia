@@ -118,7 +118,6 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_1])
@@ -406,7 +405,6 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_1])

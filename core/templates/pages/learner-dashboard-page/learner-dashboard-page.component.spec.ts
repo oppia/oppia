@@ -154,7 +154,6 @@ describe('Learner dashboard page', () => {
     draft_change_list_id: 3,
     title: 'Test Exploration',
     next_content_id_index: 3,
-    auto_tts_enabled: true,
     exploration_metadata: {
       title: 'Exploration',
       category: 'Algebra',
@@ -167,7 +166,6 @@ describe('Learner dashboard page', () => {
       init_state_name: 'Introduction',
       param_specs: {},
       param_changes: [],
-      auto_tts_enabled: false,
       edits_allowed: true,
     },
   };

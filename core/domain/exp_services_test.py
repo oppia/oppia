@@ -1,5 +1,4 @@
 # coding: utf-8
-#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2283,9 +2282,8 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
         yaml_with_no_schema_version = (
             (
                 """
-        author_notes: ''
-        auto_tts_enabled: true
-        blurb: ''
+            author_notes: ''
+            blurb: ''
         category: Category
         edits_allowed: true
         init_state_name: Introduction
@@ -2756,9 +2754,8 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
         'caption-with-value="&quot;&quot;"\n        filepath-with-value="'
         '&quot;abc.png&quot;"></oppia-noninteractive-image>'
     )
-    SAMPLE_YAML_CONTENT: str = (
-        """author_notes: ''
-auto_tts_enabled: false
+        SAMPLE_YAML_CONTENT: str = (
+                """author_notes: ''
 blurb: ''
 category: Algebra
 edits_allowed: true
@@ -2770,10 +2767,10 @@ param_changes: []
 param_specs: {}
 schema_version: %d
 states:
-  %s:
-    card_is_checkpoint: true
-    classifier_model_id: null
-    content:
+    %s:
+        card_is_checkpoint: true
+        classifier_model_id: null
+        content:
       content_id: content_0
       html: ''
     inapplicable_skill_misconception_ids: []
@@ -2856,7 +2853,7 @@ version: 2
     )
 
     UPDATED_YAML_CONTENT = """author_notes: ''
-auto_tts_enabled: false
+    UPDATED_YAML_CONTENT = """author_notes: ''
 blurb: ''
 category: Algebra
 edits_allowed: true
@@ -7587,7 +7584,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     def test_get_recently_published_exp_summaries(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_1_ID, self.owner_id)
-        self.save_new_valid_exploration(self.EXP_2_ID, self.owner_id)
+        SAMPLE_EXPLORATION_YAML: str = (
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
         rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
         rights_manager.publish_exploration(self.owner, self.EXP_2_ID)
@@ -7720,8 +7717,8 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 
     UPGRADED_EXP_YAML: Final = (
         (
+    # ...existing code...
             """author_notes: ''
-auto_tts_enabled: true
 blurb: ''
 category: category
 edits_allowed: true
@@ -8496,70 +8493,7 @@ title: Old Title
             exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME
         )
 
-    def test_update_exploration_auto_tts_enabled(self) -> None:
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, False)
-        exp_services.update_exploration(
-            self.albert_id,
-            self.NEW_EXP_ID,
-            [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'auto_tts_enabled',
-                        'new_value': False,
-                    }
-                )
-            ],
-            'Changed auto_tts_enabled.',
-        )
-
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, False)
-
-        # Check that the property can be changed when working
-        # on old version.
-        # Add change to upgrade the version.
-        exp_services.update_exploration(
-            self.albert_id,
-            self.NEW_EXP_ID,
-            [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title',
-                    }
-                )
-            ],
-            'Changed title.',
-        )
-
-        change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'auto_tts_enabled',
-                    'new_value': True,
-                }
-            )
-        ]
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.NEW_EXP_ID, 2, change_list
-        )
-        self.assertTrue(changes_are_mergeable)
-        exp_services.update_exploration(
-            self.albert_id,
-            self.NEW_EXP_ID,
-            change_list,
-            'Changed auto_tts_enabled again.',
-        )
-
-        # Assert that final version consists all the changes.
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.title, 'new title')
-        # Automatic text-to-speech is deprecated and should not be updated.
-        self.assertEqual(exploration.auto_tts_enabled, False)
+    
 
     def test_update_old_exploration_version_remains_editable(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -11216,11 +11150,12 @@ class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
     EXP_ID: Final = 'exp_id0'
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
-    SAMPLE_EXPLORATION_YAML: str = (
-        """
 author_notes: ''
-auto_tts_enabled: true
-blurb: ''
+    # ...existing code...
+    SAMPLE_EXPLORATION_YAML: str = (
+    author_notes: ''
+        """
+    blurb: ''
 category: Category
 edits_allowed: true
 init_state_name: Introduction
@@ -11610,10 +11545,11 @@ class SyncLoggedInAndLoggedOutProgressTests(test_utils.GenericTestBase):
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
     SAMPLE_EXPLORATION_YAML: str = (
-        """
 author_notes: ''
-auto_tts_enabled: true
-blurb: ''
+    # ...existing code...
+        """
+    author_notes: ''
+    blurb: ''
 category: Category
 edits_allowed: true
 init_state_name: Introduction
@@ -12944,7 +12880,6 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'tags': [],
-            'auto_tts_enabled': False,
             'next_content_id_index': 2,
             'edits_allowed': True,
             'states': {

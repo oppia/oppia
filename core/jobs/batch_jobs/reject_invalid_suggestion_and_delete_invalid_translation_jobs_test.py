@@ -177,7 +177,6 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.exp_1.commit(
@@ -220,7 +219,6 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.exp_2.commit(
@@ -374,7 +372,6 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.exp_1.commit(
@@ -417,7 +414,6 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.exp_2.commit(
@@ -574,7 +570,6 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.exp_1.commit(
@@ -726,7 +721,6 @@ class AuditDeleteTranslationsForInvalidContentIDsJobTests(
             states_schema_version=52,
             param_specs={},
             param_changes=[],
-            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.exp_1.commit(

@@ -47,7 +47,6 @@ import {ExplorationMetadataBackendDict} from './exploration-metadata.model';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 
 export interface ExplorationBackendDict {
-  auto_tts_enabled: boolean;
   draft_changes: ExplorationChange[];
   is_version_of_draft_valid: boolean;
   init_state_name: string;
@@ -219,7 +218,6 @@ export class Exploration extends BaseTranslatableObject {
     urlInterpolationService: UrlInterpolationService
   ): Exploration {
     const explorationBackendDict: ExplorationBackendDict = {
-      auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
       draft_changes: [],
       init_state_name: explorationBackendResponse.exploration.init_state_name,
       states: explorationBackendResponse.exploration.states,

@@ -2617,7 +2617,6 @@ class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     SAMPLE_EXPLORATION_YAML: Final = (
         """
 author_notes: ''
-auto_tts_enabled: true
 blurb: ''
 category: Category
 edits_allowed: true

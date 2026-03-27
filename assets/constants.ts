@@ -7769,7 +7769,7 @@ export default {
   "METADATA_PROPERTIES": [
     "title", "category", "objective", "language_code", "tags", "blurb",
     "author_notes", "states_schema_version", "init_state_name", "param_specs",
-    "param_changes", "auto_tts_enabled",
+    "param_changes",
     "edits_allowed"
   ],
   "NON_METADATA_PROPERTIES": [
@@ -7777,8 +7777,8 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": "",
+  "BRANCH_NAME": "deprecate-auto-tts-exploration-settings-18480",
+  "SHORT_COMMIT_HASH": "91e93ff293",
   // Please consult the translation team before adding any entries here.
   // These words improve the quality of automatic voiceovers.
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
