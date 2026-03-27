@@ -4310,6 +4310,11 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(previewTabContainer);
+    await this.page.waitForFunction(() =>
+      window.location.href.includes('#/preview/')
+    );
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForTimeout(2000);
     await this.waitForPageToFullyLoad();
   }
 
