@@ -162,7 +162,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             )
         )
 
-        print('\n[INFO] Servers have come up.\n')
+        print('Servers have come up.\n')
 
         output_lines = []
         while True:
@@ -189,28 +189,9 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 def main(args: Optional[List[str]] = None) -> None:
     """Run acceptance tests."""
     parsed_args = _PARSER.parse_args(args=args)
-    test_name = parsed_args.suite
-    sep = '-' * 60
-    fail_sep = '!' * 60
-
-    print(
-        f'\n{sep}'
-        f'\n[START] Running acceptance test: {test_name}'
-        f'\n{sep}\n'
-    )
 
     with servers.managed_portserver():
         _, return_code = run_tests(parsed_args)
-
-    if return_code == 0:
-        print(f'\n[SUCCESS] Completed test: {test_name}\n')
-    else:
-        print(
-            f'\n{fail_sep}'
-            f'\n[FAILURE] Test failed: {test_name}'
-            f'\n[ERROR] Return code: {return_code}'
-            f'\n{fail_sep}\n'
-        )
 
     sys.exit(return_code)
 
