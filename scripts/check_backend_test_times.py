@@ -28,6 +28,7 @@ BACKEND_TEST_TIMES_FILE: Final = os.path.join(
     os.getcwd(), 'backend_test_times.txt'
 )
 LONG_BACKEND_TEST_TIME_THRESHOLD: Final = 150.0
+AVERAGE_TEST_CASE_TIME_THRESHOLD: Final = 10.0
 
 
 class BackendTestDict(TypedDict):
@@ -125,16 +126,16 @@ def main() -> None:
                 % (backend_test['test_name'], backend_test['test_time'])
             )
     print(
-        '\033[1mBACKEND TEST TIMES WITH AVERAGE TEST CASE TIME OVER %s '
-        'SECONDS:\033[0m' % LONG_BACKEND_TEST_TIME_THRESHOLD
+        '\033[1mBACKEND TEST TIMES WITH AVERAGE TIME PER TEST CASE OVER %s '
+        'SECONDS:\033[0m' % AVERAGE_TEST_CASE_TIME_THRESHOLD
     )
     for backend_test in sorted_backend_test_times_by_avg_test_case:
         if (
             backend_test['test_time_by_average_test_case']
-            > LONG_BACKEND_TEST_TIME_THRESHOLD
+            > AVERAGE_TEST_CASE_TIME_THRESHOLD
         ):
             print(
-                '%s: %s SECONDS BY AVERAGE TEST CASE TIME.'
+                '%s: %.3f SECONDS AVERAGE TIME PER TEST CASE.'
                 % (
                     backend_test['test_name'],
                     backend_test['test_time_by_average_test_case'],

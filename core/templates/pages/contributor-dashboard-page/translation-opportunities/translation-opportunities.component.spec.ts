@@ -48,6 +48,18 @@ import {CkEditorCopyToolbarComponent} from 'components/ck-editor-helpers/ck-edit
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {EventEmitter} from '@angular/core';
 
+class MockUserService {
+  isLoggedIn(): boolean {
+    return false;
+  }
+
+  getUserInfoAsync(): Promise<UserInfo> {
+    return Promise.resolve({
+      isLoggedIn: () => true,
+    } as UserInfo);
+  }
+}
+
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
   let translationLanguageService: TranslationLanguageService;
@@ -97,7 +109,14 @@ describe('Translation opportunities component', () => {
         TranslationOpportunitiesComponent,
         WrapTextWithEllipsisPipe,
       ],
-      providers: [NgbModal, NgbActiveModal],
+      providers: [
+        NgbModal,
+        NgbActiveModal,
+        {
+          provide: UserService,
+          useClass: MockUserService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     translationModal = TestBed.createComponent(

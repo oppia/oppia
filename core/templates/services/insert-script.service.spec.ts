@@ -47,8 +47,8 @@ describe('InsertScriptService', () => {
         {provide: RendererFactory2, useClass: MockRendererFactory},
       ],
     });
-    insertScriptService = TestBed.get(InsertScriptService);
-    rendererFactory = TestBed.get(RendererFactory2);
+    insertScriptService = TestBed.inject(InsertScriptService);
+    rendererFactory = TestBed.inject(RendererFactory2);
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
@@ -152,7 +152,7 @@ describe('InsertScriptService', () => {
 
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
       expect(mockScriptElement.src).toContain(
-        '/third_party/static/MathJax-2.7.5/MathJax.js?config=default'
+        '/assets/mathjax/MathJax.js?config=TeX-AMS_SVG'
       );
       done();
     });

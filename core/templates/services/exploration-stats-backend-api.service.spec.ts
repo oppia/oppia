@@ -36,10 +36,10 @@ describe('Exploration stats backend api service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    explorationStatsBackendApiService = TestBed.get(
+    explorationStatsBackendApiService = TestBed.inject(
       ExplorationStatsBackendApiService
     );
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   it('should return an ExplorationStats domain object', fakeAsync(() => {
