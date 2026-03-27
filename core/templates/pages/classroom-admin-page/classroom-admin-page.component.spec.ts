@@ -48,6 +48,18 @@ class MockNgbModal {
   }
 }
 
+class MockModalRef implements NgbModalRef {
+  componentInstance: any;
+  result: Promise<any>;
+
+  constructor(componentInstance: any, result: Promise<any>) {
+    this.componentInstance = componentInstance;
+    this.result = result;
+  }
+  close(result?: any): void {}
+  dismiss(reason?: any): void {}
+}
+
 const dummyThumbnailData = {
   filename: 'thumbnail.svg',
   bg_color: 'transparent',
@@ -160,7 +172,7 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllClassroomDisplayInfoDictAsync'
-    ).and.returnValue(Promise.resolve(response));
+    ).and.returnValue(Promise.resolve(response) as Promise<any>);
 
     expect(component.pageIsInitialized).toBeFalse();
 
@@ -257,7 +269,7 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllTopicsToClassroomRelation'
-    ).and.returnValue(Promise.resolve(response));
+    ).and.returnValue(Promise.resolve(response) as Promise<any>);
 
     expect(component.topicsToClassroomRelation.length).toEqual(0);
     expect(component.filteredTopicsToClassroomRelation.length).toEqual(0);
@@ -324,7 +336,7 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllClassroomDisplayInfoDictAsync'
-    ).and.returnValue(Promise.resolve(response));
+    ).and.returnValue(Promise.resolve(response) as Promise<any>);
 
     expect(component.pageIsInitialized).toBeFalse();
 
@@ -586,10 +598,9 @@ describe('Classroom Admin Page component ', () => {
         thumbnailData: dummyThumbnailData,
         bannerData: dummyBannerData,
       });
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {},
-        result: Promise.resolve(),
-      } as NgbModalRef);
+      spyOn(ngbModal, 'open').and.returnValue(
+        new MockModalRef({}, Promise.resolve()) as NgbModalRef
+      );
 
       component.closeClassroomConfigEditor();
       tick();
@@ -608,10 +619,9 @@ describe('Classroom Admin Page component ', () => {
       component.classroomDataIsChanged = true;
       component.classroomEditorMode = true;
       component.classroomViewerMode = false;
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {},
-        result: Promise.reject(),
-      } as NgbModalRef);
+      spyOn(ngbModal, 'open').and.returnValue(
+        new MockModalRef({}, Promise.reject()) as NgbModalRef
+      );
 
       component.closeClassroomConfigEditor();
 
@@ -629,10 +639,9 @@ describe('Classroom Admin Page component ', () => {
       component.classroomDataIsChanged = false;
       component.classroomEditorMode = true;
       component.classroomViewerMode = false;
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {},
-        result: Promise.resolve(),
-      } as NgbModalRef);
+      spyOn(ngbModal, 'open').and.returnValue(
+        new MockModalRef({}, Promise.resolve()) as NgbModalRef
+      );
 
       component.closeClassroomConfigEditor();
 
@@ -664,18 +673,17 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllClassroomDisplayInfoDictAsync'
-    ).and.returnValue(Promise.resolve(response));
+    ).and.returnValue(Promise.resolve(response) as Promise<any>);
 
     component.ngOnInit();
     tick();
 
     component.classroomCount = 3;
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.resolve(),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef({}, Promise.resolve()) as NgbModalRef
+    );
     spyOn(classroomBackendApiService, 'deleteClassroomAsync').and.returnValue(
-      Promise.resolve()
+      Promise.resolve() as Promise<void>
     );
     component.deleteClassroom('chemistryClassroomId');
     tick();
@@ -720,12 +728,11 @@ describe('Classroom Admin Page component ', () => {
       },
     ];
     component.classroomCount = 3;
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.reject(),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef({}, Promise.reject()) as NgbModalRef
+    );
     spyOn(classroomBackendApiService, 'deleteClassroomAsync').and.returnValue(
-      Promise.resolve()
+      Promise.resolve() as Promise<void>
     );
 
     component.deleteClassroom('mathClassroomId');
@@ -776,12 +783,12 @@ describe('Classroom Admin Page component ', () => {
       topic_list_intro: '',
       topic_id_to_prerequisite_topic_ids: {},
     };
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        existingClassroomNames: ['math', 'chemistry'],
-      },
-      result: Promise.resolve(classroomDict),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef(
+        {existingClassroomNames: ['math', 'chemistry']},
+        Promise.resolve(classroomDict)
+      ) as NgbModalRef
+    );
 
     component.createNewClassroom();
     tick();
@@ -818,12 +825,12 @@ describe('Classroom Admin Page component ', () => {
       },
     ];
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        existingClassroomNames: ['math', 'chemistry'],
-      },
-      result: Promise.reject(),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef(
+        {existingClassroomNames: ['math', 'chemistry']},
+        Promise.reject()
+      ) as NgbModalRef
+    );
 
     component.createNewClassroom();
     tick();
@@ -857,7 +864,7 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       editableTopicBackendApiService,
       'getTopicIdToTopicNameAsync'
-    ).and.returnValue(Promise.resolve(topicIdTotopicName));
+    ).and.returnValue(Promise.resolve(topicIdTotopicName) as Promise<any>);
 
     component.setTopicDependencyByTopicName(topicIdToPrerequisiteTopicIds);
 
@@ -898,7 +905,7 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       editableTopicBackendApiService,
       'getTopicIdToTopicNameAsync'
-    ).and.returnValue(Promise.resolve(topicIdToTopicName));
+    ).and.returnValue(Promise.resolve(topicIdToTopicName) as Promise<any>);
 
     component.onNewTopicInputModelChange('topicId1');
 
@@ -1146,10 +1153,9 @@ describe('Classroom Admin Page component ', () => {
   });
 
   it('should be able to delete a topic from the classroom on modal confirmation', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.resolve(),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef({}, Promise.resolve()) as NgbModalRef
+    );
 
     component.topicIdsToTopicName = {
       topicId1: 'Dummy topic 1',
@@ -1202,10 +1208,9 @@ describe('Classroom Admin Page component ', () => {
     'should mark the topic dependency flag to false when all topics ' +
       'are deleted',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {},
-        result: Promise.resolve(),
-      } as NgbModalRef);
+      spyOn(ngbModal, 'open').and.returnValue(
+        new MockModalRef({}, Promise.resolve()) as NgbModalRef
+      );
 
       component.topicIdsToTopicName = {
         topicId1: 'Dummy topic 1',
@@ -1235,10 +1240,9 @@ describe('Classroom Admin Page component ', () => {
   );
 
   it('should be able to handle rejection handler on topic deletion modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.reject(),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef({}, Promise.reject()) as NgbModalRef
+    );
 
     component.topicIdsToTopicName = {
       topicId1: 'Dummy topic 1',
@@ -1340,11 +1344,9 @@ describe('Classroom Admin Page component ', () => {
       topicId3: 'Topic 3',
     };
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.resolve(),
-    } as NgbModalRef);
-
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef({}, Promise.resolve()) as NgbModalRef
+    );
     component.viewGraph();
     tick();
 
@@ -1368,10 +1370,9 @@ describe('Classroom Admin Page component ', () => {
       topicId3: 'Topic 3',
     };
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.reject(),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(
+      new MockModalRef({}, Promise.resolve()) as NgbModalRef
+    );
 
     component.viewGraph();
     tick();
@@ -1409,7 +1410,9 @@ describe('Classroom Admin Page component ', () => {
     );
 
     expect(component.allValidationErrors.length).toEqual(0);
-    spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
+    spyOn(component, 'updateClassroomData').and.returnValue(
+      Promise.resolve() as Promise<void>
+    );
     tick();
 
     component.togglePublicationStatus();
@@ -1518,7 +1521,9 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
+    spyOn(component, 'updateClassroomData').and.returnValue(
+      Promise.resolve() as Promise<void>
+    );
     tick();
 
     component.togglePublicationStatus();
@@ -1546,7 +1551,7 @@ describe('Classroom Admin Page component ', () => {
       spyOn(
         classroomBackendApiService,
         'getClassroomDataAsync'
-      ).and.returnValue(Promise.resolve(response));
+      ).and.returnValue(Promise.resolve(response) as Promise<any>);
 
       component.getClassroomData('classroomId');
       tick();
@@ -1604,7 +1609,7 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       component.classroomBackendApiService,
       'getClassroomDataAsync'
-    ).and.returnValue(Promise.resolve(response));
+    ).and.returnValue(Promise.resolve(response) as Promise<any>);
 
     component.getClassroomData('id1');
     tick();
