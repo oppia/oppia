@@ -31,6 +31,7 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {UserService} from 'services/user.service';
+import {UserContributionRightsDataBackendDict} from 'services/user-backend-api.service';
 
 @Component({
   selector: 'contributor-dashboard-page',
@@ -161,31 +162,35 @@ export class ContributorDashboardPageComponent implements OnInit {
 
     this.userService
       .getUserContributionRightsDataAsync()
-      .then(userContributionRights => {
-        if (userContributionRights === null) {
-          throw new Error('User contribution rights not found.');
+      .then(
+        (
+          userContributionRights: UserContributionRightsDataBackendDict | null
+        ) => {
+          if (!userContributionRights) {
+            throw new Error('User contribution rights not found.');
+          }
+          this.userCanReviewTranslationSuggestionsInLanguages =
+            this.getLanguageDescriptions(
+              userContributionRights.can_review_translation_for_language_codes
+            );
+
+          this.userCanReviewVoiceoverSuggestionsInLanguages =
+            this.getLanguageDescriptions(
+              userContributionRights.can_review_voiceover_for_language_codes
+            );
+
+          this.userCanReviewQuestions =
+            userContributionRights.can_review_questions;
+
+          this.userIsReviewer =
+            this.userCanReviewTranslationSuggestionsInLanguages.length > 0 ||
+            this.userCanReviewVoiceoverSuggestionsInLanguages.length > 0 ||
+            this.userCanReviewQuestions;
+
+          this.tabsDetails.submitQuestionTab.enabled =
+            userContributionRights.can_suggest_questions;
         }
-        this.userCanReviewTranslationSuggestionsInLanguages =
-          this.getLanguageDescriptions(
-            userContributionRights.can_review_translation_for_language_codes
-          );
-
-        this.userCanReviewVoiceoverSuggestionsInLanguages =
-          this.getLanguageDescriptions(
-            userContributionRights.can_review_voiceover_for_language_codes
-          );
-
-        this.userCanReviewQuestions =
-          userContributionRights.can_review_questions;
-
-        this.userIsReviewer =
-          this.userCanReviewTranslationSuggestionsInLanguages.length > 0 ||
-          this.userCanReviewVoiceoverSuggestionsInLanguages.length > 0 ||
-          this.userCanReviewQuestions;
-
-        this.tabsDetails.submitQuestionTab.enabled =
-          userContributionRights.can_suggest_questions;
-      });
+      );
 
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userInfoIsLoading = false;

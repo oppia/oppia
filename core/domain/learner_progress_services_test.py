@@ -22,6 +22,8 @@ import datetime
 
 from core.constants import constants
 from core.domain import (
+    classroom_config_services,
+    classroom_domain,
     collection_domain,
     collection_services,
     exp_fetchers,
@@ -439,6 +441,25 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id
         )
         topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
+        # Create a classroom and add topics to it.
+        classroom_config_services.update_or_create_classroom_config(
+            classroom_domain.ClassroomConfig(
+                'math',
+                'Math',
+                'math',
+                'A math classroom',
+                {
+                    self.TOPIC_ID_0: [],
+                    self.TOPIC_ID_1: [],
+                    self.TOPIC_ID_2: [],
+                    self.TOPIC_ID_3: [],
+                },
+                'thumbnail.svg',
+                '#C6DCDA',
+                'course_details',
+                True,
+            )
+        )
 
     def _get_all_completed_exp_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the explorations completed by the learner
