@@ -69,8 +69,8 @@ export class ExplorationEditorModal {
           );
           await this.userInstance.page.waitForSelector(
             dismissWelcomeModalSelector,
-            { 
-              hidden: true 
+            {
+              hidden: true,
             }
           );
           showMessage('Welcome modal appeared late and was dismissed.');
