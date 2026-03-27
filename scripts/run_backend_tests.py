@@ -50,7 +50,6 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-import fnmatch
 import json
 import multiprocessing
 import os
@@ -90,17 +89,6 @@ _LOAD_TESTS_DIR: Final = os.path.join(
 TIME_REPORT_PATH: Final = os.path.join(
     os.getcwd(), 'backend_test_time_report.json'
 )
-_EXCLUDED_DIRS: Final = [
-    '.git',
-    'third_party',
-    'node_modules',
-    'venv',
-    '.direnv',
-    'core/tests/data',
-    'core/tests/build_sources',
-    '*.egg-info',
-    'oppia_beam_job-*',
-]
 
 # Error code indicating a segmentation fault, which can occur transiently due to
 # instability in gRPC (a dependency of apache-beam[gcp]). This error was first
@@ -265,29 +253,28 @@ def get_all_test_targets_from_path(
     """
     base_path = os.path.join(os.getcwd(), test_path or '')
     paths = []
-
-    def is_excluded(path: str) -> bool:
-        """Checks if the given path should be excluded from test scanning."""
-        rel_path = os.path.relpath(path, start=os.getcwd())
-        for pattern in _EXCLUDED_DIRS:
-            if fnmatch.fnmatch(rel_path, pattern) or any(
-                fnmatch.fnmatch(part, pattern) for part in rel_path.split(os.sep)
-            ):
-                return True
-        return False
-
-    for root, dirs, files in os.walk(base_path):
-        # Filter directories in-place to prevent os.walk from descending into
-        # excluded ones.
-        dirs[:] = [d for d in dirs if not is_excluded(os.path.join(root, d))]
-
-        if _LOAD_TESTS_DIR in root and not include_load_tests:
+    excluded_dirs = [
+        '.git',
+        'third_party',
+        'node_modules',
+        'venv',
+        'core/tests/data',
+        'core/tests/build_sources',
+        '.direnv',
+    ]
+    for root in os.listdir(base_path):
+        if any(s in root for s in excluded_dirs):
             continue
-
-        for f in files:
-            if f.endswith('_test.py'):
-                paths.append(os.path.join(root, f))
-
+        if root.endswith('_test.py'):
+            paths.append(os.path.join(base_path, root))
+        for subroot, _, files in os.walk(os.path.join(base_path, root)):
+            if any(s in subroot for s in excluded_dirs):
+                continue
+            if _LOAD_TESTS_DIR in subroot and not include_load_tests:
+                continue
+            for f in files:
+                if f.endswith('_test.py'):
+                    paths.append(os.path.join(subroot, f))
     result = [
         os.path.relpath(path, start=os.getcwd())[:-3].replace('/', '.')
         for path in paths

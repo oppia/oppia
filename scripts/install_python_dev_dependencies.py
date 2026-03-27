@@ -64,13 +64,12 @@ def check_python_env_is_suitable() -> None:
     # * When sys.real_prefix exists
     # If either is true, we are in a virtual environment. We also check that
     # sys.real_prefix is Truthy to make testing easier.
-    # if sys.prefix == sys.base_prefix and not (
-    #     hasattr(sys, 'real_prefix') and getattr(sys, 'real_prefix')
-    # ):
-    #     raise AssertionError(
-    #         'Oppia must be developed within a virtual environment.'
-    #     )
-    pass
+    if sys.prefix == sys.base_prefix and not (
+        hasattr(sys, 'real_prefix') and getattr(sys, 'real_prefix')
+    ):
+        raise AssertionError(
+            'Oppia must be developed within a virtual environment.'
+        )
 
 
 def install_installation_tools() -> None:

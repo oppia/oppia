@@ -30,7 +30,6 @@ import subprocess
 import sys
 import threading
 import time
-from unittest import mock
 from urllib import request as urlrequest
 
 from core.tests import test_utils
@@ -622,38 +621,37 @@ class ManagedProcessTests(test_utils.TestBase):
                 return
             original_os_path_exists(path)
 
-        mock_is_port_in_use = mock.Mock(return_value=True)
-        mock_check_call = mock.Mock(return_value=0)
-
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap(common, 'wait_for_port_to_be_in_use', mock_is_port_in_use)
+            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
         )
         self.exit_stack.enter_context(
-            self.swap(os.path, 'exists', mock_os_path_exists)
+            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
         )
         self.exit_stack.enter_context(
-            self.swap(os, 'remove', mock_os_remove)
-        )
-        self.exit_stack.enter_context(
-            self.swap(subprocess, 'check_call', mock_check_call)
-        )
-
-        with servers.managed_redis_server():
-            self.assertEqual(len(popen_calls), 1)
-            self.assertEqual(
-                popen_calls[0].program_args,
-                '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH),
+            self.swap_with_checks(
+                subprocess,
+                'check_call',
+                lambda _: 0,
+                expected_args=[
+                    ([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)
+                ],
             )
-            self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-
-        self.assertEqual(mock_is_port_in_use.call_count, 1)
-        self.assertEqual(mock_check_call.call_count, 1)
-        self.assertEqual(
-            mock_check_call.call_args_list[0][0][0],
-            [common.REDIS_CLI_PATH, 'shutdown', 'nosave']
         )
-        self.assertEqual(mock_os_remove.times_called, 0)
+        self.exit_stack.enter_context(
+            self.swap_with_checks(os, 'remove', mock_os_remove, called=False)
+        )
+
+        self.exit_stack.enter_context(servers.managed_redis_server())
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].program_args,
+            '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH),
+        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
+        self.exit_stack.close()
 
     def test_managed_redis_server_deletes_redis_dump_when_it_exists(
         self,
@@ -673,38 +671,29 @@ class ManagedProcessTests(test_utils.TestBase):
             original_os_path_exists(path)
             return None
 
-        mock_is_port_in_use = mock.Mock(return_value=True)
-        mock_check_call = mock.Mock(return_value=0)
-
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap(common, 'wait_for_port_to_be_in_use', mock_is_port_in_use)
+            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
         )
         self.exit_stack.enter_context(
-            self.swap(os.path, 'exists', mock_os_path_exists)
+            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
         )
         self.exit_stack.enter_context(
-            self.swap(os, 'remove', mock_os_remove)
+            self.swap_with_checks(os, 'remove', mock_os_remove)
         )
         self.exit_stack.enter_context(
-            self.swap(subprocess, 'check_call', mock_check_call)
-        )
-
-        with servers.managed_redis_server():
-            self.assertEqual(len(popen_calls), 1)
-            self.assertEqual(
-                popen_calls[0].program_args,
-                '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH),
+            self.swap_with_checks(
+                subprocess,
+                'check_call',
+                lambda _: 0,
+                expected_args=[
+                    ([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)
+                ],
             )
-            self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-
-        self.assertEqual(mock_is_port_in_use.call_count, 1)
-        self.assertEqual(mock_check_call.call_count, 1)
-        self.assertEqual(
-            mock_check_call.call_args_list[0][0][0],
-            [common.REDIS_CLI_PATH, 'shutdown', 'nosave']
         )
-        self.assertEqual(mock_os_remove.times_called, 1)
+
+        self.exit_stack.enter_context(servers.managed_redis_server())
+        self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(

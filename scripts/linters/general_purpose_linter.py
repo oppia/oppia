@@ -104,8 +104,6 @@ EXCLUDED_PATHS: Final = (
     '.mypy_cache/*',
     'core/tests/puppeteer-acceptance-tests/data/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
-    'oppia_beam_job-*',
-    '*.egg-info',
 )
 
 GENERATED_FILE_PATHS: Final = ('core/templates/expressions/parser.js',)

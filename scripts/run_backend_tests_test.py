@@ -87,7 +87,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.exit_stack = contextlib.ExitStack()
         self.semaphore = threading.Semaphore(1)
         self.print_arr: list[str] = []
 
@@ -105,7 +104,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.swap_install_third_party_libs = self.swap(
             install_third_party_libs, 'main', mock_install_third_party_libs
         )
-        self.exit_stack.enter_context(self.swap_install_third_party_libs)
 
         test_target_flag = '--test_target=random_test'
         self.coverage_exc_list = [
@@ -154,10 +152,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.swap_execute_task = self.swap(
             concurrent_task_utils, 'execute_tasks', lambda *unused_args: None
         )
-
-    def tearDown(self) -> None:
-        self.exit_stack.close()
-        super().tearDown()
 
     def test_run_shell_command_successfully(self) -> None:
         class MockProcess:
