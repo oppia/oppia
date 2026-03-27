@@ -108,8 +108,12 @@ describe('Translation Modal Component', () => {
   let mockModalRef: MockConfirmTranslationExitModal;
   let windowRef: WindowRef;
   let mockWindow: {
-    addEventListener: jasmine.Spy;
-    removeEventListener: jasmine.Spy;
+    addEventListener: jasmine.Spy<
+      (event: string, handler: EventListener) => void
+    >;
+    removeEventListener: jasmine.Spy<
+      (event: string, handler: EventListener) => void
+    >;
     gtag: jasmine.Spy;
   };
 
@@ -123,7 +127,9 @@ describe('Translation Modal Component', () => {
     totalCount: 50,
     translationsCount: 20,
   };
-  const getContentTranslatableItemWithText = (text: string) => {
+  const getContentTranslatableItemWithText = (
+    text: string
+  ): Record<string, unknown> => {
     return {
       content_format: 'html',
       content_value: text,
@@ -357,7 +363,8 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback()
+          (expId: string, languageCode: string, successCallback: () => void) =>
+            successCallback()
         );
         component.ngOnInit();
       }));
@@ -373,7 +380,8 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('es');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback()
+          (expId: string, languageCode: string, successCallback: () => void) =>
+            successCallback()
         );
         component.ngOnInit();
       }));
@@ -399,7 +407,8 @@ describe('Translation Modal Component', () => {
       pageContextService.removeCustomEntityContext();
       pageContextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) =>
+          successCallback()
       );
       component.ngOnInit();
       expect(pageContextService.getEntityType()).toBe(
@@ -440,7 +449,7 @@ describe('Translation Modal Component', () => {
       expect(component.loadingData).toBeTrue();
       expect(translateTextService.init).toHaveBeenCalled();
 
-      const sampleStateWiseContentMapping = {
+      const sampleStateWiseContentMapping: Record<string, unknown> = {
         stateName1: {contentId1: getContentTranslatableItemWithText('text1')},
         stateName2: {contentId2: getContentTranslatableItemWithText('text2')},
       };
@@ -475,7 +484,8 @@ describe('Translation Modal Component', () => {
     it('should set the schema constant based on the active language', fakeAsync(() => {
       translationLanguageService.setActiveLanguageCode('ar');
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) =>
+          successCallback()
       );
       component.ngOnInit();
       expect(component.getHtmlSchema().ui_config.language).toBe('ar');
@@ -534,7 +544,8 @@ describe('Translation Modal Component', () => {
     beforeEach(fakeAsync(() => {
       paragraphTarget = document.createElement('p');
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback()
+        (expId: string, languageCode: string, successCallback: () => void) =>
+          successCallback()
       );
       broadcastSpy = spyOn(
         ckEditorCopyContentService,
@@ -617,7 +628,7 @@ describe('Translation Modal Component', () => {
   });
 
   describe('when suggesting translated text', () => {
-    let expectedPayload: Object;
+    let expectedPayload: Record<string, unknown>;
     let imagesData: ImagesData[];
     beforeEach(fakeAsync(() => {
       expectedPayload = {
