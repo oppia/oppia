@@ -39,7 +39,6 @@ class MockRendererFactory {
 
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
-  let rendererFactory: RendererFactory2;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -47,8 +46,7 @@ describe('InsertScriptService', () => {
         {provide: RendererFactory2, useClass: MockRendererFactory},
       ],
     });
-    insertScriptService = TestBed.inject(InsertScriptService);
-    rendererFactory = TestBed.inject(RendererFactory2);
+    insertScriptService = TestBed.get(InsertScriptService);
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
@@ -74,7 +72,9 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          if (script.onload) script.onload();
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
@@ -145,7 +145,9 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload();
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
@@ -171,7 +173,9 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          if (script.onload) script.onload();
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
