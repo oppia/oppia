@@ -120,6 +120,11 @@ _PARSER.add_argument(
     action='store',
 )
 _PARSER.add_argument('--shard', help='Name of shard to run lint checks for')
+_PARSER.add_argument(
+    '--skip_install',
+    help='If true, skips the installation of third-party libraries.',
+    action='store_true',
+)
 
 for path in common.DIRS_TO_ADD_TO_SYS_PATH:
     sys.path.insert(0, path)
@@ -642,7 +647,8 @@ def main(args: Optional[List[str]] = None) -> None:
         namespace=namespace,
     )
 
-    install_third_party_libs.main()
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
 
     print('Starting Linter....')
 
