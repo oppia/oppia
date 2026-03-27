@@ -2002,6 +2002,115 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(new_version_translations), 1)
         self.assertEqual(new_version_translations[0].language_code, 'hi')
 
+    def test_accept_propagates_translation_forward_on_concurrent_edit(
+        self,
+    ) -> None:
+        # This test verifies the fix for the race condition where an
+        # exploration version increments during the accept() call. The
+        # translation must be propagated forward to the latest version.
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        # Version 1.
+        initial_version = exp.version
+
+        # Edit the exploration to create version 2.
+        exp_services.update_exploration(
+            self.author_id,
+            exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'title',
+                        'new_value': 'Title v2',
+                    }
+                )
+            ],
+            'Updated title v2',
+        )
+        v2_exp = exp_fetchers.get_exploration_by_id(exp.id)
+        self.assertEqual(v2_exp.version, 2)
+
+        # Edit again to create version 3 (this will be the "concurrent edit"
+        # that happens during the accept() call).
+        exp_services.update_exploration(
+            self.author_id,
+            exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'title',
+                        'new_value': 'Title v3',
+                    }
+                )
+            ],
+            'Updated title v3',
+        )
+        v3_exp = exp_fetchers.get_exploration_by_id(exp.id)
+        self.assertEqual(v3_exp.version, 3)
+
+        # Simulate the race condition: the first call to
+        # get_exploration_by_id (at the start of accept()) returns version 2,
+        # and the second call (the re-fetch check) returns version 3.
+        original_get_exploration = exp_fetchers.get_exploration_by_id
+        call_count = {'count': 0}
+
+        def mock_get_exploration_by_id(
+            exp_id: str, **kwargs: str
+        ) -> exp_domain.Exploration:
+            call_count['count'] += 1
+            if call_count['count'] == 1:
+                # First call: return version 2 (stale).
+                return original_get_exploration(exp_id, version=2)
+            # Subsequent calls: return the latest (version 3).
+            return original_get_exploration(exp_id, **kwargs)
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            initial_version,
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            self.suggestion_dict['change_cmd'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        with self.swap(
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda *args: None,
+        ), self.swap(
+            exp_fetchers,
+            'get_exploration_by_id',
+            mock_get_exploration_by_id,
+        ):
+            suggestion.accept(
+                'Accepted suggestion by translator: Add translation change.'
+            )
+
+        # The translation should exist on both version 2 (the version at
+        # the start of accept) and version 3 (the latest version).
+        v2_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, 2
+            )
+        )
+        self.assertEqual(len(v2_translations), 1)
+        self.assertEqual(v2_translations[0].language_code, 'hi')
+
+        v3_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, 3
+            )
+        )
+        self.assertEqual(len(v3_translations), 1)
+        self.assertEqual(v3_translations[0].language_code, 'hi')
+
     def test_accept_suggestion_with_set_of_string_adds_translation(
         self,
     ) -> None:

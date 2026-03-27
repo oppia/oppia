@@ -822,6 +822,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        version_at_accept = exploration.version
 
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
@@ -834,11 +835,32 @@ class SuggestionTranslateContent(BaseSuggestion):
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
             self.target_id,
-            exploration.version,
+            version_at_accept,
             self.language_code,
             self.change_cmd.content_id,
             translated_content,
         )
+
+        # Re-fetch the exploration to check if its version has changed during
+        # the translation write. If a newer version exists, also propagate
+        # the translation forward. This guards against a race condition where
+        # an exploration edit (which copies translations from version N to
+        # N+1) occurs between reading the version and writing the
+        # translation, causing the translation to be orphaned on version N.
+        latest_exploration = exp_fetchers.get_exploration_by_id(
+            self.target_id)
+        if latest_exploration.version > version_at_accept:
+            for version in range(
+                version_at_accept + 1, latest_exploration.version + 1
+            ):
+                translation_services.add_new_translation(
+                    feconf.TranslatableEntityType.EXPLORATION,
+                    self.target_id,
+                    version,
+                    self.language_code,
+                    self.change_cmd.content_id,
+                    translated_content,
+                )
 
         (
             opportunity_services.update_translation_opportunity_with_accepted_suggestion(
