@@ -4310,7 +4310,15 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(previewTabContainer);
+    // Wait for the Angular router to complete navigation to the preview route
+    // before checking page load state.
+    await this.page.waitForFunction(() =>
+      window.location.href.includes('#/preview/')
+    );
     await this.waitForPageToFullyLoad();
+    // Give Angular time to finish broadcasting backend data to the preview
+    // component and avoid 'getInteraction' errors.
+    await this.page.waitForTimeout(2000);
   }
 
   /**
