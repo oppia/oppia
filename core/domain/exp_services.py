@@ -514,15 +514,16 @@ def get_content_updates_from_cmd_edit_state_property_change(
         return content_id_to_content_value
 
     if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-        add_subtitled_html_or_unicode_from_dict(change.new_value)
+        if isinstance(change.new_value, dict):
+            add_subtitled_html_or_unicode_from_dict(change.new_value)
     elif (
         change.property_name
         == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
     ):
         if isinstance(change.new_value, dict):
-            add_subtitled_html_or_unicode_from_dict(
-                change.new_value.get('feedback')
-            )
+            new_change_dict = change.new_value.get('feedback')
+            if isinstance(new_change_dict, dict):
+                add_subtitled_html_or_unicode_from_dict(new_change_dict)
     elif (
         change.property_name
         == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
@@ -544,9 +545,9 @@ def get_content_updates_from_cmd_edit_state_property_change(
                     )
     elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION:
         if isinstance(change.new_value, dict):
-            add_subtitled_html_or_unicode_from_dict(
-                change.new_value.get('explanation')
-            )
+            new_change_dict = change.new_value.get('explanation')
+            if isinstance(new_change_dict, dict):
+                add_subtitled_html_or_unicode_from_dict(new_change_dict)
     elif (
         change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
     ):

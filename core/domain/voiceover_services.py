@@ -1182,7 +1182,15 @@ def regenerate_voiceovers_on_exploration_update(
     for change in exploration_change_diff:
         cmd = change.get('cmd')
         if cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-            change_object = exp_domain.ExplorationChange.from_dict(change)
+            # Here we use cast because the from_dict() method returns a object of
+            # type BaseChange, which is a parent class for ExplorationChange.
+            # This cast assures the static type checker that the 'change_object'
+            # variable is of type ExplorationChange, allowing us to access its
+            # specific attributes and methods without type errors.
+            change_object = cast(
+                exp_domain.ExplorationChange,
+                exp_domain.ExplorationChange.from_dict(change),
+            )
             content_id_to_content_values = exp_services.get_content_updates_from_cmd_edit_state_property_change(
                 change_object
             )
