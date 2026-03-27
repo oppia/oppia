@@ -89,6 +89,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
   backgroundColorOfHighlightedSentence = '#f3d140';
+  topLevelHtmlNodename = '';
 
   customOppiaTags = [
     'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
@@ -334,6 +335,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // eslint-disable-next-line oppia/no-inner-html
     temporaryDivElement.innerHTML = htmlString;
 
+    this.topLevelHtmlNodename = temporaryDivElement.childNodes[0]?.nodeName;
+
     const finalDivElement = this.traverseNodeAndWrapSpanTags(
       temporaryDivElement,
       sentenceRegex
@@ -525,9 +528,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      let previousHighlightedElement = document.getElementsByClassName(
-        this.previousHighlightedElementId
-      )?.[0] as HTMLElement;
+      let previousHighlightedElement =
+        this.getElementMatchingClassAndTextContent(
+          this.previousHighlightedElementId
+        );
 
       let currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
@@ -638,6 +642,15 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // In editor mode (e.g., translation tab), all voiceovers can be played,
     // so highlighting should always be enabled.
     if (!this.isInPlayerOrPreviewPage()) {
+      if (
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT' ||
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT' ||
+        this.topLevelHtmlNodename === 'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT'
+      ) {
+        return false;
+      }
       return true;
     }
 
@@ -654,7 +667,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     const isFeedbackSectionActive =
       (currentContentId?.startsWith('default_outcome') ||
         currentContentId?.startsWith('feedback_')) &&
-      this.rteStringContext === 'feedback';
+      (this.rteStringContext === 'feedback' ||
+        this.rteStringContext === 'supplemental-card');
 
     return isContentSectionActive || isFeedbackSectionActive;
   }
