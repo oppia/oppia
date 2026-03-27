@@ -49,15 +49,18 @@ class MockNgbModal {
 }
 
 class MockModalRef implements NgbModalRef {
-  componentInstance: any;
-  result: Promise<any>;
+  componentInstance: Record<string, unknown>;
+  result: Promise<unknown>;
 
-  constructor(componentInstance: any, result: Promise<any>) {
+  constructor(
+    componentInstance: Record<string, unknown>,
+    result: Promise<unknown>
+  ) {
     this.componentInstance = componentInstance;
     this.result = result;
   }
-  close(result?: any): void {}
-  dismiss(reason?: any): void {}
+  close(result?: unknown): void {}
+  dismiss(reason?: unknown): void {}
 }
 
 const dummyThumbnailData = {
@@ -172,7 +175,9 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllClassroomDisplayInfoDictAsync'
-    ).and.returnValue(Promise.resolve(response) as Promise<any>);
+    ).and.returnValue(
+      Promise.resolve(response) as Promise<Record<string, unknown>[]>
+    );
 
     expect(component.pageIsInitialized).toBeFalse();
 
@@ -269,7 +274,9 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllTopicsToClassroomRelation'
-    ).and.returnValue(Promise.resolve(response) as Promise<any>);
+    ).and.returnValue(
+      Promise.resolve(response) as Promise<Record<string, unknown>[]>
+    );
 
     expect(component.topicsToClassroomRelation.length).toEqual(0);
     expect(component.filteredTopicsToClassroomRelation.length).toEqual(0);
@@ -336,7 +343,9 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllClassroomDisplayInfoDictAsync'
-    ).and.returnValue(Promise.resolve(response) as Promise<any>);
+    ).and.returnValue(
+      Promise.resolve(response) as Promise<Record<string, unknown>[]>
+    );
 
     expect(component.pageIsInitialized).toBeFalse();
 
@@ -673,7 +682,9 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       classroomBackendApiService,
       'getAllClassroomDisplayInfoDictAsync'
-    ).and.returnValue(Promise.resolve(response) as Promise<any>);
+    ).and.returnValue(
+      Promise.resolve(response) as Promise<Record<string, unknown>[]>
+    );
 
     component.ngOnInit();
     tick();
@@ -864,7 +875,9 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       editableTopicBackendApiService,
       'getTopicIdToTopicNameAsync'
-    ).and.returnValue(Promise.resolve(topicIdTotopicName) as Promise<any>);
+    ).and.returnValue(
+      Promise.resolve(topicIdTotopicName) as Promise<Record<string, string>>
+    );
 
     component.setTopicDependencyByTopicName(topicIdToPrerequisiteTopicIds);
 
@@ -905,7 +918,9 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       editableTopicBackendApiService,
       'getTopicIdToTopicNameAsync'
-    ).and.returnValue(Promise.resolve(topicIdToTopicName) as Promise<any>);
+    ).and.returnValue(
+      Promise.resolve(topicIdToTopicName) as Promise<Record<string, string>>
+    );
 
     component.onNewTopicInputModelChange('topicId1');
 
@@ -1551,7 +1566,9 @@ describe('Classroom Admin Page component ', () => {
       spyOn(
         classroomBackendApiService,
         'getClassroomDataAsync'
-      ).and.returnValue(Promise.resolve(response) as Promise<any>);
+      ).and.returnValue(
+        Promise.resolve(response) as Promise<Record<string, unknown>>
+      );
 
       component.getClassroomData('classroomId');
       tick();
@@ -1609,7 +1626,9 @@ describe('Classroom Admin Page component ', () => {
     spyOn(
       component.classroomBackendApiService,
       'getClassroomDataAsync'
-    ).and.returnValue(Promise.resolve(response) as Promise<any>);
+    ).and.returnValue(
+      Promise.resolve(response) as Promise<Record<string, unknown>>
+    );
 
     component.getClassroomData('id1');
     tick();
