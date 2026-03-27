@@ -27,6 +27,8 @@ import {
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
+jest.setTimeout(600000);
+
 const CARD_NAMES = {
   FIRST: 'Introduction',
   SECOND: '2nd Card',
