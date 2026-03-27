@@ -448,13 +448,6 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id
         )
         topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
-        self.save_new_valid_classroom(
-            topic_id_to_prerequisite_topic_ids={
-                self.TOPIC_ID_1: [],
-                self.TOPIC_ID_2: [],
-                self.TOPIC_ID_3: [],
-            }
-        )
 
         state_name = 'state_name'
         version = 1
