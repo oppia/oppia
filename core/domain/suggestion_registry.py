@@ -847,8 +847,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         # an exploration edit (which copies translations from version N to
         # N+1) occurs between reading the version and writing the
         # translation, causing the translation to be orphaned on version N.
-        latest_exploration = exp_fetchers.get_exploration_by_id(
-            self.target_id)
+        latest_exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if latest_exploration.version > version_at_accept:
             for version in range(
                 version_at_accept + 1, latest_exploration.version + 1
@@ -862,10 +861,9 @@ class SuggestionTranslateContent(BaseSuggestion):
                     translated_content,
                 )
 
-        (
-            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
-                self.target_id, self.language_code
-            )
+        opp_services = opportunity_services
+        opp_services.update_translation_opportunity_with_accepted_suggestion(
+            self.target_id, self.language_code
         )
 
         # If the translation is for a set of strings, we don't want to process
