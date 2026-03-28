@@ -88,6 +88,8 @@ import {LearnerExplorationSummary} from '../../../../domain/summary/learner-expl
 import {ChapterProgressService} from '../../services/chapter-progress.service';
 import {CardAnimationService} from '../../services/card-animation.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {AuthService} from 'services/auth.service';
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -96,10 +98,14 @@ class MockWindowRef {
     },
     onresize: () => {},
     addEventListener(event: string, callback) {
-      callback({returnValue: null});
+      callback({returnValue: null, preventDefault: () => {}});
     },
     scrollTo: (x, y) => {},
   };
+}
+
+class MockAuthService {
+  onUserSignIn = new EventEmitter<void>();
 }
 
 describe('New Conversation skin component', () => {
@@ -149,6 +155,7 @@ describe('New Conversation skin component', () => {
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
 
   let displayedCard = new StateCard(
     null,
@@ -446,6 +453,11 @@ describe('New Conversation skin component', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        {
+          provide: AuthService,
+          useClass: MockAuthService,
+        },
+        PreventPageUnloadEventService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -520,6 +532,9 @@ describe('New Conversation skin component', () => {
     translateService = TestBed.inject(TranslateService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService
+    );
+    preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService
     );
   }));
 
@@ -2446,4 +2461,148 @@ describe('New Conversation skin component', () => {
     tick(2000);
     flush();
   }));
+
+  it('should remove before unload listener on ngOnDestroy', () => {
+    spyOn(preventPageUnloadEventService, 'removeListener');
+    componentInstance.ngOnDestroy();
+    expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+  });
+
+  it('should add before unload listener on init', fakeAsync(() => {
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
+      false
+    );
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(
+        new UserInfo([], false, false, false, false, false, '', '', '', true)
+      )
+    );
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null
+    );
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue('url');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+
+    spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
+      (callback: () => void) => {
+        callback();
+      }
+    );
+    componentInstance.ngOnInit();
+    tick();
+    flush();
+    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+  }));
+  describe('PreventPageUnloadEvent integration', () => {
+    let capturedCallback: () => boolean;
+
+    beforeEach(() => {
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
+        false
+      );
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(
+          new UserInfo([], false, false, false, false, false, '', '', '', true)
+        )
+      );
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+        null
+      );
+      spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+      spyOn(urlService, 'isIframed').and.returnValue(false);
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(
+        urlInterpolationService,
+        'getStaticCopyrightedImageUrl'
+      ).and.returnValue('url');
+      spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+        false
+      );
+
+      // Capture the callback passed to addListener.
+      spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
+        (callback: () => boolean) => {
+          capturedCallback = callback;
+        }
+      );
+    });
+
+    it('should validate unload conditions in the listener callback', fakeAsync(() => {
+      componentInstance.ngOnInit();
+      tick();
+      expect(capturedCallback).toBeDefined();
+
+      // Mock dependencies for callback logic.
+      const getRedirectSpy = spyOn(
+        conversationFlowService,
+        'getRedirectToRefresherExplorationConfirmed'
+      );
+      const getHasInteractedSpy = spyOn(
+        conversationFlowService,
+        'getHasInteractedAtLeastOnce'
+      );
+      const getDisplayedCardSpy = spyOn(
+        conversationFlowService,
+        'getDisplayedCard'
+      );
+      const isInQuestionModeSpy = spyOn(
+        explorationModeService,
+        'isInQuestionMode'
+      );
+      const recordEventSpy = spyOn(
+        statsReportingService,
+        'recordMaybeLeaveEvent'
+      );
+      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
+        'State'
+      );
+      spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+
+      // Case 1: Redirect confirmed -> should return false (allow unload).
+      getRedirectSpy.and.returnValue(true);
+      expect(capturedCallback()).toBeFalse();
+
+      // Case 2: Redirect not confirmed, Interacted, Valid state -> should return true (prevent unload).
+      getRedirectSpy.and.returnValue(false);
+      getHasInteractedSpy.and.returnValue(true);
+      componentInstance._editorPreviewMode = false;
+      const mockStateCard = jasmine.createSpyObj('StateCard', ['isTerminal']);
+      mockStateCard.isTerminal.and.returnValue(false);
+      getDisplayedCardSpy.and.returnValue(mockStateCard);
+      isInQuestionModeSpy.and.returnValue(false);
+
+      expect(capturedCallback()).toBeTrue();
+      expect(recordEventSpy).toHaveBeenCalled();
+
+      // Case 3: Editor preview mode -> should return false.
+      componentInstance._editorPreviewMode = true;
+      expect(capturedCallback()).toBeFalse();
+
+      // Case 4: Terminal state -> should return false.
+      componentInstance._editorPreviewMode = false;
+      mockStateCard.isTerminal.and.returnValue(true);
+      expect(capturedCallback()).toBeFalse();
+
+      // Case 5: Question mode -> should return false.
+      mockStateCard.isTerminal.and.returnValue(false);
+      isInQuestionModeSpy.and.returnValue(true);
+      expect(capturedCallback()).toBeFalse();
+    }));
+  });
 });
