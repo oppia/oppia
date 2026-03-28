@@ -33,8 +33,8 @@ interface SentenceHighlightInterval {
   providedIn: 'root',
 })
 export class AutomaticVoiceoverHighlightService {
-  // Grace period to account for coarse polling intervals while checking
-  // current audio time (for example 100ms polling for short 50ms tokens).
+  // Small buffer time added because audio time is checked at intervals
+  // (e.g., checking every 100ms might miss very short tokens like 50ms).
   private static readonly HIGHLIGHT_MATCH_TOLERANCE_SECS = 0.08;
 
   public languageCode!: string;
@@ -310,9 +310,9 @@ export class AutomaticVoiceoverHighlightService {
       }
     );
 
-    // Fallback path for tiny intervals that can be skipped by polling.
-    // For example, a 50ms token checked at 100ms intervals can be missed
-    // without a small tolerance after the sentence end time.
+    // Fallback logic for very short intervals that might be skipped
+    // above. For example, a 50ms token can be missed if checks happen every
+    // 100ms, so we allow a small extra time window.
     if (!currentsentenceIdAndInterval) {
       currentsentenceIdAndInterval = this.sentenceHighlightIntervalList.find(
         sentenceIdAndInterval => {

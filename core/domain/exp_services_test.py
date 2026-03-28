@@ -2445,25 +2445,6 @@ class GetContentUpdatesFromCmdEditStatePropertyChangeTests(
             {},
         )
 
-    def test_returns_empty_mapping_when_new_value_is_not_subtitled_html(
-        self,
-    ) -> None:
-        change = exp_domain.ExplorationChange(
-            {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'State A',
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'new_value': 2,
-            }
-        )
-
-        self.assertEqual(
-            exp_services.get_content_updates_from_cmd_edit_state_property_change(
-                change
-            ),
-            {},
-        )
-
     def test_extracts_content_updates_for_content_property(self) -> None:
         change = exp_domain.ExplorationChange(
             {
