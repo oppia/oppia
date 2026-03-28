@@ -277,7 +277,6 @@ describe('Logged-Out Learner', function () {
 
       await loggedOutLearner.playLesson(explorationId);
       await loggedOutLearner.clickOnContinueButton();
-      await loggedOutLearner.page.waitForTimeout(10000);
       await loggedOutLearner.submitFractionInputResponse('1/2');
       // Click on the 'Save' button.
       await loggedOutLearner.clickOnSaveProgressButton();
@@ -316,10 +315,8 @@ describe('Logged-Out Learner', function () {
     expect(await loggedOutLearner.expectSignInButton()).toBe(true);
 
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.submitFractionInputResponse('1/2');
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(5000);
     await loggedOutLearner.clickOnContinueButton();
 
     expect(await loggedOutLearner.expectSignUpOrLoginButton()).toBe(true);
