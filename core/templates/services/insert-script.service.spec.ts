@@ -39,8 +39,6 @@ class MockRendererFactory {
 
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
-  let rendererFactory: RendererFactory2;
-
   const mockScriptLoadSuccess = (): void => {
     spyOn(document.body, 'appendChild').and.callFake((node: Node): Node => {
       const scriptElement = node as HTMLScriptElement;
@@ -60,13 +58,11 @@ describe('InsertScriptService', () => {
         {provide: RendererFactory2, useClass: MockRendererFactory},
       ],
     });
-    insertScriptService = TestBed.inject(InsertScriptService);
-    rendererFactory = TestBed.inject(RendererFactory2);
+    insertScriptService = TestBed.get(InsertScriptService);
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
     mockScriptLoadSuccess();
-
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       const result = insertScriptService.loadScript(
         KNOWN_SCRIPTS.DONORBOX,
@@ -80,11 +76,6 @@ describe('InsertScriptService', () => {
 
   it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
     mockScriptLoadSuccess();
-
-    spyOn(
-      rendererFactory.createRenderer(null, null),
-      'createElement'
-    ).and.callThrough();
 
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
@@ -136,6 +127,14 @@ describe('InsertScriptService', () => {
   });
 
   it('should return false for unknown scripts', () => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(() => {});
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN);
     expect(result).toBe(false);
   });
@@ -152,7 +151,9 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload();
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
