@@ -19,7 +19,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model.js';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 @Component({

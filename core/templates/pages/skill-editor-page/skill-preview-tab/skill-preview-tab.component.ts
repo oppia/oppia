@@ -19,7 +19,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {QuestionBackendDict, Question} from 'domain/question/question.model';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model.js';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';

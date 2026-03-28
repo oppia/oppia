@@ -23,7 +23,7 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EntityEditorBrowserTabsInfoDomainConstants} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import {PageContextService} from 'services/page-context.service';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model.js';
 import {QuestionsListService} from 'services/questions-list.service';
 import {Subscription} from 'rxjs';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';

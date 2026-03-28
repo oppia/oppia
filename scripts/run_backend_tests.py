@@ -571,7 +571,12 @@ def main(args: Optional[List[str]] = None) -> None:
     os.environ['CLOUDSDK_CORE_PROJECT'] = 'dummy-cloudsdk-project-id'
     os.environ['APPLICATION_ID'] = 'dummy-cloudsdk-project-id'
 
-    if parsed_args.test_path and '.' in parsed_args.test_path:
+    print('DEBUG: parsed_args.test_path =', parsed_args.test_path)
+    if (
+        parsed_args.test_path
+        and '.' in parsed_args.test_path
+        and not parsed_args.test_path.endswith('.ts')
+    ):
         raise Exception('The delimiter in test_path should be a slash (/)')
     if not parsed_args.skip_install:
         install_third_party_libs.main()

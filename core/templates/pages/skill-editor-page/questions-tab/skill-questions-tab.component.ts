@@ -18,7 +18,7 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Rubric} from 'domain/skill/rubric.model';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model.js';
 import {Subscription} from 'rxjs';
 import {
   GroupedSkillSummaries,

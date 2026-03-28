@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit tests for the fraction.model.ts.
+ * @fileoverview unit tests for the fraction.model.js.
  */
 
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';

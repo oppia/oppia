@@ -21,7 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {State} from 'domain/state/state.model';
 import {States} from 'domain/exploration/states.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
 
 describe('States', () => {
   let statesDict = null;

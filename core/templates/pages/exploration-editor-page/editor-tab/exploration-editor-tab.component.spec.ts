@@ -33,7 +33,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {Solution} from 'domain/exploration/solution.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ExplorationDataService} from '../services/exploration-data.service';

@@ -26,7 +26,7 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {UrlService} from 'services/contextual/url.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model.js';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';

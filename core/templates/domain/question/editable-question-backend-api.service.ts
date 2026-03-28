@@ -23,7 +23,7 @@ import {HttpClient} from '@angular/common/http';
 import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
-import {SkillBackendDict} from 'domain/skill/skill.model.ts';
+import {SkillBackendDict} from 'domain/skill/skill.model.js';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 import cloneDeep from 'lodash/cloneDeep';
 

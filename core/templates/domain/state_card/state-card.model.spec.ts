@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for state-card.model.ts.
+ * @fileoverview Tests for state-card.model.js.
  */
 
 import {TestBed} from '@angular/core/testing';
@@ -24,7 +24,7 @@ import {
   Interaction,
 } from 'domain/exploration/interaction.model';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';

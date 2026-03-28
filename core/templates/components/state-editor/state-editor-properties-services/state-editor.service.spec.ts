@@ -28,7 +28,7 @@ import {Interaction} from 'domain/exploration/interaction.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {Subscription} from 'rxjs';
 

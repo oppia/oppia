@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for answer-stats.model.ts
+ * @fileoverview Unit tests for answer-stats.model.js
  */
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';

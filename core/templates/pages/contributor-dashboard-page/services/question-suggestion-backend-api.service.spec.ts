@@ -32,7 +32,7 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Question} from 'domain/question/question.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model.js';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionSuggestionBackendApiService} from './question-suggestion-backend-api.service';
 

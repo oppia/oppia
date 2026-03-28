@@ -30,7 +30,7 @@ import {
 } from 'domain/exploration/interaction.model';
 import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {SolutionBackendDict, Solution} from 'domain/exploration/solution.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {

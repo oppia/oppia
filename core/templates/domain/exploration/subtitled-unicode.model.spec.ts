@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the SubtitledUnicode model.
  */
 
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
 
 describe('SubtitledUnicode object factory', () => {
   let subtitledUnicode: SubtitledUnicode;

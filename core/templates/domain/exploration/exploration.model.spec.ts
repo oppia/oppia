@@ -27,7 +27,7 @@ import {StateBackendDict, State} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
 import {UrlInterpolationService} from '../utilities/url-interpolation.service';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 
