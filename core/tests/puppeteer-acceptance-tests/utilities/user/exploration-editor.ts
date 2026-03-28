@@ -3698,6 +3698,33 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Returns whether a graph label matches the requested card name.
+   * Long graph labels are truncated with an ellipsis in the UI.
+   */
+  isMatchingGraphCardName(
+    displayedCardName: string,
+    requestedCardName: string
+  ): boolean {
+    return (
+      displayedCardName === requestedCardName ||
+      (displayedCardName.endsWith('...') &&
+        requestedCardName.startsWith(displayedCardName.slice(0, -3)))
+    );
+  }
+
+  /**
+   * Returns the index of a graph label matching the requested card name.
+   */
+  getGraphCardIndex(
+    displayedCardNames: string[],
+    requestedCardName: string
+  ): number {
+    return displayedCardNames.findIndex(displayedCardName =>
+      this.isMatchingGraphCardName(displayedCardName, requestedCardName)
+    );
+  }
+
+  /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    */
@@ -3730,9 +3757,26 @@ export class ExplorationEditor extends BaseUser {
     // background rect which has the click handler.
     const stateNodeGroupSelector = '.e2e-test-node';
     await this.page.waitForSelector(stateNodeGroupSelector);
+    await this.page.waitForFunction(
+      (selector: string, requestedCardName: string) => {
+        const displayedCardNames = Array.from(
+          document.querySelectorAll(selector)
+        ).map(element => element.textContent?.trim() || '');
+
+        return displayedCardNames.some(
+          displayedCardName =>
+            displayedCardName === requestedCardName ||
+            (displayedCardName.endsWith('...') &&
+              requestedCardName.startsWith(displayedCardName.slice(0, -3)))
+        );
+      },
+      {},
+      stateNodeSelector,
+      cardName
+    );
     elements = await this.page.$$(stateNodeGroupSelector);
 
-    const cardNames = await Promise.all(
+    const cardNames: string[] = await Promise.all(
       elements.map(element =>
         element.$eval(
           '.e2e-test-node-label',
@@ -3740,15 +3784,22 @@ export class ExplorationEditor extends BaseUser {
         )
       )
     );
-    const cardIndex = cardNames.indexOf(cardName);
+    const searchableCardCount = this.isViewportAtMobileWidth()
+      ? elements.length / 2
+      : elements.length;
+    const searchableCardNames = cardNames.slice(0, searchableCardCount);
+    const cardIndex = this.getGraphCardIndex(searchableCardNames, cardName);
 
     if (cardIndex === -1) {
-      throw new Error(`Card name ${cardName} not found in the graph.`);
+      throw new Error(
+        `Card name ${cardName} not found in the graph. ` +
+          `Visible graph labels: ${searchableCardNames.join(', ')}.`
+      );
     }
 
     let nodeGroup: ElementHandle<Element> | null = null;
     if (this.isViewportAtMobileWidth()) {
-      nodeGroup = elements[cardIndex + elements.length / 2];
+      nodeGroup = elements[cardIndex + searchableCardCount];
     } else {
       nodeGroup = elements[cardIndex];
     }
@@ -6106,12 +6157,17 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.page.waitForFunction(
-      (selector: string, value: string) => {
+      (selector: string, requestedCardName: string) => {
         const elements = document.querySelectorAll(selector);
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        return cardValues.includes(value);
+        return cardValues.some(
+          displayedCardName =>
+            displayedCardName === requestedCardName ||
+            (displayedCardName?.endsWith('...') &&
+              requestedCardName.startsWith(displayedCardName.slice(0, -3)))
+        );
       },
       {},
       stateNodeSelector,
