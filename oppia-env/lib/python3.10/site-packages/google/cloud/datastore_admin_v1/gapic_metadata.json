@@ -1,0 +1,118 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.datastore_admin_v1",
+  "protoPackage": "google.datastore.admin.v1",
+  "schema": "1.0",
+  "services": {
+    "DatastoreAdmin": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "DatastoreAdminClient",
+          "rpcs": {
+            "CreateIndex": {
+              "methods": [
+                "create_index"
+              ]
+            },
+            "DeleteIndex": {
+              "methods": [
+                "delete_index"
+              ]
+            },
+            "ExportEntities": {
+              "methods": [
+                "export_entities"
+              ]
+            },
+            "GetIndex": {
+              "methods": [
+                "get_index"
+              ]
+            },
+            "ImportEntities": {
+              "methods": [
+                "import_entities"
+              ]
+            },
+            "ListIndexes": {
+              "methods": [
+                "list_indexes"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "DatastoreAdminAsyncClient",
+          "rpcs": {
+            "CreateIndex": {
+              "methods": [
+                "create_index"
+              ]
+            },
+            "DeleteIndex": {
+              "methods": [
+                "delete_index"
+              ]
+            },
+            "ExportEntities": {
+              "methods": [
+                "export_entities"
+              ]
+            },
+            "GetIndex": {
+              "methods": [
+                "get_index"
+              ]
+            },
+            "ImportEntities": {
+              "methods": [
+                "import_entities"
+              ]
+            },
+            "ListIndexes": {
+              "methods": [
+                "list_indexes"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "DatastoreAdminClient",
+          "rpcs": {
+            "CreateIndex": {
+              "methods": [
+                "create_index"
+              ]
+            },
+            "DeleteIndex": {
+              "methods": [
+                "delete_index"
+              ]
+            },
+            "ExportEntities": {
+              "methods": [
+                "export_entities"
+              ]
+            },
+            "GetIndex": {
+              "methods": [
+                "get_index"
+              ]
+            },
+            "ImportEntities": {
+              "methods": [
+                "import_entities"
+              ]
+            },
+            "ListIndexes": {
+              "methods": [
+                "list_indexes"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

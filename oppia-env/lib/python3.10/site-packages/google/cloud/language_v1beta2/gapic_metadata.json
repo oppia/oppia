@@ -1,0 +1,133 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.language_v1beta2",
+  "protoPackage": "google.cloud.language.v1beta2",
+  "schema": "1.0",
+  "services": {
+    "LanguageService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "LanguageServiceClient",
+          "rpcs": {
+            "AnalyzeEntities": {
+              "methods": [
+                "analyze_entities"
+              ]
+            },
+            "AnalyzeEntitySentiment": {
+              "methods": [
+                "analyze_entity_sentiment"
+              ]
+            },
+            "AnalyzeSentiment": {
+              "methods": [
+                "analyze_sentiment"
+              ]
+            },
+            "AnalyzeSyntax": {
+              "methods": [
+                "analyze_syntax"
+              ]
+            },
+            "AnnotateText": {
+              "methods": [
+                "annotate_text"
+              ]
+            },
+            "ClassifyText": {
+              "methods": [
+                "classify_text"
+              ]
+            },
+            "ModerateText": {
+              "methods": [
+                "moderate_text"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "LanguageServiceAsyncClient",
+          "rpcs": {
+            "AnalyzeEntities": {
+              "methods": [
+                "analyze_entities"
+              ]
+            },
+            "AnalyzeEntitySentiment": {
+              "methods": [
+                "analyze_entity_sentiment"
+              ]
+            },
+            "AnalyzeSentiment": {
+              "methods": [
+                "analyze_sentiment"
+              ]
+            },
+            "AnalyzeSyntax": {
+              "methods": [
+                "analyze_syntax"
+              ]
+            },
+            "AnnotateText": {
+              "methods": [
+                "annotate_text"
+              ]
+            },
+            "ClassifyText": {
+              "methods": [
+                "classify_text"
+              ]
+            },
+            "ModerateText": {
+              "methods": [
+                "moderate_text"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "LanguageServiceClient",
+          "rpcs": {
+            "AnalyzeEntities": {
+              "methods": [
+                "analyze_entities"
+              ]
+            },
+            "AnalyzeEntitySentiment": {
+              "methods": [
+                "analyze_entity_sentiment"
+              ]
+            },
+            "AnalyzeSentiment": {
+              "methods": [
+                "analyze_sentiment"
+              ]
+            },
+            "AnalyzeSyntax": {
+              "methods": [
+                "analyze_syntax"
+              ]
+            },
+            "AnnotateText": {
+              "methods": [
+                "annotate_text"
+              ]
+            },
+            "ClassifyText": {
+              "methods": [
+                "classify_text"
+              ]
+            },
+            "ModerateText": {
+              "methods": [
+                "moderate_text"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

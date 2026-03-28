@@ -1,0 +1,163 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.spanner_admin_instance_v1",
+  "protoPackage": "google.spanner.admin.instance.v1",
+  "schema": "1.0",
+  "services": {
+    "InstanceAdmin": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "InstanceAdminClient",
+          "rpcs": {
+            "CreateInstance": {
+              "methods": [
+                "create_instance"
+              ]
+            },
+            "CreateInstanceConfig": {
+              "methods": [
+                "create_instance_config"
+              ]
+            },
+            "DeleteInstance": {
+              "methods": [
+                "delete_instance"
+              ]
+            },
+            "DeleteInstanceConfig": {
+              "methods": [
+                "delete_instance_config"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetInstance": {
+              "methods": [
+                "get_instance"
+              ]
+            },
+            "GetInstanceConfig": {
+              "methods": [
+                "get_instance_config"
+              ]
+            },
+            "ListInstanceConfigOperations": {
+              "methods": [
+                "list_instance_config_operations"
+              ]
+            },
+            "ListInstanceConfigs": {
+              "methods": [
+                "list_instance_configs"
+              ]
+            },
+            "ListInstances": {
+              "methods": [
+                "list_instances"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateInstance": {
+              "methods": [
+                "update_instance"
+              ]
+            },
+            "UpdateInstanceConfig": {
+              "methods": [
+                "update_instance_config"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "InstanceAdminAsyncClient",
+          "rpcs": {
+            "CreateInstance": {
+              "methods": [
+                "create_instance"
+              ]
+            },
+            "CreateInstanceConfig": {
+              "methods": [
+                "create_instance_config"
+              ]
+            },
+            "DeleteInstance": {
+              "methods": [
+                "delete_instance"
+              ]
+            },
+            "DeleteInstanceConfig": {
+              "methods": [
+                "delete_instance_config"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetInstance": {
+              "methods": [
+                "get_instance"
+              ]
+            },
+            "GetInstanceConfig": {
+              "methods": [
+                "get_instance_config"
+              ]
+            },
+            "ListInstanceConfigOperations": {
+              "methods": [
+                "list_instance_config_operations"
+              ]
+            },
+            "ListInstanceConfigs": {
+              "methods": [
+                "list_instance_configs"
+              ]
+            },
+            "ListInstances": {
+              "methods": [
+                "list_instances"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateInstance": {
+              "methods": [
+                "update_instance"
+              ]
+            },
+            "UpdateInstanceConfig": {
+              "methods": [
+                "update_instance_config"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

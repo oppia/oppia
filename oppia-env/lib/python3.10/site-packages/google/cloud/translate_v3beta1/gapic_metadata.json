@@ -1,0 +1,178 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.translate_v3beta1",
+  "protoPackage": "google.cloud.translation.v3beta1",
+  "schema": "1.0",
+  "services": {
+    "TranslationService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "TranslationServiceClient",
+          "rpcs": {
+            "BatchTranslateDocument": {
+              "methods": [
+                "batch_translate_document"
+              ]
+            },
+            "BatchTranslateText": {
+              "methods": [
+                "batch_translate_text"
+              ]
+            },
+            "CreateGlossary": {
+              "methods": [
+                "create_glossary"
+              ]
+            },
+            "DeleteGlossary": {
+              "methods": [
+                "delete_glossary"
+              ]
+            },
+            "DetectLanguage": {
+              "methods": [
+                "detect_language"
+              ]
+            },
+            "GetGlossary": {
+              "methods": [
+                "get_glossary"
+              ]
+            },
+            "GetSupportedLanguages": {
+              "methods": [
+                "get_supported_languages"
+              ]
+            },
+            "ListGlossaries": {
+              "methods": [
+                "list_glossaries"
+              ]
+            },
+            "TranslateDocument": {
+              "methods": [
+                "translate_document"
+              ]
+            },
+            "TranslateText": {
+              "methods": [
+                "translate_text"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "TranslationServiceAsyncClient",
+          "rpcs": {
+            "BatchTranslateDocument": {
+              "methods": [
+                "batch_translate_document"
+              ]
+            },
+            "BatchTranslateText": {
+              "methods": [
+                "batch_translate_text"
+              ]
+            },
+            "CreateGlossary": {
+              "methods": [
+                "create_glossary"
+              ]
+            },
+            "DeleteGlossary": {
+              "methods": [
+                "delete_glossary"
+              ]
+            },
+            "DetectLanguage": {
+              "methods": [
+                "detect_language"
+              ]
+            },
+            "GetGlossary": {
+              "methods": [
+                "get_glossary"
+              ]
+            },
+            "GetSupportedLanguages": {
+              "methods": [
+                "get_supported_languages"
+              ]
+            },
+            "ListGlossaries": {
+              "methods": [
+                "list_glossaries"
+              ]
+            },
+            "TranslateDocument": {
+              "methods": [
+                "translate_document"
+              ]
+            },
+            "TranslateText": {
+              "methods": [
+                "translate_text"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "TranslationServiceClient",
+          "rpcs": {
+            "BatchTranslateDocument": {
+              "methods": [
+                "batch_translate_document"
+              ]
+            },
+            "BatchTranslateText": {
+              "methods": [
+                "batch_translate_text"
+              ]
+            },
+            "CreateGlossary": {
+              "methods": [
+                "create_glossary"
+              ]
+            },
+            "DeleteGlossary": {
+              "methods": [
+                "delete_glossary"
+              ]
+            },
+            "DetectLanguage": {
+              "methods": [
+                "detect_language"
+              ]
+            },
+            "GetGlossary": {
+              "methods": [
+                "get_glossary"
+              ]
+            },
+            "GetSupportedLanguages": {
+              "methods": [
+                "get_supported_languages"
+              ]
+            },
+            "ListGlossaries": {
+              "methods": [
+                "list_glossaries"
+              ]
+            },
+            "TranslateDocument": {
+              "methods": [
+                "translate_document"
+              ]
+            },
+            "TranslateText": {
+              "methods": [
+                "translate_text"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,393 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.dataflow_v1beta3",
+  "protoPackage": "google.dataflow.v1beta3",
+  "schema": "1.0",
+  "services": {
+    "FlexTemplatesService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "FlexTemplatesServiceClient",
+          "rpcs": {
+            "LaunchFlexTemplate": {
+              "methods": [
+                "launch_flex_template"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "FlexTemplatesServiceAsyncClient",
+          "rpcs": {
+            "LaunchFlexTemplate": {
+              "methods": [
+                "launch_flex_template"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "FlexTemplatesServiceClient",
+          "rpcs": {
+            "LaunchFlexTemplate": {
+              "methods": [
+                "launch_flex_template"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "JobsV1Beta3": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "JobsV1Beta3Client",
+          "rpcs": {
+            "AggregatedListJobs": {
+              "methods": [
+                "aggregated_list_jobs"
+              ]
+            },
+            "CheckActiveJobs": {
+              "methods": [
+                "check_active_jobs"
+              ]
+            },
+            "CreateJob": {
+              "methods": [
+                "create_job"
+              ]
+            },
+            "GetJob": {
+              "methods": [
+                "get_job"
+              ]
+            },
+            "ListJobs": {
+              "methods": [
+                "list_jobs"
+              ]
+            },
+            "SnapshotJob": {
+              "methods": [
+                "snapshot_job"
+              ]
+            },
+            "UpdateJob": {
+              "methods": [
+                "update_job"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "JobsV1Beta3AsyncClient",
+          "rpcs": {
+            "AggregatedListJobs": {
+              "methods": [
+                "aggregated_list_jobs"
+              ]
+            },
+            "CheckActiveJobs": {
+              "methods": [
+                "check_active_jobs"
+              ]
+            },
+            "CreateJob": {
+              "methods": [
+                "create_job"
+              ]
+            },
+            "GetJob": {
+              "methods": [
+                "get_job"
+              ]
+            },
+            "ListJobs": {
+              "methods": [
+                "list_jobs"
+              ]
+            },
+            "SnapshotJob": {
+              "methods": [
+                "snapshot_job"
+              ]
+            },
+            "UpdateJob": {
+              "methods": [
+                "update_job"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "JobsV1Beta3Client",
+          "rpcs": {
+            "AggregatedListJobs": {
+              "methods": [
+                "aggregated_list_jobs"
+              ]
+            },
+            "CheckActiveJobs": {
+              "methods": [
+                "check_active_jobs"
+              ]
+            },
+            "CreateJob": {
+              "methods": [
+                "create_job"
+              ]
+            },
+            "GetJob": {
+              "methods": [
+                "get_job"
+              ]
+            },
+            "ListJobs": {
+              "methods": [
+                "list_jobs"
+              ]
+            },
+            "SnapshotJob": {
+              "methods": [
+                "snapshot_job"
+              ]
+            },
+            "UpdateJob": {
+              "methods": [
+                "update_job"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "MessagesV1Beta3": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "MessagesV1Beta3Client",
+          "rpcs": {
+            "ListJobMessages": {
+              "methods": [
+                "list_job_messages"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "MessagesV1Beta3AsyncClient",
+          "rpcs": {
+            "ListJobMessages": {
+              "methods": [
+                "list_job_messages"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "MessagesV1Beta3Client",
+          "rpcs": {
+            "ListJobMessages": {
+              "methods": [
+                "list_job_messages"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "MetricsV1Beta3": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "MetricsV1Beta3Client",
+          "rpcs": {
+            "GetJobExecutionDetails": {
+              "methods": [
+                "get_job_execution_details"
+              ]
+            },
+            "GetJobMetrics": {
+              "methods": [
+                "get_job_metrics"
+              ]
+            },
+            "GetStageExecutionDetails": {
+              "methods": [
+                "get_stage_execution_details"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "MetricsV1Beta3AsyncClient",
+          "rpcs": {
+            "GetJobExecutionDetails": {
+              "methods": [
+                "get_job_execution_details"
+              ]
+            },
+            "GetJobMetrics": {
+              "methods": [
+                "get_job_metrics"
+              ]
+            },
+            "GetStageExecutionDetails": {
+              "methods": [
+                "get_stage_execution_details"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "MetricsV1Beta3Client",
+          "rpcs": {
+            "GetJobExecutionDetails": {
+              "methods": [
+                "get_job_execution_details"
+              ]
+            },
+            "GetJobMetrics": {
+              "methods": [
+                "get_job_metrics"
+              ]
+            },
+            "GetStageExecutionDetails": {
+              "methods": [
+                "get_stage_execution_details"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "SnapshotsV1Beta3": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "SnapshotsV1Beta3Client",
+          "rpcs": {
+            "DeleteSnapshot": {
+              "methods": [
+                "delete_snapshot"
+              ]
+            },
+            "GetSnapshot": {
+              "methods": [
+                "get_snapshot"
+              ]
+            },
+            "ListSnapshots": {
+              "methods": [
+                "list_snapshots"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "SnapshotsV1Beta3AsyncClient",
+          "rpcs": {
+            "DeleteSnapshot": {
+              "methods": [
+                "delete_snapshot"
+              ]
+            },
+            "GetSnapshot": {
+              "methods": [
+                "get_snapshot"
+              ]
+            },
+            "ListSnapshots": {
+              "methods": [
+                "list_snapshots"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "SnapshotsV1Beta3Client",
+          "rpcs": {
+            "DeleteSnapshot": {
+              "methods": [
+                "delete_snapshot"
+              ]
+            },
+            "GetSnapshot": {
+              "methods": [
+                "get_snapshot"
+              ]
+            },
+            "ListSnapshots": {
+              "methods": [
+                "list_snapshots"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "TemplatesService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "TemplatesServiceClient",
+          "rpcs": {
+            "CreateJobFromTemplate": {
+              "methods": [
+                "create_job_from_template"
+              ]
+            },
+            "GetTemplate": {
+              "methods": [
+                "get_template"
+              ]
+            },
+            "LaunchTemplate": {
+              "methods": [
+                "launch_template"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "TemplatesServiceAsyncClient",
+          "rpcs": {
+            "CreateJobFromTemplate": {
+              "methods": [
+                "create_job_from_template"
+              ]
+            },
+            "GetTemplate": {
+              "methods": [
+                "get_template"
+              ]
+            },
+            "LaunchTemplate": {
+              "methods": [
+                "launch_template"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "TemplatesServiceClient",
+          "rpcs": {
+            "CreateJobFromTemplate": {
+              "methods": [
+                "create_job_from_template"
+              ]
+            },
+            "GetTemplate": {
+              "methods": [
+                "get_template"
+              ]
+            },
+            "LaunchTemplate": {
+              "methods": [
+                "launch_template"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

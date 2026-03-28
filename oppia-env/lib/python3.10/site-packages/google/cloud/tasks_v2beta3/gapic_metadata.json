@@ -1,0 +1,268 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.tasks_v2beta3",
+  "protoPackage": "google.cloud.tasks.v2beta3",
+  "schema": "1.0",
+  "services": {
+    "CloudTasks": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "CloudTasksClient",
+          "rpcs": {
+            "CreateQueue": {
+              "methods": [
+                "create_queue"
+              ]
+            },
+            "CreateTask": {
+              "methods": [
+                "create_task"
+              ]
+            },
+            "DeleteQueue": {
+              "methods": [
+                "delete_queue"
+              ]
+            },
+            "DeleteTask": {
+              "methods": [
+                "delete_task"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetQueue": {
+              "methods": [
+                "get_queue"
+              ]
+            },
+            "GetTask": {
+              "methods": [
+                "get_task"
+              ]
+            },
+            "ListQueues": {
+              "methods": [
+                "list_queues"
+              ]
+            },
+            "ListTasks": {
+              "methods": [
+                "list_tasks"
+              ]
+            },
+            "PauseQueue": {
+              "methods": [
+                "pause_queue"
+              ]
+            },
+            "PurgeQueue": {
+              "methods": [
+                "purge_queue"
+              ]
+            },
+            "ResumeQueue": {
+              "methods": [
+                "resume_queue"
+              ]
+            },
+            "RunTask": {
+              "methods": [
+                "run_task"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateQueue": {
+              "methods": [
+                "update_queue"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "CloudTasksAsyncClient",
+          "rpcs": {
+            "CreateQueue": {
+              "methods": [
+                "create_queue"
+              ]
+            },
+            "CreateTask": {
+              "methods": [
+                "create_task"
+              ]
+            },
+            "DeleteQueue": {
+              "methods": [
+                "delete_queue"
+              ]
+            },
+            "DeleteTask": {
+              "methods": [
+                "delete_task"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetQueue": {
+              "methods": [
+                "get_queue"
+              ]
+            },
+            "GetTask": {
+              "methods": [
+                "get_task"
+              ]
+            },
+            "ListQueues": {
+              "methods": [
+                "list_queues"
+              ]
+            },
+            "ListTasks": {
+              "methods": [
+                "list_tasks"
+              ]
+            },
+            "PauseQueue": {
+              "methods": [
+                "pause_queue"
+              ]
+            },
+            "PurgeQueue": {
+              "methods": [
+                "purge_queue"
+              ]
+            },
+            "ResumeQueue": {
+              "methods": [
+                "resume_queue"
+              ]
+            },
+            "RunTask": {
+              "methods": [
+                "run_task"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateQueue": {
+              "methods": [
+                "update_queue"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "CloudTasksClient",
+          "rpcs": {
+            "CreateQueue": {
+              "methods": [
+                "create_queue"
+              ]
+            },
+            "CreateTask": {
+              "methods": [
+                "create_task"
+              ]
+            },
+            "DeleteQueue": {
+              "methods": [
+                "delete_queue"
+              ]
+            },
+            "DeleteTask": {
+              "methods": [
+                "delete_task"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetQueue": {
+              "methods": [
+                "get_queue"
+              ]
+            },
+            "GetTask": {
+              "methods": [
+                "get_task"
+              ]
+            },
+            "ListQueues": {
+              "methods": [
+                "list_queues"
+              ]
+            },
+            "ListTasks": {
+              "methods": [
+                "list_tasks"
+              ]
+            },
+            "PauseQueue": {
+              "methods": [
+                "pause_queue"
+              ]
+            },
+            "PurgeQueue": {
+              "methods": [
+                "purge_queue"
+              ]
+            },
+            "ResumeQueue": {
+              "methods": [
+                "resume_queue"
+              ]
+            },
+            "RunTask": {
+              "methods": [
+                "run_task"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateQueue": {
+              "methods": [
+                "update_queue"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

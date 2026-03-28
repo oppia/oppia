@@ -1,0 +1,94 @@
+Metadata-Version: 2.4
+Name: google-cloud-ndb
+Version: 2.3.4
+Summary: NDB library for Google Cloud Datastore
+Home-page: https://github.com/googleapis/python-ndb
+Author: Google LLC
+Author-email: googleapis-packages@google.com
+License: Apache 2.0
+Project-URL: Documentation, https://googleapis.dev/python/python-ndb/latest
+Project-URL: Issue Tracker, https://github.com/googleapis/python-ndb/issues
+Platform: Posix; MacOS X; Windows
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Internet
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: AUTHORS
+Requires-Dist: google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0,>=1.34.0
+Requires-Dist: google-cloud-datastore!=2.20.2,<3.0.0,>=2.16.0
+Requires-Dist: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<7.0.0,>=3.20.2
+Requires-Dist: pymemcache<5.0.0,>=2.1.0
+Requires-Dist: pytz>=2018.3
+Requires-Dist: redis<7.0.0,>=3.0.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: platform
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Google Cloud Datastore `ndb` Client Library
+
+[![stable](https://img.shields.io/badge/support-stable-gold.svg)](https://github.com/googleapis/google-cloud-python/blob/main/README.rst#stability-levels)
+[![pypi](https://img.shields.io/pypi/v/google-cloud-ndb.svg)](https://pypi.org/project/google-cloud-ndb/)
+[![versions](https://img.shields.io/pypi/pyversions/google-cloud-ndb.svg)](https://pypi.org/project/google-cloud-ndb/)
+
+## Introduction
+
+This is an updated version of the `ndb` client library for use with
+[Google Cloud Datastore][0].
+
+* [Client Library Documentation](https://googleapis.dev/python/python-ndb/latest)
+* [Product Documentation](https://cloud.google.com/datastore/docs)
+
+The original Python 2 version of `ndb` was designed specifically for the
+[Google App Engine][1] `python27` runtime and can be found at
+https://github.com/GoogleCloudPlatform/datastore-ndb-python. This version of
+`ndb` is designed for the [Google App Engine Python 3 runtime][2], and will
+run on other Python platforms as well.
+
+[0]: https://cloud.google.com/datastore
+[1]: https://cloud.google.com/appengine
+[2]: https://cloud.google.com/appengine/docs/standard/python3/
+
+## Release Status
+
+GA
+
+## Supported Python Versions
+
+Our client libraries are compatible with all current [active][3] and [maintenance][4] versions of Python.
+
+Python >= 3.7
+
+[3]: https://devguide.python.org/devcycle/#in-development-main-branch
+[4]: https://devguide.python.org/devcycle/#maintenance-branches
+
+### Unsupported Python Versions
+
+Python <= 3.6
+
+If you are using an [end-of-life][5]
+version of Python, we recommend that you update as soon as possible to an actively supported version.
+
+[5]: https://devguide.python.org/devcycle/#end-of-life-branches

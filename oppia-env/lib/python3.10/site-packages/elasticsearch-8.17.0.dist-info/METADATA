@@ -1,0 +1,178 @@
+Metadata-Version: 2.4
+Name: elasticsearch
+Version: 8.17.0
+Summary: Python client for Elasticsearch
+Project-URL: Documentation, https://elasticsearch-py.readthedocs.io/
+Project-URL: Homepage, https://github.com/elastic/elasticsearch-py
+Project-URL: Issue Tracker, https://github.com/elastic/elasticsearch-py/issues
+Project-URL: Source Code, https://github.com/elastic/elasticsearch-py
+Author-email: Elastic Client Library Maintainers <client-libs@elastic.co>
+Maintainer-email: Elastic Client Library Maintainers <client-libs@elastic.co>
+License-Expression: Apache-2.0
+License-File: LICENSE
+License-File: NOTICE
+Keywords: REST,client,elastic,elasticsearch,index,kibana,mapping,search
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.8
+Requires-Dist: elastic-transport<9,>=8.15.1
+Provides-Extra: async
+Requires-Dist: aiohttp<4,>=3; extra == 'async'
+Provides-Extra: dev
+Requires-Dist: aiohttp; extra == 'dev'
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: build; extra == 'dev'
+Requires-Dist: coverage; extra == 'dev'
+Requires-Dist: isort; extra == 'dev'
+Requires-Dist: jinja2; extra == 'dev'
+Requires-Dist: mapbox-vector-tile; extra == 'dev'
+Requires-Dist: nox; extra == 'dev'
+Requires-Dist: numpy; extra == 'dev'
+Requires-Dist: orjson; extra == 'dev'
+Requires-Dist: pandas; extra == 'dev'
+Requires-Dist: pyarrow; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: pytest-asyncio; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: python-dateutil; extra == 'dev'
+Requires-Dist: pyyaml>=5.4; extra == 'dev'
+Requires-Dist: requests<3,>=2; extra == 'dev'
+Requires-Dist: simsimd; extra == 'dev'
+Requires-Dist: twine; extra == 'dev'
+Requires-Dist: unasync; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == 'docs'
+Requires-Dist: sphinx-autodoc-typehints; extra == 'docs'
+Requires-Dist: sphinx-rtd-theme>=2.0; extra == 'docs'
+Provides-Extra: orjson
+Requires-Dist: orjson>=3; extra == 'orjson'
+Provides-Extra: pyarrow
+Requires-Dist: pyarrow>=1; extra == 'pyarrow'
+Provides-Extra: requests
+Requires-Dist: requests!=2.32.2,<3.0.0,>=2.4.0; extra == 'requests'
+Provides-Extra: vectorstore-mmr
+Requires-Dist: numpy>=1; extra == 'vectorstore-mmr'
+Requires-Dist: simsimd>=3; extra == 'vectorstore-mmr'
+Description-Content-Type: text/markdown
+
+<p align="center">
+    <img src="https://github.com/elastic/elasticsearch-py/raw/main/docs/logo-elastic-glyph-color.svg" width="20%" alt="Elastic logo" />
+</p>
+
+# Elasticsearch Python Client
+
+<p align="center">
+  <a href="https://pypi.org/project/elasticsearch"><img alt="PyPI Version" src="https://img.shields.io/pypi/v/elasticsearch" /></a>
+  <a href="https://pypi.org/project/elasticsearch"><img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/elasticsearch" /></a>
+  <a href="https://anaconda.org/conda-forge/elasticsearch"><img alt="Conda Version" src="https://img.shields.io/conda/vn/conda-forge/elasticsearch" /></a>
+  <a href="https://pepy.tech/project/elasticsearch?versions=*"><img alt="Downloads" src="https://static.pepy.tech/badge/elasticsearch" /></a>
+<br/>
+  <a href="https://github.com/elastic/elasticsearch-py/actions/workflows/ci.yml?query=workflow%3ACI"><img alt="Build Status on GitHub" src="https://github.com/elastic/elasticsearch-py/workflows/CI/badge.svg" /></a>
+  <a href="https://buildkite.com/elastic/elasticsearch-py-integration-tests"><img alt="Buildkite Status on Buildkite" src="https://badge.buildkite.com/68e22afcb2ea8f6dcc20834e3a5b5ab4431beee33d3bd751f3.svg" /></a>
+  <a href="https://elasticsearch-py.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/elasticsearch-py/badge/?version=latest" /></a><br>
+</p>
+
+*The official Python client for Elasticsearch.*
+
+
+## Features
+
+* Translating basic Python data types to and from JSON
+* Configurable automatic discovery of cluster nodes
+* Persistent connections
+* Load balancing (with pluggable selection strategy) across available nodes
+* Failed connection penalization (time based - failed connections won't be
+  retried until a timeout is reached)
+* Support for TLS and HTTP authentication
+* Thread safety across requests
+* Pluggable architecture
+* Helper functions for idiomatically using APIs together
+
+
+## Installation
+
+[Download the latest version of Elasticsearch](https://www.elastic.co/downloads/elasticsearch)
+or
+[sign-up](https://cloud.elastic.co/registration?elektra=en-ess-sign-up-page)
+for a free trial of Elastic Cloud.
+
+Refer to the [Installation section](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_installation) 
+of the getting started documentation.
+
+
+## Connecting
+
+Refer to the [Connecting section](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_connecting)
+of the getting started documentation.
+
+
+## Usage
+-----
+
+* [Creating an index](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_creating_an_index)
+* [Indexing a document](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_indexing_documents)
+* [Getting documents](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_getting_documents)
+* [Searching documents](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_searching_documents)
+* [Updating documents](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_updating_documents)
+* [Deleting documents](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_deleting_documents)
+* [Deleting an index](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html#_deleting_an_index)
+
+
+## Compatibility
+
+Language clients are forward compatible; meaning that the clients support
+communicating with greater or equal minor versions of Elasticsearch without
+breaking. It does not mean that the clients automatically support new features
+of newer Elasticsearch versions; it is only possible after a release of a new
+client version. For example, a 8.12 client version won't automatically support
+the new features of the 8.13 version of Elasticsearch, the 8.13 client version
+is required for that. Elasticsearch language clients are only backwards
+compatible with default distributions and without guarantees made.
+
+| Elasticsearch Version | Elasticsearch-Python Branch | Supported |
+| --------------------- | ------------------------ | --------- |
+| main                  | main                     |           |
+| 8.x                   | 8.x                      | 8.x       |
+| 7.x                   | 7.x                      | 7.17      |
+
+
+If you have a need to have multiple versions installed at the same time older
+versions are also released as ``elasticsearch7`` and ``elasticsearch8``.
+
+
+## Documentation
+
+Documentation for the client is [available on elastic.co] and [Read the Docs].
+
+[available on elastic.co]: https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/index.html
+[Read the Docs]: https://elasticsearch-py.readthedocs.io
+
+
+## Feedback 🗣️
+
+The engineering team here at Elastic is looking for developers to participate in
+research and feedback sessions to learn more about how you use our Python client and
+what improvements we can make to their design and your workflow. If you're interested in
+sharing your insights into developer experience and language client design, please fill
+out this [short form]. Depending on the number of responses we get, we may either
+contact you for a 1:1 conversation or a focus group with other developers who use the
+same client. Thank you in advance - your feedback is crucial to improving the user
+experience for all Elasticsearch developers!
+
+[short form]: https://forms.gle/bYZwDQXijfhfwshn9
+
+## License
+
+This software is licensed under the [Apache License 2.0](./LICENSE). See [NOTICE](./NOTICE).

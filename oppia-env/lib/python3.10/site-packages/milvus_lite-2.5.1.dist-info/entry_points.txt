@@ -1,0 +1,2 @@
+[console_scripts]
+milvus-lite = milvus_lite.cmdline:main

@@ -1,0 +1,268 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.firestore_v1",
+  "protoPackage": "google.firestore.v1",
+  "schema": "1.0",
+  "services": {
+    "Firestore": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "FirestoreClient",
+          "rpcs": {
+            "BatchGetDocuments": {
+              "methods": [
+                "batch_get_documents"
+              ]
+            },
+            "BatchWrite": {
+              "methods": [
+                "batch_write"
+              ]
+            },
+            "BeginTransaction": {
+              "methods": [
+                "begin_transaction"
+              ]
+            },
+            "Commit": {
+              "methods": [
+                "commit"
+              ]
+            },
+            "CreateDocument": {
+              "methods": [
+                "create_document"
+              ]
+            },
+            "DeleteDocument": {
+              "methods": [
+                "delete_document"
+              ]
+            },
+            "GetDocument": {
+              "methods": [
+                "get_document"
+              ]
+            },
+            "ListCollectionIds": {
+              "methods": [
+                "list_collection_ids"
+              ]
+            },
+            "ListDocuments": {
+              "methods": [
+                "list_documents"
+              ]
+            },
+            "Listen": {
+              "methods": [
+                "listen"
+              ]
+            },
+            "PartitionQuery": {
+              "methods": [
+                "partition_query"
+              ]
+            },
+            "Rollback": {
+              "methods": [
+                "rollback"
+              ]
+            },
+            "RunAggregationQuery": {
+              "methods": [
+                "run_aggregation_query"
+              ]
+            },
+            "RunQuery": {
+              "methods": [
+                "run_query"
+              ]
+            },
+            "UpdateDocument": {
+              "methods": [
+                "update_document"
+              ]
+            },
+            "Write": {
+              "methods": [
+                "write"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "FirestoreAsyncClient",
+          "rpcs": {
+            "BatchGetDocuments": {
+              "methods": [
+                "batch_get_documents"
+              ]
+            },
+            "BatchWrite": {
+              "methods": [
+                "batch_write"
+              ]
+            },
+            "BeginTransaction": {
+              "methods": [
+                "begin_transaction"
+              ]
+            },
+            "Commit": {
+              "methods": [
+                "commit"
+              ]
+            },
+            "CreateDocument": {
+              "methods": [
+                "create_document"
+              ]
+            },
+            "DeleteDocument": {
+              "methods": [
+                "delete_document"
+              ]
+            },
+            "GetDocument": {
+              "methods": [
+                "get_document"
+              ]
+            },
+            "ListCollectionIds": {
+              "methods": [
+                "list_collection_ids"
+              ]
+            },
+            "ListDocuments": {
+              "methods": [
+                "list_documents"
+              ]
+            },
+            "Listen": {
+              "methods": [
+                "listen"
+              ]
+            },
+            "PartitionQuery": {
+              "methods": [
+                "partition_query"
+              ]
+            },
+            "Rollback": {
+              "methods": [
+                "rollback"
+              ]
+            },
+            "RunAggregationQuery": {
+              "methods": [
+                "run_aggregation_query"
+              ]
+            },
+            "RunQuery": {
+              "methods": [
+                "run_query"
+              ]
+            },
+            "UpdateDocument": {
+              "methods": [
+                "update_document"
+              ]
+            },
+            "Write": {
+              "methods": [
+                "write"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "FirestoreClient",
+          "rpcs": {
+            "BatchGetDocuments": {
+              "methods": [
+                "batch_get_documents"
+              ]
+            },
+            "BatchWrite": {
+              "methods": [
+                "batch_write"
+              ]
+            },
+            "BeginTransaction": {
+              "methods": [
+                "begin_transaction"
+              ]
+            },
+            "Commit": {
+              "methods": [
+                "commit"
+              ]
+            },
+            "CreateDocument": {
+              "methods": [
+                "create_document"
+              ]
+            },
+            "DeleteDocument": {
+              "methods": [
+                "delete_document"
+              ]
+            },
+            "GetDocument": {
+              "methods": [
+                "get_document"
+              ]
+            },
+            "ListCollectionIds": {
+              "methods": [
+                "list_collection_ids"
+              ]
+            },
+            "ListDocuments": {
+              "methods": [
+                "list_documents"
+              ]
+            },
+            "Listen": {
+              "methods": [
+                "listen"
+              ]
+            },
+            "PartitionQuery": {
+              "methods": [
+                "partition_query"
+              ]
+            },
+            "Rollback": {
+              "methods": [
+                "rollback"
+              ]
+            },
+            "RunAggregationQuery": {
+              "methods": [
+                "run_aggregation_query"
+              ]
+            },
+            "RunQuery": {
+              "methods": [
+                "run_query"
+              ]
+            },
+            "UpdateDocument": {
+              "methods": [
+                "update_document"
+              ]
+            },
+            "Write": {
+              "methods": [
+                "write"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

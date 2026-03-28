@@ -1,0 +1,343 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.tasks_v2beta2",
+  "protoPackage": "google.cloud.tasks.v2beta2",
+  "schema": "1.0",
+  "services": {
+    "CloudTasks": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "CloudTasksClient",
+          "rpcs": {
+            "AcknowledgeTask": {
+              "methods": [
+                "acknowledge_task"
+              ]
+            },
+            "CancelLease": {
+              "methods": [
+                "cancel_lease"
+              ]
+            },
+            "CreateQueue": {
+              "methods": [
+                "create_queue"
+              ]
+            },
+            "CreateTask": {
+              "methods": [
+                "create_task"
+              ]
+            },
+            "DeleteQueue": {
+              "methods": [
+                "delete_queue"
+              ]
+            },
+            "DeleteTask": {
+              "methods": [
+                "delete_task"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetQueue": {
+              "methods": [
+                "get_queue"
+              ]
+            },
+            "GetTask": {
+              "methods": [
+                "get_task"
+              ]
+            },
+            "LeaseTasks": {
+              "methods": [
+                "lease_tasks"
+              ]
+            },
+            "ListQueues": {
+              "methods": [
+                "list_queues"
+              ]
+            },
+            "ListTasks": {
+              "methods": [
+                "list_tasks"
+              ]
+            },
+            "PauseQueue": {
+              "methods": [
+                "pause_queue"
+              ]
+            },
+            "PurgeQueue": {
+              "methods": [
+                "purge_queue"
+              ]
+            },
+            "RenewLease": {
+              "methods": [
+                "renew_lease"
+              ]
+            },
+            "ResumeQueue": {
+              "methods": [
+                "resume_queue"
+              ]
+            },
+            "RunTask": {
+              "methods": [
+                "run_task"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateQueue": {
+              "methods": [
+                "update_queue"
+              ]
+            },
+            "UploadQueueYaml": {
+              "methods": [
+                "upload_queue_yaml"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "CloudTasksAsyncClient",
+          "rpcs": {
+            "AcknowledgeTask": {
+              "methods": [
+                "acknowledge_task"
+              ]
+            },
+            "CancelLease": {
+              "methods": [
+                "cancel_lease"
+              ]
+            },
+            "CreateQueue": {
+              "methods": [
+                "create_queue"
+              ]
+            },
+            "CreateTask": {
+              "methods": [
+                "create_task"
+              ]
+            },
+            "DeleteQueue": {
+              "methods": [
+                "delete_queue"
+              ]
+            },
+            "DeleteTask": {
+              "methods": [
+                "delete_task"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetQueue": {
+              "methods": [
+                "get_queue"
+              ]
+            },
+            "GetTask": {
+              "methods": [
+                "get_task"
+              ]
+            },
+            "LeaseTasks": {
+              "methods": [
+                "lease_tasks"
+              ]
+            },
+            "ListQueues": {
+              "methods": [
+                "list_queues"
+              ]
+            },
+            "ListTasks": {
+              "methods": [
+                "list_tasks"
+              ]
+            },
+            "PauseQueue": {
+              "methods": [
+                "pause_queue"
+              ]
+            },
+            "PurgeQueue": {
+              "methods": [
+                "purge_queue"
+              ]
+            },
+            "RenewLease": {
+              "methods": [
+                "renew_lease"
+              ]
+            },
+            "ResumeQueue": {
+              "methods": [
+                "resume_queue"
+              ]
+            },
+            "RunTask": {
+              "methods": [
+                "run_task"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateQueue": {
+              "methods": [
+                "update_queue"
+              ]
+            },
+            "UploadQueueYaml": {
+              "methods": [
+                "upload_queue_yaml"
+              ]
+            }
+          }
+        },
+        "rest": {
+          "libraryClient": "CloudTasksClient",
+          "rpcs": {
+            "AcknowledgeTask": {
+              "methods": [
+                "acknowledge_task"
+              ]
+            },
+            "CancelLease": {
+              "methods": [
+                "cancel_lease"
+              ]
+            },
+            "CreateQueue": {
+              "methods": [
+                "create_queue"
+              ]
+            },
+            "CreateTask": {
+              "methods": [
+                "create_task"
+              ]
+            },
+            "DeleteQueue": {
+              "methods": [
+                "delete_queue"
+              ]
+            },
+            "DeleteTask": {
+              "methods": [
+                "delete_task"
+              ]
+            },
+            "GetIamPolicy": {
+              "methods": [
+                "get_iam_policy"
+              ]
+            },
+            "GetQueue": {
+              "methods": [
+                "get_queue"
+              ]
+            },
+            "GetTask": {
+              "methods": [
+                "get_task"
+              ]
+            },
+            "LeaseTasks": {
+              "methods": [
+                "lease_tasks"
+              ]
+            },
+            "ListQueues": {
+              "methods": [
+                "list_queues"
+              ]
+            },
+            "ListTasks": {
+              "methods": [
+                "list_tasks"
+              ]
+            },
+            "PauseQueue": {
+              "methods": [
+                "pause_queue"
+              ]
+            },
+            "PurgeQueue": {
+              "methods": [
+                "purge_queue"
+              ]
+            },
+            "RenewLease": {
+              "methods": [
+                "renew_lease"
+              ]
+            },
+            "ResumeQueue": {
+              "methods": [
+                "resume_queue"
+              ]
+            },
+            "RunTask": {
+              "methods": [
+                "run_task"
+              ]
+            },
+            "SetIamPolicy": {
+              "methods": [
+                "set_iam_policy"
+              ]
+            },
+            "TestIamPermissions": {
+              "methods": [
+                "test_iam_permissions"
+              ]
+            },
+            "UpdateQueue": {
+              "methods": [
+                "update_queue"
+              ]
+            },
+            "UploadQueueYaml": {
+              "methods": [
+                "upload_queue_yaml"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

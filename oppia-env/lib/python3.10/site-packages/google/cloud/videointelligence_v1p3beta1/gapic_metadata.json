@@ -1,0 +1,57 @@
+ {
+  "comment": "This file maps proto services/RPCs to the corresponding library clients/methods",
+  "language": "python",
+  "libraryPackage": "google.cloud.videointelligence_v1p3beta1",
+  "protoPackage": "google.cloud.videointelligence.v1p3beta1",
+  "schema": "1.0",
+  "services": {
+    "StreamingVideoIntelligenceService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "StreamingVideoIntelligenceServiceClient",
+          "rpcs": {
+            "StreamingAnnotateVideo": {
+              "methods": [
+                "streaming_annotate_video"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "StreamingVideoIntelligenceServiceAsyncClient",
+          "rpcs": {
+            "StreamingAnnotateVideo": {
+              "methods": [
+                "streaming_annotate_video"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "VideoIntelligenceService": {
+      "clients": {
+        "grpc": {
+          "libraryClient": "VideoIntelligenceServiceClient",
+          "rpcs": {
+            "AnnotateVideo": {
+              "methods": [
+                "annotate_video"
+              ]
+            }
+          }
+        },
+        "grpc-async": {
+          "libraryClient": "VideoIntelligenceServiceAsyncClient",
+          "rpcs": {
+            "AnnotateVideo": {
+              "methods": [
+                "annotate_video"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

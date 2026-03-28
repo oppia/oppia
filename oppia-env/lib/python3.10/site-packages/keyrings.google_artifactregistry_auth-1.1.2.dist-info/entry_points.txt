@@ -1,0 +1,5 @@
+[keyring.backends]
+Google Auth = keyrings.gauth
+
+[tox]
+tox_bootstrap = google_artifactregistry_auth.tox_bootstrap
