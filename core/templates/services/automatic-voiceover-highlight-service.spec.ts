@@ -257,8 +257,6 @@ describe('Automatic voiceover highlight service', () => {
       },
     ];
 
-    // Simulates coarse polling at 100ms, where exact 50ms token windows can
-    // be skipped.
     expect(
       automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(0.1)
     ).toBe('highlightId1');

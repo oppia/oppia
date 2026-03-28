@@ -639,8 +639,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   shouldHighlightContent(): boolean {
-    // In editor mode (e.g., translation tab), all voiceovers can be played,
-    // so highlighting should always be enabled.
+    // In editor mode (i.e., not in player or preview), highlighting is
+    // generally enabled. However, these specific interactive components should
+    // be excluded because they recursively invoke this component and override
+    // highlight-related properties. Therefore, explicitly check for these tags
+    // and disable highlighting for them.
     if (!this.isInPlayerOrPreviewPage()) {
       if (
         this.topLevelHtmlNodename ===

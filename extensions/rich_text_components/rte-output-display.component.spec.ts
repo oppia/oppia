@@ -756,4 +756,81 @@ describe('RTE display component', () => {
     const result = component.isSolutionCollapsedForWorkedexample();
     expect(result).toBe(false);
   });
+
+  it('should return false for excluded interactive tags in editor mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(false);
+
+    const excludedTopLevelTags = [
+      'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT',
+      'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT',
+      'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT',
+    ];
+
+    excludedTopLevelTags.forEach(tagName => {
+      component.topLevelHtmlNodename = tagName;
+      expect(component.shouldHighlightContent()).toBeFalse();
+    });
+  });
+
+  it('should return true for non-excluded tags in editor mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(false);
+
+    component.topLevelHtmlNodename = 'P';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return true for content section in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('content_0');
+
+    component.rteStringContext = 'content';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return false for content section with non-content context in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('content_0');
+
+    component.rteStringContext = 'feedback';
+
+    expect(component.shouldHighlightContent()).toBeFalse();
+  });
+
+  it('should return true for default outcome feedback section in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('default_outcome_1');
+
+    component.rteStringContext = 'feedback';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return true for feedback section in supplemental card context in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('feedback_2');
+
+    component.rteStringContext = 'supplemental-card';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return false for feedback section with content context in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('feedback_2');
+
+    component.rteStringContext = 'content';
+
+    expect(component.shouldHighlightContent()).toBeFalse();
+  });
+
+  it('should return false for unknown section in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('hint_0');
+
+    component.rteStringContext = 'content';
+
+    expect(component.shouldHighlightContent()).toBeFalse();
+  });
 });
