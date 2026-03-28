@@ -132,7 +132,7 @@ describe('Contribution and review service', () => {
     const defaultOpportunitiesPageSize = AppConstants.OPPORTUNITIES_PAGE_SIZE;
     afterAll(() => {
       // Reset the OPPORTUNITIES_PAGE_SIZE to its original value for tests
-      // We use Object.defineProperty because it's read-only.
+      // We use Object.defineProperty because it's read-only
       Object.defineProperty(AppConstants, 'OPPORTUNITIES_PAGE_SIZE', {
         value: defaultOpportunitiesPageSize,
         writable: true,
@@ -161,7 +161,7 @@ describe('Contribution and review service', () => {
         value: 2,
         writable: true,
       });
-      // Return more than a page's worth of results (3 results for a page size of 2).
+      // Return more than a page's worth of results (3 results for a page size of 2)
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(multiplePageBackendFetchResponse)
       );
@@ -204,13 +204,13 @@ describe('Contribution and review service', () => {
       };
 
       // Return a 4th suggestion from the backend that was not available in the
-      // first fetch.
+      // first fetch
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(suggestion4BackendFetchResponse)
       );
 
       // Return both the cached 3rd suggestion and the new 4th suggestion to the
-      // caller.
+      // caller
       cars
         .getUserCreatedQuestionSuggestionsAsync(false, 'sort_key')
         .then(response => {
@@ -233,13 +233,13 @@ describe('Contribution and review service', () => {
       });
 
       // Return more than a page's worth of results (3 results for a page size
-      // of 2).
+      // of 2)
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(multiplePageBackendFetchResponse)
       );
 
       // Only the first 2 results should be returned and the extra result
-      // should be cached.
+      // should be cached
       cars
         .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then(response => {
@@ -255,12 +255,12 @@ describe('Contribution and review service', () => {
 
       flushMicrotasks();
 
-      // Fetch again from offset 0.
+      // Fetch again from offset 0
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(multiplePageBackendFetchResponse)
       );
 
-      // Return the first 2 results from offset 0 again.
+      // Return the first 2 results from offset 0 again
       cars
         .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then(response => {
