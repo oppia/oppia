@@ -39,21 +39,6 @@ class MockRendererFactory {
 
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
-  let rendererFactory: RendererFactory2;
-
-  const mockScriptAppendChildWithSuccessLoad = () => {
-    spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
-        setTimeout(() => {
-          if (script.onload) {
-            script.onload(new Event('load'));
-          }
-        }, 0);
-        return script;
-      }
-    );
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -61,12 +46,26 @@ describe('InsertScriptService', () => {
         {provide: RendererFactory2, useClass: MockRendererFactory},
       ],
     });
-    insertScriptService = TestBed.inject(InsertScriptService);
-    rendererFactory = TestBed.inject(RendererFactory2);
+    insertScriptService = TestBed.get(InsertScriptService);
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
-    mockScriptAppendChildWithSuccessLoad();
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          if (script.onload) {
+            script.onload();
+          }
+        }, 10);
+      }
+    );
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       const result = insertScriptService.loadScript(
         KNOWN_SCRIPTS.DONORBOX,
@@ -79,11 +78,22 @@ describe('InsertScriptService', () => {
   });
 
   it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
-    mockScriptAppendChildWithSuccessLoad();
-    spyOn(
-      rendererFactory.createRenderer(null, null),
-      'createElement'
-    ).and.callThrough();
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          if (script.onload) {
+            script.onload();
+          }
+        }, 10);
+      }
+    );
 
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
@@ -135,6 +145,14 @@ describe('InsertScriptService', () => {
   });
 
   it('should return false for unknown scripts', () => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(() => {});
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN);
     expect(result).toBe(false);
   });
@@ -151,7 +169,9 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload();
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
@@ -167,7 +187,22 @@ describe('InsertScriptService', () => {
   });
 
   it('should insert script into html', (done: jasmine.DoneFn) => {
-    mockScriptAppendChildWithSuccessLoad();
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          if (script.onload) {
+            script.onload();
+          }
+        }, 10);
+      }
+    );
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
