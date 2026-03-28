@@ -1,2 +1,0 @@
-ujson
-ujson-stubs

@@ -1,1 +1,0 @@
-firebase_admin
