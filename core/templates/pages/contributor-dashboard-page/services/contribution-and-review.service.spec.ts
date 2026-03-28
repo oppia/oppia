@@ -131,7 +131,7 @@ describe('Contribution and review service', () => {
   describe('getUserCreatedQuestionSuggestionsAsync', () => {
     const defaultOpportunitiesPageSize = AppConstants.OPPORTUNITIES_PAGE_SIZE;
     afterAll(() => {
-      // Reset the OPPORTUNITIES_PAGE_SIZE to its original value for tests.
+      // Reset the OPPORTUNITIES_PAGE_SIZE to its original value for tests
       // We use Object.defineProperty because it's read-only.
       Object.defineProperty(AppConstants, 'OPPORTUNITIES_PAGE_SIZE', {
         value: defaultOpportunitiesPageSize,
