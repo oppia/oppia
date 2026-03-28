@@ -88,8 +88,9 @@
 
 .next-lesson-btn {
   background-color: #0d48a1;
-  border: 1px solid #0d48a1;
-  color: #fff;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
 
 .review-card-btn {
