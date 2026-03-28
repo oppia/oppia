@@ -40,19 +40,6 @@ class MockRendererFactory {
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
   let rendererFactory: RendererFactory2;
-
-  const mockScriptLoadSuccess = (): void => {
-    spyOn(document.body, 'appendChild').and.callFake((node: Node): Node => {
-      const scriptElement = node as HTMLScriptElement;
-      setTimeout(() => {
-        if (typeof scriptElement.onload === 'function') {
-          scriptElement.onload.call(scriptElement, new Event('load'));
-        }
-      }, 0);
-      return node;
-    });
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -65,8 +52,6 @@ describe('InsertScriptService', () => {
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
-    mockScriptLoadSuccess();
-
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       const result = insertScriptService.loadScript(
         KNOWN_SCRIPTS.DONORBOX,
@@ -79,8 +64,6 @@ describe('InsertScriptService', () => {
   });
 
   it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
-    mockScriptLoadSuccess();
-
     spyOn(
       rendererFactory.createRenderer(null, null),
       'createElement'
@@ -168,8 +151,6 @@ describe('InsertScriptService', () => {
   });
 
   it('should insert script into html', (done: jasmine.DoneFn) => {
-    mockScriptLoadSuccess();
-
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
