@@ -52,6 +52,10 @@ describe('BlogAdminAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
   it('should redirect user to 401 page if user is not blog admin', done => {
     const getUserInfoAsyncSpy = spyOn(
       userService,
