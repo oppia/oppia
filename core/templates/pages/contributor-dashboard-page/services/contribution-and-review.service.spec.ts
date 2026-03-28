@@ -156,7 +156,6 @@ describe('Contribution and review service', () => {
     });
 
     it('should fetch one page ahead and cache extra results', fakeAsync(() => {
-      // Set OPPORTUNITIES_PAGE_SIZE safely
       Object.defineProperty(AppConstants, 'OPPORTUNITIES_PAGE_SIZE', {
         value: 2,
         writable: true,
@@ -226,7 +225,6 @@ describe('Contribution and review service', () => {
     }));
 
     it('should reset offset', fakeAsync(() => {
-      // Set OPPORTUNITIES_PAGE_SIZE safely
       Object.defineProperty(AppConstants, 'OPPORTUNITIES_PAGE_SIZE', {
         value: 2,
         writable: true,
