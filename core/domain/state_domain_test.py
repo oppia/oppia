@@ -2183,7 +2183,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        html_list = []
+        html_list: list[str] = []
 
         def _append(html: str) -> str:
             html_list.append(html)
@@ -2195,6 +2195,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(result['content']['html'], '<p>Hello</p>')
         self.assertEqual(len(html_list), 1)
+
+
     def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(
         self,
     ) -> None:
