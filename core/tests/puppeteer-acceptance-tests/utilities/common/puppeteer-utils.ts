@@ -503,12 +503,10 @@ export class BaseUser {
         : selector;
     // Simple retry for transient non-clickable state (max 2 tries)
     for (let attempt = 0; attempt < 2; attempt++) {
-      // Inline modal-content dismissal before each attempt.
-      const modals = await this.page.$$('.modal-content');
-      for (const modal of modals) {
-        const closeBtn = await modal.$(
-          '.close, [aria-label="Close"], button[aria-label="Close"]'
-        );
+      // Only close the welcome modal, not all .modal-content modals.
+      const welcomeModal = await this.page.$('.e2e-test-welcome-modal');
+      if (welcomeModal) {
+        const closeBtn = await welcomeModal.$('.e2e-test-close-welcome-modal');
         if (closeBtn) {
           await closeBtn.click();
           await this.page.waitForTimeout(100);
