@@ -2603,7 +2603,7 @@ class GetContentUpdatesFromCmdEditStatePropertyChangeTests(
                             },
                             {
                                 'content_id': 'ca_choices_2',
-                                'html': '<p>Choice 2</p>',
+                                'unicode_str': '<p>Choice 2</p>',
                             },
                         ]
                     },
@@ -2621,6 +2621,35 @@ class GetContentUpdatesFromCmdEditStatePropertyChangeTests(
                 'ca_choices_1': '<p>Choice 1</p>',
                 'ca_choices_2': '<p>Choice 2</p>',
             },
+        )
+
+    def test_extracts_content_updates_for_customization_args_html_dict(
+        self,
+    ) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'question': {
+                        'value': {
+                            'content_id': 'ca_question_1',
+                            'html': '<p>Question prompt</p>',
+                        }
+                    },
+                    'rows': {'value': 2},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {'ca_question_1': '<p>Question prompt</p>'},
         )
 
 

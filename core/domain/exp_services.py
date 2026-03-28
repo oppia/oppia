@@ -492,17 +492,28 @@ def get_content_updates_from_cmd_edit_state_property_change(
     if change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
         return content_id_to_content_value
 
-    def add_subtitled_html_or_unicode_from_dict(
-        subtitled_html_or_unicode: Dict[str, str],
+    def add_subtitled_html_from_dict(
+        subtitled_html: state_domain.SubtitledHtmlDict,
     ) -> None:
-        """Adds a mapping from a subtitled html or unicode dict, if valid."""
-        conten_id = subtitled_html_or_unicode.get('content_id')
+        """Adds a mapping from a subtitled html dict, if valid."""
+        conten_id = subtitled_html.get('content_id')
 
         content_value = None
-        if subtitled_html_or_unicode.get('html'):
-            content_value = subtitled_html_or_unicode.get('html')
-        elif subtitled_html_or_unicode.get('unicode_str'):
-            content_value = subtitled_html_or_unicode.get('unicode_str')
+        if subtitled_html.get('html'):
+            content_value = subtitled_html.get('html')
+
+        if isinstance(conten_id, str) and isinstance(content_value, str):
+            content_id_to_content_value[conten_id] = content_value
+
+    def add_subtitled_unicode_from_dict(
+        subtitled_unicode: state_domain.SubtitledUnicodeDict,
+    ) -> None:
+        """Adds a mapping from a subtitled unicode dict, if valid."""
+        conten_id = subtitled_unicode.get('content_id')
+
+        content_value = None
+        if subtitled_unicode.get('unicode_str'):
+            content_value = subtitled_unicode.get('unicode_str')
 
         if isinstance(conten_id, str) and isinstance(content_value, str):
             content_id_to_content_value[conten_id] = content_value
@@ -513,73 +524,68 @@ def get_content_updates_from_cmd_edit_state_property_change(
         return content_id_to_content_value
 
     if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-        # Here we use cast because this 'elif' condition forces
-        # change to have type EditExpStatePropertyContentCmd.
+        # Here we use cast because this 'if' condition forces change to have
+        # type EditExpStatePropertyContentCmd.
         edit_content_cmd = cast(
             exp_domain.EditExpStatePropertyContentCmd, change
         )
-        add_subtitled_html_or_unicode_from_dict(edit_content_cmd.new_value)
+        add_subtitled_html_from_dict(edit_content_cmd.new_value)
     elif (
         change.property_name
         == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
     ):
-        # Here we use cast because this 'elif'
-        # condition forces change to have type
-        # EditExpStatePropertyInteractionDefaultOutcomeCmd.
+        # Here we use cast because this 'elif' condition forces change to have
+        # type EditExpStatePropertyInteractionDefaultOutcomeCmd.
         edit_interaction_default_outcome_cmd = cast(
             exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,
             change,
         )
-        feedback = edit_interaction_default_outcome_cmd.new_value.get(
-            'feedback', {}
+
+        add_subtitled_html_from_dict(
+            edit_interaction_default_outcome_cmd.new_value['feedback']
         )
-        add_subtitled_html_or_unicode_from_dict(feedback)
     elif (
         change.property_name
         == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
     ):
-        # Here we use cast because this 'elif'
-        # condition forces change to have type
-        # EditExpStatePropertyInteractionAnswerGroupsCmd.
+        # Here we use cast because this 'elif' condition forces change to have
+        # type EditExpStatePropertyInteractionAnswerGroupsCmd.
         edit_interaction_answer_group_cmd = cast(
             exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
             change,
         )
         answer_group_dicts = edit_interaction_answer_group_cmd.new_value or []
+
         for answer_group_dict in answer_group_dicts:
-            add_subtitled_html_or_unicode_from_dict(
-                answer_group_dict.get('outcome', {}).get('feedback', {})
+            add_subtitled_html_from_dict(
+                answer_group_dict['outcome']['feedback']
             )
     elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS:
-        # Here we use cast because this 'elif'
-        # condition forces change to have type
-        # EditExpStatePropertyInteractionHintsCmd.
+        # Here we use cast because this 'elif' condition forces change to have
+        # type EditExpStatePropertyInteractionHintsCmd.
         edit_state_interaction_hints_cmd = cast(
             exp_domain.EditExpStatePropertyInteractionHintsCmd,
             change,
         )
         hint_dicts = edit_state_interaction_hints_cmd.new_value or []
+
         for hint_dict in hint_dicts:
-            add_subtitled_html_or_unicode_from_dict(
-                hint_dict.get('hint_content', {})
-            )
+            add_subtitled_html_from_dict(hint_dict['hint_content'])
     elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION:
-        # Here we use cast because this 'elif'
-        # condition forces change to have type
-        # EditExpStatePropertyInteractionSolutionCmd.
+        # Here we use cast because this 'elif' condition forces change to have
+        # type EditExpStatePropertyInteractionSolutionCmd.
         edit_interaction_solution_cmd = cast(
             exp_domain.EditExpStatePropertyInteractionSolutionCmd,
             change,
         )
-        solution = edit_interaction_solution_cmd.new_value
-        explanation_dict = solution.get('explanation', {})
-        add_subtitled_html_or_unicode_from_dict(explanation_dict)
+        add_subtitled_html_from_dict(
+            edit_interaction_solution_cmd.new_value['explanation']
+        )
     elif (
         change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
     ):
-        # Here we use cast because this 'elif'
-        # condition forces change to have type
-        # EditExpStatePropertyInteractionCustArgsCmd.
+        # Here we use cast because this 'elif' condition forces change to have
+        # type EditExpStatePropertyInteractionCustArgsCmd.
         edit_interaction_cust_arg_cmd = cast(
             exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
             change,
@@ -587,12 +593,49 @@ def get_content_updates_from_cmd_edit_state_property_change(
         customization_arg_dicts = edit_interaction_cust_arg_cmd.new_value or {}
         for cust_arg_dict in customization_arg_dicts.values():
             for cust_arg_value in cust_arg_dict.values():
-                if isinstance(cust_arg_value, dict):
-                    add_subtitled_html_or_unicode_from_dict(cust_arg_value)
+                if isinstance(cust_arg_value, dict) and cust_arg_value.get(
+                    'html'
+                ):
+                    # Here we use cast because we are narrowing down the type
+                    # UnionOfCustomizationArgsDictValues dict to SubtitledHtmlDict.
+                    cust_arg_subtitled_html_dict = cast(
+                        state_domain.SubtitledHtmlDict, cust_arg_value
+                    )
+                    add_subtitled_html_from_dict(cust_arg_subtitled_html_dict)
+                elif isinstance(cust_arg_value, dict) and cust_arg_value.get(
+                    'unicode_str'
+                ):
+                    # Here we use cast because we are narrowing down the type
+                    # UnionOfCustomizationArgsDictValues dict to
+                    # SubtitledUnicodeDict.
+                    cust_arg_subtitled_unicode_dict = cast(
+                        state_domain.SubtitledUnicodeDict, cust_arg_value
+                    )
+                    add_subtitled_unicode_from_dict(
+                        cust_arg_subtitled_unicode_dict
+                    )
                 elif isinstance(cust_arg_value, list):
                     for item in cust_arg_value:
-                        if isinstance(item, dict):
-                            add_subtitled_html_or_unicode_from_dict(item)
+                        if isinstance(item, dict) and item.get('html'):
+                            # Here we use cast because we are narrowing down the
+                            # type UnionOfCustomizationArgsDictValues dict to
+                            # SubtitledHtmlDict.
+                            item_subtitled_html_dict = cast(
+                                state_domain.SubtitledHtmlDict, item
+                            )
+                            add_subtitled_html_from_dict(
+                                item_subtitled_html_dict
+                            )
+                        elif isinstance(item, dict) and item.get('unicode_str'):
+                            # Here we use cast because we are narrowing down the
+                            # type UnionOfCustomizationArgsDictValues dict to
+                            # SubtitledUnicodeDict.
+                            item_subtitled_unicode_dict = cast(
+                                state_domain.SubtitledUnicodeDict, item
+                            )
+                            add_subtitled_unicode_from_dict(
+                                item_subtitled_unicode_dict
+                            )
 
     return content_id_to_content_value
 
