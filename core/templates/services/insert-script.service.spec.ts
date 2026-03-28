@@ -27,19 +27,26 @@ class MockRenderer {
     return document.createElement(tag);
   }
   appendChild(parent: HTMLElement, newChild: HTMLElement) {
-    parent.appendChild(newChild);
+    setTimeout(() => {
+      const script = newChild as unknown as HTMLScriptElement;
+      if (script.onload) {
+        script.onload(new Event('load') as Event);
+      }
+    }, 0);
   }
 }
 
 class MockRendererFactory {
+  renderer = new MockRenderer();
   createRenderer() {
-    return new MockRenderer();
+    return this.renderer;
   }
 }
 
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
   let rendererFactory: RendererFactory2;
+  let mockRenderer: MockRenderer;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -49,6 +56,7 @@ describe('InsertScriptService', () => {
     });
     insertScriptService = TestBed.inject(InsertScriptService);
     rendererFactory = TestBed.inject(RendererFactory2);
+    mockRenderer = (rendererFactory as MockRendererFactory).renderer;
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
@@ -64,10 +72,7 @@ describe('InsertScriptService', () => {
   });
 
   it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
-    spyOn(
-      rendererFactory.createRenderer(null, null),
-      'createElement'
-    ).and.callThrough();
+    spyOn(mockRenderer, 'createElement').and.callThrough();
 
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
@@ -78,6 +83,7 @@ describe('InsertScriptService', () => {
 
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
+    expect(mockRenderer.createElement).toHaveBeenCalledTimes(1);
   });
 
   it('should handle script load error correctly', (done: jasmine.DoneFn) => {
@@ -88,12 +94,12 @@ describe('InsertScriptService', () => {
       setAttribute: () => {},
     };
 
-    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(mockRenderer, 'createElement').and.returnValue(mockScriptElement);
 
-    spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+    spyOn(mockRenderer, 'appendChild').and.callFake(
+      (parent: HTMLElement, script: HTMLElement) => {
         setTimeout(() => {
-          script.onerror(new ErrorEvent('error'));
+          (script as HTMLScriptElement).onerror(new ErrorEvent('error'));
         }, 10);
       }
     );
@@ -131,11 +137,11 @@ describe('InsertScriptService', () => {
       setAttribute: () => {},
     };
 
-    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-    spyOn(document.body, 'appendChild').and.callFake(
-      (script: HTMLScriptElement) => {
+    spyOn(mockRenderer, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(mockRenderer, 'appendChild').and.callFake(
+      (parent: HTMLElement, script: HTMLElement) => {
         setTimeout(() => {
-          script.onload();
+          (script as HTMLScriptElement).onload();
         }, 10);
       }
     );
