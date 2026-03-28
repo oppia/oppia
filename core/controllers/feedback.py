@@ -380,7 +380,7 @@ class ThreadHandler(
         self.values.update(
             {
                 'messages': update_author_id_in_message_dicts(message_dicts),
-                'suggestion': suggestion.to_dict() if suggestion else None,
+                'suggestion_dict': suggestion.to_dict() if suggestion else None,
             }
         )
         self.render_json(self.values)
