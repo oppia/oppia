@@ -23,7 +23,7 @@ import copy
 import logging
 import os
 import re
-
+from core.domain import state_domain
 from core import feconf, schema_utils, utils
 from core.domain import (
     exp_domain,
@@ -2161,41 +2161,40 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ),
             state_dict_with_new_math_schema,
         )
-    def test_convert_html_fields_with_none_default_outcome(self):
-    """Test convert_html_fields_in_state when default_outcome is None."""
+    def test_convert_html_fields_with_none_default_outcome(self) -> None:
+        """Test convert_html_fields_in_state when default_outcome is None."""
 
-    state_dict = {
-        'content': {'content_id': 'content_0', 'html': '<p>Hello</p>'},
-        'param_changes': [],
-        'solicit_answer_details': False,
-        'card_is_checkpoint': False,
-        'linked_skill_id': None,
-        'classifier_model_id': None,
-        'inapplicable_skill_misconception_ids': [],
-        'interaction': {
-            'answer_groups': [],
-            'default_outcome': None,
-            'customization_args': {},
-            'confirmed_unclassified_answers': [],
-            'id': None,
-            'hints': [],
-            'solution': None,
-        },
-    }
+        state_dict: state_domain.StateDict = {
+            'content': {'content_id': 'content_0', 'html': '<p>Hello</p>'},
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False,
+            'linked_skill_id': None,
+            'classifier_model_id': None,
+            'inapplicable_skill_misconception_ids': [],
+            'interaction': {
+                'answer_groups': [],
+                'default_outcome': None,
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': [],
+                'solution': None,
+            },
+        }
 
-    html_list = []
+        html_list = []
 
-    def _append(html):
-        html_list.append(html)
-        return html
+        def _append(html: str) -> str:
+            html_list.append(html)
+            return html
 
-    result = state_domain.State.convert_html_fields_in_state(
-        state_dict, _append
-    )
+        result = state_domain.State.convert_html_fields_in_state(
+            state_dict, _append
+        )
 
-    self.assertEqual(result['content']['html'], '<p>Hello</p>')
-    self.assertEqual(len(html_list), 1)
-
+        self.assertEqual(result['content']['html'], '<p>Hello</p>')
+        self.assertEqual(len(html_list), 1)
     def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(
         self,
     ) -> None:
