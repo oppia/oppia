@@ -28,37 +28,36 @@
 }
 
 .completed-checkpoint-node {
-  align-items: center;
   background-color: #00645c;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
-  height: 25px;
+  height: 12px;
   justify-content: center;
-  width: 25px;
+  width: 12px;
   z-index: 0;
 }
 
 .in-progress-checkpoint-node {
-  align-items: center;
+  align-items: flex-start;
   background-color: #fff;
   border: 2px solid #00645c;
   border-radius: 50%;
   display: flex;
-  height: 25px;
+  height: 20px;
   justify-content: center;
-  width: 25px;
+  width: 20px;
   z-index: 0;
 }
 
 .incomplete-checkpoint-node {
-  align-items: center;
+  align-items: flex-end;
   background-color: #fff;
   border: 1px solid #c0c0c0;
   border-radius: 50%;
   display: flex;
-  height: 25px;
+  height: 12px;
   justify-content: center;
-  width: 25px;
+  width: 12px;
   z-index: 111;
 }

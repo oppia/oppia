@@ -831,7 +831,6 @@
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS": "Kies maximaal 5 onderwerpen die u interesseren en voltooi vervolgens alle hoofdstukken over de gekozen onderwerpen om uw leerdoelen te bereiken.",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE": "Hoofdstuk <[number]>: <[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS": "<[current]> VAN <[total]> HOOFDSTUKKEN VOLTOOID",
-  "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE": "<[title]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW": "<[topic]>: <[story]>",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "Annuleren",
   "I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING": "Een doel toevoegen of bewerken",
