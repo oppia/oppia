@@ -85,3 +85,4 @@ debug.log
 jest-runtime-config.json
 tsc_output.txt
 tsc_output.txt
+oppia-env/
