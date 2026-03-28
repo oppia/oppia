@@ -248,10 +248,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playLesson(explorationId);
     // Play a complete lesson.
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.submitFractionInputResponse('1/2');
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(10000);
     await loggedOutLearner.clickOnContinueButton();
 
     await loggedOutLearner.expectGoToLibraryButton();
@@ -266,7 +264,6 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able visit the next community lesson', async function () {
-    // Starts from here.
     await loggedOutLearner.openNextLessonInNewTabAndVerifyContent(
       EXPLORATION_TITLE.COMMUNITY_LESSON_2,
       'Welcome, to the Community Lesson Title 2'
