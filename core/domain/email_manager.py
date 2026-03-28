@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 import pathlib
+import tempfile
 
 from core import feconf, utils
 from core.constants import constants
@@ -35,6 +36,7 @@ from core.domain import (
     story_domain,
     subscription_services,
     suggestion_registry,
+    taskqueue_services,
     user_services,
 )
 from core.platform import models
@@ -671,16 +673,36 @@ def _send_email(
         """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
-        email_services.send_mail(
-            sender_name_email,
-            recipient_email_address,
-            email_subject,
-            cleaned_plaintext_body,
-            cleaned_html_body,
-            cc_emails=cc_emails,
-            bcc_admin=bcc_admin,
-            attachments=attachments,
-        )
+        try:
+            email_services.send_mail(
+                sender_name_email,
+                recipient_email_address,
+                email_subject,
+                cleaned_plaintext_body,
+                cleaned_html_body,
+                cc_emails=cc_emails,
+                bcc_admin=bcc_admin,
+                attachments=attachments,
+            )
+        except Exception as e:
+            logging.error(
+                'Email to %s failed to send: %s. Enqueuing for retry.',
+                recipient_email_address,
+                e,
+            )
+
+            payload = {
+                'sender_email': sender_name_email,
+                'recipient_id': recipient_email_address,
+                'subject': email_subject,
+                'html_body': cleaned_html_body,
+                'text_body': cleaned_plaintext_body,
+            }
+
+            taskqueue_services.enqueue_task(
+                feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
+            )
+
         email_models.SentEmailModel.create(
             recipient_id,
             recipient_email_address,
@@ -755,14 +777,31 @@ def _send_bulk_mail(
         """
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
-        email_services.send_bulk_mail(
-            sender_name_email,
-            recipient_emails,
-            email_subject,
-            cleaned_plaintext_body,
-            cleaned_html_body,
-            attachments,
-        )
+        try:
+            email_services.send_bulk_mail(
+                sender_name_email,
+                recipient_emails,
+                email_subject,
+                cleaned_plaintext_body,
+                cleaned_html_body,
+                attachments,
+            )
+        except Exception as e:
+            logging.error(
+                'Bulk email failed to send: %s. Enqueuing for retry.', e
+            )
+
+            for recipient_email in recipient_emails:
+                payload = {
+                    'sender_email': sender_name_email,
+                    'recipient_id': recipient_email,
+                    'subject': email_subject,
+                    'html_body': cleaned_html_body,
+                    'text_body': cleaned_plaintext_body,
+                }
+                taskqueue_services.enqueue_task(
+                    feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
+                )
 
         email_models.BulkEmailModel.create(
             instance_id,
@@ -3165,6 +3204,9 @@ def _generate_attachments_for_failed_voiceovers(
 
     filename = 'voiceover_regeneration_errors.txt'
 
+    temp_dir = tempfile.gettempdir()
+    file_path = pathlib.Path(temp_dir) / filename
+
     lines = [
         'Synthesis details for each piece of content are presented below.\n',
         'Date: %s\n' % date,
@@ -3187,11 +3229,9 @@ def _generate_attachments_for_failed_voiceovers(
             )
             lines.append('\n----------------------------------------\n')
 
-    file = open(filename, 'w', encoding='utf-8')
-    file.writelines(lines)
-    file.close()
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.writelines(lines)
 
-    file_path = pathlib.Path(filename).resolve()
     return [{'filename': filename, 'path': str(file_path)}]
 
 

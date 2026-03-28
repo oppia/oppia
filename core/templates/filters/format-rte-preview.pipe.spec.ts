@@ -23,7 +23,7 @@ describe('Testing CamelCaseToHyphensPipe', () => {
   let pipe: FormatRtePreviewPipe;
 
   beforeEach(() => {
-    pipe = TestBed.get(FormatRtePreviewPipe);
+    pipe = TestBed.inject(FormatRtePreviewPipe);
   });
 
   it('should have all expected pipes', () => {
