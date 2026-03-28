@@ -619,3 +619,8 @@
     }
   }
 }
+
+.e2e-test-profile-link {
+  white-space: normal;
+  word-break: break-word;
+}
