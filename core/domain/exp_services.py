@@ -590,11 +590,9 @@ def get_content_updates_from_cmd_edit_state_property_change(
                 if isinstance(cust_arg_value, dict):
                     add_subtitled_html_or_unicode_from_dict(cust_arg_value)
                 elif isinstance(cust_arg_value, list):
-                    [
-                        add_subtitled_html_or_unicode_from_dict(item)
-                        for item in cust_arg_value
-                        if isinstance(item, dict)
-                    ]
+                    for item in cust_arg_value:
+                        if isinstance(item, dict):
+                            add_subtitled_html_or_unicode_from_dict(item)
 
     return content_id_to_content_value
 
