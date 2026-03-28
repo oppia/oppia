@@ -367,6 +367,29 @@ jobs:
         with:
           message: "A Lighthouse performance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+
+  acceptance_stress_test:
+    needs: [check_test_suites_to_run, build]
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        run: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    name: Acceptance Stress Test (${{ matrix.run }})
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Generate build files
+        uses: ./.github/actions/generate-build-files
+      - name: Run Mobile Acceptance Test
+        uses: ./.github/actions/run-a-specific-acceptance-test
+        with:
+          test-suite: "logged-out-learner/visits-the-community-library-and-look-around"
+          viewport-type: "mobile"
+          enable-screen-recording: false
+
   check_workflow_statuses:
     # This job is needed because we cannot make each e2e/acceptance/lighthouse
     # task a "required" check via GitHub, since different tasks may execute
@@ -378,6 +401,7 @@ jobs:
       - acceptance_test
       - lighthouse_accessibility_test
       - lighthouse_performance_test
+      - acceptance_stress_test
     if: always()
     runs-on: ubuntu-22.04
     steps:
