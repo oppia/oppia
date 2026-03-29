@@ -161,11 +161,13 @@ APP_YAML_FILEPATH = 'app.yaml'
 
 MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Creates a third-party directory where all the JS and CSS dependencies are
 built and stored. Depending on the options passed to the script, might also
 minify third-party libraries and/or generate a build directory.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--prod_env', action='store_true', default=False, dest='prod_env'
