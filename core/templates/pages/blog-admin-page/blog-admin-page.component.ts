@@ -119,19 +119,23 @@ export class BlogAdminPageComponent implements OnInit {
         formResponse.newRole as string,
         formResponse.username
       )
-      .then(
-        () => {
-          this.statusMessage =
-            'Role of ' +
-            formResponse.username +
-            ' successfully updated to ' +
-            formResponse.newRole;
-          this.refreshFormData();
-        },
-        errorResponse => {
-          this.statusMessage = errorResponse;
-        }
-      );
+      .then(() => {
+        this.statusMessage =
+          'Role of ' +
+          formResponse.username +
+          ' successfully updated to ' +
+          formResponse.newRole;
+        this.refreshFormData();
+        setTimeout(() => {
+          this.statusMessage = '';
+        }, 3000);
+      })
+      .catch(errorResponse => {
+        this.statusMessage = errorResponse.error?.error || errorResponse;
+        setTimeout(() => {
+          this.statusMessage = '';
+        }, 3000);
+      });
     this.adminTaskManagerService.finishTask();
   }
 
@@ -145,12 +149,17 @@ export class BlogAdminPageComponent implements OnInit {
       () => {
         this.statusMessage = 'Success.';
         this.refreshFormData();
+        setTimeout(() => {
+          this.statusMessage = '';
+        }, 3000);
       },
       error => {
-        this.statusMessage = 'Server error: ' + error.error.error;
+        this.statusMessage = 'User is not a blog editor.';
+        setTimeout(() => {
+          this.statusMessage = '';
+        }, 3000);
       }
     );
-    this.adminTaskManagerService.finishTask();
   }
 
   reloadPlatformParameters(): void {
@@ -194,10 +203,16 @@ export class BlogAdminPageComponent implements OnInit {
         () => {
           this.statusMessage = 'Data saved successfully.';
           this.adminTaskManagerService.finishTask();
+          setTimeout(() => {
+            this.statusMessage = '';
+          }, 3000);
         },
         errorResponse => {
           this.statusMessage = 'Server error: ' + errorResponse;
           this.adminTaskManagerService.finishTask();
+          setTimeout(() => {
+            this.statusMessage = '';
+          }, 3000);
         }
       );
   }
