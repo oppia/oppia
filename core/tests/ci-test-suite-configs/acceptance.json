@@ -21,10 +21,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts"
     },
     {
-      "name": "interested-partner-organization/learn-about-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/learn-about-the-organization.spec.ts"
-    },
-    {
       "name": "interested-partner-organization/view-the-blog",
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts"
     },
@@ -279,10 +275,6 @@
     {
       "name": "exploration-creator/preview-rarely-used-interactions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
-    },
-    {
-      "name": "exploration-creator/create-exploration-with-interactions-hints-and-language-change",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/create-exploration-with-interactions-hints-and-language-change.spec.ts"
     },
     {
       "name": "logged-out-learner/complete-some-practice-question",

@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * IP.PJ. Parent learns about the organization
+ * IP.1. Learn about the organization
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -29,13 +29,13 @@ describe('Interested Parent', function () {
     parentUser = await UserFactory.createLoggedOutUser();
   });
 
-  it('should be able to learn about the organization', async function () {
+  it('should learn about the organization', async function () {
     // Visit splash page.
     await parentUser.navigateToSplashPage();
     await parentUser.expectScreenshotToMatch('homePage', __dirname);
 
-    // Visit the About Page.
-    await parentUser.navigateToAboutPage();
+    // Visit the About Oppia page from navbar.
+    await parentUser.clickAboutButtonInAboutMenuOnNavbar();
     await parentUser.expectAboutUsPageHeadingToBe(
       ' Empowering learners around the globe '
     );
@@ -78,9 +78,8 @@ describe('Interested Parent', function () {
     await parentUser.expectFooterVersionToMatchPattern(
       /Version: [^\s]* \(\w*\)/
     );
-  });
 
-  it('should visit for parents / teachers page', async function () {
+    // Visit the For Parents / Teachers page from navbar.
     await parentUser.clickTeachButtonInAboutMenuOnNavbar();
     await parentUser.expectScreenshotToMatch(
       'parentsOrTeachersPage',
