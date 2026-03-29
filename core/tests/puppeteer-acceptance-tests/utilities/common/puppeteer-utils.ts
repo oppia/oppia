@@ -134,6 +134,10 @@ export class BaseUser {
         this.page = await browser.newPage();
         this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
+        // Increase the default navigation timeout from 30s to 60s to
+        // prevent flaky TimeoutError failures during sign-in and other
+        // navigation-heavy flows in CI environments.
+        this.page.setDefaultNavigationTimeout(60000);
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
