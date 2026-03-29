@@ -70,3 +70,45 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             ),
             True,
         )
+
+    def test_log_role_query_with_username(self) -> None:
+        """Test log_role_query when username parameter is provided."""
+        self.assertEqual(
+            gae_models.RoleQueryAuditModel.has_reference_to_user_id(
+                'TEST_USER_2'
+            ),
+            False,
+        )
+        role_services.log_role_query(
+            'TEST_USER_2',
+            feconf.ROLE_ACTION_ADD,
+            role='GUEST',
+            username='test_username',
+        )
+        self.assertEqual(
+            gae_models.RoleQueryAuditModel.has_reference_to_user_id(
+                'TEST_USER_2'
+            ),
+            True,
+        )
+
+    def test_get_all_actions_with_multiple_roles(self) -> None:
+        """Test get_all_actions returns combined actions for multiple roles."""
+        guest_actions = set(
+            role_services.get_all_actions([feconf.ROLE_ID_GUEST])
+        )
+        moderator_actions = set(
+            role_services.get_all_actions([feconf.ROLE_ID_MODERATOR])
+        )
+        combined_actions = set(
+            role_services.get_all_actions(
+                [feconf.ROLE_ID_GUEST, feconf.ROLE_ID_MODERATOR]
+            )
+        )
+
+        # Combined actions should be the union of both roles' actions.
+        self.assertEqual(combined_actions, guest_actions | moderator_actions)
+        # Combined actions should contain at least as many as the larger set.
+        self.assertGreaterEqual(
+            len(combined_actions), len(moderator_actions)
+        )
