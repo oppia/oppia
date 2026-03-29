@@ -1966,8 +1966,7 @@ class UserIdByFirebaseAuthIdTests(test_utils.TestBase):
     def test_invalid_user_id_type(self) -> None:
         # Here we use MyPy ignore because we are intentionally passing
         # an integer to test validation for incorrect type
-        # type: ignore[arg-type]
-        obj = user_domain.UserIdByFirebaseAuthId(123)
+        obj = user_domain.UserIdByFirebaseAuthId(123)  # type: ignore[arg-type]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected user_id to be a string'
         ):
