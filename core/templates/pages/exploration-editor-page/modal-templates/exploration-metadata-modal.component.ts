@@ -64,6 +64,7 @@ export class ExplorationMetadataModalComponent
   filteredChoices: CategoryChoices[] = [];
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   tagIsInvalid: boolean = false;
+  isSaving: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -185,6 +186,7 @@ export class ExplorationMetadataModalComponent
       return;
     }
 
+    this.isSaving = true;
     this.changeListService.autosaveIsInProgress$
       .pipe(
         filter(inProgress => !inProgress),

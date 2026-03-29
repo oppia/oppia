@@ -379,6 +379,7 @@ describe('Exploration Metadata Modal Component', () => {
         expect(component.isSavingAllowed()).toBe(true);
 
         component.save();
+        expect(component.isSaving).toBe(true);
         expect(ngbActiveModal.close).not.toHaveBeenCalled();
 
         changeListService.emitAutosaveCompletion();
@@ -415,6 +416,29 @@ describe('Exploration Metadata Modal Component', () => {
       flush();
 
       expect(ngbActiveModal.close).toHaveBeenCalledWith([]);
+    }));
+
+    it('should not enter saving state when no autosave is triggered', fakeAsync(() => {
+      spyOn(ngbActiveModal, 'close').and.stub();
+
+      explorationCategoryService.displayed = 'New Category';
+      explorationLanguageCodeService.displayed = 'en';
+      explorationObjectiveService.displayed =
+        'A valid objective already exists';
+      explorationTagsService.displayed = [];
+      explorationTitleService.displayed = 'New Title';
+
+      explorationCategoryService.savedMemento = 'New Category';
+      explorationLanguageCodeService.savedMemento = 'en';
+      explorationObjectiveService.savedMemento =
+        'A valid objective already exists';
+      explorationTagsService.savedMemento = [];
+      explorationTitleService.savedMemento = 'New Title';
+
+      component.save();
+      flush();
+
+      expect(component.isSaving).toBe(false);
     }));
   });
 
