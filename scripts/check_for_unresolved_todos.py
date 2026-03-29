@@ -22,12 +22,6 @@ from scripts import github_api, todo_finder
 
 from typing import List, Optional
 
-# TODO(#4): Temporary workflow test.
-
-# TODO(#1): Temporary workflow test for PR comment proof.
-
-# TODO(#2): Temporary workflow test for PR comment proof.
-
 UNRESOLVED_TODOS_PRESENT_INDICATOR = (
     'THERE ARE TODOS ASSOCIATED WITH THE PROVIDED ISSUES.'
 )
