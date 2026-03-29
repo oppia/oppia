@@ -334,7 +334,7 @@ class BlogPostHandler(
             blog_post_id
         ).to_dict()
 
-        self.values.update({'blog_post': blog_post_dict})
+        self.values.update({'blog_post_dict': blog_post_dict})
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
