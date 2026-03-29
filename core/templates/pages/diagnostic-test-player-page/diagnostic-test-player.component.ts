@@ -135,6 +135,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   }
 
   startDiagnosticTest(): void {
+    if (!this.classroomData) {
+      return;
+    }
     this.classroomBackendApiService
       .getClassroomDataAsync(this.classroomData.getClassroomId())
       .then(response => {

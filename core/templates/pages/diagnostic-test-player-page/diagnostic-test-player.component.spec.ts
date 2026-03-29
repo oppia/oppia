@@ -22,6 +22,7 @@ import {
   fakeAsync,
   TestBed,
   tick,
+  waitForAsync,
 } from '@angular/core/testing';
 import {AppConstants} from 'app.constants';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -40,7 +41,10 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {PlatformFeatureService} from '../../services/platform-feature.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {SignInEventService} from 'services/sign-in-event.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LoaderService} from 'services/loader.service';
 
 class MockTranslateService {
   instant(key: string, interpolateParams?: Object): string {
@@ -86,6 +90,38 @@ class MockWindowRef {
 class MockRouter {
   navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
+  }
+}
+
+class MockLoaderService {
+  showLoadingScreen(msg: string) {}
+  hideLoadingScreen() {}
+}
+
+class MockPreventPageUnloadEventService {
+  addListener(callback: () => boolean) {}
+  removeListener() {}
+}
+
+class MockSiteAnalyticsService {
+  registerDiagnosticTestRecommendationAcceptedEvent(
+    classroomName: string,
+    topicName: string
+  ) {}
+  registerDiagnosticTestStartedEvent(classroomName: string) {}
+  registerDiagnosticTestCompletionEvent(classroomName: string) {}
+}
+
+class MockAlertsService {
+  addWarning(message: string) {}
+}
+
+class MockClassroomBackendApiService {
+  getClassroomDataAsync(classroomName: string) {
+    return Promise.resolve(dummyClassroomData);
+  }
+  fetchClassroomDataAsync(classroomName: string) {
+    return Promise.resolve(dummyClassroomData);
   }
 }
 
@@ -173,14 +209,17 @@ describe('Diagnostic test player component', () => {
     onDiagnosticTestSessionProgressChange = progressEmitter;
   }
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [DiagnosticTestPlayerComponent, MockTranslatePipe],
       providers: [
-        PreventPageUnloadEventService,
+        {
+          provide: PreventPageUnloadEventService,
+          useClass: MockPreventPageUnloadEventService,
+        },
         {provide: WindowRef, useValue: windowRef},
         {
           provide: TranslateService,
@@ -195,23 +234,34 @@ describe('Diagnostic test player component', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
+        {provide: LoaderService, useClass: MockLoaderService},
+        {provide: AlertsService, useClass: MockAlertsService},
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService,
+        },
+        {
+          provide: ClassroomBackendApiService,
+          useClass: MockClassroomBackendApiService,
+        },
+        UrlInterpolationService,
+        SignInEventService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-
-    router = TestBed.inject(Router);
-    alertsService = TestBed.inject(AlertsService);
-  });
+  }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DiagnosticTestPlayerComponent);
-    component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    alertsService = TestBed.inject(AlertsService);
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
     );
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     translateService = TestBed.inject(TranslateService);
+    fixture = TestBed.createComponent(DiagnosticTestPlayerComponent);
+    component = fixture.componentInstance;
   });
 
   it('should listen to page unload events after initialization', () => {
@@ -375,7 +425,7 @@ describe('Diagnostic test player component', () => {
       'math',
       'public/img1.png',
       'green',
-      null,
+      '',
       1,
       1,
       [5, 4],
