@@ -88,3 +88,73 @@ class CronServicesTests(test_utils.GenericTestBase):
         cron_services.mark_outdated_models_as_deleted()
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+
+    def test_delete_models_does_not_remove_recently_deleted_models(
+        self,
+    ) -> None:
+        """Test that models marked as deleted but updated recently are NOT
+        hard-deleted. This covers the date-filtering branch in
+        delete_models_marked_as_deleted().
+        """
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        # Create a model marked as deleted but with a RECENT last_updated
+        # timestamp (less than the hard-delete threshold).
+        recent_deleted_model = user_models.CompletedActivitiesModel(
+            id=admin_user_id,
+            exploration_ids=[],
+            collection_ids=[],
+            story_ids=[],
+            learnt_topic_ids=[],
+            last_updated=datetime.datetime.utcnow(),
+            deleted=True,
+        )
+        recent_deleted_model.update_timestamps(
+            update_last_updated_time=False
+        )
+        recent_deleted_model.put()
+
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id)
+        )
+
+        cron_services.delete_models_marked_as_deleted()
+
+        # The model should still exist because it was recently deleted
+        # (within the hard-delete threshold period).
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id)
+        )
+
+    def test_mark_outdated_does_not_mark_recent_models(self) -> None:
+        """Test that models within their retention period are NOT marked
+        as deleted. This covers the date-filtering branch in
+        mark_outdated_models_as_deleted().
+        """
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        # Create a UserQueryModel with a RECENT last_updated timestamp
+        # (within the 30-day retention period).
+        recent_query_model = user_models.UserQueryModel(
+            id='recent_query_id',
+            user_ids=[],
+            submitter_id=admin_user_id,
+            query_status=feconf.USER_QUERY_STATUS_PROCESSING,
+            last_updated=datetime.datetime.utcnow(),
+        )
+        recent_query_model.update_timestamps(update_last_updated_time=False)
+        recent_query_model.put()
+
+        self.assertFalse(
+            user_models.UserQueryModel.get_by_id('recent_query_id').deleted
+        )
+
+        cron_services.mark_outdated_models_as_deleted()
+
+        # The model should NOT be marked as deleted because it was
+        # updated recently (within the retention period).
+        self.assertFalse(
+            user_models.UserQueryModel.get_by_id('recent_query_id').deleted
+        )
