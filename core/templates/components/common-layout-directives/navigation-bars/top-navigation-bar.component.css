@@ -619,3 +619,15 @@
     }
   }
 }
+/* Fix for long translation text overflow */
+.oppia-top-navigation-bar .nav-item-links {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.oppia-top-navigation-bar .nav-item-links a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
