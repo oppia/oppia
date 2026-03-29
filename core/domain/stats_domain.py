@@ -2451,6 +2451,9 @@ class AnswerSubmittedEventLogEntry:
         if not isinstance(self.exp_id, str) or not self.exp_id.strip():
             raise domain_errors.InvalidExpIdError(self.exp_id)
 
+        # The max exp_version check is done in audit job as it falls outside
+        # scope of domain layer checks - because it involves fetching another
+        # prod model.
         if not isinstance(self.exp_version, int) or (self.exp_version < 1):
             raise domain_errors.InvalidExpVersionError(self.exp_version)
 
