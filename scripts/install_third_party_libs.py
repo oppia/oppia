@@ -39,10 +39,7 @@ import tarfile
 from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
-from scripts import (
-    install_dependencies_json_packages,
-    install_python_prod_dependencies,
-)
+
 
 from typing import Final
 
@@ -434,6 +431,12 @@ def main() -> None:
     # This ensures dev dependencies are present and compiled before we
     # proceed to other setup tasks that require them.
     install_python_dev_dependencies.main(['--assert_compiled'])
+
+    from scripts import (
+        install_dependencies_json_packages,
+        install_python_prod_dependencies,
+    )
+
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
     from . import pre_commit_hook  # pylint: disable=wrong-import-position

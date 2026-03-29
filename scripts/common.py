@@ -69,7 +69,7 @@ YARN_VERSION = '1.22.15'
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-REDIS_CLI_VERSION = '6.2.4'
+REDIS_CLI_VERSION = '7.2.2'
 ELASTICSEARCH_VERSION = '8.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
@@ -837,6 +837,7 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
             return
         except OSError as e:
             if e.errno == errno.EAGAIN:
+                time.sleep(0.01)
                 continue
 
             raise
