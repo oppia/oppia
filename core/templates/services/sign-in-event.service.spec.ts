@@ -15,6 +15,8 @@
 /**
  * @fileoverview Unit tests for SignInEventService.
  */
+// NOTE: This test was migrated to use emittedSource instead of eventEmitted
+// to better track the source of the sign-in event.
 
 import {TestBed} from '@angular/core/testing';
 import {SignInEventService} from 'services/sign-in-event.service';
