@@ -1975,6 +1975,6 @@ class UserIdByFirebaseAuthIdTests(test_utils.TestBase):
     def test_empty_user_id(self) -> None:
         obj = user_domain.UserIdByFirebaseAuthId('')
         with self.assertRaisesRegex(
-            utils.ValidationError, 'No user id specified.'
+            utils.ValidationError, 'No user id specified'
         ):
             obj.validate()
