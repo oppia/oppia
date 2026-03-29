@@ -51,6 +51,10 @@ export class CollectionPlayerAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
+          window.sessionStorage.setItem(
+            'oppia_401_error_message',
+            'You do not have sufficient permissions to access this collection.'
+          );
           this.router
             .navigate([
               `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,

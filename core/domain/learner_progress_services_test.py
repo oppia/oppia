@@ -24,6 +24,7 @@ from core.constants import constants
 from core.domain import (
     collection_domain,
     collection_services,
+    exp_domain,
     exp_fetchers,
     exp_services,
     learner_goals_services,
@@ -3356,3 +3357,225 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             displayable_compeleted_story_summaries[1]['id'], self.COL_ID_3
         )
+
+    def test_get_checkpoint_progress_for_explorations_with_no_explorations(
+        self,
+    ) -> None:
+        """Test checkpoint progress calculation with no explorations."""
+        progress = (
+            learner_progress_services.get_checkpoint_progress_for_explorations(
+                self.user_id, []
+            )
+        )
+        self.assertEqual(progress, {})
+
+    def test_get_checkpoint_progress_for_explorations_with_no_progress(
+        self,
+    ) -> None:
+        """Test checkpoint progress with explorations that have no checkpoints
+        visited.
+        """
+        # Create exploration with checkpoint.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_0,
+            self.owner_id,
+            title='Test Exploration',
+            category='Test',
+            objective='Test Objective',
+        )
+
+        # Mark initial state as checkpoint.
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_0,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+
+        # Get checkpoint progress.
+        progress = (
+            learner_progress_services.get_checkpoint_progress_for_explorations(
+                self.user_id, [self.EXP_ID_0]
+            )
+        )
+
+        # Verify no progress has been made.
+        self.assertIn(self.EXP_ID_0, progress)
+        self.assertEqual(
+            progress[self.EXP_ID_0]['visited_checkpoints_count'], 0
+        )
+        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 1)
+
+    def test_get_checkpoint_progress_for_explorations_with_partial_progress(
+        self,
+    ) -> None:
+        """Test checkpoint progress calculation with partial completion."""
+        # Create exploration with checkpoint.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_0,
+            self.owner_id,
+            title='Test Exploration',
+            category='Test',
+            objective='Test Objective',
+        )
+
+        # Mark initial state as checkpoint.
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_0,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+
+        # Record progress to checkpoint.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.user_id, self.EXP_ID_0),
+            user_id=self.user_id,
+            exploration_id=self.EXP_ID_0,
+            most_recently_reached_checkpoint_state_name=exploration.init_state_name,
+        ).put()
+
+        # Get checkpoint progress.
+        progress = (
+            learner_progress_services.get_checkpoint_progress_for_explorations(
+                self.user_id, [self.EXP_ID_0]
+            )
+        )
+
+        # Verify partial progress.
+        self.assertIn(self.EXP_ID_0, progress)
+        self.assertEqual(
+            progress[self.EXP_ID_0]['visited_checkpoints_count'], 1
+        )
+        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 1)
+
+    def test_get_checkpoint_progress_for_multiple_explorations(self) -> None:
+        """Test checkpoint progress for multiple explorations."""
+        # Create first exploration with checkpoint.
+        exploration_1 = self.save_new_valid_exploration(
+            self.EXP_ID_0, self.owner_id, title='Test Exploration 1'
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_0,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration_1.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+
+        # Create second exploration with checkpoint.
+        exploration_2 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, title='Test Exploration 2'
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration_2.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+
+        # Record progress on first exploration only.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.user_id, self.EXP_ID_0),
+            user_id=self.user_id,
+            exploration_id=self.EXP_ID_0,
+            most_recently_reached_checkpoint_state_name=exploration_1.init_state_name,
+        ).put()
+
+        # Get checkpoint progress for both.
+        progress = (
+            learner_progress_services.get_checkpoint_progress_for_explorations(
+                self.user_id, [self.EXP_ID_0, self.EXP_ID_1]
+            )
+        )
+
+        # Verify progress for both explorations.
+        self.assertIn(self.EXP_ID_0, progress)
+        self.assertEqual(
+            progress[self.EXP_ID_0]['visited_checkpoints_count'], 1
+        )
+        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 1)
+
+        self.assertIn(self.EXP_ID_1, progress)
+        self.assertEqual(
+            progress[self.EXP_ID_1]['visited_checkpoints_count'], 0
+        )
+        self.assertEqual(progress[self.EXP_ID_1]['total_checkpoints_count'], 1)
+
+    def test_get_checkpoint_progress_for_nonexistent_exploration(self) -> None:
+        """Test checkpoint progress handles nonexistent explorations gracefully."""
+        progress = (
+            learner_progress_services.get_checkpoint_progress_for_explorations(
+                self.user_id, ['nonexistent_exp_id']
+            )
+        )
+
+        # Should return empty dict for nonexistent exploration.
+        self.assertEqual(progress, {})
+
+    def test_get_checkpoint_progress_with_invalid_checkpoint_name(self) -> None:
+        """Test checkpoint progress with invalid checkpoint name in user data."""
+        # Create exploration with checkpoints.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_0, self.owner_id, title='Test Exploration'
+        )
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.card_is_checkpoint = True
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        # Record progress with invalid checkpoint name.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.user_id, self.EXP_ID_0),
+            user_id=self.user_id,
+            exploration_id=self.EXP_ID_0,
+            most_recently_reached_checkpoint_state_name='invalid_checkpoint',
+        ).put()
+
+        # Get checkpoint progress.
+        progress = (
+            learner_progress_services.get_checkpoint_progress_for_explorations(
+                self.user_id, [self.EXP_ID_0]
+            )
+        )
+
+        # Should return 0 visited checkpoints for invalid checkpoint.
+        self.assertIn(self.EXP_ID_0, progress)
+        self.assertEqual(
+            progress[self.EXP_ID_0]['visited_checkpoints_count'], 0
+        )
+        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 1)
