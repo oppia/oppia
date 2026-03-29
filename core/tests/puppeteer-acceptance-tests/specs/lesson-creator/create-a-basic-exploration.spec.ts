@@ -94,7 +94,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.saveExplorationDraftFromSaveRecommendationModal();
       await explorationEditor.expectSaveDraftButtonToBeDisabled(true);
     },
-    50 * 60 * 1000 // Test takes longer that 35 minutes
+    50 * 60 * 1000
   );
 
   it(
@@ -115,7 +115,6 @@ describe('Lesson Creator', function () {
         'Bold text',
       ]);
 
-      // Add correct response. isLastResponse=false so modal stays open
       await explorationEditor.addResponsesToTheInteraction(
         INTERACTION_TYPES.MULTIPLE_CHOICE,
         'Bold text',
@@ -152,7 +151,6 @@ describe('Lesson Creator', function () {
 
       await explorationEditor.addTextInputInteraction();
 
-      // Add response with feedback and destination
       await explorationEditor.addResponsesToTheInteraction(
         INTERACTION_TYPES.TEXT_INPUT,
         'bold',
