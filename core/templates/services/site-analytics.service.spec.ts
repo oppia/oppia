@@ -59,6 +59,7 @@ describe('Site Analytics Service', () => {
         },
         {provide: LocalStorageService, useValue: localStorageServiceSpy},
         {provide: UserService, useValue: userServiceSpy},
+        SignInEventService,
       ],
     }).compileComponents();
 

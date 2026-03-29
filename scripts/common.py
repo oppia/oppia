@@ -28,8 +28,9 @@ import shutil
 import socket
 import ssl
 import subprocess
-import sys
-import time  # Used for EAGAIN retries.
+
+# Used for EAGAIN retries.
+import time
 from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
