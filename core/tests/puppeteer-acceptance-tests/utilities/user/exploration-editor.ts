@@ -3753,12 +3753,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let nodeGroup: ElementHandle<Element> | null = null;
-    if (this.isViewportAtMobileWidth()) {
-      nodeGroup = elements[cardIndex + elements.length / 2];
-    } else {
-      nodeGroup = elements[cardIndex];
-    }
+    const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
     if (!nodeGroup) {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
