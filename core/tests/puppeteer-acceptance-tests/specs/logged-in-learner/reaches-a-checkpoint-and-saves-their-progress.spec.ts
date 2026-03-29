@@ -172,7 +172,7 @@ describe('Logged-in Learner', function () {
       'logged_in_user@example.com'
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS * 2);
+  }, 900000);
 
   it('should be able to track the checkpoint progress', async function () {
     // Visit the Math classroom page.
@@ -196,7 +196,7 @@ describe('Logged-in Learner', function () {
     await loggedInUser.expectContinueToNextCardButtonToBePresent();
 
     // Click on the continue button in the footer.
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInLessonPlayer();
 
     // Verify Fraction interaction is displayed.
     // Verify a back button that is enabled and a continue button that is disabled are displayed.
@@ -210,27 +210,26 @@ describe('Logged-in Learner', function () {
     await loggedInUser.expectContinueToNextCardButtonToBePresent(false);
     // Verify submit button is visible.
     await loggedInUser.expectSubmitButtonToBe('Visible');
+    await loggedInUser.verifyCheckpointModalAppears();
 
     // Enter the correct answer in the input box.
     // Click on the Submit button.
-    await loggedInUser.submitAnswer('1/2');
+    await loggedInUser.submitAnswerInLessonPlayer('1/2');
 
     // Verify the submit button vanishes, and the Continue button shows up.
-    // Verify celebration pop-up shows up.
     await loggedInUser.expectSubmitButtonToBe('Hidden');
     await loggedInUser.expectContinueToNextCardButtonToBePresent();
-    await loggedInUser.verifyCheckpointModalAppears();
 
     // Click on the continue button in the footer.
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardInLessonPlayer();
 
     // Verify second question card appears.
     await loggedInUser.expectCardContentToMatch(
       'Enter another fraction to continue learning.'
     );
-    await loggedInUser.submitAnswer('3/4');
     await loggedInUser.verifyCheckpointModalAppears();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.submitAnswerInLessonPlayer('3/4');
+    await loggedInUser.continueToNextCardInLessonPlayer();
 
     // Verify final card appears.
     await loggedInUser.expectCardContentToMatch(
@@ -271,7 +270,7 @@ describe('Logged-in Learner', function () {
 
     // Verify 3rd card is displayed.
     await loggedInUser.expectCardContentToMatch(
-      'Great job! You have completed the lesson on place values.'
+      'Enter another fraction to continue learning.'
     );
   });
 

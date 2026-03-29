@@ -532,6 +532,9 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
     await this.waitForPageToFullyLoad();
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
     await this.page.waitForSelector(profileDropdown, {
       visible: true,
     });

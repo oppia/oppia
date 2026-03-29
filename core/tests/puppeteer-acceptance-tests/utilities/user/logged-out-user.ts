@@ -3428,6 +3428,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Uses the lesson player card navigation helper on mixed user objects
+   * created via UserFactory.createNewUser().
+   */
+  async continueToNextCardInLessonPlayer(): Promise<void> {
+    await this.continueToNextCard();
+  }
+
+  /**
    * Clicks on continue button in continue button interaction.
    */
   async clickOnContinueButtonInInteractionCard(): Promise<void> {
@@ -3448,6 +3456,14 @@ export class LoggedOutUser extends BaseUser {
     await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.typeInInputField(submitResponseToInteractionInput, answer);
     await this.clickOnSubmitAnswerButton();
+  }
+
+  /**
+   * Uses the lesson player answer submission helper on mixed user objects
+   * created via UserFactory.createNewUser().
+   */
+  async submitAnswerInLessonPlayer(answer: string): Promise<void> {
+    await this.submitAnswer(answer);
   }
 
   /**
