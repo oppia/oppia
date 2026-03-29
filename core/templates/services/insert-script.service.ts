@@ -90,9 +90,6 @@ export class InsertScriptService {
           this.fullyLoadedScripts.add(script);
           this.partiallyLoadedScripts.delete(script);
           resolve();
-          if (onLoadCb) {
-            onLoadCb();
-          }
         };
       });
 

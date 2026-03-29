@@ -52,6 +52,13 @@ describe('InsertScriptService', () => {
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
+    spyOn(document.body, 'appendChild').and.callFake((script: HTMLElement) => {
+      setTimeout(() => {
+        (script as unknown as HTMLScriptElement).onload?.(new Event('load'));
+      }, 10);
+      return script;
+    });
+
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       const result = insertScriptService.loadScript(
         KNOWN_SCRIPTS.DONORBOX,
@@ -68,6 +75,13 @@ describe('InsertScriptService', () => {
       rendererFactory.createRenderer(null, null),
       'createElement'
     ).and.callThrough();
+
+    spyOn(document.body, 'appendChild').and.callFake((script: HTMLElement) => {
+      setTimeout(() => {
+        (script as unknown as HTMLScriptElement).onload?.(new Event('load'));
+      }, 10);
+      return script;
+    });
 
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
@@ -151,6 +165,13 @@ describe('InsertScriptService', () => {
   });
 
   it('should insert script into html', (done: jasmine.DoneFn) => {
+    spyOn(document.body, 'appendChild').and.callFake((script: HTMLElement) => {
+      setTimeout(() => {
+        (script as unknown as HTMLScriptElement).onload?.(new Event('load'));
+      }, 10);
+      return script;
+    });
+
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
