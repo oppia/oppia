@@ -1961,7 +1961,6 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
 class UserIdByFirebaseAuthIdTests(test_utils.TestBase):
     def test_valid_user_id(self) -> None:
         obj = user_domain.UserIdByFirebaseAuthId('abc123')
-        # Should not raise error
         obj.validate()
 
     def test_invalid_user_id_type(self) -> None:
