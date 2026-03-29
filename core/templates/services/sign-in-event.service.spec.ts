@@ -37,14 +37,14 @@ describe('SignInEventService', () => {
     expect(signInEventService.onUserSignIn).toBeTruthy();
   });
 
-  it('should emit onUserSignIn event', () => {
-    let eventEmitted = false;
-    signInEventService.onUserSignIn.subscribe(() => {
-      eventEmitted = true;
+  it('should emit onUserSignIn event with source', () => {
+    let emittedSource: string | undefined;
+    signInEventService.onUserSignIn.subscribe((source: string | undefined) => {
+      emittedSource = source;
     });
 
-    signInEventService.onUserSignIn.emit();
+    signInEventService.onUserSignIn.emit('testSource');
 
-    expect(eventEmitted).toBe(true);
+    expect(emittedSource).toBe('testSource');
   });
 });

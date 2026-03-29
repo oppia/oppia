@@ -837,6 +837,7 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
             return
         except OSError as e:
             if e.errno == errno.EAGAIN:
+                time.sleep(0.01)
                 continue
 
             raise

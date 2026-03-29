@@ -22,6 +22,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {UserService} from 'services/user.service';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
@@ -30,6 +31,7 @@ describe('Site Analytics Service', () => {
   let pathname = 'pathname';
   let localStorageService: jasmine.SpyObj<LocalStorageService>;
   let userService: jasmine.SpyObj<UserService>;
+  let signInEventService: SignInEventService;
   const explorationId = 'abc1';
 
   class MockWindowRef {
@@ -62,6 +64,7 @@ describe('Site Analytics Service', () => {
 
     sas = TestBed.inject(SiteAnalyticsService);
     ws = TestBed.inject(WindowRef);
+    signInEventService = TestBed.inject(SignInEventService);
     localStorageService = TestBed.inject(
       LocalStorageService
     ) as jasmine.SpyObj<LocalStorageService>;
@@ -1102,6 +1105,16 @@ describe('Site Analytics Service', () => {
           login_status: 'logged_in',
         }
       );
+    });
+
+    it('should register start login event when a sign in event is broadcast', () => {
+      signInEventService.onUserSignIn.emit('loginButton');
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'login', {
+        source_element: 'loginButton',
+        page_path: pathname,
+        login_status: 'logged_in',
+      });
     });
   });
 });

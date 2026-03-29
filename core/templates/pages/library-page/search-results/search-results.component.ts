@@ -24,6 +24,7 @@ import {LoaderService} from 'services/loader.service';
 import {SearchService} from 'services/search.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 @Component({
   selector: 'oppia-search-results',
@@ -40,7 +41,8 @@ export class SearchResultsComponent {
     private searchService: SearchService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private userService: UserService
+    private userService: UserService,
+    private signInEventService: SignInEventService
   ) {}
 
   getStaticCopyrightedImageUrl(imagePath: string): string {
@@ -48,7 +50,7 @@ export class SearchResultsComponent {
   }
 
   onRedirectToLogin(destinationUrl: string): boolean {
-    this.siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+    this.signInEventService.onUserSignIn.emit('noSearchResults');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = destinationUrl;
     }, 150);

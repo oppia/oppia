@@ -52,10 +52,7 @@ export class LoginRequiredMessageComponent {
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
-        this.signInEventService.onUserSignIn.emit();
-        // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
-        // rather than manually being triggered by buttons.
-        this.siteAnalyticsService.registerStartLoginEvent('loginButton');
+        this.signInEventService.onUserSignIn.emit('loginButton');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;
         }, 150);

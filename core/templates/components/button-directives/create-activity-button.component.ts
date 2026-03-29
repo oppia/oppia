@@ -23,6 +23,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import {AppConstants} from 'app.constants';
 
@@ -43,11 +44,12 @@ export class CreateActivityButtonComponent implements OnInit {
     private urlService: UrlService,
     private explorationCreationService: ExplorationCreationService,
     private ngbModal: NgbModal,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private signInEventService: SignInEventService
   ) {}
 
   onRedirectToLogin(destinationUrl: string): boolean {
-    this.siteAnalyticsService.registerStartLoginEvent('createActivityButton');
+    this.signInEventService.onUserSignIn.emit('createActivityButton');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = destinationUrl;
     }, 150);

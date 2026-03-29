@@ -25,6 +25,7 @@ import {LocalStorageService} from './local-storage.service';
 import {UserService} from './user.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 // Service for sending events to Google Analytics.
 //
@@ -41,7 +42,8 @@ export class SiteAnalyticsService {
   constructor(
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
-    private userService: UserService
+    private userService: UserService,
+    private signInEventService: SignInEventService
   ) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
       // This ensures that google analytics is initialized whenever this
@@ -51,6 +53,12 @@ export class SiteAnalyticsService {
     }
 
     this._initializeLoginStatus();
+
+    this.signInEventService.onUserSignIn.subscribe(
+      (srcElement: string | undefined) => {
+        this.registerStartLoginEvent(srcElement || 'unknown');
+      }
+    );
   }
 
   private async _initializeLoginStatus(): Promise<void> {
