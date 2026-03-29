@@ -85,10 +85,29 @@ describe('Practice Question Coordinator', function () {
     await questionSubmitter.navigateToCreatorDashboardPage();
   }, 900000);
 
-  it('should be able to add question submitter and question review rights for a user', async function () {
+  it('should be able to add question review rights for a user', async function () {
     // Navigate to the contributor dashboard admin page.
     await questionCoordinator.navigateToContributorDashboardAdminPage();
 
+    await questionCoordinator.switchToTabInContributorAdminPage(
+      'Question Reviewers'
+    );
+
+    // Add question reviewer rights.
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal(
+      questionReviewer.username ?? ''
+    );
+
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Reviewer'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+    await questionCoordinator.page.reload();
+    await questionCoordinator.expectTotalQuestionReviewersToBe(1);
+  });
+
+  it('should be able to add question submitter rights for a user', async function () {
     // Add question submitter rights.
     await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
     await questionCoordinator.addUsernameInUsernameInputModal(
@@ -103,17 +122,6 @@ describe('Practice Question Coordinator', function () {
       'Submitter'
     );
     await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
-
-    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
-    await questionCoordinator.addUsernameInUsernameInputModal(
-      questionReviewer.username ?? ''
-    );
-    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
-      'Reviewer'
-    );
-    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
-    await questionCoordinator.page.reload();
-    await questionCoordinator.expectTotalQuestionReviewersToBe(1);
 
     // Submit a question as question submitter.
     await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
@@ -142,23 +150,35 @@ describe('Practice Question Coordinator', function () {
     await questionCoordinator.expectNumberOfStatsRowsToBe(1);
   });
 
-  it('should be able to remove question rights', async function () {
-    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
-    await questionCoordinator.addUsernameInUsernameInputModal(
-      questionReviewer.username ?? ''
-    );
-    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
-      'Reviewer',
-      'remove'
-    );
-    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
-
+  it('should be able to remove question submitter rights for a user', async function () {
     await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
     await questionCoordinator.addUsernameInUsernameInputModal(
       questionSubmitter.username ?? ''
     );
+    await questionCoordinator.expectScreenshotToMatch(
+      'editQuestionRightsModalWithSubmitterChecked',
+      __dirname
+    );
+
     await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
       'Submitter',
+      'remove'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+  });
+
+  it('should be able to remove question review rights for a user', async function () {
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal(
+      questionReviewer.username ?? ''
+    );
+    await questionCoordinator.expectScreenshotToMatch(
+      'editQuestionRightsModalWithReviewerChecked',
+      __dirname
+    );
+
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Reviewer',
       'remove'
     );
     await questionCoordinator.saveAndCloseQuestionRoleEditorModal();

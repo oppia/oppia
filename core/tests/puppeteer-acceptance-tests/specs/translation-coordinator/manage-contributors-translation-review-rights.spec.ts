@@ -151,7 +151,7 @@ describe('Translation Coordinator', function () {
     await translationReviewer2.expectReviewModalToBePresent(false);
   }, 900000);
 
-  it('should be able to add translation rights in a language for a user', async function () {
+  it('should be able to add language translation rights for a user', async function () {
     // Navigate to the contributor dashboard admin page.
     await translationCoordinator.navigateToContributorDashboardAdminPage();
     await translationCoordinator.switchToTabInContributorAdminPage(
@@ -191,13 +191,17 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.expectNumberOfStatsRowsToBe(1);
   });
 
-  it('should be able to remove translation rights', async function () {
+  it('should be able to remove language translation rights for a user', async function () {
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
       'translationReviewer1'
+    );
+    await translationCoordinator.expectScreenshotToMatch(
+      'translationRightsModalWithHindiSelected',
+      __dirname
     );
 
     await translationCoordinator.removeLanguageFromLanguageSelectorModal(
