@@ -1321,6 +1321,31 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.exit_stack.close()
 
+    def test_managed_acceptance_test_server_update_snapshot(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        suite_name = (
+            'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
+        )
+
+        self.exit_stack.enter_context(
+            servers.managed_acceptance_tests_server(
+                suite_name=suite_name,
+                update_snapshot=True,
+                stdout=subprocess.PIPE,
+            )
+        )
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
+        )
+        program_args = popen_calls[0].program_args
+        self.assertIn(suite_name, program_args)
+        self.assertIn('--updateSnapshot', program_args)
+        self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
+
+        self.exit_stack.close()
+
 
 class GetChromedriverVersionTests(test_utils.TestBase):
 

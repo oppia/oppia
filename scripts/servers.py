@@ -836,6 +836,7 @@ def managed_acceptance_tests_server(
     headless: bool = False,
     mobile: bool = False,
     prod_env: bool = False,
+    update_snapshot: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the acceptance tests
@@ -847,6 +848,7 @@ def managed_acceptance_tests_server(
         headless: bool. Whether to run the acceptance tests in headless mode.
         mobile: bool. Whether to run the acceptance tests in mobile mode.
         prod_env: bool. Whether to run the acceptance tests in production mode.
+        update_snapshot: bool. Whether to update screenshot snapshots for tests.
         stdout: int. The file descriptor where the standard output of the
             subprocess is sent.
 
@@ -882,6 +884,9 @@ def managed_acceptance_tests_server(
         '%s' % os.path.join(available_suites[suite_name]),
         '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js',
     ]
+
+    if update_snapshot:
+        acceptance_tests_args.append('--updateSnapshot')
 
     # OK to use shell=True here because we are passing string literals,
     # and verifying that the passed suite-name are within the list of

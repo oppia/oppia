@@ -72,6 +72,12 @@ _PARSER.add_argument(
     '--mobile', help='Run the tests in mobile mode.', action='store_true'
 )
 
+_PARSER.add_argument(
+    '--updateSnapshot',
+    help='Update screenshot snapshots for Puppeteer acceptance tests.',
+    action='store_true',
+)
+
 
 def compile_test_ts_files() -> None:
     """Compiles the test typescript files into a build directory."""
@@ -163,6 +169,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
                 headless=args.headless,
                 mobile=args.mobile,
                 prod_env=args.prod_env,
+                update_snapshot=args.updateSnapshot,
                 stdout=subprocess.PIPE,
             )
         )
