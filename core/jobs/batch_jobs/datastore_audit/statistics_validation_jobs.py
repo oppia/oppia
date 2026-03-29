@@ -20,13 +20,10 @@ from __future__ import annotations
 
 from core.domain import exp_fetchers, stats_domain
 from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
-from core.jobs.types import (
-    job_run_result,
-    statistics_validation_errors,
-)
+from core.jobs.types import job_run_result, statistics_validation_errors
 from core.platform import models
 
-from typing import Callable, Iterator, List
+from typing import Callable, Iterator, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -49,6 +46,12 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
     base_validation_jobs.BaseValidationJob
 ):
     """Audit job for AnswerSubmittedEventLogEntryModel."""
+
+    def get_model_class(
+        self,
+    ) -> Type[stats_models.AnswerSubmittedEventLogEntryModel]:
+        """Returns the model class to validate."""
+        return stats_models.AnswerSubmittedEventLogEntryModel
 
     def get_validation_fns(
         self,
@@ -74,15 +77,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Validates domain object."""
-        # BaseValidationJob calls datastore_services.query_everything()
-        # and passes every model through this function. Since the method
-        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
-        # only those instances.
-        if not isinstance(
-            model, stats_models.AnswerSubmittedEventLogEntryModel
-        ):
-            return
-
+        assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
         try:
             domain_object = stats_domain.AnswerSubmittedEventLogEntry(
                 exp_id=model.exp_id,
@@ -106,15 +101,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks if exp_id corresponds to a valid exploration."""
-        # BaseValidationJob calls datastore_services.query_everything()
-        # and passes every model through this function. Since the method
-        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
-        # only those instances.
-        if not isinstance(
-            model, stats_models.AnswerSubmittedEventLogEntryModel
-        ):
-            return
-
+        assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
         try:
             with datastore_services.get_ndb_context():
                 exploration = exp_fetchers.get_exploration_by_id(
@@ -136,16 +123,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks state_name should be valid key in states of exploration."""
-
-        # BaseValidationJob calls datastore_services.query_everything()
-        # and passes every model through this function. Since the method
-        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
-        # only those instances.
-        if not isinstance(
-            model, stats_models.AnswerSubmittedEventLogEntryModel
-        ):
-            return
-
+        assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
         try:
             with datastore_services.get_ndb_context():
                 exploration = exp_fetchers.get_exploration_by_id(
@@ -168,15 +146,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         """Checks exp_version should be in valid range i.e.
         1 <= exp_version <= current exploration version.
         """
-        # BaseValidationJob calls datastore_services.query_everything()
-        # and passes every model through this function. Since the method
-        # is implemented for AnswerSubmittedEventLogEntryModel, it processes
-        # only those instances.
-        if not isinstance(
-            model, stats_models.AnswerSubmittedEventLogEntryModel
-        ):
-            return
-
+        assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
         try:
             with datastore_services.get_ndb_context():
                 exploration = exp_fetchers.get_exploration_by_id(

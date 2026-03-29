@@ -25,15 +25,14 @@ from core.jobs.types import base_validation_errors, job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Callable, Dict, Iterator, List
+from typing import Callable, Dict, Iterator, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models, datastore_services
+    from mypy_imports import base_models
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
-datastore_services = models.Registry.import_datastore_services()
 
 ERROR_TRUNCATION_LIMIT = 10
 
@@ -76,7 +75,9 @@ class BaseValidationJob(base_jobs.JobBase):
             types and values are lists of truncated model IDs.
         """
         all_models = self.pipeline | 'Get all models' >> (
-            ndb_io.GetModels(datastore_services.query_everything())
+            ndb_io.GetModels(
+                self.get_model_class().get_all(include_deleted=False)
+            )
         )
 
         default_validation_fns = [
@@ -111,6 +112,17 @@ class BaseValidationJob(base_jobs.JobBase):
                     f'{group[0]}: {chr(10).join(sorted(error.stderr for error in group[1])[:ERROR_TRUNCATION_LIMIT])}'
                 )
             )
+        )
+
+    def get_model_class(self) -> Type[base_models.BaseModel]:
+        """Returns the model class to validate.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in derived
+                classes.
+        """
+        raise NotImplementedError(
+            'Missing implementation for get_model_class in derived class.'
         )
 
     def get_validation_fns(

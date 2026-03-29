@@ -34,6 +34,40 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
+class MissingGetModelClassJob(base_validation_jobs.BaseValidationJob):
+    """Child validation job with missing get_model_class."""
+
+    def validate_domain_object(
+        self, unused_model: base_models.BaseModel
+    ) -> Iterator[job_run_result.JobRunResult]:
+        """Mock domain validate function."""
+        # The yield from () statement is used to ensure that the function
+        # returns an empty iterator every time it's called.
+        # The following other approaches won't work:
+        # - Using pass: The function would implicitly return None. Attempting to
+        # iterate over None in the calling code results in a
+        # TypeError: 'NoneType' object is not iterable.
+        # - Using yield: The function would yield None. Subsequent processing
+        # steps in the validation pipeline would then try to access attributes
+        # of this None value (expecting a validation error object),
+        # leading to an AttributeError.
+        yield from ()
+
+    def get_validate_domain_object_fn(
+        self,
+    ) -> Callable[
+        [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
+    ]:
+        return self.validate_domain_object
+
+    def get_validation_fns(
+        self,
+    ) -> List[
+        Callable[[base_models.BaseModel], Iterator[job_run_result.JobRunResult]]
+    ]:
+        return []
+
+
 class MissingGetValidationFnsJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with missing get_validation_fns."""
 
@@ -59,6 +93,9 @@ class MissingGetValidationFnsJob(base_validation_jobs.BaseValidationJob):
         [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
     ]:
         return self.validate_domain_object
+
+    def get_model_class(self) -> Type[base_models.BaseModel]:
+        return base_models.BaseModel
 
 
 class MissingGetValidateDomainObjectFnJob(
@@ -88,6 +125,9 @@ class MissingGetValidateDomainObjectFnJob(
         Callable[[base_models.BaseModel], Iterator[job_run_result.JobRunResult]]
     ]:
         return [self.validate_mock_error]
+
+    def get_model_class(self) -> Type[base_models.BaseModel]:
+        return base_models.BaseModel
 
 
 class MockDomainObjectValidationError(
@@ -139,6 +179,9 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
         [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
     ]:
         return self.validate_domain_object
+
+    def get_model_class(self) -> Type[base_models.BaseModel]:
+        return base_models.BaseModel
 
 
 class BaseValidationJobTests(job_test_utils.JobTestBase):
@@ -243,5 +286,14 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
             NotImplementedError,
             'Missing implementation for get_validate_domain_object_fn '
             'in derived class.',
+        ):
+            self.run_job()
+
+    def test_get_model_class_not_implemented(self) -> None:
+        self.job = MissingGetModelClassJob(self.pipeline)
+
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            'Missing implementation for get_model_class in derived class.',
         ):
             self.run_job()
