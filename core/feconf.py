@@ -66,7 +66,7 @@ DEBUG = False
 
 
 # Whether to render the frontend with consistent elements for screenshot testing.
-SCREENSHOT_CONSISTENCY = False
+SCREENSHOT_CONSISTENCY = True
 
 
 def check_dev_mode_is_true() -> None:
