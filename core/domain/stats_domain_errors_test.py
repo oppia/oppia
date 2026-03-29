@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for AnswerSubmittedEventLogEntry domain error classes."""
+"""Tests for statistics domain error classes."""
 
 from __future__ import annotations
 
 from core.domain import (
-    answer_submitted_event_log_entry_domain_errors as domain_errors,
+    stats_domain_errors as domain_errors,
 )
 from core.tests import test_utils
 

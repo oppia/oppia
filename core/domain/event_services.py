@@ -22,7 +22,6 @@ import logging
 
 from core import feconf
 from core.domain import (
-    answer_submitted_event_log_entry_services,
     exp_domain,
     exp_fetchers,
     feedback_services,
@@ -169,7 +168,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
             exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
         )
 
-        answer_submitted_event_log_entry_services.create_answer_submitted_event_log_entry(
+        stats_services.create_answer_submitted_event_log_entry(
             exploration_id,
             exploration_version,
             state_name,

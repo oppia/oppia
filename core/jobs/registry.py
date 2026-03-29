@@ -105,7 +105,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     missing_translation_images_repair_jobs,
 )
 from core.jobs.batch_jobs.datastore_audit import (  # pylint: disable=unused-import  # isort: skip
-    answerSubmittedEventLogEntryModel_validation_jobs,
+    statistics_validation_jobs,
 )
 
 

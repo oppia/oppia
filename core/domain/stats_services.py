@@ -1607,3 +1607,82 @@ def delete_learner_answer_details_for_question_state(question_id: str) -> None:
     )
     if learner_answer_details_model is not None:
         learner_answer_details_model.delete()
+
+
+def get_answer_submitted_event_log_entry_from_model(
+    answer_submitted_event_log_entry: stats_models.AnswerSubmittedEventLogEntryModel,
+) -> stats_domain.AnswerSubmittedEventLogEntry:
+    """Creates a domain object from an AnswerSubmittedEventLogEntryModel.
+
+    Args:
+        answer_submitted_event_log_entry: AnswerSubmittedEventLogEntryModel.
+            The datastore model instance containing the answer submitted
+            event log entry data.
+
+    Returns:
+        AnswerSubmittedEventLogEntry. The corresponding domain object created
+        from the given model.
+    """
+    return stats_domain.AnswerSubmittedEventLogEntry(
+        exp_id=answer_submitted_event_log_entry.exp_id,
+        exp_version=answer_submitted_event_log_entry.exp_version,
+        state_name=answer_submitted_event_log_entry.state_name,
+        session_id=answer_submitted_event_log_entry.session_id,
+        time_spent_in_state_secs=answer_submitted_event_log_entry.time_spent_in_state_secs,
+        is_feedback_useful=answer_submitted_event_log_entry.is_feedback_useful,
+        event_schema_version=answer_submitted_event_log_entry.event_schema_version,
+    )
+
+
+def create_answer_submitted_event_log_entry(
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    session_id: str,
+    time_spent_in_secs: float,
+    feedback_is_useful: bool,
+) -> None:
+    """Creates and stores an AnswerSubmittedEventLogEntryModel.
+
+    This function constructs a domain object for an answer submitted
+    event log entry and persists it as a datastore model.
+
+    Args:
+        exploration_id: str. The ID of the exploration in which the
+            answer was submitted.
+        exploration_version: int. The version of the exploration at the
+            time the answer was submitted.
+        state_name: str. The name of the state where the answer was
+            submitted.
+        session_id: str. The ID of the learner session.
+        time_spent_in_secs: float. The time spent by the learner in the
+            state before submitting the answer.
+        feedback_is_useful: bool. Whether the learner marked the
+            feedback as useful.
+    """
+
+    answer_submitted_event_log_entry = (
+        stats_domain.AnswerSubmittedEventLogEntry(
+            exp_id=exploration_id,
+            exp_version=exploration_version,
+            state_name=state_name,
+            session_id=session_id,
+            time_spent_in_state_secs=time_spent_in_secs,
+            is_feedback_useful=feedback_is_useful,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION,
+        )
+    )
+
+    # Enable strict validation for create operations.
+    # New instances must pass validation before being stored
+    # to prevent invalid data from entering the system.
+    answer_submitted_event_log_entry.validate()
+
+    stats_models.AnswerSubmittedEventLogEntryModel.create(
+        exp_id=answer_submitted_event_log_entry.exp_id,
+        exp_version=answer_submitted_event_log_entry.exp_version,
+        state_name=answer_submitted_event_log_entry.state_name,
+        session_id=answer_submitted_event_log_entry.session_id,
+        time_spent_in_state_secs=answer_submitted_event_log_entry.time_spent_in_state_secs,
+        is_feedback_useful=answer_submitted_event_log_entry.is_feedback_useful,
+    )

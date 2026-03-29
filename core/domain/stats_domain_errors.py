@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain error class for AnswerSubmittedEventLogEntry."""
+"""Domain error class for statistics domain."""
 
 from __future__ import annotations
 

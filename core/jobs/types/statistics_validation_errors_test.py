@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.jobs.types import answerSubmittedEventLogEntryModel_validation_errors
+from core.jobs.types import statistics_validation_errors
 from core.platform import models
 from core.tests import test_utils
 
@@ -37,9 +37,7 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
         model.exp_id = 'test_exp_id'
         model.exp_version = 2
 
-        error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-            model
-        )
+        error = statistics_validation_errors.InvalidExplorationIdError(model)
 
         self.assertEqual(
             'InvalidExplorationIdError in BaseModel(id="test_id"): '
@@ -53,9 +51,7 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
         model = base_models.BaseModel(id='test_id')
         model.exp_id = 'test_exp_id'
 
-        error = answerSubmittedEventLogEntryModel_validation_errors.ExplorationDoesNotExistError(
-            model
-        )
+        error = statistics_validation_errors.ExplorationDoesNotExistError(model)
 
         self.assertEqual(
             'ExplorationDoesNotExistError in BaseModel(id="test_id"): '
@@ -68,7 +64,7 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
     ) -> None:
         model = base_models.BaseModel(id='test_id')
 
-        error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+        error = statistics_validation_errors.DomainValidationError(
             'test failure', model
         )
 
@@ -86,9 +82,7 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
         model = base_models.BaseModel(id='test_id')
         model.exp_version = 10
 
-        error = answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
-            1, model
-        )
+        error = statistics_validation_errors.ExpVersionOutOfRangeError(1, model)
 
         self.assertEqual(
             (
@@ -104,9 +98,7 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
         model = base_models.BaseModel(id='test_id')
         model.state_name = 'Introduction'
 
-        error = answerSubmittedEventLogEntryModel_validation_errors.InvalidStateNameError(
-            model
-        )
+        error = statistics_validation_errors.InvalidStateNameError(model)
 
         self.assertEqual(
             (

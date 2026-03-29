@@ -22,11 +22,11 @@ from unittest import mock
 
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs.datastore_audit import (
-    answerSubmittedEventLogEntryModel_validation_jobs,
+    statistics_validation_jobs,
 )
 from core.jobs.types import (
-    answerSubmittedEventLogEntryModel_validation_errors,
     job_run_result,
+    statistics_validation_errors,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -40,7 +40,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
     """Tests for AnswerSubmittedEventLogEntryModelValidationJob."""
 
     JOB_CLASS = (
-        answerSubmittedEventLogEntryModel_validation_jobs.AnswerSubmittedEventLogEntryModelValidationJob
+        statistics_validation_jobs.AnswerSubmittedEventLogEntryModelValidationJob
     )
 
     def test_validation_with_proper_model_data_yields_no_errors(self) -> None:
@@ -81,9 +81,9 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
-        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-            model
-        ).stderr
+        invalid_exp_error = (
+            statistics_validation_errors.InvalidExplorationIdError(model).stderr
+        )
 
         self.assert_job_output_is(
             [
@@ -118,9 +118,9 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
-        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-            model
-        ).stderr
+        invalid_exp_error = (
+            statistics_validation_errors.InvalidExplorationIdError(model).stderr
+        )
 
         mock_get_exploration_by_id.return_value = None
         self.assert_job_output_is(
@@ -156,18 +156,20 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
-        domain_error = answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+        domain_error = statistics_validation_errors.DomainValidationError(
             'Expected exp_version to be an integer >= 1, received -1',
             model,
         ).stderr
 
-        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-            model
-        ).stderr
+        invalid_exp_error = (
+            statistics_validation_errors.InvalidExplorationIdError(model).stderr
+        )
 
-        exp_version_error = answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
-            1, model
-        ).stderr
+        exp_version_error = (
+            statistics_validation_errors.ExpVersionOutOfRangeError(
+                1, model
+            ).stderr
+        )
 
         self.assert_job_output_is(
             [
@@ -207,9 +209,9 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
-        invalid_state_name_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidStateNameError(
-            model
-        ).stderr
+        invalid_state_name_error = (
+            statistics_validation_errors.InvalidStateNameError(model).stderr
+        )
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
@@ -239,12 +241,14 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
-        exp_version_range_error = answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
-            1, model
-        ).stderr
-        invalid_exp_error = answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-            model
-        ).stderr
+        exp_version_range_error = (
+            statistics_validation_errors.ExpVersionOutOfRangeError(
+                1, model
+            ).stderr
+        )
+        invalid_exp_error = (
+            statistics_validation_errors.InvalidExplorationIdError(model).stderr
+        )
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(

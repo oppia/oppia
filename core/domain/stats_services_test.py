@@ -34,7 +34,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Optional, Tuple, Union
+from typing import Any, Dict, Final, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3627,3 +3627,82 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_QUESTION, self.state_reference_question
         )
         self.assertEqual(learner_answer_details, None)
+
+
+class AnswerSubmittedEventLogEntryServicesTest(test_utils.GenericTestBase):
+    """Tests for AnswerSubmittedEventLogEntry services."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exp_id = 'exp_1'
+        self.owner_id = 'owner'
+
+        self.exploration = self.save_new_valid_exploration(
+            self.exp_id, self.owner_id
+        )
+
+    def test_conversion_with_valid_model_returns_domain_object(self) -> None:
+        model = stats_models.AnswerSubmittedEventLogEntryModel(
+            exp_id='exp_1',
+            exp_version=1,
+            state_name='Introduction',
+            session_id='session_1',
+            time_spent_in_state_secs=12.0,
+            is_feedback_useful=True,
+            event_schema_version=1,
+        )
+
+        domain_obj = (
+            stats_services.get_answer_submitted_event_log_entry_from_model(
+                model
+            )
+        )
+
+        self.assertEqual(domain_obj.exp_id, 'exp_1')
+        self.assertEqual(domain_obj.exp_version, 1)
+        self.assertEqual(domain_obj.state_name, 'Introduction')
+        self.assertEqual(domain_obj.session_id, 'session_1')
+        self.assertEqual(domain_obj.time_spent_in_state_secs, 12.0)
+        self.assertTrue(domain_obj.is_feedback_useful)
+        self.assertEqual(domain_obj.event_schema_version, 1)
+
+    def test_creation_with_valid_parameters_returns_none(self) -> None:
+        with self.swap(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            'create',
+            lambda *args, **kwargs: None,
+        ):
+            stats_services.create_answer_submitted_event_log_entry(
+                exploration_id=self.exp_id,
+                exploration_version=self.exploration.version,
+                state_name='Introduction',
+                session_id='session_1',
+                time_spent_in_secs=10.0,
+                feedback_is_useful=True,
+            )
+
+    def test_creation_with_valid_parameters_invokes_model_create(
+        self,
+    ) -> None:
+        calls = []
+
+        # Here we use type Any because mock_create function
+        # accept any type of arguments.
+        def mock_create(**kwargs: Any) -> None:
+            calls.append(kwargs)
+
+        with self.swap(
+            stats_models.AnswerSubmittedEventLogEntryModel,
+            'create',
+            mock_create,
+        ):
+            stats_services.create_answer_submitted_event_log_entry(
+                exploration_id=self.exp_id,
+                exploration_version=self.exploration.version,
+                state_name='Introduction',
+                session_id='session_123',
+                time_spent_in_secs=15.0,
+                feedback_is_useful=False,
+            )
+
+        self.assertEqual(len(calls), 1)

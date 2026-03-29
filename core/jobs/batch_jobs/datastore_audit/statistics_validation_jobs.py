@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
-from core.domain import answer_submitted_event_log_entry_domain, exp_fetchers
+from core.domain import exp_fetchers, stats_domain
 from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
 from core.jobs.types import (
-    answerSubmittedEventLogEntryModel_validation_errors,
     job_run_result,
+    statistics_validation_errors,
 )
 from core.platform import models
 
@@ -84,7 +84,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
             return
 
         try:
-            domain_object = answer_submitted_event_log_entry_domain.AnswerSubmittedEventLogEntry(
+            domain_object = stats_domain.AnswerSubmittedEventLogEntry(
                 exp_id=model.exp_id,
                 exp_version=model.exp_version,
                 state_name=model.state_name,
@@ -97,7 +97,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
 
         except Exception as e:
             yield (
-                answerSubmittedEventLogEntryModel_validation_errors.DomainValidationError(
+                statistics_validation_errors.DomainValidationError(
                     str(e), model
                 )
             )
@@ -123,15 +123,13 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
 
             if exploration is None:
                 yield (
-                    answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
+                    statistics_validation_errors.InvalidExplorationIdError(
                         model
                     )
                 )
         except Exception:
             yield (
-                answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-                    model
-                )
+                statistics_validation_errors.InvalidExplorationIdError(model)
             )
 
     def validate_state_name_according_exploration(
@@ -157,15 +155,11 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
 
             if model.state_name not in exploration.states:
                 yield (
-                    answerSubmittedEventLogEntryModel_validation_errors.InvalidStateNameError(
-                        model
-                    )
+                    statistics_validation_errors.InvalidStateNameError(model)
                 )
         except Exception:
             yield (
-                answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-                    model
-                )
+                statistics_validation_errors.InvalidExplorationIdError(model)
             )
 
     def validate_range_of_exp_version(
@@ -192,13 +186,11 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
 
             if model.exp_version < 1 or model.exp_version > exploration.version:
                 yield (
-                    answerSubmittedEventLogEntryModel_validation_errors.ExpVersionOutOfRangeError(
+                    statistics_validation_errors.ExpVersionOutOfRangeError(
                         exploration.version, model
                     )
                 )
         except Exception:
             yield (
-                answerSubmittedEventLogEntryModel_validation_errors.InvalidExplorationIdError(
-                    model
-                )
+                statistics_validation_errors.InvalidExplorationIdError(model)
             )
