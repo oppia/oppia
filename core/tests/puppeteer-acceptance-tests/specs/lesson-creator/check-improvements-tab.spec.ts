@@ -68,7 +68,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
       // Improvements Tab should NOT be visible in a draft exploration.
-      await explorationEditor.expectImprovementsTabToBeHidden();
+      await explorationEditor.expectImprovementsTabToBePresnt(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

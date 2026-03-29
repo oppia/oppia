@@ -4605,9 +4605,12 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to verify that the improvements tab is hidden.
+   * @param visible - Expected visibility.
    */
-  async expectImprovementsTabToBeHidden(): Promise<void> {
-    await this.expectElementToBeVisible(improvementsTabButton, false);
+  async expectImprovementsTabToBePresnt(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(improvementsTabButton, visible);
   }
 
   /**
