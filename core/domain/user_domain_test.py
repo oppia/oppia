@@ -1956,3 +1956,23 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_contribution_rights.can_submit_at_least_one_item()
         )
+
+
+class UserIdByFirebaseAuthIdTests(test_utils.TestBase):
+    def test_valid_user_id(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('abc123')
+        obj.validate()  #  should not raise error
+
+    def test_invalid_user_id_type(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId(123)  # type: ignore
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            obj.validate()
+
+    def test_empty_user_id(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No user id specified.'
+        ):
+            obj.validate()

@@ -1850,3 +1850,18 @@ class TranslationCoordinatorStats:
             'coordinator_ids': self.coordinator_ids,
             'coordinators_count': self.coordinators_count,
         }
+
+
+class UserIdByFirebaseAuthId:
+    """Domain object for UserIdByFirebaseAuthIdModel."""
+
+    def __init__(self, user_id: str) -> None:
+        self.user_id = user_id
+
+    def validate(self) -> None:
+        if not isinstance(self.user_id, str):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id
+            )
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
