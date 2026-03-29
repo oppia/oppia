@@ -21,11 +21,6 @@ from __future__ import annotations
 import contextlib
 import logging
 import time
-
-from core import utils
-from core.platform import models
-
-from google.cloud import ndb
 from typing import (
     Any,
     ContextManager,
@@ -37,6 +32,11 @@ from typing import (
     TypeVar,
     Union,
 )
+
+from google.cloud import ndb
+
+from core import utils
+from core.platform import models
 
 MYPY = False
 if MYPY:  # pragma: no cover

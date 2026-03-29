@@ -11,7 +11,7 @@ filetype==1.2.0
 isort==5.13.2
 mypy==1.0.1
 Pillow==10.1.0
-packaging==24.2
+packaging==25.0
 psutil==7.0.0
 pycodestyle==2.14.0
 pylint==2.17.7

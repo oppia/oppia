@@ -196,11 +196,26 @@ def install_gcloud_sdk() -> None:
             # If the google cloud version is updated here, the corresponding
             # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
             # should also be updated.
-            common.url_retrieve(
+            if common.OS_NAME == 'Linux':
+                gcloud_os_name = 'linux'
+            elif common.OS_NAME == 'Darwin':
+                gcloud_os_name = 'darwin'
+            else:
+                raise Exception('Unsupported OS: %s' % common.OS_NAME)
+
+            if common.ARCHITECTURE in ('x86_64', 'amd64'):
+                gcloud_arch_name = 'x86_64'
+            elif common.ARCHITECTURE == 'arm64':
+                gcloud_arch_name = 'arm'
+            else:
+                gcloud_arch_name = 'x86'
+
+            gcloud_url = (
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-500.0.0-linux-x86_64.tar.gz',
-                'gcloud-sdk.tar.gz',
+                'google-cloud-sdk-500.0.0-%s-%s.tar.gz'
+                % (gcloud_os_name, gcloud_arch_name)
             )
+            common.url_retrieve(gcloud_url, 'gcloud-sdk.tar.gz')
         except Exception as e:
             print('Error downloading Google Cloud SDK. Exiting.')
             raise Exception('Error downloading Google Cloud SDK.') from e
