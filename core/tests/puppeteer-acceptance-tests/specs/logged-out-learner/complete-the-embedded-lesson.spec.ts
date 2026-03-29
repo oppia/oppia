@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * @fileoverview Acceptance test from CUJ spreadsheet
+ * https://docs.google.com/spreadsheets/d/1IrxN13IC5xwWdAFnGMu_4p3FUlADL4Q0-elZIuTow/
  *
- * EE. Learner can complete the embedded lesson
+ * LO.11. Play an embedded exploration
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -28,11 +28,6 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-
-/**
- * @fileoverview Acceptance Test for checking if a learner can play an
- * exploration in an embedded lesson
- */
 
 describe('Logged-Out Learner in Embedded Lesson', function () {
   let loggedOutUser: LoggedOutUser;
@@ -92,7 +87,7 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to play an embedded lesson',
+    'should be able to play and complete an embedded lesson',
     async function () {
       // Open the embedded exploration player.
       await loggedOutUser.goto(
@@ -102,34 +97,35 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
       // Verify UI elements expected in embedded player mode.
       await loggedOutUser.expectCardContentToMatch('Exploración de pruebas');
       await loggedOutUser.expectLanguageDropdownToBePresent();
+      await loggedOutUser.expectPageLanguageToMatch('en');
+
       await loggedOutUser.expectLessonInfoTextToBePresent(false);
       await loggedOutUser.expectVoiceoverBarToBePresent(false);
       await loggedOutUser.expectSignInButtonToBePresent(false);
       await loggedOutUser.expectProgressBarToBePresent(false);
+      await loggedOutUser.expectRateOptionsNotAvailable();
 
-      // Ensure visual regression snapshot matches expected UI.
+      // Screenshot verification.
       await loggedOutUser.expectScreenshotToMatch(
         'lessonPlayerEmbedded',
         __dirname
       );
 
-      // Submit correct answer to move to next card.
+      // Play until checkpoint.
       await loggedOutUser.submitAnswer('0');
       await loggedOutUser.expectContinueToNextCardButtonToBePresent();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+      await loggedOutUser.continueToNextCard();
 
-  it(
-    'should be able to complete the embedded lesson, but not rate the exploration',
-    async function () {
-      // Complete the exploration and expect completion toast message.
+      // TODO: Verify checkpoint behavior. Currently, the expected behavior is not observed (see issue #24066).
+
+      // Complete lesson.
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
 
-      // Logged-out users should not see rating options or suggestion section.
+      // Post-completion checks.
+      await loggedOutUser.expectEndChapterConfettiToBePresent();
       await loggedOutUser.expectRateOptionsNotAvailable();
       await loggedOutUser.expectSuggestionSectionToBePresent(false);
     },
@@ -143,10 +139,10 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
         `http://localhost:8181/embed/exploration/${explorationId}`
       );
 
-      // Change the site language using the embedded exploration URL parameter.
+      // Change the site language using the embedded exploration.
       await loggedOutUser.changeSiteLanguageForEmbeddedExploration('es');
 
-      // Verify Spanish placeholder appears in number input interaction.
+      // Verify Spanish placeholder.
       await loggedOutUser.expectNumberInputPlaceholderToMatch(
         'Ingresa un número'
       );

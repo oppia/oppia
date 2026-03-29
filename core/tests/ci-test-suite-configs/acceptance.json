@@ -105,8 +105,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
     },
     {
-      "name": "exploration-editor/check-improvements-tab",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/check-improvements-tab.spec.ts"
+      "name": "lesson-creator/check-improvements-tab",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts"
     },
     {
       "name": "lesson-creator/create-a-basic-exploration",

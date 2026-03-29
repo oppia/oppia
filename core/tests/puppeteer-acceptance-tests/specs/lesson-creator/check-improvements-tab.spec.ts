@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test to verify that the Improvements tab
- * is not visible for draft explorations in the exploration editor.
+ * @fileoverview Acceptance test from CUJ spreadsheet
+ * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/edit?gid=888982708#gid=888982708
+ *
+ * LC.13. Check Improvements Tab
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -27,7 +29,7 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Check Improvements Tab', function () {
+describe('Lesson Creator', function () {
   let explorationEditor: ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   const IMPROVEMENTS_TAB_FEATURE_FLAG = 'is_improvements_tab_enabled';
@@ -60,7 +62,7 @@ describe('Check Improvements Tab', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should not show improvements tab in a draft exploration',
+    'should not see improvements tab in draft exploration',
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();

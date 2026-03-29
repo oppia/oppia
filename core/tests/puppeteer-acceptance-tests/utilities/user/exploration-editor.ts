@@ -4607,43 +4607,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to verify that the improvements tab is hidden.
    */
   async expectImprovementsTabToBeHidden(): Promise<void> {
-    const improvementsTabs = await this.page.$$(improvementsTabButton);
-    if (improvementsTabs.length !== 0) {
-      throw new Error(
-        'Expected the improvements tab to be hidden, but it is visible.'
-      );
-    }
-  }
-
-  /**
-   * Function to verify that the improvements tab is visible.
-   */
-  async expectImprovementsTabToBeVisible(): Promise<void> {
-    // Wait a bit for the page to fully render after reload.
-    await this.page.waitForTimeout(2000);
-
-    // Check with retry logic.
-    let isVisible = false;
-    let attempts = 0;
-    const maxAttempts = 5;
-
-    while (!isVisible && attempts < maxAttempts) {
-      const improvementsTabs = await this.page.$$(improvementsTabButton);
-      if (improvementsTabs.length > 0) {
-        isVisible = true;
-        break;
-      }
-      attempts++;
-      if (attempts < maxAttempts) {
-        await this.page.waitForTimeout(1000);
-      }
-    }
-
-    if (!isVisible) {
-      throw new Error(
-        'Expected the improvements tab to be visible, but it is hidden.'
-      );
-    }
+    await this.expectElementToBeVisible(improvementsTabButton, false);
   }
 
   /**

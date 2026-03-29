@@ -465,6 +465,7 @@ const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
 const progressBarSelector = '.oppia-progress-bar';
 const suggestionSection = '.suggested-for-you-section';
+const endChapterConfettiSelector = 'oppia-end-chapter-confetti';
 
 const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = '.e2e-test-collapsible-heading';
@@ -6155,21 +6156,7 @@ export class LoggedOutUser extends BaseUser {
   async expectSuggestionSectionToBePresent(
     visible: boolean = true
   ): Promise<void> {
-    let isVisible = true;
-
-    try {
-      await this.page.waitForSelector(suggestionSection);
-    } catch (error) {
-      isVisible = false;
-    }
-
-    if (!visible === isVisible) {
-      throw new Error(
-        `Expected progress bar to be ${
-          visible ? 'visible' : 'hidden'
-        }, but it was ${isVisible ? 'visible' : 'hidden'}`
-      );
-    }
+    await this.expectElementToBeVisible(suggestionSection, visible);
   }
 
   /**
@@ -6177,25 +6164,22 @@ export class LoggedOutUser extends BaseUser {
    * @param visible - Expected visibility.
    */
   async expectProgressBarToBePresent(visible: boolean = true): Promise<void> {
-    let isVisible = true;
+    await this.expectElementToBeVisible(progressBarSelector, visible);
+  }
 
-    try {
-      await this.page.waitForSelector(progressBarSelector);
-    } catch (error) {
-      isVisible = false;
-    }
-
-    if (!visible === isVisible) {
-      throw new Error(
-        `Expected progress bar to be ${
-          visible ? 'visible' : 'hidden'
-        }, but it was ${isVisible ? 'visible' : 'hidden'}`
-      );
-    }
+  /**
+   * Checks if end-of-chapter confetti is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectEndChapterConfettiToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(endChapterConfettiSelector, visible);
   }
 
   /**
    * Check if the number input placeholder matches the expected text.
+   * @param expectedPlaceholder - Expected placeholder text of the input field.
    */
   async expectNumberInputPlaceholderToMatch(
     expectedPlaceholder: string
