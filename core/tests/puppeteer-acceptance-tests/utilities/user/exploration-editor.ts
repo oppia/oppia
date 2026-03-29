@@ -3480,13 +3480,22 @@ export class ExplorationEditor extends BaseUser {
     expectedCommunityOwnedMessage: string
   ): Promise<void> {
     await this.expectElementToBeVisible(communityOwnedMessageSelector);
-
-    const messageText = await this.page.$eval(
-      communityOwnedMessageSelector,
-      el => el.textContent?.trim() || ''
-    );
-
-    if (!messageText.includes(expectedCommunityOwnedMessage)) {
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const element = document.querySelector(selector);
+          const messageText = element?.textContent?.trim() || '';
+          return messageText.includes(expectedText);
+        },
+        {timeout: 5000},
+        communityOwnedMessageSelector,
+        expectedCommunityOwnedMessage
+      );
+    } catch {
+      const messageText = await this.page.$eval(
+        communityOwnedMessageSelector,
+        el => el.textContent?.trim() || ''
+      );
       throw new Error(
         `Expected community-owned message to contain "${expectedCommunityOwnedMessage}", but got: "${messageText}"`
       );

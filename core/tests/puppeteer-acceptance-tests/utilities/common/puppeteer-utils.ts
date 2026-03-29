@@ -483,7 +483,7 @@ export class BaseUser {
    */
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>,
-    timeout: number = 30000
+    timeout: number = 15000
   ): Promise<void> {
     const elementDesc = await this.getElementDescription(selector);
     showMessage(`Checking if element ${elementDesc} is clickable...`);

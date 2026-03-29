@@ -58,6 +58,7 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.navigateToSettingsTab();
     await expEditor1.expectRolesFormToBeOpen();
     await expEditor1.assignUserToManagerRoleAfterFormOpen('expEditor2');
+    await expEditor1.expectUserToBeExplorationManager('expEditor2');
 
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
