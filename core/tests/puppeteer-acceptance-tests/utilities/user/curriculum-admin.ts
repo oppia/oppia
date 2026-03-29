@@ -1673,7 +1673,22 @@ export class CurriculumAdmin extends TopicManager {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        this.page.click(mobileOptionsDropdown);
+        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
+        await this.page.click(mobileOptionsDropdown);
+        try {
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true, timeout: 10000}
+          );
+        } catch (error) {
+          await this.page.click(mobileOptionsDropdown);
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true}
+          );
+        }
+        // Ensure layout fully stabilized.
+        await this.waitForPageToFullyLoad();
       }
     } else {
       await this.page.waitForSelector(explorationSettingsTab, {visible: true});
