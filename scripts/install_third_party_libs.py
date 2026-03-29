@@ -450,7 +450,7 @@ def main() -> None:
     from scripts import (
         install_dependencies_json_packages,
         install_python_prod_dependencies,
-    )
+    )  # pylint: disable=wrong-import-position
 
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
