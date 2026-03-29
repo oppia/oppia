@@ -207,3 +207,11 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
     width: auto;
   }
 }
+
+.topic-viewer-content-wrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}

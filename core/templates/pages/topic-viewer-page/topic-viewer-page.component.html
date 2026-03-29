@@ -31,6 +31,7 @@
   </div>
   <background-banner></background-banner>
   <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
+  <div class="topic-viewer-content-wrapper">
     <div *ngIf="activeTab === 'story'" class="e2e-test-lessons-tab-container">
       <stories-list *ngIf="canonicalStorySummaries.length"
                     [topicName]="topicName"
@@ -72,4 +73,5 @@
       </subtopics-list>
     </div>
   </div>
+</div> 
 </div>

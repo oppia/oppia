@@ -85,17 +85,15 @@ def install_installation_tools() -> None:
 
         # We suppress the "Requirement already satisfied" warning since it
         # clutters the output.
-        proc_filter_output = subprocess.Popen(
-            ['grep', '-v', 'Requirement already satisfied'],
-            stdin=proc_pip_install.stdout,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-
         if proc_pip_install.stdout is not None:
-            proc_pip_install.stdout.close()
-
-        out, err = proc_filter_output.communicate()
+            raw_out, err = proc_pip_install.communicate()
+        else:
+            raw_out = b''
+            err = b''
+        out = b'\n'.join(
+            line for line in raw_out.splitlines()
+            if b'Requirement already satisfied' not in line
+        )
         if out:
             print(out.splitlines())
         if err:
