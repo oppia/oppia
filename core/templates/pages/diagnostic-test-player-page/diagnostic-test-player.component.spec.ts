@@ -355,6 +355,63 @@ describe('Diagnostic test player component', () => {
     expect(component.recommendedTopicSummaries).toEqual([topicData1]);
   }));
 
+  it('should filter out recommended topics that do not have a URL fragment', () => {
+    const topicData3 = new CreatorTopicSummary(
+      'dummy3',
+      'multiplication',
+      2,
+      2,
+      3,
+      3,
+      0,
+      'es',
+      'dummy3',
+      1,
+      1,
+      1,
+      1,
+      true,
+      true,
+      'math',
+      'public/img1.png',
+      'green',
+      null,
+      1,
+      1,
+      [5, 4],
+      [3, 4]
+    );
+
+    const classroomDataWithEmptyFragmentTopic = new ClassroomData(
+      'id',
+      'math',
+      'math',
+      [topicData1, topicData2, topicData3],
+      'dummy',
+      'dummy',
+      'dummy',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    component.classroomData = classroomDataWithEmptyFragmentTopic;
+
+    component.getRecommendedTopicSummaries(['dummy', 'dummy2', 'dummy3']);
+
+    // The topicData3 should be filtered out because its URL fragment is null.
+    expect(component.recommendedTopicSummaries).toEqual([
+      topicData1,
+      topicData2,
+    ]);
+  });
+
+  it('should return an empty string if the topic URL fragment is null or undefined', () => {
+    expect(component.getTopicUrlFromUrlFragment(null)).toEqual('');
+    expect(component.getTopicUrlFromUrlFragment(undefined)).toEqual('');
+  });
+
   it('should be able to set topic tracker model after starting diagnostic test', fakeAsync(() => {
     windowRef.nativeWindow.location.search = '?classroom=math';
     // A linear graph with 3 nodes.

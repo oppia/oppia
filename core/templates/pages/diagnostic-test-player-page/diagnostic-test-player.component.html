@@ -72,6 +72,7 @@
 
         <div class="oppia-topic-recommendation-container">
           <div *ngFor="let topicSummary of recommendedTopicSummaries"
+               *ngIf="topicSummary.getUrlFragment()"
                class="oppia-topic-summary-tile e2e-test-recommended-topic-summary-tile">
             <oppia-topic-summary-tile [topicSummary]="topicSummary"
                                       [classroomUrlFragment]="classroomUrlFragment"
