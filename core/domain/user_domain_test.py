@@ -1961,12 +1961,12 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
 class UserIdByFirebaseAuthIdTests(test_utils.TestBase):
     def test_valid_user_id(self) -> None:
         obj = user_domain.UserIdByFirebaseAuthId('abc123')
-        # should not raise error
+        # Should not raise error
         obj.validate()
 
     def test_invalid_user_id_type(self) -> None:
         # Here we use MyPy ignore because we are intentionally passing
-        # an integer to test validation for incorrect type.
+        # An integer to test validation for incorrect type
         # type: ignore[arg-type]
         obj = user_domain.UserIdByFirebaseAuthId(123)
         with self.assertRaisesRegex(
