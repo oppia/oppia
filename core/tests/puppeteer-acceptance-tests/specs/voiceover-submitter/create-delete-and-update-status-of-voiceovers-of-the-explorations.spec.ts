@@ -60,13 +60,13 @@ describe('Voiceover Submitter', function () {
     );
 
     // Creating exploration manually.
-    await curriculumAdm.navigateToCreatorDashboardPage();
+    await curriculumAdm.navigateToCreatorDashboardPageInExplorationEditor();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.waitForPageToFullyLoad();
-    await curriculumAdm.dismissWelcomeModal();
+    await curriculumAdm.dismissWelcomeModalInExplorationEditor();
 
     // Card 1 (Introduction).
-    await curriculumAdm.updateCardContent('What is 2 + 3?');
+    await curriculumAdm.updateCardContentInExplorationEditor('What is 2 + 3?');
 
     // Text input interaction.
     await curriculumAdm.addTextInputInteraction();
@@ -89,29 +89,36 @@ describe('Voiceover Submitter', function () {
     );
 
     // Hint.
-    await curriculumAdm.addHintToState(
+    await curriculumAdm.addHintToStateInExplorationEditor(
       'If you have 2 apples and someone gives you 3 apples, how many apples you have?'
     );
 
     // Solution.
-    await curriculumAdm.addSolutionToState('5', '2 + 3 = 5', false);
+    await curriculumAdm.addSolutionToStateInExplorationEditor(
+      '5',
+      '2 + 3 = 5',
+      false
+    );
 
-    await curriculumAdm.saveExplorationDraft();
+    await curriculumAdm.saveExplorationDraftInExplorationEditor();
 
     // Card 2 (End).
 
     await curriculumAdm.navigateToCard('End');
-    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await curriculumAdm.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
-    await curriculumAdm.saveExplorationDraft();
+    await curriculumAdm.saveExplorationDraftInExplorationEditor();
 
     // Publish.
 
-    explorationId = await curriculumAdm.publishExplorationWithMetadata(
-      'Exploration for voiceover submitter',
-      'Testing voiceover translations',
-      'Mathematics'
-    );
+    explorationId =
+      await curriculumAdm.publishExplorationWithMetadataInExplorationEditor(
+        'Exploration for voiceover submitter',
+        'Testing voiceover translations',
+        'Mathematics'
+      );
 
     await curriculumAdm.addSupportedLanguageAccentPair('English (India)');
 
@@ -212,7 +219,7 @@ describe('Voiceover Submitter', function () {
 
     await voiceoverSubmitter.deleteVoiceoverInCurrentCard();
 
-    await voiceoverSubmitter.saveExplorationDraft();
+    await voiceoverSubmitter.saveExplorationDraftInExplorationEditor();
   });
 
   it('should be able to add and remove voiceovers to explorations', async function () {
