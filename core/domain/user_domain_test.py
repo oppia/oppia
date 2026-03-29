@@ -1961,7 +1961,8 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
 class UserIdByFirebaseAuthIdTests(test_utils.TestBase):
     def test_valid_user_id(self) -> None:
         obj = user_domain.UserIdByFirebaseAuthId('abc123')
-        obj.validate()  #  should not raise error
+        # should not raise error
+        obj.validate()
 
     def test_invalid_user_id_type(self) -> None:
         # Here we use MyPy ignore because we are intentionally passing
