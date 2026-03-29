@@ -1859,6 +1859,7 @@ class UserIdByFirebaseAuthId:
         self.user_id = user_id
 
     def validate(self) -> None:
+        """Validates the user_id."""
         if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id

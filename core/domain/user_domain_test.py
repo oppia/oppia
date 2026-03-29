@@ -1964,7 +1964,8 @@ class UserIdByFirebaseAuthIdTests(test_utils.TestBase):
         obj.validate()  #  should not raise error
 
     def test_invalid_user_id_type(self) -> None:
-        obj = user_domain.UserIdByFirebaseAuthId(123)  # type: ignore
+        # type: ignore[arg-type]
+        obj = user_domain.UserIdByFirebaseAuthId(123)
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected user_id to be a string'
         ):
