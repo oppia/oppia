@@ -94,14 +94,11 @@ describe('Lesson Creator', function () {
       await explorationEditor.saveExplorationDraftFromSaveRecommendationModal();
       await explorationEditor.expectSaveDraftButtonToBeDisabled(true);
     },
-    50 * 60 * 1000 // Test takes longer that 35 minutes.
+    50 * 60 * 1000 // Test takes longer that 35 minutes
   );
 
   it(
     'should add a Continue Button interaction',
-    // Functionality has issues with continue button
-    // doesnt align with what the WIP doc states
-    // there is no feedback text for continue
     async function () {},
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -119,22 +116,20 @@ describe('Lesson Creator', function () {
       ]);
 
       // Add correct response. isLastResponse=false so modal stays open
-      // and we can add the default response next without reopening.
       await explorationEditor.addResponsesToTheInteraction(
         INTERACTION_TYPES.MULTIPLE_CHOICE,
         'Bold text',
         'Correct!',
         'Text Input - 3',
         true,
-        false // keep modal open
+        false
       );
 
-      // Now still inside the modal, add the default (wrong) response.
       await explorationEditor.addResponseDetailsInResponseModal(
         'Try again!',
         '1 - Intro',
         false,
-        true // isLastResponse=true closes modal
+        true
       );
 
       await explorationEditor.saveExplorationDraft(
@@ -155,10 +150,9 @@ describe('Lesson Creator', function () {
         'Type the word "bold" in the box below.'
       );
 
-      // addTextInputInteraction opens modal and saves with no customization.
       await explorationEditor.addTextInputInteraction();
 
-      // Now add the response with feedback and destination.
+      // Add response with feedback and destination
       await explorationEditor.addResponsesToTheInteraction(
         INTERACTION_TYPES.TEXT_INPUT,
         'bold',
