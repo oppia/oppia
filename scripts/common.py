@@ -28,6 +28,7 @@ import shutil
 import socket
 import ssl
 import subprocess
+import sys
 
 # Used for EAGAIN retries.
 import time
