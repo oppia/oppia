@@ -1,3 +1,9 @@
+.user-value {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .oppia-community-stats-value {
   color: rgb(51, 51, 51);
   font-family: Roboto, sans-serif;
