@@ -26,8 +26,6 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
-jest.setTimeout(900000);
-
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 

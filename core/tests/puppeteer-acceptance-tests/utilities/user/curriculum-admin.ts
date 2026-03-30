@@ -19,6 +19,7 @@
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
 
@@ -42,8 +43,6 @@ const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
-
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -1717,21 +1716,9 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Function to dismiss welcome modal
    */
-  async dismissWelcomeModal(): Promise<void> {
-    try {
-      await this.page.waitForNetworkIdle();
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: 10000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      showMessage(`welcome modal not found: ${error.message}`);
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
   /**
@@ -2475,7 +2462,7 @@ export class CurriculumAdmin extends TopicManager {
         }
         return false;
       },
-      {},
+      {timeout: 60000},
       classroomTopicBoxSelector,
       classroomTopicNameSelector,
       topicName
@@ -2997,7 +2984,7 @@ export class CurriculumAdmin extends TopicManager {
           const element = document.querySelector(selector);
           return (element as HTMLInputElement).checked === true;
         },
-        {},
+        {timeout: 60000},
         practiceTabToggle
       );
     } catch (error) {

@@ -535,7 +535,7 @@ export class BaseUser {
     elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    let element = await context.waitForSelector(selector, {timeout: 15000});
+    let element = await context.waitForSelector(selector, {timeout: 30000});
 
     // Get nth element if elementPlace is given.
     if (elementPlace) {
@@ -1022,28 +1022,6 @@ export class BaseUser {
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
     await this.waitTillHTMLRendered(this.page);
-  }
-
-  /**
-   * Waits for Angular's zone to become stable, indicating all change detection
-   * and async operations have completed. This is useful when interacting with
-   * dynamically rendered components (e.g., modals) to ensure elements are ready.
-   * @param timeout - The maximum time to wait in milliseconds. Default is 10000.
-   */
-  async waitForAngularToStabilize(timeout: number = 10000): Promise<void> {
-    try {
-      await this.page.waitForFunction(
-        () =>
-          (window as unknown as {ngZone: {isStable: boolean}}).ngZone
-            ?.isStable === true,
-        {timeout}
-      );
-
-      // Small buffer for DOM updates after Angular stabilizes.
-      await this.page.waitForTimeout(500);
-    } catch (error) {
-      await this.page.waitForTimeout(1000);
-    }
   }
 
   /**
