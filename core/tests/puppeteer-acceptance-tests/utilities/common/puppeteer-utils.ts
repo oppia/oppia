@@ -87,6 +87,7 @@ export class BaseUser {
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
   static instances: BaseUser[] = []; // Track instances.
+  static serverErrors: string[] = []; // Track server errors.
 
   constructor() {
     BaseUser.instances.push(this);
@@ -2253,6 +2254,14 @@ export class BaseUser {
   attachNavigationLogs(page: Page): void {
     page.on('framenavigated', frame => {
       showMessage('NAVIGATED: ' + frame.url());
+    });
+
+    page.on('response', response => {
+      if (response.status() >= 500 && response.url().startsWith(baseURL)) {
+        const errorMsg = `Server error: ${response.status()} at ${response.url()}`;
+        showMessage(errorMsg);
+        BaseUser.serverErrors.push(errorMsg);
+      }
     });
   }
 }
