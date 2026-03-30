@@ -365,10 +365,7 @@ export class BaseUser {
     }
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
-    await this.clickAndWaitForNavigation('Sign In', false, {
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
+    await this.clickAndWaitForNavigation('Sign In');
   }
 
   /**
@@ -383,10 +380,7 @@ export class BaseUser {
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
-    await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON, false, {
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
+    await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
   }
@@ -397,7 +391,7 @@ export class BaseUser {
   async reloadPage(): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.page.reload({
-      waitUntil: ['networkidle0', 'load'],
+      waitUntil: ['networkidle2', 'load'],
       timeout: 60000,
     });
   }
@@ -816,7 +810,7 @@ export class BaseUser {
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
     await this.page.goto(url, {
-      waitUntil: ['networkidle0', 'load'],
+      waitUntil: ['networkidle2', 'load'],
       timeout: 60000,
     });
 
