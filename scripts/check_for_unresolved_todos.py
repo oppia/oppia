@@ -50,6 +50,9 @@ class GitHubCommentDict(TypedDict):
     body: str
 
 
+# Here we use type Any because the nested dictionary from GraphQL response
+# can contain values of various types (strings, ints, dicts, lists, etc.),
+# and we cannot predict or specify the exact type of nested values.
 def deep_get(data: Optional[Dict[str, Any]], keys: List[str]) -> Any:
     """Gets a value from a nested dictionary. If the key is not found, it
     returns None.
@@ -115,6 +118,9 @@ def get_github_api_authorization_header() -> str:
     return f'Bearer {get_github_auth_token()}'
 
 
+# Here we use type Any because the GraphQL API returns a generic JSON object
+# with dynamic structure based on the query, so we cannot specify exact types
+# for all nested values in the response dictionary.
 def run_graphql_query(query: str) -> Dict[str, Any]:
     """Runs a GraphQL query on the Oppia repository.
 
@@ -150,6 +156,9 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         request = urllib.request.Request(url, request_data, headers)
         with urllib.request.urlopen(request) as response:
             if response.getcode() == 200:
+                # Here we use type Any because the json.loads() result contains
+                # a generic JSON object with dynamic keys and values that vary
+                # based on the GraphQL query structure.
                 data: Dict[str, Any] = json.loads(
                     response.read().decode('utf-8')
                 ).get('data')
