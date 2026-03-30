@@ -47,9 +47,9 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             content = (
                 f"""
                 The following TODOs are unresolved for this issue #4175:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
+                [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
+                [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
+                [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)
                 """
             ).lstrip('\n')
             file.write(textwrap.dedent(content))
@@ -59,8 +59,8 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             content = (
                 f"""
                 The following TODOs are unresolved for this issue #4176:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
+                [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
+                [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
                 """
             ).lstrip('\n')
             file.write(textwrap.dedent(content))
@@ -70,9 +70,9 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             content = (
                 f"""
                 The following TODOs are unresolved for this issue #4177:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L41
+                [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
+                [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
+                [oppia/scripts/common.py#L41]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L41)
                 """
             ).lstrip('\n')
             file.write(textwrap.dedent(content))
@@ -82,9 +82,9 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             content = (
                 f"""
                 The following TODOs are unresolved for this issue #4177:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
+                [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
+                [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
+                [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)
                 """
             ).lstrip('\n')
             file.write(textwrap.dedent(content))
@@ -128,9 +128,9 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4176:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L40
+                [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L38)
+                [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L39)
+                [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L40)
                 """
             ).lstrip('\n')
             return {'body': body} if issue == 4176 else None
@@ -161,9 +161,9 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4177:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
+                [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
+                [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
+                [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)
                 """
             ).lstrip('\n')
             return {'body': body} if pull_request == 1234 else None
@@ -196,9 +196,9 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4177:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
+                [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
+                [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
+                [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)
                 """
             ).lstrip('\n')
             return {'body': body} if pull_request == 1234 else None

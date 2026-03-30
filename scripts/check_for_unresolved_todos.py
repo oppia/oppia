@@ -379,13 +379,17 @@ def append_todos_to_file(
         for todo in sorted(
             todos, key=lambda todo: (todo['file_path'], todo['line_number'])
         ):
-            file.write(
+            relative_path = todo['file_path'].replace(repository_path, '', 1)
+            full_url = (
                 f'{github_perma_link_url}/'
-                + todo['file_path'].replace(repository_path, '', 1)
+                + relative_path
                 + '#L'
                 + str(todo['line_number'])
-                + '\n'
             )
+            display_text = (
+                'oppia/' + relative_path + '#L' + str(todo['line_number'])
+            )
+            file.write(f'[{display_text}]({full_url})\n')
 
 
 def log_unresolved_todos_failure(
