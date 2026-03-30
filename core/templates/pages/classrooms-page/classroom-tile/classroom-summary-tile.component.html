@@ -1,20 +1,23 @@
 <div class="oppia-classroom-tile-container e2e-test-classroom-tile"
      [ngClass]="{'classroom-tile-dropshadow': isPublished()}"
-     [ngStyle]="{'background-color': classroomSummary.is_published ? '#FFFFFF' : '#EEEEEE'}"
-    >
+     [ngStyle]="{'background-color': classroomSummary.is_published ? '#FFFFFF' : '#EEEEEE'}">
+
   <a [href]="getClassroomUrl()"
      class="classroom-content"
-     [ngClass]="{'diable-classroom-tile-click': !isPublished()}"
-  >
+     [ngClass]="{'diable-classroom-tile-click': !isPublished()}">
+
     <img alt="Classroom thumbnail image"
          class="classroom-thumbnail"
          [src]="classroomThumbnailUrl">
+
     <div class="classroom-text-container">
       <h3 class="classroom-name e2e-test-classroom-name">{{getName()}}</h3>
       <p class="classroom-teaser-text"
-         [ngClass]="{'private-classroom-teaser-text': !isPublished()}"
-      >{{getTeaserText()}}</p>
+         [ngClass]="{'private-classroom-teaser-text': !isPublished()}">
+        {{getTeaserText()}}
+      </p>
     </div>
+
   </a>
 </div>
 
@@ -37,9 +40,7 @@
     color: #005240;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 20px;
-    font-style: normal;
     font-weight: 400;
-    letter-spacing: 0.0075em;
     margin: 0;
     text-align: center;
   }
@@ -48,9 +49,6 @@
     color: #3c3c3c;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 18px;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: -0.02em;
     margin: 0;
     text-align: center;
     width: 158px;
@@ -69,6 +67,7 @@
     pointer-events: none;
   }
 
+  /* MAIN TILE */
   .oppia-classroom-tile-container {
     align-items: center;
     background-color: #fff;
@@ -78,17 +77,22 @@
     justify-content: center;
     padding: 35px;
     width: 278px;
+    transition: all 0.2s ease;
   }
 
-  .oppia-classroom-tile-container .classroom-content {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
+  /* FULL CLICK AREA */
+  .oppia-classroom-tile-container a {
     height: 100%;
-    justify-content: start;
-    text-decoration: none;
     width: 100%;
+    display: block;
+  }
+
+  /* HOVER EFFECT */
+  .oppia-classroom-tile-container:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
   }
 
   @media only screen and (max-width: 575px) {
