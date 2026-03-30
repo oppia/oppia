@@ -192,7 +192,7 @@ export class ProgressTabComponent {
       })
     );
 
-    this.displayInCommunityLessons = this.allCommunityLessons;
+    this.displayInCommunityLessons = this.allCommunityLessons.slice(0, this.pageSize);
     this.selectedSection = this.all;
     this.dropdownEnabled = false;
     this.currentGoalIds = new Set(this.currentGoals.map(g => g.id));
