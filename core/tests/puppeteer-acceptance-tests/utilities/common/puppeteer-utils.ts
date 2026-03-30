@@ -1617,6 +1617,7 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
