@@ -22,6 +22,11 @@ from scripts import github_api, todo_finder
 
 from typing import List, Optional
 
+# TODO(#6): Temporary workflow test first.
+# TODO(#6): Temporary workflow test SECOND.
+# TODO(#6): Temporary workflow test third.
+# TODO(#6): Temporary workflow test forth.
+
 UNRESOLVED_TODOS_PRESENT_INDICATOR = (
     'THERE ARE TODOS ASSOCIATED WITH THE PROVIDED ISSUES.'
 )
