@@ -380,12 +380,11 @@ def append_todos_to_file(
             todos, key=lambda todo: (todo['file_path'], todo['line_number'])
         ):
             file.write(
-                '`'
-                + f'{github_perma_link_url}/'
+                f'{github_perma_link_url}/'
                 + todo['file_path'].replace(repository_path, '', 1)
                 + '#L'
                 + str(todo['line_number'])
-                + '`\n'
+                + '\n'
             )
 
 
