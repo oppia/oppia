@@ -126,7 +126,6 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
       );
 
       // Post-completion checks.
-      // await loggedOutUser.expectEndChapterConfettiToBePresent();
       await loggedOutUser.expectRateOptionsNotAvailable();
       await loggedOutUser.expectSuggestionSectionToBePresent(false);
     },
