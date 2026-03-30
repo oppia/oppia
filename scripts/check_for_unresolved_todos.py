@@ -289,10 +289,11 @@ def fetch_latest_comment_from_pull_request(
     return next(iter(latest_comment_nodes), None)
 
 
-# TODO(#6): Temporary workflow test first.
-# TODO(#6): Temporary workflow test SECOND.
-# TODO(#6): Temporary workflow test third.
-# TODO(#6): Temporary workflow test forth.
+# TODO(#9): Temporary workflow test first.
+# TODO(#9): Temporary workflow test SECOND.
+# TODO(#9): Temporary workflow test third.
+# TODO(#9): Temporary workflow test forth.
+# TODO(#9): Temporary workflow test FIVE.
 
 UNRESOLVED_TODOS_PRESENT_INDICATOR = (
     'THERE ARE TODOS ASSOCIATED WITH THE PROVIDED ISSUES.'
