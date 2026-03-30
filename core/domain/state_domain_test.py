@@ -3686,7 +3686,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                 invalid_content_id_to_delete  # type: ignore[arg-type]
             )
 
-    def test_validation_with_invalid_content_id_raise_error(self) -> None:
+    def test_validation_fails_for_invalid_content_id(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
@@ -3723,7 +3723,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
-    def test_validation_with_invalid_type_language_code_raise_error(
+    def test_validation_fails_for_invalid_type_language_code(
         self,
     ) -> None:
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
@@ -3748,7 +3748,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         ):
             recorded_voiceovers.validate(['content'])
 
-    def test_validation_with_unknown_language_code_raise_error(self) -> None:
+    def test_validation_fails_for_unknown_language_code(self) -> None:
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
@@ -3769,7 +3769,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid language_code: ed'):
             recorded_voiceovers.validate(['content'])
 
-    def test_validation_with_invalid_content_id_list(self) -> None:
+    def test_validation_fails_for_invalid_content_id_list(self) -> None:
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
