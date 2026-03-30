@@ -7441,6 +7441,33 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(creatorDashboardMenuLink);
     await this.expectElementToBeVisible(creatorDashboardContainerSelector);
   }
+
+  /**
+   * Verifies that the placeholder text of a Number Input interaction matches the expected string.
+   * @param {string} expectedPlaceholder - The expected placeholder text (e.g., 'Ingresa un número').
+   */
+  async expectNumericInputPlaceholderToBe(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    const numericInputSelector = '.e2e-test-float-form-input';
+
+    await this.page.waitForSelector(numericInputSelector, {visible: true});
+
+    const actualPlaceholder = await this.page.$eval(
+      numericInputSelector,
+      element => (element as HTMLInputElement).placeholder
+    );
+
+    if (actualPlaceholder !== expectedPlaceholder) {
+      throw new Error(
+        `Expected numeric input placeholder to be "${expectedPlaceholder}", but found "${actualPlaceholder}".`
+      );
+    }
+
+    console.log(
+      `Successfully verified numeric input placeholder: ${actualPlaceholder}`
+    );
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>

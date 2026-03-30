@@ -1643,6 +1643,18 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Clicks the save changes button on the preferences page.
+   */
+  async savePreferences(): Promise<void> {
+    const saveButtonSelector = '.e2e-test-save-changes-button';
+
+    await this.page.waitForSelector(saveButtonSelector, {visible: true});
+    await this.page.click(saveButtonSelector);
+
+    await this.waitForNetworkIdle();
+  }
+
+  /**
    * Navigates to the Profile tab from the Preferences page.
    */
   async navigateToProfilePageFromPreferencePage(): Promise<void> {

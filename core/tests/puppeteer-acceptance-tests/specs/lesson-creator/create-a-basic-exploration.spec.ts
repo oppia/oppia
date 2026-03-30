@@ -94,7 +94,31 @@ describe('Lesson Creator', function () {
     50 * 60 * 1000 // Test takes longer that 35 minutes.
   );
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
+  it(
+    'should show Spanish placeholder for Number Input interaction',
+    async function () {
+      await explorationEditor.navigateToPreferencesPage();
+      await explorationEditor.updatePreferredSiteLanguage('Español');
+      await explorationEditor.savePreferences();
+      await explorationEditor.navigateToCreatorDashboardUsingProfileDropdown();
+      await explorationEditor.expectToBeInCreatorDashboard();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+
+      try {
+        await explorationEditor.dismissWelcomeModal();
+      } catch (error) {
+        console.log('Welcome modal not present, proceeding.');
+      }
+
+      await explorationEditor.updateCardContent(
+        'Por favor, responde la siguiente pregunta:'
+      );
+
+      await explorationEditor.addInteraction('Number Input');
+      await explorationEditor.expectNumericInputPlaceholderToBe(
+        'Ingresa un número'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 });
