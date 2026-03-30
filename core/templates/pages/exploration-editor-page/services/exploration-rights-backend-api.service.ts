@@ -19,17 +19,23 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
+interface ExplorationRightsDict {
+  cloned_from: string;
+  status: string;
+  community_owned: boolean;
+  owner_names: string[];
+  editor_names: string[];
+  voice_artist_names: string[];
+  viewer_names: string[];
+  viewable_if_private: boolean;
+}
+
 export interface ExplorationRightsBackendData {
-  rights: {
-    cloned_from: string;
-    status: string;
-    community_owned: boolean;
-    owner_names: string[];
-    editor_names: string[];
-    voice_artist_names: string[];
-    viewer_names: string[];
-    viewable_if_private: boolean;
-  };
+  rights: ExplorationRightsDict;
+}
+
+export interface ModeratorRightsBackendData {
+  rights_dict: ExplorationRightsDict;
 }
 
 @Injectable({
@@ -102,11 +108,11 @@ export class ExplorationRightsBackendApiService {
     explorationId: string,
     version: number,
     emailBody: string
-  ): Promise<ExplorationRightsBackendData> {
+  ): Promise<ModeratorRightsBackendData> {
     const requestUrl = '/createhandler/moderatorrights/' + explorationId;
 
     return this.http
-      .put<ExplorationRightsBackendData>(requestUrl, {
+      .put<ModeratorRightsBackendData>(requestUrl, {
         email_body: emailBody,
         version: version,
       })
