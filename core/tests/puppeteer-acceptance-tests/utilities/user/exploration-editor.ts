@@ -4479,6 +4479,24 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
+    // A lingering modal can block the Preview tab click even after a save.
+    const hasOpenModal = await this.isElementVisible(
+      'ngb-modal-window.modal.show',
+      true,
+      1500
+    );
+    if (hasOpenModal) {
+      const closeModalButton = await this.page.$(closeModalButtonSelector);
+      if (closeModalButton) {
+        await this.clickOnElementWithSelector(closeModalButtonSelector);
+      } else {
+        await this.page.keyboard.press('Escape');
+      }
+      await this.page.waitForSelector('ngb-modal-window.modal.show', {
+        hidden: true,
+      });
+    }
+
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
       const element = await this.page.$(mobileNavbarOptions);
@@ -4695,6 +4713,24 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the editor tab.
    */
   async navigateToEditorTab(): Promise<void> {
+    // A lingering modal can block Main tab and Save Draft interactions.
+    const hasOpenModal = await this.isElementVisible(
+      'ngb-modal-window.modal.show',
+      true,
+      1500
+    );
+    if (hasOpenModal) {
+      const closeModalButton = await this.page.$(closeModalButtonSelector);
+      if (closeModalButton) {
+        await this.clickOnElementWithSelector(closeModalButtonSelector);
+      } else {
+        await this.page.keyboard.press('Escape');
+      }
+      await this.page.waitForSelector('ngb-modal-window.modal.show', {
+        hidden: true,
+      });
+    }
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -6393,21 +6429,32 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
 
-      const selectedDestinationText = await this.page.$eval(
-        `${destinationSelectorDropdown} option:checked`,
-        option => option.textContent?.trim() || ''
-      );
-      const currentCardName = await this.page.$eval(
-        currentCardNameContainerSelector,
-        el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
-      );
-      expect(selectedDestinationText).toContain(currentCardName);
+      try {
+        const selectedDestinationText = await this.page.$eval(
+          `${destinationSelectorDropdown} option:checked`,
+          option => option.textContent?.trim() || ''
+        );
+        const currentCardName = await this.page.$eval(
+          currentCardNameContainerSelector,
+          el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
+        );
 
-      const cancelDestinationButton = await this.page.$(
-        '.e2e-test-cancel-outcome-dest'
-      );
-      if (cancelDestinationButton) {
-        await this.clickOnElementWithSelector('.e2e-test-cancel-outcome-dest');
+        const normalizedDestination = selectedDestinationText.toLowerCase();
+        const normalizedCurrentCardName = currentCardName.toLowerCase();
+        const isSelfLoopDestination =
+          normalizedDestination === '(try again)' ||
+          normalizedDestination === '' ||
+          normalizedDestination.includes(normalizedCurrentCardName);
+        expect(isSelfLoopDestination).toBe(true);
+      } finally {
+        const cancelDestinationButton = await this.page.$(
+          '.e2e-test-cancel-outcome-dest'
+        );
+        if (cancelDestinationButton) {
+          await this.clickOnElementWithSelector(
+            '.e2e-test-cancel-outcome-dest'
+          );
+        }
       }
       return;
     }

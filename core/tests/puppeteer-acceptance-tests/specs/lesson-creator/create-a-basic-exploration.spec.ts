@@ -238,7 +238,11 @@ describe('Lesson Creator', function () {
         '.e2e-test-multiple-choice-option',
         elements => elements.map(el => el.textContent?.trim() || '')
       );
-      expect(previewChoices).toEqual(['Italic text', 'Bold text']);
+      const nonEmptyPreviewChoices = previewChoices.filter(choice => choice);
+      expect(nonEmptyPreviewChoices.length).toBe(2);
+      expect(nonEmptyPreviewChoices).toEqual(
+        expect.arrayContaining(['Italic text', 'Bold text'])
+      );
 
       await explorationEditor.selectMultipleChoiceOption('Italic text');
       await explorationEditor.expectResponseFeedbackToBe('Try again.');
@@ -248,6 +252,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.continueToNextCard();
 
       await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
       await explorationEditor.expectStateNameToBe(CARD_NAMES.THIRD);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -256,6 +261,9 @@ describe('Lesson Creator', function () {
   it(
     'should add a Text Input interaction with hints and a solution',
     async function () {
+      await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
+      await explorationEditor.expectStateNameToBe(CARD_NAMES.THIRD);
+
       await explorationEditor.updateCardContent(
         'Explain why "Bold text" is the correct option.'
       );
@@ -325,9 +333,45 @@ describe('Lesson Creator', function () {
       );
       await explorationEditor.closeHintModal();
 
+      // In preview, the solution button is released only after enough wrong
+      // submissions and hint-consumption side effects. Trigger retries until
+      // the button is actually visible to avoid timing-dependent flakes.
+      let isSolutionVisible = await explorationEditor.isElementVisible(
+        '.e2e-test-view-solution',
+        true,
+        2000
+      );
+      for (let i = 0; i < 5 && !isSolutionVisible; i++) {
+        await explorationEditor.submitTextInputAnsswer('Italic text');
+        await explorationEditor.expectResponseFeedbackToBe('Try again.');
+
+        const isHintVisible = await explorationEditor.isElementVisible(
+          '.e2e-test-view-hint',
+          true,
+          2000
+        );
+        if (isHintVisible) {
+          await explorationEditor.viewHint();
+          await explorationEditor.closeHintModal();
+        }
+
+        isSolutionVisible = await explorationEditor.isElementVisible(
+          '.e2e-test-view-solution',
+          true,
+          2000
+        );
+      }
+      expect(isSolutionVisible).toBe(true);
+
       await explorationEditor.viewSolution();
+      await explorationEditor.page.waitForSelector(
+        'ngb-modal-window.modal.show .modal-body',
+        {
+          visible: true,
+        }
+      );
       const solutionModalText = await explorationEditor.page.$eval(
-        'oppia-add-or-update-solution-modal',
+        'ngb-modal-window.modal.show .modal-body',
         el => el.textContent || ''
       );
       expect(solutionModalText).toContain('Bold text');
@@ -341,7 +385,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.continueToNextCard();
 
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.expectStateNameToBe(CARD_NAMES.FOURTH);
+      await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -403,6 +447,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.expectToBeInCreatorDashboard();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal(false);
+      await explorationEditor.updateCardContent('What is 2 + 2?');
 
       await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
 

@@ -4910,6 +4910,27 @@ export class LoggedOutUser extends BaseUser {
    * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
    */
   async viewSolution(timeout: number = 60000): Promise<void> {
+    const isSolutionButtonVisible = await this.isElementVisible(
+      viewSolutionButton,
+      true,
+      3000
+    );
+
+    // In some flows, the learner must consume the currently-visible hint
+    // before the solution button is shown.
+    if (!isSolutionButtonVisible) {
+      const isHintButtonVisible = await this.isElementVisible(
+        hintButtonSelector,
+        true,
+        3000
+      );
+
+      if (isHintButtonVisible) {
+        await this.viewHint();
+        await this.closeHintModal();
+      }
+    }
+
     await this.page.waitForSelector(viewSolutionButton, {
       visible: true,
       timeout: timeout,
