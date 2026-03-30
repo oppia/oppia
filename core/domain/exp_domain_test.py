@@ -3041,7 +3041,7 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         exploration.title = 'Hello #'
         self._assert_validation_error(exploration, 'Invalid character #')
 
-    def test_validation_invalid_state_name(self) -> None:
+    def test_validation_fails_for_invalid_state_name(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
@@ -3062,17 +3062,17 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
             exploration, 'Invalid character / in a state name'
         )
 
-    def test_validation_empty_states(self) -> None:
+    def test_validation_fails_for_empty_states(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.states = {}
         self._assert_validation_error(exploration, 'exploration has no states')
 
-    def test_validation_invalid_init_state(self) -> None:
+    def test_validation_fails_for_invalid_init_state(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.init_state_name = ''
         self._assert_validation_error(exploration, 'has no initial state name')
 
-    def test_validation_invalid_destination(self) -> None:
+    def test_validation_fails_for_invalid_destination(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
@@ -3101,7 +3101,7 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
             exploration, 'Expected all content id indexes to be less than'
         )
 
-    def test_validation_invalid_rulespec(self) -> None:
+    def test_validation_fails_for_invalid_rulespec(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
@@ -3148,7 +3148,7 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
             exploration, 'RuleSpec \'Equals\' is missing inputs'
         )
 
-    def test_validation_invalid_interaction(self) -> None:
+    def test_validation_fails_for_invalid_interaction(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         state = list(exploration.states.values())[0]
 
@@ -3159,13 +3159,13 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
             exploration, 'Expected interaction id to be a string'
         )
 
-    def test_validation_invalid_language_code(self) -> None:
+    def test_validation_fails_for_invalid_language_code(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.language_code = 'fake_code'
 
         self._assert_validation_error(exploration, 'Invalid language_code')
 
-    def test_validation_invalid_param_specs(self) -> None:
+    def test_validation_fails_for_invalid_param_specs(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         # Here we use MyPy ignore because we intentionally assign an invalid type to test validation.
         exploration.param_specs = 'A string'  # type: ignore[assignment]
