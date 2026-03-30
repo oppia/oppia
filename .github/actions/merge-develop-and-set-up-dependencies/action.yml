@@ -68,6 +68,21 @@ runs:
         # resulting in the occasional "No module named PIL" errors in CI.
         command: python -m scripts.install_python_dev_dependencies
 
+    # Compiled C extensions like psutil and PIL may not be properly restored
+    # from the cache, causing "No module named 'psutil'" errors. This step
+    # verifies that critical dev dependencies are importable and re-installs
+    # them if they are missing. See issue #25314.
+    - name: Verify critical Python dev dependencies are available
+      run: |
+        echo "Verifying critical Python dev dependencies..."
+        if ! python -c "import psutil; import PIL" 2>/dev/null; then
+          echo "One or more critical dev dependencies are missing. Re-installing..."
+          python -m scripts.install_python_dev_dependencies
+        else
+          echo "All critical dev dependencies are available."
+        fi
+      shell: bash
+
     - name: Show where pip installs its packages, and the contents of that folder.
       run: |
         pip show certifi
