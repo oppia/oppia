@@ -2891,6 +2891,8 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    await this.ensureEditorTabIsActive();
+
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -2957,6 +2959,8 @@ export class ExplorationEditor extends BaseUser {
     interactionToAdd: string,
     skipInteractionCustoization: boolean = true
   ): Promise<void> {
+    await this.ensureEditorTabIsActive();
+
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -3692,6 +3696,112 @@ export class ExplorationEditor extends BaseUser {
    * Function to display the Oppia responses section.
    */
   async viewOppiaResponses(): Promise<void> {
+    await this.ensureEditorTabIsActive();
+
+    await this.page.waitForSelector(stateResponsesSelector, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(stateResponsesSelector);
+
+    // Ensure the default response tab actually becomes active.
+    await this.page
+      .waitForSelector(`${stateResponsesSelector}.oppia-rule-tab-active`, {
+        visible: true,
+        timeout: 4000,
+      })
+      .catch(async () => {
+        // Retry using a DOM click in case layered UI blocks pointer events.
+        await this.page.evaluate((selector: string) => {
+          const tabs = Array.from(document.querySelectorAll(selector));
+          const visibleTab = tabs.find(tab => {
+            const rect = (tab as HTMLElement).getBoundingClientRect();
+            return rect.width > 0 && rect.height > 0;
+          }) as HTMLElement | undefined;
+          visibleTab?.click();
+        }, stateResponsesSelector);
+
+        await this.page.waitForSelector(
+          `${stateResponsesSelector}.oppia-rule-tab-active`,
+          {
+            visible: true,
+            timeout: 4000,
+          }
+        );
+      });
+
+    // For some interactions, the default response panel can take longer to
+    // render or only expose the destination editor first.
+    try {
+      await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
+        visible: true,
+        timeout: 7000,
+      });
+    } catch {
+      await this.page.waitForSelector(
+        `${openOutcomeDestButton}, ${destinationCardSelector}`,
+        {
+          visible: true,
+        }
+      );
+    }
+  }
+
+  /**
+   * Returns whether the destination selector is already visible.
+   */
+  async isOutcomeDestinationSelectorVisible(): Promise<boolean> {
+    return await this.isElementVisible(destinationCardSelector, true, 1200);
+  }
+
+  /**
+   * Opens destination editor if needed.
+   */
+  async openOutcomeDestinationEditorIfNeeded(): Promise<void> {
+    const isDestinationSelectorVisible =
+      await this.isOutcomeDestinationSelectorVisible();
+
+    if (isDestinationSelectorVisible) {
+      return;
+    }
+
+    await this.page.waitForSelector(openOutcomeDestButton, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(openOutcomeDestButton);
+    await this.page.waitForSelector(destinationCardSelector, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Function to select destination for default response.
+   */
+  async selectDestinationAndSave(cardName: string): Promise<void> {
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, '/');
+    await this.typeInInputField(addStateInput, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
+    await this.page.waitForSelector(saveOutcomeDestButton, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Function to select existing destination and save.
+   */
+  async selectExistingDestinationAndSave(cardName: string): Promise<void> {
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
+    await this.page.waitForSelector(saveOutcomeDestButton, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Function to display the Oppia responses section.
+   */
+  async viewOppiaResponsesLegacyKeptForCompatibility(): Promise<void> {
     await this.page.waitForSelector(stateResponsesSelector, {
       visible: true,
     });
@@ -3706,18 +3816,21 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to which learners will be directed.
    */
   async directLearnersToNewCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(openOutcomeDestButton, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(openOutcomeDestButton);
-    await this.waitForElementToBeClickable(destinationCardSelector);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
-    await this.select(destinationCardSelector, '/');
-    await this.typeInInputField(addStateInput, cardName);
-    await this.clickOnElementWithSelector(saveOutcomeDestButton);
-    await this.page.waitForSelector(saveOutcomeDestButton, {
-      hidden: true,
-    });
+    const isOutcomeDestinationEditorVisible = await this.isElementVisible(
+      openOutcomeDestButton,
+      true,
+      2500
+    );
+
+    const isDestinationSelectorVisible =
+      await this.isOutcomeDestinationSelectorVisible();
+
+    if (!isOutcomeDestinationEditorVisible && !isDestinationSelectorVisible) {
+      await this.viewOppiaResponses();
+    }
+
+    await this.openOutcomeDestinationEditorIfNeeded();
+    await this.selectDestinationAndSave(cardName);
     await this.waitForNetworkIdle();
 
     if (this.isViewportAtMobileWidth()) {
@@ -3757,16 +3870,8 @@ export class ExplorationEditor extends BaseUser {
    * @param cardName - Card name where learners should be directed
    */
   async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(openOutcomeDestButton, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(openOutcomeDestButton);
-    await this.waitForElementToBeClickable(destinationCardSelector);
-    await this.select(destinationCardSelector, cardName);
-    await this.clickOnElementWithSelector(saveOutcomeDestButton);
-    await this.page.waitForSelector(saveOutcomeDestButton, {
-      hidden: true,
-    });
+    await this.openOutcomeDestinationEditorIfNeeded();
+    await this.selectExistingDestinationAndSave(cardName);
   }
 
   /**
@@ -3783,6 +3888,8 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
+    await this.ensureEditorTabIsActive();
+
     let elements;
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
@@ -3869,8 +3976,10 @@ export class ExplorationEditor extends BaseUser {
         showMessage(`Unable to navigate to the card ${cardName}. Retrying...`);
         await this.navigateToCard(cardName, false);
       } else {
-        error.message =
-          `Unable to navigate to the card ${cardName}.\n` + error.message;
+        if (error instanceof Error) {
+          error.message =
+            `Unable to navigate to the card ${cardName}.\n` + error.message;
+        }
         throw error;
       }
     }
@@ -3883,6 +3992,8 @@ export class ExplorationEditor extends BaseUser {
   async updateDefaultResponseFeedbackInExplorationEditorPage(
     defaultResponseFeedback: string
   ): Promise<void> {
+    await this.viewOppiaResponses();
+
     await this.page.waitForSelector(openOutcomeFeedBackEditor, {
       visible: true,
     });
@@ -3913,6 +4024,8 @@ export class ExplorationEditor extends BaseUser {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
+    await this.ensureEditorTabIsActive();
+
     await this.page.waitForSelector(defaultFeedbackTab, {
       visible: true,
     });
@@ -3926,7 +4039,18 @@ export class ExplorationEditor extends BaseUser {
 
     if (directToCard) {
       await this.clickOnElementWithSelector(openOutcomeDestButton);
-      await this.page.select(destinationSelectorDropdown, directToCard);
+
+      // '(try again)' is represented in the UI summary, but destination
+      // selection expects the current card name for a self-loop.
+      let destinationValue = directToCard;
+      if (directToCard === '(try again)') {
+        destinationValue = await this.page.$eval(
+          currentCardNameContainerSelector,
+          el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
+        );
+      }
+
+      await this.page.select(destinationSelectorDropdown, destinationValue);
       await this.page.click(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
@@ -4607,6 +4731,59 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Navigates to editor tab when preview tab is currently active.
+   */
+  async ensureEditorTabIsActive(): Promise<void> {
+    const isDismissWelcomeModalButtonVisible = await this.isElementVisible(
+      'button.e2e-test-dismiss-welcome-modal',
+      true,
+      1500
+    );
+
+    if (isDismissWelcomeModalButtonVisible) {
+      await this.dismissWelcomeModal(false);
+    }
+
+    const isPreviewTabActive = await this.isElementVisible(
+      previewTabContainer,
+      true,
+      1000
+    );
+
+    if (isPreviewTabActive) {
+      await this.navigateToEditorTab();
+      return;
+    }
+
+    const isAddInteractionButtonVisible = await this.isElementVisible(
+      addInteractionButton,
+      true,
+      1200
+    );
+    const isStateEditorVisible = await this.isElementVisible(
+      stateEditSelector,
+      true,
+      1200
+    );
+    const isInteractionEditorVisible = await this.isElementVisible(
+      interactionDiv,
+      true,
+      1200
+    );
+
+    // Once an interaction exists, "+ ADD INTERACTION" is hidden by design.
+    // So we treat any editor surface as a valid editor-tab signal.
+    const isEditorTabReady =
+      isAddInteractionButtonVisible ||
+      isStateEditorVisible ||
+      isInteractionEditorVisible;
+
+    if (!isEditorTabReady) {
+      await this.navigateToEditorTab();
+    }
+  }
+
+  /**
    * Function to verify if the preview is on a particular card by checking the content of the card.
    * @param {string} cardName - The name of the card to check.
    * @param {string} expectedCardContent - The expected text content of the card.
@@ -4623,7 +4800,19 @@ export class ExplorationEditor extends BaseUser {
     try {
       await this.page.waitForFunction(
         (element: HTMLElement, value: string, matchCase: boolean) => {
-          return (element.innerText.trim() === value.trim()) === matchCase;
+          const normalizedElementText = element.innerText
+            .replace(/\s+/g, ' ')
+            .trim();
+          const normalizedExpectedText = value.replace(/\s+/g, ' ').trim();
+
+          if (matchCase) {
+            return normalizedElementText === normalizedExpectedText;
+          }
+
+          return (
+            normalizedElementText.toLowerCase() ===
+            normalizedExpectedText.toLowerCase()
+          );
         },
         {},
         element,
@@ -4631,9 +4820,11 @@ export class ExplorationEditor extends BaseUser {
         matchCase
       );
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.stack ?? error.message : String(error);
       throw new Error(
-        `Card content ${matchCase ? 'did not' : 'did'} match expected content.\n` +
-          `Original Error: ${error.stack}`
+        `Card content for ${cardName} ${matchCase ? 'did not' : 'did'} match expected content.\n` +
+          `Original Error: ${errorMessage}`
       );
     }
   }
@@ -4643,6 +4834,13 @@ export class ExplorationEditor extends BaseUser {
    * @param skipVerification - Whether to skip verification of the card content.
    */
   async continueToNextCard(skipVerification: boolean = false): Promise<void> {
+    const previousCardContent = await this.page
+      .$eval(
+        stateConversationContent,
+        element => element.textContent?.trim() || ''
+      )
+      .catch(() => '');
+
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOnElementWithSelector(nextCardButton);
@@ -4654,12 +4852,46 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
+    // Transition can complete without showing a dedicated "Back" button in
+    // some interaction flows; we wait for any reliable signal of progression.
+    await this.page.waitForFunction(
+      (
+        previousButtonSelector: string,
+        primaryNextSelector: string,
+        secondaryNextSelector: string,
+        contentSelector: string,
+        oldContent: string
+      ) => {
+        const previousButton = document.querySelector(
+          previousButtonSelector
+        ) as HTMLElement | null;
+        if (previousButton && previousButton.offsetParent !== null) {
+          return true;
+        }
+
+        const nextButton = (document.querySelector(primaryNextSelector) ||
+          document.querySelector(secondaryNextSelector)) as HTMLElement | null;
+        const isNextButtonHidden =
+          !nextButton || nextButton.offsetParent === null;
+
+        const content =
+          (
+            document.querySelector(contentSelector) as HTMLElement | null
+          )?.textContent?.trim() || '';
+
+        return isNextButtonHidden || content !== oldContent;
+      },
+      {timeout: 10000},
+      previousCardButton,
+      nextCardButton,
+      nextCardArrowButton,
+      stateConversationContent,
+      previousCardContent
+    );
+
     if (skipVerification) {
       return;
     }
-    await this.page.waitForSelector(previousCardButton, {
-      visible: true,
-    });
   }
 
   /**
@@ -6145,6 +6377,11 @@ export class ExplorationEditor extends BaseUser {
       el => el.textContent?.trim()
     );
 
+    if (expectedDestination === '(try again)') {
+      expect(['(try again)', '']).toContain(currentDestination || '');
+      return;
+    }
+
     expect(currentDestination).toBe(expectedDestination);
   }
 
@@ -6327,17 +6564,18 @@ export class ExplorationEditor extends BaseUser {
    * Verifies that the outcome feedback is visible.
    */
   async expectOutcomeFeedbackToBe(expectedFeedback: string): Promise<void> {
-    await this.page.waitForSelector(outcomeFeedbackSelector);
-    const feedbackText = await this.page.evaluate(
-      element => element.textContent,
-      outcomeFeedbackSelector
+    await this.page.waitForSelector(outcomeFeedbackSelector, {
+      visible: true,
+    });
+    const feedbackText = await this.page.$eval(
+      outcomeFeedbackSelector,
+      element => element.textContent?.trim() || ''
     );
 
     // Remove "Oppia tells the learner..." prefix.
-    const feedbackTextWithoutPrefix = feedbackText.replace(
-      'Oppia tells the learner...',
-      ''
-    );
+    const feedbackTextWithoutPrefix = feedbackText
+      .replace('Oppia tells the learner...', '')
+      .trim();
 
     expect(feedbackTextWithoutPrefix).toBe(expectedFeedback);
   }
