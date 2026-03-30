@@ -3011,7 +3011,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration.validate(strict=True)
 
 
-# TODO(#20377): The validation tests below should be split into separate
+
 # unit tests. Also, all validation errors should be covered in the tests.
 
 
