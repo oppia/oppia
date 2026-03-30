@@ -40,6 +40,9 @@ from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
 from scripts import install_python_prod_dependencies
+from scripts import (
+    dependency_utils,
+)
 
 from typing import Final
 
@@ -50,6 +53,12 @@ TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
 
 _PARSER: Final = argparse.ArgumentParser(
     description='Installation script for Oppia third-party libraries.'
+)
+
+_PARSER.add_argument(
+    '--force',
+    help='Force the installation of all third-party libraries, bypassing the cache.',
+    action='store_true',
 )
 
 
@@ -420,11 +429,28 @@ def install_elasticsearch_dev_server() -> None:
 
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
+    args = _PARSER.parse_args()
+
+    # Initialize the gatekeeper
+    # Use common.THIRD_PARTY_PYTHON_LIBS_DIR or the specific libs path
+    gatekeeper = dependency_utils.DependencyGatekeeper(
+        python_libs_dir=common.THIRD_PARTY_PYTHON_LIBS_DIR
+    )
+
+    # Check the cache using 'args.force'
+    is_python_install_required = getattr(args, 'force', False) or gatekeeper.is_install_required()
+    if not is_python_install_required:
+        print(
+            "Python dependencies match the local cache. Skipping Python installation."
+        )
+
     print('Running install_third_party_libs script...')
 
     # This ensures dev dependencies are present and compiled before we
     # proceed to other setup tasks that require them.
-    install_python_dev_dependencies.main(['--assert_compiled'])
+    if is_python_install_required:
+        install_python_dev_dependencies.main(['--assert_compiled'])
+
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
     from . import pre_commit_hook  # pylint: disable=wrong-import-position
@@ -459,16 +485,17 @@ def main() -> None:
 
     # Install third-party libraries in third_party/ directory. Files in this
     # directory will be deployed to production.
-    common.print_each_string_after_two_new_lines(
-        ['Installing third-party Python and JS libs in third_party directory']
-    )
-    common.create_readme(
-        common.THIRD_PARTY_DIR,
-        'This folder contains third-party libraries used in Oppia codebase.\n'
-        'You can regenerate this folder by deleting it and then running '
-        'the start.py script.\n',
-    )
-    install_python_prod_dependencies.main()
+    if is_python_install_required:
+        common.print_each_string_after_two_new_lines(
+            ['Installing third-party Python and JS libs in third_party directory']
+        )
+        common.create_readme(
+            common.THIRD_PARTY_DIR,
+            'This folder contains third-party libraries used in Oppia codebase.\n'
+            'You can regenerate this folder by deleting it and then running '
+            'the start.py script.\n',
+        )
+        install_python_prod_dependencies.main()
 
     # The install_gcloud_sdk() function needs the Python third-party libs
     # "google" folder to exist first, so we only do the installation here after
@@ -490,6 +517,9 @@ def main() -> None:
         'the start.py script.\n',
     )
     subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
+
+    if is_python_install_required:
+        gatekeeper.record_success()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

@@ -83,3 +83,7 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
+
+# Local cache for skipping redundant Python dependency installations.
+# Created by scripts/install_third_party_libs.py to speed up local startup.
+pip_requirements_checksums.json
