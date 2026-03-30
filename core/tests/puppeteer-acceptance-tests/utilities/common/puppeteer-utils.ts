@@ -1064,6 +1064,34 @@ export class BaseUser {
   }
 
   /**
+   * Waits for Angular to finish its change detection cycle and stabilize.
+   * This is essential before interacting with Angular Material components like mat-select.
+   */
+  async waitForAngularStability(): Promise<void> {
+    try {
+      await this.page.evaluate(async () => {
+        const win = window as unknown as {
+          getAllAngularTestabilities?: () => {
+            whenStable: (cb: () => void) => void;
+          }[];
+        };
+        const testabilities = win.getAllAngularTestabilities?.();
+        if (testabilities?.[0]) {
+          await new Promise<void>(resolve =>
+            testabilities[0].whenStable(() => resolve())
+          );
+        }
+      });
+      showMessage('Angular stabilized.');
+    } catch (error) {
+      // If Angular testabilities are not available, just log and continue.
+      showMessage(
+        'Warning: Could not wait for Angular stability (testabilities not available)'
+      );
+    }
+  }
+
+  /**
    * This function takes a screenshot of the page.
    * If there's no image with the given filename, it stores the screenshot with the given filename in the folder:
    *   - prod-desktop-screenshots or prod-mobile-screenshots for screenshots in production mode
