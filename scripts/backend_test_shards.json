@@ -360,7 +360,6 @@
         "scripts.check_for_unresolved_todos_test",
         "scripts.check_for_duplicate_todo_comment_test",
         "scripts.todo_finder_test",
-        "scripts.github_api_test",
         "scripts.check_backend_associated_test_file_test",
         "scripts.run_custom_eslint_tests_test",
         "scripts.run_presubmit_checks_test",
