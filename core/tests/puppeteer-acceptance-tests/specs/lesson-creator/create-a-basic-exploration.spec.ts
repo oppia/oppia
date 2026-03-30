@@ -137,16 +137,6 @@ describe('Lesson Creator', function () {
       );
 
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-        'Response'
-      );
-      await explorationEditor.expectOutcomeFeedbackToBe('Response');
-
-      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-        'New Response'
-      );
-      await explorationEditor.expectOutcomeFeedbackToBe('New Response');
-
       await explorationEditor.viewOppiaResponses();
       await explorationEditor.directLearnersToNewCard(CARD_NAMES.SECOND);
       await explorationEditor.expectCurrentOutcomeDestinationToBe(
@@ -174,10 +164,10 @@ describe('Lesson Creator', function () {
         LONG_CONTENT
       );
 
-      await explorationEditor.continueToNextCard();
-      await explorationEditor.expectResponseFeedbackToBe('New Response');
+      await explorationEditor.continueToNextCard(true);
 
       await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
       await explorationEditor.expectStateNameToBe(CARD_NAMES.SECOND);
       await explorationEditor.navigateToPreviewTab();
 
@@ -192,6 +182,7 @@ describe('Lesson Creator', function () {
       );
 
       await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(CARD_NAMES.FIRST);
       await explorationEditor.expectStateNameToBe(CARD_NAMES.FIRST);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

@@ -6369,18 +6369,56 @@ export class ExplorationEditor extends BaseUser {
   async expectCurrentOutcomeDestinationToBe(
     expectedDestination: string
   ): Promise<void> {
+    if (expectedDestination === '(try again)') {
+      const isCurrentDestinationSummaryVisible = await this.isElementVisible(
+        currentOutcomeDestinationSelector,
+        true,
+        3000
+      );
+
+      if (isCurrentDestinationSummaryVisible) {
+        const currentDestination = await this.page.$eval(
+          currentOutcomeDestinationSelector,
+          el => el.textContent?.trim() || ''
+        );
+        expect(['(try again)', '']).toContain(currentDestination);
+        return;
+      }
+
+      // Self-loop destinations sometimes render without current-outcome text.
+      // In that case, verify by opening the destination editor and checking
+      // that the selected destination is the current card.
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
+      await this.page.waitForSelector(destinationSelectorDropdown, {
+        visible: true,
+      });
+
+      const selectedDestinationText = await this.page.$eval(
+        `${destinationSelectorDropdown} option:checked`,
+        option => option.textContent?.trim() || ''
+      );
+      const currentCardName = await this.page.$eval(
+        currentCardNameContainerSelector,
+        el => (el.textContent || '').replace(/[\uE000-\uF8FF]/g, '').trim()
+      );
+      expect(selectedDestinationText).toContain(currentCardName);
+
+      const cancelDestinationButton = await this.page.$(
+        '.e2e-test-cancel-outcome-dest'
+      );
+      if (cancelDestinationButton) {
+        await this.clickOnElementWithSelector('.e2e-test-cancel-outcome-dest');
+      }
+      return;
+    }
+
     await this.page.waitForSelector(currentOutcomeDestinationSelector, {
       visible: true,
     });
     const currentDestination = await this.page.$eval(
       currentOutcomeDestinationSelector,
-      el => el.textContent?.trim()
+      el => el.textContent?.trim() || ''
     );
-
-    if (expectedDestination === '(try again)') {
-      expect(['(try again)', '']).toContain(currentDestination || '');
-      return;
-    }
 
     expect(currentDestination).toBe(expectedDestination);
   }
