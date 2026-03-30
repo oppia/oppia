@@ -190,9 +190,14 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
         question_services.create_new_question_skill_link(
             self.admin_id, question_id, self.skill_id, 0.5
         )
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s?offset=0' % (feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id)
+        )
+        self.assertEqual(len(json_response['question_summary_dicts']), 1)
+
         question_services.delete_question(self.admin_id, question_id)
 
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
         json_response = self.get_json(
             '%s/%s?offset=0' % (feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id)
         )

@@ -513,9 +513,12 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Add story'
         )
-        self.get_json(
+        json_response = self.get_json(
             '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
         )
+        self.assertEqual(self.story_id, json_response['story']['id'])
+        self.assertEqual('Name', json_response['topic_name'])
+        self.assertEqual(len(json_response['skill_summaries']), 0)
         self.logout()
 
     def test_editable_story_handler_put(self) -> None:
