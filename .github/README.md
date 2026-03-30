@@ -1,6 +1,6 @@
 # [Oppia](https://www.oppia.org) [![Full-stack tests](https://github.com/oppia/oppia/actions/workflows/full_stack_tests.yml/badge.svg)](https://github.com/oppia/oppia/actions/workflows/full_stack_tests.yml)
 
-Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, enabling students to learn by doing while getting feedback.
+Oppia is an online learning platform that allows anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, allowing students to learn by doing while receiving feedback.
 
 In addition to developing the Oppia platform, the team has developed free and effective [lessons](https://www.oppia.org/fractions) on basic mathematics, and we are planning to expand our educational offering to basic science and financial literacy. These lessons help learners who lack appropriate access to educational resources.
 
@@ -28,10 +28,10 @@ Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/
 
 The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
 
-You can help with Oppia's development in many ways, including art, coding, design and documentation.
+You can contribute to Oppia in many ways, including art, coding, design, and documentation.
 
-- **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
-- **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
+- **Developers**: Please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
+- **All other contributors**: Please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
 
 If you'd like to donate to support our work, you can do so [here](https://www.oppia.org/donate).
 
