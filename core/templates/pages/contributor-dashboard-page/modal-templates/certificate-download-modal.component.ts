@@ -214,7 +214,7 @@ export class CertificateDownloadModalComponent {
         let timeDisplay: string;
         if (info.contribution_hours < 1) {
           const minutes = Math.round(info.contribution_hours * 60);
-          timeDisplay = minutes + ' minutes';
+          timeDisplay = minutes === 1 ? '1 minute' : minutes + ' minutes';
         } else {
           timeDisplay = info.contribution_hours + ' hours';
         }

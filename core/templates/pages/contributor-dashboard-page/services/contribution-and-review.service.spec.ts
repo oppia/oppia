@@ -323,7 +323,7 @@ describe('Contribution and review service', () => {
       expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
     });
 
-    it('should download the contributor certificate when contribution time is less than 1 minute', async () => {
+    it('should download the contributor certificate when contribution time is less than 1 hour', async () => {
       downloadContributorCertificateAsyncSpy.and.returnValue(
         Promise.resolve({
           certificate_data: {
