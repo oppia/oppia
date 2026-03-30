@@ -640,7 +640,7 @@ export class LoggedOutUser extends BaseUser {
    * Waits for Angular to finish any pending async operations.
    * This ensures the UI is stable before interacting with elements.
    */
-  private async waitForAngularStability(): Promise<void> {
+  async waitForAngularStability(): Promise<void> {
     await this.page.evaluate(async () => {
       const win = window as unknown as {
         getAllAngularTestabilities?: () => {

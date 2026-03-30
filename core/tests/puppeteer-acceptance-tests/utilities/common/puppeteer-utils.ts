@@ -1064,45 +1064,6 @@ export class BaseUser {
   }
 
   /**
-   * Waits for Angular to finish its change detection cycle and stabilize.
-   * This is essential before interacting with Angular Material components like mat-select.
-   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 15000.
-   */
-  async waitForAngularStability(timeout: number = 15000): Promise<void> {
-    try {
-      await this.page.evaluate(async (waitTimeout: number) => {
-        const win = window as unknown as {
-          getAllAngularTestabilities?: () => {
-            whenStable: (cb: () => void) => void;
-          }[];
-        };
-        const testabilities = win.getAllAngularTestabilities?.();
-        if (testabilities?.[0]) {
-          await new Promise<void>((resolve, reject) => {
-            const timeoutId = setTimeout(() => {
-              reject(
-                new Error(
-                  'Angular stability timeout after ' + waitTimeout + 'ms'
-                )
-              );
-            }, waitTimeout);
-            testabilities[0].whenStable(() => {
-              clearTimeout(timeoutId);
-              resolve();
-            });
-          });
-        }
-      }, timeout);
-      showMessage('Angular stabilized.');
-    } catch (error) {
-      // If Angular testabilities are not available, just log and continue.
-      showMessage(
-        'Warning: Could not wait for Angular stability (testabilities not available)'
-      );
-    }
-  }
-
-  /**
    * This function takes a screenshot of the page.
    * If there's no image with the given filename, it stores the screenshot with the given filename in the folder:
    *   - prod-desktop-screenshots or prod-mobile-screenshots for screenshots in production mode
