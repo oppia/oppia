@@ -43,6 +43,9 @@ from scripts import (
     install_dependencies_json_packages,
     install_python_prod_dependencies,
 )
+from scripts import (
+    dependency_utils,
+)
 
 from typing import Final
 
@@ -53,6 +56,12 @@ TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
 
 _PARSER: Final = argparse.ArgumentParser(
     description='Installation script for Oppia third-party libraries.'
+)
+
+_PARSER.add_argument(
+    '--force',
+    help='Force the installation of all third-party libraries, bypassing the cache.',
+    action='store_true',
 )
 
 
@@ -429,11 +438,30 @@ def install_elasticsearch_dev_server() -> None:
 
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
+    args = _PARSER.parse_args()
+
+    # Initialize the gatekeeper
+    # Use common.THIRD_PARTY_PYTHON_LIBS_DIR or the specific libs path
+    gatekeeper = dependency_utils.DependencyGatekeeper(
+        python_libs_dir=common.THIRD_PARTY_PYTHON_LIBS_DIR
+    )
+
+    # Check the cache using 'args.force'
+    if (
+        not getattr(args, 'force', False)
+        and not gatekeeper.is_install_required()
+    ):
+        print(
+            "Python dependencies match the local cache. Skipping installation."
+        )
+        return
+
     print('Running install_third_party_libs script...')
 
     # This ensures dev dependencies are present and compiled before we
     # proceed to other setup tasks that require them.
     install_python_dev_dependencies.main(['--assert_compiled'])
+
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.
     from . import pre_commit_hook  # pylint: disable=wrong-import-position
@@ -500,6 +528,8 @@ def main() -> None:
         'the start.py script.\n',
     )
     subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
+
+    gatekeeper.record_success()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
