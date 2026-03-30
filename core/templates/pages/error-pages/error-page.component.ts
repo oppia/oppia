@@ -27,9 +27,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   styleUrls: [],
 })
 export class ErrorPageComponent implements OnInit {
-  // This property is initialized using Angular lifecycle hooks.
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() statusCode!: string;
 
   customErrorMessage: string | null = null;
@@ -40,18 +37,21 @@ export class ErrorPageComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    // Get custom error message from sessionStorage.
-    // Auth guards store it there since location.replaceState clears router state.
     const storedErrorMessage =
       this.windowRef.nativeWindow.sessionStorage.getItem(
         'oppia_401_error_message'
       );
-    if (storedErrorMessage) {
+
+    // FIX: Explicit handling for null and empty string
+    if (storedErrorMessage !== null && storedErrorMessage !== '') {
       this.customErrorMessage = storedErrorMessage;
-      // Clear it immediately after reading so it doesn't persist across page reloads.
+
+      // Clear after reading
       this.windowRef.nativeWindow.sessionStorage.removeItem(
         'oppia_401_error_message'
       );
+    } else {
+      this.customErrorMessage = null;
     }
   }
 
