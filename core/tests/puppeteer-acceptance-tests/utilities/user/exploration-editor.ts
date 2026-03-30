@@ -4708,9 +4708,11 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function creates simple Programming Exploration.
+   * This function creates an exploration with an interaction that is not
+   * supported on the mobile app (e.g. SetInput). This is useful for testing
+   * validation errors when adding mobile-unsupported explorations to stories.
    * Starts at new Exploration Editor Page.
-   * Ends at same page, after adding programming interaction and saving the
+   * Ends at same page, after adding the unsupported interaction and saving the
    * draft.
    */
   async createSimpleUnsupportedExploration(): Promise<string> {
