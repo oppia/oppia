@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import argparse
 
-from scripts import github_api
+from scripts import check_for_unresolved_todos
 
 from typing import List, Optional
 
@@ -58,14 +58,20 @@ def main(args: Optional[List[str]] = None) -> None:
     # might change depending on the workflow.
     compare_start_index = len(github_perma_link_url) + COMMIT_SHA_HASH_LENGTH
 
-    latest_comment: Optional[github_api.GitHubCommentDict] = None
+    latest_comment: Optional[check_for_unresolved_todos.GitHubCommentDict] = (
+        None
+    )
     if parsed_args.issue:
-        latest_comment = github_api.fetch_latest_comment_for_issue(
-            parsed_args.issue
+        latest_comment = (
+            check_for_unresolved_todos.fetch_latest_comment_for_issue(
+                parsed_args.issue
+            )
         )
     elif parsed_args.pull_request:
-        latest_comment = github_api.fetch_latest_comment_from_pull_request(
-            parsed_args.pull_request
+        latest_comment = (
+            check_for_unresolved_todos.fetch_latest_comment_from_pull_request(
+                parsed_args.pull_request
+            )
         )
     else:
         raise Exception('No issue or pull request number provided.')

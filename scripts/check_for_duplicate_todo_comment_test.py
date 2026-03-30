@@ -22,7 +22,7 @@ import sys
 import textwrap
 
 from core.tests import test_utils
-from scripts import github_api
+from scripts import check_for_unresolved_todos
 
 from typing import Optional
 
@@ -99,11 +99,11 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     ) -> None:
         def mock_fetch_latest_comment_for_issue(
             issue: int,
-        ) -> Optional[github_api.GitHubCommentDict]:
+        ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             return {'body': ''} if issue == 4175 else None
 
         fetch_latest_comment_swap = self.swap(
-            github_api,
+            check_for_unresolved_todos,
             'fetch_latest_comment_for_issue',
             mock_fetch_latest_comment_for_issue,
         )
@@ -124,7 +124,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     ) -> None:
         def mock_fetch_latest_comment_for_issue(
             issue: int,
-        ) -> Optional[github_api.GitHubCommentDict]:
+        ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4176:
@@ -136,7 +136,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             return {'body': body} if issue == 4176 else None
 
         fetch_latest_comment_swap = self.swap(
-            github_api,
+            check_for_unresolved_todos,
             'fetch_latest_comment_for_issue',
             mock_fetch_latest_comment_for_issue,
         )
@@ -157,7 +157,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     ) -> None:
         def mock_fetch_latest_comment_from_pull_request(
             pull_request: int,
-        ) -> Optional[github_api.GitHubCommentDict]:
+        ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4177:
@@ -169,7 +169,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             return {'body': body} if pull_request == 1234 else None
 
         fetch_latest_comment_swap = self.swap(
-            github_api,
+            check_for_unresolved_todos,
             'fetch_latest_comment_from_pull_request',
             mock_fetch_latest_comment_from_pull_request,
         )
@@ -192,7 +192,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
 
         def mock_fetch_latest_comment_from_pull_request(
             pull_request: int,
-        ) -> Optional[github_api.GitHubCommentDict]:
+        ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4177:
@@ -205,7 +205,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
 
         stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
         fetch_latest_comment_swap = self.swap(
-            github_api,
+            check_for_unresolved_todos,
             'fetch_latest_comment_from_pull_request',
             mock_fetch_latest_comment_from_pull_request,
         )
@@ -225,11 +225,11 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     def test_check_for_duplicate_todo_comment_no_comment_error(self) -> None:
         def mock_fetch_latest_comment_from_pull_request(
             _: int,
-        ) -> Optional[github_api.GitHubCommentDict]:
+        ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             return None
 
         fetch_latest_comment_swap = self.swap(
-            github_api,
+            check_for_unresolved_todos,
             'fetch_latest_comment_from_pull_request',
             mock_fetch_latest_comment_from_pull_request,
         )

@@ -22,7 +22,6 @@ import sys
 import textwrap
 
 from core.tests import test_utils
-from scripts import github_api
 
 from typing import List
 
@@ -177,7 +176,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
 
         def mock_fetch_linked_issues_for_pull_request(
             pull_request: int,
-        ) -> List[github_api.GitHubIssueDict]:
+        ) -> List[check_for_unresolved_todos.GitHubIssueDict]:
             return (
                 [
                     {
@@ -202,7 +201,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
 
         swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
         swap_fetch_linked_issues_for_pull_request = self.swap(
-            github_api,
+            check_for_unresolved_todos,
             'fetch_linked_issues_for_pull_request',
             mock_fetch_linked_issues_for_pull_request,
         )
