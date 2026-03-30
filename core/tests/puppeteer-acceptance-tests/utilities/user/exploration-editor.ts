@@ -5207,12 +5207,12 @@ export class ExplorationEditor extends BaseUser {
         `Switching content type from ${activeContentType} to ${contentType}`
       );
       await this.clickOnElementWithText(contentType);
-      // Wait for content type switch to complete and Angular to stabilize
+      // Wait for content type switch to complete and Angular to stabilize.
       await this.waitForAngularStability();
       await this.waitForNetworkIdle();
     }
 
-    // Wait for mat-select to be properly initialized before clicking
+    // Wait for mat-select to be properly initialized before clicking.
     await this.page.waitForSelector(voiceoverLanguageSelector);
     await this.waitForElementToBeClickable(voiceoverLanguageSelector, 45000);
     await this.clickOnElementWithSelector(voiceoverLanguageSelector);
@@ -5232,10 +5232,10 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    // Wait for language selection to process
+    // Wait for language selection to process.
     await this.waitForAngularStability();
 
-    // Wait for second mat-select to be properly initialized
+    // Wait for second mat-select to be properly initialized.
     await this.page.waitForSelector(voiceoverLanguageAccentSelector);
     await this.waitForElementToBeClickable(
       voiceoverLanguageAccentSelector,
@@ -5260,7 +5260,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    // Wait for language accent selection to process
+    // Wait for language accent selection to process.
     await this.waitForAngularStability();
 
     await this.clickOnElementWithSelector(addManualVoiceoverButton);
@@ -5269,13 +5269,13 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
 
-    // Wait for save button to disappear indicating upload completion
+    // Wait for save button to disappear indicating upload completion.
     await this.page.waitForSelector(saveUploadedAudioButton, {
       hidden: true,
       timeout: 30000,
     });
 
-    // Wait for Angular to process the upload completion and update the UI
+    // Wait for Angular to process the upload completion and update the UI.
     await this.waitForAngularStability();
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();

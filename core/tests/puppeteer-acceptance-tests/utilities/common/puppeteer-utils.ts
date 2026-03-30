@@ -1095,7 +1095,7 @@ export class BaseUser {
       }, timeout);
       showMessage('Angular stabilized.');
     } catch (error) {
-      // If Angular testabilities are not available, just log and continue
+      // If Angular testabilities are not available, just log and continue.
       showMessage(
         'Warning: Could not wait for Angular stability (testabilities not available)'
       );
