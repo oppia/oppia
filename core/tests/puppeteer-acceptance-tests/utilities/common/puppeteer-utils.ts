@@ -485,16 +485,17 @@ export class BaseUser {
    * by the ElementHandle.
    */
   async waitForElementToBeClickable(
-    selector: string | ElementHandle<Element>
+    selector: string | ElementHandle<Element>,
+    timeout: number = 30000
   ): Promise<void> {
     const elementDesc = await this.getElementDescription(selector);
     showMessage(`Checking if element ${elementDesc} is clickable...`);
     const element =
       typeof selector === 'string'
-        ? await this.page.waitForSelector(selector)
+        ? await this.page.waitForSelector(selector, {timeout})
         : selector;
     try {
-      await this.page.waitForFunction(isElementClickable, {}, element);
+      await this.page.waitForFunction(isElementClickable, {timeout}, element);
     } catch (error) {
       if (error instanceof Error) {
         await this.page.evaluate(isElementClickable, element, true, true);
@@ -1059,6 +1060,45 @@ export class BaseUser {
 
       lastHTMLSize = currentHTMLSize;
       await page.waitForTimeout(checkDurationMsecs);
+    }
+  }
+
+  /**
+   * Waits for Angular to finish its change detection cycle and stabilize.
+   * This is essential before interacting with Angular Material components like mat-select.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 15000.
+   */
+  async waitForAngularStability(timeout: number = 15000): Promise<void> {
+    try {
+      await this.page.evaluate(async (waitTimeout: number) => {
+        const win = window as unknown as {
+          getAllAngularTestabilities?: () => {
+            whenStable: (cb: () => void) => void;
+          }[];
+        };
+        const testabilities = win.getAllAngularTestabilities?.();
+        if (testabilities?.[0]) {
+          await new Promise<void>((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+              reject(
+                new Error(
+                  'Angular stability timeout after ' + waitTimeout + 'ms'
+                )
+              );
+            }, waitTimeout);
+            testabilities[0].whenStable(() => {
+              clearTimeout(timeoutId);
+              resolve();
+            });
+          });
+        }
+      }, timeout);
+      showMessage('Angular stabilized.');
+    } catch (error) {
+      // If Angular testabilities are not available, just log and continue
+      showMessage(
+        'Warning: Could not wait for Angular stability (testabilities not available)'
+      );
     }
   }
 

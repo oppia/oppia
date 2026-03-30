@@ -4478,6 +4478,10 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(translationTabContainer);
+    // Wait for Angular components to fully render and stabilize after tab navigation.
+    await this.waitForPageToFullyLoad();
+    await this.waitForAngularStability();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -5193,6 +5197,7 @@ export class ExplorationEditor extends BaseUser {
     voiceoverFilePath: string
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
+    await this.waitForAngularStability();
 
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
@@ -5202,10 +5207,19 @@ export class ExplorationEditor extends BaseUser {
         `Switching content type from ${activeContentType} to ${contentType}`
       );
       await this.clickOnElementWithText(contentType);
+      // Wait for content type switch to complete and Angular to stabilize
+      await this.waitForAngularStability();
+      await this.waitForNetworkIdle();
     }
 
+    // Wait for mat-select to be properly initialized before clicking
+    await this.page.waitForSelector(voiceoverLanguageSelector);
+    await this.waitForElementToBeClickable(voiceoverLanguageSelector, 45000);
     await this.clickOnElementWithSelector(voiceoverLanguageSelector);
-    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector, {
+      timeout: 15000,
+    });
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
 
     for (const option of languageOptions) {
@@ -5218,8 +5232,20 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
+    // Wait for language selection to process
+    await this.waitForAngularStability();
+
+    // Wait for second mat-select to be properly initialized
+    await this.page.waitForSelector(voiceoverLanguageAccentSelector);
+    await this.waitForElementToBeClickable(
+      voiceoverLanguageAccentSelector,
+      45000
+    );
     await this.clickOnElementWithSelector(voiceoverLanguageAccentSelector);
-    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
+
+    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector, {
+      timeout: 15000,
+    });
     const languageAccentOptions = await this.page.$$(
       voiceoverLanguageAccentOptionSelector
     );
@@ -5234,15 +5260,25 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
+    // Wait for language accent selection to process
+    await this.waitForAngularStability();
+
     await this.clickOnElementWithSelector(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
     await this.waitForElementToStabilize(saveUploadedAudioButton);
     await this.clickOnElementWithSelector(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
 
+    // Wait for save button to disappear indicating upload completion
     await this.page.waitForSelector(saveUploadedAudioButton, {
       hidden: true,
+      timeout: 30000,
     });
+
+    // Wait for Angular to process the upload completion and update the UI
+    await this.waitForAngularStability();
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
