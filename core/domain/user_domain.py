@@ -1867,5 +1867,4 @@ class FirebaseSeed:
 
         Since there are no fields, no validation checks are required.
         """
-
         pass
