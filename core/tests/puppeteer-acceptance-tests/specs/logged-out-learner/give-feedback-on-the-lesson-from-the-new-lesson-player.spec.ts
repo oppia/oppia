@@ -132,6 +132,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectThankYouFeedbackMessage(
       'Thank you for the feedback!'
     );
+    await loggedOutLearner.expectScreenshotToMatch(
+      'thankYouMessageOnFeedbackSubmission',
+      __dirname
+    );
   });
 
   afterAll(async function () {
