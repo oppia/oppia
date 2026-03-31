@@ -50,13 +50,14 @@ Project-specific conventions and patterns (discoverable in the tree):
 - Storage / platform: code assumes Google App Engine-style storage models under
   `core/storage` and platform helpers in `core/platform`.
 - Frontend: see the `core/templates` folder.
-  -- Tests mapping: tests are split into backend unit tests (`core/tests`),
+- Tests mapping: tests are split into backend unit tests (`core/tests`),
   frontend unit tests, Puppeteer-based acceptance tests
   (`core/tests/puppeteer-acceptance-tests`) and WebdriverIO e2e
   (`core/tests/wdio.conf.js`). The WebdriverIO e2e tests are intended to be
   deprecated in favour of the Puppeteer tests after we have confirmed parity
   in coverage.
-  -- Tooling pinning: Node and other tools are provided under `oppia_tools/`
+
+- Tooling pinning: Node and other tools are provided under `oppia_tools/`
   (e.g. `node-16.13.0`). In general we prefer using the pinned versions in
   CI and in local development so that we can keep the environment consistent.
 
@@ -87,18 +88,18 @@ Integration points / external dependencies:
 - Tool pinning: Node and other tools are provided under `oppia_tools/` (e.g.
   `node-16.13.0`) in CI; when running locally prefer a system or nvm-managed
   Node 16 matching CI.
-  -- CI: workflows live in `.github/workflows/` (see badges in
+- CI: workflows live in `.github/workflows/` (see badges in
   `.github/README.md`); CI runs may run in different execution environments
   than your local machine.
 
 Small examples for agents to be effective quickly:
 
--- To run a focused backend test for a file locally:
+- To run a focused backend test for a file locally:
 `python -m scripts.run_backend_tests --test_target <path_or_testname>`.
--- When editing frontend deps or build config locally: install Node 16 (nvm),
+- When editing frontend deps or build config locally: install Node 16 (nvm),
 then run `yarn install --pure-lockfile` from `assets/` and follow the steps
 for running frontend scripts described on the wiki.
--- Lint and style checks are enforced via scripts under `scripts/`; prefer
+- Lint and style checks are enforced via scripts under `scripts/`; prefer
 running them via the local Python venv to match CI tool versions.
 
 What to watch out for / common pitfalls:
