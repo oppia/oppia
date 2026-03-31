@@ -111,7 +111,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.ts',
-    'core/templates/pages/exploration-editor-page/services/exploration-states.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-states.service.ts',
     'core/templates/pages/exploration-editor-page/services/router.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
