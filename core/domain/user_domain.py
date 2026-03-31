@@ -1807,6 +1807,50 @@ class LearnerGroupsUser:
             ValidationError. One or more attributes of the LearnerGroupsUser
                 are invalid.
         """
+        # 1. user_id validation
+        if not isinstance(self.user_id, str):
+            raise utils.ValidationError('Expected user_id to be a string.')
+        if not self.user_id:
+            raise utils.ValidationError('Expected user_id to be a non-empty string.')
+
+        # 2. invited_to_learner_groups_ids validation
+        if not isinstance(self.invited_to_learner_groups_ids, list):
+            raise utils.ValidationError(
+                'Expected invited_to_learner_groups_ids to be a list.'
+            )
+            
+        for group_id in self.invited_to_learner_groups_ids:
+            if not isinstance(group_id, str):
+                raise utils.ValidationError(
+                    'Expected each group_id in invited_to_learner_groups_ids to be a string.'
+                )
+            if not group_id:
+                raise utils.ValidationError(
+                    'Expected each group_id in invited_to_learner_groups_ids to be a non-empty string.'
+                )
+
+        if len(self.invited_to_learner_groups_ids) != len(set(self.invited_to_learner_groups_ids)):
+            raise utils.ValidationError(
+                'Expected invited_to_learner_groups_ids to not contain duplicate values.'
+            )
+
+        # 3. learner_groups_user_details validation
+        if not isinstance(self.learner_groups_user_details, list):
+            raise utils.ValidationError('Expected learner_groups_user_details to be a list.')
+
+        joined_group_ids = []
+        for learner_group_details in self.learner_groups_user_details:
+            # Assuming learner_group_details domain object has its own validate() method
+            if hasattr(learner_group_details, 'validate'):
+                learner_group_details.validate()
+            joined_group_ids.append(learner_group_details.group_id)
+
+        if len(joined_group_ids) != len(set(joined_group_ids)):
+            raise utils.ValidationError(
+                'Expected learner_groups_user_details to not contain duplicate group_ids.'
+            )
+
+        # 4. Cross-Validation: Check for overlap
         for learner_group_details in self.learner_groups_user_details:
             if learner_group_details.group_id in (
                 self.invited_to_learner_groups_ids
