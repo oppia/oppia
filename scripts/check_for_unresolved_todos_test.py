@@ -471,8 +471,8 @@ class HelperFunctionsTests(unittest.TestCase):
         """Test get_github_auth_token with GitHub CLI fallback."""
 
         def mock_subprocess_run(  # pylint: disable=unused-argument
-            cmd, *args, **kwargs
-        ):
+            cmd: List[str], *args: str, **kwargs: str
+        ) -> mock.MagicMock:
             """Mock subprocess.run for GitHub CLI commands."""
             mock_process = mock.MagicMock()
             if 'help' in cmd:
@@ -482,9 +482,7 @@ class HelperFunctionsTests(unittest.TestCase):
                 mock_process.returncode = 0
             return mock_process
 
-        with mock.patch.dict(
-            check_for_unresolved_todos.os.environ, {}, clear=True
-        ), mock.patch(
+        with mock.patch.dict(os.environ, {}, clear=True), mock.patch(
             'scripts.check_for_unresolved_todos.subprocess.run',
             side_effect=mock_subprocess_run,
         ):
@@ -495,16 +493,14 @@ class HelperFunctionsTests(unittest.TestCase):
         """Test get_github_auth_token when GitHub CLI is not installed."""
 
         def mock_subprocess_run(  # pylint: disable=unused-argument
-            cmd, *args, **kwargs
-        ):
+            cmd: List[str], *args: str, **kwargs: str
+        ) -> mock.MagicMock:
             """Mock subprocess.run with gh CLI not installed."""
             mock_process = mock.MagicMock()
             mock_process.returncode = 1
             return mock_process
 
-        with mock.patch.dict(
-            check_for_unresolved_todos.os.environ, {}, clear=True
-        ), mock.patch(
+        with mock.patch.dict(os.environ, {}, clear=True), mock.patch(
             'scripts.check_for_unresolved_todos.subprocess.run',
             side_effect=mock_subprocess_run,
         ):
@@ -517,8 +513,8 @@ class HelperFunctionsTests(unittest.TestCase):
         """Test get_github_auth_token when GitHub CLI auth fails."""
 
         def mock_subprocess_run(  # pylint: disable=unused-argument
-            cmd, *args, **kwargs
-        ):
+            cmd: List[str], *args: str, **kwargs: str
+        ) -> mock.MagicMock:
             """Mock subprocess.run for GitHub CLI."""
             mock_process = mock.MagicMock()
             if 'help' in cmd:
@@ -527,9 +523,7 @@ class HelperFunctionsTests(unittest.TestCase):
                 mock_process.returncode = 1
             return mock_process
 
-        with mock.patch.dict(
-            check_for_unresolved_todos.os.environ, {}, clear=True
-        ), mock.patch(
+        with mock.patch.dict(os.environ, {}, clear=True), mock.patch(
             'scripts.check_for_unresolved_todos.subprocess.run',
             side_effect=mock_subprocess_run,
         ):
