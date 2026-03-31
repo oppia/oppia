@@ -591,6 +591,8 @@ def get_content_updates_from_cmd_edit_state_property_change(
         customization_arg_dicts = edit_interaction_cust_arg_cmd.new_value or {}
         for cust_arg_dict in customization_arg_dicts.values():
             for cust_arg_value in cust_arg_dict.values():
+                # Each of these conversions are intended to be run on every
+                # single item.
                 try:
                     # Here we use cast because we are narrowing down the type
                     # UnionOfCustomizationArgsDictValues dict to SubtitledHtmlDict.
@@ -615,6 +617,8 @@ def get_content_updates_from_cmd_edit_state_property_change(
 
                 if isinstance(cust_arg_value, list):
                     for item in cust_arg_value:
+                        # Each of these conversions are intended to be run on
+                        # every single item.
                         try:
                             # Here we use cast because we are narrowing down the
                             # type UnionOfCustomizationArgsDictValues dict to
