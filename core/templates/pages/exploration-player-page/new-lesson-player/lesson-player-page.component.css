@@ -27,6 +27,7 @@
   align-items: flex-end;
   display: flex;
   flex: 1;
+  overflow-x: clip;
   z-index: 0;
 }
 

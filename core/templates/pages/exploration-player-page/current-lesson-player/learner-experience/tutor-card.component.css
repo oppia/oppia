@@ -26,8 +26,11 @@ oppia-tutor-card .oppia-learner-view-card {
 
 oppia-tutor-card .oppia-learner-view-card-top-content {
   background-color: rgba(224,242,241,1);
+  box-sizing: border-box;
   border-top-left-radius: 0;
   margin-bottom: 12px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: 12px;
   width: 100%;
 }

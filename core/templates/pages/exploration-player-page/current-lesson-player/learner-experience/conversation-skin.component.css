@@ -46,11 +46,13 @@ oppia-conversation-skin .supplemental-card-parent-container {
 
 .conversation-skin-cards-container {
   align-items: flex-start;
+  box-sizing: border-box;
   display: -webkit-flex;
   display: flex;
   justify-content: center;
   margin: 0 auto;
   max-width: 1400px;
+  overflow-x: clip;
   padding: 56px 14px 0;
   width: 100%;
 }

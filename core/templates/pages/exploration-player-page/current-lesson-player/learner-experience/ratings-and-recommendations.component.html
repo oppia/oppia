@@ -59,12 +59,15 @@
       </button>
     </div>
     <div class="conversation-skin-login-secondary-options">
-      <button class="conversation-skin-login-button">
+      <button class="conversation-skin-login-button"
+              (click)="signIn('.conversation-skin-login-button')">
         Already have an account?
-        <span class="conversation-skin-login-button-text" translate="" (click)="signIn('.conversation-skin-login-button-text')">Sign In</span>
+        <span class="conversation-skin-login-button-text">Sign In</span>
       </button>
-      <button class="conversation-skin-hide-sign-up-section-button e2e-test-dismiss-sign-up-section-button">
-        <span class="conversation-skin-hide-sign-up-section-text" translate="I18N_SIGNUP_SECTION_DONT_ASK_ME_AGAIN" (click)="hideSignUpSection()"></span>
+      <button class="conversation-skin-hide-sign-up-section-button e2e-test-dismiss-sign-up-section-button"
+              (click)="hideSignUpSection()">
+        <span class="conversation-skin-hide-sign-up-section-text"
+              translate="I18N_SIGNUP_SECTION_DONT_ASK_ME_AGAIN"></span>
       </button>
     </div>
   </div>
