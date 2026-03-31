@@ -42,6 +42,9 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
+VOICEOVER_AUTOGENERATION_BY_ACCENT_ID: Final = (
+    'voiceover_autogeneration_by_accent'
+)
 
 
 assert feconf.VoiceoverType.MANUAL.value == 'manual'
@@ -451,4 +454,43 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
             plaintext=plaintext,
             voiceover_filename=voiceover_filename,
             audio_offset_list=audio_offset_list,
+        )
+
+
+class LanguageAccentForAutogenerationModel(base_models.BaseModel):
+    """Model to store language accent codes for which voiceover autogeneration
+    needs to be done.
+
+    There should only be one instance of this class, and it is keyed by
+    VOICEOVER_AUTOGENERATION_BY_ACCENT_ID.
+    """
+
+    # A dict with language_codes as keys and nested dicts as values.
+    # Each nested dict contains language_accent_codes as keys and booleans
+    # indicating whether it's possible to generate automatic voiceovers
+    # for this language-accent code as values.
+    language_accent_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
         )

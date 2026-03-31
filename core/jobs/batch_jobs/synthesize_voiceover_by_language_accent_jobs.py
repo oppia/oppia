@@ -18,8 +18,9 @@
 
 from __future__ import annotations
 
+import collections
 import logging
-import time
+import traceback
 
 from core import feconf
 from core.domain import (
@@ -30,7 +31,7 @@ from core.domain import (
     voiceover_regeneration_services,
     voiceover_services,
 )
-from core.jobs import base_jobs
+from core.jobs import base_jobs, job_options
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -41,15 +42,17 @@ from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Union, cast
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
+        cloud_task_models,
         datastore_services,
         exp_models,
         translation_models,
         voiceover_models,
     )
 
-(exp_models, translation_models, voiceover_models) = (
+(cloud_task_models, exp_models, translation_models, voiceover_models) = (
     models.Registry.import_models(
         [
+            models.Names.CLOUD_TASK,
             models.Names.EXPLORATION,
             models.Names.TRANSLATION,
             models.Names.VOICEOVER,
@@ -57,10 +60,6 @@ if MYPY:  # pragma: no cover
     )
 )
 datastore_services = models.Registry.import_datastore_services()
-
-# Waiting time between requests helps to avoid sudden spike in Azure TTS
-# requests.
-WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -70,6 +69,18 @@ WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 # ignore here.
 class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
     """A DoFn that generates voiceovers for a given exploration."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        logging.info(
+            'Voiceover synthesis log: Initializing GenerateVoiceoversFn.'
+        )
+
+        self.oppia_project_id = 'oppia_project_id'
+        logging.info(
+            'Voiceover synthesis log: Setting oppia project ID from args: %s',
+            self.oppia_project_id,
+        )
 
     def process(
         self,
@@ -85,9 +96,12 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         autogeneration_policy_model: (
             voiceover_models.VoiceoverAutogenerationPolicyModel
         ),
+        language_accent_for_autogeneration_model: (
+            voiceover_models.LanguageAccentForAutogenerationModel
+        ),
     ) -> Iterator[
         Union[
-            voiceover_models.EntityVoiceoversModel,
+            Optional[voiceover_models.EntityVoiceoversModel],
             beam.pvalue.TaggedOutput[str],
         ]
     ]:
@@ -100,11 +114,36 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
                 to a list of corresponding models.
             autogeneration_policy_model: VoiceoverAutogenerationPolicyModel.
                 The voiceover autogeneration policy model.
+            language_accent_for_autogeneration_model: LanguageAccentForAutogenerationModel.
+                The language accent for autogeneration model.
 
         Yields:
             EntityVoiceoversModel. The generated entity voiceover models.
             str. The status string for the voiceover generation process.
         """
+        entity_id = combined_models[0]
+        with datastore_services.get_ndb_context():
+            try:
+                language_accent_to_generate = (
+                    language_accent_for_autogeneration_model.language_accent_code
+                )
+
+            except Exception as e:
+                error = (
+                    'Not able to fetch language accent for autogeneration model. Error: %s'
+                    % str(e)
+                )
+                logging.error(
+                    'Voiceover synthesis log: Not able to fetch language accent for autogeneration model. Verify the model exists and has the correct properties. Error: %s'
+                    % str(e)
+                )
+                language_accent_to_generate = None
+        # Check language_accent_for_autogeneration_model must be in policy model.
+
+        logging.info(
+            'Voiceover synthesis log: Generating voiceovers for exploration ID: %s',
+            entity_id,
+        )
         # Here we use cast because we are narrowing down the type of
         # exploration field in combined_models to Exploration model.
         exploration_model = cast(
@@ -130,12 +169,31 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
                 entity_translation_models=entity_translation_models,
                 entity_voiceover_models=entity_voiceover_models,
                 voiceover_policy_model=autogeneration_policy_model,
+                language_accent_to_generate=language_accent_to_generate,
             )
         )
 
+        logging.info(
+            'Voiceover synthesis log: Completed generating voiceovers for exploration ID: %s',
+            entity_id,
+        )
+
         # Yield entity voiceovers to main output.
-        for entity_voiceovers in entity_voiceovers_list:
-            yield entity_voiceovers
+        if entity_voiceovers_list:
+            for entity_voiceovers in entity_voiceovers_list:
+                yield entity_voiceovers
+        else:
+            if error:
+                status_string = (
+                    'No voiceovers generated due to error: %s.\n Check LanguageAccentForAutogenerationModel and its fields.'
+                    % error
+                )
+            else:
+                status_string = (
+                    'No voiceovers generated for language accent: %s.'
+                    % language_accent_to_generate
+                )
+            yield None
 
         # Yield status string to tagged side output.
         yield beam.pvalue.TaggedOutput('status', status_string)
@@ -183,6 +241,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             voiceover_models.EntityVoiceoversModel
         ],
         voiceover_policy_model: voiceover_models.VoiceoverAutogenerationPolicyModel,
+        language_accent_to_generate,
     ) -> Tuple[Sequence[voiceover_models.EntityVoiceoversModel], str]:
         """Generates voiceovers in English and all translated languages,
         covering every supported accent for the given exploration.
@@ -196,15 +255,15 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 entity voiceover models related to the exploration.
             voiceover_policy_model: VoiceoverAutogenerationPolicyModel. The
                 voiceover autogeneration policy model.
+            oppia_project_id: Optional[str]. The Google Cloud Project ID.
+                Explicitly required when running on Beam Dataflow, as workers
+                cannot retrieve the ID from environment variables.
 
         Returns:
             Iterable[EntityVoiceoversModel]. An iterable of
             EntityVoiceoversModels that were updated or created.
         """
         logs_during_voiceover_generation = ''
-        logs_during_voiceover_generation += (
-            'Exploration ID: %s.\n' % exploration_model.id
-        )
 
         entity_translations_list = []
         entity_voiceovers_list = []
@@ -214,6 +273,9 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             exploration = exp_fetchers.get_exploration_from_model(
                 exploration_model, False
             )
+            logging.info(
+                'Voiceover synthesis log: Converted exploration model to exploration domain object.'
+            )
 
             # Converting EntityTranslationsModels to domain objects.
             for entity_translation_model in list(entity_translation_models):
@@ -222,6 +284,10 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         entity_translation_model
                     )
                 )
+            logging.info(
+                'Voiceover synthesis log: Converted entity translation models to '
+                'entity translation domain objects.'
+            )
 
             # Converting EntityVoiceoversModels to domain objects.
             for entity_voiceover_model in list(entity_voiceover_models):
@@ -232,6 +298,10 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         entity_voiceover_model
                     )
                 )
+            logging.info(
+                'Voiceover synthesis log: Converted entity voiceover models to '
+                'entity voiceover domain objects.'
+            )
 
             # Extracting language codes mapping from the autogeneration policy
             # model.
@@ -266,6 +336,8 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         for language_code, accent_mapping in language_codes_mapping.items():
             autogeneratable_language_codes_mapping[language_code] = []
             for accent_code, is_autogeneratable in accent_mapping.items():
+                if accent_code != language_accent_to_generate:
+                    continue
                 if is_autogeneratable:
                     autogeneratable_language_codes_mapping[
                         language_code
@@ -316,14 +388,32 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         language_accent_code,
                     )
                 )
+                error_message_to_content_ids_dict = collections.defaultdict(
+                    list
+                )
 
                 entity_voiceovers = entity_voiceovers_id_to_domain_object.get(
                     entity_voiceovers_id, default_entity_voiceovers
                 )
 
+                logging.info(
+                    'Voiceover synthesis log: Generating voiceovers for Entityvoiceover with ID: %s.',
+                    entity_voiceovers_id,
+                )
                 logs_during_voiceover_generation += (
-                    'Generating voiceovers for Entityvoiceover with ID: %s.\n'
-                    % entity_voiceovers_id
+                    'EntityVoiceovers ID: %s.\n' % entity_voiceovers_id
+                )
+
+                number_of_content_ids = len(content_ids_to_content_values)
+                number_of_characters = 0
+
+                logging.info(
+                    'Voiceover synthesis log: content_ids_to_content_values: %s.',
+                    content_ids_to_content_values,
+                )
+                logging.info(
+                    'Voiceover synthesis log: number_of_content_ids: %s.',
+                    number_of_content_ids,
                 )
 
                 for (
@@ -332,12 +422,12 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 ) in content_ids_to_content_values.items():
 
                     try:
-                        time.sleep(
-                            WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS
-                        )
-
                         voiceover_filename = voiceover_regeneration_services.generate_new_voiceover_filename(
                             content_id, language_accent_code
+                        )
+                        logging.info(
+                            'Voiceover synthesis log: Generated new voiceover filename: %s for content_id: %s, content_html: %s.'
+                            % (voiceover_filename, content_id, content_html)
                         )
 
                         with datastore_services.get_ndb_context():
@@ -348,9 +438,14 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                                 voiceover_filename,
                             )
 
+                            if not sentence_tokens_with_durations:
+                                continue
+
                             voiceover = voiceover_regeneration_services.fetch_voiceover_by_filename(
                                 entity_id, voiceover_filename
                             )
+
+                        number_of_characters += len(content_html)
 
                         entity_voiceovers.add_voiceover(
                             content_id, feconf.VoiceoverType.AUTO, voiceover
@@ -359,23 +454,57 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                             content_id, sentence_tokens_with_durations
                         )
 
-                        logs_during_voiceover_generation += (
-                            'Generated voiceover for content_id: %s.\n'
-                            % content_id
+                        logging.info(
+                            'Voiceover synthesis log: Generated voiceover for content_id: %s.',
+                            content_id,
                         )
                     except Exception as error:
-                        logs_during_voiceover_generation += (
-                            VoiceoverSynthesisJob.generate_error_log(
+                        error_message_to_content_ids_dict[str(error)].append(
+                            content_id
+                        )
+                        stack_trace = traceback.format_exc()
+                        logging.error(
+                            'Voiceover synthesis log: Stack trace: %s',
+                            stack_trace,
+                        )
+                        logging.error(
+                            'Voiceover synthesis log: Error generating voiceover for exploration ID: %s, language_accent_code: %s, content_id: %s. Error: %s'
+                            % (
                                 entity_id,
-                                content_id,
                                 language_accent_code,
-                                error,
+                                content_id,
+                                str(error),
                             )
                         )
+
+                for (
+                    error_message,
+                    content_ids,
+                ) in error_message_to_content_ids_dict.items():
+                    comma_separated_content_ids = ', '.join(content_ids)
+                    logs_during_voiceover_generation += (
+                        'Content IDs failed: [%s]. Error message: %s\n'
+                        % (comma_separated_content_ids, error_message)
+                    )
 
                 entity_voiceovers.validate()
                 entity_voiceovers_id_to_domain_object[entity_voiceovers_id] = (
                     entity_voiceovers
+                )
+
+                final_report_logs = (
+                    'Total content IDs processed: %d. '
+                    'Total characters processed: %d.\n'
+                    % (
+                        number_of_content_ids,
+                        number_of_characters,
+                    )
+                )
+                logging.info('Voiceover synthesis log: %s.' % final_report_logs)
+                logs_during_voiceover_generation += final_report_logs
+                logging.info(
+                    'Voiceover synthesis log: Completed voiceover generation for entity ID: %s.'
+                    % entity_voiceovers_id
                 )
 
         # List of EntityVoiceoversModel instances to be stored in the datastore.
@@ -391,30 +520,6 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         return (
             entity_voiceover_models_to_put,
             logs_during_voiceover_generation,
-        )
-
-    @staticmethod
-    def generate_error_log(
-        exploration_id: str,
-        content_id: str,
-        language_accent_code: str,
-        error: Exception,
-    ) -> str:
-        """Generates a formatted error log string.
-
-        Args:
-            exploration_id: str. The ID of the exploration.
-            content_id: str. The ID of the content.
-            language_accent_code: str. The language accent code.
-            error: str. The error message.
-
-        Returns:
-            str. The formatted error log string.
-        """
-        return (
-            'Error for exploration_id: %s, content_id: %s, '
-            'language_accent_code: %s: %s\n'
-            % (exploration_id, content_id, language_accent_code, str(error))
         )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -444,6 +549,12 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             >> ndb_io.GetModels(
                 translation_models.EntityTranslationsModel.get_all()
             )
+            | 'Filter out entity translations for curated explorations'
+            >> beam.Filter(
+                lambda model: self.is_exploration_curated(
+                    exploration_id=model.entity_id
+                )
+            )
         )
 
         entity_voiceovers_models = (
@@ -451,6 +562,12 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             | 'Get all entity voiceover models'
             >> ndb_io.GetModels(
                 voiceover_models.EntityVoiceoversModel.get_all()
+            )
+            | 'Filter out entity voiceovers for curated explorations'
+            >> beam.Filter(
+                lambda model: self.is_exploration_curated(
+                    exploration_id=model.entity_id
+                )
             )
         )
 
@@ -486,12 +603,23 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             )
         )
 
+        language_accent_for_autogeneration_model = (
+            self.pipeline
+            | 'Get language accent for autogeneration model'
+            >> ndb_io.GetModels(
+                voiceover_models.LanguageAccentForAutogenerationModel.get_all()
+            )
+        )
+
         voiceovers_and_status = (
             combined_models
             | 'Generate voiceovers for each exploration'
             >> beam.ParDo(
                 GenerateVoiceoversFn(),
                 beam.pvalue.AsSingleton(voiceover_policy_model),
+                beam.pvalue.AsSingleton(
+                    language_accent_for_autogeneration_model
+                ),
             ).with_outputs('status', main='voiceovers')
         )
 
@@ -501,6 +629,8 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
                 entity_voiceovers_models
+                | 'Filter out None results'
+                >> beam.Filter(lambda model: model is not None)
                 | 'Put models into datastore' >> ndb_io.PutModels()
             )
 
@@ -509,7 +639,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         )
 
 
-class VoiceoverSynthesisJobAuditJob(VoiceoverSynthesisJob):
+class VoiceoverSynthesisAuditJob(VoiceoverSynthesisJob):
     """Audit job for VoiceoverSynthesisJob."""
 
     DATASTORE_UPDATES_ALLOWED = False

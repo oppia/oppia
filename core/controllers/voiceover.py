@@ -484,3 +484,40 @@ class RegenerateVoiceoversForExplorationHandler(
                 datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)
+
+
+class LanguageAccentRegenerationHander(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to add language accent code for regeneration and to mark
+    voiceover regeneration for a language accent as complete.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {},
+        'POST': {'language_accent_code': {'schema': {'type': 'basestring'}}},
+        'DELETE': {},
+    }
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def get(self) -> None:
+        language_accent_code = (
+            voiceover_services.get_language_accent_for_bulk_autogeneration()
+        )
+        self.values.update({'language_accent_code': language_accent_code})
+        self.render_json(self.values)
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def post(self) -> None:
+        language_accent_code = self.normalized_payload['language_accent_code']
+        voiceover_services.save_language_accent_code_for_bulk_autogeneration(
+            language_accent_code
+        )
+        self.render_json(self.values)
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def delete(self) -> None:
+        voiceover_services.mark_voiceover_regeneration_for_accent_as_complete()
+        self.render_json(self.values)

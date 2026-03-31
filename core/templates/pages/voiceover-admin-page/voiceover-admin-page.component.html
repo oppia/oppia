@@ -171,6 +171,47 @@
   </div>
 </mat-card>
 
+
+<mat-card class="oppia-page-card oppia-long-text-card">
+  <h3>Autogenerate Voiceovers by Language Accent</h3>
+
+  <p>
+    Follow the steps below to generate voiceovers for all the contents across all explorations for a specific language-accent pair.
+  </p>
+  <ol class="voiceover-regeneration-steps">
+    <li>Select a <strong>language-accent pair</strong> from the dropdown below.</li>
+    <li>Go to the <strong>Release Coordinator</strong> page, or ask a <strong>server administrator</strong> (email) for assistance if needed.</li>
+    <li>Run <strong>Jobname1</strong> and wait until the job completes successfully.</li>
+    <li>Run <strong>Jobname2</strong> and wait until the job completes successfully.</li>
+    <li>Once both jobs (Steps 3 and 4) finish successfully, click <strong>“Jobs Executed Successfully.”</strong></li>
+  </ol>
+
+  <div class="">
+    <div class="language-accent-regeneration-input-container">
+      <span><strong>Language accent code:</strong></span>
+      <mat-form-field class="language-accent-regeneration-dropdown">
+        <mat-select [(ngModel)]="languageAccentCodeForRegeneration">
+          <mat-option *ngFor="let languageAccentCode of getLanguageAccentCodesThatSupportAutogeneration()" [value]="languageAccentCode">
+            {{languageAccentCodesToDescriptionsMasterList[languageAccentCode]}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button class="btn btn-primary" (click)="addLanguageAccentCodeForRegeneration()">Add</button>
+    </div>
+
+    <div *ngIf="languageAccentCodeForRegeneration">
+      <p>
+        The voiceover regeneration for <strong>{{languageAccentCodesToDescriptionsMasterList[languageAccentCodeForRegeneration]}}</strong> has been initiated. Please follow the steps mentioned above to complete the process.
+      </p>
+    </div>
+
+    <div>
+      <button class="btn btn-primary language-accent-regeneration-complete-button" (click)="markVoiceoverRegenerationForAccentAsComplete()">Jobs Executed Successfully</button>
+    </div>
+  </div>
+
+</mat-card>
+
 <mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
   <h3>Automatic voiceover updates</h3>
 
@@ -333,6 +374,20 @@
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
     margin-bottom: 1%;
     margin-left: 1%;
+  }
+  .voiceover-regeneration-steps {
+    margin-left: 5%;
+  }
+  .language-accent-regeneration-input-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+  .language-accent-regeneration-dropdown {
+    width: 50%;
+  }
+  .language-accent-regeneration-complete-button {
+    float: right;
   }
   .date-selector-inner-container {
     align-items: center;

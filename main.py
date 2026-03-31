@@ -1393,6 +1393,10 @@ URLS = [
         voiceover.AutomaticVoiceoverRegenerationRecordHandler,
     ),
     get_redirect_route(
+        '/language_accent_regeneration',
+        voiceover.LanguageAccentRegenerationHander,
+    ),
+    get_redirect_route(
         r'/exploration_voiceover_regeneration_status_url/<exploration_id>',
         voiceover.VoiceoverRegenerationRequestToCloudTaskHandler,
     ),
