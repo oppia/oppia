@@ -16,10 +16,13 @@
 from __future__ import annotations
 
 import io
+import json
 import os
 import shutil
 import sys
 import textwrap
+import unittest
+from unittest import mock
 
 from core.tests import test_utils
 
@@ -250,3 +253,213 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             self.assertEqual(
                 file.read().splitlines(), expected_unresolved_todo_list_lines
             )
+
+
+class HelperFunctionsTests(unittest.TestCase):
+    """Unit tests for helper functions in check_for_unresolved_todos.py."""
+
+    def test_deep_get_with_valid_keys(self) -> None:
+        """Test deep_get function with valid nested keys."""
+        test_data = {'level1': {'level2': {'level3': 'value'}}}
+        result = check_for_unresolved_todos.deep_get(
+            test_data, ['level1', 'level2', 'level3']
+        )
+        self.assertEqual(result, 'value')
+
+    def test_deep_get_with_missing_keys(self) -> None:
+        """Test deep_get function with missing keys."""
+        test_data = {'level1': {'level2': 'value'}}
+        result = check_for_unresolved_todos.deep_get(
+            test_data, ['level1', 'missing', 'level3']
+        )
+        self.assertIsNone(result)
+
+    def test_deep_get_with_empty_keys(self) -> None:
+        """Test deep_get function with empty keys list."""
+        test_data = {'key': 'value'}
+        result = check_for_unresolved_todos.deep_get(test_data, [])
+        self.assertEqual(result, test_data)
+
+    def test_deep_get_with_none_data(self) -> None:
+        """Test deep_get function with None data."""
+        result = check_for_unresolved_todos.deep_get(None, ['key1', 'key2'])
+        self.assertIsNone(result)
+
+    def test_get_github_api_authorization_header(self) -> None:
+        """Test get_github_api_authorization_header function."""
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'get_github_auth_token',
+            return_value='test_token_value',
+        ):
+            header = (
+                check_for_unresolved_todos.get_github_api_authorization_header()
+            )
+            self.assertEqual(header, 'Bearer test_token_value')
+
+    def test_run_graphql_query_success(self) -> None:
+        """Test run_graphql_query function with successful response."""
+        expected_response = {
+            'repository': {
+                'pullRequest': {
+                    'closingIssuesReferences': {
+                        'nodes': [{'number': 123, 'title': 'Issue'}]
+                    }
+                }
+            }
+        }
+
+        mock_response = mock.MagicMock()
+        mock_response.__enter__.return_value.getcode.return_value = 200
+        mock_response.__enter__.return_value.read.return_value = json.dumps(
+            {'data': expected_response}
+        ).encode('utf-8')
+
+        with mock.patch(
+            'urllib.request.urlopen', return_value=mock_response
+        ), mock.patch.object(
+            check_for_unresolved_todos,
+            'get_github_api_authorization_header',
+            return_value='Bearer test_token',
+        ):
+            result = check_for_unresolved_todos.run_graphql_query('test query')
+            self.assertEqual(result, expected_response)
+
+    def test_fetch_linked_issues_for_pull_request(self) -> None:
+        """Test fetch_linked_issues_for_pull_request function."""
+        expected_issues = [
+            {'body': 'Issue body', 'number': 123, 'title': 'Issue title'}
+        ]
+        expected_response = {
+            'repository': {
+                'pullRequest': {
+                    'closingIssuesReferences': {'nodes': expected_issues}
+                }
+            }
+        }
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=expected_response,
+        ):
+            issues = (
+                check_for_unresolved_todos.fetch_linked_issues_for_pull_request(
+                    123
+                )
+            )
+            self.assertEqual(issues, expected_issues)
+
+    def test_fetch_linked_issues_for_nonexistent_pull_request(self) -> None:
+        """Test fetch_linked_issues_for_pull_request with non-existent PR."""
+        response_data = {'repository': {'pullRequest': None}}
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=response_data,
+        ):
+            with self.assertRaisesRegex(
+                Exception, 'The pull request \\(#999\\) does not exist.'
+            ):
+                check_for_unresolved_todos.fetch_linked_issues_for_pull_request(
+                    999
+                )
+
+    def test_fetch_latest_comment_for_issue(self) -> None:
+        """Test fetch_latest_comment_for_issue function."""
+        expected_comment = {'body': 'Latest comment'}
+        expected_response = {
+            'repository': {'issue': {'comments': {'nodes': [expected_comment]}}}
+        }
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=expected_response,
+        ):
+            comment = check_for_unresolved_todos.fetch_latest_comment_for_issue(
+                123
+            )
+            self.assertEqual(comment, expected_comment)
+
+    def test_fetch_latest_comment_for_nonexistent_issue(self) -> None:
+        """Test fetch_latest_comment_for_issue with non-existent issue."""
+        response_data = {'repository': {'issue': None}}
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=response_data,
+        ):
+            with self.assertRaisesRegex(
+                Exception, 'The issue \\(#888\\) does not exist.'
+            ):
+                check_for_unresolved_todos.fetch_latest_comment_for_issue(888)
+
+    def test_fetch_latest_comment_from_pull_request(self) -> None:
+        """Test fetch_latest_comment_from_pull_request function."""
+        expected_comment = {'body': 'PR comment'}
+        expected_response = {
+            'repository': {
+                'pullRequest': {'comments': {'nodes': [expected_comment]}}
+            }
+        }
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=expected_response,
+        ):
+            comment = check_for_unresolved_todos.fetch_latest_comment_from_pull_request(
+                456
+            )
+            self.assertEqual(comment, expected_comment)
+
+    def test_fetch_latest_comment_from_nonexistent_pull_request(self) -> None:
+        """Test fetch_latest_comment_from_pull_request with non-existent PR."""
+        response_data = {'repository': {'pullRequest': None}}
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=response_data,
+        ):
+            with self.assertRaisesRegex(
+                Exception, 'The pull request \\(#555\\) does not exist.'
+            ):
+                check_for_unresolved_todos.fetch_latest_comment_from_pull_request(
+                    555
+                )
+
+    def test_fetch_latest_comment_for_issue_no_comments(self) -> None:
+        """Test fetch_latest_comment_for_issue when issue has no comments."""
+        expected_response = {
+            'repository': {'issue': {'comments': {'nodes': []}}}
+        }
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=expected_response,
+        ):
+            comment = check_for_unresolved_todos.fetch_latest_comment_for_issue(
+                123
+            )
+            self.assertIsNone(comment)
+
+    def test_fetch_latest_comment_from_pull_request_no_comments(self) -> None:
+        """Test fetch_latest_comment_from_pull_request when PR has no comments."""
+        expected_response = {
+            'repository': {'pullRequest': {'comments': {'nodes': []}}}
+        }
+
+        with mock.patch.object(
+            check_for_unresolved_todos,
+            'run_graphql_query',
+            return_value=expected_response,
+        ):
+            comment = check_for_unresolved_todos.fetch_latest_comment_from_pull_request(
+                456
+            )
+            self.assertIsNone(comment)
