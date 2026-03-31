@@ -458,17 +458,14 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
 
 
 class LanguageAccentForAutogenerationModel(base_models.BaseModel):
-    """Model to store language accent codes for which voiceover autogeneration
+    """Model to store language accent code for which voiceover regeneration
     needs to be done.
 
     There should only be one instance of this class, and it is keyed by
     VOICEOVER_AUTOGENERATION_BY_ACCENT_ID.
     """
 
-    # A dict with language_codes as keys and nested dicts as values.
-    # Each nested dict contains language_accent_codes as keys and booleans
-    # indicating whether it's possible to generate automatic voiceovers
-    # for this language-accent code as values.
+    # Language accent code for which voiceover regeneration needs to be done.
     language_accent_code = datastore_services.StringProperty(
         required=True, indexed=True
     )
