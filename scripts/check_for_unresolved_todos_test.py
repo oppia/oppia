@@ -434,6 +434,8 @@ class HelperFunctionsTests(unittest.TestCase):
 
     def test_fetch_latest_comment_for_issue_no_comments(self) -> None:
         """Test fetch_latest_comment_for_issue when issue has no comments."""
+        # Here we use type Any because GraphQL responses contain nested dictionaries
+        # with dynamic structures and values of various types (strings, ints, lists).
         expected_response: Dict[str, Any] = {
             'repository': {'issue': {'comments': {'nodes': []}}}
         }
@@ -450,6 +452,8 @@ class HelperFunctionsTests(unittest.TestCase):
 
     def test_fetch_latest_comment_from_pull_request_no_comments(self) -> None:
         """Test fetch_latest_comment_from_pull_request when PR has no comments."""
+        # Here we use type Any because GraphQL responses contain nested dictionaries
+        # with dynamic structures and values of various types (strings, ints, lists).
         expected_response: Dict[str, Any] = {
             'repository': {'pullRequest': {'comments': {'nodes': []}}}
         }
