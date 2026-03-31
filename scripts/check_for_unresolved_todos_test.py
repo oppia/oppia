@@ -467,3 +467,119 @@ class HelperFunctionsTests(unittest.TestCase):
                 456
             )
             self.assertIsNone(comment)
+
+    def test_get_github_auth_token_with_gh_cli_fallback(self) -> None:
+        """Test get_github_auth_token with GitHub CLI fallback."""
+
+        def mock_subprocess_run(cmd, *args, **kwargs):
+            """Mock subprocess.run for GitHub CLI commands."""
+            mock_process = mock.MagicMock()
+            if 'help' in cmd:
+                mock_process.returncode = 0
+            elif 'auth' in cmd and 'token' in cmd:
+                mock_process.stdout = 'cli_test_token'
+                mock_process.returncode = 0
+            return mock_process
+
+        def mock_env_get(key, default=None):
+            """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
+            return default
+
+        with mock.patch.object(
+            check_for_unresolved_todos.os.environ, 'get', mock_env_get
+        ), mock.patch.object(
+            check_for_unresolved_todos.subprocess,
+            'run',
+            side_effect=mock_subprocess_run,
+        ):
+            token = check_for_unresolved_todos.get_github_auth_token()
+            self.assertEqual(token, 'cli_test_token')
+
+    def test_get_github_auth_token_gh_cli_not_installed(self) -> None:
+        """Test get_github_auth_token when GitHub CLI is not installed."""
+
+        def mock_subprocess_run(cmd, *args, **kwargs):
+            """Mock subprocess.run with gh CLI not installed."""
+            mock_process = mock.MagicMock()
+            mock_process.returncode = 1  # Command failed
+            return mock_process
+
+        def mock_env_get(key, default=None):
+            """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
+            return default
+
+        with mock.patch.object(
+            check_for_unresolved_todos.os.environ, 'get', mock_env_get
+        ), mock.patch.object(
+            check_for_unresolved_todos.subprocess,
+            'run',
+            side_effect=mock_subprocess_run,
+        ):
+            with self.assertRaisesRegex(
+                RuntimeError, 'GitHub CLI is not installed'
+            ):
+                check_for_unresolved_todos.get_github_auth_token()
+
+    def test_get_github_auth_token_gh_cli_auth_failed(self) -> None:
+        """Test get_github_auth_token when GitHub CLI auth fails."""
+
+        def mock_subprocess_run(cmd, *args, **kwargs):
+            """Mock subprocess.run for GitHub CLI."""
+            mock_process = mock.MagicMock()
+            if 'help' in cmd:
+                mock_process.returncode = 0
+            elif 'auth' in cmd and 'token' in cmd:
+                mock_process.returncode = 1  # Auth failed
+            return mock_process
+
+        def mock_env_get(key, default=None):
+            """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
+            return default
+
+        with mock.patch.object(
+            check_for_unresolved_todos.os.environ, 'get', mock_env_get
+        ), mock.patch.object(
+            check_for_unresolved_todos.subprocess,
+            'run',
+            side_effect=mock_subprocess_run,
+        ):
+            with self.assertRaisesRegex(
+                RuntimeError, 'Failed to get GitHub auth token'
+            ):
+                check_for_unresolved_todos.get_github_auth_token()
+
+    def test_run_graphql_query_non_200_status(self) -> None:
+        """Test run_graphql_query with non-200 HTTP status."""
+        mock_response = mock.MagicMock()
+        mock_response.__enter__.return_value.getcode.return_value = 400
+        mock_response.__enter__.return_value.read.return_value = json.dumps(
+            {'errors': 'Invalid query'}
+        ).encode('utf-8')
+
+        with mock.patch(
+            'urllib.request.urlopen', return_value=mock_response
+        ), mock.patch.object(
+            check_for_unresolved_todos,
+            'get_github_api_authorization_header',
+            return_value='Bearer test_token',
+        ):
+            with self.assertRaisesRegex(
+                RuntimeError,
+                'Failed to run the GraphQL query due to an API error',
+            ):
+                check_for_unresolved_todos.run_graphql_query('test query')
+
+    def test_run_graphql_query_request_exception(self) -> None:
+        """Test run_graphql_query with network request exception."""
+        with mock.patch(
+            'urllib.request.urlopen', side_effect=Exception('Network error')
+        ), mock.patch.object(
+            check_for_unresolved_todos,
+            'get_github_api_authorization_header',
+            return_value='Bearer test_token',
+        ):
+            with self.assertRaisesRegex(
+                RuntimeError,
+                'Failed to run the GraphQL query due to a request error',
+            ):
+                check_for_unresolved_todos.run_graphql_query('test query')
