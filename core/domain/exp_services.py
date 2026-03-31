@@ -492,6 +492,9 @@ def get_content_updates_from_cmd_edit_state_property_change(
     if change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
         return content_id_to_content_value
 
+    if change.new_value is None:
+        return content_id_to_content_value
+
     def add_subtitled_html_from_dict(
         subtitled_html: state_domain.SubtitledHtmlDict,
     ) -> None:
@@ -517,11 +520,6 @@ def get_content_updates_from_cmd_edit_state_property_change(
 
         if isinstance(conten_id, str) and isinstance(content_value, str):
             content_id_to_content_value[conten_id] = content_value
-
-    # These changes may clear fields (e.g. default outcome), so we ignore
-    # None payloads.
-    if change.new_value is None:
-        return content_id_to_content_value
 
     if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
         # Here we use cast because this 'if' condition forces change to have
@@ -593,30 +591,31 @@ def get_content_updates_from_cmd_edit_state_property_change(
         customization_arg_dicts = edit_interaction_cust_arg_cmd.new_value or {}
         for cust_arg_dict in customization_arg_dicts.values():
             for cust_arg_value in cust_arg_dict.values():
-                if isinstance(cust_arg_value, dict) and cust_arg_value.get(
-                    'html'
-                ):
+                try:
                     # Here we use cast because we are narrowing down the type
                     # UnionOfCustomizationArgsDictValues dict to SubtitledHtmlDict.
                     cust_arg_subtitled_html_dict = cast(
                         state_domain.SubtitledHtmlDict, cust_arg_value
                     )
                     add_subtitled_html_from_dict(cust_arg_subtitled_html_dict)
-                elif isinstance(cust_arg_value, dict) and cust_arg_value.get(
-                    'unicode_str'
-                ):
+                except Exception:
+                    pass
+
+                try:
                     # Here we use cast because we are narrowing down the type
-                    # UnionOfCustomizationArgsDictValues dict to
-                    # SubtitledUnicodeDict.
+                    # UnionOfCustomizationArgsDictValues dict to SubtitledUnicodeDict.
                     cust_arg_subtitled_unicode_dict = cast(
                         state_domain.SubtitledUnicodeDict, cust_arg_value
                     )
                     add_subtitled_unicode_from_dict(
                         cust_arg_subtitled_unicode_dict
                     )
-                elif isinstance(cust_arg_value, list):
+                except Exception:
+                    pass
+
+                if isinstance(cust_arg_value, list):
                     for item in cust_arg_value:
-                        if isinstance(item, dict) and item.get('html'):
+                        try:
                             # Here we use cast because we are narrowing down the
                             # type UnionOfCustomizationArgsDictValues dict to
                             # SubtitledHtmlDict.
@@ -626,7 +625,10 @@ def get_content_updates_from_cmd_edit_state_property_change(
                             add_subtitled_html_from_dict(
                                 item_subtitled_html_dict
                             )
-                        elif isinstance(item, dict) and item.get('unicode_str'):
+                        except Exception:
+                            pass
+
+                        try:
                             # Here we use cast because we are narrowing down the
                             # type UnionOfCustomizationArgsDictValues dict to
                             # SubtitledUnicodeDict.
@@ -636,6 +638,8 @@ def get_content_updates_from_cmd_edit_state_property_change(
                             add_subtitled_unicode_from_dict(
                                 item_subtitled_unicode_dict
                             )
+                        except Exception:
+                            pass
 
     return content_id_to_content_value
 

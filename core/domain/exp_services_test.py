@@ -2652,6 +2652,33 @@ class GetContentUpdatesFromCmdEditStatePropertyChangeTests(
             {'ca_question_1': '<p>Question prompt</p>'},
         )
 
+    def test_should_not_extract_content_for_invalid_customization_args(
+        self,
+    ) -> None:
+        # Invalid value type for customization arg.
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'question': {
+                        'value': [999],
+                    },
+                    'rows': {'value': 2},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {},
+        )
+
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
