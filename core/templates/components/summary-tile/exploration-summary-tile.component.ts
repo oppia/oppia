@@ -74,6 +74,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
+  @Input() tags: string[] = [];
 
   activityType!: string;
   resizeSubscription!: Subscription;
