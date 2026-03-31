@@ -26,7 +26,7 @@ from unittest import mock
 
 from core.tests import test_utils
 
-from typing import List
+from typing import Any, Dict, List
 
 from . import check_for_unresolved_todos
 
@@ -434,7 +434,7 @@ class HelperFunctionsTests(unittest.TestCase):
 
     def test_fetch_latest_comment_for_issue_no_comments(self) -> None:
         """Test fetch_latest_comment_for_issue when issue has no comments."""
-        expected_response = {
+        expected_response: Dict[str, Any] = {
             'repository': {'issue': {'comments': {'nodes': []}}}
         }
 
@@ -450,7 +450,7 @@ class HelperFunctionsTests(unittest.TestCase):
 
     def test_fetch_latest_comment_from_pull_request_no_comments(self) -> None:
         """Test fetch_latest_comment_from_pull_request when PR has no comments."""
-        expected_response = {
+        expected_response: Dict[str, Any] = {
             'repository': {'pullRequest': {'comments': {'nodes': []}}}
         }
 
