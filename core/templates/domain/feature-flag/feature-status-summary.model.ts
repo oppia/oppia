@@ -45,6 +45,9 @@ export enum FeatureNames {
   EnableWorkedExamplesRteComponent = 'enable_worked_examples_rte_component',
   ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
   EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
+  EnableReadyForReviewTest = 'enable_ready_for_review_test',
+  EnableCampaignBanner = 'enable_financial_literacy_campaign_banner',
+  EnableCampaignBannerTestMode = 'enable_financial_literacy_campaign_banner_test_mode',
 }
 
 export interface FeatureStatusSummaryBackendDict {

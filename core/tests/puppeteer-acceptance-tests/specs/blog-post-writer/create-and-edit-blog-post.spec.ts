@@ -47,6 +47,7 @@ describe('Blog Post Writer', function () {
     // Navigate to blog dashboard.
     await blogPostWriter.reloadPage();
     await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
+    await blogPostWriter.updateUsernameInRegisterModal('blogPostWriter');
     await blogPostWriter.updateUserBioInRegisterModal('I am the test user.');
     await blogPostWriter.clickOnSaveProfileButton();
     await blogPostWriter.expectToastMessage(
@@ -134,6 +135,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
 
     // Preview the blog post.
+    await blogPostWriter.scrollToTopOfPage(); // Scroll to top of the page so the background in screenshot matches.
     await blogPostWriter.previewBlogPost();
     await blogPostWriter.expectScreenshotToMatch('blogPostPreview', __dirname);
 
