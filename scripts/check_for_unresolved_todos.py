@@ -383,7 +383,10 @@ def append_todos_to_file(
             todos, key=lambda todo: (todo['file_path'], todo['line_number'])
         ):
             relative_path = todo['file_path'].replace(repository_path, '', 1)
-            file.write(f'- oppia/{relative_path}:L{todo["line_number"]}\n')
+            file.write(
+                f'- {github_perma_link_url}/{relative_path}'
+                f'#L{todo["line_number"]}\n'
+            )
 
 
 def log_unresolved_todos_failure(
