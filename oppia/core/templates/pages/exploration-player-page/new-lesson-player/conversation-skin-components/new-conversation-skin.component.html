@@ -1,0 +1,77 @@
+<div role="main" class="new-conversation-skin-animate-cards-container position-relative" *ngIf="getHasFullyLoaded()">
+  <div class="new-conversation-skin-cards-container">
+
+    <!-- tutor Card -->
+    <div class="new-conversation-skin-tutor-card-container"
+     [ngClass]="{
+       'new-conversation-skin-tutor-card-alone': !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty(),
+       'supplemental-cards': isCurrentSupplementalCardNonempty()
+     }">
+      <oppia-conversation-display [displayedCard]="getDisplayedCard()"
+                        [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
+                        [avatarImageIsShown]="true"
+                        [shouldHideInteraction]="continueToReviseStateButtonIsVisible || !showInteraction"
+                        [userIsLoggedIn]="isLoggedIn"
+                        [collectionSummary]="collectionSummary"
+                        [questionPlayerConfig]="questionPlayerConfig"
+                        [explorationIsInPreviewMode]="isInPreviewMode"
+                        [recommendedExplorationSummaries]="this.getRecommendationExplorationSummaries()"
+                        [nextLessonLink]="getExplorationLink()">
+      </oppia-conversation-display>
+
+      <!-- Ask more information about answer -->
+      <div *ngIf="getCanAskLearnerForAnswerInfo()">
+        <oppia-learner-answer-info-card></oppia-learner-answer-info-card>
+      </div>
+
+      <!-- End card display -->
+      <div *ngIf="isOnTerminalCard() && this.getRecommendationExplorationSummaries() && this.getRecommendationExplorationSummaries().length > 0 && (inStoryMode || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
+           class="new-conversation-skin-next-lesson-wrapper">
+        <div class="new-conversation-skin-next-lesson-text-container">
+          <span class="new-conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
+          <span *ngIf="!isHackyExpTitleTranslationDisplayed(this.getRecommendationExplorationSummaries()[0].id)">
+            {{ this.getRecommendationExplorationSummaries()[0].title }}
+          </span>
+          <span *ngIf="isHackyExpTitleTranslationDisplayed(this.getRecommendationExplorationSummaries()[0].id)">
+            {{ getRecommendedExpTitleTranslationKey(this.getRecommendationExplorationSummaries()[0].id) | translate }}
+          </span>
+        </div>
+        <div>
+          <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+            <button mat-raised-button class="oppia-new-button-raised">
+              <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supplemental card -->
+    <div *ngIf="isCurrentSupplementalCardNonempty()"
+         class="new-conversation-skin-supplemental-card-container">
+      <div class="new-supplemental-card-parent-container">
+        <oppia-supplemental-card [displayedCard]="getDisplayedCard()"
+                                 [isLearnAgainButton]="isLearnAgainButton()">
+        </oppia-supplemental-card>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!getCanAskLearnerForAnswerInfo()" class="new-progress-nav-bar-container">
+    <oppia-card-navigation-control [ngClass]="{'expanded-sidebar': getSidebarIsExpanded(),'question-player-footer': !isInLessonPlayer()}" (submit)="submitAnswerFromProgressNav()"
+                        [isLearnAgainButton]="isLearnAgainButton()"
+                        [displayedCard]="getDisplayedCard()"
+                        [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
+                        [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
+                        (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
+                        (skipQuestion)="skipCurrentQuestion()"
+                        [userIsLoggedIn]="isLoggedIn">
+    </oppia-card-navigation-control>
+  </div>
+
+  <!-- Correct Answer Pop-Up -->
+  <div class="new-conversation-skin-correctness-footer-container">
+    <oppia-new-correctness-footer *ngIf="isCorrectnessFooterEnabled()"></oppia-new-correctness-footer>
+    <oppia-checkpoint-celebration-footer *ngIf="isCheckpointCelebrationFooterEnabled()"></oppia-checkpoint-celebration-footer>
+  </div>
+</div>

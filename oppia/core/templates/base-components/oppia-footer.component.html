@@ -1,0 +1,122 @@
+<footer class="oppia-footer" role="contentinfo">
+  <div class="oppia-footer-newsletter-container">
+    <div class="oppia-footer-newsletter">
+      <div class="oppia-newsletter-content">
+        <h2>{{ 'I18N_FOOTER_NEWSLETTER_HEADING' | translate }}</h2>
+        <p>{{ 'I18N_FOOTER_NEWSLETTER_TEXT' | translate }}</p>
+      </div>
+      <div class="oppia-footer-newsletter-input">
+        <label id="email">
+          {{ 'I18N_FOOTER_NEWSLETTER_EMAIL' | translate }}
+        </label>
+        <div class="oppia-newsletter-input">
+          <input type="email"
+                 class="e2e-test-newsletter-input"
+                 [(ngModel)]="emailAddress"
+                 [ngModelOptions]="{standalone: true}"
+                 (ngModelChange)="clearNewsletterWarning()"
+                 (blur)="newsletterTouched = true"
+                 required="true"
+                 aria-labelledby="email">
+          <button class="oppia-footer-newsletter-button e2e-test-newsletter-subscribe-btn"
+                  [disabled]="disableNewsletterSubscription()"
+                  (click)="subscribeToMailingList()">
+            <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>
+          </button>
+        </div>
+        <div class="oppia-footer-newsletter-warning" *ngIf="emailDuplicated">
+          <p>{{ 'I18N_FOOTER_NEWSLETTER_WARNING' | translate }}</p>
+        </div>
+        <div class="oppia-footer-newsletter-warning"
+             *ngIf="newsletterTouched && (!emailAddress || (emailAddress && emailAddress.trim() === ''))">
+          <p>{{ 'I18N_FOOTER_NEWSLETTER_REQUIRED' | translate }}</p>
+        </div>
+        <div class="oppia-footer-newsletter-warning"
+             *ngIf="newsletterTouched && emailAddress && !validateEmailAddress()">
+          <p>{{ 'I18N_FOOTER_NEWSLETTER_INVALID' | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-footer-container">
+    <div class="row p-0 m-0">
+      <div class="oppia-mission-volunteer col-7">
+        <p class="oppia-mission">{{ 'I18N_FOOTER_OPPIA_MISSION' | translate }}</p>
+        <oppia-footer-donate-volunteer></oppia-footer-donate-volunteer>
+      </div>
+      <hr class="oppia-footer-separator">
+      <div class="col pd-0 pd-r-10 me-30">
+        <p>{{ 'I18N_FOOTER_ABOUT_ALL_CAPS' | translate }}</p>
+        <ul>
+          <li>
+            <a href="/about" (click)="onAboutLinkClick()" class="e2e-test-footer-about-link">
+              {{ 'I18N_FOOTER_ABOUT' | translate }}
+            </a>
+          </li>
+          <li>
+            <a [href]="getOppiaBlogUrl()" class="e2e-test-footer-blog-link">
+              {{ 'I18N_FOOTER_BLOG' | translate }}
+            </a>
+          </li>
+          <li>
+            <a href="https://groups.google.com/g/oppia" class="e2e-test-footer-forum-link">
+              {{ 'I18N_FOOTER_FORUM' | translate }}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col pd-0 me-30">
+        <p>{{ 'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate }}</p>
+        <ul>
+          <li>
+            <a href="/get-started" class="e2e-test-get-started-link">
+              {{ 'I18N_FOOTER_GET_STARTED' | translate }}
+            </a>
+          </li>
+          <li>
+            <a href="/creator-guidelines" class="e2e-test-creator-guidelines-link">
+              {{ 'I18N_PLAYBOOK_HEADING' | translate }}
+            </a>
+          </li>
+          <li>
+            <a href="/teach" (click)="onTeachLinkClick()" class="e2e-test-teach-link">
+              {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
+            </a>
+          </li>
+          <li>
+            <a href="/community-library" class="e2e-test-community-library-link">
+              {{ 'I18N_FOOTER_BROWSE_LIBRARY' | translate }}
+            </a>
+          </li>
+          <li>
+            <a href="/contact" class="e2e-test-contact-link">
+              {{ 'I18N_FOOTER_CONTACT_US' | translate }}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="oppia-flex-break"></div>
+      <div class="col p-0 max-width-fit">
+        <oppia-social-buttons></oppia-social-buttons>
+      </div>
+    </div>
+    <div class="oppia-footer-version-info e2e-test-footer-version-info" *ngIf="versionInformationIsShown">
+      Version: {{ BRANCH_NAME + ' (' + SHORT_COMMIT_HASH + ')' }}
+    </div>
+  </div>
+  <div class="oppia-footer-terms-privacy">
+    <small>
+      {{ 'I18N_FOOTER_COPYRIGHT' | translate:{currentYear: currentYear} }}
+    </small>
+    <small>
+      <a href="/terms" class="e2e-test-terms-link">
+        {{ 'I18N_FOOTER_TERMS_OF_SERVICE' | translate }}
+      </a>
+    </small>
+    <small>
+      <a href="/privacy-policy" class="e2e-test-privacy-policy-link">
+        {{ 'I18N_FOOTER_PRIVACY_POLICY' | translate }}
+      </a>
+    </small>
+  </div>
+</footer>

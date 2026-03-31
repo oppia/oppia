@@ -1,0 +1,35 @@
+<div class="url-fragment-editor">
+  <label class="form-heading">{{ label }}*</label>
+  <input type="text"
+         class="form-control url-fragment-input e2e-test-url-fragment-field"
+         [(ngModel)]="urlFragment"
+         (blur)="onBlur()"
+         [ngModelOptions]="{ standalone: true }"
+         placeholder="{{placeholder}}"
+         maxlength="{{maxLength}}"
+         [attr.disabled]="disabled?'':null"
+         [ngClass]="{ 'is-invalid': shouldInvalidUrlFragmentMessageBeShown() }"
+         (change)="onChange()">
+  <span class="oppia-input-box-subtitle">
+    <em>
+      The {{ fragmentType }} URL fragment is used to uniquely access the {{ fragmentType }} viewer page. It should consist of one or
+      more hyphen-separated words, all in lowercase, with at most {{ maxLength }} characters in total. Please use
+      meaningful keywords, and avoid using words like "and", "of", or "the". This {{ fragmentType }} can be accessed
+      at the following URL:<br>
+      {{ generatedUrlPrefix }}/{{urlFragment}}
+    </em>
+  </span>
+  <div class="oppia-input-box-subtitle text-danger"
+       [hidden]="urlFragment === '' || validUrlFragmentRegex.test(urlFragment.trim())">
+    <b>Please use only lowercase letters and hyphens.</b>
+  </div>
+  <div *ngIf="fragmentIsDuplicate" class="oppia-input-box-subtitle text-danger">
+    <em>This {{ fragmentType }} URL fragment already exists.</em>
+  </div>
+</div>
+<style>
+  .url-fragment-input {
+    border: 1px solid #b9b5b5;
+    border-radius: 5px;
+  }
+</style>

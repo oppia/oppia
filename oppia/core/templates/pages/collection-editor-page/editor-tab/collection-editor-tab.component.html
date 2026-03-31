@@ -1,0 +1,82 @@
+<div *ngIf="hasLoadedCollection()">
+  <div class="collection-editor-cards-container e2e-test-collection-editor-cards-container">
+    <mat-card class="oppia-page-card oppia-long-text">
+      <!-- Collection node list graph -->
+      <div class="collection-editor-node-list-container">
+        <div *ngIf="collection.getCollectionNodeCount() === 0">
+          No explorations have been added to this collection yet.
+        </div>
+        <div *ngIf="collection.getCollectionNodeCount() > 0">
+          <div class="collection-editor-node-container"
+               *ngFor="let node of getLinearlySortedNodes(); index as idx">
+            <oppia-collection-node-editor [collectionNode]="node"
+                                          [linearIndex]="idx"
+                                          [ngClass]="{'collection-editor-last-node': idx === (getLinearlySortedNodes().length - 1)}">
+            </oppia-collection-node-editor>
+
+            <div *ngIf="!(idx === (getLinearlySortedNodes().length - 1))"
+                 class="collection-editor-node-connector-container">
+              <svg class="collection-editor-node-connector">
+                <defs>
+                  <marker id="arrow" markerWidth="10" markerHeight="10"
+                          refx="0" refy="3" orient="auto"
+                          markerUnits="strokeWidth" viewBox="0 0 20 20">
+                    <path d="M0,0 L0,6 L9,3 z" stroke="#88888A"/>
+                  </marker>
+                </defs>
+
+                <line x1="0" y1="25" x2="35" y2="25" stroke="#88888A"
+                      stroke-width="2" marker-end="url(#arrow)" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <oppia-collection-node-creator></oppia-collection-node-creator>
+    </mat-card>
+  </div>
+</div>
+
+<style>
+  .collection-editor-cards-container {
+    margin: auto;
+    max-width: 898px;
+    position: relative;
+  }
+
+  .collection-editor-last-node {
+    margin-right: 20px;
+  }
+
+  .collection-editor-node-list-container {
+    background-color: white;
+    border: 1px solid #bdbdbd;
+    display: block;
+    margin: 30px auto;
+    min-width: 98%;
+    overflow-x: auto;
+    padding: 70px 20px;
+    text-align: center;
+    white-space: nowrap;
+    width: 98%;
+  }
+
+  .collection-editor-node-container, .collection-editor-node-connector-container {
+    display: inline-block;
+  }
+
+  .collection-editor-node-connector-container {
+    margin-left: -4px;
+    width: 45px;
+  }
+
+  .collection-editor-node-connector {
+    height: 30px;
+    width: 50px;
+  }
+
+  svg {
+    color: #88888a;
+  }
+</style>

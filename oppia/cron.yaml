@@ -1,0 +1,37 @@
+cron:
+- description: weekly cleanup of models marked as deleted
+  url: /cron/models/cleanup
+  schedule: every thursday 09:00
+- description: run user deletion job
+  url: /cron/users/user_deletion
+  schedule: every 12 hours
+- description: run user deletion verification job
+  url: /cron/users/fully_complete_user_deletion
+  schedule: every 12 hours
+- description: daily email about suggestions on the Contributor Dashboard
+  url: /cron/mail/reviewers/contributor_dashboard_suggestions
+  schedule: every day 16:00
+- description: daily email about bottlenecks on the Contributor Dashboard
+  url: /cron/mail/admins/contributor_dashboard_bottlenecks
+  schedule: every day 17:00
+- description: daily scrubber to scrub expiring feedback reports
+  url: /cron/app_feedback_report/scrub_expiring_reports
+  schedule: every day 1:00
+- description: weekly copy of a user's dashboard statistics
+  url: /cron/users/dashboard_stats
+  schedule: every monday 09:00
+- description: weekly exploration recommendations computation
+  url: /cron/explorations/recommendations
+  schedule: every tuesday 9:00
+- description: weekly exploration search rank computation
+  url: /cron/explorations/search_rank
+  schedule: every wednesday 9:00
+- description: weekly blog post search computation
+  url: /cron/blog_posts/search_rank
+  schedule: every thursday 9:00
+- description: daily job to populate translation contribution stats
+  url: /cron/suggestions/translation_contribution_stats
+  schedule: every day 16:00
+- description: daily email about new suggestions to review on the Contributor Dashboard
+  url: /cron/mail/reviewers/new_contributor_dashboard_suggestions
+  schedule: every day 17:00

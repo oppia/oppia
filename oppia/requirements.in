@@ -1,0 +1,36 @@
+# NOTE TO DEVELOPERS: If you make changes to this file, please run
+#
+#    python -m scripts.install_third_party_libs
+#
+# to update `requirements.txt` and `third_party/python_libs` accordingly.
+apache-beam[gcp]==2.67.0
+azure-cognitiveservices-speech==1.41.1
+beautifulsoup4==4.12.3
+bleach==4.1.0
+deepdiff==8.6.1
+defusedxml==0.7.1
+elasticsearch==8.17.0
+filetype==1.2.0
+firebase-admin==6.9.0
+future==1.0.0
+google-cloud-storage==2.19.0
+google-auth==2.40.3
+google-cloud-dataflow-client==0.9.0
+google-cloud-logging==3.12.1
+google-cloud-ndb==2.3.4
+google-cloud-secret-manager==2.24.0
+google-cloud-tasks==2.19.3
+google-cloud-translate==3.21.1
+gunicorn==23.0.0
+mailchimp3==3.0.21
+mutagen==1.47.0
+Pillow==10.1.0
+# Note: proto-plus is added temporarily based on https://github.com/googleapis/python-bigquery/issues/1908#issuecomment-2077899818. We use 1.25.0 since it includes the fix in https://github.com/googleapis/proto-plus-python/pull/474.
+proto-plus==1.25.0
+pylatexenc==2.10
+PyYAML==6.0.2
+redis==5.3.1
+requests==2.32.5
+requests-mock==1.12.1
+result==0.17.0
+webapp2==3.0.0b1

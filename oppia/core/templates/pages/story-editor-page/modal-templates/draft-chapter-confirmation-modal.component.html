@@ -1,0 +1,15 @@
+<div class="modal-header">
+  <h3>
+    Converting Chapter to Draft
+  </h3>
+</div>
+<div class="modal-body">
+  <p>The checklist for this chapter is not complete. Because of this, the chapter status will change to Draft when it is saved.</p>
+  <p>If you want to keep the chapter as Ready-to-Publish, please click "Cancel", fix the issues in the checklist, and try saving your changes again.</p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger e2e-test-confirm-delete-chapter-button" (click)="confirm()">
+    <span>Convert to Draft</span>
+  </button>
+</div>

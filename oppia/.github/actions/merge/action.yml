@@ -1,0 +1,26 @@
+name: 'Merge Source Branch into Base Branch'
+description: 'Merge the PR source branch into its base branch, leaving the merge commit checked-out'
+runs:
+  using: 'composite'
+  steps:
+    - id: merge
+      name: Merge
+      run: |
+        if [[ ${{ github.event_name}} != "pull_request" ]]
+        then
+          echo "Skipping merge because not triggered by a PR event."
+          exit 0
+        fi
+        echo "Base Repository: ${{ github.repository }}"
+        echo "Base Branch: ${{ github.base_ref }}"
+        echo "Head Repository: ${{ github.event.pull_request.head.repo.full_name }}"
+        echo "Head Branch: $GITHUB_HEAD_REF"
+        git config --global user.email "mergeAction@example.com"
+        git config --global user.name "Oppia Merge Base Branch GitHub Action"
+        git remote add source "https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
+        git remote add base "https://github.com/${{ github.repository }}.git"
+        git fetch source $GITHUB_HEAD_REF
+        git fetch base ${{ github.base_ref }}
+        git checkout base/${{ github.base_ref }}
+        git merge source/$GITHUB_HEAD_REF
+      shell: bash

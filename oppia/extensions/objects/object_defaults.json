@@ -1,0 +1,60 @@
+{
+    "AlgebraicExpression": "",
+    "AlgebraicIdentifier": "x",
+    "CodeString": "",
+    "CoordTwoDim": [0.0, 0.0],
+    "AllowedVariables": [],
+    "DragAndDropPositiveInt": 1,
+    "Graph": {
+        "edges": [],
+        "isDirected": false,
+        "isLabeled": false,
+        "isWeighted": false,
+        "vertices": []
+    },
+    "GraphProperty": "strongly_connected",
+    "Int": 0,
+    "ListOfCodeEvaluation": [],
+    "ListOfCoordTwoDim": [],
+    "ListOfGraph": [],
+    "ListOfSetsOfTranslatableHtmlContentIds": [],
+    "MusicPhrase": [],
+    "NonnegativeInt": 0,
+    "NormalizedString": "",
+    "PositiveInt": 1,
+    "Real": 0.0,
+    "SetOfAlgebraicIdentifier": [],
+    "SetOfTranslatableHtmlContentIds": [],
+    "SetOfUnicodeString": [],
+    "TranslatableHtmlContentId": "",
+    "TranslatableSetOfNormalizedString": {
+      "contentId": null,
+      "normalizedStrSet": []
+    },
+    "TranslatableSetOfUnicodeString": {
+      "contentId": null,
+      "unicodeStrSet": []
+    },
+    "UnicodeString": "",
+    "Fraction": {
+      "isNegative": false,
+      "wholeNumber": 0,
+      "numerator": 0,
+      "denominator": 1
+    },
+    "MathEquation": "",
+    "NumberWithUnits": {
+      "type": "real",
+      "real": 0.0,
+      "fraction": {
+        "isNegative": false,
+        "wholeNumber": 0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "units": []
+    },
+    "NumericExpression": "",
+    "PositionOfTerms": "both",
+    "RatioExpression": [1, 1]
+}

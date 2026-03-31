@@ -1,0 +1,40 @@
+<oppia-angular-root>
+  <oppia-base-content>
+    <navbar-breadcrumb>
+      <oppia-topic-editor-navbar-breadcrumb>
+      </oppia-topic-editor-navbar-breadcrumb>
+    </navbar-breadcrumb>
+
+    <nav-options class="hide-on-mobile">
+      <oppia-topic-editor-navbar>
+      </oppia-topic-editor-navbar>
+    </nav-options>
+
+    <mobile-nav-options class="hide-on-desktop">
+      <oppia-topic-editor-navbar>
+      </oppia-topic-editor-navbar>
+    </mobile-nav-options>
+
+    <content>
+      <oppia-topic-editor-page></oppia-topic-editor-page>
+    </content>
+
+    <page-footer></page-footer>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<style>
+  @media (min-width: 778px) {
+    /* this property hides mobile-nav-options on desktops */
+    .hide-on-desktop {
+      display: none;
+    }
+  }
+
+  @media (max-width: 778px) {
+    /* this property hides nav-options on mobiles */
+    .hide-on-mobile {
+      display: none;
+    }
+  }
+</style>

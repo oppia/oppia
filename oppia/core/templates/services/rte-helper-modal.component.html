@@ -1,0 +1,68 @@
+<div class="oppia-customization-arg-form-container e2e-test-rte-helper-modal-container">
+  <div class="modal-header e2e-test-modal-header e2e-test-rte-helper-modal-header">
+    <h3>Customize This Component</h3>
+  </div>
+
+  <div class="modal-body">
+    <form *ngIf="customizationArgsForm" [formGroup]="customizationArgsForm">
+      <div *ngFor="let customizationArgSpec of customizationArgSpecs;let ind = index"
+           class="oppia-customization-arg-editor e2e-test-arg-editor-{{ ind }}">
+        <strong>{{ customizationArgSpec.description }}</strong>
+        <div class="oppia-customization-arg-editor-inner e2e-test-arg-editor-inner-{{ ind }}">
+          <schema-based-editor [formControlName]="ind"
+                               [schema]="customizationArgSpec.schema">
+          </schema-based-editor>
+        </div>
+        <div *ngIf="customizationArgSpec.schema?.type === 'html' && customizationArgsForm.get(ind.toString())?.value &&
+                     isContentLengthExceeded(customizationArgsForm.get(ind.toString())?.value, componentId)"
+             class="oppia-length-validation-error">
+          The content length is too long. Please use at most {{ getCharacterLimit(componentId) }} characters.
+        </div>
+      </div>
+    </form>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button"
+            class="btn btn-danger e2e-test-delete-button"
+            *ngIf="!componentIsNewlyCreated"
+            (click)="delete()">
+            Delete
+    </button>
+
+    <button type="button"
+            class="btn btn-secondary e2e-test-cancel-rich-text-editor oppia-cancel-btn"
+            (click)="cancel()">
+            Cancel
+    </button>
+
+    <button type="button"
+            class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
+            (click)="save()"
+            [disabled]="!customizationArgsForm.valid || isErrorMessageNonempty()">
+            Done
+    </button>
+  </div>
+</div>
+<style>
+  .oppia-customization-arg-form-container .oppia-customization-arg-editor {
+    margin-bottom: 25px;
+    z-index: 3001;
+  }
+  .oppia-customization-arg-form-container
+    .oppia-customization-arg-editor-inner {
+    margin-top: 15px;
+  }
+  .oppia-customization-arg-form-container .error-message {
+    color: #f00;
+    display: block;
+    font-size: 0.8em;
+  }
+  .oppia-customization-arg-editor-modal {
+    z-index: 1;
+  }
+  input.oppia-save-btn, input.oppia-cancel-btn {
+    max-width: 100px;
+  }
+</style>

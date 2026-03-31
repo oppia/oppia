@@ -1,0 +1,2 @@
+core/templates/pages/about-page/about-page.module.ts
+core/templates/pages/volunteer-page/volunteer-page.module.ts

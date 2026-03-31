@@ -1,0 +1,24 @@
+.oppia-progress-bar {
+  background-color: #e1cbc5;
+  border-radius: 8px;
+  height: 16px;
+  width: 392px;
+}
+
+.oppia-current-progress {
+  background: linear-gradient(180deg, #dd7358 0%, #b35239 100%);
+  border-radius: 8px;
+  height: 16px;
+}
+
+@media(max-width: 768px) {
+  .oppia-progress-bar {
+    width: 300px;
+  }
+}
+
+@media(max-width: 480px) {
+  .oppia-progress-bar {
+    width: 180px;
+  }
+}

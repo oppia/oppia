@@ -1,0 +1,11 @@
+# This file specifies which non-py files need to be included in the Oppia Python
+# package that is generated in order for Apache Beam jobs to be able to run
+# in production. Note that this package is generated
+# by running 'python setup.py sdist' in build.py.
+
+graft assets
+include extensions/interactions/html_field_types_to_rule_specs.json
+include extensions/interactions/legacy_interaction_specs_by_state_version/*.json
+include extensions/interactions/rule_templates.json
+include extensions/objects/object_defaults.json
+include requirements.txt

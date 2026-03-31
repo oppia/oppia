@@ -1,0 +1,35 @@
+.donate-page .donate-learners-section .carousel-indicators li.active {
+  background-color: #005240;
+}
+
+.donate-page .donate-learners-section .carousel-indicators {
+  bottom: -48px;
+  gap: 8px;
+  margin: 0;
+}
+
+.donate-page .donate-learners-section .carousel-indicators li {
+  background-color: gray;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+}
+
+
+@media only screen and (min-width: 922px) {
+  .donate-page .donate-learners-section .carousel-indicators {
+    bottom: -36px;
+    gap: 0;
+  }
+  .donate-page .donate-learners-section .carousel-indicators li {
+    height: 15px;
+    width: 15px;
+  }
+}
+
+@media only screen and (max-width: 641px) {
+  .donate-page .donate-learners-section .carousel-indicators li {
+    height: 8px;
+    width: 8px;
+  }
+}

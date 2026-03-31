@@ -1,0 +1,3 @@
+core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts
+core/templates/pages/exploration-editor-page/exploration-editor-page.module.ts
+core/templates/pages/release-coordinator-page/release-coordinator-page.module.ts

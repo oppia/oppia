@@ -1,0 +1,17 @@
+<div>
+  <div *ngIf="getActiveTabName() === 'edit'">
+    <oppia-collection-editor-tab></oppia-collection-editor-tab>
+  </div>
+
+  <div [hidden]="getActiveTabName() !== 'settings'">
+    <collection-settings-tab></collection-settings-tab>
+  </div>
+
+  <div *ngIf="getActiveTabName() === 'history'">
+    <collection-history-tab></collection-history-tab>
+  </div>
+
+  <div *ngIf="getActiveTabName() === 'stats'">
+    <collection-statistics-tab></collection-statistics-tab>
+  </div>
+</div>

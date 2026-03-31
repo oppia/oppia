@@ -1,0 +1,11 @@
+<div class="input-group oppia-bool-editor-input-group">
+  <span>
+    <input type="checkbox" [ngModel]="localValue" (ngModelChange)="updateValue($event)" [disabled]="disabled"
+           [oppiaFocusOn]="labelForFocusTarget">
+  </span>
+</div>
+<style>
+  .oppia-bool-editor-input-group {
+    height: auto;
+  }
+</style>

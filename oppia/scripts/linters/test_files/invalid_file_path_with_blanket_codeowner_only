@@ -1,0 +1,33 @@
+# We will list a new file in /core/domain, so that it becomes a file that is covered by blanket codeowners only.
+
+# Blanket codeowners
+# This is for the case when new files are created in any directories that aren't
+# covered as a whole, since in these cases, codeowners are not recognized for
+# those files when reviewing, even if the PR does add it. Unless new
+# files/folders are created in the following directories, these codeowners would
+# be superseded by the relevant codeowners mentioned elsewhere in this file.
+# (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
+/core/controllers/ @aks681
+/core/domain/ @DubeySandeep
+/core/templates/components/ @srijanreddy98
+/core/templates/domain/ @kevintab95
+/core/templates/pages/ @srijanreddy98
+/core/templates/services/ @nithusha21
+/extensions/ @vojtechjelinek
+/scripts/ @DubeySandeep
+
+# Critical files.
+#
+# IMPORTANT NOTE: Please ensure that these files are always located at the end
+# of the CODEOWNERS file, since later rows override earlier ones. For details,
+# see the example at the bottom of this page:
+#
+#     https://help.github.com/en/articles/about-code-owners
+#
+# On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
+# in scripts/linters/run_lint_checks.py in sync with the modifications.
+/dependencies.json @vojtechjelinek
+/package.json @vojtechjelinek
+/yarn.lock @vojtechjelinek
+/scripts/install_third_party_libs.py @vojtechjelinek
+/.github/CODEOWNERS @DubeySandeep

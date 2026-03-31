@@ -1,0 +1,136 @@
+.oppia-progress-reminder-modal {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+}
+
+.oppia-progress-reminder-modal .progress-bar-container {
+  align-items: center;
+  display: flex;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin-bottom: 20px;
+  position: relative;
+  width: 100%;
+}
+
+.oppia-progress-reminder-modal .single-checkpoint-bar {
+  justify-content: center;
+}
+
+.oppia-progress-reminder-modal .multiple-checkpoints-bar {
+  justify-content: space-between;
+}
+
+.oppia-progress-reminder-modal .reverse-checkpoint-order {
+  flex-direction: row-reverse;
+}
+
+.oppia-progress-reminder-modal .progress-bar {
+  background-color: #bbb;
+  border-radius: 5px;
+  display: flex;
+  height: 5px;
+  justify-content: flex-start;
+  margin-left: 14px;
+  position: absolute;
+  width: 92%;
+}
+
+.oppia-progress-reminder-modal .completed-progress-bar {
+  background-color: #00645c;
+  border-radius: 5px;
+  height: 100%;
+  max-width: 100%;
+}
+
+.oppia-progress-reminder-modal .completed-checkpoint-node {
+  background-color: #00645c;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  height: 25px;
+  justify-content: center;
+  text-align: center;
+  width: 25px;
+  z-index: 0;
+}
+
+.oppia-progress-reminder-modal .in-progress-checkpoint-node {
+  align-items: flex-start;
+  background-color: #fff;
+  border: 3.5px solid #00645c;
+  border-radius: 50%;
+  color: #00645c;
+  display: flex;
+  font-size: 1.1em;
+  height: 35px;
+  justify-content: center;
+  text-align: center;
+  width: 35px;
+  z-index: 0;
+}
+
+.oppia-progress-reminder-modal .incomplete-checkpoint-node {
+  align-items: flex-end;
+  background-color: #fff;
+  border: 3.5px solid #bbb;
+  border-radius: 50%;
+  color: #bbb;
+  display: flex;
+  font-size: 0.9em;
+  height: 25px;
+  justify-content: center;
+  text-align: center;
+  width: 25px;
+  z-index: 0;
+}
+
+.oppia-progress-reminder-modal .progress-reminder-text {
+  color: #00645c;
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+.oppia-progress-reminder-modal .progress-reminder-text .completion-fraction {
+  font-weight: 800;
+}
+
+.oppia-progress-reminder-modal .exploration-title {
+  margin-bottom: 30px;
+  margin-top: 20px;
+}
+
+.oppia-progress-reminder-modal .continue-text {
+  color: #00645c;
+  font-size: 1.2em;
+  font-weight: 401;
+  margin-bottom: 10px;
+}
+
+.oppia-progress-reminder-modal .resume-button {
+  align-self: center;
+  background: #00645c;
+  border: 2px solid #00645c;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  padding: 5px;
+  width: 240px;
+}
+
+.oppia-progress-reminder-modal .restart-button {
+  align-self: center;
+  background: none;
+  border: 2px solid #00645c;
+  border-radius: 5px;
+  color: #00645c;
+  font-size: 0.9em;
+  padding: 5px;
+  width: 240px;
+}
+
+oppia-progress-reminder-modal .restart-button:focus,
+oppia-progress-reminder-modal .resume-button:focus {
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
+}

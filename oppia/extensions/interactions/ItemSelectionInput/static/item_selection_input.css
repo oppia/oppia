@@ -1,0 +1,121 @@
+/* The following is needed so that the radio button does not show. */
+.item-selection-info-text {
+  display: block;
+  font-size: 1em;
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+.item-selection-input-radio-button {
+  display: none;
+}
+
+.item-selection-input-checkbox {
+  font-weight: normal;
+  margin: 2px;
+}
+.mat-checkbox.item-selection-input-checkbox.mat-accent .mat-checkbox-background {
+  border-color: #0d48a1;
+}
+
+.mat-checkbox.item-selection-input-checkbox.mat-accent.mat-checkbox-checked .mat-checkbox-background {
+  background-color: #666;
+}
+
+.mat-checkbox.item-selection-input-checkbox .mat-checkbox-label {
+  vertical-align: top;
+}
+
+.item-selection-input-form-container {
+  margin-top: -5px;
+}
+.item-selection-input-item {
+  background: none;
+  border: none;
+  color: #0d48a1;
+  direction: ltr;
+  margin: 0;
+  padding-left: 0;
+  text-align: left;
+  /* This is needed so that images stay bounded by the container in Firefox. */
+  width: 100%;
+}
+.item-selection-input-container {
+  padding-bottom: 5px;
+}
+
+.item-selection-input-container .mat-form-field .mat-label {
+  border-bottom: 0;
+}
+
+.item-selection-input-container img {
+  max-height: 200px;
+  object-fit: contain;
+}
+
+.multiple-choice-option-container {
+  padding: 4px 0;
+}
+
+.multiple-choice-option {
+  background: none;
+  border: none;
+  color: #0d48a1;
+  direction: ltr;
+  text-align: left;
+}
+
+.multiple-choice-radio-button-container {
+  display: table-cell;
+}
+
+.multiple-choice-content-container {
+  display: table-cell;
+  padding-left: 12px;
+  padding-right: 16px;
+  vertical-align: top;
+}
+
+.multiple-choice-outer-radio-button {
+  border: 2px solid #0d48a1;
+  border-radius: 50%;
+  display: inline-block;
+  height: 16px;
+  margin-bottom: -1px;
+  width: 16px;
+}
+
+.multiple-choice-option.selected .multiple-choice-inner-radio-button {
+  background-color: #115fd4;
+  border-radius: 50%;
+  display: block;
+  height: 8px;
+  margin: 2px;
+  width: 8px;
+}
+
+.multiple-choice-option:focus .multiple-choice-outer-radio-button {
+  border-color: #115fd4;
+}
+
+/* Hover pseudo-class should only be used in desktops because it
+ * breaks functionality on mobile.
+ */
+@media screen and (min-width: 800px) {
+  .multiple-choice-option:hover {
+    color: #115fd4;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-inner-radio-button {
+    background-color: #115fd4;
+    border-radius: 50%;
+    display: block;
+    height: 8px;
+    margin: 2px;
+    width: 8px;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-outer-radio-button {
+    border-color: #115fd4;
+  }
+}

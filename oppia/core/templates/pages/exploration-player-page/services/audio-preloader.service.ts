@@ -1,0 +1,170 @@
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
+ */
+
+import {Injectable} from '@angular/core';
+
+import {AppConstants} from 'app.constants';
+import {Exploration} from 'domain/exploration/exploration.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {PageContextService} from 'services/page-context.service';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AudioPreloaderService {
+  private filenamesOfAudioCurrentlyDownloading: string[] = [];
+  private filenamesOfAudioToBeDownloaded: string[] = [];
+  public contentIdsToVoiceovers: {[contentId: string]: Voiceover[]} = {};
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  public exploration!: Exploration;
+  private audioLoadedCallback!: (_: string) => void;
+  // The following property can be null, when there is no recently
+  // requested audio filename.
+  private mostRecentlyRequestedAudioFilename: string | null = null;
+
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private computeGraphService: ComputeGraphService,
+    private pageContextService: PageContextService
+  ) {}
+
+  init(exploration: Exploration): void {
+    this.exploration = exploration;
+  }
+
+  kickOffAudioPreloader(sourceStateName: string): void {
+    this.filenamesOfAudioToBeDownloaded =
+      this.getAudioFilenamesInBfsOrder(sourceStateName);
+
+    const numFilesToDownload =
+      AppConstants.MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY -
+      this.filenamesOfAudioCurrentlyDownloading.length;
+    if (numFilesToDownload > 0) {
+      const filesToDownload = this.filenamesOfAudioToBeDownloaded.splice(
+        0,
+        numFilesToDownload
+      );
+      filesToDownload.forEach(filename => this.loadAudio(filename));
+      this.filenamesOfAudioCurrentlyDownloading.push(...filesToDownload);
+    }
+  }
+
+  isLoadingAudioFile(filename: string): boolean {
+    return this.filenamesOfAudioCurrentlyDownloading.indexOf(filename) !== -1;
+  }
+
+  restartAudioPreloader(sourceStateName: string): void {
+    this.cancelPreloading();
+    this.kickOffAudioPreloader(sourceStateName);
+  }
+
+  setAudioLoadedCallback(audioLoadedCallback: (_: string) => void): void {
+    this.audioLoadedCallback = audioLoadedCallback;
+  }
+
+  setMostRecentlyRequestedAudioFilename(filename: string): void {
+    this.mostRecentlyRequestedAudioFilename = filename;
+  }
+
+  clearMostRecentlyRequestedAudioFilename(): void {
+    this.mostRecentlyRequestedAudioFilename = null;
+  }
+
+  // This function returns null when there is no recently requested
+  // audio filename.
+  getMostRecentlyRequestedAudioFilename(): string | null {
+    return this.mostRecentlyRequestedAudioFilename;
+  }
+
+  getFilenamesOfAudioCurrentlyDownloading(): string[] {
+    return this.filenamesOfAudioCurrentlyDownloading;
+  }
+
+  private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
+    const initialStateName = this.exploration.getInitialState().name;
+    let bfsTraversalOfStates: string[] = [];
+    if (initialStateName !== null) {
+      bfsTraversalOfStates =
+        this.computeGraphService.computeBfsTraversalOfStates(
+          initialStateName,
+          this.exploration.getStates(),
+          sourceStateName
+        );
+    }
+    const audioFilenamesInBfsOrder = [];
+    for (const stateName of bfsTraversalOfStates) {
+      let contentIds = this.getAllContentIdsFromState(stateName) as string[];
+      for (let contentId of contentIds) {
+        let voiceovers = this.contentIdsToVoiceovers[contentId];
+        if (voiceovers === undefined) {
+          continue;
+        }
+
+        for (let voiceover of voiceovers) {
+          let filename = voiceover.filename;
+          if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
+            audioFilenamesInBfsOrder.push(voiceover.filename);
+          }
+        }
+      }
+    }
+    return audioFilenamesInBfsOrder;
+  }
+
+  getAllContentIdsFromState(stateName: string): string[] | undefined {
+    let state = this.exploration.states.getState(stateName);
+    if (state !== undefined) {
+      return state.getAllContentIds();
+    }
+  }
+
+  private loadAudio(audioFilename: string): void {
+    this.assetsBackendApiService
+      .loadAudio(this.pageContextService.getExplorationId(), audioFilename)
+      .then(loadedAudio => {
+        const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
+          filename => filename === loadedAudio.filename
+        );
+        if (index !== -1) {
+          this.filenamesOfAudioCurrentlyDownloading.splice(index, 1);
+        }
+
+        if (this.filenamesOfAudioToBeDownloaded.length > 0) {
+          const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
+          if (nextAudioFilename !== undefined) {
+            this.loadAudio(nextAudioFilename);
+            this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
+          }
+        }
+
+        if (this.audioLoadedCallback) {
+          this.audioLoadedCallback(loadedAudio.filename);
+        }
+      });
+  }
+
+  private cancelPreloading(): void {
+    this.assetsBackendApiService.abortAllCurrentAudioDownloads();
+    this.filenamesOfAudioCurrentlyDownloading.length = 0;
+  }
+}

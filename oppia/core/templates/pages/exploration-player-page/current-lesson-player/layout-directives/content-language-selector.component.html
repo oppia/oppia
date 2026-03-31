@@ -1,0 +1,11 @@
+<div *ngIf="shouldDisplaySelector()" class="row oppia-content-language-selector-container">
+  <i class="oppia-content-language-selector-icon fas fa-book-open"></i>
+  <span class="oppia-exploration-language" [innerHTML]="'I18N_PLAYER_AUDIO_LANGUAGE' | translate:{abc: xyz}"></span>
+  <select #select
+          class="oppia-content-language-selector"
+          [ngModel]="selectedLanguageCode"
+          (ngModelChange)="onSelectLanguage($event)"
+          aria-label="Website Language Select Menu">
+    <option *ngFor="let language of languageOptions" [value]="language.value">{{language.displayed}}</option>
+  </select>
+</div>

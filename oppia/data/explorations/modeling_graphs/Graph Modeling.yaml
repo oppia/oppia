@@ -1,0 +1,633 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Graph Theory
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: Learn how to model objects as graphs
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Bosses correct:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>As you can see, graphs are very useful for modeling real world behavior.\
+        \ They are widely used in many fields, such as computer science and statistics.\_\
+        </p><p>\_</p><p>Maybe from now on you'll start seeing graphs all over the\
+        \ place!\_</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Bosses question:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>There are 6 employees in a company: Fred, George, Hannah, Irene, John
+        and Kevin.</p><ul><li>Fred and Hannah report to John.</li><li>Kevin reports
+        to George.</li><li>John and George report to Irene.</li></ul><p>Try modeling
+        this as a graph, with a directed edge from an employee to his or her immediate
+        superior.</p>'
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Bosses correct
+          feedback:
+            content_id: feedback_1
+            html: <p>Well done!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 0
+                src: 1
+                weight: 1
+              - dst: 0
+                src: 2
+                weight: 1
+              - dst: 2
+                src: 5
+                weight: 1
+              - dst: 1
+                src: 4
+                weight: 1
+              - dst: 1
+                src: 3
+                weight: 1
+              isDirected: true
+              isLabeled: true
+              isWeighted: false
+              vertices:
+              - label: Irene
+                x: 156.59375
+                y: 43.0
+              - label: John
+                x: 126.59375
+                y: 99.0
+              - label: George
+                x: 220.59375
+                y: 92.0
+              - label: Fred
+                x: 103.59375
+                y: 163.0
+              - label: Hannah
+                x: 163.59375
+                y: 163.0
+              - label: Kevin
+                x: 218.59375
+                y: 162.0
+          rule_type: IsIsomorphicTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: false
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: false
+        canEditEdgeWeight:
+          value: false
+        canEditVertexLabel:
+          value: false
+        canMoveVertex:
+          value: true
+        graph:
+          value:
+            edges: []
+            isDirected: true
+            isLabeled: true
+            isWeighted: false
+            vertices:
+            - label: Fred
+              x: 150.0
+              y: 50.0
+            - label: George
+              x: 200.0
+              y: 50.0
+            - label: Irene
+              x: 150.0
+              y: 100.0
+            - label: Hannah
+              x: 269.09375
+              y: 49.0
+            - label: John
+              x: 201.09375
+              y: 101.0
+            - label: Kevin
+              x: 265.09375
+              y: 100.0
+      default_outcome:
+        dest: Bosses question
+        feedback:
+          content_id: default_outcome
+          html: <p>Not exactly... try again!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: GraphInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Cities correct:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Distances on a map are a very common thing to use graphs to model,\
+        \ as computers can then process these graphs to do stuff like path-finding\
+        \ without worrying about extra details that a full map would have. Note that\
+        \ it doesn't matter how far apart the vertices are when you draw them, the\
+        \ important thing is the weight of the edge.</p><p>\_</p><p>Another piece\
+        \ of extra information we might want to add to a graph are relations that\
+        \ only go in one direction. In that case, instead of having lines between\
+        \ dots, we have arrows instead. In mathematician-speak, this would be a \"\
+        directed graph\", since every edge has a direction.</p><p>\_</p><p>Let's give\
+        \ this a try now!</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Bosses question
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Cities question:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>Use the following information about distances between cities to model
+        them on a graph:</p><ul><li>Paris is 344km from London.</li><li>London is
+        932km from Berlin.</li><li>Berlin is 878km from Paris.</li><li>Paris is 1054km
+        from Madrid.</li><li>London is 1265km from Madrid.</li><li>Madrid is 1871km
+        from Berlin.</li></ul><p>(Note: On the graph, don''t put "km" on the edges,
+        just put the number)</p>'
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Cities correct
+          feedback:
+            content_id: feedback_1
+            html: <p>Excellent!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 1
+                src: 0
+                weight: 344
+              - dst: 0
+                src: 2
+                weight: 932
+              - dst: 1
+                src: 2
+                weight: 878
+              - dst: 3
+                src: 1
+                weight: 1054
+              - dst: 0
+                src: 3
+                weight: 1265
+              - dst: 2
+                src: 3
+                weight: 1871
+              isDirected: false
+              isLabeled: true
+              isWeighted: true
+              vertices:
+              - label: London
+                x: 158.59375
+                y: 45.0
+              - label: Paris
+                x: 227.59375
+                y: 197.0
+              - label: Berlin
+                x: 218.59375
+                y: 64.0
+              - label: Madrid
+                x: 99.59375
+                y: 177.0
+          rule_type: IsIsomorphicTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: false
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: false
+        canEditEdgeWeight:
+          value: true
+        canEditVertexLabel:
+          value: false
+        canMoveVertex:
+          value: true
+        graph:
+          value:
+            edges: []
+            isDirected: false
+            isLabeled: true
+            isWeighted: true
+            vertices:
+            - label: London
+              x: 305.09375
+              y: 32.0
+            - label: Paris
+              x: 324.09375
+              y: 98.0
+            - label: Madrid
+              x: 211.09375
+              y: 190.0
+            - label: Berlin
+              x: 491.09375
+              y: 119.0
+      default_outcome:
+        dest: Cities question
+        feedback:
+          content_id: default_outcome
+          html: <p>Not quite, try again!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: GraphInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  Friends correct:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Friendships and social relations are just one example of things that\
+        \ can be modeled by graphs.</p><p>\_</p><p>Sometimes, though, we want a bit\
+        \ more information in our graphs. For example, let's say that we want to use\
+        \ a graph to model distances between cities. In this case, we can attach numbers\
+        \ to each edge to represent this data. In mathematician-speak, such a graph\
+        \ is a \"weighted graph\", since each edge has a \"weight\" number.</p><p>\_\
+        </p><p>Let's give this a try!</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Cities question
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Friends question:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>There are a group of 5 people in a room: Alice, Bob, Charlie, David
+        and Emily. We have that:</p><ul><li>Alice is friends with everyone but David<br></li><li>Bob
+        is friends with Alice only<br></li><li>Charlie is friends with Alice and David<br></li><li>David
+        is friends with Charlie and Emily<br></li><li>Emily is friends with Alice
+        and David<br></li></ul><p>Try to model the friendships as a graph!</p>'
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Friends correct
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 1
+                src: 0
+                weight: 1
+              - dst: 0
+                src: 2
+                weight: 1
+              - dst: 4
+                src: 0
+                weight: 1
+              - dst: 3
+                src: 4
+                weight: 1
+              - dst: 2
+                src: 3
+                weight: 1
+              isDirected: false
+              isLabeled: true
+              isWeighted: false
+              vertices:
+              - label: Alice
+                x: 68.09375
+                y: 91
+              - label: Bob
+                x: 128.09375
+                y: 124
+              - label: Charlie
+                x: 114.09375
+                y: 189
+              - label: David
+                x: 45.09375
+                y: 206
+              - label: Emily
+                x: 17.09375
+                y: 161
+          rule_type: IsIsomorphicTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Friends question
+          feedback:
+            content_id: feedback_2
+            html: <p>Did you forget to add new edges?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            g:
+              edges: []
+              isDirected: false
+              isLabeled: true
+              isWeighted: false
+              vertices:
+              - label: Alice
+                x: 115.09375
+                y: 85
+              - label: Bob
+                x: 184.09375
+                y: 110
+              - label: Charlie
+                x: 164.09375
+                y: 156
+              - label: David
+                x: 109.09375
+                y: 185
+              - label: Emily
+                x: 80.09375
+                y: 138
+          rule_type: IsIsomorphicTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: false
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: false
+        canEditEdgeWeight:
+          value: false
+        canEditVertexLabel:
+          value: false
+        canMoveVertex:
+          value: true
+        graph:
+          value:
+            edges: []
+            isDirected: false
+            isLabeled: true
+            isWeighted: false
+            vertices:
+            - label: Bob
+              x: 380.59375
+              y: 97.0
+            - label: Emily
+              x: 259.59375
+              y: 98.0
+            - label: David
+              x: 291.59375
+              y: 157.0
+            - label: Charlie
+              x: 353.59375
+              y: 159.0
+            - label: Alice
+              x: 320.59375
+              y: 57.0
+      default_outcome:
+        dest: Friends question
+        feedback:
+          content_id: default_outcome
+          html: <p>Not quite... Let's try again!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: GraphInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+  Introduction:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>When mathematicians talk about graph theory, they usually aren't referring\
+        \ to curve sketching!</p><p>\_</p><p>A graph is a mathematical object that\
+        \ consists of \"vertices\" and \"edges\". Does this sound complicated? Actually,\
+        \ it isn't: in simple terms, graphs are just dots joined by lines! The dots\
+        \ are called \"vertices\" and the lines are called \"edges\". An example of\
+        \ a graph is shown below:</p><p>\_</p><oppia-noninteractive-image alt-with-value=\"\
+        &amp;quot;image&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+        &amp;quot;Asimplegraph_height_100_width_112.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
+        </p><p>\_</p><p>Despite this simplicity, graphs are useful for modeling all\
+        \ kinds of real world behavior. Not convinced? Let's take a look at some things\
+        \ that graphs can model...</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Friends question
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Graph Modeling

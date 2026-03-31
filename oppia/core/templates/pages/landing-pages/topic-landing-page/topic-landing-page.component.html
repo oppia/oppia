@@ -1,0 +1,214 @@
+<div class="oppia-landing-page">
+  <div class="oppia-landing-section text-center">
+    <div [ngStyle]="{background: 'no-repeat center/cover url(' + backgroundBannerUrl + ')'}">
+      <div class="oppia-landing-section-inner">
+        <div class="oppia-flex-box oppia-flex-row oppia-flex-mobile-column oppia-flex-mobile-align-center">
+          <div class="oppia-flex-item oppia-landing-page-image-container oppia-flex-mobile-order-2">
+            <picture>
+              <source type="image/webp" [srcset]="lessonInDevicesWebpImageSrc">
+              <source type="image/png" [srcset]="lessonInDevicesPngImageSrc">
+              <img class="oppia-devices-image" [src]="lessonInDevicesPngImageSrc" alt="Oppia lesson in different devices.">
+            </picture>
+          </div>
+          <div class="oppia-flex-item oppia-flex-box oppia-flex-column">
+            <div class="oppia-flex-item oppia-text-align-left">
+              <h2>{{ topicTitle }} just got easier. Learn anywhere, anytime with our free and interactive lessons.</h2>
+            </div>
+            <div class="oppia-flex-item oppia-text-align-left oppia-flex-mobile-order-3">
+              <p>Have your students and children get started today on our {{ topicTitle }} lessons. Oppia offers story-based content for learners at many different skill levels, and our resources are free to you, always.</p>
+            </div>
+            <div class="oppia-flex-item oppia-text-align-left oppia-mobile-text-align-center oppia-flex-mobile-order-2">
+              <button class="btn oppia-landing-page-button" (click)="onClickGetStartedButton()">Explore {{ topicTitle }} lessons</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-landing-section text-center oppia-white-container">
+    <div class="oppia-landing-section-inner oppia-flex-box oppia-flex-column">
+      <div class="oppia-flex-item">
+        <h2>What is unique about our {{ topicTitle }} lessons?</h2>
+      </div>
+      <div class="oppia-flex-item">
+        <div class="oppia-flex-box oppia-flex-row oppia-flex-mobile-column">
+          <div class="oppia-flex-item oppia-langing-page-qualities" *ngFor="let quality of lessonsQualities">
+            <div class="oppia-flex-box oppia-flex-column oppia-flex-mobile-row">
+              <div class="oppia-flex-item oppia-landing-page-image-container">
+                <picture>
+                  <source type="image/webp" [srcset]="getLessonQualityImageSrc(quality.imageWebpFilename)">
+                  <source type="image/png" [srcset]="getLessonQualityImageSrc(quality.imagePngFilename)">
+                  <img [src]="getLessonQualityImageSrc(quality.imagePngFilename)" [alt]="quality.imageAlt">
+                </picture>
+              </div>
+              <div class="oppia-flex-item oppia-landing-qualities-description">
+                <div class="oppia-flex-box oppia-flex-column">
+                  <div class="oppia-flex-item oppia-text-align-left">
+                    <h3>{{ quality.title }}</h3>
+                  </div>
+                  <div class="oppia-flex-item oppia-text-align-left">
+                    <p>{{ quality.description }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-flex-item oppia-only-display-in-mobile">
+        <button class="btn oppia-landing-page-button" (click)="onClickGetStartedButton()">Explore {{ topicTitle }} lessons</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-landing-section text-center oppia-grey-container">
+    <div class="oppia-landing-section-inner oppia-flex-box oppia-flex-column oppia-container-low-width">
+      <h3>Get started today! Looking for something else? Check out all of our other lessons in the Basic Mathematics curriculum in the Oppia Classroom! </h3>
+      <div class="oppia-flex-item">
+        <button class="btn oppia-landing-page-button" (click)="onClickGetStartedButton()">Get started with {{ topicTitle }}</button>
+      </div>
+      <div class="oppia-flex-item">
+        <button class="btn oppia-landing-page-button oppia-make-button-transparent" (click)="goToClassroom()">Go to Oppia Classroom</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-landing-page h2, button {
+    border-radius: 4px;
+    font-family: "Roboto", Arial, sans-serif;
+  }
+  .oppia-landing-page h2, h3, p {
+    line-height: 1.5;
+  }
+  .oppia-white-container {
+    background-color: #fff
+  }
+  .oppia-grey-container {
+    background-color: #e8e7e3
+  }
+  .oppia-landing-section-inner {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1200px;
+    padding: 4% 0;
+  }
+  .oppia-langing-page-qualities {
+    width: 30%;
+  }
+  .oppia-flex-box {
+    display: flex;
+    justify-content: center;
+  }
+  .oppia-flex-row {
+    flex-flow: row;
+  }
+  .oppia-flex-column {
+    flex-flow: column;
+  }
+  .oppia-flex-item {
+    padding: 5px;
+  }
+  .oppia-text-align-left {
+    text-align: left;
+  }
+  .oppia-flex-align-center {
+    align-items: center;
+  }
+  .oppia-landing-page-button {
+    background-color: #009688;
+    border: 4px solid #009688;
+    border-radius: 5px;
+    color: #fff;
+    margin: 14px 0;
+    min-width: 250px;
+    text-transform: uppercase;
+  }
+  .oppia-make-button-transparent {
+    background-color: transparent;
+    color: #009688;
+  }
+  .oppia-landing-page-image-container {
+    display: block;
+    margin: auto;
+    min-height: 150px;
+    min-width: 200px;
+    width: 80%;
+  }
+  .oppia-devices-image {
+    width: 80%;
+  }
+  .oppia-container-low-width {
+    width: 40%;
+  }
+  .oppia-only-display-in-mobile {
+    display: none;
+  }
+  .oppia-container-margin {
+    margin: 10px;
+  }
+  .oppia-landing-page-button:hover,
+  .oppia-landing-page-button:focus,
+  .oppia-landing-page-button:active {
+    background-color: #015c53;
+    border-color: #015c53;
+    color: #fff;
+  }
+  .oppia-make-button-transparent:hover,
+  .oppia-make-button-transparent:focus,
+  .oppia-make-button-transparent:active {
+    background-color: transparent;
+    border-color: #004d45;
+    color: #004d45;
+  }
+
+  @media screen and (max-width: 780px) {
+    .oppia-landing-section-inner,
+    .oppia-landing-section {
+      height: auto;
+    }
+    .oppia-landing-page-button {
+      margin: 0 0 14px;
+    }
+    .oppia-flex-mobile-column {
+      flex-flow: column;
+    }
+    .oppia-flex-mobile-order-2 {
+      order: 2;
+    }
+    .oppia-flex-mobile-order-3 {
+      order: 3;
+    }
+    .oppia-flex-mobile-row {
+      flex-flow: row;
+    }
+    .oppia-flex-mobile-align-center {
+      align-items: center;
+    }
+    .oppia-mobile-text-align-center {
+      text-align: center;
+    }
+    .oppia-landing-page-image-container {
+      min-height: unset;
+      min-width: unset;
+      width: 35%;
+    }
+    .oppia-langing-page-qualities {
+      width: 100%;
+    }
+    .oppia-landing-qualities-description {
+      width: 65%;
+    }
+    .oppia-container-low-width {
+      width: 75%;
+    }
+    .oppia-only-display-in-mobile {
+      display: block;
+    }
+    .oppia-container-margin {
+      margin: 0;
+    }
+  }
+</style>

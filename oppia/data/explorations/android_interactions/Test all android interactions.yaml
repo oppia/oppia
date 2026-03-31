@@ -1,0 +1,832 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Algorithms
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: test android specific interactions
+param_changes: []
+param_specs: {}
+schema_version: 50
+states:
+  Fraction:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>What fraction represents half of something?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: radio button
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 2
+              isNegative: false
+              numerator: 1
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_0
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: Fraction
+        feedback:
+          content_id: default_outcome
+          html: <p>That answer isn't correct. Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_2
+          html: <p>Remember that two halves, when added together, make one whole.</p>
+      - hint_content:
+          content_id: hint_3
+          html: <p>One half is a fraction resulting from dividing one by two.</p>
+      - hint_content:
+          content_id: hint_4
+          html: <p>Half in fraction&nbsp;is represented by 1 in the numerator and
+            2 in the denominator.</p>
+      id: FractionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          denominator: 2
+          isNegative: false
+          numerator: 1
+          wholeNumber: 0
+        explanation:
+          content_id: solution
+          html: <p>Half of something has one part in the numerator for every two parts
+            in the denominator.</p>
+    linked_skill_id: null
+    next_content_id_index: 5
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_2: {}
+        hint_3: {}
+        hint_4: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_2: {}
+        hint_3: {}
+        hint_4: {}
+        solution: {}
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Test exploration with all android specific interactions</p><oppia-noninteractive-image
+        alt-with-value="&amp;quot;tests&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20210622_123005_efcgi87dk2_height_130_width_289.png&amp;quot;"></oppia-noninteractive-image>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Fraction
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Text:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>In which language does Oppia mean 'to learn'?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: drag and drop
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_2
+              normalizedStrSet:
+              - finnish
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
+      default_outcome:
+        dest: Text
+        feedback:
+          content_id: default_outcome
+          html: <p>Not quite. Try again (or maybe use a search engine).</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_2: {}
+  check box:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>What are the primary colors of light?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: integer input
+          feedback:
+            content_id: feedback_6
+            html: <p><strong>Correct!</strong></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_0
+            - ca_choices_2
+            - ca_choices_3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: check box
+          feedback:
+            content_id: feedback_7
+            html: <p>'Yellow' is considered a primary color in the RYB spectrum, but
+              that doesn't correspond to light. Try again!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_1
+          rule_type: ContainsAtLeastOneOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_0
+            html: <p>Red</p>
+          - content_id: ca_choices_1
+            html: <p>Yellow</p>
+          - content_id: ca_choices_2
+            html: <p>Green</p>
+          - content_id: ca_choices_3
+            html: <p>Blue</p>
+          - content_id: ca_choices_4
+            html: <p>Orange</p>
+          - content_id: ca_choices_5
+            html: <p>Purple</p>
+        maxAllowableSelectionCount:
+          value: 3
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: check box
+        feedback:
+          content_id: default_outcome
+          html: <p>That's not quite right. Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_6: {}
+        feedback_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_6: {}
+        feedback_7: {}
+  drag and drop:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Sort the following in descending order.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: drag and drop sort
+          feedback:
+            content_id: feedback_4
+            html: <p>That's correct</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_1
+            - - ca_choices_2
+            - - ca_choices_3
+            - - ca_choices_0
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: false
+        choices:
+          value:
+          - content_id: ca_choices_0
+            html: <p>0.35</p>
+          - content_id: ca_choices_1
+            html: <p>3/5</p>
+          - content_id: ca_choices_2
+            html: <p>0.5</p>
+          - content_id: ca_choices_3
+            html: <p>0.46</p>
+      default_outcome:
+        dest: drag and drop
+        feedback:
+          content_id: default_outcome
+          html: <p>Not quite. Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 5
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_4: {}
+  drag and drop sort:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Sort the following in descending order, putting equal items in the
+        same position.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: image region
+          feedback:
+            content_id: feedback_4
+            html: <p>That's correct</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_0
+              - ca_choices_1
+            - - ca_choices_3
+            - - ca_choices_2
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: drag and drop sort
+          feedback:
+            content_id: feedback_5
+            html: <p>Seems like you did the ascending order</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_0
+            y: 2
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_0
+            html: <p>3/5</p>
+          - content_id: ca_choices_1
+            html: <p>6.0</p>
+          - content_id: ca_choices_2
+            html: <p>0.35</p>
+          - content_id: ca_choices_3
+            html: <p>0.46</p>
+      default_outcome:
+        dest: drag and drop sort
+        feedback:
+          content_id: default_outcome
+          html: <p>Not quite. Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_4: {}
+        feedback_5: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_4: {}
+        feedback_5: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  image region:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Click on the "O" letter in the below image.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          feedback:
+            content_id: feedback_1
+            html: <p>Continue</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: O
+          rule_type: IsInRegion
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        highlightRegionsOnHover:
+          value: false
+        imageAndRegions:
+          value:
+            imagePath: img_20210622_123420_m5o3l7p665_height_288_width_288.png
+            labeledRegions:
+            - label: O
+              region:
+                area:
+                - - 0.10069444444444445
+                  - 0.3285590277777778
+                - - 0.3506944444444444
+                  - 0.5959201388888888
+                regionType: Rectangle
+            - label: P
+              region:
+                area:
+                - - 0.3541666666666667
+                  - 0.4084201388888889
+                - - 0.4930555555555556
+                  - 0.64453125
+                regionType: Rectangle
+            - label: p2
+              region:
+                area:
+                - - 0.4965277777777778
+                  - 0.3980034722222222
+                - - 0.65625
+                  - 0.6584201388888888
+                regionType: Rectangle
+            - label: I
+              region:
+                area:
+                - - 0.6423611111111112
+                  - 0.3389756944444444
+                - - 0.7395833333333334
+                  - 0.6028645833333334
+                regionType: Rectangle
+            - label: a
+              region:
+                area:
+                - - 0.7256944444444444
+                  - 0.4188368055555556
+                - - 0.8715277777777778
+                  - 0.5855034722222222
+                regionType: Rectangle
+      default_outcome:
+        dest: image region
+        feedback:
+          content_id: default_outcome
+          html: <p>Select the left most letter</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ImageClickInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  integer input:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>What is 11 times 11?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: ratio
+          feedback:
+            content_id: feedback_0
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 121.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: integer input
+          feedback:
+            content_id: feedback_1
+            html: <p>Not quite. It's actually larger than that. Try again.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 121.0
+          rule_type: IsLessThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: integer input
+          feedback:
+            content_id: feedback_2
+            html: <p>Not quite. It's less than that.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 121.0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: integer input
+        feedback:
+          content_id: default_outcome
+          html: <p>Try again</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_0: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_0: {}
+        feedback_1: {}
+        feedback_2: {}
+  radio button:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Which bird can sustain flight for long periods of time?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: check box
+          feedback:
+            content_id: feedback_3
+            html: <p>Correct! Eagles can sustain flight.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_0
+            html: <p>Penguin</p>
+          - content_id: ca_choices_1
+            html: <p>Chicken</p>
+          - content_id: ca_choices_2
+            html: <p>Eagle</p>
+          - content_id: ca_choices_3
+            html: <p>Tiger</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: radio button
+        feedback:
+          content_id: default_outcome
+          html: <p>Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_0: {}
+        ca_choices_1: {}
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_3: {}
+  ratio:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Two numbers are respectively 20% and 50% more than a third number.
+        The ratio of the two numbers is:</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Text
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - 4
+            - 5
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        numberOfTerms:
+          value: 0
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+      default_outcome:
+        dest: ratio
+        feedback:
+          content_id: default_outcome
+          html: <p>Not correct</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: RatioExpressionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+states_schema_version: 45
+tags: []
+title: Test all android interactions

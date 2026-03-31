@@ -1,0 +1,24 @@
+<div class="oppia-editor-cards-container" *ngIf="stateEditorIsInitialized">
+  <oppia-state-editor (onSaveStateContent)="saveStateContent($event)"
+                      (onSaveInteractionData)="saveInteractionData($event)"
+                      (onSaveNextContentIdIndex)="saveNextContentIdIndex()"
+                      (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
+                      (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
+                      (onSaveSolution)="saveSolution($event)"
+                      (onSaveHints)="saveHints($event)"
+                      (onSaveInapplicableSkillMisconceptionIds)="saveInapplicableSkillMisconceptionIds($event)"
+                      [interactionIsShown]="interactionIsShown"
+                      [stateContentPlaceholder]="getStateContentPlaceholder()"
+                      [stateContentSaveButtonPlaceholder]="getStateContentSaveButtonPlaceholder()">
+  </oppia-state-editor>
+</div>
+
+<style>
+  .oppia-editor-cards-container {
+    padding-bottom: 5vh;
+  }
+
+  question-editor oppia-outcome-feedback-editor {
+    min-width: 100%;
+  }
+</style>

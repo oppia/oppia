@@ -1,0 +1,40 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Algorithms
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Start
+language_code: en
+objective: To learn testing
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Start:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Test exploration</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 42
+tags: []
+title: Test Exploration

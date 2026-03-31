@@ -1,0 +1,50 @@
+<div *ngIf="currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-start">
+  <ul [ngClass]="{'float-start': isLanguageRTL(), 'float-end': !isLanguageRTL()}" class="list-inline">
+    <span class="float-start footer-hints-label"
+          translate="I18N_PLAYER_HINTS"
+          *ngIf="isHintButtonVisible(0)">
+    </span>
+    <li *ngFor="let hintIndex of hintIndexes; index as idx">
+      <button mat-button class="oppia-learner-hint-solution-button e2e-test-view-hint"
+              *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)"
+              [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              (click)="displayHintModal(hintIndex)">
+        <i class="fas fa-lightbulb"></i>
+      </button>
+      <button mat-button class="oppia-learner-hint-solution-button e2e-test-view-hint"
+              *ngIf="hintIndex && isHintButtonVisible(hintIndex)"
+              [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              (click)="displayHintModal(hintIndex)">
+        <i class="fas fa-lightbulb"></i>
+      </button>
+    </li>
+    <li *ngIf="isSolutionButtonVisible()">
+      <button mat-button class="oppia-learner-hint-solution-button e2e-test-view-solution"
+              [ngClass]="{'viewed': isSolutionConsumed()}"
+              (click)="onClickSolutionButton()">
+        <i class="fas fa-lightbulb oppia-lightbulb-yellow"></i>
+      </button>
+    </li>
+  </ul>
+  <div class="hint-container" *ngIf="isVisible && isTooltipVisible() && !iframed">
+    <div class="hint-box hint-box-add-ons">
+      <span [innerHTML]="'I18N_HINT_NEED_HELP' | translate"></span>
+      <button type="button"
+              class="btn btn-close"
+              aria-label="Close"
+              (click)="isVisible = !isVisible">
+      </button>
+    </div>
+  </div>
+  <div class="hint-container solution-container"
+       *ngIf="isTooltipForSolutionVisible && isSolutionTooltipVisible() && !iframed">
+    <div class="hint-box hint-box-add-ons">
+      <span [innerHTML]="'I18N_SOLUTION_NEED_HELP' | translate"></span>
+      <button type="button"
+              class="btn btn-close"
+              aria-label="Close"
+              (click)="isTooltipForSolutionVisible = !isTooltipForSolutionVisible">
+      </button>
+    </div>
+  </div>
+</div>

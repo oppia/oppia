@@ -1,0 +1,19 @@
+oppia-lesson-feedback-modal textarea {
+  margin-bottom: 10px;
+  padding: 8px;
+  resize: none;
+  width: 100%;
+}
+
+oppia-lesson-feedback-modal input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+oppia-lesson-feedback-modal .feedback-submit-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+oppia-lesson-feedback-modal .feedback-submit-btn:disabled {
+  background-color: #dfdee2;
+}

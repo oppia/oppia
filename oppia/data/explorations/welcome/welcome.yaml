@@ -1,0 +1,828 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Welcome
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Welcome!
+language_code: en
+objective: become familiar with Oppia's capabilities
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  Estimate 100:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>What is 10 times 10?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Numeric input
+          feedback:
+            content_id: feedback_1
+            html: <p>Yes! So 11 times 11 must be bigger. Let's try again.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 100.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Estimate 100
+        feedback:
+          content_id: default_outcome
+          html: <p>No; try again. Remember, multiplication by ten can be done by just
+            adding a zero at the end.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Finding Helsinki:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>You might want to build something more complicated than that, though.
+        The good news is that you can integrate your own interactive questions into
+        Oppia!</p><p><br>Where would people say the word 'Oppia'? Well, in Finland,
+        and probably in its capital, Helsinki. Can you find Helsinki on a map of the
+        world?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Things you can do
+          feedback:
+            content_id: feedback_1
+            html: <p>Hooray, you found it!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            d: 110.0
+            p:
+            - 60.1708
+            - 24.9375
+          rule_type: Within
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Finding Helsinki
+          feedback:
+            content_id: feedback_2
+            html: <p>Close, but not quite. Helsinki is on the south coast of Finland;
+              try looking there.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            d: 1100.0
+            p:
+            - 60.1708
+            - 24.9375
+          rule_type: Within
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        latitude:
+          value: 60.1708
+        longitude:
+          value: 24.9375
+        zoom:
+          value: 2.0
+      default_outcome:
+        dest: Finding Helsinki
+        feedback:
+          content_id: default_outcome
+          html: <p>That is rather far away! Try zooming into Finland.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: InteractiveMap
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+  Numeric input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Let\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;x=11&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_151542_toclmk6i95_height_2d021_width_6d795_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;,\
+        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_151657_43i02glydt_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>?</p><p>\_</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Finding Helsinki
+          feedback:
+            content_id: feedback_1
+            html: '<p>Yes, that''s correct: 11 times 11 is 121.</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 121.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Estimate 100
+          feedback:
+            content_id: feedback_2
+            html: <p>Nope. Let's make a quick estimate.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 121.0
+          rule_type: IsLessThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numeric input
+          feedback:
+            content_id: feedback_3
+            html: <p>You are actually very close. Think about the last digit of the
+              answer; what must it be? Then you should be able to get it in one or
+              two more goes.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            tol: 9.0
+            x: 121.0
+          rule_type: IsWithinTolerance
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numeric input
+          feedback:
+            content_id: feedback_4
+            html: <p>That's too high! Try guessing lower.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 121.0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Numeric input
+        feedback:
+          content_id: default_outcome
+          html: <p>If you got here, something's gone a bit wrong with this exploration.
+            Sorry about that. If you're wondering, the answer is 121.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+  Things you can do:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>That's a very quick sample of Oppia. For more sample explorations,\
+        \ check out the Library. You can also create new explorations, like this one,\
+        \ by clicking on the \"Create\" button in the top right of the page.</p><p>\_\
+        </p><p>We hope you enjoy using Oppia. If you have feedback, please let us\
+        \ know at our <oppia-noninteractive-link text-with-value=\"&amp;quot;discussion\
+        \ forum&amp;quot;\" url-with-value=\"&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;\"\
+        ></oppia-noninteractive-link>!</p><p></p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Welcome!:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Hi, welcome to Oppia! <oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"
+        url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></oppia-noninteractive-link>
+        is a tool that helps you create interactive learning activities that can be
+        continually improved over time.<br><br>Incidentally, do you know where the
+        name 'Oppia' comes from?<br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_1
+            html: <p>Yes!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Welcome!
+          feedback:
+            content_id: feedback_2
+            html: <p>Actually, I don't know of any such characters, so I must confess
+              to making that choice up. Have another go?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_3
+            html: <p>It's translated from a different language.</p>
+          - content_id: ca_choices_4
+            html: <p>It's a nonsense word that someone made up.</p>
+          - content_id: ca_choices_5
+            html: <p>It's the name of a popular cartoon character.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: What language
+        feedback:
+          content_id: default_outcome
+          html: <p>Hm, it certainly looks like it! But it's actually a word from a
+            different language.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+  What language:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>In fact, the word Oppia means 'learn'. Can you guess which language\
+        \ it comes from?<br><br></p><oppia-noninteractive-tabs tab_contents-with-value=\"\
+        [{&amp;quot;title&amp;quot;: &amp;quot;Hints&amp;quot;, &amp;quot;content&amp;quot;:\
+        \ &amp;quot;&amp;lt;p&amp;gt;Here are some hints. The first hint narrows down\
+        \ the continent, the second tells you the geographical region, and the last\
+        \ gives away the answer.&amp;lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;}, {&amp;quot;title&amp;quot;:\
+        \ &amp;quot;Hint 1&amp;quot;, &amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;This\
+        \ language is spoken in a European country.&amp;lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;},\
+        \ {&amp;quot;title&amp;quot;: &amp;quot;Hint 2&amp;quot;, &amp;quot;content&amp;quot;:\
+        \ &amp;quot;&amp;lt;p&amp;gt;This country is located in Northern Europe.&amp;lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;},\
+        \ {&amp;quot;title&amp;quot;: &amp;quot;Hint 3&amp;quot;, &amp;quot;content&amp;quot;:\
+        \ &amp;quot;&amp;lt;p&amp;gt;Oppia is a Finnish word.&amp;lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;}]\"\
+        ></oppia-noninteractive-tabs><p>\_</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_1
+            html: <p>That's a pretty good guess. Several Greek words end with 'ia',
+              such as 'thexia' and 'paralia'. But Oppia is not a Greek word, though
+              it's from a country that's not too far away. Try again?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_17
+              normalizedStrSet:
+              - greek
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_2
+            html: <p>There is indeed an ancient Roman law named Lex Oppia, which was
+              instituted by Gaius Oppius, a friend of Julius Caesar. But this isn't
+              where our word comes from, and Oppius isn't the language (or person)
+              that we're looking for. (Please feel free to search on the Web for the
+              answer, by the way; this is admittedly a factual question which not
+              many people will know the answer to.)</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_18
+              normalizedStrSet:
+              - roman
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_3
+            html: <p>There is indeed an ancient Roman law named Lex Oppia, which was
+              instituted by Gaius Oppius, a friend of Julius Caesar. But this isn't
+              where our word comes from, and Oppius isn't the language (or person)
+              that we're looking for. (Please feel free to search on the Web for the
+              answer, by the way; this is admittedly a factual question which not
+              many people will know the answer to.)</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_19
+              normalizedStrSet:
+              - latin
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_4
+            html: <p>That's not it, alas. But you're very close! Oppia is indeed a
+              Nordic word, but it's not from Sweden.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_20
+              normalizedStrSet:
+              - Swedish
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_5
+            html: '<p>Oops, I was unclear, sorry. I meant: type ''translate oppia''
+              into a search engine, such as Google.</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_21
+              normalizedStrSet:
+              - translate oppia
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_6
+            html: <p>Not quite; that's actually the opposite of 'start'. Check your
+              spelling!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_22
+              normalizedStrSet:
+              - finish
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numeric input
+          feedback:
+            content_id: feedback_7
+            html: <p>Yes! Oppia is the Finnish word for learn. As you can see, you're
+              not limited to multiple-choice questions here. For example, you could
+              ask for numeric answers, text answers, sets of strings, and so on. You
+              can even write your own types of questions. Here is a question that
+              takes numeric input:</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_23
+              normalizedStrSet:
+              - finnish
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_8
+            html: <p>I think your spelling isn't quite right; you might want to check
+              it.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_24
+              normalizedStrSet:
+              - finnish
+          rule_type: FuzzyEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_9
+            html: <p>Great, glad to hear that. Which language is it?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_25
+              normalizedStrSet:
+              - 'yes'
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_10
+            html: <p>Nein! Ahem... no, it's not German. But it's a European language.
+              From a place that's colder than Germany. Have another go?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_26
+              normalizedStrSet:
+              - German
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_11
+            html: '<p>Mais non! Well, no, it''s not French. But it''s pretty close.
+              Here, I''ll give you a hint: Oppia is a word from one of the Scandinavian
+              countries. Can you guess which one?</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_27
+              normalizedStrSet:
+              - French
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numeric input
+          feedback:
+            content_id: feedback_12
+            html: <p>Yes! Suomi is Finnish for Finnish and Oppia is the Finnish word
+              for learn. As you can see, you're not limited to multiple-choice questions
+              here. For example, you could ask for numeric answers, text answers,
+              sets of strings, and so on. You can even write your own types of questions.
+              Here is a question that takes numeric input:</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_28
+              normalizedStrSet:
+              - suomi
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_13
+            html: <p>Finland is a country. But what language do they speak there?<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_29
+              normalizedStrSet:
+              - Finland
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_14
+            html: <p>You're close! Try heading east...<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_30
+              normalizedStrSet:
+              - Norway
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: What language
+          feedback:
+            content_id: feedback_15
+            html: <p>That's not it, alas. But you're very close! Oppia is indeed a
+              Nordic word, but it's not from Sweden.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_31
+              normalizedStrSet:
+              - Sweden
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_16
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: What language
+        feedback:
+          content_id: default_outcome
+          html: <p>Sorry, nope, we didn't get it from {{answer}}. But you can find
+            out lots of things on the Web. Why not try doing a search for [translate
+            oppia] on your favorite search engine?</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 32
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_16: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_15: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+        rule_input_17: {}
+        rule_input_18: {}
+        rule_input_19: {}
+        rule_input_20: {}
+        rule_input_21: {}
+        rule_input_22: {}
+        rule_input_23: {}
+        rule_input_24: {}
+        rule_input_25: {}
+        rule_input_26: {}
+        rule_input_27: {}
+        rule_input_28: {}
+        rule_input_29: {}
+        rule_input_30: {}
+        rule_input_31: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_16: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_15: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+        rule_input_17: {}
+        rule_input_18: {}
+        rule_input_19: {}
+        rule_input_20: {}
+        rule_input_21: {}
+        rule_input_22: {}
+        rule_input_23: {}
+        rule_input_24: {}
+        rule_input_25: {}
+        rule_input_26: {}
+        rule_input_27: {}
+        rule_input_28: {}
+        rule_input_29: {}
+        rule_input_30: {}
+        rule_input_31: {}
+states_schema_version: 42
+tags: []
+title: Welcome to Oppia!

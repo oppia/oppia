@@ -1,0 +1,25 @@
+<div class="oppia-skill-mastery-viewer">
+  <div class="skill-mastery-degree">
+    <b> Mastery Degree: </b>
+    <div class="oppia-mastery-percentage-container">
+      {{ getSkillMasteryPercentage() }}%
+      <span class="oppia-mastery-percentage-increment" *ngIf="masteryChange >= 0"> ({{ getMasteryChangePercentage() }}%) </span>
+      <span class="oppia-mastery-percentage-decrement" *ngIf="masteryChange < 0"> ({{ getMasteryChangePercentage() }}%) </span>
+    </div>
+  </div>
+  <div class="learning-tips">
+    <b> Learning Tips: </b>
+    <div> {{ getLearningTips() }} </div>
+  </div>
+</div>
+<style>
+  .oppia-skill-mastery-viewer .oppia-mastery-percentage-increment {
+    color: green;
+  }
+  .oppia-skill-mastery-viewer .oppia-mastery-percentage-decrement {
+    color: red;
+  }
+  .oppia-skill-mastery-viewer .oppia-mastery-percentage-container {
+    margin-bottom: 10px;
+  }
+</style>

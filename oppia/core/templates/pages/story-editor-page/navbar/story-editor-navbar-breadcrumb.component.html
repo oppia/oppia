@@ -1,0 +1,6 @@
+<div class="nav navbar-nav oppia-navbar-breadcrumb">
+  <span class="oppia-navbar-breadcrumb-separator"></span>
+  <span *ngIf="topicName">
+    <span (click)="returnToTopicEditorPage()">{{ topicName }}</span> &gt; {{ story.getTitle() }} (v{{ story.getVersion() }})
+  </span>
+</div>

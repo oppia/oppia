@@ -1,0 +1,23 @@
+<div class="modal-header">
+  <h4 class="modal-title" tabindex="0" #confirmHeader>
+    Confirmation Required
+  </h4>
+</div>
+<div class="modal-body" tabindex="0">
+  <p>
+    All <b>unsaved</b> changes will be lost if you exit this window. Are you sure you want to
+    leave?
+  </p>
+</div>
+<div class="modal-footer">
+  <button type="button"
+          (click)="cancel()"
+          class="btn btn-secondary">
+    Cancel
+  </button>
+  <button type="button"
+          (click)="confirm()"
+          class="btn btn-danger">
+    Leave
+  </button>
+</div>

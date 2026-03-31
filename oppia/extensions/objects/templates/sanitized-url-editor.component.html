@@ -1,0 +1,7 @@
+<form #schemaBasedEditorForm="ngForm">
+  <schema-based-editor [schema]="getSchema()"
+                       [ngModel]="value"
+                       (ngModelChange)="updateValue($event)"
+                       name="schemaForm">
+  </schema-based-editor>
+</form>

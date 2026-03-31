@@ -1,0 +1,75 @@
+<div class="oppia-topic-viewer-container position-relative e2e-test-topic-viewer-container">
+  <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
+    <div class="topic-viewer-tabs-list">
+      <ul class="topic-viewer-tabs" [ngClass]="checkTabletView() ? 'pad-top-mobile': 'pad-top-desktop'">
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}" tabindex="0" (keydown.enter)="setActiveTab('story')">
+          <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
+            <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
+            <a class="tab-title e2e-test-lesson-tab-link"
+               [innerHTML]="'I18N_TOPIC_VIEWER_LEARN' | translate">
+            </a>
+          </div>
+        </li>
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}" tabindex="0" (keydown.enter)="setActiveTab('practice')">
+          <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
+            <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+            <a class="tab-title e2e-test-practice-tab-link"
+               [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
+            </a>
+          </div>
+        </li>
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}" tabindex="0" (keydown.enter)="setActiveTab('subtopics')">
+          <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
+            <img *ngIf="!checkTabletView()" alt="revision icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+            <a class="tab-title e2e-test-study-tab-link"
+               [innerHTML]="'I18N_TOPIC_VIEWER_STUDY' | translate">
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <background-banner></background-banner>
+  <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
+    <div *ngIf="activeTab === 'story'" class="e2e-test-lessons-tab-container">
+      <stories-list *ngIf="canonicalStorySummaries.length"
+                    [topicName]="topicName"
+                    [topicId]="topicId"
+                    [topicDescription]="topicDescription"
+                    [canonicalStorySummaries]="canonicalStorySummaries"
+                    [classroomUrlFragment]="classroomUrlFragment"
+                    [classroomName]="classroomName"
+                    [topicUrlFragment]="topicUrlFragment">
+      </stories-list>
+      <mat-card dir="auto" *ngIf="!canonicalStorySummaries.length" class="oppia-page-card practice-tab-not-available-card">
+        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+        </h2>
+        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_LESSONS' | translate">
+        </div>
+      </mat-card>
+    </div>
+    <div *ngIf="activeTab === 'practice'">
+      <practice-tab *ngIf="isPracticeTabEnabled() && topicId"
+                    [subtopicsList]="subtopics"
+                    [topicName]="topicName"
+                    [topicId]="topicId"
+                    [topicUrlFragment]="topicUrlFragment"
+                    [classroomUrlFragment]="classroomUrlFragment">
+      </practice-tab>
+      <mat-card dir="auto" *ngIf="!isPracticeTabEnabled()" class="oppia-page-card practice-tab-not-available-card">
+        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+        </h2>
+        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
+        </div>
+      </mat-card>
+    </div>
+    <div *ngIf="activeTab === 'subtopics'" class="e2e-test-topic-viewer-revision-tab">
+      <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
+                      [subtopicsList]="subtopics"
+                      [topicId]="topicId"
+                      [topicUrlFragment]="topicUrlFragment"
+                      [topicName]="topicName">
+      </subtopics-list>
+    </div>
+  </div>
+</div>

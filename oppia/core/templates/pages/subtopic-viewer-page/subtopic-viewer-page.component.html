@@ -1,0 +1,315 @@
+<background-banner></background-banner>
+<div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container">
+  <div class="oppia-subtopic-viewer-container-card" tabindex="0">
+    <div class="oppia-topic-title">
+      <span *ngIf="!isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitle }}
+      </span>
+      <span *ngIf="isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitleTranslationKey | translate }}
+      </span>
+    </div>
+    <div class="oppia-subtopic-title">
+      <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitle }}
+      </span>
+      <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitleTranslationKey | translate }}
+      </span>
+    </div>
+    <div class="oppia-page-contents-viewer">
+      <div>
+        <oppia-rte-output-display *ngIf="pageContents" [rteString]="pageContents.getHtml()">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
+  <div class="breadcrumb-container">
+    <button (click)="backToTopic($event)" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
+      <i class="material-icons md-18 icon-next-study-guide">arrow_back</i>
+      {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
+    </button>
+  </div>
+  <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitle }}</p>
+  <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
+  <div class="content-box">
+    <div class="content">
+      <div class="card" *ngFor="let section of sections">
+        <div class="card-header">
+          <h3 class="card-title">{{ section.heading.unicode }}</h3>
+        </div>
+        <div class="card-content">
+          <oppia-rte-output-display [rteString]="section.content.html">
+          </oppia-rte-output-display>
+        </div>
+      </div>
+      <button *ngIf="isPracticeTabDisplayed" (click)="openPracticeMenu($event)" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
+        <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px" class="practice-section-icon">
+        <p class="text-practice-section-fixed">
+          {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }} {{ subtopicTitle }}
+        </p>
+      </button>
+    </div>
+  </div>
+  <div class="next-actions-buttons-container">
+    <button (click)="openStudyGuideMenu($event)" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
+      <i class="material-icons icon-study-guide-menu">exit_to_app</i>
+      <p class="text-go-to-study-guides-fixed"> {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}</p>
+    </button>
+    <button (click)="openStudyGuide($event)" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
+      <i class="material-icons icon-next-study-guide next-study-guide-forward-arrow">arrow_forward</i>
+      <div>
+        <div>
+          <p class="text-next-study-guide-fixed">{{ 'I18N_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON' | translate }}</p>
+        </div>
+        <div>
+          <p class="revision-subtitle">{{ checkNextSubtopicTitleLengthAndModify() }}</p>
+        </div>
+      </div>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="subtopicSummaryIsShown && !isShowRestructuredStudyGuidesFeatureEnabled()"
+     class="oppia-subtopic-viewer-next-subtopic-summary pb-4"
+     [ngClass]="{'justify-content-start': prevSubtopic, 'justify-content-end': nextSubtopic}">
+  <div class="next-subtopic-section">
+    <p *ngIf="nextSubtopic"
+       class="oppia-subtopic-next-subtopic-label"
+       [innerHTML]="'I18N_SUBTOPIC_VIEWER_NEXT_SKILL' | translate"
+       tabindex="0">
+    </p>
+    <p *ngIf="prevSubtopic"
+       class="oppia-subtopic-next-subtopic-label"
+       [innerHTML]="'I18N_SUBTOPIC_VIEWER_PREVIOUS_SKILL' | translate"
+       tabindex="0">
+    </p>
+    <oppia-subtopic-summary-tile [topicUrlFragment]="topicUrlFragment"
+                                 [classroomUrlFragment]="classroomUrlFragment"
+                                 [subtopic]="nextSubtopic || prevSubtopic"
+                                 [topicId]="parentTopicId">
+    </oppia-subtopic-summary-tile>
+  </div>
+</div>
+
+<style>
+  .content-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    top: 20vh;
+    width: 70%;
+  }
+  .content {
+    background-color: #fff;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px 35px;
+    width: 65%;
+  }
+  .content-title {
+    color: #00645c;
+    display: block;
+    font-family: Capriola, Arial, sans-serif;
+    font-size: 30px;
+    font-weight: 400;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  .html-content {
+    background-color: #ecf5fc;
+    padding: 15px 25px;
+  }
+
+  .card {
+    background-color: #fff;
+    border: none !important;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background-color: #003b36;
+    padding: 10px 10px;
+  }
+
+  .card-title {
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    text-align: center;
+  }
+
+  .card-content {
+    border: none !important;
+    padding: 18px 6px;
+  }
+
+  .new-subtopic-viewer-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .next-actions-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 30px 0 10px;
+    width: 45%;
+  }
+
+  .btn-next-actions {
+    border-radius: 4px;
+    box-shadow: 0 0 10px 0 #00000026;
+    gap: 5px;
+    height: 60px;
+    padding: 8px;
+    width: 200px;
+  }
+
+  .btn-next-study-guide {
+    align-items: center;
+    background-color: #0d48a1;
+    color: #fff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-left: 5px;
+  }
+  .text-next-study-guide-fixed {
+    font-weight: 500;
+    margin: 0 !important;
+  }
+  .text-go-to-study-guides-fixed {
+    display: inline;
+    font-weight: 500;
+  }
+
+  .btn-study-guide-menu {
+    background-color: #e8f1f0;
+    border: 1px solid #00645c;
+    color: #00645c;
+    margin-right: 5px;
+  }
+
+  .btn-back-to-topic {
+    align-self: flex-start;
+    color: #003b36;
+    display: block;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 200;
+    padding: 0;
+    text-align: center;
+  }
+
+  .breadcrumb-container {
+    display: flex;
+    margin-bottom: 15px;
+    width: 45%;
+  }
+
+  .btn-practice-section {
+    align-items: center;
+    align-self: center;
+    background-color: #f4fafb;
+    border: 1px solid #008098;
+    border-radius: 4px;
+    border-width: 1px;
+    box-shadow: 0 0 10px 0 #00000026;
+    color: #008098;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 30px;
+    padding-left: 16px;
+    padding-right: 16px;
+    width: 250px;
+  }
+  .text-practice-section-fixed {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 !important;
+  }
+
+  .next-study-guide-forward-arrow {
+    align-self: flex-start;
+    padding-top: 2px;
+  }
+
+  .icon-study-guide-menu {
+    transform: scaleX(-1);
+  }
+
+  @media screen and (max-width: 1100px) {
+    .content-box {
+      width: 100%;
+    }
+
+    .breadcrumb-container {
+      width: 65%;
+    }
+
+    .next-actions-buttons-container {
+      width: 65%;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .oppia-subtopic-viewer-container {
+      padding-top: 40px;
+    }
+    .next-actions-buttons-container {
+      width: 100%;
+    }
+    .content,
+    .content-box {
+      width: 100%;
+    }
+    .content {
+      padding: 30px;
+    }
+
+    .card-header {
+      padding: 15px 15px;
+    }
+
+    .card-title {
+      font-size: 18px;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .btn-back-to-topic {
+      align-self: center;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .breadcrumb-container {
+      justify-content: center;
+    }
+
+    .btn-study-guide-menu {
+      padding-left: 0;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    .btn-study-guide-menu {
+      align-items: center;
+      display: flex;
+      padding: 2px;
+    }
+  }
+</style>

@@ -1,0 +1,156 @@
+<ng-template #ContentEditorTab>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Content</h3>
+  <p tabindex="0">An Oppia exploration is divided into several 'cards'. The first part of a card is the <b>content</b>. Use the content section to set the scene. Tell the learner a story,
+  give them some information, and then ask a relevant question.</p>
+</ng-template>
+
+<ng-template #StateInteractionEditorTab>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Interaction</h3>
+  <p tabindex="0">After you've written the content of your conversation, choose an <b>interaction type</b>. An interaction is how you want your learner to respond
+    to your question. Oppia has several built-in interactions, including:
+  </p>
+  <ul tabindex="0">
+    <li>Multiple Choice</li>
+    <li>Text/Number input</li>
+    <li>Code snippets</li>
+  </ul> and more.
+</ng-template>
+
+<ng-template #StateResponsesTab>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Responses</h3>
+  <p tabindex="0">
+    After the learner uses the interaction you created, it's your turn again to choose how your exploration will respond to their input. You can send a learner to a new card or have them repeat the same card, depending on how they answer.
+  </p>
+</ng-template>
+
+<mat-card class="oppia-editor-card-with-avatar">
+  <div class="state-content-header-container" (click)="toggleConceptCard()">
+    <div class="state-content-header oppia-mobile-collapsible-card-header">
+      <h3 class="oppia-exp-content-card-header">Content</h3>
+      <i class="fa fa-caret-down"
+         *ngIf="!conceptCardIsShown"
+         aria-hidden="true">
+      </i>
+      <i class="fa fa-caret-up"
+         *ngIf="conceptCardIsShown"
+         aria-hidden="true">
+      </i>
+    </div>
+  </div>
+  <div class="oppia-mobile-collapsible-card-content" *ngIf="conceptCardIsShown"  joyrideStep="editorTabTourContentEditorTab" [stepContent]="ContentEditorTab">
+    <div class="oppia-editor-card-body oppia-editor-concept-container">
+      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar">
+      <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
+        <oppia-state-content-editor class="e2e-test-state-content-editor"
+                                    (saveStateContent)="sendOnSaveStateContent($event)"
+                                    [stateContentPlaceholder]="stateContentPlaceholder"
+                                    [stateContentSaveButtonPlaceholder]="stateContentSaveButtonPlaceholder">
+        </oppia-state-content-editor>
+      </div>
+    </div>
+  </div>
+</mat-card>
+
+<div joyrideStep="editorTabTourSlideStateInteractionEditorTab" [stepContent]="StateInteractionEditorTab">
+  <oppia-state-interaction-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
+                                  (onSaveInteractionData)="sendOnSaveInteractionData($event)"
+                                  (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
+                                  (onSaveSolution)="sendOnSaveSolution($event)"
+                                  (recomputeGraph)="sendRecomputeGraph()"
+                                  [hidden]="!interactionIsShown">
+  </oppia-state-interaction-editor>
+</div>
+<div joyrideStep="editorTabTourStateResponsesTab" [stepContent]="StateResponsesTab">
+  <div [hidden]="!interactionIdIsSet || currentStateIsTerminal">
+    <oppia-state-responses [addState]="addState"
+                           (navigateToState)="sendNavigateToState($event)"
+                           (onResponsesInitialized)="reinitializeEditor()"
+                           (onSaveInapplicableSkillMisconceptionIds)="sendOnSaveInapplicableSkillMisconceptionIds($event)"
+                           (onSaveInteractionAnswerGroups)="sendOnSaveInteractionAnswerGroups($event)"
+                           (onSaveInteractionDefaultOutcome)="sendOnSaveInteractionDefaultOutcome($event)"
+                           (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
+                           (onSaveSolicitAnswerDetails)="sendOnSaveSolicitAnswerDetails($event)"
+                           (refreshWarnings)="sendRefreshWarnings()">
+    </oppia-state-responses>
+    <div>
+      <oppia-state-hints-editor (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
+                                (onSaveSolution)="sendOnSaveSolution($event)"
+                                (onSaveHints)="sendOnSaveHints($event)">
+      </oppia-state-hints-editor>
+    </div>
+    <div *ngIf="currentInteractionCanHaveSolution">
+      <oppia-state-solution-editor (saveSolution)="sendOnSaveSolution($event)"
+                                   (refreshWarnings)="sendRefreshWarnings()">
+      </oppia-state-solution-editor>
+    </div>
+    <div *ngIf="explorationIsLinkedToStory">
+      <state-skill-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
+                          (onSaveLinkedSkillId)="sendOnSaveLinkedSkillId($event)">
+      </state-skill-editor>
+    </div>
+  </div>
+</div>
+
+<style>
+  .state-content-header-container {
+    display: none;
+    padding: 0 30px;
+  }
+
+  .state-content-header {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 0 15px;
+  }
+
+  .state-content-header i {
+    display: none;
+  }
+
+  .oppia-exp-content-card-header {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .state-solution-content-container {
+    padding: 15px 30px;
+  }
+
+  .oppia-add-hint-button-container {
+    margin: 5px 0 15px;
+  }
+
+  .state-content-editor-parent-container {
+    padding-bottom: 36px;
+    padding-top: 36px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .state-content-editor-parent-container {
+      padding: 0;
+    }
+    .oppia-editor-card-with-avatar {
+      padding: 0;
+    }
+    .state-content-header-container {
+      display: block;
+      padding: 0;
+    }
+
+    .state-content-header {
+      padding: 16px;
+    }
+
+    .state-content-header i {
+      display: block;
+    }
+  }
+
+  @media only screen and (max-width: 500px) {
+    .oppia-mobile-collapsible-card-content {
+      padding-left: 10px;
+    }
+  }
+</style>

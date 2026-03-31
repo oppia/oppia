@@ -1,0 +1,44 @@
+<div *ngIf="options.header">
+  <strong>{{ options.header }}</strong>
+</div>
+
+<ol class="oppia-visualization-sorted-tiles">
+  <li tabindex="-1"
+      *ngFor="let datum of data; index as index"
+      [ngClass]="{'selected': isSelected[index]}">
+    <div class="oppia-visualization-sorted-tile-content"
+         (mouseover)="select(index)"
+         (mouseleave)="unselect(index)">
+      <div class="oppia-visualization-sorted-tile-answer answer-{{ index }}"
+           #oppiaVisualizationSortedTileAnswer>
+        <oppia-interaction-display class="oppia-visualization-sorted-tile-answer-content"
+                                   [htmlData]="datum.answer">
+        </oppia-interaction-display>
+        <div class="more"
+             *ngIf="isAnswerTooLong(oppiaVisualizationSortedTileAnswer)">
+          <a href="#"
+             (click)="openAnswerContentModal(index)">
+             ...more
+          </a>
+        </div>
+      </div>
+      <div class="oppia-visualization-sorted-tile-frequency">
+        <span *ngIf="options.use_percentages">
+          {{ percentages[index] }}%
+        </span>
+        <span *ngIf="!options.use_percentages" [ngPlural]="datum.frequency">
+          <ng-template ngPluralCase="one">1 time</ng-template>
+          <ng-template ngPluralCase="other">{{ '{} times' }}</ng-template>
+        </span>
+      </div>
+      <div class="oppia-visualization-sorted-tile-tooltip"
+           *ngIf="options.use_percentages && isSelected[index]">
+        <i class="arrow-up"></i>
+        <p class="frequency" [ngPlural]="datum.frequency">
+          <ng-template ngPluralCase="one">1 time</ng-template>
+          <ng-template ngPluralCase="other">{{ '{} times' }}</ng-template>
+        </p>
+      </div>
+    </div>
+  </li>
+</ol>

@@ -1,0 +1,876 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Welcome
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: First State
+language_code: en
+objective: Learn about the world's first community-built personal online tutor
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  About this website:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Oppia.org is a hosted version of the Oppia codebase:\xC2\_</p><p><oppia-noninteractive-link\
+        \ text-with-value=\"&amp;quot;codebase&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia/&amp;quot;\"\
+        ></oppia-noninteractive-link></p><p>\_</p><p>This site is maintained by a\
+        \ group of volunteers in their spare time. If you want to help, let us know!\
+        \ You can email the site admins at admin@oppia.org.</p><p>\_</p><p>Much of\
+        \ the code powering this site is written by Google engineers. However, oppia.org\
+        \ is not a Google product, and Google bears no responsibility for the content\
+        \ of this website.</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Contact
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Credits
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Site License
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>Who created this site?</p>
+          - content_id: ca_choices_5
+            html: <p>How can I contact the creators of Oppia?</p>
+          - content_id: ca_choices_6
+            html: <p>Can I use the content on this site?</p>
+          - content_id: ca_choices_7
+            html: <p>I want to go back to my earlier questions.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: About this website
+        feedback:
+          content_id: default_outcome
+          html: <p>...</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+  Contact:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>If you have a question relating to this site, you can get in touch\
+        \ by posting to our forum:</p><p><oppia-noninteractive-link text-with-value=\"\
+        &amp;quot;forum link&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/forum&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p><p>\_</p><p>You can also follow our blog\
+        \ to get the latest updates:</p><p><oppia-noninteractive-link text-with-value=\"\
+        &amp;quot;updates&amp;quot;\" url-with-value=\"&amp;quot;https://medium.com/oppia-org&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p><p>\_</p><p>If you find a bug or have\
+        \ a feature request, please create an issue on the Oppia bug tracker:</p><p><oppia-noninteractive-link\
+        \ text-with-value=\"&amp;quot;bug tracker&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p><p>\_</p><p>You can also get in touch\
+        \ with the developers of the open-source Oppia codebase via the developers'\
+        \ forum:</p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;developers forum&amp;quot;\"\
+        \ url-with-value=\"&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p><p>\_</p><p>If you need to contact the\
+        \ admins privately, you can email them at admin@oppia.org.</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: So what can I tell you
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Credits
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Site License
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>So who created this site?</p>
+          - content_id: ca_choices_5
+            html: <p>Can I use the content on this site?</p>
+          - content_id: ca_choices_6
+            html: <p>I want to go back to my earlier questions.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Contact
+        feedback:
+          content_id: default_outcome
+          html: <p>...</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+  Contribute:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Great question! I'm completely built and owned by the community, so\
+        \ without your contributions I wouldn't exist!</p><p>\_</p><p>First, you can\
+        \ contribute by being an active member of the Oppia community. This includes\
+        \ posting on our forum, giving feedback to the site, and giving feedback to\
+        \ exploration authors. You can take a look at our Community Guidelines here:</p><p><oppia-noninteractive-link\
+        \ text-with-value=\"&amp;quot;guidelines&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#community&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p><p>\_</p><p>Second, you can contribute\
+        \ by creating content. This includes creating and publishing explorations.\
+        \ Making explorations is fun and easy, you can try it for yourself by going\
+        \ back to my home page and clicking 'Create Exploration'. You can take a look\
+        \ at the Publishing Criteria here:</p><p><oppia-noninteractive-link text-with-value=\"\
+        &amp;quot;publishing criteria&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#publish-criteria&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p><p>\_</p><p>Finally, you can contribute\
+        \ directly to the open source platform. We are always in need of designers,\
+        \ programmers, marketers, and everyone in-between. Visit the code site to\
+        \ find out more about how you can contribute:</p><p><oppia-noninteractive-link\
+        \ text-with-value=\"&amp;quot;How to contribute?&amp;quot;\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: So what can I tell you
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Credits:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>The open-source codebase has been contributed to by many people. You\
+        \ can see a full list of contributors on our Credits page:</p><p><oppia-noninteractive-link\
+        \ text-with-value=\"&amp;quot;Lst of contributors&amp;quot;\" url-with-value=\"&amp;quot;https://www.oppia.org/info#credits&amp;quot;\"\
+        ></oppia-noninteractive-link><br></p><p>\xC2\_</p><p>We have lots of plans\
+        \ for the future! If you'd like to help, you'd be very welcome, and we'd be\
+        \ delighted to help you get started. Feel free to reach out to us at the oppia-dev\
+        \ Google Group, or by contacting admin@oppia.org.</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Contact
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: So what can I tell you
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Site License
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>How can I contact the creators of Oppia?</p>
+          - content_id: ca_choices_5
+            html: <p>Can I use the site content?</p>
+          - content_id: ca_choices_6
+            html: <p>I want to go back to my earlier questions.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Credits
+        feedback:
+          content_id: default_outcome
+          html: <p>...</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  End Card:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Fantastic. Feel free to try one of my featured explorations below.\
+        \ Then I hope you'll feel inspired to create a few explorations yourself.\xC2\
+        \_</p><p>\_</p><p>Have fun!</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Example1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Great question! To demonstrate, can I ask your name?</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: Type your answer here.
+        rows:
+          value: 1
+      default_outcome:
+        dest: Example2
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+  Example2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Guess what {{answer}}, you\u2019ve been playing one of my explorations\
+        \ all along!\_</p><p>\_</p><p>Explorations are like interactive lessons. There\
+        \ are many types of interactions you can have in an exploration; for example,\
+        \ let's try using a map.</p><p>\_</p><p>Can you find Helsinki, Finland on\
+        \ the map?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Example3
+          feedback:
+            content_id: feedback_1
+            html: <p>Great job, you found it!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            d: 0
+            p:
+            - 0.0
+            - 0.0
+          rule_type: Within
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        latitude:
+          value: 0.0
+        longitude:
+          value: 0.0
+        zoom:
+          value: 0.0
+      default_outcome:
+        dest: Example3
+        feedback:
+          content_id: default_outcome
+          html: <p>Well, not quite, but close enough!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: InteractiveMap
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Example3:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>You can easily share explorations with others using the share icon\
+        \ at the top. You can click on the discussion icon to give feedback and report\
+        \ issues with a conversation. Remember, this is a community project\xE2\u20AC\
+        \u201D your participation is welcome and needed!</p><p>\_</p><p>Creating conversations\
+        \ is fun and easy. You try it for yourself by clicking 'Create Exploration'\
+        \ on my home page.</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: So what can I tell you
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  First State:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Hi there, I\u2019m Oppia! I\u2019m an online personal tutor for everybody.</p><p>\_\
+        </p><p>Most of the time, learning something online feels like watching a lecture,\
+        \ or reading a textbook, or filling out a worksheet-- ugh. My learning explorations\
+        \ are much more dynamic: I ask you questions and give you feedback, just like\
+        \ a real tutor!</p><p>\_</p><p>I\u2019m completely owned and built by the\
+        \ community, *anyone* can come build and play with me. The more you build,\
+        \ the more helpful I can be to the world.\_</p><p>\_</p><p>You can share my\
+        \ explorations in the Oppia library, embed them on a webpage, or just share\
+        \ them with your friends-- it\u2019s all up to you. And best of all, I'm completely\
+        \ free!</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: So what can I tell you
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Site License:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Yes, all the content on this website can be used freely under the Creative
+        Commons 2.0 License. You can learn more about the License here:</p><p><oppia-noninteractive-link
+        text-with-value="&amp;quot;License&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Credits
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Contact
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: So what can I tell you
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>So who created this site?</p>
+          - content_id: ca_choices_5
+            html: <p>How can I contact the creators of Oppia?</p>
+          - content_id: ca_choices_6
+            html: <p>I want to go back to my earlier questions.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Site License
+        feedback:
+          content_id: default_outcome
+          html: <p>...</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+  So what can I tell you:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>So, what else can I tell you about myself?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: About this website
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: End Card
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Example1
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Contribute
+          feedback:
+            content_id: feedback_4
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>How do your explorations work?</p>
+          - content_id: ca_choices_6
+            html: <p>What can you tell me about this website?</p>
+          - content_id: ca_choices_7
+            html: <p>How can I contribute to Oppia?</p>
+          - content_id: ca_choices_8
+            html: <p>Those were all the questions I had!</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: So what can I tell you
+        feedback:
+          content_id: default_outcome
+          html: <p>...</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+states_schema_version: 42
+tags: []
+title: About Oppia

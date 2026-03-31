@@ -1,0 +1,92 @@
+<div class="modal-header">
+  <h3>
+    Unassign Skill from Topics
+  </h3>
+</div>
+<div class="modal-body">
+  <div *ngIf="ineligibleTopicsCount > 0">
+    <div>
+      <p>
+        This skill is used as the only diagnostic test skill in the following
+        <span *ngIf="ineligibleTopicsCount === 1">topic</span>
+        <span *ngIf="ineligibleTopicsCount > 1">topics</span>
+      </p>
+      <ul>
+        <li *ngFor="let ineligibleTopicNameToTopicAssignment of ineligibleTopicNameToTopicAssignments | keyvalue">
+          <a [href]="getTopicEditorUrl(ineligibleTopicNameToTopicAssignment.value)" target="_blank" rel="noopener">
+            {{ ineligibleTopicNameToTopicAssignment.key }}
+          </a>
+        </li>
+      </ul>
+      <p>
+        Please remove this skill from the diagnostic tests of those topics first
+        before unassigning it.
+      </p>
+    </div>
+    <br>
+  </div>
+  <div class="unassign-info-text">
+    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicsCount !== 0">
+      Tick the eligible topics that you want this skill to be unassigned from.
+    </div>
+    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicsCount === 0">
+      This skill is not currently assigned to any topic.
+    </div>
+  </div>
+  <div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
+    <mat-spinner [diameter]="30"></mat-spinner>
+  </div>
+  <div *ngFor="let eligibleTopicNameToTopicAssignment of eligibleTopicNameToTopicAssignments | keyvalue"
+       class="topic-name-checkbox e2e-test-unassign-topic-label">
+    <label>
+      <input type="checkbox"
+             class="e2e-test-unassign-topic"
+             (click)="selectedTopicToUnassign(eligibleTopicNameToTopicAssignment.key)">
+      <span class="topic-name">{{ eligibleTopicNameToTopicAssignment.key }}</span>
+    </label>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger e2e-test-confirm-unassign-skill-button"
+          (click)="close()"
+          [disabled]="!topicsAssignmentsAreFetched || selectedTopicNames.length === 0"
+          *ngIf="eligibleTopicsCount !== 0">
+    <span>Unassign Skill</span>
+  </button>
+</div>
+
+<style>
+  .unassign-info-text {
+    margin-bottom: 5px;
+  }
+  .topic-name-checkbox {
+    margin-bottom: 5px;
+    margin-left: 20px;
+    margin-top: 5px;
+  }
+  .topic-name {
+    margin-left: 10px;
+  }
+  .loading-spinner {
+    margin-left: 45%;
+  }
+  @media screen and (max-width: 768px) {
+    .unassign-skill-from-topics-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .unassign-skill-from-topics-modal .modal-header {
+      display: inline-block;
+      padding: 10px 15px;
+    }
+    .unassign-skill-from-topics-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }
+</style>

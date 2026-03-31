@@ -1,0 +1,13 @@
+<form #schemaForm="ngForm">
+  <schema-based-editor [(ngModel)]="localValue" [schema]="definition" [disabled]="isDisabled()" name="schemaEditor">
+  </schema-based-editor>
+</form>
+
+<div *ngIf="!isDisabled()">
+  <button (click)="submitValue(localValue)" class="btn btn-success" [disabled]="schemaForm.invalid">
+    Submit
+  </button>
+  <button (click)="cancelEdit()" class="btn btn-secondary">
+    Cancel
+  </button>
+</div>

@@ -1,0 +1,27 @@
+<style>
+  .graph-input-container {
+    background: #fff;
+    display: flow-root;
+    padding: 8px;
+  }
+  .oppia-error-message-text {
+    margin-left: 30px;
+  }
+</style>
+
+<div class="graph-input-container">
+  <graph-viz [graph]="graph"
+             [canAddVertex]="canAddVertex"
+             [canDeleteVertex]="canDeleteVertex"
+             [canEditVertexLabel]="canEditVertexLabel"
+             [canMoveVertex]="canMoveVertex"
+             [canAddEdge]="canAddEdge"
+             [canDeleteEdge]="canDeleteEdge"
+             [canEditEdgeWeight]="canEditEdgeWeight"
+             [interactionIsActive]="interactionIsActive">
+  </graph-viz>
+  <button [ngStyle]="isLanguageRTL() ? {'margin' : '0 30px 0 0', 'float': 'right'} : {'margin' : '0 0 0 30px', 'float': 'left'}" mat-raised-button (click)="resetGraph()" [disabled]="!interactionIsActive" [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESET_BUTTON' | translate" class="e2e-test-reset-graph-button"></button>
+  <span [hidden]="errorMessage" class="text-danger oppia-error-message-text" aria-live="assertive">
+    {{errorMessage | translate}}
+  </span>
+</div>

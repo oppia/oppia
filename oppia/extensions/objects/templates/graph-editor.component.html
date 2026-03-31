@@ -1,0 +1,14 @@
+<div *ngIf="graphIsShown">
+  <graph-viz [graph]="value"
+             (graphChange)="updateValue($event)"
+             [canAddVertex]="true"
+             [canDeleteVertex]="true"
+             [canEditVertexLabel]="true"
+             [canMoveVertex]="true"
+             [canAddEdge]="true"
+             [canDeleteEdge]="true"
+             [canEditEdgeWeight]="true"
+             [canEditOptions]="true"
+             [interactionIsActive]="true">
+  </graph-viz>
+</div>

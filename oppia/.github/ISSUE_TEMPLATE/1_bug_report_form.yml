@@ -1,0 +1,117 @@
+name: Bug report
+description: Create a report to help us improve
+title: "[BUG]: "
+labels: [triage needed, bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug in the Oppia project.
+  - type: markdown
+    attributes:
+      value: |
+        Before filing a new issue, **please do a quick search** to check that it hasn't already been filed on the issue tracker. You can do this by going to [this link](https://github.com/oppia/oppia/issues) and typing some words related to the issue in the search box next to the "New issue" button.
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A concise description of what issue you're experiencing. **Example:** "When I click on the 'Sign in' button, I expect to be redirected to the login page, but instead I get a 404 error."
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: URL of the page where the issue is observed.
+      description: The URL of the specific page where you are experiencing the issue (or N/A if not applicable).
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: |
+        Steps to reproduce the behavior. **Example:** "1. Go to the library page. 2. Click on the 'Sign in' button. 3. See error."
+
+        **Notes:**
+          - Please list the full step-by-step instructions. Do not require the reader to infer the steps from watching a video.
+          - (For devs) If any feature flags need to be turned on to reproduce the issue, specify them here as well.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen. **Example:** "I expect to be redirected to the login page."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Screenshots/Videos
+      description: |
+        If applicable, add screenshots or videos to help explain your problem.
+
+        **Tip:** You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
+  - type: dropdown
+    attributes:
+      label: What device are you using?
+      description: Please select the device you're using.
+      multiple: true
+      options:
+        - Desktop
+        - Mobile
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Operating System
+      description: Please select the operating system you're using. **Example:** "Windows". If you're using multiple Operating systems, please select all that apply.
+      multiple: true
+      options:
+        - Windows
+        - MacOS
+        - Linux
+        - Android
+        - IOS
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: What browsers are you seeing the problem on?
+      description: Please select the browser you're using. If you're using multiple browsers, please select all that apply.
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Opera
+        - Internet Explorer
+        - Other
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: Browser version
+      description: Please enter the version of the browser you're using. **Example:** "90.0.4430.212". You can find this by clicking on the three dots in the top right corner of your browser and selecting "Help" or "About". If you're using multiple browsers, please enter the version for each browser. **Example:** "90.0.4430.212 (Chrome), 88.1.1 (Firefox)"
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context about the problem here.
+
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Tips for developers
+      description: Please leave this section as-is.
+      value: |
+        Before addressing the bug, please identify which PR caused the issue (you can follow the steps [here](https://github.com/oppia/oppia/wiki/How-to-find-the-commit-which-introduced-a-bug)). If you identify the PR, comment on the issue with a link to it. If not, mention the commit hash of the oldest commit you saw the bug on (and the month and year it was made in).
+
+        Then, please leave a comment with details of the approach that you plan to take to fix the issue (see [example](https://github.com/oppia/oppia/issues/19157#issuecomment-1858788463)).
+
+        **Note:** If this is your first Oppia issue, please make sure to follow our guidelines for [choosing an issue](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#choosing-a-good-first-issue) and [setting things up](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up). You will also need to show a demo of the fix working correctly on your local machine. Thanks!
+    validations:
+      required: true

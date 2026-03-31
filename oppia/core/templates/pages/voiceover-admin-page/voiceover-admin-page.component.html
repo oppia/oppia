@@ -1,0 +1,543 @@
+<mat-card class="oppia-editor-card-with-avatar oppia-page-card oppia-long-text-card">
+  <h3 class="header-text">Update language/accent pairs that learners and voice artists can select</h3>
+  <div class="card-content">
+    <div *ngIf="!pageIsInitialized">
+      <p>Loading ...</p>
+    </div>
+
+    <div *ngIf="pageIsInitialized">
+      <p class="oppia-supported-language-pair-heading"
+         *ngIf="!languageAccentCodeIsPresent">
+        No language/accent pairs added!
+      </p>
+      <p class="oppia-supported-language-pair-heading"
+         *ngIf="languageAccentCodeIsPresent">
+        <span class="language-accent-header">
+          Supported language/accent pairs
+        </span>
+        <span>
+          Supports autogeneration?
+        </span>
+      </p>
+    </div>
+
+    <div *ngIf="pageIsInitialized">
+      <div>
+        <mat-list class="oppia-supported-language-list">
+          <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
+            <div class="oppia-language-accent-list">
+              <span class="language-accent-description">
+                {{languageAccentCodeToDescription.value}}
+              </span>
+              <span class="language-accent-autogeneration-status">
+                <span *ngIf="!isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
+                      matTooltip="This language accent does not support autogeneration functionality."
+                      matTooltipPosition="after">
+                  <span class="autogeneration-disabled-text">N/A</span>
+                  <span>
+                    <mat-icon>info</mat-icon>
+                  </span>
+                </span>
+                <mat-form-field *ngIf="isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
+                                class="autogeneration-select-field">
+                  <mat-select
+                    [(ngModel)]="languageAccentCodesToSupportsAutogeneration[languageAccentCodeToDescription.key]"
+                    (selectionChange)="updateSupportsAutogenerationField(languageAccentCodeToDescription.key, $event.value)"
+                    [ngClass]="'e2e-test-' + languageAccentCodeToDescription.key + '-supports-autogeneration-select'">
+                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="true">Yes</mat-option>
+                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="false">No</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </span>
+              <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
+                      mat-icon-button
+                      mat-button>
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <div *ngIf="languageAccentDropdownIsShown" class="oppia-language-accent-dropdown">
+        <mat-form-field class="oppia-language-accent-dropdown-selector">
+          <mat-label>Language Accent pair</mat-label>
+          <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)"
+                      class="e2e-test-language-accent-dropdown-selector">
+            <mat-option *ngFor="let languageAccentDescriptionToCode of availableLanguageAccentDescriptionsToCodes | keyvalue"
+                        [value]="languageAccentDescriptionToCode.value"
+                        class="e2e-test-language-accent-selector-option">
+              <span>
+                {{languageAccentDescriptionToCode.key}}
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button (click)="removeLanguageAccentDropdown()"
+                mat-icon-button
+                mat-button
+                class="btn btn-secondary oppia-cancel-language-accent-dropdown">
+          Cancel
+        </button>
+      </div>
+
+      <div class="oppia-first-card-bottom-buttons">
+        <button (click)="showLanguageAccentDropdown()"
+                *ngIf="!languageAccentDropdownIsShown"
+                class="e2e-test-add-new-language-accent-button btn btn-secondary">
+          <mat-icon>add</mat-icon>
+          <span> Add new language accent support</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-page-card oppia-long-text-card">
+  <h3>Autogenerate Voiceovers for Exploration</h3>
+
+  <p>
+    Regenerates the voiceovers for an exploration’s content in the selected language-accent pair.
+  </p>
+  <div class="exploration-data-request-container" *ngIf="!isExplorationDataResponseContainerShown">
+    <div class="exploration-data-request-input-container">
+      <span class="exploration-id-label">Exploration ID: </span>
+
+      <input class="exploration-id-input" [(ngModel)]="explorationIDForVoiceoverRegeneration" type="text">
+
+      <button class="btn btn-primary exploration-data-request-button"
+              *ngIf="!explorationDataResponseForVoiceoverRegeneration"
+              (click)="fetchExplorationDataForVoiceoverRegeneration()"
+              [disabled]="explorationIDForVoiceoverRegeneration?.length === 0">
+        <span *ngIf="!explorationDataForVoiceoverRegenerationIsLoading">
+          Get Data
+        </span>
+        <mat-spinner color="accent" class="mx-auto" [diameter]="25" *ngIf="explorationDataForVoiceoverRegenerationIsLoading"></mat-spinner>
+      </button>
+
+      <button class="btn btn-primary" *ngIf="explorationDataResponseForVoiceoverRegeneration">Reset</button>
+    </div>
+  </div>
+
+  <div class="exploration-data-response-row-container" *ngIf="isExplorationDataResponseContainerShown">
+    <span class="exploration-id-label">Exploration ID: </span>
+    <span>{{explorationIDForVoiceoverRegeneration}}</span>
+    <button class="btn btn-secondary exploration-data-close-button" (click)="closeExpDataResponseContainer()">Close</button>
+  </div>
+
+  <div class="exploration-data-response-container" *ngIf="isExplorationDataResponseContainerShown && !explorationDataResponseForVoiceoverRegeneration">
+
+    <div class="exploration-data-response-row-container">
+      <span class="exploration-title-label">Title:</span>
+      <span>{{explorationTitleForVoiceoverRegeneration}}</span>
+    </div>
+
+    <div class="exploration-data-response-row-container">
+      <span class="language-accent-code-label">Language Accent Code:</span>
+      <div>
+        <mat-form-field>
+          <mat-label>Language Accent pair</mat-label>
+          <mat-select [formControl]="languageAccentControl"
+                      (selectionChange)="updateLanguageAccentForVoiceoverRegenerationChoice($event.value)"
+                      class="e2e-test-language-accent-for-voiceover-regeneration-selector">
+            <mat-option *ngFor="let choice of autogeneratableLanguageAccentCodes"
+                        [value]="choice">
+              {{languageAccentCodesToDescriptionsMasterList[choice]}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div>
+      <p>
+        <i>
+          <strong>Note:</strong> This process incurs a cost. Assuming this exploration contains 10,000 characters in English, the total cost of regenerating voiceovers is approximately $0.16 USD.
+        </i>
+      </p>
+    </div>
+
+    <div>
+      <button class="btn btn-primary generate-voiceover-button"
+              (click)="generateVoiceoversForExploration()"
+              [disabled]="!selectedLanguageAccentForExplorationVoiceoverRegeneration">
+              Generate
+      </button>
+    </div>
+  </div>
+  <div *ngIf="explorationDataResponseForVoiceoverRegeneration && explorationIDForVoiceoverRegeneration.length > 0"
+       class="exploration-data-response-message-container">
+    <p>{{explorationDataResponseForVoiceoverRegeneration}}</p>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
+  <h3>Automatic voiceover updates</h3>
+
+  <div class="info-text">
+    <p>
+      To ensure that all curated content has matching audio, these updates run
+      automatically when the content of an exploration in a published topic is
+      updated.
+    </p>
+    <span>
+      <i>
+        Note: Does not include manual requests triggered via the
+        exploration editor page.
+      </i>
+    </span>
+  </div>
+
+  <div>
+    <div class="datepicker-container">
+      <div class="date-selector-inner-container">
+        <mat-form-field class="datepicker-form-container">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [formGroup]="range" [rangePicker]="picker" class="datepicker-input">
+            <input matStartDate formControlName="start" placeholder="Start date">
+            <input matEndDate formControlName="end" placeholder="End date">
+          </mat-date-range-input>
+          <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+
+        <button (click)="fetchVoiceoverRegenerationRecord()"
+                class="btn btn-primary apply-datepicker-button">
+          Apply
+        </button>
+      </div>
+
+      <div *ngIf="cloudTaskRunList.length === 100">
+        <p class="exceeding-limit-info-text">
+          <strong>Note: </strong>
+          Displaying the most recent 100 voiceover regeneration records (in descending order of "Last updated"). Please choose a narrower date range to view more specific results.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <div *ngIf="fetchingRegeneratedVoiceoverData">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
+  <div *ngIf="!fetchingRegeneratedVoiceoverData && !cloudTaskRunList.length && !regenerationRecordsErrorMessage">
+    <p class="info-text">
+      <i>No records found for the selected date range.</i>
+    </p>
+  </div>
+
+  <div *ngIf="cloudTaskRunList.length > 0">
+    <table mat-table [dataSource]="cloudTaskRunList" class="voice-artist-table">
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef> State </th>
+        <td mat-cell *matCellDef="let element">
+          <mat-icon class="job-status-mat-icon"
+                    [matTooltip]="element.getJobStatusTooltipString()"
+                    [color]="element.getJobStatusMaterialThemeColor()"
+                    [ngClass]="{'error-icon': element.getJobStatusMaterialIconCode() === 'error'}">
+            {{ element.getJobStatusMaterialIconCode() }}
+          </mat-icon>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="functionID">
+        <th mat-header-cell *matHeaderCellDef> Event </th>
+        <td mat-cell *matCellDef="let element" class="task-run-data"> {{getFunctionIdText(element.functionId)}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="numberOfRetries">
+        <th mat-header-cell *matHeaderCellDef> Number of retries </th>
+        <td mat-cell *matCellDef="let element"> {{element.currentRetryAttempt}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="startedOn">
+        <th mat-header-cell *matHeaderCellDef> Started on </th>
+        <td mat-cell *matCellDef="let element"> {{element.createdOn | date:'medium'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastUpdated">
+        <th mat-header-cell *matHeaderCellDef> Last updated </th>
+        <td mat-cell *matCellDef="let element"> {{element.lastUpdated | date:'medium'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="details">
+        <th mat-header-cell *matHeaderCellDef> Details </th>
+        <td mat-cell *matCellDef="let element">
+          <button class="btn btn-secondary" (click)="openCloudTaskRunDetailModal(element.id)">Detail</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="autogeneratedVoiceoverRecordsDisplayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: autogeneratedVoiceoverRecordsDisplayedColumns;"></tr>
+    </table>
+  </div>
+</mat-card>
+
+<div class="information-toast" *ngIf="toastMessage.length > 0">
+  <p>
+    {{toastMessage}}
+  </p>
+</div>
+
+<style>
+  .generate-voiceover-button {
+    color: #fff;
+    float: right;
+  }
+  .exploration-id-label, .exploration-title-label,  .language-accent-code-label {
+    font-weight: bold;
+    width: 30%;
+  }
+  .exploration-data-request-button {
+    margin-left: 10px;
+    width: 10%;
+  }
+  .exploration-data-request-input-container, .exploration-data-response-row-container {
+    align-items: center;
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .exploration-data-close-button {
+    margin-left: 50%;
+  }
+  .exploration-data-response-message-container {
+    color: #f00;
+  }
+  .information-toast {
+    background-color: #4caf50;
+    border-radius: 8px;
+    bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    margin: 20px;
+    padding: 12px 16px;
+    position: fixed;
+    right: 20px;
+    transition: opacity 0.8s ease;
+    width: 300px;
+    z-index: 9999;
+  }
+  .information-toast.fade-out {
+    opacity: 0;
+  }
+  .error-icon {
+    color: red;
+  }
+  .refresh-data-info-container {
+    margin: 20px;
+    text-align: right;
+  }
+  .datepicker-container {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 1%;
+    margin-left: 1%;
+  }
+  .date-selector-inner-container {
+    align-items: center;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin: 10px;
+    padding: 16px 20px;
+    position: relative;
+    vertical-align: top;
+  }
+  .exceeding-limit-info-text {
+    padding: 10px 20px;
+  }
+  .info-text {
+    margin-left: 1%;
+  }
+  .date-selector-inner-container .mat-form-field-wrapper {
+    padding-bottom: 0;
+  }
+  .date-selector-inner-container .filter-label {
+    margin: 2px;
+  }
+  .date-selector-inner-container mat-form-field .mat-form-field-infix {
+    border-top: 0;
+    display: flex;
+    padding-left: 4px;
+    width: 100px;
+  }
+  .date-selector-inner-container mat-form-field .mat-form-field-wrapper .mat-form-field-flex {
+    margin: 0 2px 0 2px;
+  }
+  .datepicker-container button {
+    margin-top: 20px;
+  }
+  .datepicker-form-container {
+    width: 30%;
+  }
+  .language-accent-header {
+    margin-right: 23%;
+  }
+  .language-accent-autogeneration-status {
+    cursor: pointer;
+    width: 20%;
+  }
+  .language-accent-description {
+    width: 30%;
+  }
+  .table-container {
+    max-height: 500px;
+    overflow: auto;
+  }
+  .modify-accent {
+    width: 120px;
+  }
+  .table-header {
+    color: #000;
+    font-size: initial;
+  }
+  .voice-artist-table {
+    width: 100%;
+  }
+  .mat-header-cell {
+    justify-content: center;
+    text-align: center;
+  }
+  .mat-cell {
+    justify-content: center;
+    text-align: center;
+  }
+  .mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+  }
+
+  .mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+  }
+
+  .demo-row-is-clicked {
+    font-weight: bold;
+  }
+
+  .oppia-cancel-language-accent-dropdown {
+    width: fit-content;
+  }
+  .oppia-long-text-card {
+    max-width: 1050px;
+  }
+  .oppia-update-button {
+    margin-left: 10px;
+  }
+  .card-content {
+    padding: 20px
+  }
+  .oppia-language-accent-list {
+    align-items: center;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    width: -webkit-fill-available;
+  }
+  .oppia-language-accent-dropdown {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 25px;
+    padding-top: 20px;
+    width: -webkit-fill-available;
+  }
+  .oppia-first-card-bottom-buttons {
+    display: flex;
+    margin-left: 25px;
+    padding-top: 20px;
+  }
+  .oppia-language-accent-dropdown-selector {
+    width: 400px;
+  }
+  .oppia-add-language-accent-button {
+    color: #00645c;
+  }
+  .oppia-supported-language-pair-heading {
+    font-weight: bold;
+    margin-left: 25px;
+  }
+  .oppia-supported-language-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .mat-card.oppia-page-card {
+    background: rgb(255,255,255);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-top: 5%;
+    overflow: auto;
+    padding: 30px 55px 30px 45px;
+    position: relative;
+  }
+  /* :ng-deep is used to style the dropdown select panel.*/
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .mat-select-panel {
+    margin-left: 15px;
+  }
+
+  /* :ng-deep is used to style the form field.*/
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .datepicker-form-container .mat-form-field-infix {
+    align-items: center;
+    display: flex;
+    width: auto;
+  }
+
+  .autogeneration-disabled-text {
+    margin-right: 15px;
+  }
+
+  @media (max-width: 600px) {
+    .language-accent-description {
+      width: 50%;
+    }
+    .oppia-supported-language-pair-heading {
+      font-size: 1rem;
+      margin-left: 0;
+    }
+    .oppia-long-text-card {
+      padding: 8px 2px 8px 2px;
+    }
+    .language-accent-header {
+      margin-right: 0%;
+    }
+    .header-text {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .oppia-language-accent-list {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: bold;
+      gap: 8px;
+      justify-content: flex-start;
+      padding: 5px 0;
+      width: 100%;
+    }
+    .language-accent-autogeneration-status {
+      width: 30%;
+    }
+    .autogeneration-select-field {
+      width: 100%;
+    }
+    .oppia-language-accent-dropdown-selector {
+      min-width: 120px;
+      width: 100%;
+    }
+    .voice-artist-table {
+      font-size: 0.85rem;
+    }
+    .modify-accent {
+      margin-top: 5px;
+      width: 100%;
+    }
+    .mat-card.oppia-page-card {
+      margin: 20% 5%;
+      padding: 10px;
+    }
+  }
+</style>

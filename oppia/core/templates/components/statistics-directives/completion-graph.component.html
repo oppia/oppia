@@ -1,0 +1,30 @@
+<svg class="completion-bar" viewBox="0 0 128 64">
+  <g fill-opacity="0" stroke-width="12px">
+    <!--
+      NOTE TO DEVELOPERS: The d attribute defines a path to be drawn. The definition uses commands
+      (letters) and parameters (numbers) to represent motions.
+      For more details, see: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d.
+
+      The following commands are used to draw the completion bar:
+          `M` command: Move the current point to the coordinate x, y.
+              x: number (in pixels).
+              y: number (in pixels).
+          `a` command: Draws an arc curve from the current point to a point for which coordinates
+                       are those of the current point shifted by dx along the x-axis and dy along
+                       the y-axis. The center of the ellipse used to draw the arc is determined
+                       automatically based on the other parameters of the command:
+              rx: number. Horizontal radius of the ellipse in pixels.
+              ry: number. Vertical radius of the ellipse in pixels.
+              angle: number. Rotation of the ellipse relative to the x-axis in degrees.
+              large-arc-flag: boolean. When 1, follows the larger of two arcs which would connect
+                              the two end-points of the arc, otherwise the smaller of the two.
+              sweep-flag: boolean. When 1, follows the path of the arc using a clockwise motion,
+                          otherwise with an anti-clockwise motion.
+              dx: number. Shift in x coordinate from the beginning point to the end point in pixels.
+              dy: number. Shift in y coordinate from the beginning point to the end point in pixels.
+    -->
+    <path d="M 6 64, a 58 58 0 1 1 116 0" stroke="#E0E0E0"/>
+    <path d="M 6 64, a 58 58 0 1 1 116 0" stroke="#419889" class="completion"
+          [ngStyle]="completionBarStyle"/>
+  </g>
+</svg>

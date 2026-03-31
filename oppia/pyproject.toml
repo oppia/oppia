@@ -1,0 +1,7 @@
+[tool.black]
+line-length = 80
+skip-string-normalization = true
+extend-exclude = '''
+    scripts/linters/test_files/*
+    | stubs/*
+'''

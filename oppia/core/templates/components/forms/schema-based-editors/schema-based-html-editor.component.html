@@ -1,0 +1,13 @@
+<!-- label-for-focus-target feature is removed since CKEditor has a
+focusManager to manage the focus activity automatically. -->
+<ck-editor-4-rte class="e2e-test-ck-editor"
+                 *ngIf="!disabled"
+                 [value]="localValue"
+                 (valueChange)="updateValue($event)"
+                 [uiConfig]="uiConfig">
+</ck-editor-4-rte>
+
+<span *ngIf="disabled"
+      [ngClass]="{'oppia-disabled-contenteditable': disabled}"
+      [innerHTML]="localValue">
+</span>

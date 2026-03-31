@@ -1,0 +1,43 @@
+<div class="click-hexbin-wrapper">
+  <div class="click-hexbin-chart-tooltip"
+       *ngIf="isTooltipVisible()" [ngStyle]="getTooltipStyle()">
+    <div [ngPlural]="getTooltipNumClicks()">
+      <ng-template ngPluralCase="one">1 click</ng-template>
+      <ng-template ngPluralCase="other">
+        {{ '{} clicks'}}
+      </ng-template>
+    </div>
+  </div>
+  <svg class="click-hexbin-chart"
+       [attr.viewBox]="'0 0 {{wrapperWidth}} {{wrapperHeight}}'">
+    <image [attr.href]="imageUrl"
+           [attr.width]="wrapperWidth + 'px'"
+           [attr.height]="wrapperHeight + 'px'">
+    </image>
+    <rect class="click-hexbin-image-overlay"
+          x="0"
+          y="0"
+          [attr.width]="wrapperWidth"
+          [attr.height]="wrapperHeight">
+    </rect>
+    <clipPath class="click-hexbin-clip-path">
+      <rect class="mesh"
+            [attr.width]="wrapperWidth"
+            [attr.height]="wrapperHeight">
+      </rect>
+    </clipPath>
+    <svg class="click-hexbin-mesh" clip-path="url(.click-hexbin-clip-path)">
+      <path [attr.d]="hexagonMesh">
+      </path>
+    </svg>
+    <g clip-path="url(.click-hexbin-clip-path)">
+      <path *ngFor="let hexbin of hexbins; index as index"
+            [ngClass]="['click-hexbin-hexagon', 'e2e-test-hexagon-' + index]"
+            [attr.fill]="getFillColor(hexbin)"
+            [attr.d]="'M' + hexbin.x +','+ hexbin.y + hexagon"
+            (mouseover)="showTooltip(hexbin)"
+            (mouseout)="hideTooltip(hexbin)">
+      </path>
+    </g>
+  </svg>
+</div>

@@ -1,0 +1,33 @@
+.click-hexbin-wrapper {
+  min-width: 300px;
+  position: relative;
+  width: 100%;
+  z-index: 0;
+}
+.click-hexbin-chart-tooltip {
+  background-color: #000;
+  border-radius: 4px;
+  color: #fff;
+  display: block;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 1.4;
+  margin: 8px;
+  max-width: 200px;
+  padding: 3px 8px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  text-decoration: none;
+  z-index: 1070;
+}
+.click-hexbin-image-overlay {
+  fill: rgba(0, 0, 0, 0.35);
+}
+.click-hexbin-mesh {
+  fill: none;
+  stroke: #fff;
+  stroke-opacity: 0.12;
+  stroke-width: .5;
+}

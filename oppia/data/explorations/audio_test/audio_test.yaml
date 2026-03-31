@@ -1,0 +1,286 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Art
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: Try out playing audio on Oppia
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Finish:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 59289
+            filename: test_audio_2_en.mp3
+            needs_update: false
+          hi-en:
+            duration_secs: 0.0
+            file_size_bytes: 88905
+            filename: test_audio_2_hi_en.mp3
+            needs_update: true
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  Introduction:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Try clicking on the speaker! After listening, click continue.</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Second
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 95426
+            filename: test_audio_1_en.mp3
+            needs_update: false
+          hi-en:
+            duration_secs: 0.0
+            file_size_bytes: 132719
+            filename: test_audio_1_hi_en.mp3
+            needs_update: false
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Second:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Try typing some code.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Third
+          feedback:
+            content_id: feedback_1
+            html: <p>Nice!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: x
+          rule_type: CodeEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Third
+        feedback:
+          content_id: default_outcome
+          html: <p>Nice work.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: CodeRepl
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content:
+          hi-en:
+            duration_secs: 0.0
+            file_size_bytes: 59613
+            filename: test_audio_3_hi_en.mp3
+            needs_update: true
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Third:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Are you a cat or dog person?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Finish
+          feedback:
+            content_id: feedback_1
+            html: <p>I like cats too.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_4
+              normalizedStrSet:
+              - cat
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Finish
+          feedback:
+            content_id: feedback_2
+            html: <p>I like dogs too.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - dog
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_3
+            unicode_str: Are you a cat or dog person?
+        rows:
+          value: 1
+      default_outcome:
+        dest: Third
+        feedback:
+          content_id: default_outcome
+          html: <p>I'm not sure what that animal is.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>There's no wrong answer.</p>
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: cat
+        explanation:
+          content_id: solution
+          html: <p>I'm a cat person.</p>
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_3: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 57996
+            filename: content-en-3iibmhu8je2.mp3
+            needs_update: false
+        default_outcome:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 55733
+            filename: feedback-en-s0w3v9gslr9.mp3
+            needs_update: false
+        feedback_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 41549
+            filename: feedback-en-kt33y1e2rwg.mp3
+            needs_update: false
+        feedback_2:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 38524
+            filename: feedback-en-vvixng5ajds.mp3
+            needs_update: false
+        hint_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 47188
+            filename: hint-en-jca2lxjibh.mp3
+            needs_update: false
+        rule_input_4: {}
+        rule_input_5: {}
+        solution:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 79822
+            filename: solution-en-t0xc2qtuf0j.mp3
+            needs_update: false
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        hint_1: {}
+        rule_input_4: {}
+        rule_input_5: {}
+        solution: {}
+states_schema_version: 42
+tags: []
+title: Audio Test

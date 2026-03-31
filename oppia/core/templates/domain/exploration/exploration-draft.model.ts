@@ -1,0 +1,226 @@
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Model Class for creating instances of ExplorationDraft
+ * domain objects.
+ */
+
+import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
+import {ParamSpecBackendDict} from 'domain/exploration/param-spec.model';
+import {InteractionBackendDict} from 'domain/exploration/interaction.model';
+import {WrittenTranslationsBackendDict} from 'domain/exploration/written-translations.model';
+import {SubtitledHtmlBackendDict} from './subtitled-html.model';
+import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
+import {InteractionCustomizationArgsBackendDict} from 'interactions/customization-args-defs';
+import {TranslatedContentBackendDict} from './translated-content.model';
+import {VoiceoverTypeToVoiceoversBackendDict} from './voiceover.model';
+
+export type ExplorationChange =
+  | ExplorationChangeAddState
+  | ExplorationChangeAddWrittenTranslation
+  | ExplorationChangeMarkTranslationsNeedsUpdate
+  | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
+  | ExplorationChangeEditTranslation
+  | ExplorationChangeEditVoiceovers
+  | ExplorationChangeMarkVoiceoversAsNeedsUpdate
+  | ExplorationChangeRemoveVoiceovers
+  | ExplorationChangeRemoveTranslations
+  | ExplorationChangeRenameState
+  | ExplorationChangeDeleteState
+  | ExplorationChangeEditStateProperty
+  | ExplorationChangeEditExplorationProperty
+  | RevertChangeList
+  | CreateChangeList
+  | MigrateStatesVersionChangeList;
+
+export type ExplorationTranslationChange =
+  | ExplorationChangeMarkTranslationsNeedsUpdate
+  | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
+  | ExplorationChangeEditTranslation
+  | ExplorationChangeRemoveTranslations;
+
+export interface ExplorationChangeAddState {
+  cmd: 'add_state';
+  state_name: string;
+  content_id_for_state_content: string;
+  content_id_for_default_outcome: string;
+}
+
+export interface ExplorationChangeRenameState {
+  cmd: 'rename_state';
+  new_state_name: string;
+  old_state_name: string;
+}
+
+export interface ExplorationChangeDeleteState {
+  cmd: 'delete_state';
+  state_name: string;
+}
+
+// TODO(xxx): Add more discrimination and create multiple versions of this
+// interface, each with a different 'state_name'.
+export interface ExplorationChangeEditStateProperty {
+  cmd: 'edit_state_property';
+  new_value:
+    | SubtitledHtmlBackendDict
+    | InteractionBackendDict
+    | ParamChangeBackendDict[]
+    | RecordedVoiceOverBackendDict
+    | WrittenTranslationsBackendDict
+    | InteractionCustomizationArgsBackendDict
+    | boolean
+    | number
+    | string;
+  old_value:
+    | SubtitledHtmlBackendDict
+    | InteractionBackendDict
+    | ParamChangeBackendDict[]
+    | RecordedVoiceOverBackendDict
+    | WrittenTranslationsBackendDict
+    | InteractionCustomizationArgsBackendDict
+    | boolean
+    | number
+    | string;
+  state_name: string;
+  property_name: string;
+}
+
+export interface ExplorationChangeEditExplorationProperty {
+  cmd: 'edit_exploration_property';
+  new_value: ParamChangeBackendDict[] | ParamSpecBackendDict | string | boolean;
+  old_value: ParamChangeBackendDict[] | ParamSpecBackendDict | string | boolean;
+  property_name: string;
+}
+
+export interface RevertChangeList {
+  cmd: 'AUTO_revert_version_number';
+  version_number: number;
+}
+
+export interface CreateChangeList {
+  cmd: 'create_new';
+  category: string;
+  title: string;
+}
+
+export interface MigrateStatesVersionChangeList {
+  cmd: 'migrate_states_schema_to_latest_version';
+  from_version: number;
+  to_version: number;
+}
+
+export interface ExplorationChangeAddWrittenTranslation {
+  cmd: 'add_written_translation';
+  content_id: string;
+  data_format: string;
+  language_code: string;
+  content_html: string;
+  state_name: string;
+  translation_html: string;
+}
+
+export interface ExplorationChangeMarkTranslationsNeedsUpdate {
+  cmd: 'mark_translations_needs_update';
+  content_id: string;
+}
+
+export interface ExplorationChangeMarkTranslationNeedsUpdateForLanguage {
+  cmd: 'mark_translation_needs_update_for_language';
+  content_id: string;
+  language_code: string;
+}
+
+export interface ExplorationChangeEditTranslation {
+  cmd: 'edit_translation';
+  content_id: string;
+  language_code: string;
+  translation: TranslatedContentBackendDict;
+}
+
+export interface ExplorationChangeEditVoiceovers {
+  cmd: 'update_voiceovers';
+  content_id: string;
+  language_accent_code: string;
+  voiceovers: VoiceoverTypeToVoiceoversBackendDict;
+}
+
+export interface ExplorationChangeMarkVoiceoversAsNeedsUpdate {
+  cmd: 'mark_voiceovers_needs_update';
+  content_id: string;
+  language_code: string;
+}
+
+export interface ExplorationChangeRemoveVoiceovers {
+  cmd: 'remove_voiceovers';
+  content_id: string;
+  language_code: string;
+}
+
+export interface ExplorationChangeRemoveTranslations {
+  cmd: 'remove_translations';
+  content_id: string;
+}
+
+export interface ExplorationDraftDict {
+  draftChanges: ExplorationChange[];
+  draftChangeListId: number;
+}
+
+export class ExplorationDraft {
+  draftChanges: ExplorationChange[];
+  draftChangeListId: number;
+
+  constructor(draftChanges: ExplorationChange[], draftChangeListId: number) {
+    this.draftChanges = draftChanges;
+    this.draftChangeListId = draftChangeListId;
+  }
+
+  /**
+   * Checks whether the draft object has been overwritten by another
+   * draft which has been committed to the back-end. If the supplied draft id
+   * has a different value then a newer changeList must have been committed
+   * to the back-end.
+   * @param {Integer} - currentDraftId. The id of the draft changes whch was
+   *  retrieved from the back-end.
+   * @returns {Boolean} - True iff the currentDraftId is the same as the
+   * draftChangeListId corresponding to this draft.
+   */
+  isValid(currentDraftId: number): boolean {
+    return currentDraftId === this.draftChangeListId;
+  }
+
+  getChanges(): ExplorationChange[] {
+    return this.draftChanges;
+  }
+
+  static createFromLocalStorageDict(
+    explorationDraftDict: ExplorationDraftDict
+  ): ExplorationDraft {
+    return new ExplorationDraft(
+      explorationDraftDict.draftChanges,
+      explorationDraftDict.draftChangeListId
+    );
+  }
+
+  static toLocalStorageDict(
+    changeList: ExplorationChange[],
+    draftChangeListId: number
+  ): ExplorationDraftDict {
+    return {
+      draftChanges: changeList,
+      draftChangeListId: draftChangeListId,
+    };
+  }
+}

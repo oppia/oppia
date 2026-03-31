@@ -1,0 +1,45 @@
+<style>
+  .drag-and-drop-sort-response-content img {
+    max-height: 100px;
+    object-fit: contain;
+  }
+
+  .drag-and-drop-response-item {
+    background-color: #add8e6;
+    border: 1px solid #000;
+    margin: 10px 0 0 0;
+    max-height: 100px;
+    min-height: 70px;
+    overflow: hidden;
+    padding-left: 5px;
+    width: 100px;
+  }
+
+  .drag-and-drop-response-subitem {
+    background-color: #add8e6;
+    border: 1px solid #000;
+    margin: -10px 0 0 0;
+    max-height: 100px;
+    min-height: 70px;
+    overflow: hidden;
+    padding-left: 5px;
+    position: relative;
+    width: 100px;
+  }
+
+  ul {
+    list-style-type: none;
+  }
+</style>
+
+<ul *ngIf="isAnswerLengthGreaterThanZero" class="drag-and-drop-sort-response-content">
+  <li *ngFor="let responses of responseList">
+    <ul [(ngModel)]="responses" ngDefaultControl>
+      <li *ngFor="let response of responses; index as idx">
+        <div [ngClass]="chooseItemType(idx)">
+          <oppia-rte-output-display [rteString]="response"></oppia-rte-output-display>
+        </div>
+      </li>
+    </ul>
+  </li>
+</ul>

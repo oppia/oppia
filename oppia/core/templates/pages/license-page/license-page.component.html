@@ -1,0 +1,26 @@
+<div class="oppia-license-page">
+  <div class="oppia-static-header">
+    <h1 [innerHTML]="'I18N_LICENSE_TERMS_HEADING' | translate"></h1>
+  </div>
+  <background-banner></background-banner>
+  <div class="oppia-static-content-below-banner">
+    <div class="oppia-page-card oppia-static-content">
+      <div class="oppia-about-visible-content">
+        <div class="oppia-static-card-content oppia-static-card-content-narrow">
+          <h2 [innerHTML]="'I18N_LICENSE_PAGE_LICENSE_HEADING' | translate"></h2>
+          <p [innerHTML]="'I18N_LICENSE_PAGE_PARAGRAPH_1' | translate"></p>
+          <p [innerHTML]="'I18N_LICENSE_PAGE_PARAGRAPH_2' | translate"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-license-page {
+    margin-bottom: 300px;
+  }
+  .oppia-license-page .oppia-static-content {
+    justify-content: center;
+  }
+</style>

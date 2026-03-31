@@ -1,0 +1,39 @@
+name: Oppiabot
+
+on:
+  merge_group:
+    types:
+      - checks_requested
+  issues:
+    types:
+      - labeled
+  pull_request_target:
+    branches:
+      - develop
+      - release-*
+permissions: read-all
+
+jobs:
+  oppiabot:
+    name: Verify CLA
+    runs-on: ubuntu-22.04
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+      statuses: write
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
+      - name: Github Actions from Oppiabot
+        # Since we control the oppia/oppiabot repository, we can safely
+        # run the latest version of its code automatically. This is generally
+        # not a safe practice for dependencies we do not control.
+        uses: oppia/oppiabot@master
+        with:
+          repo-token: ${{secrets.GITHUB_TOKEN}}
+          sheets-cred: ${{ secrets.SHEETS_CRED }}
+          sheets-token: ${{ secrets.SHEETS_TOKEN }}
+          cla-sheet-id: ${{ secrets.SPREADSHEET_ID }}

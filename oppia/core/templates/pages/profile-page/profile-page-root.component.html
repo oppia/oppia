@@ -1,0 +1,12 @@
+<oppia-angular-root *ngIf="pageIsShown">
+  <oppia-base-content>
+    <navbar-breadcrumb>
+      <profile-page-navbar></profile-page-navbar>
+    </navbar-breadcrumb>
+    <content>
+      <oppia-profile-page></oppia-profile-page>
+    </content>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>

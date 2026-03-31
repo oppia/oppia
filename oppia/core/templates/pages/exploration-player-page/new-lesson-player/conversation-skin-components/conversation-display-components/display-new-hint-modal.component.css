@@ -1,0 +1,62 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+oppia-new-display-hint-modal .oppia-learner-hint-and-solution-modal-title {
+  color: #c55f45;
+  font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
+  font-size: 1.25em;
+  font-weight: 400;
+  margin-top: 20px;
+  text-align: center;
+}
+
+oppia-new-display-hint-modal .oppia-learner-hint-and-solution-modal-body {
+  margin: 20px 0;
+  word-wrap: break-word;
+}
+
+oppia-new-display-hint-modal .modal-body {
+  max-height: calc(85vh - 125px);
+  overflow-y: auto;
+}
+
+oppia-new-display-hint-modal .oppia-learner-solution-container {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+oppia-new-display-hint-modal .oppia-learner-solution-container > p {
+  color: #c55f45;
+  left: 50%;
+  margin-top: 10px;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+oppia-new-display-hint-modal .mat-button.hint-display-modal-got-it-button {
+  background-color: #00645c !important;
+  color: white;
+  font-weight: 700;
+}
+
+oppia-new-display-hint-modal .mat-button.hint-display-modal-got-it-button:focus {
+  outline: none !important;
+}
+
+oppia-new-display-hint-modal .hint-modal-control-btn {
+  border: 1px solid #00645c !important;
+  color: #00645c;
+  font-weight: 700;
+  outline: none !important;
+}
+
+@media (max-width: 480px) {
+  oppia-new-display-hint-modal .oppia-learner-solution-container > p {
+    margin-left: 10px;
+  }
+}

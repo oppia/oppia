@@ -1,0 +1,43 @@
+<div class="oppia-delete-topic-container">
+  <div class="modal-header">
+    <h3>
+      Delete Topic
+    </h3>
+  </div>
+  <div class="modal-body oppia-delete-topic-text-container">
+    Are you sure you want to delete <strong class="oppia-topic-name-text">{{topicName}}</strong>? This cannot be recovered.
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    <button class="btn btn-danger e2e-test-confirm-topic-deletion-button" (click)="confirm()">
+      <span>Delete Topic</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .oppia-delete-topic-container .oppia-delete-topic-text-container {
+    color: #666;
+  }
+  .oppia-delete-topic-container .oppia-topic-name-text {
+    color: #000;
+  }
+
+  @media screen and (max-width: 768px) {
+    .delete-topic-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .delete-topic-modal .modal-header {
+      padding: 10px 15px;
+    }
+    .delete-topic-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }
+</style>

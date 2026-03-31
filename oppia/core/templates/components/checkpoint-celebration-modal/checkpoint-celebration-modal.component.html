@@ -1,0 +1,133 @@
+<div class="checkpoint-celebration-modal">
+  <div *ngIf="shouldDisplayFullScaleMessage"
+       class="standard-message-container"
+       [ngClass]="{'modal-display-transition': messageModalIsShown && !messageModalIsDismissed, 'downward-transition': messageModalIsDismissed && !messageModalIsShown}">
+    <div class="mascot-placeholder">
+      <img [src]="oppiaAvatarImageUrl" alt="Oppia Mascot">
+    </div>
+    <svg viewBox="0 0 10 0.6" class="timer-svg">
+      <polyline #checkpointCelebrationModalTimer
+                class="checkpoint-celebration-modal-timer"
+                stroke="#00645c"
+                stroke-width="0.5"
+                points="0,0 10,0" />
+    </svg>
+    <h2>
+      {{ translatedCurrentCheckpointMessageTitle }}
+    </h2>
+
+    <svg class="checkpoint-flag"
+         [ngClass]="{'flag-animation': messageModalIsShown || messageModalIsDismissed}"
+         width="150"
+         height="180"
+         viewBox="0 0 150 180"
+         fill="none"
+         xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="43.9259" cy="170.673"
+               rx="15.4638" ry="9.32739"
+               fill="#C4C4C4"/>
+      <path d="M141.764 52.1C144.866 53.4282 144.866 57.825 141.764 59.1532L42.8464 101.511C40.3151 102.595 37.5 100.738 37.5 97.9846L37.5 13.2686C37.5 10.5149 40.3151 8.65802 42.8465 9.74198L141.764 52.1Z"
+            fill="#F7ED64"/>
+      <g filter="url(#filter0_d_37_5)">
+        <line x1="41.5123" y1="8.82352"
+              x2="41.5123" y2="172.634"
+              stroke="#976B42"
+              stroke-width="8.6"/>
+      </g>
+      <defs>
+        <filter id="filter0_d_37_5"
+                x="35.6778" y="8.82352"
+                width="11.669" height="166.88"
+                filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB">
+          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feColorMatrix in="SourceAlpha"
+                         type="matrix"
+                         values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                         result="hardAlpha" />
+          <feOffset dy="1.53453" />
+          <feGaussianBlur stdDeviation="0.767263" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_37_5" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_37_5" result="shape" />
+        </filter>
+      </defs>
+    </svg>
+
+    <p>
+      {{ translatedCurrentCheckpointMessage }}
+    </p>
+    <div class="progress-bar-container"
+         [ngClass]="{'single-checkpoint-bar': totalNumberOfCheckpoints === 1, 'multiple-checkpoints-bar': totalNumberOfCheckpoints > 1}">
+      <div class="progress-bar">
+        <div class="completed-progress-bar"
+             [style.width.%]="getCompletedProgressBarWidth() ? getCompletedProgressBarWidth() : 0">
+        </div>
+      </div>
+      <div *ngFor="let checkpointNode of checkpointStatusArrayPlaceholder; index as idx"
+           class="checkpoint-node"
+           [style.transition-delay.s]="checkpointNodeFadeInDelays[idx]"
+           [ngClass]="{
+            'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed',
+            'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress',
+            'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete',
+            'hidden-checkpoint-node': !checkpointNodesAreVisible
+          }">
+        {{ idx + 1 }}
+      </div>
+    </div>
+    <div class="button-row">
+      <button class="progress-info" (click)="openLessonInfoModal()" [attr.tabindex]="(messageModalIsShown || miniMessageTooltipIsShown) ? 1 : -1">
+        <i class="material-icons progress-info-icon">&#xE88E;</i>
+      </button>
+      <button class="modal-close-button" (click)="dismissMessage()" tabindex="-1" [attr.tabindex]="(messageModalIsShown || miniMessageTooltipIsShown) ? 1 : -1">
+        <i class="material-icons">&#xE5CD;</i>
+      </button>
+    </div>
+  </div>
+  <div *ngIf="!shouldDisplayFullScaleMessage"
+       class="minified-message-container e2e-test-congratulatory-checkpoint-message-box"
+       [ngClass]="{'tooltip-display-transition': miniMessageTooltipIsShown, 'tooltip-dismissal-transition': !miniMessageTooltipIsShown && miniMessageTooltipIsDismissed}">
+    <p>
+      {{ currentCheckpointPosition }}/{{ totalNumberOfCheckpoints }}
+    </p>
+    <svg class="checkpoint-flag"
+         width="150"
+         height="180"
+         viewBox="0 0 150 180"
+         fill="none"
+         xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="43.9259" cy="170.673"
+               rx="15.4638" ry="9.32739"
+               fill="#C4C4C4"/>
+      <path d="M141.764 52.1C144.866 53.4282 144.866 57.825 141.764 59.1532L42.8464 101.511C40.3151 102.595 37.5 100.738 37.5 97.9846L37.5 13.2686C37.5 10.5149 40.3151 8.65802 42.8465 9.74198L141.764 52.1Z"
+            fill="#F7ED64"/>
+      <g filter="url(#filter0_d_37_5)">
+        <line x1="41.5123" y1="8.82352"
+              x2="41.5123" y2="172.634"
+              stroke="#976B42"
+              stroke-width="8.6"/>
+      </g>
+      <defs>
+        <filter id="filter0_d_37_5"
+                x="35.6778" y="8.82352"
+                width="11.669" height="166.88"
+                filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB">
+          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feColorMatrix in="SourceAlpha"
+                         type="matrix"
+                         values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                         result="hardAlpha" />
+          <feOffset dy="1.53453" />
+          <feGaussianBlur stdDeviation="0.767263" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_37_5" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_37_5" result="shape" />
+        </filter>
+      </defs>
+    </svg>
+  </div>
+</div>

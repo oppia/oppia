@@ -1,0 +1,17 @@
+<div>
+  <h5>Code</h5>
+  <pre>{{ escapedAnswer.code }}</pre>
+
+  <span *ngIf="escapedAnswer.output">
+    <h5>Output</h5>
+    <pre>{{ escapedAnswer.output }}</pre>
+  </span>
+
+  <span *ngIf="escapedAnswer.error" [oppiaFocusOn]="errorFocusLabel">
+    <font color="red">Error: {{ escapedAnswer.error }}</font><br>
+  </span>
+
+  <span *ngIf="escapedAnswer.evaluation">
+    &gt;&gt; {{ escapedAnswer.evaluation }}
+  </span>
+</div>

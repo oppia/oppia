@@ -1,0 +1,777 @@
+author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: Languages
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Hola
+language_code: en
+objective: start speaking Spanish
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Adios:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>\xA1Ay! \xBF\xA150 pesos por una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
+        \xA1Adi\xF3s!</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Adios
+          feedback:
+            content_id: feedback_1
+            html: <p>Don't forget your accent marks next time!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_4
+              normalizedStrSet:
+              - adios
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - "adi\xF3s"
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_3
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Adios
+        feedback:
+          content_id: default_outcome
+          html: <p>Say goodbye</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        rule_input_4: {}
+        rule_input_5: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        rule_input_4: {}
+        rule_input_5: {}
+  Colores:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>\xBFDe qu\xE9 colores son las manzanas?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Colores
+          feedback:
+            content_id: feedback_1
+            html: <p>Apples aren't black unless they are rotten...and they aren't
+              blue</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Colores
+          feedback:
+            content_id: feedback_2
+            html: <p>Orange and white...not quite</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Adios
+          feedback:
+            content_id: feedback_3
+            html: "<p>\xA1S\xED! That's right -- apples are red and green.</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Colores
+          feedback:
+            content_id: feedback_4
+            html: <p>Yellow and gray? Apples?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>negro y azul</p>
+          - content_id: ca_choices_6
+            html: <p>anaranjado y blanco</p>
+          - content_id: ca_choices_7
+            html: <p>rojo y verde</p>
+          - content_id: ca_choices_8
+            html: <p>amarillo y gris</p>
+          - content_id: ca_choices_9
+            html: <p>I don't know</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Colores
+        feedback:
+          content_id: default_outcome
+          html: '<p>Colores is easy to translate.
+
+            manzanas is apples.
+
+            So this is asking, what colors are apples?</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 10
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        ca_choices_9: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        ca_choices_9: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Como meaning:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Now, \"te llamas\" looks a lot like \"me llamo.\"\nAnd this sentence\
+        \ is a question.\n<br><br>What do you think \"\xBFC\xF3mo te llamas?\" means?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Me llamo
+          feedback:
+            content_id: feedback_1
+            html: '<p>Yes!
+
+              So, let''s try this again...Introduce yourself.</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_4
+              normalizedStrSet:
+              - what is your name?
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Me llamo
+          feedback:
+            content_id: feedback_2
+            html: '<p>Great!
+
+              So, let''s try this again...Introduce yourself.</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - what do you call yourself?
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_3
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Me llamo
+        feedback:
+          content_id: default_outcome
+          html: '<p>So this means "What is your name?"
+
+            So, let''s try this again...Introduce yourself.</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        rule_input_4: {}
+        rule_input_5: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        rule_input_4: {}
+        rule_input_5: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  Hola:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Let's speak some Spanish! I'll say something in Spanish, and you can\
+        \ respond in Spanish. OK?<br><br>\n\xC2\xA1Hola!</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Me llamo
+          feedback:
+            content_id: feedback_1
+            html: '<p>Don''t forget: Spanish uses inverted exclamation points at the
+              beginning of sentences as well as the ending exclamation point.</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - hola!
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Me llamo
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_6
+              normalizedStrSet:
+              - hola
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Hola
+          feedback:
+            content_id: feedback_3
+            html: <p>Check your spelling!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - hola
+          rule_type: FuzzyEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_4
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Hola
+        feedback:
+          content_id: default_outcome
+          html: <p>Hola means Hello. Say Hello back (in Spanish).</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        rule_input_5: {}
+        rule_input_6: {}
+        rule_input_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        rule_input_5: {}
+        rule_input_6: {}
+        rule_input_7: {}
+  Me llamo:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Me llamo
+          feedback:
+            content_id: feedback_1
+            html: <p>You've got one too many verbs.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - me llamo es
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Supermercado
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_6
+              normalizedStrSet:
+              - me llamo
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Supermercado
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - mi nombre es
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_4
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Me llamo meaning
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        rule_input_5: {}
+        rule_input_6: {}
+        rule_input_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        rule_input_5: {}
+        rule_input_6: {}
+        rule_input_7: {}
+  Me llamo meaning:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>(What do you think "Me llamo" means?)</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Como meaning
+          feedback:
+            content_id: feedback_1
+            html: <p>That's right!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - my name is
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Como meaning
+          feedback:
+            content_id: feedback_2
+            html: <p>Literally, yes, but it can also be translated as "My name is."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_6
+              normalizedStrSet:
+              - i am called
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Como meaning
+          feedback:
+            content_id: feedback_3
+            html: <p>Literally, yes, but it can also be translated as "My name is."</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - i call myself
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_4
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Como meaning
+        feedback:
+          content_id: default_outcome
+          html: '<p>Me llamo means "My name is"
+
+            So "Me llamo Oppia" means "My name is Oppia".</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        rule_input_5: {}
+        rule_input_6: {}
+        rule_input_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        rule_input_5: {}
+        rule_input_6: {}
+        rule_input_7: {}
+  Supermercado:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>\xA1Vamos al supermercado!\n<br><br>\n\xBFQu\xE9 podemos comprar all\xED\
+        ?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Supermercado
+          feedback:
+            content_id: feedback_1
+            html: "<p>\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\
+              You can't buy windows in a supermarket. If you need more help, select\
+              \ \"I don't know\"</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Supermercado
+          feedback:
+            content_id: feedback_2
+            html: "<p>\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\
+              \nYou can't buy cars in a supermarket. If you need more help, select\
+              \ \"I don't know\"</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Colores
+          feedback:
+            content_id: feedback_3
+            html: <p>Yes! You can buy apples in a supermarket.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>Ventanas</p>
+          - content_id: ca_choices_5
+            html: <p>Coches</p>
+          - content_id: ca_choices_6
+            html: <p>Manzanas</p>
+          - content_id: ca_choices_7
+            html: <p>I don't know</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Supermercado
+        feedback:
+          content_id: default_outcome
+          html: '<p>Supermercado is supermarket.
+
+            What can you buy at a supermarket?</p>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+states_schema_version: 42
+tags: []
+title: "\xA1Hola!"

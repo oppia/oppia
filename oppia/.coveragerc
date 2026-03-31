@@ -1,0 +1,53 @@
+# .coveragerc to control coverage.py
+
+[run]
+omit =
+    */oppia_tools/*
+    */third_party/*
+    */usr/*
+    *_test.py
+    *core/tests/*
+    *scripts/linters/test_files/*
+    *__init__.py
+    */vm_deps/*
+    */scripts/build.py
+    */scripts/install_python_dev_dependencies.py
+    */scripts/install_python_prod_dependencies.py
+    */scripts/install_third_party_libs.py
+    */scripts/run_acceptance_tests.py
+    # TODO(#22761): The files in the jobs folder will be removed from here,
+    # after upgrading to Python 3.11 or later. At present, backend test coverage
+    # is missing due to an unresolved issue with the coverage library.
+    */core/jobs/batch_jobs/audit_topic_related_models_relation_jobs.py
+    */core/jobs/batch_jobs/collection_info_jobs.py
+    */core/jobs/batch_jobs/exp_migration_jobs.py
+    */core/jobs/batch_jobs/contributor_admin_stats_jobs.py
+    */core/jobs/batch_jobs/exp_version_history_computation_job.py
+    */core/jobs/batch_jobs/math_interactions_audit_jobs.py
+    */core/jobs/batch_jobs/model_validation_jobs.py
+    */core/jobs/batch_jobs/opportunity_management_jobs.py
+    */core/jobs/batch_jobs/missing_translation_images_repair_jobs.py
+    */core/jobs/batch_jobs/populate_study_guide_models_jobs.py
+    */core/jobs/batch_jobs/question_migration_jobs.py
+    */core/jobs/batch_jobs/remove_profile_picture_data_url_field_jobs.py
+    */core/jobs/batch_jobs/skill_migration_jobs.py
+    */core/jobs/batch_jobs/story_migration_jobs.py
+    */core/jobs/batch_jobs/story_node_jobs.py
+    */core/jobs/batch_jobs/subtopic_migration_jobs.py
+    */core/jobs/batch_jobs/suggestion_migration_jobs.py
+    */core/jobs/batch_jobs/suggestion_stats_computation_jobs.py
+    */core/jobs/batch_jobs/topic_migration_jobs.py
+    */core/jobs/batch_jobs/translation_migration_jobs.py
+    */core/jobs/io/gcs_io.py
+    */core/jobs/transforms/job_result_transforms.py
+
+
+# The 'exclude_lines' is used to skip a particular clause in coverage.
+# We exclude any line with a comment of "pragma: no cover" as this is the default option
+# provided by the coverage library.
+# We also exclude @overload, because it is used for defining multiple MyPy definitions
+# of a function and cannot be tested by Python tests.
+[report]
+exclude_lines =
+    pragma: no cover
+    @overload

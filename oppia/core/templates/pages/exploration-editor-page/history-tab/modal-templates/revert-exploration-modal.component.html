@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <h3 tabindex="0" #revertExploration>Revert Exploration</h3>
+</div>
+
+<div class="modal-body oppia-long-text" tabindex="0">
+  <p>
+    You are about to revert this exploration to version {{ version }}. All changes made since that older version will be retracted and you will lose any unsaved changes.
+  </p>
+  <p>
+    Before reverting, you can preview the exploration you are reverting to by following <a href="{{ getExplorationUrl(version) }}" target="_blank" rel="noopener">this link</a>. (It opens in a new window.)
+  </p>
+  <p>
+    Are you sure you want to revert this exploration to version {{ version }}?
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-danger e2e-test-confirm-revert" (click)="confirm(version)">Revert</button>
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+</div>

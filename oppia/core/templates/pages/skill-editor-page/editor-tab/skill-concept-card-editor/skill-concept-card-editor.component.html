@@ -1,0 +1,121 @@
+<mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+  <div class="oppia-editor-card-body">
+    <div class="skill-card-header oppia-mobile-collapsible-card-header" (click)="toggleSkillEditorCard()">
+      <h3 class="skill-card-header-text">Details</h3>
+      <i class="fa fa-caret-down"
+         *ngIf="!skillEditorCardIsShown"
+         [attr.aria-hidden]="true">
+      </i>
+      <i class="fa fa-caret-up"
+         *ngIf="skillEditorCardIsShown"
+         [attr.aria-hidden]="true">
+      </i>
+    </div>
+    <div class="oppia-mobile-collapsible-card-content e2e-test-skill-editor-collapsible-card" *ngIf="skillEditorCardIsShown">
+      <oppia-skill-description-editor (onSaveDescription)="onSaveDescription()"></oppia-skill-description-editor>
+      <div class="oppia-editor-card-section review-material-container">
+        <strong class="heading-text">Review Material</strong>
+        <div class="concept-card-subtitle">
+          This gives the learner a brief overview of how to perform the skill.
+        </div>
+        <oppia-review-material-editor [bindableDict]="bindableFieldsDict"
+                                      (onSaveExplanation)="onSaveExplanation($event)">
+        </oppia-review-material-editor>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-secondary btn-show-preview oppia-concept-card-preview-btn"
+          *ngIf="skillEditorCardIsShown"
+          (click)="showSkillPreview()">
+    Preview Concept Card
+  </button>
+</mat-card>
+
+<style>
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+  .oppia-option-list.cdk-drop-list-dragging {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .oppia-concept-card-preview-btn {
+    width: 100%;
+  }
+  .concept-card-subtitle {
+    color: #595959;
+    font-size: 13px;
+    font-style: italic;
+    padding-bottom: 12px;
+  }
+  .heading-text {
+    font-size: 16px;
+  }
+  .review-material-text {
+    font-size: 16px;
+  }
+  .btn-show-preview {
+    border-top: 1px solid #c1c1c1;
+    color: #00645d;
+    font-size: 14px;
+    padding: 10px 0;
+  }
+  .last-element {
+    border-bottom: 1px solid #ccc;
+  }
+  .skill-card-header-text {
+    font-size: 19px;
+    margin-bottom: 15px;
+    margin-left: 20px;
+    margin-top: 30px;
+  }
+  .skill-card-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .skill-card-header i {
+    display: none;
+  }
+  .oppia-skill-concept-card-preview-list {
+    display: block;
+  }
+  .oppia-skill-concept-card-preview {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
+  .oppia-skill-concept-card-preview > li {
+    display: block;
+    position: relative;
+  }
+  @media screen and (max-width: 768px) {
+    .skill-card-header i {
+      display: block;
+    }
+    .skill-card-header-text {
+      margin: 0;
+    }
+    .review-material-container {
+      margin-top: 30px;
+      padding: 0;
+    }
+    .mat-card {
+      box-shadow: none;
+      padding: 0;
+    }
+  }
+</style>

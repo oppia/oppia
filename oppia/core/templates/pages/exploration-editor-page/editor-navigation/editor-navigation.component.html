@@ -1,0 +1,318 @@
+<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'mobile-navbar-toggled': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
+<div class="navbar-mobile-container">
+  <div class="navbar-mobile-options e2e-test-mobile-navigation-bar-container" *ngIf="mobileNavOptionsAreShown">
+    <div  placement="top-start" class="exp-nav-dropdown-container">
+      <div ngbDropdown class="exp-nav-dropdown-content" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a>
+          <i class="fa fa-pen"></i>
+          Options
+        </a>
+        <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown"></div>
+        <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'dropdown': countWarnings()}">
+            <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-main-tab">
+              <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
+            </a>
+            <div [hidden]="!countWarnings()" class="oppia-editor-warnings-indicator" (click)="selectMainTab()" [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+              <span class="oppia-editor-warnings-count">
+                {{ countWarnings() }}
+              </span>
+            </div>
+          </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-translation-tab" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'translation'}">
+            <a href="#" ngbTooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" placement="bottom" (click)="selectTranslationTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="fa fa-microphone oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
+            </a>
+          </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
+            <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-preview-button">
+              <i class="fa fa-play oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
+            </a>
+          </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" [ngClass]="{'active': getActiveTabName() === 'settings'}">
+            <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-settings-button">
+              <i class="fa fa-cog oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
+            </a>
+          </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'stats'}">
+            <a href="#" ngbTooltip="Statistics" placement="bottom" (click)="selectStatsTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="fa fa-poll oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
+            </a>
+          </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'improvements'}" *ngIf="isImprovementsTabEnabled()">
+            <a href="#" ngbTooltip="Improvements" placement="bottom" (click)="selectImprovementsTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="fa fa-arrow-trend-up oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
+            </a>
+          </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'history'}">
+            <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
+               disabled="ExplorationRightsService.isCloned()"
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-history-button">
+              <i class="fa fa-clock oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
+            </a>
+          </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-feedback-button" [ngClass]="{'active': getActiveTabName() === 'feedback'}">
+            <a href="#" ngbTooltip="Feedback" placement="bottom" (click)="selectFeedbackTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="fa fa-comment-alt oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
+            </a>
+            <div [hidden]="!getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+              <span class="oppia-exploration-open-threads-count">
+                  {{ getOpenThreadsCount() }}&nbsp;open
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div placement="top-start" class="exp-nav-dropdown-container">
+      <div ngbDropdown class="exp-nav-dropdown-content right-container">
+
+        <div *ngIf="isEditableOutsideTutorialMode()">
+          <div [ngClass]="{'disable-save-button': !connectedToInternet || !isExplorationSaveable()}">
+            <button class="btn publish-button e2e-test-save-changes-for-small-screens"
+                    [ngClass]="{'btn-success': connectedToInternet && isExplorationSaveable()}"
+                    (click)="saveChanges()"
+                    [disabled]="!connectedToInternet || !isExplorationSaveable()">
+              <span *ngIf="!saveIsInProcess">
+                <span *ngIf="isPrivate()">
+                  <i class="fa fa-floppy-disk md-18 oppia-save-publish-button-icon"></i>
+                  <span>Save Draft</span>
+                  <span class="d-none d-md-block" *ngIf="getChangeListLength()">({{getChangeListLength()}})</span>
+                </span>
+                <span class="oppia-publish-label-container" *ngIf="!isPrivate()" title="Publish Changes">
+                  <span>Publish</span>
+                  <span *ngIf="getChangeListLength()">({{getChangeListLength()}})</span>
+                </span>
+              </span>
+              <span *ngIf="saveIsInProcess">
+                <span *ngIf="isPrivate()">
+                  Saving
+                </span>
+                <span *ngIf="!isPrivate()">
+                  Publishing
+                </span>
+                <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-changes-dropdown" id="discardButtonPopup" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></div>
+
+        <ul ngbDropdownMenu class="dropdown-menu discard-publish e2e-test-state-changes-dropdown" aria-labelledby="discardButtonPopup">
+          <button ngbDropdownItem class="btn btn-light e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()" [disabled]="autosaveIsInProgress">
+            <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
+            Discard
+          </button>
+          <div ngbDropdownItem *ngIf="showPublishButton()" [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
+            <button type="button" class="btn btn-light e2e-test-mobile-publish-button"
+                    [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
+                    (click)="showPublishExplorationModal()"
+                    [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
+              <span *ngIf="!publishIsInProcess">
+                <i class="fa fa-cloud-upload-alt"></i>
+                <span>Publish</span>
+              </span>
+              <span *ngIf="publishIsInProcess">
+                <i class="oppia-save-publish-loading"
+                   alt="Publish to Oppia Library">
+                  <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+                </i>
+                <span>
+                  Publishing
+                  <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+                </span>
+              </span>
+            </button>
+          </div>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Overwrite the Bootstrap defaults. */
+  .nav > li > a.oppia-editor-navbar-tab-anchor {
+    padding: 15px 11px;
+  }
+  .oppia-exploration-open-threads-count {
+    background-color: #4078c0;
+    border: 1px solid;
+    border-radius: 10px;
+    bottom: 8px;
+    color: white;
+    font-size: 12px;
+    height: 16px;
+    line-height: 16px;
+    padding: 0 5px;
+    position: relative;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+  }
+  .oppia-exploration-open-threads-color {
+    background-color: #4078c0;
+  }
+  .oppia-exploration-open-threads-indicator {
+    border-radius: 50%;
+    bottom: 5px;
+    height: 15px;
+    position: absolute;
+    right: 3px;
+    text-align: center;
+  }
+  .oppia-exploration-open-threads-indicator-dropdown {
+    border-radius: 10%;
+    bottom: 25%;
+    height: 15px;
+    position: absolute;
+    right: 1px;
+    text-align: center;
+  }
+  editor-navigation > ul > li.nav-link {
+    color: white;
+    text-align: center;
+    width: 46px;
+  }
+  .oppia-exploration-editor-tabs-dropdown {
+    border: 0;
+    max-width: 280px;
+    min-width: 170px;
+    padding: 8px 0;
+  }
+  .oppia-exploration-editor-tabs-dropdown .oppia-exploration-editor-tabs-dropdown-item {
+    height: 48px;
+    margin-right: 0;
+    padding: 0 16px;
+    position: relative;
+  }
+  .oppia-exploration-editor-tabs-dropdown-toggle {
+    border: none;
+    margin-top: 8px;
+  }
+  .oppia-exploration-editor-tabs-dropdown-item .oppia-exploration-editor-tabs-dropdown-element {
+    color: #000;
+    margin: 0;
+    position: absolute;
+    text-decoration: none;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+  .dropdown-menu.oppia-exploration-editor-tabs-dropdown {
+    transform: translate3d(0, -344px, 0) !important;
+  }
+  .dropdown-menu.discard-publish {
+    transform: translate3d(0, -73px, 0) !important;
+  }
+  .oppia-exploration-editor-tabs-dropdown-item .oppia-exploration-editor-tabs-dropdown-element .oppia-mobile-exploration-editor-tabs-icon {
+    padding-right: 10px;
+  }
+  .oppia-exploration-editor-tabs-dropdown-item .oppia-exploration-editor-tabs-dropdown-element .oppia-exploration-editor-tabs-dropdown-inner {
+    font-family: "Roboto", Arial, sans-serif;
+  }
+  .oppia-exploration-editor-tabs-dropdown-item .oppia-editor-warnings-indicator {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+  .navbar-mobile-container {
+    bottom: 0;
+    display: none;
+    position: fixed;
+    right: 0;
+    text-align: right;
+    width: 100%;
+    z-index: 1040;
+  }
+  .show-mobile-navbar-icon {
+    background-color: #e6e6e6;
+    border-left: 1.5px solid #000;
+    border-radius: 10px 0;
+    border-top: 1.5px solid #000;
+    bottom: 0;
+    color: #000;
+    display: none;
+    font-size: 25px;
+    padding: 10px;
+    position: fixed;
+    right: 0;
+    z-index: 1040;
+  }
+
+  @media screen and (max-width: 600px) {
+    .navbar-mobile-container {
+      display: block;
+    }
+
+    .show-mobile-navbar-icon {
+      display: block;
+    }
+  }
+  .navbar-mobile-options {
+    background-color: #e6e6e6;
+    border-top: 1px solid #000;
+    display: flex;
+    flex-wrap: wrap;
+    height: 60px;
+    justify-content: space-evenly;
+  }
+  .mobile-navbar-toggled {
+    transform: translateY(-60px);
+  }
+  .exp-nav-dropdown-container {
+    padding: 10px 0;
+    position: relative;
+    text-align: left;
+    width: 45%;
+  }
+  .exp-nav-dropdown-content {
+    align-items: center;
+    background-color: #fff;
+    border: 1.5px solid #6d6969;
+    border-radius: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: space-between;
+  }
+  .right-container {
+    background-color: #419889;
+    color: #fff;
+  }
+  .exp-nav-dropdown-icon {
+    align-items: center;
+    background-color: #e6e6e6;
+    border-left: 1.5px solid #6d6969;
+    color: #000;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    text-align: center;
+    width: 20%;
+  }
+  .publish-button {
+    background-color: #419889;
+    color: #fff;
+    position: relative;
+    z-index: 1041;
+  }
+</style>

@@ -1,0 +1,426 @@
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>Topic Similarities</h3>
+  <div class="oppia-topic-similarities-container">
+    Upload a csv file:<br>
+    The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
+    <input type="file" id="topicSimilaritiesFile">
+    <button (click)="uploadTopicSimilaritiesFile()">Upload</button>
+    <button (click)="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Search Index</h3>
+  <button (click)="clearSearchIndex()">Clear Search Index</button>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Extract Data</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="submitQuery()">
+      <div class="mb-3 row">
+        <label class="form-label">Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expId"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <label class="form-label">Exploration version:</label>
+        <input type="number"
+               min="0"
+               [(ngModel)]="expVersion"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <label class="form-label">State name:</label>
+        <input type="text"
+               [(ngModel)]="stateName"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <label class="form-label">Number of answers:</label>
+        <input type="number"
+               min="0"
+               [(ngModel)]="numAnswers"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="submit query">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+    <p> (To get all answers set number of answers to 0) </p>
+    <p *ngIf="showDataExtractionQueryStatus">Status: {{ dataExtractionQueryStatusMessage }}</p>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Regenerate contribution opportunities for a topic:</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="regenerateOpportunitiesRelatedToTopic()">
+      <div class="mb-3 row">
+        <label class="form-label">Topic ID:</label>
+        <input type="text"
+               [(ngModel)]="topicIdForRegeneratingOpportunities"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-topic-id-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Regenerate" class="e2e-test-regenerate-opportunities-button">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Regenerate topic summaries:</h3>
+  <p>
+    Creates new topic summaries to replace the old topic summaries with.
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="regenerateTopicSummaries()">
+      <div class="mb-3 row">
+        <input type="submit" value="Regenerate" class="e2e-test-regenerate-topic-summaries-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Generate Study Guide Models:</h3>
+  <p>
+    Generates new Study Guide Models by using the content of the existing Subtopic Page Models.
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="generateStudyGuideModels()">
+      <div class="form-group row">
+        <input type="submit" value="Generate" class="e2e-test-generate-study-guide-models-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Delete Study Guide Models:</h3>
+  <p>
+    Deletes all Study Guide Models and their corresponding StudyGuideSnapshotMetadataModels, StudyGuideSnapshotContentModels, StudyGuideCommitLogEntryModels.
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="deleteStudyGuideModels()">
+      <div class="form-group row">
+        <input type="submit" value="Delete All" class="e2e-test-delete-study-guide-models-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Verify Study Guide Models:</h3>
+  <p>
+    Verifies all Study Guide Models. This will check that the StudyGuideSnapshotMetadataModels, StudyGuideSnapshotContentModels, StudyGuideCommitLogEntryModels and their quantities for each of the StudyGuideModels is accurate. (If a StudyGuideModel has version 4, there should be 4 of each of these models - 1 for each version)
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="verifyStudyGuideModels()">
+      <div class="form-group row">
+        <input type="submit" value="Verify All" class="e2e-test-verify-study-guide-models-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Rollback exploration to latest known safe state:</h3>
+  <em>
+    Here, a "safe state" refers to the latest version of the exploration for
+    which both snapshot content and snapshot metadata models also exist.
+  </em>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="rollbackExploration()">
+      <div class="mb-3 row">
+        <label class="form-label">Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expIdToRollback"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-exploration-id-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Rollback Exploration" class="e2e-test-rollback-exploration-button">
+        <input type="reset" value="reset">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Send a Test Mail to Admin</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="sendDummyMailToAdmin()">
+      <div class="mb-3 row">
+        <input type="submit" value="Send" class="e2e-test-send-test-mail-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Update username</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="updateUsername()">
+      <div class="mb-3 row">
+        <label class="form-label">Old username:</label>
+        <input type="text"
+               [(ngModel)]="oldUsername"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-old-username-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <label class="form-label">New username:</label>
+        <input type="text"
+               [(ngModel)]="newUsername"
+               [ngModelOptions]="{standalone: true}"
+               required="true"
+               class="e2e-test-new-username-input"
+               [maxlength]="MAX_USERNAME_LENGTH">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Update" class="e2e-test-update-username-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Number of pending deletion requests</h3>
+  <div class="oppia-query-form">
+    <form class="form"
+          (submit)="getNumberOfPendingDeletionRequestModels()">
+      <div class="mb-3 row">
+        <input type="submit"
+               value="Get number of users whose deletion is currently in-progress"
+               class="e2e-test-get-deletion-request-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Get models related to a user</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="getModelsRelatedToUser()">
+      <div class="mb-3 row">
+        <label class="form-label">User ID:</label>
+        <input type="text"
+               [(ngModel)]="userIdToGet"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Get">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Delete user</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="deleteUser()">
+      <div class="mb-3 row">
+        <label class="form-label">User ID:</label>
+        <input type="text"
+               [(ngModel)]="userIdToDelete"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <label class="form-label">Username:</label>
+        <input type="text"
+               [(ngModel)]="usernameToDelete"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Delete">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Grant super admin privileges to Firebase account</h3>
+  <p>The chosen user will be forcibly logged out.</p>
+  <p>This operation is idempotent.</p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="grantSuperAdminPrivileges()">
+      <div class="mb-3 row">
+        <label class="form-label">Username:</label>
+        <input type="text"
+               [(ngModel)]="usernameToGrant"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-username-to-grant-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Grant" class="e2e-test-grant-super-admin-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Update Blog Post Data</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="updateBlogPostData()">
+      <div class="mb-3 row">
+        <label class="form-label">Blog Post Id:</label>
+        <input type="text"
+               [(ngModel)]="blogPostId"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-blog-id-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <label class="form-label">Author Username:</label>
+        <input type="text"
+               [(ngModel)]="authorUsername"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-blog-author-name-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <label class="form-label">Published On:</label>
+        <input type="text"
+               [(ngModel)]="publishedOn"
+               [ngModelOptions]="{standalone: true}"
+               required="true"
+               class="e2e-test-blog-published-on-input"
+               placeholder="Enter in mm/dd/yyyy">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Update" class="e2e-test-update-blog-post-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Revoke super admin privileges from Firebase account</h3>
+  <p>The chosen user will be forcibly logged out.</p>
+  <p>This operation is idempotent.</p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="revokeSuperAdminPrivileges()">
+      <div class="mb-3 row">
+        <label class="form-label">Username:</label>
+        <input type="text"
+               [(ngModel)]="usernameToRevoke"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-username-to-revoke-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Revoke" class="e2e-test-revoke-super-admin-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Lookup exploration interactions</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="retrieveExplorationInteractionIds()">
+      <div class="mb-3 row">
+        <label class="form-label">Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expIdToGetInteractionIdsFor"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-exploration-id-to-get-interactions-input"
+               required="true">
+      </div>
+      <div class="mb-3 row">
+        <input type="submit" value="Get" class="e2e-test-get-interactions-button">
+      </div>
+    </form>
+  </div>
+
+  <div>
+    <p *ngIf="explorationInteractionIds.length > 0">Interaction IDs:</p>
+    <ul>
+      <li *ngFor="let interactionId of explorationInteractionIds" [innerHTML]="interactionId"></li>
+    </ul>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text azure-controls-card">
+  <h3>Azure Text-to-Speech service</h3>
+  <p class="oppia-azure-controls-text-container">
+    <span *ngIf="voiceoverAutogenerationIsEnabled">
+      Autogenerated voiceover using Azure is curently enabled.
+    </span>
+    <span *ngIf="!voiceoverAutogenerationIsEnabled">
+        Autogenerated voiceover using Azure is curently disabled.
+    </span>
+    <span>
+      <mat-slide-toggle [color]="'primary'"
+                        [(ngModel)]="voiceoverAutogenerationIsEnabled"
+                        class="e2e-test-cloud-service-autogeneration-toggle">
+      </mat-slide-toggle>
+    </span>
+  </p>
+
+  <div class="oppia-query-form">
+    <form class="form" (submit)="updateAutomaticVoiceoverSynthesisUsingAzure()">
+      <div class="mb-3 row">
+        <input type="submit" class="e2e-test-save-autogeneration-toggle-button" value="Save">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<style>
+  .oppia-admin-page-card {
+    max-width: 700px
+  }
+  .oppia-admin-page-card > button {
+    max-width: 30%;
+  }
+  .oppia-admin-page-card.oppia-long-text p {
+    margin: 0 0 1em 0;
+  }
+  .oppia-admin-page-card .oppia-query-form .mb-3 {
+    margin-left: 0;
+  }
+  .oppia-admin-page-card .oppia-query-form label {
+    font-weight: normal;
+    width: 30%;
+  }
+  .oppia-topic-similarities-container > input,
+  .oppia-topic-similarities-container > button {
+    display: block;
+    margin: 5px 0 5px 0;
+  }
+  .oppia-long-text-card {
+    max-width: 700px;
+  }
+
+  .oppia-page-card.mat-card {
+    margin-top: 40px;
+    padding: 30px 55px 30px 45px;
+  }
+  .oppia-azure-controls-text-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  .row > * {
+    max-width: none;
+    width: auto;
+  }
+</style>

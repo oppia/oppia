@@ -1,0 +1,710 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Test
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Continue
+language_code: en
+objective: check all the interactions work
+param_changes: []
+param_specs:
+  a:
+    obj_type: UnicodeString
+  b:
+    obj_type: UnicodeString
+  c:
+    obj_type: UnicodeString
+schema_version: 47
+states:
+  Code REPL:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Write a program the prints 12.<br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Music notes input
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: '12'
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '[Type your code here.]'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Code REPL
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: CodeRepl
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Continue:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Click continue.<br></p><p>\_</p><p><strong>Parameters</strong></p><p>{{a}}\
+        \ should be 1.</p><p>{{c}} should be 2.</p><p>{{b}} should be 0.5.<br></p><p>{{a*b}}\
+        \ should be 0.5.</p><p>{{-a*b}} should be -0.5.<br></p><p>{{a \_ * b \_}}\
+        \ should be 0.5.</p><p>{{abs(-a*b)}} should be 0.5.</p><p>{{if a + a == c\
+        \ then 'yes' else 'no'}} should be 'yes'</p><p>{{if a == c then 'yes' else\
+        \ 'no'}} should be 'no'<br></p><p>{{floor(a*b)}} should be 0.</p><p>{{log(2,\
+        \ 10)}} should be around 0.3.<br></p><p>{{pow(2, 10)}} should be 1024.</p><p>{{3\
+        \ &lt; 4}} should be true.</p><p>{{3 &gt; 4}} should be false.</p><p>{{4 &lt;=\
+        \ 4}} should be true.</p><p>{{4 &gt;= 3}} should be true.</p><p>&lt; should\
+        \ be an unescaped 'less-than' sign.</p><p>&gt; should be an unescaped 'greater-than'\
+        \ sign.</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Multiple choice input
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes:
+    - customization_args:
+        parse_with_jinja: false
+        value: '1'
+      generator_id: Copier
+      name: a
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a}}'
+      generator_id: Copier
+      name: b
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+b}}'
+      generator_id: Copier
+      name: c
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{b/c}}'
+      generator_id: Copier
+      name: b
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  Multiple choice input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Choose option B.<br></p><p>\_</p><p><strong>Parameters</strong></p><p>{{a}}\
+        \ should be 1.</p><p>{{b}} should be 3.<br></p><p>{{c}} should be 2.</p><p>{{a*b}}\
+        \ should be 3.</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Text input
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: "<oppia-noninteractive-image alt-with-value=\"&amp;quot;image&amp;quot;\"\
+              \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"\
+              &amp;quot;A_height_24_width_24.png&amp;quot;\"></oppia-noninteractive-image><p>\_\
+              </p>"
+          - content_id: ca_choices_3
+            html: <p>Option B<br></p>
+          - content_id: ca_choices_4
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;\\frac{x}{y}&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_152727_0lz7a7ui3f_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math><br></p>'
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Multiple choice input
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 5
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+c}}'
+      generator_id: Copier
+      name: b
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Music notes input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Enter two E4 notes (bottom line).<br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: World map
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+      default_outcome:
+        dest: Music notes input
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Network Graph:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Do the following step by step:<br><br>1. Delete Node labelled B</p><p>2.
+        Add Node labelled Z</p><p>3. Add Edge of weight 150 connecting A to Z</p><p>4.
+        Delete Edge between A and F</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Code REPL
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 1
+                src: 0
+                weight: 150
+              isDirected: false
+              isLabeled: true
+              isWeighted: true
+              vertices:
+              - label: A
+                x: 128.328125
+                y: 65.25
+              - label: Z
+                x: 189.0
+                y: 66.0
+              - label: F
+                x: 155.0
+                y: 125.0
+          rule_type: IsIsomorphicTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: true
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: true
+        canEditEdgeWeight:
+          value: true
+        canEditVertexLabel:
+          value: true
+        canMoveVertex:
+          value: true
+        graph:
+          value:
+            edges:
+            - dst: 2
+              src: 0
+              weight: 1000
+            isDirected: false
+            isLabeled: true
+            isWeighted: true
+            vertices:
+            - label: A
+              x: 212.0
+              y: 45.0
+            - label: B
+              x: 379.0
+              y: 44.0
+            - label: F
+              x: 215.0
+              y: 155.5
+      default_outcome:
+        dest: Network Graph
+        feedback:
+          content_id: default_outcome
+          html: <p>Incorrect</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: GraphInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Numeric input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Enter a number larger than 6.<br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Set input
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6.0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Numeric input
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Set input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Enter the set {abc, xyz}<br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Network Graph
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              unicodeStrSet:
+              - abc
+              - xyz
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: Add item
+      default_outcome:
+        dest: Set input
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: SetInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  Text Area Input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Please type hello.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Numeric input
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - hello
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: Type your answer here.
+        rows:
+          value: 10
+      default_outcome:
+        dest: Text Area Input
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  Text input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Enter the string rrrrr<br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Text Area Input
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - rrrrr
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: Type your answer here.
+        rows:
+          value: 1
+      default_outcome:
+        dest: Text input
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  World map:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Click on the USA.<br></p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            d: 3300.0
+            p:
+            - 40.0
+            - -105.0
+          rule_type: Within
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        latitude:
+          value: 0.0
+        longitude:
+          value: 0.0
+        zoom:
+          value: 0.0
+      default_outcome:
+        dest: World map
+        feedback:
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: InteractiveMap
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+states_schema_version: 42
+tags: []
+title: Test of expressions and interactions

@@ -1,0 +1,520 @@
+<div class="volunteer-page e2e-test-volunteer-page">
+  <div class="oppia-volunteer-banner">
+    <div class="oppia-volunteer-banner-content">
+      <h1 class="oppia-volunteer-h1 e2e-test-volunteer-page-headings">{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_HEADING' | translate }}</h1>
+
+      <div class="oppia-volunteer-content">
+        <p class="oppia-volunteer-subtext">{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT' | translate }}</p>
+      </div>
+
+      <oppia-primary-button
+          [buttonHref]="formLink"
+          (onClickPrimaryButton)="onClickVolunteerCTAButtonAtTop()"
+          [customClasses]="['volunteer-btn','oppia-volunteer-subtext','e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top']"
+          buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
+      </oppia-primary-button>
+    </div>
+
+    <div class="bannerImg">
+      <picture>
+        <source type="image/webp"
+                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(bannerImgPath))">
+        <source type="image/png"
+                [srcset]="this.getStaticImageUrl(bannerImgPath)">
+        <img alt="Volunteer page banner image - Desktop view" [src]="this.getStaticImageUrl(bannerImgPath)">
+      </picture>
+    </div>
+
+  </div>
+
+  <div class="oppia-section-why-volunteer">
+    <div class="container text-center">
+      <h2 class="section-heading mb-5 e2e-test-volunteer-page-headings">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION' | translate }}</h2>
+      <div class="row mt-4">
+        <div class="col-md-4">
+          <img [src]="getStaticImageUrl('/icons/community-icon.svg')" alt="Community icon" class="m-3">
+          <h3 class="fw-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_1' | translate }}</h3>
+          <p class="oppia-volunteer-subtext" >{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_1_CONTENT' | translate }}</p>
+        </div>
+        <div class="col-md-4">
+          <img [src]="getStaticImageUrl('/icons/skills-icon.svg')" alt="Skills icon" class="m-3">
+          <h3 class="fw-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2' | translate }}</h3>
+          <p class="oppia-volunteer-subtext" >{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2_CONTENT' | translate }}</p>
+        </div>
+        <div class="col-md-4">
+          <img [src]="getStaticImageUrl('/icons/projects-icon.svg')" alt="Projects icon" class="m-3">
+          <h3 class="fw-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3' | translate }}</h3>
+          <p class="oppia-volunteer-subtext" >{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT' | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-volunteer-body e2e-test-volunteer-page-tabs-section">
+    <h1 class="oppia-volunteer-h1 e2e-test-volunteer-page-headings">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION' | translate }}</h1>
+    <div class="oppia-volunteer-tabs">
+      <button class="oppia-volunteer-tab-prev-btn e2e-test-volunteer-page-tabs-prev-btn"
+              *ngIf="screenType !== 'desktop'"
+              [disabled]="activeTabGroupIndex === 0"
+              (click)="decrementTabGroupIndex()">
+        <i class="oppia-volunteer-chevron-icon fas"
+           [ngClass]="{
+            'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL(),
+            'oppia-disabled-chevron': activeTabGroupIndex === 0}">
+        </i>
+        <span class="visually-hidden">Previous</span>
+      </button>
+
+      <mat-tab-group [disablePagination]="true" [animationDuration]="0" [disableRipple]="true">
+        <mat-tab *ngIf="tabGroups[screenType][activeTabGroupIndex].includes(0)">
+          <ng-template mat-tab-label>
+            <picture>
+              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/outreach-icon.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/icons/outreach-icon.png')">
+              <img [src]="getStaticImageUrl('/icons/outreach-icon.png')" alt="Outreach icon" width="28px" height="28px">
+            </picture>
+            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH' | translate }}</span>
+          </ng-template>
+          <div class="oppia-volunteer-tab-content">
+            <div class="oppia-volunteer-tab-content-top">
+              <div class=" oppia-volunteer-tab-description">
+                <p class="oppia-volunteer-tab-subtitle">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_WHAT_WE' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_SUB_HEADING_1' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_CONTENT_1' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_SUB_HEADING_2' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_CONTENT_2' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_SUB_HEADING_3' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_CONTENT_3' | translate }}</p>
+              </div>
+              <div class="oppia-volunteer-carousel-container">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="outreach.images.length > 0" [animation]="false">
+                  <ng-template *ngFor="let image of outreach.images; index as index" ngbSlide>
+                    <div class="oppia-carousel-wrapper">
+                      <picture>
+                        <source type="image/webp"
+                                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                        <source type="image/png"
+                                [srcset]="this.getStaticImageUrl(image)">
+                        <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                      </picture>
+                    </div>
+                    <div class="carousel-caption">
+                      <p> "{{ outreach.caption[index].content }}" </p>
+                      <div class="oppia-volunteer-name">
+                        <p><b> {{ outreach.caption[index].name }} </b></p>
+                        <p> {{ outreach.caption[index].type }} </p>
+                      </div>
+                    </div>
+                  </ng-template>
+                </ngb-carousel>
+              </div>
+            </div>
+
+            <div class="oppia-volunteer-tab-content-bottom">
+              <div class="oppia-volunteer-tab-content-boxes-container">
+                <div class="oppia-volunteer-tab-expectations">
+                  <p class="oppia-volunteer-tab-subtitle e2e-test-volunteer-page-first-expectations">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_EXPECTATIONS_HEADING' | translate }}
+                  </p>
+                  <p class="oppia-volunteer-subtext">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
+                  </p>
+                  <ul>
+                    <li class="oppia-volunteer-subtext" *ngFor="let expectation of volunteerExpectations">
+                      <p class="oppia-volunteer-subtext">{{ expectation | translate }}</p>
+                    </li>
+                  </ul>
+                </div>
+                <div class="oppia-volunteer-tab-skills">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SKILLS_HEADING' | translate }}
+                  </p>
+                  <div class="oppia-volunteer-tab-skill-boxes">
+                    <div class="oppia-volunteer-tab-skill-box"
+                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (outreachSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
+                         *ngFor="let skillSet of outreachSkills">
+                      <p class="oppia-volunteer-subtext oppia-volunteer-tab-heading">{{ skillSet.title | translate }}</p>
+                      <ul>
+                        <li class="oppia-volunteer-subtext" *ngFor="let skill of skillSet.skills">
+                          <p class="oppia-volunteer-subtext">{{ skill | translate }}</p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab *ngIf="tabGroups[screenType][activeTabGroupIndex].includes(1)">
+          <ng-template mat-tab-label>
+            <picture>
+              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/software-icon.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/icons/software-icon.png')">
+              <img [src]="getStaticImageUrl('/icons/software-icon.png')" alt="Software icon" width="28px" height="28px">
+            </picture>
+            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE' | translate }}</span>
+          </ng-template>
+          <div class="oppia-volunteer-tab-content">
+            <div class="oppia-volunteer-tab-content-top">
+              <div class=" oppia-volunteer-tab-description">
+                <p class="oppia-volunteer-tab-subtitle">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_WHAT_WE' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_SUB_HEADING_1' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_CONTENT_1' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_SUB_HEADING_2' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_CONTENT_2' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_SUB_HEADING_3' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_CONTENT_3' | translate }}</p>
+              </div>
+              <div class="oppia-volunteer-carousel-container">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="software.images.length > 0" [animation]="false">
+                  <ng-template *ngFor="let image of software.images; index as index" ngbSlide>
+                    <div class="oppia-carousel-wrapper">
+                      <picture>
+                        <source type="image/webp"
+                                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                        <source type="image/png"
+                                [srcset]="this.getStaticImageUrl(image)">
+                        <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                      </picture>
+                    </div>
+                    <div class="carousel-caption">
+                      <p> "{{ software.caption[index].content }}" </p>
+                      <div class="oppia-volunteer-name">
+                        <p><b> {{ software.caption[index].name }} </b></p>
+                        <p> {{ software.caption[index].type }} </p>
+                      </div>
+                    </div>
+                  </ng-template>
+                </ngb-carousel>
+              </div>
+            </div>
+
+            <div class="oppia-volunteer-tab-content-bottom">
+              <div class="oppia-volunteer-tab-content-boxes-container">
+                <div class="oppia-volunteer-tab-expectations">
+                  <p class="oppia-volunteer-tab-subtitle e2e-test-volunteer-page-second-expectations">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_EXPECTATIONS_HEADING' | translate }}
+                  </p>
+                  <p class="oppia-volunteer-subtext">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
+                  </p>
+                  <ul>
+                    <li class="oppia-volunteer-subtext" *ngFor="let expectation of volunteerExpectations">
+                      <p class="oppia-volunteer-subtext">{{ expectation | translate }}</p>
+                    </li>
+                  </ul>
+                </div>
+                <div class="oppia-volunteer-tab-skills">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SKILLS_HEADING' | translate }}
+                  </p>
+                  <div class="oppia-volunteer-tab-skill-boxes">
+                    <div class="oppia-volunteer-tab-skill-box"
+                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (softwareSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
+                          *ngFor="let skillSet of softwareSkills">
+                      <p class="oppia-volunteer-subtext oppia-volunteer-tab-heading">{{ skillSet.title | translate }}</p>
+                      <ul>
+                        <li class="oppia-volunteer-subtext" *ngFor="let skill of skillSet.skills">
+                          <p class="oppia-volunteer-subtext">{{ skill | translate }}</p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab *ngIf="tabGroups[screenType][activeTabGroupIndex].includes(2)">
+          <ng-template mat-tab-label>
+            <picture>
+              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/art-icon.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/icons/art-icon.png')">
+              <img [src]="getStaticImageUrl('/icons/art-icon.png')" alt="Art and Design icon" width="28px" height="28px">
+            </picture>
+            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN' | translate }}</span>
+          </ng-template>
+          <div class="oppia-volunteer-tab-content">
+            <div class="oppia-volunteer-tab-content-top">
+              <div class=" oppia-volunteer-tab-description">
+                <p class="oppia-volunteer-tab-subtitle">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_WHAT_WE' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_SUB_HEADING_1' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_CONTENT_1' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_SUB_HEADING_2' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_CONTENT_2' | translate }}</p>
+
+              </div>
+              <div class="oppia-volunteer-carousel-container">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="art.images.length > 0" [animation]="false">
+                  <ng-template *ngFor="let image of art.images; index as index" ngbSlide>
+                    <div class="oppia-carousel-wrapper">
+                      <picture>
+                        <source type="image/webp"
+                                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                        <source type="image/png"
+                                [srcset]="this.getStaticImageUrl(image)">
+                        <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                      </picture>
+                    </div>
+                    <div class="carousel-caption">
+                      <p> "{{ art.caption[index].content }}" </p>
+                      <div class="oppia-volunteer-name">
+                        <p><b> {{ art.caption[index].name }} </b></p>
+                        <p> {{ art.caption[index].type }} </p>
+                      </div>
+                    </div>
+                  </ng-template>
+                </ngb-carousel>
+              </div>
+            </div>
+
+            <div class="oppia-volunteer-tab-content-bottom">
+              <div class="oppia-volunteer-tab-content-boxes-container">
+                <div class="oppia-volunteer-tab-expectations">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_EXPECTATIONS_HEADING' | translate }}
+                  </p>
+                  <p class="oppia-volunteer-subtext">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
+                  </p>
+                  <ul>
+                    <li class="oppia-volunteer-subtext" *ngFor="let expectation of volunteerExpectations">
+                      <p class="oppia-volunteer-subtext">{{ expectation | translate }}</p>
+                    </li>
+                  </ul>
+                </div>
+                <div class="oppia-volunteer-tab-skills">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SKILLS_HEADING' | translate }}
+                  </p>
+                  <div class="oppia-volunteer-tab-skill-boxes">
+                    <div class="oppia-volunteer-tab-skill-box"
+                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (artAndDesignSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
+                          *ngFor="let skillSet of artAndDesignSkills">
+                      <p class="oppia-volunteer-subtext oppia-volunteer-tab-heading">{{ skillSet.title | translate }}</p>
+                      <ul>
+                        <li class="oppia-volunteer-subtext" *ngFor="let skill of skillSet.skills">
+                          <p class="oppia-volunteer-subtext">{{ skill | translate }}</p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab *ngIf="tabGroups[screenType][activeTabGroupIndex].includes(3)">
+          <ng-template mat-tab-label>
+            <picture>
+              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/translation-icon.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/icons/translation-icon.png')">
+              <img [src]="getStaticImageUrl('/icons/translation-icon.png')" alt="Translation icon" width="28px" height="28px">
+            </picture>
+            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION' | translate }}</span>
+          </ng-template>
+          <div class="oppia-volunteer-tab-content">
+            <div class="oppia-volunteer-tab-content-top">
+              <div class=" oppia-volunteer-tab-description">
+                <p class="oppia-volunteer-tab-subtitle">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_WHAT_WE' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_SUB_HEADING_1' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_1' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_SUB_HEADING_2' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_2' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_SUB_HEADING_3' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_3' | translate }}</p>
+              </div>
+              <div class="oppia-volunteer-carousel-container">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="translation.images.length > 0" [animation]="false">
+                  <ng-template *ngFor="let image of translation.images; index as index" ngbSlide>
+                    <div class="oppia-carousel-wrapper">
+                      <picture>
+                        <source type="image/webp"
+                                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                        <source type="image/png"
+                                [srcset]="this.getStaticImageUrl(image)">
+                        <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                      </picture>
+                    </div>
+                    <div class="carousel-caption">
+                      <p> "{{ translation.caption[index].content }}" </p>
+                      <div class="oppia-volunteer-name">
+                        <p><b> {{ translation.caption[index].name }} </b></p>
+                        <p> {{ translation.caption[index].type }} </p>
+                      </div>
+                    </div>
+                  </ng-template>
+                </ngb-carousel>
+              </div>
+            </div>
+
+            <div class="oppia-volunteer-tab-content-bottom">
+              <div class="oppia-volunteer-tab-content-boxes-container">
+                <div class="oppia-volunteer-tab-expectations">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_EXPECTATIONS_HEADING' | translate }}
+                  </p>
+                  <p class="oppia-volunteer-subtext">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
+                  </p>
+                  <ul>
+                    <li class="oppia-volunteer-subtext" *ngFor="let expectation of volunteerExpectations">
+                      <p class="oppia-volunteer-subtext">{{ expectation | translate }}</p>
+                    </li>
+                  </ul>
+                </div>
+                <div class="oppia-volunteer-tab-skills">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SKILLS_HEADING' | translate }}
+                  </p>
+                  <div class="oppia-volunteer-tab-skill-boxes">
+                    <div class="oppia-volunteer-tab-skill-box"
+                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (translationSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
+                          *ngFor="let skillSet of translationSkills">
+                      <p class="oppia-volunteer-subtext oppia-volunteer-tab-heading">{{ skillSet.title | translate }}</p>
+                      <ul>
+                        <li class="oppia-volunteer-subtext" *ngFor="let skill of skillSet.skills">
+                          <p class="oppia-volunteer-subtext">{{ skill | translate }}</p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab *ngIf="tabGroups[screenType][activeTabGroupIndex].includes(4)">
+          <ng-template mat-tab-label>
+            <picture>
+              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/lesson-icon.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/icons/lesson-icon.png')">
+              <img [src]="getStaticImageUrl('/icons/lesson-icon.png')" alt="Lesson creation icon" width="28px" height="28px">
+            </picture>
+            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION' | translate }}</span>
+          </ng-template>
+          <div class="oppia-volunteer-tab-content">
+            <div class="oppia-volunteer-tab-content-top">
+              <div class=" oppia-volunteer-tab-description">
+                <p class="oppia-volunteer-tab-subtitle">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_SUB_HEADING_1' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_1' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_SUB_HEADING_2' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_2' | translate }}</p>
+
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_SUB_HEADING_3' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_3' | translate }}</p>
+              </div>
+              <div class="oppia-volunteer-carousel-container">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="lessonCreation.images.length > 0" [animation]="false">
+                  <ng-template *ngFor="let image of lessonCreation.images; index as index" ngbSlide>
+                    <div class="oppia-carousel-wrapper">
+                      <picture>
+                        <source type="image/webp"
+                                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                        <source type="image/png"
+                                [srcset]="this.getStaticImageUrl(image)">
+                        <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                      </picture>
+                    </div>
+                    <div class="carousel-caption">
+                      <p> "{{ lessonCreation.caption[index].content }}" </p>
+                      <div class="oppia-volunteer-name">
+                        <p><b> {{ lessonCreation.caption[index].name }} </b></p>
+                        <p> {{ lessonCreation.caption[index].type }} </p>
+                      </div>
+                    </div>
+                  </ng-template>
+                </ngb-carousel>
+              </div>
+            </div>
+
+            <div class="oppia-volunteer-tab-content-bottom">
+              <div class="oppia-volunteer-tab-content-boxes-container">
+                <div class="oppia-volunteer-tab-expectations">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_EXPECTATIONS_HEADING' | translate }}
+                  </p>
+                  <p class="oppia-volunteer-subtext">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
+                  </p>
+                  <ul>
+                    <li class="oppia-volunteer-subtext" *ngFor="let expectation of volunteerExpectations">
+                      <p>{{ expectation | translate }}</p>
+                    </li>
+                  </ul>
+                </div>
+                <div class="oppia-volunteer-tab-skills">
+                  <p class="oppia-volunteer-tab-subtitle">
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SKILLS_HEADING' | translate }}
+                  </p>
+                  <div class="oppia-volunteer-tab-skill-boxes">
+                    <div class="oppia-volunteer-tab-skill-box"
+                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (lessonCreationSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
+                          *ngFor="let skillSet of lessonCreationSkills">
+                      <p class="oppia-volunteer-subtext oppia-volunteer-tab-heading">{{ skillSet.title | translate }}</p>
+                      <ul>
+                        <li class="oppia-volunteer-subtext" *ngFor="let skill of skillSet.skills">
+                          <p class="oppia-volunteer-subtext">{{ skill | translate }}</p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+
+      <button class="oppia-volunteer-tab-next-btn e2e-test-volunteer-page-tabs-next-btn"
+              *ngIf="screenType !== 'desktop'"
+              [disabled]="activeTabGroupIndex === tabGroups[screenType].length - 1"
+              (click)="incrementTabGroupIndex()">
+        <i class="oppia-volunteer-chevron-icon fas"
+           [ngClass]="{
+            'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL(),
+            'oppia-disabled-chevron': activeTabGroupIndex === tabGroups[screenType].length - 1}">
+        </i>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="oppia-volunteer-footer"
+       [style.background-image]="'url(' + getStaticImageUrl(getWebpExtendedName(footerImgPath)) + '), url(' + getStaticImageUrl(footerImgPath) + ')'"
+       [style.background-position]="'center center'"
+       [style.background-size]="'cover'">
+    <p class="oppia-volunteer-subtext" >{{ 'I18N_VOLUNTEER_PAGE_FOOTER' | translate }}</p>
+
+    <oppia-primary-button
+        [buttonHref]="formLink"
+        (onClickPrimaryButton)="onClickVolunteerCTAButtonAtBottom()"
+        [customClasses]="['volunteer-btn','oppia-volunteer-subtext','e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom']"
+        buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
+    </oppia-primary-button>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<div *ngIf="languageSelected">
+  <oppia-opportunities-list [loadOpportunities]="loadOpportunitiesAsync.bind(this)"
+                            (clickActionButton)="onClickButton($event)"
+                            [loadMoreOpportunities]="loadMoreOpportunitiesAsync.bind(this)"
+                            [progressBarRequired]="true"
+                            [opportunityType]="opportunityType">
+  </oppia-opportunities-list>
+</div>
+<div *ngIf="!languageSelected" class="oppia-language-required-message-container">
+  <div class="oppia-mascot-avatar-container">
+    <img class="oppia-mascot-avatar"
+         [src]="OPPIA_AVATAR_IMAGE_URL"
+         alt="">
+  </div>
+  <div class="oppia-language-required-message">
+    Oops! You haven't selected a language yet.
+    <br>
+    Select a language to start translating!
+  </div>
+</div>
+
+<style>
+  .oppia-language-required-message-container {
+    align-items: center;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    margin: auto;
+    min-height: 40vh;
+    padding: 25px;
+    width: 75%;
+  }
+  .oppia-language-required-message {
+    color: #4a4a4a;
+    font-size: 28px;
+    text-align: center;
+  }
+  .oppia-language-required-message > .oppia-link-text {
+    color: #009688;
+  }
+</style>

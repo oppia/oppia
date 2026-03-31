@@ -1,0 +1,19 @@
+# Duplicate patterns are there on line 18 and 19.
+
+# Critical files.
+#
+# IMPORTANT NOTE: Please ensure that these files are always located at the end
+# of the CODEOWNERS file, since later rows override earlier ones. For details,
+# see the example at the bottom of this page:
+#
+#     https://help.github.com/en/articles/about-code-owners
+#
+# On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
+# in scripts/linters/run_lint_checks.py in sync with the modifications.
+/dependencies.json @vojtechjelinek
+/package.json @vojtechjelinek
+/yarn.lock @vojtechjelinek
+/scripts/install_third_party_libs.py @vojtechjelinek
+/.github/CODEOWNERS @DubeySandeep
+/.github/stale.yml @ankita240796
+/.github/stale.yml @ankita240796

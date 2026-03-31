@@ -1,0 +1,134 @@
+{
+  "splash": {
+    "url": "http://localhost:8181/",
+    "page_module": "core/templates/pages/splash-page/splash-page.module.ts"
+  },
+  "about": {
+    "url": "http://localhost:8181/about",
+    "page_module": "core/templates/pages/about-page/about-page.module.ts"
+  },
+  "admin": {
+    "url": "http://localhost:8181/admin",
+    "page_module": "core/templates/pages/admin-page/admin-page.module.ts"
+  },
+  "blog-dashboard": {
+    "url": "http://localhost:8181/blog-dashboard",
+    "page_module": "core/templates/pages/blog-dashboard-page/blog-dashboard-page.module.ts"
+  },
+  "community-library": {
+    "url": "http://localhost:8181/community-library",
+    "page_module": "core/templates/pages/library-page/library-page.module.ts"
+  },
+  "contact": {
+    "url": "http://localhost:8181/contact",
+    "page_module": "core/templates/pages/contact-page/contact-page.module.ts"
+  },
+  "contributor-dashboard": {
+    "url": "http://localhost:8181/contributor-dashboard",
+    "page_module": "core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.module.ts"
+  },
+  "creator-dashboard": {
+    "url": "http://localhost:8181/creator-dashboard",
+    "page_module": "core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts"
+  },
+  "creator-guidelines": {
+    "url": "http://localhost:8181/creator-guidelines",
+    "page_module": "core/templates/pages/participation-playbook/playbook.module.ts"
+  },
+  "delete-account": {
+    "url": "http://localhost:8181/delete-account",
+    "page_module": "core/templates/pages/delete-account-page/delete-account-page.module.ts"
+  },
+  "donate": {
+    "url": "http://localhost:8181/donate",
+    "page_module": "core/templates/pages/donate-page/donate-page.module.ts"
+  },
+  "email-dashboard": {
+    "url": "http://localhost:8181/emaildashboard",
+    "page_module": "core/templates/pages/email-dashboard-page/email-dashboard-page.module.ts"
+  },
+  "get-started": {
+    "url": "http://localhost:8181/get-started",
+    "page_module": "core/templates/pages/get-started-page/get-started-page.module.ts"
+  },
+  "learner-dashboard": {
+    "url": "http://localhost:8181/learner-dashboard",
+    "page_module": "core/templates/pages/learner-dashboard-page/learner-dashboard-page.module.ts"
+  },
+  "license": {
+    "url": "http://localhost:8181/license",
+    "page_module": "core/templates/pages/license-page/license.module.ts"
+  },
+  "moderator": {
+    "url": "http://localhost:8181/moderator",
+    "page_module": "core/templates/pages/moderator-page/moderator-page.module.ts"
+  },
+  "preferences": {
+    "url": "http://localhost:8181/preferences",
+    "page_module": "core/templates/pages/preferences-page/preferences-page.module.ts"
+  },
+  "privacy-policy": {
+    "url": "http://localhost:8181/privacy-policy",
+    "page_module": "core/templates/pages/privacy-page/privacy-page.module.ts"
+  },
+  "profile": {
+    "url": "http://localhost:8181/profile/username1",
+    "page_module": "core/templates/pages/profile-page/profile-page.module.ts"
+  },
+  "signup": {
+    "url": "http://localhost:8181/signup?return_url=%2F",
+    "page_module": "core/templates/pages/signup-page/signup-page.module.ts"
+  },
+  "teach": {
+    "url": "http://localhost:8181/teach",
+    "page_module": "core/templates/pages/teach-page/teach-page.module.ts"
+  },
+  "topics-and-skills-dashboard": {
+    "url": "http://localhost:8181/topics-and-skills-dashboard",
+    "page_module": "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts"
+  },
+  "terms": {
+    "url": "http://localhost:8181/terms",
+    "page_module": "core/templates/pages/terms-page/terms-page.module.ts"
+  },
+  "thanks": {
+    "url": "http://localhost:8181/thanks",
+    "page_module": "core/templates/pages/thanks-page/thanks-page.module.ts"
+  },
+  "volunteer": {
+    "url": "http://localhost:8181/volunteer",
+    "page_module": "core/templates/pages/volunteer-page/volunteer-page.module.ts"
+  },
+  "topic-viewer": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/story",
+    "page_module": "core/templates/pages/topic-viewer-page/topic-viewer-page.module.ts"
+  },
+  "story-viewer": {
+    "url": "http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade",
+    "page_module": "core/templates/pages/story-viewer-page/story-viewer-page.module.ts"
+  },
+  "classroom": {
+    "url": "http://localhost:8181/learn/math",
+    "page_module": "core/templates/pages/classroom-page/classroom-page.module.ts"
+  },
+  "exploration-editor": {
+    "url": "http://localhost:8181/create/{{exploration_id}}",
+    "page_module": "core/templates/pages/exploration-editor-page/exploration-editor-page.module.ts"
+  },
+  "exploration-player": {
+    "url": "http://localhost:8181/explore/{{exploration_id}}",
+    "page_module": "core/templates/pages/exploration-player-page/exploration-player-page.module.ts"
+  },
+  "topic-editor": {
+    "url": "http://localhost:8181/topic_editor/{{topic_id}}",
+    "page_module": "core/templates/pages/topic-editor-page/topic-editor-page.module.ts"
+  },
+  "skill-editor": {
+    "url": "http://localhost:8181/skill_editor/{{skill_id}}",
+    "page_module": "core/templates/pages/skill-editor-page/skill-editor-page.module.ts"
+  },
+  "story-editor": {
+    "url": "http://localhost:8181/story_editor/{{story_id}}",
+    "page_module": "core/templates/pages/story-editor-page/story-editor-page.module.ts"
+  }
+}

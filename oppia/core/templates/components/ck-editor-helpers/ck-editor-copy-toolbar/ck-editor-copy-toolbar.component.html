@@ -1,0 +1,53 @@
+<div class="oppia-ck-editor-copy-toolbar-container">
+  <div>
+    <p class="oppia-ck-editor-copy-toolbar-label">Copy Tool (Learn more
+      <span>
+        <a href="https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html"
+           rel="noopener"
+           target="_blank">
+            here
+        </a>
+      </span>
+      )
+    </p>
+    <span class="oppia-ck-editor-copy-toolbar-tip-sublabel">
+      Use the copy tool to copy text and images.
+    </span>
+  </div>
+  <button type="button"
+          class="btn btn-secondary e2e-test-copy-button"
+          [ngClass]="{'oppia-ck-editor-copy-toolbar-tip-button-active': ckEditorCopyContentService.copyModeActive}"
+          (click)="toggleToolActive()">
+    {{ckEditorCopyContentService.copyModeActive ? "On" : "Off"}}
+  </button>
+</div>
+
+<style>
+  .oppia-ck-editor-copy-toolbar-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .oppia-ck-editor-copy-toolbar-tip-button-active {
+    background-color: #000;
+    color: #fff;
+  }
+  .oppia-ck-editor-copy-toolbar-label {
+    color: #505050;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .oppia-ck-editor-copy-toolbar-label a:focus {
+    text-decoration: underline;
+  }
+  .oppia-ck-editor-copy-toolbar-tip-sublabel {
+    color: #757575;
+  }
+  @media screen and (max-width: 700px) {
+    .oppia-ck-editor-copy-toolbar-label,
+    .oppia-ck-editor-copy-toolbar-tip-sublabel {
+      font-size: 16px;
+    }
+  }
+</style>

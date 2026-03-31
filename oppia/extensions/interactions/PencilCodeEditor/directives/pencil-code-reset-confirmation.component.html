@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    <span [innerHTML]="'I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED' | translate"></span>
+  </h4>
+</div>
+<div class="modal-body">
+  <span [innerHTML]="'I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE' | translate">
+  </span>
+</div>
+<div class="modal-footer">
+  <button type="button"
+          (click)="cancel()"
+          class="btn btn-secondary"
+          [innerHTML]="'I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL' | translate">
+  </button>
+  <button type="button"
+          (click)="confirm()"
+          class="btn btn-danger"
+          [innerHTML]="'I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE' | translate">
+  </button>
+</div>

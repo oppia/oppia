@@ -1,0 +1,7 @@
+<div class="container-fluid">
+  <select (change)="selection($event.target.value)" id="choice">
+    <option *ngFor="let rank of allowedRanks" [selected]="rank === value">
+      {{ rank }}
+    </option>
+  </select>
+</div>

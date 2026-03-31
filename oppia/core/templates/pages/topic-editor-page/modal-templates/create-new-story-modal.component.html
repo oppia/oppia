@@ -1,0 +1,108 @@
+<div class="modal-header create-new-story-header">
+  <h3>
+    New Story
+  </h3>
+</div>
+<form (submit)="save()">
+  <div class="modal-body create-new-story">
+    <div class="story-input">
+      <div class="story-input-header">
+        <span>Title*</span>
+      </div>
+      <input class="e2e-test-new-story-title-field required"
+             [(ngModel)]="story.title"
+             [ngModelOptions]="{standalone: true}"
+             [maxlength]="MAX_CHARS_IN_STORY_TITLE"
+             aria-label="Title"
+             autofocus>
+      <div>
+        <span class="oppia-input-box-subtitle">
+          <em>
+            Story title should be at most {{ MAX_CHARS_IN_STORY_TITLE }} characters.
+          </em>
+        </span>
+      </div>
+    </div>
+    <div class="story-input story-input-description">
+      <div class="story-input-header">
+        <span>Description*</span>
+      </div>
+      <textarea rows="3"
+                cols="50"
+                [maxlength]="MAX_CHARS_IN_STORY_DESCRIPTION"
+                [(ngModel)]="story.description"
+                [ngModelOptions]="{standalone: true}"
+                class="e2e-test-new-story-description-field required"
+                aria-label="Description">
+      </textarea>
+      <div>
+        <span class="oppia-input-box-subtitle">
+          <em>
+            Story description should be at most
+            {{ MAX_CHARS_IN_STORY_DESCRIPTION }} characters.
+          </em>
+        </span>
+      </div>
+    </div>
+    <div class="story-input e2e-test-create-new-story-url-fragment-field">
+      <url-fragment-editor-component label="Url Fragment"
+                                     placeholder="Enter url fragment for the story."
+                                     maxLength="{{MAX_CHARS_IN_STORY_URL_FRAGMENT}}"
+                                     fragmentType="story"
+                                     [generatedUrlPrefix]="generatedUrlPrefix"
+                                     [fragmentIsDuplicate]="storyUrlFragmentExists"
+                                     [disabled]="false"
+                                     [(urlFragment)]="story.urlFragment"
+                                     (urlFragmentChange)="onUrlFragmentChange($event)">
+      </url-fragment-editor-component>
+    </div>
+    <div class="story-input story-input-thumbnail">
+      <div class="story-input-header">
+        <span>Thumbnail Image*</span>
+      </div>
+      <oppia-thumbnail-uploader class="e2e-test-story-image"
+                                [previewTitle]="story.title"
+                                [aspectRatio]="'4:3'"
+                                [disabled]="false"
+                                [useLocalStorage]="true"
+                                [allowedBgColors]="allowedBgColors"
+                                previewDescriptionBgColor="#2F6687">
+      </oppia-thumbnail-uploader>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary"
+            (click)="cancel()"
+            type="button">
+      Cancel
+    </button>
+    <button class="btn btn-success e2e-test-confirm-story-creation-button"
+            type="submit"
+            [disabled]="!isValid()">
+      <span>Create Story</span>
+    </button>
+  </div>
+</form>
+<style>
+  .create-new-story-header h3 {
+    font-size: 28px;
+  }
+  .story-input {
+    padding: 10px 10px 16px;
+  }
+  input {
+    width: 70%;
+  }
+  .story-input-description input {
+    width: 95%;
+  }
+  .story-input-header span {
+    font-weight: bold;
+  }
+  .story-input-thumbnail {
+    padding-top: 15px;
+  }
+  .ng-touched.ng-empty.required {
+     outline: 1px solid #f00;
+  }
+</style>

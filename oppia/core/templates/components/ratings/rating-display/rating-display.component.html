@@ -1,0 +1,16 @@
+<span [ngStyle]="{'cursor': isEditable ? 'pointer' : 'auto'}" (mouseleave)="leaveArea()">
+  <ng-container *ngIf="ratingValue || isEditable">
+    <span *ngFor="let star of stars; index as idx"
+          tabindex="0"
+          role="button"
+          class="{{ star.cssClass }} oppia-rating-star e2e-test-rating-star"
+          (click)="clickStar(star.value)"
+          (keydown.enter)="clickStar(star.value)"
+          (focus)="enterStar(star.value)"
+          (mouseenter)="enterStar(star.value)">
+      <span class="oppia-icon-accessibility-label">
+        Rate this {{ idx + 1 }} stars
+      </span>
+    </span>
+  </ng-container>
+</span>

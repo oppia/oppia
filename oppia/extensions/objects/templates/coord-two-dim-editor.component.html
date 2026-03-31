@@ -1,0 +1,21 @@
+<div class="oppia-coord-two-dim-editor-container">
+  <div leaflet
+       id="coordTwoDimEditor"
+       class="oppia-coord-to-dim-editor-map"
+       [leafletOptions]="options"
+       (leafletClick)="leafletClick($event)">
+    <div [leafletLayer]="mapMarkers"></div>
+  </div>
+</div>
+<style>
+  .oppia-coord-to-dim-editor-map {
+    height: 250px;
+    margin: auto;
+    max-height: 250px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .oppia-coord-two-dim-editor-container {
+    border: 2px solid grey;
+  }
+</style>

@@ -1,0 +1,47 @@
+body:
+- type: input
+  attributes:
+    label: Operating System
+    description: "What operating system (OS) are you using?"
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: RAM size
+    description: "How much RAM does your computer have?"
+  validations:
+    required: true
+- type: textarea
+  id: steps
+  attributes:
+    label: Which step are you stuck on?
+    description: |
+        If you encountered this error while following a wiki page, provide a link to the page and specify which step failed.
+        Otherwise, list what steps caused the error.
+        These should be detailed enough for someone else to follow them.
+  validations:
+    required: true
+- type: textarea
+  id: error
+  attributes:
+    label: Error Log
+    description: "Please copy and paste the error log."
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: approaches
+  attributes:
+    label: Approaches already used to resolve the issue
+    description: "What appoaches have you tried to resolve the above issue?"
+  validations:
+    required: false
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional information
+    description: |
+        Add any other context about the problem here.
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+  validations:
+    required: false

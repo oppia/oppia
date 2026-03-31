@@ -1,0 +1,10 @@
+<div class="modal-header">
+  <h3 [innerHTML]="'I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER' | translate:{sectionNameI18nId: sectionNameI18nId | translate}"></h3>
+</div>
+<div class="modal-body">
+  <p [innerHTML]="'I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY' | translate:{entityTitle: activityTitle, sectionNameI18nId: sectionNameI18nId | translate}"></p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
+  <button class="btn btn-danger e2e-test-confirm-delete-interaction" (click)="remove()" [innerHTML]="'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate"></button>
+</div>

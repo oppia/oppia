@@ -1,0 +1,890 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Programming
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Intro
+language_code: en
+objective: solve Problem 1 on the Project Euler site
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  After First Question:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Yes, 23 is correct. There are four numbers below 10 that are multiples
+        of 3 or 5. These numbers are 3, 5, 6, and 9, and if we add all of them, we
+        get 23. Well done!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Second Question
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  First Question:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p><strong>Question:</strong>\xC2\_What is the sum of the multiples of\
+        \ 3 or 5 that are less than 10?<br></p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: After First Question
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 23.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: First Question
+          feedback:
+            content_id: feedback_2
+            html: <p>That seems slightly off. Please check your addition.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            a: 22.0
+            b: 24.0
+          rule_type: IsInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: First Question
+          feedback:
+            content_id: feedback_3
+            html: '<p>Yes, 8 is the sum of 3 and 5 but this is not what we want in
+              this problem. We are talking ''multiples'' of 3 and 5 from 1 to 10.
+              Think of the 3 ''times'' table: 3;6;9;12;.. and the 5 ''times'' table:
+              5;10,15,...</p><p>Your answer would be correct if the range was from
+              1 to 5.</p>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 8.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Numbers for first question
+        feedback:
+          content_id: default_outcome
+          html: <p>OK. To check our work, let's have a quick look at what we're adding
+            up!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+  Intro:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>The aim of this exercise is to explain how to solve Problem #1 on\
+        \ Project Euler (<oppia-noninteractive-link text-with-value=\"&amp;quot;problems&amp;quot;\"\
+        \ url-with-value=\"&amp;quot;http://projecteuler.net/problems&amp;quot;\"\
+        ></oppia-noninteractive-link>). Here is the problem:</p><p>\_</p><p><em>\_\
+        \ \_ \_Find the sum of all multiples of 3 or 5 below 1000.</em></p><p>\_</p><p>We\
+        \ can tackle this directly, or we could also try to check that we understand\
+        \ the problem by answering the question for a smaller case. Which of these\
+        \ would you prefer?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Second Question
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Solve the problem directly</p>
+          - content_id: ca_choices_3
+            html: <p>Start by trying a smaller case</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: First Question
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Numbers for first question:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p><strong>Question:\xC2\_</strong>List all the multiples of 3 or 5 below\
+        \ 10.</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Numbers for first question
+          feedback:
+            content_id: feedback_1
+            html: <p>Hmm. The question asks for the numbers that are below 10. But
+              10 is not below 10...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_8
+              unicodeStrSet:
+              - '10'
+          rule_type: HasElementsIn
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numbers for first question
+          feedback:
+            content_id: feedback_2
+            html: <p>It does differ by country, but in this problem we use the traditional
+              definition that considers 0 not to be a natural number. (We consider
+              'multiples' in this question to be positive integers.)</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_9
+              unicodeStrSet:
+              - '0'
+          rule_type: HasElementsIn
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: First Question
+          feedback:
+            content_id: feedback_3
+            html: <p>That's right! Now that you know what the numbers are, let's return
+              to the first question.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_10
+              unicodeStrSet:
+              - <p>3</p>
+              - <p>5</p>
+              - <p>6</p>
+              - <p>9</p>
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numbers for first question
+          feedback:
+            content_id: feedback_4
+            html: <p>I think you missed a multiple of 5. Remember that 1 times 5 is
+              5.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_11
+              unicodeStrSet:
+              - '5'
+          rule_type: OmitsElementsIn
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numbers for first question
+          feedback:
+            content_id: feedback_5
+            html: <p>I think you've missed some multiples of 3? Have a check and make
+              sure you've got all of them.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_12
+              unicodeStrSet:
+              - '3'
+              - '6'
+              - '9'
+          rule_type: OmitsElementsIn
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Numbers for first question
+          feedback:
+            content_id: feedback_6
+            html: <p>It looks like your list contains numbers that are not multiples
+              of 3 or 5. Remember that each of your numbers must be 3 times an integer,
+              or 5 times an integer.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_13
+              unicodeStrSet:
+              - '1'
+              - '2'
+              - '4'
+              - '7'
+              - '8'
+          rule_type: HasElementsIn
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_7
+            unicode_str: Add item
+      default_outcome:
+        dest: Numbers for first question
+        feedback:
+          content_id: default_outcome
+          html: <p>Something about your list of numbers isn't quite right. Perhaps
+            it contains numbers that are less than 1, or more than 10?</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: SetInput
+      solution: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_13: {}
+        rule_input_8: {}
+        rule_input_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        rule_input_10: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_13: {}
+        rule_input_8: {}
+        rule_input_9: {}
+  Second Question:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>OK, let's try the actual Project Euler problem.</p><p>\_</p><p><strong>Question:</strong>\xC2\
+        \_What is the sum of all the multiples of 3 or 5 below 1000?</p><p>\_</p><p>1000\
+        \ is a big number. Would you prefer to give an answer directly, or would you\
+        \ instead like to write a small program allowing the computer to do the computational\
+        \ work for you?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Second Question Straight Answer
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>I want to submit an answer directly.</p>
+          - content_id: ca_choices_3
+            html: <p>I want to write a simple program to compute the answer.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Second Question Coding
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Second Question Coding:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Let's write a small program in Python that prints out the answer to\
+        \ the question.</p><p>\_</p><p>Here are some useful constructs that you might\
+        \ like to know. They are all based on the number 7, but feel free to substitute\
+        \ 7 with any other number of your choice:</p><p>\_</p><ul><li>range(7) is\
+        \ the list [0, 1, 2, 3, 4, 5, 6]</li><li>x % 7 gives the remainder when x\
+        \ is divided by 7. So, for example, 1 % 7 = 1, and 20 % 7 = 6.</li><li>You\
+        \ can print the value of a variable x by typing 'print x'.</li></ul>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Second Question Coding
+          feedback:
+            content_id: feedback_1
+            html: <p>Oops, it looks like the code has an error! Have a look at the
+              error message in the terminal; that might help you fix it.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs: {}
+          rule_type: ResultsInError
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Sample Answer
+          feedback:
+            content_id: feedback_2
+            html: <p>That is correct! Well done.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: '233168'
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Coding
+          feedback:
+            content_id: feedback_3
+            html: "<p>Careful with your definition of range() (or similar). You don't\
+              \ want to include 1000!</p><p>\xC2\_</p><p>If you like, you can type\
+              \ something like 'print range(5)' to find out what range(5) is.</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: '234168'
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Coding
+          feedback:
+            content_id: feedback_4
+            html: "<p>It looks like you've counted some numbers twice. Notice that\
+              \ 15 is a multiple of 3, and it is also a multiple of 5. But you only\
+              \ want to count it once.</p><p>\_</p><p>Are you doing something like\
+              \ this?</p><p>\_</p><p>\_ \_ if x % 3 == 0:</p><p>\_ \_ \_ \_ sum +=\
+              \ x</p><p>\_ \_ if x % 5 == 0:</p><p>\_ \_ \_ \_ sum += x</p><p>\_</p><p>Because\
+              \ if so, you'll be counting numbers like 15 twice. See if you can find\
+              \ a way to only count them once.</p><p>\_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: '266333'
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Coding
+          feedback:
+            content_id: feedback_5
+            html: <p>Yep, that's the correct answer for the case when we were looking
+              at numbers that were less than 10. Can you get your program to print
+              the right answer for numbers less than 1000?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: '23'
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Coding
+          feedback:
+            content_id: feedback_6
+            html: "<p>That's quite small. I think you might only be counting numbers\
+              \ that are multiples of <strong>both</strong>\_3 and 5. But, actually,\
+              \ we want numbers that are multiples of <strong>either</strong>\_3 or\
+              \ 5...</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: '33165'
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Coding
+          feedback:
+            content_id: feedback_7
+            html: <p>Ooh, that's really big. I think you might actually just be adding
+              every single number less than 1000. Is that what your program is doing?
+              Remember, we only care about numbers that are multiples of either 3
+              or 5...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: '499500'
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Coding
+          feedback:
+            content_id: feedback_8
+            html: <p>Sorry, it doesn't look like your program prints any output. Could
+              you get it to print something? You can do this by using a statement
+              like 'print x'.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ''
+          rule_type: OutputEquals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# In Python, the code
+
+            #
+
+            #     for letter in [''a'', ''b'']:
+
+            #         print letter
+
+            #
+
+            # prints:
+
+            #
+
+            #     a
+
+            #     b
+
+
+            for num in range(1000):'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Second Question Coding
+        feedback:
+          content_id: default_outcome
+          html: <p>Unfortunately, that's not correct, but I'm not sure what went wrong.
+            Why don't you try replacing the number 1000 in your program with 10, and
+            seeing if that gives you 23, as before?</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: CodeRepl
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+  Second Question Sample Answer:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>In case you're interested, here is a sample answer:</p><p>\_</p><p>\_\
+        \ \_ sum = 0</p><p>\_ \_ for num in range(1000):</p><p>\_ \_ \_ \_ if num\
+        \ % 3 == 0 or num % 5 == 0:</p><p>\_ \_ \_ \_ \_ \_ sum += num<br></p><p>\_\
+        </p><p>\_ \_ print sum</p><p>\_</p><p>\_</p><p>This code loops through all\
+        \ the integers under 1000, and checks if each is a multiple of 3 or 5. If\
+        \ either of these conditions holds, we add the integer to a running sum and\
+        \ continue. (In fact, it also loops through 0, but since that doesn't add\
+        \ anything to the sum, we still get the correct result.)</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Second Question Straight Answer:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>All right, go for it! What is the answer?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Second Question Why
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 233168.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Straight Answer
+          feedback:
+            content_id: feedback_2
+            html: <p>You probably figured that, since the answer for 10 is 23, the
+              answer for 1000 is 23 times 100, which is 2300.<br><br>No, it's not
+              so simple! Let's replace 10 by 20. This logic suggests that the answer
+              should then be 23 times 2, which is 46. But the relevant multiples are
+              3, 5, 6, 9, 10, 12, 15 and 18, which sum to 78.<br><br>Try again?<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2300.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Second Question Straight Answer
+          feedback:
+            content_id: feedback_3
+            html: <p>Um... that does not make sense, does it? The answer for numbers
+              less than 10 was 23. Surely the answer for numbers less than 1000 is
+              greater than that?<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 23.0
+          rule_type: IsLessThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Second Question Coding
+        feedback:
+          content_id: default_outcome
+          html: <p>Hm, that doesn't look correct. It's easy to make mistakes when
+            adding many numbers together, so sometimes it might be easier to let the
+            computer do it instead.<br></p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+  Second Question Why:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>That is correct!</p><p>\xC2\_</p><p>Can you explain how you got to\
+        \ this answer?</p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: Type your answer here.
+        rows:
+          value: 5
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Project Euler Problem 1

@@ -1,0 +1,55 @@
+<div class="stories-list">
+  <div class="oppia-stories-list-container">
+    <mat-card class="oppia-page-card oppia-long-text">
+      <div class="oppia-topic-viewer-breadcrumbs">
+        <div class="desktop-breadcrumbs">
+          <a href="/">{{ 'I18N_TOPNAV_HOME' | translate }}</a>
+          <div class="classroom-name-container" *ngIf="classroomName">
+            <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
+            <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
+            <a [href]="getClassroomUrl()" *ngIf="!isHackyClassroomNameTranslationDisplayed()" class="e2e-test-classroom-name">{{ classroomName }}</a>
+            <a [href]="getClassroomUrl()" *ngIf="isHackyClassroomNameTranslationDisplayed()" class="e2e-test-classroom-name">{{ classroomNameTranslationKey | translate }}</a>
+          </div>
+          <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
+          <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
+          <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+            {{ topicName }}
+          </span>
+          <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+            {{ topicNameTranslationKey | translate }}
+          </span>
+        </div>
+        <div class="mobile-breadcrumbs">
+          <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
+          <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
+          <a [href]="getClassroomUrl()" [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName }" *ngIf="classroomUrlFragment" class="e2e-test-mobile-breadcrumbs-classroom"></a>
+          <a [href]="getClassroomUrl()" *ngIf="!classroomUrlFragment">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
+        </div>
+      </div>
+      <h1 class="tab-title e2e-test-topic-page-tab-title" tabindex="0">
+        <span class="e2e-test-preview-topic-title" *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicName }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicNameTranslationKey | translate }}
+        </span>
+      </h1>
+      <div class="topic-description e2e-test-topic-description" tabindex="0">
+        <span class="e2e-test-preview-topic-description" *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicDescription }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicDescTranslationKey | translate }}
+        </span>
+      </div>
+      <strong class="stories-can-play text-capitalize" *ngIf="checkTabletView()">{{'I18N_TOPIC_VIEWER_STORIES_HEAD' | translate}}</strong>
+      <div *ngFor="let storySummary of canonicalStorySummaries" class="story-info-container">
+        <oppia-story-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+                                  [storySummary]="storySummary"
+                                  [topicUrlFragment]="topicUrlFragment"
+                                  [allChaptersAreShown]="canonicalStorySummaries.length === 1">
+        </oppia-story-summary-tile>
+      </div>
+    </mat-card>
+  </div>
+</div>

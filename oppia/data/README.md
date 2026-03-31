@@ -1,0 +1,1 @@
+This folder contains yaml data used while testing and loading explorations & collections on a local Oppia server. You can do this by going to the Admin tab, clicking the Activities subtab, and selecting "Reload" next to the corresponding exploration.

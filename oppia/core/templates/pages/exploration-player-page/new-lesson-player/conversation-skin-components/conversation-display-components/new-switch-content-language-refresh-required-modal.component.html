@@ -1,0 +1,16 @@
+<button class="switch-language-modal-cancel-btn" mat-icon-button (click)="cancel()" aria-label="Close the modal">
+  <mat-icon>close</mat-icon>
+</button>
+<div class="modal-header">
+  <h3>{{ 'I18N_SWITCH_LANGUAGES' | translate }}</h3>
+</div>
+
+<div class="modal-body">
+  <p>{{ modalText | translate }}</p>
+  <br>
+  <p>{{ 'I18N_SWITCH_LANGUAGES_CONFIRMATION_TEXT' | translate }}</p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-success" (click)="confirm()">{{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate}}</button>
+</div>

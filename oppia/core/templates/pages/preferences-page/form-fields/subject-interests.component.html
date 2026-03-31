@@ -1,0 +1,42 @@
+<mat-form-field class="subject-interests-chip-list" appearance="fill">
+  <mat-label class="text-capitalize">
+    {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
+  </mat-label>
+  <mat-chip-list #chipList role="textbox">
+    <mat-chip *ngFor="let subjectInterest of subjectInterests"
+              [selectable]="selectable"
+              [removable]="removable"
+              tabindex="-1"
+              (removed)="remove(subjectInterest)">
+      <span class="e2e-test-subject-interest-chip" tabindex="0" [attr.aria-label]=" subjectInterest+ '. selected'">{{ subjectInterest }}</span>
+      <button class="oppia-cancel-button" tabindex="0" matChipRemove aria-label=". Remove" *ngIf="removable">
+        <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+      </button>
+    </mat-chip>
+    <input placeholder="{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_LABEL' | translate }}"
+           class="e2e-test-subject-interests-input"
+           aria-label="New subject interests"
+           #subjectInterestInput
+           [formControl]="formCtrl"
+           [matAutocomplete]="auto"
+           [matChipInputFor]="chipList"
+           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+           (matChipInputTokenEnd)="add($event)"
+           (blur)="onBlur()"
+           (input)="onInput($event)">
+  </mat-chip-list>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-option *ngFor="let subjectInterest of filteredSubjectInterests | async" [value]="subjectInterest">
+      {{ subjectInterest }}
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error>
+    {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_ERROR_TEXT' | translate }}
+  </mat-error>
+</mat-form-field>
+
+<style>
+  .subject-interests-chip-list {
+    width: 100%;
+  }
+</style>

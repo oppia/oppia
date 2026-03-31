@@ -1,0 +1,137 @@
+<div>
+  <div>
+    <mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+      <div class="oppia-editor-card-body">
+        <div class="state-solution-header-container"
+             (click)="toggleSolutionCard()"
+             (keydown.enter)="toggleSolutionCard()">
+          <div class="state-solution-header oppia-mobile-collapsible-card-header">
+            <h3 class="oppia-exp-solution-card-header" tabindex="0">Solution</h3>
+            <i class="fa fa-caret-down"
+               *ngIf="!solutionCardIsShown"
+               tabindex="0"
+               role="button"
+               aria-label="Expand solutions card"
+               [attr.aria-hidden]="solutionCardIsShown ? 'true' : 'false'">
+            </i>
+            <i class="fa fa-caret-up"
+               *ngIf="solutionCardIsShown"
+               tabindex="0"
+               role="button"
+               aria-label="collapse solutions card"
+               [attr.aria-hidden]="solutionCardIsShown ? 'false' : 'true'">
+            </i>
+          </div>
+        </div>
+        <div class="state-solution-content-container oppia-mobile-collapsible-card-content" *ngIf="solutionCardIsShown">
+          <div class="oppia-add-solution-button-container">
+            <div *ngIf="isEditable()">
+              <button *ngIf="!savedMemento()"
+                      type="button"
+                      aria-label="Add solution"
+                      class="btn btn-secondary oppia-add-hint-button e2e-test-oppia-add-solution-button"
+                      (click)="openAddOrUpdateSolutionModal()">
+                + ADD SOLUTION
+              </button>
+            </div>
+          </div>
+          <ul class="nav oppia-option-list nav-stacked nav-pills"
+              role="tablist"
+              *ngIf="savedMemento()">
+            <li class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
+                role="tab">
+              <div class="oppia-rule-header-warning-placement"
+                   *ngIf="!isSolutionValid()"
+                   (click)="toggleInlineSolutionEditorIsActive()"
+                   [ngbTooltip]="getInvalidSolutionTooltip()"
+                   tabindex="0"
+                   placement="auto">
+                <div class="oppia-rule-header-warning-style">
+                  ⚠
+                </div>
+              </div>
+              <a (click)="toggleInlineSolutionEditorIsActive()"
+                 (keydown.enter)="toggleInlineSolutionEditorIsActive()"
+                 tabindex="0"
+                 class="oppia-rule-tab e2e-test-oppia-solution-tab">
+                <oppia-response-header [summary]="getSolutionSummary()"
+                                       [defaultOutcome]="false"
+                                       [shortSummary]="getSolutionSummary()"
+                                       (delete)="deleteSolution($event)">
+                </oppia-response-header>
+              </a>
+
+              <div *ngIf="inlineSolutionEditorIsActive">
+                <div class="oppia-editor-card-section e2e-test-oppia-solution-body">
+                  <oppia-solution-editor (openSolutionEditorModal)="openAddOrUpdateSolutionModal()"
+                                         (saveSolution)="onSaveSolution($event)">
+                  </oppia-solution-editor>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div *ngIf="!savedMemento()" class="oppia-empty-solution-warning">
+            <i class="material-icons oppia-empty-solution-warning-icon">&#xe002;</i>
+            <span [innerHTML]="'I18N_EMPTY_SOLUTION_MESSAGE' | translate" tabindex="0"></span>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>
+<style>
+  .oppia-empty-solution-warning-icon {
+    color: #827127;
+  }
+  .oppia-empty-solution-warning {
+    background: #fff5c8;
+    border: 0.0625rem solid #827127;
+    border-radius: 0.25rem;
+    color: #333;
+    margin-top: 1rem;
+    padding-left: 0.25rem;
+  }
+  .state-solution-header-container {
+    padding: 0 20px 0 30px;
+  }
+  .state-solution-header {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0 15px;
+  }
+  .oppia-exp-solution-card-header {
+    font-size: 18px;
+  }
+  .state-solution-content-container {
+    padding: 15px 30px;
+  }
+  .oppia-add-hint-button-container {
+    margin: 10px 0;
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
+    }
+    .state-solution-content-container {
+      margin-top: 10px;
+      padding: 15px 5px;
+    }
+    .state-solution-header-container {
+      padding: 0;
+    }
+    .state-solution-header {
+      padding: 0;
+    }
+    .state-solution-header i {
+      display: block;
+    }
+  }
+  @media screen and (max-width: 500px) {
+    .oppia-editor-card-section {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+</style>

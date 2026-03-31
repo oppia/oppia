@@ -1,0 +1,895 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Algebra
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Start
+language_code: en
+objective: discover the Root Linear Coefficient Theorem
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Coefficient Signs:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Here's that expression again:</p><p><oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x\
+        \ - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>If\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is even, what's the sign of the constant term?\
+        \ \_How about the linear term?</p><p><br>Likewise, if\_<oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;,\
+        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is odd, what's the sign of the constant term?\
+        \ \_What's the sign of the linear term?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Quotient of terms
+          feedback:
+            content_id: feedback_1
+            html: <p>Good.  As a side note, what do you think the sign is of the x^i
+              term given n is even? Given n is odd?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Coefficient signs WA1
+          feedback:
+            content_id: feedback_2
+            html: <p>Hmm... that's a bit weird isn't it?  The expression had only
+              negative signs, and your answer has all positive signs...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Coefficient signs WA1
+          feedback:
+            content_id: feedback_3
+            html: <p>That looks correct, but let's try a sample case just to make
+              sure.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Coefficient signs WA2
+          feedback:
+            content_id: feedback_4
+            html: <p>That looks a little fishy... let's try a sample case just to
+              be sure...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_134604_kjwad50w4g_height_2d258_width_10d408_vertical_0d715.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_6
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;+,+,+,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_134658_e5dg8ij01b_height_2d258_width_10d408_vertical_0d715.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_7
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;+,-,+,-&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_134757_f1uwdf95b2_height_2d258_width_10d408_vertical_0d715.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_8
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;-,+,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_134842_r40fdf6mk0_height_2d258_width_10d408_vertical_0d715.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Coefficient Signs
+        feedback:
+          content_id: default_outcome
+          html: <p>Oops, if you have reached this case, something has gone wrong...</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Coefficient signs WA1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>If we tried a simple case, like:<br><br></p><p><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
+        \ 3)(x - 4)(x - 1)&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_145032_kpinnt0x2d_height_2d731_width_21d582_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math></p><p>\_</p><p>where\_<oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;a_1\
+        \ = 3&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_145112_zdet2aoua9_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_2=4&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_145208_5bmpx75x83_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>, and\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_3 = 1&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_145257_o9m38za85u_height_2d376_width_6d584_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>, then you're suggesting that the constant term\
+        \ should be positive, right?</p><p>\_</p><p>What is the constant term?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Coefficient Signs
+          feedback:
+            content_id: feedback_1
+            html: <p>Right!  But wait-- that's not positive.  Let's try the previous
+              question again...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: -12.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Coefficient signs WA1
+        feedback:
+          content_id: default_outcome
+          html: <p>Try again.  We want the constant term.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Coefficient signs WA2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>You said \"-,+,-,+\" meaning if you expand:</p><p><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
+        \ a_1) (x - a_2) (x - a_3) ... (x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,<br>and\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is even, you should get that the constant term\
+        \ is negative. \_Let's try it on this sample case:</p><p>\_</p><p><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
+        \ 3) (x - 4)&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_145457_e8wewljydb_height_2d731_width_14d388_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>What is the coefficient of the constant\
+        \ term?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Coefficient Signs
+          feedback:
+            content_id: feedback_1
+            html: <p>Right.  And that's not negative.  Let's try the previous question
+              again...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 12.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Coefficient signs WA2
+        feedback:
+          content_id: default_outcome
+          html: <p>Nope!  Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    next_content_id_index: 2
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  More General Expansion:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>What about\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;(x-a)(x-b)(x-c)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_150030_q2zopa1qyw_height_2d731_width_21d329_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Particular coefficients (part 1)
+          feedback:
+            content_id: feedback_1
+            html: <p>Great!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;x^3 - a x^2 - b x - c&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_145644_k7kgyhp35x_height_2d494_width_17d962_vertical_0d36.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_3
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_145731_sug9iaaiaj_height_2d968_width_42d822_vertical_0d833.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_4
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_145820_opah350bca_height_2d968_width_42d822_vertical_0d833.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_5
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_145933_tv24zk1jjf_height_2d968_width_42d822_vertical_0d833.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: More General Expansion
+        feedback:
+          content_id: default_outcome
+          html: <p>Nope!  Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Particular coefficients (part 1):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Did you notice something about the previous answer? \_What happens\
+        \ if we consider an even more general expression:<br><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
+        \ a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>What is the absolute value of the constant\
+        \ term (the term with no x's)?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Particular coefficients (part 2)
+          feedback:
+            content_id: feedback_1
+            html: <p>That's correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;a_1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133655_ou7e9pxilh_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_3
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;a_1 + a_2 + a_3 + ... + a_n&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_144222_qonc2d8qgh_height_2d139_width_21d844_vertical_0d596.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_4
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_132540_jbva8gbc53_height_2d021_width_1d173_vertical_0d241.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_5
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;a_1 a_2 a_3 ... a_n&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_144401_1b7zx4oho0_height_1d784_width_12d505_vertical_0d596.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Particular coefficients (part 1)
+        feedback:
+          content_id: default_outcome
+          html: <p>Nope!  Try again.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Particular coefficients (part 2):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Again, consider the expression:<br><oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x\
+        \ - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_135011_dpupkuy4ou_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>What is the absolute value of the linear\
+        \ term (the\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;x^1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_144914_08fk62lk4x_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_term)?<br></p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Coefficient Signs
+          feedback:
+            content_id: feedback_1
+            html: <p>Yep!  Admit it, you just chose the longest answer...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;a_1 a_2 + a_2 a_3 + ... + a_n a_1&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_144605_6v3h6dslb9_height_2d139_width_23d597_vertical_0d596.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_3
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;a_1 + a_2 + a_3 + ... + a_n&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_144222_qonc2d8qgh_height_2d139_width_21d844_vertical_0d596.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_4
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;a_2&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133755_mnzsrlo05g_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_5
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;a_1 a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ... + a_2
+              a_3 ... a_n&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_144728_0wv3mw37oj_height_2d258_width_46d927_vertical_0d715.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Particular coefficients (part 2)
+        feedback:
+          content_id: default_outcome
+          html: "<p>This one's a little tricky.  Maybe trying this case will help\
+            \ you out?\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+            \ &amp;quot;(x - a_1) (x - a_2) (x - a_3)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+            \ &amp;quot;mathImg_20200904_144525_sn4diooumw_height_2d731_width_24d969_vertical_0d833.svg&amp;quot;}\"\
+            ></oppia-noninteractive-math></p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Quotient of terms:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Here's the general expression again:</p><p><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x -\
+        \ a_1)(x - a_2)(x - a_3) ... (x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_130924_ji4wc82lll_height_2d731_width_36d59_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>When\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is even, the constant and linear terms have\
+        \ opposite signs...</p><p><br>when\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_131209_bn2zj4i2te_height_1d429_width_1d405_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_is odd, the constant and linear terms also\
+        \ have opposite signs...<br><br>What, then, is the sign of the quotient:<br>[linear\
+        \ coefficient] / [constant term]<br>?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Quotient part 2
+          feedback:
+            content_id: feedback_1
+            html: <p>Yep.  For example, 5 / (-3) is negative, and -3 / 5 is negative,
+              but 3 / 5 is positive.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Positive</p>
+          - content_id: ca_choices_3
+            html: <p>Negative</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Quotient of terms
+        feedback:
+          content_id: default_outcome
+          html: <p>Try again!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Quotient part 2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Now for the fun part. \_Do you remember how the linear coefficient\
+        \ was:</p><p><oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;(-1)^{n+1}(a_1 a_2 ... a_{n-1} + a_1 a_2 ... a_{n-2} a_n + ...\
+        \ + a_2 a_3 ... a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133324_00rnxfeixu_height_2d968_width_56d92_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>and the constant term was:</p><p><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(-1)^n\
+        \ a_1 a_2 ... a_n&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133422_a8bz4ywoyi_height_2d731_width_16d251_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>(where, as discussed before, the sign\
+        \ is added in).<br><br>What happens when we divide the linear coefficient\
+        \ by the constant term?</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Theorem
+          feedback:
+            content_id: feedback_1
+            html: <p>Yep... that leads us to the statement of the theorem...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_132540_jbva8gbc53_height_2d021_width_1d173_vertical_0d241.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_3
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;(-1)^n (1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_132759_wbixeo0y7j_height_2d731_width_39d105_vertical_0d833.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_4
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;(-1)(1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_133006_w144ga6wx8_height_2d731_width_37d879_vertical_0d833.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+          - content_id: ca_choices_5
+            html: '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+              &amp;quot;(1/a_1 + 1/a_2 + 1/a_3 + ... + 1/a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:
+              &amp;quot;mathImg_20200904_133101_w95yopk5m9_height_2d731_width_33d057_vertical_0d833.svg&amp;quot;}"></oppia-noninteractive-math></p>'
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Quotient part 2
+        feedback:
+          content_id: default_outcome
+          html: <p>Oops, that's not right.  Careful; signs can be tricky!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 6
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  Simple Expansion:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>What about something a little harder? \_Can you tell me what the terms\
+        \ are in the expansion of this:</p><p><oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;(x-3)(x+2)(x-5)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_135225_0gz4xvjk92_height_2d731_width_21d582_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>If a, b, c, and d are the coefficients\
+        \ of\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;x^3&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_135312_mxctsqirp2_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_135422_87qht0r32f_height_2d376_width_2d402_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;x&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_144017_spjf7y0aym_height_1d429_width_1d34_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>\_and\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;1&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_132540_jbva8gbc53_height_2d021_width_1d173_vertical_0d241.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>, respectively, format your answer as the string:\
+        \ a,b,c,d (without spaces).</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: More General Expansion
+          feedback:
+            content_id: feedback_1
+            html: <p>Good!  Now let's look at a slightly more general expansion.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - 1,-6,-1,30
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Simple Expansion
+        feedback:
+          content_id: default_outcome
+          html: <p>Sorry, try again.  Remember to format it exactly as shown.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  Start:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Do you remember FOIL? \_It goes something like this:\_<oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;(a +\
+        \ b)(c + d) = ac + ad + bc + bd&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_145553_bpk4bpmcis_height_2d731_width_34d499_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>.<br></p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: Simple Expansion
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  Theorem:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>The Root Linear Coefficient Theorem is...<br><br>Given the polynomial\_\
+        <oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;x^n + c_{n-1} x^{n-1} + ... + c_2 x^2 + c_1 x^1 + c_0&amp;quot;,\
+        \ &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_133543_2upm7inrzr_height_2d85_width_37d969_vertical_0d715.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br>with roots\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_1&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_133655_ou7e9pxilh_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_2&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_133755_mnzsrlo05g_height_1d784_width_2d302_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>, ...,\_<oppia-noninteractive-math math_content-with-value=\"\
+        {&amp;quot;raw_latex&amp;quot;: &amp;quot;a_n&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_133855_jhklfg01go_height_1d784_width_2d466_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math>:<br><br>The sum of the reciprocals of the roots:\_\
+        <oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_133958_w8wzb081od_height_2d731_width_25d559_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br>is equal to the negative coefficient of the\
+        \ linear term:\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:\
+        \ &amp;quot;-c_1&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20200904_134100_2931f8hu3e_height_2d139_width_3d898_vertical_0d596.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math><br><br>or...</p><p><br><oppia-noninteractive-math\
+        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;: &amp;quot;c_1\
+        \ = -(1/a_1 + 1/a_2 + ... + 1/a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;:\
+        \ &amp;quot;mathImg_20200904_134203_ob2se8mse4_height_2d731_width_32d565_vertical_0d833.svg&amp;quot;}\"\
+        ></oppia-noninteractive-math></p>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: <p>Congrats!  We may use this theorem later on to prove something
+            even more interesting...</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Root Linear Coefficient Theorem

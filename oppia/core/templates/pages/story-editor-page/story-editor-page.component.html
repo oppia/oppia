@@ -1,0 +1,172 @@
+<div class="story-editor">
+  <div class="navbar-helper">
+    <div class="navbar-tabs">
+      <div class="navbar-text">
+        {{ getNavbarText() }}
+      </div>
+      <div class="navbar-icons">
+        <li [ngClass]="{'navbar-tab-active': isMainEditorTabSelected(), 'dropdown': getTotalWarningsCount()}"
+            [attr.dropdown]="getTotalWarningsCount()"
+            class="nav-item icon nav-list-item"
+            (click)="navigateToStoryEditor()">
+          <a ngbTooltip="Main Editor" placement="bottom" class="nav-link navbar-tab">
+            <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': isMainEditorTabSelected()}"></i>
+          </a>
+          <div [hidden]="!getTotalWarningsCount()"
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+               (mouseover)="isWarningsAreShown(true)" (mouseleave)="isWarningsAreShown(false)">
+            <span class="oppia-editor-warnings-count e2e-test-warning-indicator">
+              {{ getTotalWarningsCount() }}
+            </span>
+            <ul class="dropdown-menu oppia-editor-warnings-box story-editor-warning-box" *ngIf="warningsAreShown">
+              <span class="oppia-editor-warnings-header">Warnings</span>
+              <li class="oppia-editor-warnings-text e2e-test-warnings-text"
+                  *ngFor="let issue of validationIssues.concat(explorationValidationIssues);trackBy: $index">
+                <hr class="oppia-editor-warnings-separator">
+                {{ issue }}
+              </li>
+              <li class="oppia-editor-warnings-text e2e-test-warnings-text"
+                  *ngFor="let issue of prepublishValidationIssues;trackBy: $index">
+                <hr class="oppia-editor-warnings-separator">
+                {{ issue }}
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <li *ngIf="!(getActiveTab() === 'chapter_editor')" [ngClass]="{'navbar-tab-active': getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" (click)="navigateToStoryPreviewTab()">
+          <a class="nav-link navbar-tab" ngbTooltip="Preview" aria-label="Preview" placement="bottom">
+            <i class="fas fa-play navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTab() === 'story_preview'}"></i>
+          </a>
+        </li>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="story" class="story-editor-parent">
+    <div *ngIf="getActiveTab() === 'story_editor'">
+      <oppia-story-editor></oppia-story-editor>
+    </div>
+    <div *ngIf="getActiveTab() === 'chapter_editor'">
+      <oppia-chapter-editor-tab></oppia-chapter-editor-tab>
+    </div>
+    <div *ngIf="getActiveTab() === 'story_preview'">
+      <oppia-story-preview-tab></oppia-story-preview-tab>
+    </div>
+  </div>
+</div>
+
+<style>
+  .story-editor .back-to-topic-button {
+    margin-bottom: 10px;
+    margin-left: 9%;
+    margin-top: 1.5%;
+  }
+  .story-editor {
+    margin-bottom: 80px;
+  }
+  .navbar-helper {
+    background-color: #00609c;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+    height: 70px;
+    margin-bottom: 20px;
+    position: fixed;
+    text-align: center;
+    top: 56px;
+    width: 100%;
+    z-index: 10;
+  }
+  .navbar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: flex-start;
+    text-align: center;
+  }
+  .navbar-tab-icon {
+    color: #fff;
+    display: block;
+    font-size: 22px;
+    width: 100%;
+  }
+  .navbar-tab span {
+    color: #fff;
+    font-size: 12px;
+  }
+  .oppia-editor-warnings-box {
+    cursor: default;
+    max-width: none;
+  }
+  .navbar-tab-active {
+    background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
+  }
+  .navbar-tab-active-icon {
+    color: #00609c;
+  }
+  .topic-warning-container {
+    display: block;
+  }
+  .story-editor-parent {
+    margin-top: 100px;
+  }
+
+  @media screen and (max-width: 800px) {
+    .story-editor-parent {
+      margin-top: 40px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .navbar-helper {
+      display: none;
+    }
+  }
+  .navbar-text {
+    align-items: center;
+    color: #fff;
+    display: flex;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    margin-left: 4%;
+    width: 35%;
+  }
+  .navbar-icons {
+    display: flex;
+  }
+  .nav-list-item {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    width: 90px;
+  }
+  .navbar-icons .nav-list-item:hover {
+    background-color: #4eb0c0;
+  }
+  .story-editor-warning-box {
+    cursor: default;
+    display: block;
+    max-width: none;
+  }
+  .story-warning-count {
+    display: inline-block;
+    height: 20px;
+    margin-left: -10px;
+    width: 20px;
+  }
+
+  @media screen and (max-width: 800px) {
+    .navbar-helper {
+      position: inherit;
+    }
+    .navbar-tabs {
+      justify-content: center;
+    }
+    .navbar-text {
+      display: none;
+    }
+    .topic-editor-main {
+      margin-top: 16px;
+    }
+  }
+</style>

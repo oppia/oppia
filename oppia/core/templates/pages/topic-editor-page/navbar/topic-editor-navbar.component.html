@@ -1,0 +1,336 @@
+<ul class="oppia-navbar-desktop nav navbar-nav oppina-navbar-nav float-end"
+    *ngIf="topic && topicRights.canEditTopic()">
+  <li class="oppia-navbar-dropdown-menu d-inline-flex align-items-center">
+    <div class="d-inline-block position-relative">
+      <span [matTooltip]="getAllTopicWarnings()"
+            matTooltipClass="oppia-mat-tooltip-list"
+            [matTooltipDisabled]="isWarningTooltipDisabled()"
+            aria-label="List that shows issues preventing to save changes to the topic"
+            class="w-100">
+        <button type="button"
+                class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-start"
+                [ngClass]="{'btn-success': topicIsSaveable}"
+                (click)="saveChanges()"
+                [disabled]="!topicIsSaveable">
+          <span *ngIf="!isSaveInProgress()">
+            <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
+               alt="Save Topic">
+            </i>
+            <span class="oppia-save-publish-button-label float-start">Save Changes</span>
+            <span class="d-none d-md-block float-start oppia-change-count"
+                  *ngIf="changeListLength">
+              ({{ changeListLength }})
+            </span>
+          </span>
+
+          <span *ngIf="isSaveInProgress()">
+            <span class="oppia-save-publish-button-label">Saving</span>
+            <loading-dots></loading-dots>
+          </span>
+        </button>
+      </span>
+      <div ngbDropdown class="d-inline-block">
+        <button type="button"
+                class="btn btn-light dropdown-toggle dropdown-toggle oppia-dropdown-toggle-button"
+                [disabled]="!changeListLength"
+                aria-label="Dropdown toggle"
+                ngbDropdownToggle>
+        </button>
+        <ul ngbDropdownMenu role="menu"
+            class="oppia-dropdown-menu"
+            [ngStyle]="{ width: changeListLength && topicRights.isPublished() ? '150px' : '120px' }">
+          <li title="Discard all pending changes">
+            <a (click)="discardChanges()"
+               [ngClass]="{'oppia-disabled-link': !changeListLength}"
+               class="dropdown-item">
+              Discard Draft
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </li>
+  <li class="oppia-editor-publish-button-container">
+    <button type="button"
+            *ngIf="!topicRights.isPublished()"
+            class="btn btn-light oppia-editor-publish-button e2e-test-publish-topic-button"
+            (click)="publishTopic()"
+            [ngClass]="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
+            [disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+      <i class="fas fa-cloud-upload-alt md-18 md-dark oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+      </i>
+      <span class="oppia-save-publish-button-label">
+        Publish Topic
+      </span>
+    </button>
+    <button type="button"
+            (click)="unpublishTopic()"
+            *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
+            class="btn btn-light e2e-test-unpublish-topic-button"
+            [disabled]="isTopicSaveable()">
+      Unpublish Topic
+    </button>
+  </li>
+</ul>
+<div class="oppia-topic-nav-mobile" *ngIf="topic">
+  <div class="oppia-topic-navbar-mobile-tabs">
+    <div class="oppia-topic-nav-dropdown-container">
+      <div class="oppia-topic-nav-topic-nav-dropdown-options"
+           *ngIf="showNavigationOptions">
+        <div class="oppia-topic-nav-dropdown-option" (click)="selectMainTab()">
+          <i class="fas fa-pen"></i><span>Editor</span>
+        </div>
+        <div *ngIf="getActiveTabName() !== 'subtopic_preview' && getActiveTabName() !== 'subtopic_editor'"
+             class="oppia-topic-nav-dropdown-option e2e-test-mobile-questions-tab" (click)="selectQuestionsTab()">
+          <i class="fas fa-book-open"></i><span>Questions</span>
+        </div>
+        <div class="oppia-topic-nav-dropdown-option e2e-test-mobile-preview-tab" (click)="openTopicViewer()">
+          <i class="fas fa-play"></i><span>Preview</span>
+        </div>
+      </div>
+      <div>
+        <div *ngIf="warningsAreShown" class="oppia-warning-box">
+          <span>Warnings</span>
+          <div *ngFor="let issue of validationIssues">
+            <hr class="oppia-editor-warnings-separator">
+            {{ issue }}
+          </div>
+          <div *ngFor="let issue of prepublishValidationIssues">
+            <hr class="oppia-editor-warnings-separator">
+            {{ issue }}
+          </div>
+        </div>
+      </div>
+      <div class="oppia-topic-nav-dropdown-content">
+        <div class="oppia-topic-nav-dropdown-text" (click)="toggleWarningText()">
+          <i *ngIf="!getTotalWarningsCount() && (getActiveTabName() === 'main' || getActiveTabName() === 'subtopic_editor')"
+             class="fas fa-pen">&#xE254;
+          </i>
+          <i *ngIf="!getTotalWarningsCount() && getActiveTabName() === 'questions'"
+             class="fas fa-book-open">&#xE254;
+          </i>
+          <i *ngIf="!getTotalWarningsCount() && (getActiveTabName() === 'topic_preview' || getActiveTabName() === 'subtopic_preview')"
+             class="fas fa-play">&#xE254;
+          </i>
+          <span>{{ activeTab }}</span>
+          <span [hidden]="!totalWarningsCount">
+            ({{ totalWarningsCount }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
+          </span>
+        </div>
+        <div class="oppia-topic-nav-dropdown-icon e2e-test-mobile-navbar-dropdown"
+             (click)="toggleNavigationOptions()">
+          <i class="fa fa-caret-down"></i>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-topic-nav-dropdown-container oppia-save-options-dropdown">
+      <div class="oppia-topic-nav-topic-nav-dropdown-options" *ngIf="showTopicEditOptions">
+        <div class="oppia-topic-nav-dropdown-option" (click)="discardChanges()">
+          <i class="fas fa-pen"></i>
+          <span>Discard Changes</span>
+        </div>
+        <div class="oppia-topic-nav-dropdown-option">
+          <div *ngIf="!topicRights.isPublished()"
+               class="e2e-test-mobile-publish-topic-button"
+               (click)="publishTopic()"
+               [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+            <i class="fas fa-pen"></i>
+            <span>Publish Topic</span>
+          </div>
+          <div (click)="unpublishTopic()"
+               *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
+               class="e2e-test-mobile-unpublish-topic-button"
+               [attr.disabled]="isTopicSaveable()">
+            <i class="fas fa-pen"></i>
+            <span>Unpublish Topic</span>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-topic-nav-dropdown-content oppia-right-container">
+        <div class="oppia-topic-nav-dropdown-text e2e-test-mobile-save-topic-button"
+             (click)="saveChanges()">
+          <span *ngIf="isSaveInProgress()">
+            <span>Saving</span>
+          </span>
+          <span *ngIf="!isSaveInProgress()">
+            Save Changes
+          </span>
+          <span [hidden]="!(changeListLength > 0)">
+            ({{ changeListLength }})
+          </span>
+        </div>
+        <div class="oppia-topic-nav-dropdown-icon e2e-test-mobile-save-topic-dropdown"
+             (click)="toggleTopicEditOptions()">
+          <i class="fa fa-caret-down"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-icon {
+    width: 3.5em;
+  }
+  .oppia-icon .oppia-material-icons {
+    font-size: 1.4em;
+    margin-left: 0.3vw;
+  }
+  .oppia-topic-nav-mobile {
+    display: none;
+  }
+  .oppia-navbar-dropdown-menu {
+    margin-right: 5px;
+    margin-top: 8px;
+  }
+  .oppia-change-count {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  .oppia-dropdown-toggle-button {
+    height: 34px;
+    margin-left: 5px !important;
+
+  }
+  .oppia-dropdown-menu {
+    left: auto;
+    min-width: 125px;
+    right: 0;
+  }
+  .oppia-editor-publish-button-container {
+    margin-right: 20px;
+    margin-top: 8px;
+  }
+  .oppia-topic-editor-save-icon {
+    padding-left: 5px;
+  }
+
+  @media screen and (max-width: 991px) {
+    .oppia-editor-publish-button-container {
+      margin-right: 10px;
+      margin-top: 8px;
+    }
+    .oppia-navbar-desktop {
+      flex-direction: row;
+      width: 170px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .oppia-navbar-desktop {
+      display: none;
+    }
+    .oppia-topic-nav-mobile {
+      display: block;
+    }
+    .oppia-topic-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    .oppia-save-change-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    .oppia-save-changes-btn {
+      background-color: #008098;
+      color: #fff;
+      font-weight: bold;
+      width: 80%;
+    }
+    .oppia-discard-changes-btn {
+      background-color: #008098;
+      bottom: 47px;
+      color: #fff;
+      font-weight: bold;
+      left: 12px;
+      position: absolute;
+      width: 144px;
+    }
+    .oppia-btn-publish-topic {
+      background-color: white;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+    .oppia-arrow-up-container {
+      align-items: center;
+      background-color: #fff;
+      border: 1px solid #808080;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      width: 20%;
+    }
+    .oppia-arrow-up-container i {
+      color: #008098;
+    }
+    .oppia-publish-button-container {
+      width: 40%;
+    }
+    .oppia-publish-button-container button {
+      width: 100%;
+    }
+    .oppia-topic-nav-dropdown-container {
+      position: relative;
+      text-align: left;
+      width: 45%;
+    }
+    .oppia-topic-nav-topic-nav-dropdown-options {
+      background-color: #fff;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+      width: 100%;
+    }
+    .oppia-topic-nav-dropdown-content {
+      background-color: #fff;
+      border: 1.5px solid #6d6969;
+      border-radius: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .oppia-right-container {
+      background-color: #419889;
+      color: #fff;
+    }
+
+    .oppia-topic-nav-dropdown-option {
+      padding: 5px 0;
+    }
+
+    .oppia-topic-nav-dropdown-icon {
+      align-items: center;
+      background-color: #e6e6e6;
+      border-left: 1.5px solid #6d6969;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: 20%;
+    }
+    .oppia-topic-nav-dropdown-text {
+      padding: 5px 10px;
+    }
+    .oppia-save-options-dropdown {
+      width: 52%;
+    }
+    .oppia-warning-box {
+      background-color: #f5f55a;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+    }
+    .oppia-error-icon {
+      background-color: #f5f55a;
+    }
+    .fas {
+      font-size: 0.8em;
+      padding: 5px;
+    }
+  }
+</style>

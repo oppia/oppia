@@ -1,0 +1,288 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-profile-picture-edit-prompt {
+  background-color: #333;
+  border-radius: 5px;
+  color: white;
+  left: 50%;
+  min-width: 120px;
+  padding: 5px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.oppia-profile-container .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
+  background-color: #808080;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+}
+.oppia-profile-subject-interest-blocks {
+  column-gap: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 5px;
+  row-gap: 5px;
+}
+.oppia-profile-container .oppia-stats-value-text {
+  font-size: 16px;
+}
+.oppia-profile-container .oppia-user-bio-text {
+  white-space: pre-wrap;
+}
+.oppia-navigation-button[disabled] {
+  color: #bdc3c7;
+  cursor: default;
+}
+.oppia-profile-portfolio-pages {
+  display: block;
+  font-size: .9em;
+  font-weight: bold;
+  text-align: right;
+}
+.oppia-profile-h1 {
+  color: #fff;
+  display: inline;
+  float: right;
+  font-size: 1em;
+  font-weight: normal;
+  line-height: unset;
+}
+
+.oppia-profile-user-card {
+  background-color: #fff;
+  float: left;
+  margin-right: 28px;
+  padding: 24px;
+  position: relative;
+  width: 220px;
+}
+
+.oppia-profile-container {
+  margin: 0 auto 30px auto;
+  max-width: 980px;
+  overflow: auto;
+  padding-top: 30px;
+  position: relative;
+  width: 90%;
+}
+
+.oppia-subscription-button,
+.oppia-subscription-button:focus,
+.oppia-subscription-button:active {
+  background-color: #015c54;
+  border-radius: 0;
+  color: white;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  margin-top: 16px;
+  text-transform: uppercase;
+  width: 129.42px;
+}
+
+.oppia-subscription-button:hover,
+.oppia-subscription-button:focus {
+  background-color: #004d45;
+  color: white;
+}
+
+.oppia-profile-picture-fullsize {
+  border-radius: 4px;
+  display: block;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 160px;
+  width: 90%;
+}
+
+.oppia-profile-username-large-screen {
+  display: block;
+  font-size: 130%;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.oppia-profile-username-small-screen {
+  display: none;
+  font-size: 110%;
+  margin-top: 20px;
+  max-width: 30px;
+  text-align: left;
+}
+
+.oppia-profile-first-contributed {
+  display: block;
+  font-size: 0.7em;
+  line-height: 120%;
+  text-align: center;
+}
+
+.oppia-profile-user-stat-container-large-screen {
+  display: block;
+  font-size: 12px;
+  margin-top: 16px;
+  max-width: 220px;
+  text-align: center;
+}
+
+.oppia-profile-user-stat-container-small-screen {
+  display: none;
+  font-size: 12px;
+  max-width: 100%;
+  text-align: center;
+}
+
+.oppia-profile-stat-container-line-small-screen {
+  display: none;
+}
+
+.oppia-profile-user-stat {
+  display: inline-block;
+  width: 33%;
+}
+
+.oppia-profile-user-bio {
+  display: block;
+  font-size: 0.7em;
+  line-height: 130%;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.oppia-profile-subject-interest-container {
+  display: block;
+  font-size: .8em;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.oppia-profile-subject-interest {
+  background-color: rgba(0, 150, 136, 0.85);
+  border-radius: .25em;
+  color: #fff;
+  display: inline;
+  font-size: 0.8em;
+  line-height: 1;
+  padding: .3em .35em .3em .5em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.oppia-profile-no-interests-text {
+  font-size: .9em;
+  font-weight: normal;
+}
+
+.oppia-profile-portfolio-container {
+  margin: 0 auto;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* By using 'grid-template-columns' we specify the number of columns for different display sizes. */
+.mat-card-content.oppia-profile-portfolio-container {
+  background-color: transparent;
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+}
+.mat-card.oppia-profile-content-card {
+  background-color: transparent;
+  box-shadow: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+.oppia-profile-content-card {
+  box-shadow: none;
+  float: right;
+  min-height: 630px;
+  padding: 0 30px 30px 30px;
+  width: -webkit-calc(100% - 280px);
+  width: -moz-calc(100% - 280px);
+  width: -o-calc(100% - 280px);
+  width: calc(100% - 280px);
+}
+
+@media (max-width: 1080px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content max-content;
+  }
+}
+
+@media (max-width: 820px) {
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: max-content;
+  }
+}
+
+@media (max-width: 1065px) {
+  .oppia-profile-h1 {
+    display: none;
+  }
+}
+
+@media (max-width: 610px) {
+  .oppia-profile-container {
+    width: 90%;
+  }
+  .oppia-profile-user-container {
+    height: auto;
+    width: 250px;
+  }
+  .oppia-profile-text {
+    float: left;
+    height: auto;
+    margin-left: 10px;
+    width: 100px;
+  }
+  .oppia-profile-user-card {
+    float: none;
+    margin: 0 auto 12px auto;
+    min-width: 270px;
+    padding: 30px;
+    width: 90%;
+  }
+  .oppia-profile-content-card {
+    float: none;
+    margin: 0 auto;
+    width: 90%;
+  }
+  .oppia-profile-picture-fullsize {
+    display: inline-block;
+    float: left;
+    margin-right: 20px;
+  }
+  .oppia-profile-username-large-screen {
+    display: none;
+  }
+  .oppia-profile-username-small-screen {
+    display: inline-block;
+  }
+  .oppia-profile-first-contributed {
+    font-size: .6em;
+    text-align: left;
+  }
+  .oppia-profile-user-stat-container-large-screen {
+    display: none;
+  }
+  .oppia-profile-user-stat-container-small-screen {
+    display: block;
+  }
+  .oppia-profile-stat-container-line-small-screen {
+    border-top: 1px solid #7e7e7e;
+    display: block;
+    width: 100%;
+  }
+  .oppia-profile-user-bio {
+    display: inline-block;
+  }
+  .mat-card-content.oppia-profile-portfolio-container {
+    grid-template-columns: unset;
+  }
+}

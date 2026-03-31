@@ -1,0 +1,19 @@
+<div class="skill-preview-modal e2e-test-concept-card-preview-modal">
+  <h3 class="skill-preview-modal-title">{{ skillDescription }}</h3>
+  <div class="skill-preview-modal-content">
+    <oppia-rte-output-display [rteString]="skillExplanation"></oppia-rte-output-display>
+  </div>
+</div>
+
+<style>
+  .skill-preview-modal {
+    background-color: #f0ffff;
+    padding: 30px 35px;
+  }
+  .skill-preview-modal .skill-preview-modal-title {
+    font-size: 28px;
+  }
+  .skill-preview-modal .skill-preview-modal-content {
+    margin-top: 15px;
+  }
+</style>

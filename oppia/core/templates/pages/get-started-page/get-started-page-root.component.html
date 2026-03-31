@@ -1,0 +1,55 @@
+<oppia-angular-root>
+  <oppia-base-content>
+    <navbar-breadcrumb>
+      <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+        <li>
+          <span class="oppia-navbar-breadcrumb-separator"></span>
+          <span [innerHTML]="'I18N_GET_STARTED_PAGE_BREADCRUMB' | translate"></span>
+        </li>
+      </ul>
+    </navbar-breadcrumb>
+    <content>
+      <div class="oppia-static-header">
+        <h1 class="e2e-test-get-started-page" [innerHTML]="'I18N_GET_STARTED_PAGE_HEADING' | translate"></h1>
+      </div>
+      <background-banner></background-banner>
+      <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
+        <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
+
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_1' | translate"></p>
+
+          <h2 [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING' | translate"></h2>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_2' | translate"></p>
+
+          <h2 [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_3_HEADING' | translate"></h2>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_3' | translate"></p>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_4' | translate"></p>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_5' | translate"></p>
+          <ul class="oppia-links-container">
+            <li><a href="https://www.oppia.org/explore/0" target="new">Welcome to Oppia</a></li>
+            <li><a href="https://www.oppia.org/collection/wqCTKpKA0LBe" target="new">Get Electrified!</a></li>
+            <li><a href="https://www.oppia.org/collection/inDXV0w8-p1C" target="new">Programming with Carla</a></li>
+          </ul>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_6' | translate"></p>
+
+          <h2 [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_7_HEADING' | translate"></h2>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_7' | translate"></p>
+
+          <h2 [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING' | translate"></h2>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_8' | translate"></p>
+
+          <!-- TODO(vojtechjelinek): Make it easy to get the right link to share, update this doc with that info -->
+
+          <h2 [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING' | translate"></h2>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_9'| translate"></p>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_10' | translate"></p>
+
+          <h2 [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING' | translate"></h2>
+          <p [innerHTML]="'I18N_GET_STARTED_PAGE_PARAGRAPH_11' | translate"></p>
+        </div>
+      </div>
+      <div class="oppia-footer-padding-below-banner">
+      </div>
+    </content>
+  </oppia-base-content>
+</oppia-angular-root>

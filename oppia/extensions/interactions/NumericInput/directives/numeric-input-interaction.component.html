@@ -1,0 +1,12 @@
+<div class="row numeric-input-container">
+  <div class="col-lg-12 col-md-12 col-sm-12">
+    <schema-based-editor [schema]="getSchema()"
+                         [localValue]="answer"
+                         (localValueChange)="onAnswerChange($event)"
+                         [labelForFocusTarget]="getLabelForFocusTarget()">
+    </schema-based-editor>
+    <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container e2e-test-form-error-container">
+      {{errorMessageI18nKey | translate}}
+    </div>
+  </div>
+</div>

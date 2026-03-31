@@ -1,0 +1,36 @@
+<!--  TODO(#20462): Remove the use of CDN here and install the package locally in node_modules. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
+
+<div [id]="chartId" class="oppia-bar-chart">
+  <table class="charts-css bar show-labels data-spacing-4">
+    <tbody>
+
+      <tr>
+        <td class="oppia-chart-scale-element">
+          <span class="oppia-scale-container">
+            <div class="oppia-bar-chart-scale-tick"
+              *ngFor="let tick of ticks"
+              [ngStyle]="{'width': tick.width}">
+              <p class="oppia-scale-number">{{ tick.value }}</p>
+              <p class="oppia-scale-line">|</p>
+            </div>
+          </span>
+        </td>
+      </tr>
+
+      <tr *ngFor="let dataPoint of normalizedData">
+        <th scope="row">
+          <span [ngStyle]="{'border-color': labelsColor}">
+            {{ dataPoint.country | translate }}
+          </span>
+        </th>
+        <td class="oppia-chart-bar-element">
+          <span class="data" *ngIf="dataPoint.annotationText" [ngStyle]="{'color': annotationTextColor}">
+            {{ dataPoint.annotationText | translate }}
+          </span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>

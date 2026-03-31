@@ -1,0 +1,116 @@
+<div class="post-chapter-recommendations-container" *ngIf="!isNewLessonPlayerEnabled()">
+  <p class="post-chapter-recommendation-text">
+    {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
+  </p>
+  <div class="post-chapter-recommendation-cards-container">
+    <div *ngIf="nextStoryNodeTitle" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Next chapter card</title>
+          <a [attr.href]="nextStoryNodeLink" class="e2e-test-recommended-next-chapter-button">
+            <rect width="192"
+                  height="150"
+                  [attr.fill]="nextStoryNodeThumbnailBgColor">
+            </rect>
+            <image x="0"
+                   y="0"
+                   height="180"
+                   width="240"
+                   class="next-story-node-image"
+                   [attr.xlink:href]="nextStoryNodeThumbnailUrl">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p class="to-the-next-lesson-text">
+        {{ 'I18N_END_CHAPTER_NEXT_CHAPTER_TEXT' | translate }}
+      </p>
+      <p class="fst-italic">
+        {{ nextStoryNodeTitle }}
+      </p>
+    </div>
+    <p *ngIf="nextStoryNodeTitle" class="or-text">or</p>
+    <div *ngIf="practiceQuestionsAreEnabled" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Practice session card</title>
+          <a [attr.href]="getPracticeTabUrl()" class="e2e-test-start-practice-from-recommendations-button">
+            <rect width="192"
+                  height="150"
+                  [attr.fill]="'#a6dacf'">
+            </rect>
+            <image x="17"
+                   y="20"
+                   height="180"
+                   width="240"
+                   class="post-chapter-recommendations-practice-icon"
+                   [attr.xlink:href]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p class="fst-italic">
+        {{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}
+      </p>
+    </div>
+    <div *ngIf="!practiceQuestionsAreEnabled" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Study Guide</title>
+          <a [attr.href]="getStudyTabUrl()" class="e2e-test-study-guide-recommendation-link" >
+            <rect width="192"
+                  height="150"
+                  [attr.fill]="'#be563c'">
+            </rect>
+            <image x="17"
+                   y="20"
+                   height="180"
+                   width="240"
+                   class="post-chapter-recommendations-revision-icon"
+                   [attr.xlink:href]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p class="fst-italic e2e-test-study-guide-recommendation-text">
+        {{ 'I18N_END_CHAPTER_STUDY_GUIDE_TEXT' | translate }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="post-chapter-recommendations-container" *ngIf="isNewLessonPlayerEnabled()">
+  <p class="post-chapter-recommendation-text">
+    {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
+  </p>
+  <div class="new-post-chapter-recommendation-cards-container" [ngClass]="{'three-buttons-container': !nextStoryNodeTitle}">
+    <button *ngIf="!userIsLoggedIn" class="post-chapter-recommendations-btn signup-btn" tabindex="0" (click)="signIn()">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i>
+      <p>Sign up or Login <br><span>And save your lesson progress</span></p>
+    </button>
+    <a href="/learner-dashboard" *ngIf="userIsLoggedIn">
+      <button class="post-chapter-recommendations-btn learner-dashboard-btn">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        <p>Go To Learner Dashboard</p>
+      </button>
+    </a>
+    <a [href]="nextStoryNodeLink" *ngIf="nextStoryNodeTitle">
+      <button class="post-chapter-recommendations-btn next-lesson-btn" tabindex="0">
+        <i class="fa-solid fa-arrow-right"></i>
+        <p>Next Lesson <br><span>{{ nextStoryNodeTitle }}</span></p>
+      </button>
+    </a>
+    <a [href]="getStudyTabUrl()" *ngIf="practiceQuestionsAreEnabled">
+      <button class="post-chapter-recommendations-btn review-card-btn" tabindex="0">
+        <i class="fa-solid fa-eye"></i>
+        <p>Check Review Card <br><span>And save your lesson progress</span></p>
+      </button>
+    </a>
+    <a [href]="getPracticeTabUrl()" *ngIf="practiceQuestionsAreEnabled">
+      <button class="post-chapter-recommendations-btn more-practice-btn" tabindex="0">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <p>Do More Practice <br><span>Practice learned skills</span></p>
+      </button>
+    </a>
+  </div>
+</div>

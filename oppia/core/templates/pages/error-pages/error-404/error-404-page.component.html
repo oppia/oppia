@@ -1,0 +1,40 @@
+<div class="oppia-content oppia-error-page-main-content">
+  <br>
+  <div class="oppia-wide-panel oppia-error-wide-container">
+    <div class="oppia-wide-panel-content e2e-test-error-container">
+      <h1 class="oppia-error-h1">
+        <div>
+          <span [innerHTML]="'I18N_ERROR_HEADER_404' | translate"></span>
+          - Page Not Found
+        </div>
+      </h1>
+
+      <br>
+      <picture>
+        <source type="image/webp" [srcset]="getStaticImageUrl('/general/oops_mint.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/general/oops_mint.png')">
+        <img [src]="getStaticImageUrl('/general/oops_mint.png')" alt="Oops!" width="299" height="142">
+      </picture>
+
+      <div>
+        <h2 class="oppia-error-h2" [innerHTML]="'I18N_ERROR_MESSAGE_404' | translate"></h2>
+      </div>
+      <p><span [innerHTML]="'I18N_ERROR_NEXT_STEPS' | translate: {issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-error-h1 {
+    font-size: 1em;
+    margin: 1.33em 0;
+  }
+  .oppia-error-h2 {
+    font-size: 1.17em;
+    font-weight: 700;
+  }
+  @media screen and (min-width: 768px) {
+    .oppia-footer {
+      position: relative;
+    }
+  }
+</style>

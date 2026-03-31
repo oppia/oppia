@@ -1,0 +1,153 @@
+<div class="home-tab e2e-test-learner-dash-home-tab">
+  <ng-container *ngIf="!redesignFeatureFlag">
+    <div tabindex="0" class="greeting e2e-learner-dashboard-greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+      {{ getTimeOfDay() | translate }}, {{ username }}!
+    </div>
+    <div tabindex="0" class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
+      <p class="continue-where-you-left-off-heading e2e-test-section-heading"
+        [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="continueWhereYouLeftOffList.length !== 0">
+      </p>
+      <p class="continue-where-you-left-off-heading e2e-test-section-heading"
+        [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING' | translate"
+        *ngIf="continueWhereYouLeftOffList.length === 0">
+      </p>
+      <div class="empty-continue-where-you-left-off-section e2e-test-continue-section e2e-test-empty-section" *ngIf="continueWhereYouLeftOffList.length === 0">
+        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
+        </p>
+        <a id="setting-a-goal-link" (click)="changeActiveSection()">
+          <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate" class="empty-continue-where-you-left-off-section-text">
+          </p>
+        </a>
+      </div>
+      <div class="continue-where-you-left-off-scroll">
+        <div class="continue-where-you-left-off-section e2e-test-continue-section e2e-test-non-empty-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
+        [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
+          <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
+            <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
+                 class="story-summary-tile">
+              <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
+                [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroomName, topicSummaryTile.name)">
+              </oppia-learner-story-summary-tile>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div tabindex="0" class="suggested-for-you e2e-test-learner-dash-section" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+      <p class="suggested-for-you-heading e2e-test-section-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
+      </p>
+      <div class="suggested-for-you-section">
+        <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
+          <div *ngIf="item.value.length !== 0" class="classroom-name">
+            Basic {{item.key}}
+          </div>
+          <div class="topic-summary-tile-scroll">
+            <div class="topic-summary-tile-section d-flex"
+              [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
+              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile" (click)="registerNewClassroomLessonEvent(item.key, topicSummaryTile.name)">
+                <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
+                </oppia-learner-topic-summary-tile>
+              </div>
+              <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
+                 class="oppia-classroom-link">
+                <div class="classroom-card">
+                  <p class="classroom-text">
+                    <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
+                  </p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div tabindex="0" class="empty-suggested-for-you"
+    *ngIf="isGoalLimitReached()">
+      <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></p>
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate" class="mt-4"></p>
+      <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+         [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+         href="/community-library"
+         [oppiaFocusOn]="'ourLessonsBtn'"[routerLink]="communityLibraryUrl"
+        >
+      </a>
+    </div>
+    <div tabindex="0" class="empty-suggested-for-you learn-something-new-section"
+      *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
+      <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
+      </p>
+      <div class="empty-suggested-for-you-section e2e-test-home-tab-empty-suggestions">
+        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
+        </p>
+      </div>
+    </div>
+  </ng-container>
+
+  <div *ngIf="redesignFeatureFlag">
+    <!--TODO(#18384): Hides recommendations if no classroom topics in-progress (isNonemptyObject(untrackedTopics) not sure what this does)-->
+    <div *ngIf="!allCardsLoaded" >
+      <oppia-loading-message class="oppia-message-loader" [message]="loadingMessage"></oppia-loading-message>
+    </div>
+    <div  [class.loading-content]="!allCardsLoaded">
+      <div class="oppia-learner-dash-section e2e-test-learner-dash-section" *ngIf="getTotalInProgressLessons() > 0 ">
+        <p class="oppia-learner-dash-section-heading e2e-test-learner-dash-section-heading">
+          {{ 'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
+        </p>
+        <div class="d-flex flex-wrap justify-content-between w-100">
+          <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0"
+                              [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'"
+                              [numCards]="getTotalInProgressLessons()"
+                              [displayMaxWidth]="'fit-content'"
+                              class="e2e-test-continue-where-you-left-off">
+            <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
+              <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
+                <lesson-card [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)" (lessonLoaded)="onLessonLoaded()" > </lesson-card>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngFor="let exploration of incompleteExplorationsList">
+              <lesson-card [story]="exploration" (lessonLoaded)="onLessonLoaded()"></lesson-card>
+            </ng-container>
+            <ng-container *ngFor="let collection of incompleteCollectionsList">
+              <lesson-card [story]="collection" (lessonLoaded)="onLessonLoaded()"></lesson-card>
+            </ng-container>
+          </oppia-card-display>
+          <!--TODO(#18384): Learner Group (Recommended cards)Styling: https://www.figma.com/design/YWe7SqfUVjxlJLKTUn0UZa/Project-2?node-id=4405-61681&t=8H8GSGQJk3lUxOBc-0 (links to Figma frame) -->
+          <oppia-card-display class="e2e-test-learner-dash-recommended-section" *ngIf="hasMultipleUnfinishedPublished &&
+          storySummariesWithAvailableNodes.size > 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="storySummariesWithAvailableNodes.size" [displayMaxWidth]="'fit-content'">
+            <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
+              <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
+                <lesson-card *ngIf="storySummariesWithAvailableNodes.has(storySummaryTile.getId())" [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)" [isRecommendation]="true" (lessonLoaded)="onLessonLoaded()"> </lesson-card>
+              </ng-container>
+            </ng-container>
+          </oppia-card-display>
+        </div>
+      </div>
+      <div class="oppia-learner-dash-section  e2e-test-learner-dash-section" *ngIf="totalLessonsInPlaylists?.length > 0 || (isNonemptyObject(untrackedTopics)) && !isGoalLimitReached()">
+        <p class="oppia-learner-dash-section-heading e2e-test-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+        <!--TODO(#18384): Add search bar -->
+        <!--TODO(#18384): Only untracked topics. Will need to change headings when there are multiple classrooms-->
+        <ng-container *ngFor="let item of untrackedTopics | keyvalue">
+          <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [cardWidth]="226">
+            <ng-container *ngFor="let topicSummaryTile of item.value">
+              <oppia-learner-topic-summary-tile class="e2e-test-learer-topic-summary-tile" [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
+              </oppia-learner-topic-summary-tile>
+            </ng-container>
+          </oppia-card-display>
+          <oppia-classroom-button [classroom]="item.key" [variant]="'blue'"></oppia-classroom-button>
+        </ng-container>
+        <oppia-card-display *ngIf="totalLessonsInPlaylists.length > 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [numCards]="totalLessonsInPlaylists.length">
+          <ng-container *ngFor="let lesson of totalLessonsInPlaylists">
+            <lesson-card [story]="lesson" [isSavedSection]="true" (lessonLoaded)="onLessonLoaded()"></lesson-card>
+          </ng-container>
+        </oppia-card-display>
+      </div>
+      <div class="oppia-learner-dash-section px-3 py-4 w-100 e2e-test-learner-dash-section"
+        *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
+        <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+        <div class="empty-suggested-for-you-section e2e-test-home-tab-empty-suggestions">
+          <p> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate }} </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,199 @@
+<div class="stage">
+  <div class="confetti" [ngClass]="{'confetti-animation-class-1': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-2': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-3': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-4': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-5': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-6': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-7': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-8': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-9': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-10': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-11': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-12': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-13': confettiIsShown}"></div>
+  <div class="confetti" [ngClass]="{'confetti-animation-class-14': confettiIsShown}"></div>
+  <svg class="coiled-confetti" [ngClass]="{'coiled-confetti-animation-class-1': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="red" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
+  <svg class="coiled-confetti" [ngClass]="{'coiled-confetti-animation-class-2': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="green" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
+  <svg class="coiled-confetti" [ngClass]="{'coiled-confetti-animation-class-3': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="blue" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
+</div>
+
+<style>
+  .confetti {
+    background: #00f;
+    height: 34px;
+    left: 53%;
+    opacity: 0;
+    position: fixed;
+    top: 40px;
+    width: 10px;
+    z-index: 2;
+  }
+  .coiled-confetti {
+    height: 40px;
+    opacity: 0;
+    position: fixed;
+    top: 40px;
+    width: 50px;
+    z-index: 2;
+  }
+  .confetti:nth-child(2n) {
+    background: #0a0;
+    height: 40px;
+    left: 47%;
+    width: 14px;
+  }
+  .confetti:nth-child(3n) {
+    animation-delay: 200ms;
+    background: #f00;
+    height: 30px;
+    width: 8px;
+  }
+  .confetti:nth-child(4n) {
+    animation-delay: 200ms;
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+  }
+  .confetti:nth-child(7n) {
+    animation-delay: 400ms;
+    background: #ff0;
+    height: 30px;
+    width: 10px;
+  }
+  @keyframes confetti-anim-1 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(-350px, 40px) rotate(9deg); }
+  }
+  @keyframes confetti-anim-2 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(-330px, 80px) rotate(7deg); }
+  }
+  @keyframes confetti-anim-3 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(-210px, 120px) rotate(-26deg); }
+  }
+  @keyframes confetti-anim-4 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(-140px, 160px) rotate(0deg); }
+  }
+  @keyframes confetti-anim-5 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(-70px, 200px) rotate(74deg); }
+  }
+  @keyframes confetti-anim-6 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(0, 240px) rotate(-50deg); }
+  }
+  @keyframes confetti-anim-7 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(70px, 200px) rotate(11deg); }
+  }
+  @keyframes confetti-anim-8 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(140px, 160px) rotate(32deg); }
+  }
+  @keyframes confetti-anim-9 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(210px, 120px) rotate(62deg); }
+  }
+  @keyframes confetti-anim-10 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(280px, 80px) rotate(93deg); }
+  }
+  @keyframes confetti-anim-11 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(280px, 80px) rotate(-40deg); }
+  }
+  @keyframes confetti-anim-12 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(280px, 80px) rotate(22deg); }
+  }
+  @keyframes confetti-anim-13 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(260px, 40px) rotate(78deg); }
+  }
+  @keyframes confetti-anim-14 {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { transform: translate(230px, 60px) rotate(-78deg); }
+  }
+  .confetti-animation-class-1 {
+    animation: confetti-anim-1 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-2 {
+    animation: confetti-anim-2 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-3 {
+    animation: confetti-anim-3 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-4 {
+    animation: confetti-anim-4 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-5 {
+    animation: confetti-anim-5 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-6 {
+    animation: confetti-anim-6 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-7 {
+    animation: confetti-anim-7 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-8 {
+    animation: confetti-anim-8 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-9 {
+    animation: confetti-anim-9 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-10 {
+    animation: confetti-anim-10 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-11 {
+    animation: confetti-anim-11 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-12 {
+    animation: confetti-anim-12 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-13 {
+    animation: confetti-anim-13 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .confetti-animation-class-14 {
+    animation: confetti-anim-14 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+  }
+  .coiled-confetti-animation-class-1 {
+    animation: confetti-anim-2 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+    left: 50%
+  }
+  .coiled-confetti-animation-class-2 {
+    animation: confetti-anim-3 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+    left: 60%
+  }
+  .coiled-confetti-animation-class-3 {
+    animation: confetti-anim-4 3000ms cubic-bezier(0, 0.7, 0, 1.5);
+    left: 70%
+  }
+  @media(max-width: 700px) {
+    .stage {
+      transform: scale(0.65);
+    }
+    .confetti {
+      top: -160px;
+    }
+    .coiled-confetti {
+      top: -160px;
+    }
+  }
+</style>

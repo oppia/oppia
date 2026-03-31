@@ -1,0 +1,27 @@
+<div class="new-save-progress-menu">
+  <h3>{{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}</h3>
+  <div class="checkpoint-status">
+    <p>Your progress will be saved up to the last checkpoint you've reached.</p>
+    <oppia-checkpoint-bar></oppia-checkpoint-bar>
+  </div>
+  <div class="sign-in-box">
+    <p>Create an account and have your progress saved automatically:</p>
+    <button type="button"
+            class="btn btn-secondary create-account-btn e2e-test-sign-up-button"
+            (click)="onLoginButtonClicked()">
+          {{ 'I18N_CREATE_ACCOUNT' | translate }}
+    </button>
+    <p class="sign-in-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2' | translate }}<a class="sign-in-link" (click)="onLoginButtonClicked()">{{ 'I18N_TOPNAV_SIGN_IN' | translate }}</a></p>
+  </div>
+  <div class="uid-box">
+    <p class="guide-text">Or copy the link below to save progress for 72 hours:</p>
+    <div [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }"
+         class="oppia-tooltip-container">
+      <oppia-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-copy-url>
+    </div>
+  </div>
+  <button type="button" class="save-progress-close-button e2e-test-save-progress-close-button" (click)="closeModal()">
+    <i class="material-icons md-24">&#xE5CD;</i>
+    <span class="oppia-icon-accessibility-label">Close</span>
+  </button>
+</div>

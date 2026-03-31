@@ -1,0 +1,32 @@
+<figure>
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && !altTextIsDisplayed">
+    <img [src]="imageUrl"
+         alt="{{imageAltText}}"
+         class="center-element-horizontally e2e-test-image"
+         [ngStyle]="imageContainerStyle">
+    <figcaption class="text-center">{{imageCaption}}</figcaption>
+  </div>
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown && altTextIsDisplayed">
+    <img [src]="imageUrl"
+         alt="{{imageAltText}}"
+         class="e2e-test-image"
+         [ngStyle]="miniatureImageContainerStyle">
+    <figcaption><strong>Caption:</strong> {{imageCaption}}</figcaption>
+    <figcaption class="alt-text mb-5"><strong>Description:</strong> {{imageAltText}}</figcaption>
+  </div>
+  <div *ngIf="isLoadingIndicatorShown"
+       class="oppia-image-container"
+       [ngStyle]="imageContainerStyle">
+    <img [src]="loadingIndicatorUrl"
+         class="center-element-horizontally"
+         [ngStyle]="loadingIndicatorStyle"
+         alt="Loading...">
+  </div>
+  <div *ngIf="isTryAgainShown" class="oppia-image-container" [ngStyle]="imageContainerStyle">
+    <button matButton
+            (click)="loadImage()"
+            class="oppia-learner-reload-image-button center-element-horizontally">
+      <span>Reload image<i class="material-icons oppia-reload-image-symbol">&#10227;</i></span>
+    </button>
+  </div>
+</figure>

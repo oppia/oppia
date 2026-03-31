@@ -1,0 +1,235 @@
+<div>
+  <div class="modal-header">
+    <h3>
+      Subtopics & Skills
+    </h3>
+  </div>
+  <div class="modal-body subtopics">
+    <div class="subtopics-container" cdkDropListGroup>
+      <div class="empty-placeholder"></div>
+      <div class="item-flex-container">
+        <mat-card class="item-container uncategorized-skill-ids e2e-test-uncategorized-skills-container"
+                  [ngClass]="{'skills-valid': !uncategorizedSkillSummaries?.length, 'skills-invalid': uncategorizedSkillSummaries?.length}">
+          <strong>Uncategorized Skills</strong>
+          <div class="number-skills-container">
+            <span *ngIf="uncategorizedSkillSummaries?.length === 1"
+                  class="number-skills-text">
+              {{ uncategorizedSkillSummaries?.length }} Skill
+            </span>
+            <span *ngIf="!(uncategorizedSkillSummaries?.length === 1)"
+                  class="number-skills-text">
+              {{ uncategorizedSkillSummaries.length }} Skills
+            </span>
+          </div>
+          <div class="uncategorized-skills-container outside-container"
+               cdkDropList
+               [cdkDropListData]="uncategorizedSkillSummaries"
+               (cdkDropListDropped)="onMoveSkillEnd($event, null)">
+            <div class="skill-id"
+                      *ngFor="let skillSummary of uncategorizedSkillSummaries"
+                      cdkDrag
+                      (cdkDragStarted)="onMoveSkillStart(null, skillSummary)">
+              <div class="skill-card e2e-test-uncategorized-skill-card">
+                <a *ngIf="!isSkillDeleted(skillSummary)"
+                   class="skill-name"
+                   [href]="getSkillEditorUrl(skillSummary.getId())"
+                   target="_blank"
+                   rel="noopener">
+                   {{ skillSummary.getDescription() }}
+                </a>
+              </div>
+            </div>
+            <p class="intro-card-message e2e-test-no-uncategorized-skills"
+               *ngIf="uncategorizedSkillSummaries?.length === 0">
+              There are no unassigned skills left in the topic.
+            </p>
+          </div>
+        </mat-card>
+      </div>
+      <div *ngFor="let subtopic of subtopics"
+           class="item-flex-container">
+        <mat-card class="subtopic item-container">
+          <div class="subtopic-header"
+               (click)="editNameOfSubtopicWithId(subtopic.getId())">
+            <strong [ngbTooltip]="subtopic.getTitle()"
+                    placement="bottom"
+                    *ngIf="subtopic?.getTitle()?.length < 25">
+              {{ subtopic.getTitle() }} <mat-icon class="edit-icon-style">edit</mat-icon>
+            </strong>
+            <strong [ngbTooltip]="subtopic?.getTitle()"
+                    placement="bottom"
+                    *ngIf="subtopic?.getTitle().length >= 25">
+              {{ subtopic?.getTitle().substring(0,15) }}...
+            </strong>
+            <div class="number-skills-container">
+              <span *ngIf="subtopic.getSkillSummaries().length === 1"
+                    class="number-skills-text">
+                {{ subtopic?.getSkillSummaries().length }} Skill
+              </span>
+              <span *ngIf="!(subtopic?.getSkillSummaries().length === 1)"
+                    class="number-skills-text">
+                {{ subtopic?.getSkillSummaries().length }} Skills
+              </span>
+            </div>
+          </div>
+          <div *ngIf="subtopic.getId() === selectedSubtopicId">
+            <input type="text" class="e2e-test-rename-subtopic-field" [(ngModel)]="editableName" maxlength="{{maxCharsInSubtopicTitle}}">
+            <button class="btn btn-secondary"
+                    (click)="editNameOfSubtopicWithId(null)">
+              Cancel
+            </button>
+            <button class="btn btn-primary e2e-test-save-reassignments"
+                    (click)="updateSubtopicTitle(subtopic.getId())">
+              Save
+            </button>
+          </div>
+          <div class="subtopic-container outside-container e2e-test-subtopic-column"
+               cdkDropList
+               [cdkDropListData]="subtopic?.getSkillSummaries()"
+               (cdkDropListDropped)="onMoveSkillEnd($event, subtopic.getId())">
+            <div class="skill-id"
+                      *ngFor="let skillSummary of subtopic.getSkillSummaries()"
+                      cdkDrag
+                      (cdkDragStarted)="onMoveSkillStart(subtopic.getId(), skillSummary)">
+              <div class="skill-card">
+                <a [href]="getSkillEditorUrl(skillSummary?.getId())"
+                   class="skill-name e2e-test-subtopic-skill-description"
+                   target="_blank"
+                   rel="noopener">
+                  {{ skillSummary.getDescription() }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary"
+            (click)="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success e2e-test-save-rearrange-skills"
+            (click)="confirm()">
+      Save
+    </button>
+  </div>
+</div>
+<style>
+  .modal-dialog {
+    max-width: inherit;
+    width: 80vw;
+  }
+  .modal-body {
+    height: 55vh;
+    padding: 40px 0 0 0;
+  }
+  a {
+    color: #666;
+  }
+  .subtopic-container {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .uncategorized-skills-container {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .item-container {
+    background-color: #eee;
+    border-radius: 4px;
+    max-height: 95%;
+    padding: 5px 10px;
+    width: 15vw;
+  }
+  .rearrange-skills-modal {
+    display: flex;
+    height: auto;
+    margin: 6vh 10vh 0 10vh;
+  }
+  .intro-card-message {
+    color: #808080;
+    font-size: 0.8em;
+    line-height: 1.846;
+    padding: 10px;
+    text-align: center;
+  }
+  .subtopics-container {
+    align-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 100%;
+    max-height: 350px;
+    overflow-x: auto;
+  }
+  .subtopic-header {
+    text-align: left;
+  }
+  .item-flex-container {
+    min-height: 200px;
+  }
+  .edit-icon-style {
+    font-size: 17px;
+    margin-top: 2px;
+  }
+  .skill-id {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: none;
+    cursor: move;
+    margin: 8px 0;
+    text-align: left;
+  }
+  .skill-id:hover {
+    background-color: #e0e0e0;
+  }
+  .skill-card {
+    margin-left: 12px;
+  }
+  .skills-valid {
+    background-color: #009c8a33;
+    border: 2px solid #009c8a;
+  }
+  .skills-invalid {
+    background-color: #c55f4533;
+    border: 2px solid #c55f45;
+  }
+  .number-skills-container {
+    bottom: 3px;
+    position: relative;
+  }
+  .number-skills-text {
+    color: #666;
+    font-size: 14px;
+  }
+  .empty-placeholder {
+    height: 100%;
+    width: 60px;
+  }
+  .mat-card {
+    margin: 8px
+  }
+  .outside-container {
+    min-height: 25px;
+  }
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+    z-index: 99999 !important;
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .outside-container.cdk-onMoveSkillEnd-list-dragging .skill-id:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+</style>

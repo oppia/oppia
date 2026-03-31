@@ -1,0 +1,122 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+oppia-input-response-pair .conversation-skin-learner-answer-container,
+oppia-input-response-pair .conversation-skin-oppia-feedback-container {
+  padding: 0 20px;
+  position: relative;
+}
+
+oppia-input-response-pair .conversation-skin-oppia-avatar {
+  left: -87px;
+}
+
+
+oppia-input-response-pair .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+  height: 100px;
+  left: -87px;
+  top: -20px;
+  width: 100px;
+}
+
+oppia-input-response-pair .conversation-skin-oppia-feedback-content,
+oppia-input-response-pair .conversation-skin-learner-answer-content {
+  margin-bottom: 12px;
+  overflow: auto;
+  padding: 8px 12px;
+  word-wrap: break-word;
+}
+
+oppia-input-response-pair .conversation-skin-oppia-feedback-content,
+oppia-input-response-pair .conversation-skin-help-card-content {
+  background-color: rgba(224,242,241,1);
+  border-top-left-radius: 0;
+}
+
+oppia-input-response-pair .conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,1);
+  border-bottom-right-radius: 0;
+}
+
+oppia-input-response-pair .conversation-skin-learner-answer-container {
+  text-align: right;
+}
+
+oppia-input-response-pair .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  border: 2px solid #094142;
+  height: 100px;
+  right: -98px;
+  top: -33px;
+  width: 100px;
+}
+
+@media screen and (max-width: 959px) {
+  oppia-input-response-pair .conversation-skin-user-avatar {
+    display: none;
+  }
+}
+
+oppia-input-response-pair .oppia-popover {
+  cursor: pointer;
+  display: inline-block;
+}
+.oppia-answer-popup-container .oppia-answer-popup {
+  max-height: 300px;
+  max-width: 300px;
+}
+
+oppia-input-response-pair .oppia-loading-dot-one,
+oppia-input-response-pair .oppia-loading-dot-two,
+oppia-input-response-pair .oppia-loading-dot-three {
+  background-color: #666;
+  border-radius: 50%;
+  display: inline-block;
+  font-size: 0;
+  height: 5px;
+  margin-right: 4px;
+  width: 5px;
+}
+
+oppia-input-response-pair .oppia-loading-dot-one {
+  -webkit-animation: dot 1.0s infinite;
+  -moz-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.0s;
+  -moz-animation-delay: 0.0s;
+  animation-delay: 0.0s;
+  opacity: 0;
+}
+
+oppia-input-response-pair .oppia-loading-dot-two {
+  -webkit-animation: dot 1.0s infinite;
+  -moz-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.2s;
+  -moz-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+oppia-input-response-pair .oppia-loading-dot-three {
+  -moz-animation: dot 1.0s infinite;
+  -webkit-animation: dot 1.0s infinite;
+  animation: dot 1.0s infinite;
+  -moz-animation-delay: 0.4s;
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+  margin-right: 0;
+  opacity: 0;
+}
+
+oppia-input-response-pair .conversation-skin-oppia-feedback.ng-enter {
+  opacity: 0;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+oppia-input-response-pair .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
+  opacity: 1;
+}

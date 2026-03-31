@@ -1,0 +1,11 @@
+<input type="text" [(ngModel)]="localValue.label" class="form-control" (ngModelChange)="isValidRatio($event)">
+
+<div class="oppia-form-error oppia-ratio-error">
+  {{ warningTextI18nKey | translate }}
+</div>
+
+<style>
+  .oppia-ratio-error {
+    position: absolute;
+  }
+</style>

@@ -1,0 +1,288 @@
+<oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
+<div *ngFor="let featureFlagViewModel of featureFlagViewModels; index as index">
+  <div *ngIf="getFeatureValidOnCurrentServer(featureFlagViewModel)" class="container oppia-page-card oppia-long-text oppia-features e2e-test-feature-flag e2e-test-feature-flag-{{index}}">
+    <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlagViewModel.name}}</h2>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Description:</b></div>
+      <div class="col-10 oppia-description-content">{{featureFlagViewModel.description}}</div>
+    </div>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Feature Stage:</b></div>
+      <div class="col-10">{{ getFeatureStageString(featureFlagViewModel) }}</div>
+    </div>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Rollout percentage for logged-in users (0-100):</b></div>
+      <div class="col-10">
+        <div class="row">
+          <div class="col-3">
+            <schema-based-editor [disabled]="featureFlagViewModel.forceEnableForAllUsers"
+                                 [schema]="getSchema()"
+                                 [(ngModel)]="featureFlagViewModel.rolloutPercentage"
+                                 class="e2e-test-rollout-percentage">
+            </schema-based-editor>
+          </div>
+          <div class="col-1">
+            <div class="d-flex flex-column">
+              <div *ngIf="featureFlagViewModel.forceEnableForAllUsers" class="mb-2" matTooltip="This value is not applied if the feature is force-enabled for all users (see below)." matTooltipPosition="right">
+                <i class="fas fa-info-circle practice-tab-info-circle info-button"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <small><i>This feature will only be enabled for the above percentage of <b>logged-in</b> users. We recommend rolling out the feature to logged-in users first, and once we are sure that doing so doesn't break anything, extending it to logged-out users as well using the "Force-enable for all users" control below.</i></small>
+        </div>
+      </div>
+    </div>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Force-enable for all users:</b></div>
+      <div class="col-10">
+        <div>
+          <select [(ngModel)]="featureFlagViewModel.forceEnableForAllUsers" class="e2e-test-value-selector">
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+        </div>
+        <div>
+          <small><i>Setting this to "Yes" will force-enable the feature for all the users, both <b>logged-in</b> and <b>logged-out</b>. Setting this property will disable the effect of all the other properties and enable the feature for all the users.</i></small>
+        </div>
+      </div>
+    </div>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Last Updated:</b></div>
+      <div class="col-10">{{ getLastUpdatedDate(featureFlagViewModel) }}</div>
+    </div>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>User Groups:</b></div>
+      <div class="col-10">
+        <mat-chip-list #chipList aria-label="Associated User Groups" tabindex="0">
+          <mat-chip *ngFor="let userGroupId of featureFlagViewModel.userGroupIds"
+                    [selectable]="true"
+                    [removable]="true"
+                    (removed)="removeUserGroupFromFeatureFlagViewModel(userGroupId, featureFlagViewModel)">
+            {{ getUserGroupName(userGroupId) }}
+            <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
+              <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+            </button>
+          </mat-chip>
+          <input placeholder="Add User Group"
+                 #userGroupInput
+                 [attr.data-feature-flag-id]="featureFlagViewModel.name"
+                 [matAutocomplete]="auto"
+                 [matChipInputFor]="chipList"
+                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                 (matChipInputTokenEnd)="addUserGroupToFeatureFlagViewModel($event, featureFlagViewModel)"
+                 [(ngModel)]="featureFlagViewModel.searchQuery" (ngModelChange)="filterUserGroups(featureFlagViewModel)" (click)="resetUserGroupSearch(featureFlagViewModel)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectUserGroup($event, featureFlagViewModel)">
+          <mat-option *ngFor="let userGroup of featureFlagViewModel.filteredUserGroups" [value]="userGroup.name">
+            {{ userGroup.name }}
+          </mat-option>
+        </mat-autocomplete>
+        <div>
+          <small><i>Users in the selected user groups will always have the feature enabled, regardless of the rollout percentage. If both user groups and rollout percentage are set, the feature will be enabled for users present in the user groups and for the percentage of logged-in users specified.</i></small>
+        </div>
+      </div>
+    </div>
+    <div class="row oppia-control-buttons-container oppia-feature-top-margin">
+      <!-- Control Buttons -->
+      <button
+              class="btn btn-primary e2e-test-save-button"
+              (click)="updateFeatureFlagViewModel(featureFlagViewModel)"
+              [disabled]="!isFeatureFlagViewModelChanged(featureFlagViewModel)">
+        Save
+      </button>
+      <button
+              class="btn btn-secondary"
+              (click)="clearChanges(featureFlagViewModel)"
+              [disabled]="!isFeatureFlagViewModelChanged(featureFlagViewModel)">
+        Clear Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<div *ngFor="let featureFlagViewModel of featureFlagViewModels;">
+  <div *ngIf="!getFeatureValidOnCurrentServer(featureFlagViewModel)" class="container oppia-page-card oppia-long-text oppia-features">
+    <div class="oppia-feature-configuration-warning">
+      <i class="material-icons oppia-feature-configuration-warning-icon">&#xe002;</i>
+      This feature flag is in {{featureFlagViewModel.featureStage}} stage, and cannot be configured on this server (which is in {{serverStage}} server mode).
+    </div>
+    <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlagViewModel.name}}</h2>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2 oppia-feature-column-mobile"><b>Description:</b></div>
+      <div class="col-10 oppia-description-content">{{featureFlagViewModel.description}}</div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="featureFlagViewModels.length === 0 && featureFlagsAreFetched" class="oppia-page-card oppia-long-text oppia-features oppia-empty-indicator e2e-test-no-feature">
+  No feature flags are available.
+</div>
+
+<div *ngIf="dummyFeatureFlagForE2eTestsIsEnabled" class="oppia-dev-mode e2e-test-angular-dummy-feature-indicator">
+  Angular: Dummy Feature Enabled
+  <span *ngIf="isDummyApiEnabled" class="e2e-test-angular-dummy-handler-indicator">, Dummy Handler Enabled.</span>
+</div>
+
+
+<style>
+  .info-button {
+    margin-left: -39px;
+    margin-top: 18px;
+  }
+
+  .oppia-feature-configuration-warning-icon {
+    color: #827127;
+  }
+
+  .oppia-feature-configuration-warning {
+    background: #fff5c8;
+    border: 0.0625rem solid #827127;
+    border-radius: 0.25rem;
+    color: #333;
+    margin-top: 1rem;
+    padding-left: 0.25rem;
+  }
+
+  .oppia-features .oppia-flex-center {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .oppia-features .oppia-flex-horizon-center {
+    display: flex;
+    justify-content: center;
+  }
+
+  .oppia-features .oppia-flex-vertical-center {
+    align-items: center;
+    display: flex;
+  }
+
+  .oppia-features .oppia-control-buttons-container {
+    align-items: center;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+  }
+
+  .oppia-features .oppia-control-buttons-container button {
+    margin-left: 5px;
+  }
+
+  .oppia-features .oppia-conjunction-indicator {
+    align-items: center;
+    display: flex;
+    font-size: 12px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .oppia-features .oppia-conjunction-indicator > .horizontal-line {
+    border-bottom: 1px dotted #dee2e6;
+    flex-grow: 1;
+    height: 0;
+  }
+
+  .oppia-features .oppia-input-error {
+    margin-left: 15px;
+    position: relative;
+  }
+
+  .oppia-features .oppia-input-error .input-error-symbol {
+    color: #ff6347;
+    font-weight: bold;
+  }
+
+  .oppia-features .oppia-input-error .tooltip {
+    background-color: #f5f5f5;
+    border: 1px solid #ff6347;
+    border-radius: 3px;
+    display: none;
+    font-size: 14px;
+    left: -50%;
+    opacity: 0;
+    padding: 5px;
+    position: absolute;
+    width: 200px;
+  }
+
+  .oppia-features .oppia-input-error:hover .tooltip {
+    display: inherit;
+    opacity: 1;
+  }
+
+  .oppia-features .oppia-feature-top-margin {
+    margin-top: 10px;
+  }
+
+  .oppia-features .oppia-feature-bottom-margin {
+    margin-bottom: 15px;
+  }
+
+  .oppia-features .oppia-feature-name {
+    border-bottom: 1px solid #dee2e6;
+    overflow-wrap: break-word;
+  }
+
+  .oppia-features .oppia-description-content {
+    overflow-wrap: anywhere;
+  }
+
+  .oppia-features .oppia-condition-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .oppia-features .oppia-filter-container {
+    border: 1px solid #dee2e6;
+    padding-bottom: 10px;
+    padding-top: 10px;
+  }
+
+  .oppia-features .oppia-rule-container {
+    border: 1px solid #a8a8a8;
+    padding-bottom: 10px;
+    padding-top: 10px;
+  }
+
+  .oppia-features.oppia-empty-indicator {
+    max-width: 1050px;
+  }
+
+  .oppia-features .oppia-condition-input {
+    max-width: 100px;
+  }
+
+  .oppia-features .oppia-rule-moving-buttons-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    min-height: 100px;
+    padding: 1px
+  }
+
+  .oppia-features .admin-note {
+    display: flex;
+    font-weight: bold;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .e2e-test-angular-dummy-feature-indicator {
+    bottom: 10px;
+  }
+
+  @media screen and (max-width: 767px) {
+    .oppia-feature-column-mobile {
+      flex: none;
+      max-width: none;
+    }
+  }
+</style>

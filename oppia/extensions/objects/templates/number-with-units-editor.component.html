@@ -1,0 +1,5 @@
+<input type="text" [(ngModel)]="numberWithUnitsString" (ngModelChange)="updateValue($event)" class="form-control">
+
+<div class="oppia-form-error">
+  {{errorMessageI18nKey | translate}}
+</div>

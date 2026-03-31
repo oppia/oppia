@@ -1,0 +1,65 @@
+<div class="oppia-activities-infinity-grid-container"
+     infiniteScroll
+     [infiniteScrollDistance]="1"
+     (scrolled)="showMoreActivities()"
+     [infiniteScrollDisabled]="endOfPageIsReached || searchResultsAreLoading">
+  <div *ngFor="let activity of allActivitiesInOrder; index as idx" class="d-inline-block">
+    <oppia-collection-summary-tile *ngIf="activity.activity_type === 'collection'"
+                                   [getCollectionId]="activity.id"
+                                   [getCollectionTitle]="activity.title"
+                                   [getLastUpdatedMsec]="activity.last_updated_msec"
+                                   [getNodeCount]="activity.node_count"
+                                   [getObjective]="activity.objective"
+                                   [getThumbnailIconUrl]="activity.thumbnail_icon_url"
+                                   [getThumbnailBgColor]="activity.thumbnail_bg_color"
+                                   [showLearnerDashboardIconsIfPossible]="true"
+                                   [isContainerNarrow]="libraryWindowIsNarrow"
+                                   class="e2e-test-collection-summary-tile">
+    </oppia-collection-summary-tile>
+    <oppia-exploration-summary-tile *ngIf="activity.activity_type === 'exploration'"
+                                    [explorationId]="activity.id"
+                                    [explorationTitle]="activity.title"
+                                    [lastUpdatedMsec]="activity.last_updated_msec"
+                                    [objective]="activity.objective"
+                                    [category]="activity.category"
+                                    [ratings]="activity.ratings"
+                                    [thumbnailIconUrl]="activity.thumbnail_icon_url"
+                                    [thumbnailBgColor]="activity.thumbnail_bg_color"
+                                    [numViews]="activity.num_views"
+                                    [contributorsSummary]="activity.human_readable_contributors_summary"
+                                    [isCommunityOwned]="activity.community_owned"
+                                    [showLearnerDashboardIconsIfPossible]="true"
+                                    [isContainerNarrow]="libraryWindowIsNarrow"
+                                    class="e2e-test-exp-summary-tile">
+    </oppia-exploration-summary-tile>
+  </div>
+</div>
+<div class="oppia-search-results-loading-message"
+     *ngIf="searchResultsAreLoading">
+  Loading more results
+  <loading-dots></loading-dots>
+</div>
+
+<style>
+  .oppia-activities-infinity-grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 856px;
+  }
+
+  .oppia-search-results-loading-message {
+    background-color: #e9e9e9;
+    bottom: 0;
+    color: #000;
+    height: 30px;
+    margin-top: 15px;
+    opacity: 0.9;
+    padding-top: 5px;
+    text-align: center;
+    width: 100%;
+    z-index: 50;
+  }
+</style>

@@ -1,0 +1,443 @@
+<div class="inner-container-alignment">
+  <div class="inner-container inner-container-fade-out">
+    <div class="sprinkle-dot dot1"></div>
+    <div class="sprinkle-dot dot2"></div>
+    <div class="sprinkle-dot dot3"></div>
+    <div class="sprinkle-dot dot4"></div>
+    <div class="sprinkle-dot dot5"></div>
+    <div class="sprinkle-dot dot6"></div>
+    <div class="sprinkle-dot dot7"></div>
+    <div class="sprinkle-dot dot8"></div>
+    <div class="sprinkle-dot dot9"></div>
+    <div class="sprinkle-dot dot10"></div>
+    <div class="sprinkle-dot dot11"></div>
+    <div class="sprinkle-dot dot12"></div>
+    <div class="sprinkle-dot dot13"></div>
+    <div class="sprinkle-dot dot14"></div>
+    <div class="sprinkle-dot dot15"></div>
+    <div class="sprinkle-dot dot16"></div>
+    <div class="sprinkle-dot dot17"></div>
+    <div class="sprinkle-dot dot18"></div>
+    <i class="fas fa-check-circle tick-symbol"></i>
+    <span class="inner-content e2e-test-correct-feedback">
+      <span [innerHTML]="'I18N_CORRECT_FEEDBACK' | translate"></span>
+    </span>
+  </div>
+</div>
+
+<style>
+  .inner-container {
+    -webkit-animation-delay: 0.5s;
+    -ms-animation-delay: 0.5s;
+    -webkit-animation-direction: normal;
+    -ms-animation-direction: normal;
+    -webkit-animation-duration: 2s;
+    -ms-animation-duration: 2s;
+    -webkit-animation-fill-mode: forwards;
+    -ms-animation-fill-mode: forwards;
+    -webkit-animation-iteration-count: 1;
+    -ms-animation-iteration-count: 1;
+    -webkit-animation-name: fadein;
+
+    -ms-animation-name: fadein;
+    -webkit-animation-play-state: running;
+    -ms-animation-play-state: running;
+    -webkit-animation-timing-function: linear;
+    -ms-animation-timing-function: linear;
+    background-color: rgb(224, 245, 236);
+    border: 2px;
+    border-color: #00b269;
+    border-radius: 3px;
+    border-style: solid;
+    color: #00b269;
+    font-family: Roboto, arial, sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    height: 60px;
+    line-height: normal;
+    margin: 0 auto;
+    max-width: 560px;
+    min-width: 360px;
+    opacity: 0;
+    padding-top: 5px;
+    position: relative;
+    text-align: center;
+  }
+
+  .inner-container-alignment {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  .tick-symbol {
+    font-size: 42px;
+    vertical-align: middle;
+  }
+
+  .inner-content {
+    padding-left: 8px;
+    text-transform: uppercase;
+  }
+
+  .inner-container-fade-out {
+    animation: fadeout 5s 1;
+  }
+
+  .sprinkle-dot {
+    border-radius: 50%;
+    height: 10px;
+    position: absolute;
+    width: 10px;
+  }
+
+  .dot1 {
+    -webkit-animation: flasha 2s 1;
+    animation: flasha 2s 1;
+    opacity: 0;
+  }
+
+  .dot2 {
+    -webkit-animation: flashb 2s 1;
+    animation: flashb 2s 1;
+    opacity: 0;
+  }
+
+  .dot3 {
+    -webkit-animation: flashc 2s 1;
+    animation: flashc 2s 1;
+    opacity: 0;
+  }
+
+  .dot4 {
+    -webkit-animation: flashd 2s 1;
+    animation: flashd 2s 1;
+    opacity: 0;
+  }
+
+  .dot5 {
+    -webkit-animation: flashe 2s 1;
+    animation: flashe 2s 1;
+    opacity: 0;
+  }
+
+  .dot6 {
+    -webkit-animation: flashf 2s 1;
+    animation: flashf 2s 1;
+    opacity: 0;
+  }
+
+  .dot7 {
+    -webkit-animation: flashg 2s 1;
+    animation: flashg 2s 1;
+    opacity: 0;
+  }
+
+  .dot8 {
+    -webkit-animation: flashh 2s 1;
+    animation: flashh 2s 1;
+    opacity: 0;
+  }
+
+  .dot9 {
+    -webkit-animation: flashi 2s 1;
+    animation: flashi 2s 1;
+    opacity: 0;
+  }
+
+  .dot10 {
+    -webkit-animation: flashra 2s 1;
+    animation: flashra 2s 1;
+    opacity: 0;
+  }
+
+  .dot11 {
+    -webkit-animation: flashrb 2s 1;
+    animation: flashrb 2s 1;
+    opacity: 0;
+  }
+
+  .dot12 {
+    -webkit-animation: flashrc 2s 1;
+    animation: flashrc 2s 1;
+    opacity: 0;
+  }
+
+  .dot13 {
+    -webkit-animation: flashrd 2s 1;
+    animation: flashrd 2s 1;
+    opacity: 0;
+  }
+
+  .dot14 {
+    -webkit-animation: flashre 2s 1;
+    animation: flashre 2s 1;
+    opacity: 0;
+  }
+
+  .dot15 {
+    -webkit-animation: flashrf 2s 1;
+    animation: flashrf 2s 1;
+    opacity: 0;
+  }
+
+  .dot16 {
+    -webkit-animation: flashrg 2s 1;
+    animation: flashrg 2s 1;
+    opacity: 0;
+  }
+
+  .dot17 {
+    -webkit-animation: flashrh 2s 1;
+    animation: flashrh 2s 1;
+    opacity: 0;
+  }
+
+  .dot18 {
+    -webkit-animation: flashri 2s 1;
+    animation: flashri 2s 1;
+    opacity: 0;
+  }
+
+  @keyframes fadeout {
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @-webkit-keyframes fadeout {
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes flasha {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #800000; left: 90px; opacity: 1; top: 20px; }
+    100% { background-color: #800000; left: 20px; opacity: 1; top: -50px; }
+  }
+  @-webkit-keyframes flasha {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #800000; left: 90px; opacity: 1; top: 20px; }
+    100% { background-color: #800000; left: 20px; opacity: 1; top: -50px; }
+  }
+  @keyframes flashb {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: red; left: 55px; opacity: 1; top: 35px; }
+    100% { background-color: red; left: -5px; opacity: 1; top: -30px; }
+  }
+  @-webkit-keyframes flashb {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: red; left: 55px; opacity: 1; top: 35px; }
+    100% { background-color: red; left: -5px; opacity: 1; top: -30px; }
+  }
+  @keyframes flashc {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b30000; left: 65px; opacity: 1; top: 0; }
+    100% { background-color: #b30000; left: 0; opacity: 1; top: -65px; }
+  }
+  @-webkit-keyframes flashc {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b30000; left: 65px; opacity: 1; top: 0; }
+    100% { background-color: #b30000; left: 0; opacity: 1; top: -65px; }
+  }
+  @keyframes flashd {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: yellow; left: 25px; opacity: 1; top: 30px; }
+    100% { background-color: yellow; left: -35px; opacity: 1; top: -35px; }
+  }
+  @-webkit-keyframes flashd {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: yellow; left: 25px; opacity: 1; top: 30px; }
+    100% { background-color: yellow; left: -35px; opacity: 1; top: -35px; }
+  }
+  @keyframes flashe {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; left: 40px; opacity: 1; top: 15px; }
+    100% { background-color: #0ff; left: -20px; opacity: 1; top: -50px; }
+  }
+  @-webkit-keyframes flashe {
+    0% { opacity: 0; }
+    50% { background-color: #0ff; left: 40px; opacity: 1; top: 15px; }
+    100% { background-color: #0ff; left: -20px; opacity: 1; top: -50px; }
+  }
+  @keyframes flashf {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; left: -15px; opacity: 1; top: 30px; }
+    100% { background-color: #0ff; left: -60px; opacity: 1; top: -35px; }
+  }
+  @-webkit-keyframes flashf {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; left: -15px; opacity: 1; top: 30px; }
+    100% { background-color: #0ff; left: -60px; opacity: 1; top: -35px; }
+  }
+  @keyframes flashg {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #300; left: 10px; opacity: 1; top: 5px; }
+    100% { background-color: #300;left: -50px; opacity: 1; top: -50px; }
+  }
+  @-webkit-keyframes flashg {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #300; left: 10px; opacity: 1; top: 5px; }
+    100% { background-color: #300;left: -50px; opacity: 1; top: -50px; }
+  }
+  @keyframes flashh {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; left: 40px; opacity: 1; top: -10px; }
+    100% { background-color: #0ff;left: -20px; opacity: 1; top: -70px; }
+  }
+  @-webkit-keyframes flashh {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; left: 40px; opacity: 1; top: -10px; }
+    100% { background-color: #0ff;left: -20px; opacity: 1; top: -70px; }
+  }
+  @keyframes flashi {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b34700; left: -20px; opacity: 1; top: -20px; }
+    100% { background-color: #b34700;left: -80px; opacity: 1; top: -80px; }
+  }
+  @-webkit-keyframes flashi {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b34700; left: -20px; opacity: 1; top: -20px; }
+    100% { background-color: #b34700;left: -80px; opacity: 1; top: -80px; }
+  }
+  @keyframes flashra {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #800000; opacity: 1; right: 90px; top: 20px; }
+    100% { background-color: #800000; opacity: 1; right: 20px; top: -50px; }
+  }
+  @-webkit-keyframes flashra {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #800000; opacity: 1; right: 90px; top: 20px; }
+    100% { background-color: #800000; opacity: 1; right: 20px; top: -50px; }
+  }
+  @keyframes flashrb {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: red; opacity: 1; right: 55px; top: 35px; }
+    100% { background-color: red; opacity: 1; right: -5px; top: -30px; }
+  }
+  @-webkit-keyframes flashrb {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: red; opacity: 1; right: 55px; top: 35px; }
+    100% { background-color: red; opacity: 1; right: -5px; top: -30px; }
+  }
+  @keyframes flashrc {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b30000; opacity: 1; right: 65px; top: 0; }
+    100% { background-color: #b30000; opacity: 1; right: 0; top: -65px; }
+  }
+  @-webkit-keyframes flashrc {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b30000; opacity: 1; right: 65px; top: 0; }
+    100% { background-color: #b30000; opacity: 1; right: 0; top: -65px; }
+  }
+  @keyframes flashrd {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: yellow; opacity: 1; right: 25px; top: 30px; }
+    100% { background-color: yellow; opacity: 1; right: -35px; top: -35px; }
+  }
+  @-webkit-keyframes flashrd {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: yellow; opacity: 1; right: 25px; top: 30px; }
+    100% { background-color: yellow; opacity: 1; right: -35px; top: -35px; }
+  }
+  @keyframes flashre {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; opacity: 1; right: 40px; top: 15px; }
+    100% { background-color: #0ff; opacity: 1; right: -20px; top: -50px; }
+  }
+  @-webkit-keyframes flashre {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; opacity: 1; right: 40px; top: 15px; }
+    100% { background-color: #0ff; opacity: 1; right: -20px; top: -50px; }
+  }
+  @keyframes flashrf {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; opacity: 1; right: -15px; top: 30px; }
+    100% { background-color: #0ff; opacity: 1; right: -60px; top: -35px; }
+  }
+  @-webkit-keyframes flashrf {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; opacity: 1; right: -15px; top: 30px; }
+    100% { background-color: #0ff; opacity: 1; right: -60px; top: -35px; }
+  }
+  @keyframes flashrg {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #300; opacity: 1; right: 10px; top: 5px; }
+    100% { background-color: #300; opacity: 1;right: -50px; top: -50px; }
+  }
+  @-webkit-keyframes flashrg {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #300; opacity: 1; right: 10px; top: 5px; }
+    100% { background-color: #300; opacity: 1;right: -50px; top: -50px; }
+  }
+  @keyframes flashrh {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; opacity: 1; right: 40px; top: -10px; }
+    100% { background-color: #0ff; opacity: 1;right: -20px; top: -70px; }
+  }
+  @-webkit-keyframes flashrh {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #0ff; opacity: 1; right: 40px; top: -10px; }
+    100% { background-color: #0ff; opacity: 1;right: -20px; top: -70px; }
+  }
+  @keyframes flashri {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b34700; opacity: 1; right: -20px; top: -20px; }
+    100% { background-color: #b34700; opacity: 1;right: -80px; top: -80px; }
+  }
+  @-webkit-keyframes flashri {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { background-color: #b34700; opacity: 1; right: -20px; top: -20px; }
+    100% { background-color: #b34700; opacity: 1;right: -80px; top: -80px; }
+  }
+  /* Some mobile devices have CSS width below 520px, use a responsive min-width
+     when under 520px to prevent pushing things offscreen. */
+  @media(max-width: 500px) {
+    .inner-container {
+      min-width: 250px;
+    }
+  }
+
+  @media(max-width: 959px) {
+    .inner-container-alignment {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+
+    .inner-container {
+      max-width: 650px;
+    }
+  }
+
+</style>

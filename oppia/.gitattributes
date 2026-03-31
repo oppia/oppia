@@ -1,0 +1,40 @@
+# Source files
+# ============
+*.pxd      text eol=lf
+*.py       text eol=lf
+*.py3      text eol=lf
+*.pyw      text eol=lf
+*.pyx      text eol=lf
+*.sh       text eol=lf
+*.js       text eol=lf
+*.txt      text eol=lf
+*.css      text eol=lf
+*.html     text eol=lf
+*.md       text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.md       text eol=lf
+*.json     text eol=lf
+*.html     text eol=lf
+*.txt      text eol=lf
+*.xml      text eol=lf
+*.pegjs    text eol=lf
+
+# Misc files
+# ==========
+.jscsrc      text eol=lf
+.gitignore   text eol=lf
+.pylintrc    text eol=lf
+AUTHORS      text eol=lf
+CHANGELOG    text eol=lf
+CONTRIBUTORS text eol=lf
+LICENSE      text eol=lf
+
+# Binary files
+# ============
+*.db      binary
+*.p       binary
+*.pkl     binary
+*.pyc     binary
+*.pyd     binary
+*.pyo     binary

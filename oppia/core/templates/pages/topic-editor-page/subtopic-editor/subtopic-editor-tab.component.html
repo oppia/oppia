@@ -1,0 +1,654 @@
+<div *ngIf="topic"
+     class="subtopic-content e2e-test-subtopic-editor-container">
+  <p class="oppia-mobile-back-to-parent"
+     (click)="navigateToTopicEditor()">
+    <i class="fa fa-angle-left"></i>
+    <span>Back to Topic</span>
+  </p>
+  <div class="subtopic-header-text">
+    <span class="topic-name"
+          (click)="navigateToTopicEditor()"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'Navigate back to ' + topic?.getName()"
+          (keydown.enter)="navigateToTopicEditor()">
+      {{ topic?.getName() + ' / ' }}
+    </span>
+    <span class="subtopic-name">{{ editableTitle }}</span>
+  </div>
+  <div class="subtopic-content-box">
+    <div class="subtopic-left-box">
+      <mat-card class="subtopic-item-container oppia-mobile-collapsible-card">
+        <div class="skill-card-header oppia-mobile-collapsible-card-header"
+             (click)="toggleSubtopicEditorCard()">
+          <h3 class="subtopic-card-heading">Review Material</h3>
+          <i class="fa fa-caret-down"
+             *ngIf="!subtopicEditorCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="subtopicEditorCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div class="oppia-subtopics-list-card oppia-mobile-collapsible-card-content"
+             *ngIf="subtopicEditorCardIsShown">
+          <div class="subtopic-title" tabindex="0">
+            <p>
+              <strong>Title*</strong>
+            </p>
+            <form class="form-horizontal" role="form">
+              <input class="form-control e2e-test-subtopic-title-field"
+                     type="text"
+                     (blur)="updateSubtopicTitle(editableTitle)"
+                     [(ngModel)]="editableTitle"
+                     aria-label="Input field to add Subtopic title"
+                     [ngModelOptions]="{standalone: true}"
+                     [maxlength]="maxCharsInSubtopicTitle"
+                     (change)="resetErrorMsg()">
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Subtopic title should be at most {{ maxCharsInSubtopicTitle }} characters.
+                </em>
+              </span>
+            </form>
+            <span class="form-text error-msg" *ngIf="errorMsg">
+              <em>{{ errorMsg }}</em>
+            </span>
+            <span class="form-text error-message" *ngIf="editableTitle?.length === maxCharsInSubtopicTitle">
+              <em>The maximum length of subtopic title is {{ maxCharsInSubtopicTitle }} characters.</em>
+            </span>
+          </div>
+          <div class="subtopic-url-fragment e2e-test-subtopic-url-fragment-field" tabindex="0">
+            <url-fragment-editor-component label="Url Fragment"
+                                           placeholder="Enter url fragment for the subtopic."
+                                           maxLength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}"
+                                           fragmentType="subtopic"
+                                           [generatedUrlPrefix]="generatedUrlPrefix"
+                                           [fragmentIsDuplicate]="subtopicUrlFragmentExists"
+                                           [disabled]="false"
+                                           [(urlFragment)]="editableUrlFragment"
+                                           (urlFragmentChange)="onSubtopicUrlFragmentChange($event)">
+            </url-fragment-editor-component>
+          </div>
+          <div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="subtopic-html" tabindex="0">
+            <div (click)="showSchemaEditor()"
+                 class="e2e-test-edit-html-content"
+                 role="button"
+                 aria-label="Edit explanation of the subtopic"
+                 tabindex="0"
+                 (keydown.enter)="showSchemaEditor()">
+              <p>
+                <strong>Explanation of the subtopic*</strong>
+                <i class="fa fa-pen edit-icon" *ngIf="!schemaEditorIsShown"></i>
+              </p>
+            </div>
+            <span class="oppia-input-box-subtitle">
+              <em>
+                Gives learner an overview of how to perform a skill. Go to the preview tab to preview.
+              </em>
+            </span>
+            <div *ngIf="schemaEditorIsShown">
+              <schema-based-editor [schema]="SUBTOPIC_PAGE_SCHEMA"
+                                   class="e2e-test-edit-subtopic-page-contents"
+                                   [(localValue)]="htmlData">
+              </schema-based-editor>
+              <div class="text-end pt-3">
+                <button class="btn btn-outline-dark"
+                        (click)="cancelHtmlDataChange()">
+                  Cancel
+                </button>
+                <button class="btn btn-success e2e-test-save-subtopic-content-button"
+                        (click)="updateHtmlData()">
+                  Save
+                </button>
+              </div>
+            </div>
+            <div *ngIf="!schemaEditorIsShown"
+                 (click)="showSchemaEditor()"
+                 class="subtopic-html-content e2e-test-edit-html-content">
+              <oppia-rte-output-display class="e2e-test-subtopic-html-content"
+                                        [rteString]="htmlData">
+              </oppia-rte-output-display>
+            </div>
+          </div>
+          <div class="subtopic-thumbnail e2e-test-subtopic-thumbnail">
+            <p>
+              <strong>Thumbnail Image*</strong>
+            </p>
+            <oppia-thumbnail-uploader [filename]="subtopic?.getThumbnailFilename()"
+                                      [useLocalStorage]="false"
+                                      (updateFilename)="updateSubtopicThumbnailFilename($event)"
+                                      [bgColor]="subtopic?.getThumbnailBgColor()"
+                                      (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
+                                      [allowedBgColors]="allowedBgColors"
+                                      [aspectRatio]="'4:3'"
+                                      [previewTitle]="editableTitle"
+                                      previewDescriptionBgColor="#BE563C">
+            </oppia-thumbnail-uploader>
+          </div>
+        </div>
+        <div *ngIf="editableThumbnailFilename && subtopicEditorCardIsShown">
+          <div *ngIf="!subtopicPreviewCardIsShown">
+            <button class="btn btn-secondary show-subtopic-preview-button"
+                    tabindex="0"
+                    (keydown.enter)="toggleSubtopicPreview()"
+                    (click)="toggleSubtopicPreview()">
+              Expand Preview
+              <i class="fa fa-angle-down"></i>
+            </button>
+          </div>
+          <div *ngIf="subtopicPreviewCardIsShown">
+            <button class="btn btn-secondary show-subtopic-preview-button"
+                    tabindex="0"
+                    (keydown.enter)="toggleSubtopicPreview()"
+                    (click)="toggleSubtopicPreview()">
+              Collapse Preview
+              <i class="fa fa-angle-up"></i>
+            </button>
+          </div>
+          <div *ngIf="subtopicPreviewCardIsShown">
+            <oppia-preview-thumbnail [name]="editableTitle"
+                                     [aspectRatio]="'4:3'"
+                                     [filename]="editableThumbnailFilename"
+                                     [thumbnailBgColor]="editableThumbnailBgColor"
+                                     [bgColor]="'#2F6687'">
+            </oppia-preview-thumbnail>
+          </div>
+        </div>
+      </mat-card>
+      <mat-card *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+        <div class="oppia-editor-card-body">
+          <div class="oppia-editor-card-section study-guide-section-content">
+            <div class="oppia-study-guide-sections-header oppia-mobile-collapsible-card-header"
+                 (click)="toggleSectionsList()"
+                 role="button"
+                 tabindex="0">
+              <strong class="heading-text">Sections</strong>
+              <i class="fa fa-caret-down e2e-test-show-study-guide-sections-list"
+                 *ngIf="!sectionsListIsShown"
+                 [attr.aria-hidden]="true">
+              </i>
+              <i class="fa fa-caret-up"
+                 *ngIf="sectionsListIsShown"
+                 [attr.aria-hidden]="true">
+              </i>
+            </div>
+            <div *ngIf="sectionsListIsShown" class="oppia-mobile-collapsible-card-content">
+              <p class="study-guide-section-subtitle">
+                Sections of the study guide.
+              </p>
+              <div>
+                <ul class="oppia-study-guide-section-preview oppia-option-list nav-stacked nav-pills study-guide-sections-list">
+                  <li *ngFor="let section of sections; let index = index"
+                      [ngClass]="{'active': activeSectionIndex === index}"
+                      class="oppia-rule-block oppia-prevent-selection">
+                    <button (click)="changeActiveSectionIndex(index)"
+                            class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
+                            [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
+                      <oppia-summary-list-header [index]="index"
+                                                 [disableSorting]="true"
+                                                 [summary]="section.getHeadingText()"
+                                                 [shortSummary]="section.getHeadingText()"
+                                                 [isActive]="index === activeSectionIndex"
+                                                 [isDeleteAvailable]="sections.length > 1"
+                                                 (summaryDelete)="deleteSection($event.index, $event.event)">
+                      </oppia-summary-list-header>
+                    </button>
+                    <div *ngIf="activeSectionIndex === index" class="oppia-editor-card-section e2e-test-study-guide-section-{{ index }}-expanded">
+                      <oppia-study-guide-section-editor [section]="section"
+                                                        [index]="index"
+                                                        [isEditable]="isEditable">
+                      </oppia-study-guide-section-editor>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <button type="button"
+                      class="btn btn-add-study-guide-section skill-editor-add-btn e2e-test-add-study-guide-section"
+                      [disabled]="activeSectionIndex!==-1"
+                      (click)="openAddSectionModal()"
+                      [matTooltip]="activeSectionIndex !== -1 ? 'Please close any open sections before adding a new one.' : ''"
+                      [matTooltipDisabled]="activeSectionIndex === -1"
+                      matTooltipPosition="below">
+                + ADD SECTION
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+      <mat-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card" tabindex="0">
+        <div class="skill-card-header oppia-mobile-collapsible-card-header"
+             (click)="togglePreviewSkillCard()">
+          <h3>Skills</h3>
+          <i class="fa fa-caret-down"
+             *ngIf="!skillsListIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="skillsListIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div *ngIf="skillsListIsShown" class="oppia-mobile-collapsible-card-content">
+          <div *ngIf="!subtopic?.getSkillSummaries()?.length">
+            <span>There are no skills assigned to this subtopic.</span>
+          </div>
+          <div *ngIf="subtopic?.getSkillSummaries()?.length">
+            <div class="list-header">
+              <span>Name</span>
+              <span class="number-skills-header"># of Questions</span>
+            </div>
+            <div class="skills-list" cdkDropList (cdkDropListDropped)="drop($event)">
+              <div *ngFor="let skillSummary of subtopic?.getSkillSummaries();index as idx"
+                   class="skill-list-item"
+                   cdkDrag>
+                <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
+                <a *ngIf="!isSkillDeleted(skillSummary)"
+                   tabindex="0"
+                   [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
+                  {{ skillSummary.getDescription() }}
+                </a>
+                <div class="skill-options-box">
+                  <span tabindex="0" [attr.aria-label]="'Number of questions: ' + skillQuestionCountDict[skillSummary.getId()]">{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
+                  <i class="fa fa-ellipsis-v"
+                     tabindex="0"
+                     (click)="showSkillEditOptions(idx)"
+                     role="button"
+                     aria-label="More options"
+                     (keydown.enter)="showSkillEditOptions(idx)">
+                  </i>
+                </div>
+                <div class="skill-option-box"
+                     *ngIf="selectedSkillEditOptionsIndex === idx"
+                     (mouseleave)="showSkillEditOptions(null)"
+                     (click)="showSkillEditOptions(null)">
+                  <div class="skill-edit-option"
+                       tabindex="0"
+                       role="button"
+                       (keydown.enter)="removeSkillFromSubtopic(skillSummary)"
+                       (click)="removeSkillFromSubtopic(skillSummary)">
+                    <i class="fa fa-trash"></i>
+                    <span>Remove from subtopic</span>
+                  </div>
+                  <div class="skill-edit-option remove-from-topic-option"
+                       tabindex="0"
+                       role="button"
+                       (keydown.enter)="removeSkillFromTopic(skillSummary)"
+                       (blur)="showSkillEditOptions(null)"
+                       (click)="removeSkillFromTopic(skillSummary)">
+                    <i class="fa fa-trash"></i>
+                    <span>Remove from topic</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+    <div class="subtopic-right-box">
+      <div class="entity-count" tabindex="0">
+        <div class="skill-count">
+          <span class="skill-count-value">{{ skillIds?.length }}</span>
+          <span class="skill-count-text">Skills</span>
+        </div>
+        <div class="question-count">
+          <span class="question-count-value">{{ questionCount }}</span>
+          <span class="question-count-text">Questions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-subtopics-list-card,
+  .skills-card,
+  .uncategorized-skill-ids {
+    font-family: Roboto, Arial, sans-serif;
+    padding: 30px 55px 30px 45px;
+  }
+  .subtopic-content-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    width: 85%;
+  }
+  .show-subtopic-preview-button {
+    border-top: 1px solid #c1c1c1;
+    color: #419889;
+    font-size: 15px;
+    padding: 10px 0;
+    width: 100%;
+  }
+  .error-message {
+    color: #f00;
+    font-size: smaller;
+  }
+  .list-header {
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0 0;
+  }
+  .list-header span {
+    font-weight: bold;
+  }
+  .number-skills-header {
+    margin-right: 30px;
+  }
+  .skill-list-item {
+    background: white;
+    border-bottom: 1px solid #dbdbdb;
+    box-sizing: border-box;
+    cursor: move;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px 0;
+    position: relative;
+  }
+  .skill-list-item a {
+    color: inherit;
+    flex: 1;
+    overflow: hidden;
+    padding-left: 5px;
+    padding-right: 10px;
+    text-decoration: none;
+    word-wrap: break-word;
+  }
+  .skill-options-box {
+    margin-right: 14px;
+  }
+  .skill-options-box span {
+    margin-right: 42px;
+  }
+  .skill-option-box {
+    background-color: #e1dcdc;
+    border: 1px solid #000;
+    padding: 0;
+    position: absolute;
+    right: -6px;
+    width: 210px;
+    z-index: 1;
+  }
+  .skill-edit-option {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+  }
+  .remove-from-topic-option {
+    border-bottom: none;
+  }
+  .subtopic-left-box {
+    margin-right: 3%;
+    width: 50%;
+  }
+  .subtopic-thumbnail,
+  .subtopic-content, .subtopic-url-fragment {
+    margin: 20px 0;
+  }
+  .subtopic-html {
+    margin: 30px 0;
+  }
+  .add-skill-btn {
+    background-color: #008098;
+    color: #fff;
+    font-weight: bold;
+    margin: 15px 0;
+  }
+  .subtopic-right-box {
+    width: 35%;
+  }
+  .subtopics-list-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 7px 0;
+  }
+  .skill-card-header i {
+    display: none;
+  }
+  .subtopic-header-text {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
+  }
+  .topic-name {
+    color: #000;
+    cursor: pointer;
+  }
+  .entity-count {
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #aaaac1;
+    border-radius: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    height: 110px;
+    justify-content: center;
+    position: fixed;
+    width: 24%;
+  }
+  .skill-count,
+  .question-count {
+    border-right: 2px solid #aaaac1;
+    display: inline-block;
+    text-align: center;
+    width: 50%;
+  }
+  .edit-icon {
+    color: #595959;
+  }
+  .question-count {
+    border-right: none;
+  }
+  .skill-count-value,
+  .question-count-value,
+  .story-count-value {
+    display: block;
+    font-size: 26px;
+    font-weight: bold;
+    height: 40px;
+  }
+  .create-skill-container i {
+    color: #419889;
+    font-size: 30px;
+    width: 100%;
+  }
+  .create-skill-text {
+    color: #419889;
+  }
+  .subtopic-title p {
+    margin-bottom: 10px;
+  }
+  .subtopic-item-container {
+      border-radius: 4px;
+      margin: 0;
+      padding-top: 45px;
+  }
+  .subtopic-html-content {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 6px 12px;
+  }
+  .subtopic-skill-card {
+    margin-bottom: 30px;
+    margin-top: 64px;
+  }
+  .subtopic-card-heading {
+    margin-bottom: 0;
+    margin-left: 20px;
+    margin-top: 0;
+    padding-bottom: 4px;
+  }
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .skill-list-item:last-child {
+    border: none;
+  }
+  .skills-list.cdk-drop-list-dragging .skill-list-item:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  @media screen and (max-width: 1100px) {
+    .subtopic-left-box {
+      width: 55%;
+    }
+    .subtopic-right-box {
+      width: 40%;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .subtopic-content-box {
+      width: 100%;
+    }
+    .subtopic-left-box {
+      margin-right: 0;
+    }
+    .entity-count,
+    .subtopic-header-text {
+      display: none;
+    }
+    .subtopic-content {
+      margin-top: 25px;
+    }
+    .draggable-icon-indicator {
+      display: none;
+    }
+    .subtopic-left-box,
+    .subtopic-right-box {
+      width: 100%;
+    }
+    .subtopic-item-container {
+      padding: 0;
+    }
+    .oppia-subtopics-list-card {
+      padding: 20px 10px 15px;
+    }
+    .subtopic-card-heading {
+      margin: 0;
+      padding: 0;
+    }
+    .subtopic-skill-card {
+      display: block;
+      margin-bottom: 0;
+      margin-top: 40px;
+      padding: 0;
+    }
+    .skill-card-header i {
+      color: #000;
+      display: block;
+    }
+    .skill-card-header {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+    .skill-card-header h3 {
+      margin: 0;
+    }
+    .skill-option-box {
+      right: 30px;
+    }
+  }
+  .study-guide-section-subtitle {
+    color: #595959;
+    font-size: 13px;
+    font-style: italic;
+    padding-bottom: 12px;
+  }
+  .heading-text {
+    font-size: 16px;
+  }
+  .study-guide-sections-list {
+    position: relative;
+  }
+  .btn-add-study-guide-section {
+    background-color: #058ca6;
+    color: #fff;
+  }
+  .btn-show-preview {
+    border-top: 1px solid #c1c1c1;
+    color: #00645d;
+    font-size: 14px;
+    padding: 10px 0;
+  }
+  .oppia-rule-block:last-child {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+  .oppia-study-guide-sections-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-study-guide-sections-header i {
+    display: none;
+  }
+  .oppia-study-guide-section-preview-list {
+    display: block;
+  }
+  .oppia-study-guide-section-preview {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
+  .oppia-study-guide-section-preview > li {
+    display: block;
+    position: relative;
+  }
+  .nav-pills > li > button.oppia-rule-tab {
+    background: rgba(0,0,0,0.05);
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    border-radius: 0;
+    color: #444;
+    cursor: pointer;
+    outline: none;
+    padding: 7px 15px;
+    text-align: left;
+    width: 100%;
+  }
+  .nav-pills > li > button.oppia-rule-tab-disabled {
+    cursor: default;
+  }
+  .nav-pills > li:hover > button.oppia-rule-tab {
+    background: rgba(0,0,0,0.1);
+  }
+  .nav-pills > li:hover > button.oppia-rule-tab-disabled {
+    background: rgba(0,0,0,0.05);
+  }
+  .nav-pills > li.active > button.oppia-rule-tab-active {
+    background: rgba(5,140,166,0.1);
+    border-right: 0;
+    color: #333;
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-study-guide-sections-header i {
+      display: block;
+    }
+    .study-guide-section-content {
+      padding: 0;
+    }
+    .mat-card {
+      box-shadow: none;
+      padding: 0;
+    }
+  }
+</style>

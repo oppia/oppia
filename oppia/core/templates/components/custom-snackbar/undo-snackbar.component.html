@@ -1,0 +1,35 @@
+<div class="snackbar-container">
+  <div class="oppia-snackbar-message">
+    {{ message }}
+  </div>
+  <div class="oppia-action-buttons">
+    <button mat-button class="undo-button" (click)="onUndo()">Undo</button>
+    <button mat-button class="dismiss-button" (click)="onDismiss()">Dismiss</button>
+  </div>
+</div>
+<style>
+  .snackbar-container {
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .oppia-snackbar-message {
+    align-items: center;
+    display: flex;
+  }
+
+  .oppia-action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: space-evenly;
+  }
+
+  .undo-button {
+    color: #27b8a7;
+  }
+
+  .dismiss-button {
+    color: #bdbdbd;
+  }
+</style>

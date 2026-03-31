@@ -1,0 +1,33 @@
+<div class="improvements-tab-task-container">
+  <div class="improvements-tab-task-header">
+    <div class="improvements-tab-task-health-bar improvements-tab-critical">&nbsp;</div>
+    <div class="improvements-tab-task-overview">
+      <div class="improvements-tab-task-overview-title">Needs Guiding Responses</div>
+      <div class="improvements-tab-task-overview-summary">Provide feedback for answers that currently do not get any</div>
+    </div>
+  </div>
+  <div class="improvements-tab-task-body">
+    <div class="improvements-tab-task-details">
+      <div class="improvements-tab-task-details-header">Top answers with no feedback</div>
+
+      <oppia-visualization-sorted-tiles [data]="sortedTilesData"
+                                        [options]="sortedTilesOptions"
+                                        [totalFrequency]="sortedTilesTotalFrequency">
+      </oppia-visualization-sorted-tiles>
+
+      <div class="improvements-tab-task-actions">
+        <a (click)="navigateToStateEditor()">
+          Address Answers <i class="material-icons improvements-tab-east-icon">east</i>
+        </a>
+      </div>
+    </div>
+    <div class="improvements-tab-task-suggestions">
+      <div class="improvements-tab-suggestions-header">suggestions</div>
+      <div class="improvements-tab-suggestions-content">
+        <strong>Give direction</strong><br>
+        Address the most frequent wrong answers so that your learners can identify and fix errors in
+        their understanding.
+      </div>
+    </div>
+  </div>
+</div>

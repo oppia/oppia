@@ -1,0 +1,12 @@
+<span>
+  <span class="text-danger" *ngIf="availableParamNames.length === 0">
+    <em>No available parameters to follow. Please add one first.</em>
+  </span>
+
+  <span *ngIf="availableParamNames.length > 0">
+    <schema-based-editor [schema]="SCHEMA"
+                         [localValue]="localValue"
+                         (localValueChange)="updateValue($event)">
+    </schema-based-editor>
+  </span>
+</span>

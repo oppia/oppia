@@ -1,0 +1,59 @@
+<ng-template #popContent>
+  <oppia-feedback-popup (closePopover)="closePopover()"></oppia-feedback-popup>
+</ng-template>
+<ul class="nav navbar-nav oppia-navbar-nav float-end me-0">
+  <li class="nav-item">
+    <span tabindex="0"
+          class="nav-link e2e-test-share-exploration-button"
+          ngbTooltip="Share"
+          placement="bottom"
+          (click)="toggleAttributionModal()"
+          (keydown.enter)="toggleAttributionModal()">
+      <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">Share</span>
+    </span>
+  </li>
+  <li *ngIf="feedbackOptionIsShown"
+      placement="bottom-right"
+      [ngbPopover]="popContent"
+      triggers="manual"
+      (click)="togglePopover()"
+      (keydown.enter)="togglePopover()"
+      class="nav-item"
+      tabindex="0"
+      #feedbackPopOver="ngbPopover"
+      [autoClose]="false">
+    <div class="nav-link e2e-test-exploration-feedback-popup-link"
+       ngbTooltip="{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}" placement="bottom">
+      <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>
+    </div>
+  </li>
+  <li class="nav-item">
+    <a *ngIf="canEdit" href="/create/{{explorationId}}"
+       ngbTooltip="{{'I18N_PLAYER_EDIT_TOOLTIP' | translate}}" placement="bottom"
+       target="_blank" rel="noopener" class="nav-link">
+      <i class="fas fa-pen exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_EDIT_TOOLTIP' | translate }}</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <div tabindex="0"
+         *ngIf="username"
+         class="nav-link e2e-test-report-exploration-button"
+         ngbTooltip="{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}"
+         (click)="showFlagExplorationModal()"
+         (keydown.enter)="showFlagExplorationModal()"
+         placement="bottom">
+      <i class="fas fa-flag exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}</span>
+    </div>
+  </li>
+</ul>
+
+<style>
+  .exploration-player-navbar-icons {
+    font-size: 21px;
+    margin: 3px;
+  }
+</style>

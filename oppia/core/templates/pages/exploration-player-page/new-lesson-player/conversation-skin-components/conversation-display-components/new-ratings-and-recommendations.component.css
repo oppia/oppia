@@ -1,0 +1,161 @@
+oppia-new-ratings-and-recommendations .oppia-sign-up-button {
+  background-color: #00645c;
+  border-radius: 15px;
+  font-size: 1em;
+  margin-bottom: 25px;
+  min-width: max-content;
+  width: 154px;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-final-summary {
+  margin-bottom: 25px;
+  margin-top: 20px;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-final-ratings-header {
+  color: #333;
+  font-family: 'Capriola', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin: 20px 0 8px;
+  text-align: center;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-final-ratings {
+  margin: 0 auto 60px;
+  text-align: center;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-final-ratings-display {
+  color: #064b46;
+  letter-spacing: 10px;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-final-recommendations-header {
+  color: #333;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-final-recommendations-header-container {
+  text-align: center;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-recommended-activities-container {
+  padding-top: 10px;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-back-to-collection-container {
+  border: 1px solid #00645c;
+  border-radius: 40px;
+  margin: auto;
+  padding: 5px;
+  text-align: center;
+  width: 35%;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-back-to-collection {
+  color: #064b46;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-login-container {
+  background-color: #fff;
+  border-bottom: 2px solid #bbb;
+  border-top: 2px solid #bbb;
+  margin-bottom: 24px;
+  margin-top: 24px;
+  padding: 1.5em 2em;
+  padding-bottom: 0.5em;
+  text-align: center;
+  width: 100%;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-login-container .conversation-skin-login-text {
+  font-size: 0.8em;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-login-container .conversation-skin-congratulations-text {
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-login-container .conversation-skin-hide-sign-up-section-text {
+  color: #00645c;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-login-container .conversation-skin-login-button-text {
+  color: #00645c;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-login-container .conversation-skin-login-secondary-options {
+  display: flex;
+  justify-content: space-between;
+}
+
+oppia-new-ratings-and-recommendations .conversation-skin-login-secondary-options button {
+  background: none;
+  border: none;
+  cursor: default;
+  font-size: 0.8em;
+}
+
+oppia-new-ratings-and-recommendations .ratings-and-recommendations-exp-summary-tiles-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 24px;
+}
+
+oppia-new-ratings-and-recommendations .community-library-btn {
+  align-items: center;
+  background-color: #e8f1f0;
+  border: 1px solid #00645c;
+  border-radius: 4px;
+  border-width: 1px;
+  color: #00645c;
+  display: flex;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  height: 78px;
+  margin: auto;
+  margin-bottom: 15px;
+  padding: 16px;
+  width: 325px;
+}
+
+oppia-new-ratings-and-recommendations a:hover {
+  text-decoration: none;
+}
+
+oppia-new-ratings-and-recommendations .community-library-btn i {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+@media screen and (max-width: 959px) {
+  oppia-new-ratings-and-recommendations .conversation-skin-final-summary {
+    margin: 0 auto;
+    max-width: 650px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  oppia-new-ratings-and-recommendations .community-library-btn {
+    font-size: 13px;
+    width: 240px;
+  }
+
+  oppia-new-ratings-and-recommendations .community-library-btn i {
+    font-size: 18px;
+  }
+}

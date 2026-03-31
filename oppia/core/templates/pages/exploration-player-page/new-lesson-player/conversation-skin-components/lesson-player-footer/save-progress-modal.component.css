@@ -1,0 +1,91 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+oppia-save-progress-modal .new-save-progress-menu {
+  padding: 16px;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .checkpoint-status {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 32px 0;
+  width: 100%;
+}
+
+oppia-save-progress-modal .new-save-progress-menu h3 {
+  color: #00645c;
+  font-family: capriola, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .sign-in-box {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 30%;
+  justify-content: center;
+  width: 100%;
+}
+
+oppia-save-progress-modal.new-save-progress-menu .sign-in-box p {
+  margin: 10px 20px;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .sign-in-box .sign-in-text a {
+  color: #00645c;
+  text-decoration: underline;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .sign-in-box .create-account-btn {
+  background-color: #00645c;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  height: 38px;
+  margin-bottom: 12px;
+  width: 169px;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .uid-box {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 40%;
+  width: 100%;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .uid-box .oppia-tooltip-container {
+  width: 100%;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .uid-box .guide-text {
+  margin-top: 32px;
+  text-align: center;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .uid-box .copy-text {
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding-left: 20px;
+  text-align: left;
+  width: 100%;
+}
+
+oppia-save-progress-modal .new-save-progress-menu .save-progress-close-button {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}

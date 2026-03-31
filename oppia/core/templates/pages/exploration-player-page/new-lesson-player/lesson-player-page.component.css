@@ -1,0 +1,81 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.lesson-player-page-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.oppia-new-player-content {
+  background-color: #cadbda;
+  display: flex;
+  justify-content: flex-end;
+  min-height: calc(100vh - 96px);
+}
+
+.oppia-new-player-main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: calc(100% - 83px);
+}
+
+.conversation-wrapper {
+  align-items: flex-end;
+  display: flex;
+  flex: 1;
+  z-index: 0;
+}
+
+.conversation-wrapper::before {
+  background-image: url(/assets/images/background/conversation_skin.svg);
+  background-position: center;
+  content: '';
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -1;
+}
+
+.expanded-sidebar {
+  width: calc(100% - 243px);
+}
+
+oppia-new-conversation-skin {
+  width: 100%;
+}
+
+.card-navigation-control {
+  width: 100% ;
+}
+
+oppia-new-audio-bar {
+  z-index: 2;
+}
+
+oppia-player-header {
+  z-index: 2;
+}
+
+oppia-lesson-player-sidebar {
+  z-index: 3;
+}
+
+attribution-guide {
+  opacity: 0;
+}
+
+@media(max-width: 767px) {
+  .oppia-new-player-main-content {
+    width: 100vw;
+  }
+
+  .expanded-sidebar {
+    width: 100vw;
+  }
+}

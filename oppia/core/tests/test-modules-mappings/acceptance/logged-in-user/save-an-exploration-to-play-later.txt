@@ -1,0 +1,5 @@
+core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts
+core/templates/pages/exploration-editor-page/exploration-editor-page.module.ts
+core/templates/pages/exploration-player-page/exploration-player-page.module.ts
+core/templates/pages/learner-dashboard-page/learner-dashboard-page.module.ts
+core/templates/pages/library-page/library-page.module.ts

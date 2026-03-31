@@ -1,0 +1,65 @@
+<div *ngIf="learnerGroup" class="oppia-view-learner-group oppia-dashboard-view">
+  <div class="learner-group-card-container">
+    <div class="group-info-container">
+      <div class="group-info">
+        <div class="group-info-title">
+          <span>{{ learnerGroup.title }}</span>
+        </div>
+        <div class="group-info-description">
+          <span translate="I18N_LEARNER_GROUP_FACILITATOR_LABEL_TEXT"></span>: &nbsp;
+          <span *ngFor="let facilitator of learnerGroup.facilitatorUsernames">{{ facilitator }} &nbsp;</span>
+        </div>
+      </div>
+      <div class="group-cta-buttons-container">
+        <button class="btn btn-primary" (click)="viewLearnerGroupPreferences()" [innerHTML]="'I18N_LEARNER_GROUP_VIEW_PREFERENCES' | translate"></button>
+        <button class="btn btn-danger" (click)="exitLearnerGroup()" [innerHTML]="'I18N_LEAVE_LEARNER_GROUP' | translate"></button>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-dashboard-view-tabs-container">
+    <div class="oppia-dashboard-view-tabs">
+      <div class="oppia-dashboard-view-tabs-item"
+           (click)="setActiveTab(VIEW_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW)"
+           [ngClass]="{'active': isTabActive(VIEW_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW)}">
+        <span class="oppia-dashboard-view-tabs-item-text">
+          {{ 'I18N_LEARNER_GROUP_OVERVIEW_TAB' | translate }}
+        </span>
+      </div>
+      <div class="oppia-dashboard-view-tabs-item"
+           (click)="setActiveTab(VIEW_LEARNER_GROUP_TABS_I18N_IDS.ASSIGNED_SYLLABUS)"
+           [ngClass]="{'active': isTabActive(VIEW_LEARNER_GROUP_TABS_I18N_IDS.ASSIGNED_SYLLABUS)}">
+        <span class="oppia-dashboard-view-tabs-item-text">
+          {{ 'I18N_LEARNER_GROUP_ASSIGNED_SYLLABUS_TAB' | translate }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-dashboard-view-content-container">
+    <div *ngIf="activeTab === VIEW_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW">
+      <div class="learner-group-overview-summary-card">
+        <div class="learner-group-overview-summary-card-title">
+          <span translate="I18N_LEARNER_GROUP_VIEW_OVERVIEW_SUMMARY_TITLE"></span>
+        </div>
+        <div class="learner-group-overview-summary-card-content" *ngIf="learnerProgress">
+          <div class="assigned-stories-info">
+            <div class="stories-count">{{ getCompletedStoriesCountByLearner() }}</div>
+            <div>
+              <span translate="I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION"></span>
+            </div>
+          </div>
+          <div class="assigned-skills-info">
+            <div class="skills-count">{{ getMasteredSubtopicsCountOfLearner() }}</div>
+            <div>
+              <span translate="I18N_LEARNER_GROUP_SKILLS_MASTERED_SECTION"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="activeTab === VIEW_LEARNER_GROUP_TABS_I18N_IDS.ASSIGNED_SYLLABUS">
+      <oppia-learner-group-view-assigned-syllabus [learnerGroup]="learnerGroup"
+                                                  [learnerProgress]="learnerProgress">
+      </oppia-learner-group-view-assigned-syllabus>
+    </div>
+  </div>
+</div>

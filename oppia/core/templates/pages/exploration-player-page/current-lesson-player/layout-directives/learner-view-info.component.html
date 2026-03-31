@@ -1,0 +1,27 @@
+<ul class="nav navbar-nav oppia-navbar-breadcrumb">
+  <li>
+    <span class="oppia-navbar-breadcrumb-separator"></span>
+    <div class="lesson-info-section">
+      <h1 class="oppia-exploration-h1">
+        <span class="e2e-test-exploration-header oppia-exploration-header"
+              itemprop="description">
+          <span *ngIf="!isHackyExpTitleTranslationDisplayed()">
+            {{ explorationTitle }}
+          </span>
+          <span *ngIf="isHackyExpTitleTranslationDisplayed()">
+            {{ explorationTitleTranslationKey | translate }}
+          </span>
+        </span>
+      </h1>
+      <a class="oppia-topic-title" *ngIf="isLinkedToTopic == true"
+         [href]="getTopicUrl()">
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicName }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicNameTranslationKey | translate }}
+        </span>
+      </a>
+    </div>
+  </li>
+</ul>

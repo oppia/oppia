@@ -1,0 +1,17 @@
+<div class="modal-header">
+  <h3>
+    Select the misconception to tag to:
+  </h3>
+</div>
+<div class="modal-body new-subtopic-title-editor">
+  <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
+                                         [misconceptionFeedbackIsUsed]="tempMisconceptionFeedbackIsUsed"
+                                         [selectedMisconception]="tempSelectedMisconception"
+                                         [selectedMisconceptionSkillId]="tempSelectedMisconceptionSkillId"
+                                         [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
+  </oppia-question-misconception-selector>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
+  <button class="btn btn-success" [disabled]="tempSelectedMisconception === null" (click)="done()"> Done </button>
+</div>

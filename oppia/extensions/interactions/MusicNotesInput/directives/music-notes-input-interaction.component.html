@@ -1,0 +1,103 @@
+<div class="music-notes-input-container">
+  <div class="oppia-music-input-valid-note-area">
+    <button type="button"
+            class="btn btn-secondary oppia-music-input-btn oppia-music-input-play-btn"
+            (click)="playCurrentSequence()">
+      <span><i class="fas fa-play music-notes-play"></i></span>
+      <span [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY' | translate"></span>
+    </button>
+    <music-phrase-editor>
+    </music-phrase-editor>
+    <div class="oppia-music-input-note-choices">
+      <div *ngFor="let noteType of NOTE_TYPES"
+           class="note-choice"
+           [ngClass]="getNoteClass(noteType)"
+           cdkDrag
+           [cdkDragData]="{ noteType: noteType, isPalette: true }"
+           (cdkDragStarted)="onDragStart()"
+           (cdkDragEnded)="onDragEnd()">
+      </div>
+    </div>
+    <div class="oppia-music-input-staff"
+        #staffArea
+        cdkDropList
+        [cdkDropListConnectedTo]="[]"
+        (cdkDropListDropped)="onNoteDropped($event)">
+      <div *ngFor="let note of placedNotes"
+           class="placed-note"
+           [ngClass]="getNoteClass(note.type)"
+           cdkDrag
+           [cdkDragData]="getDragData(note)"
+           (cdkDragEnded)="onPlacedNoteDragEnd($event, note)">
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-music-input-control-buttons">
+    <button type="button"
+            class="btn btn-secondary oppia-music-input-btn"
+            (click)="playSequenceToGuess()"
+            [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE' | translate">
+    </button>
+    <div class="float-start">
+      <button type="button"
+              class="btn btn-secondary oppia-music-input-btn"
+              [disabled]="!interactionIsActive"
+              (click)="clearSequence()"
+              [innerHTML]="'I18N_INTERACTIONS_MUSIC_CLEAR' | translate">
+      </button>
+    </div>
+  </div>
+</div>
+<style>
+  .music-notes-input-container {
+    background: #fff;
+    padding: 8px;
+  }
+
+  .note-choice, .placed-note {
+    cursor: pointer;
+  }
+
+  .placed-note.cdk-drag-dragging {
+    z-index: 1000;
+  }
+
+  .placed-note {
+    left: 0;
+    position: absolute;
+    top: 0;
+    transform: translate(0, 0);
+  }
+
+  @media screen and (max-width: 1024px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 235px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 526px;
+    }
+  }
+
+  @media screen and (max-width: 425px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 289px;
+    }
+  }
+
+  @media screen and (max-width: 375px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 248px;
+    }
+  }
+  .music-notes-play {
+    padding-right: 5px;
+  }
+</style>

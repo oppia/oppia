@@ -1,0 +1,27 @@
+<strong>{{ options.title }}</strong>
+<table class="table">
+  <tr>
+    <th>{{ options.column_headers[0] }}</th>
+    <th>{{ options.column_headers[1] }}</th>
+    <th *ngIf="addressedInfoIsSupported">Addressed specifically?</th>
+  </tr>
+  <tr *ngFor="let row of data; index as index">
+    <td>
+      <a class="answer-rank" (click)="toggleAnswerVisibility(index)">Answer Set #{{ index + 1 }}</a>
+      <table class="item table item-table"
+             [hidden]="!answerVisible[index]">
+        <tr *ngFor="let item of row.answer">
+          <td class="answers">
+            <oppia-rte-output-display [rteString]="item">
+            </oppia-rte-output-display>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td class="answers">{{ row.frequency }}</td>
+    <td *ngIf="addressedInfoIsSupported">
+      <span *ngIf="row.isAddressed">Yes</span>
+      <span *ngIf="!row.isAddressed">No</span>
+    </td>
+  </tr>
+</table>

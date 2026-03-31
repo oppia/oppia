@@ -1,0 +1,603 @@
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the Editor tab in the exploration editor page.
+ */
+
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {JoyrideService} from 'ngx-joyride';
+import cloneDeep from 'lodash/cloneDeep';
+import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
+import {EditabilityService} from 'services/editability.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {RouterService} from '../services/router.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {InteractionData} from 'interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {Solution} from 'domain/exploration/solution.model';
+import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
+import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
+import {ExplorationWarningsService} from '../services/exploration-warnings.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {StateEditorRefreshService} from '../services/state-editor-refresh.service';
+import {LoaderService} from 'services/loader.service';
+import {GraphDataService} from '../services/graph-data.service';
+import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {VersionHistoryService} from '../services/version-history.service';
+import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+
+@Component({
+  selector: 'oppia-exploration-editor-tab',
+  templateUrl: './exploration-editor-tab.component.html',
+})
+export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
+  @Input() explorationIsLinkedToStory = false;
+
+  directiveSubscriptions = new Subscription();
+  misconceptionsBySkill: MisconceptionSkillMap = {};
+  TabName = '';
+  interactionIsShown = false;
+  _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
+  _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
+  tutorialInProgress = false;
+  explorationId = '';
+  stateName: string | null = null;
+  index: number = 0;
+  validationErrorIsShown: boolean = false;
+  joyRideSteps: string[] = [
+    'editorTabTourContainer',
+    'editorTabTourContentEditorTab',
+    'editorTabTourSlideStateInteractionEditorTab',
+    'editorTabTourStateResponsesTab',
+    'editorTabTourPreviewTab',
+    'editorTabTourSaveDraft',
+    'editorTabTourTutorialComplete',
+  ];
+
+  constructor(
+    private editabilityService: EditabilityService,
+    private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
+    private generateContentIdService: GenerateContentIdService,
+    private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private explorationStatesService: ExplorationStatesService,
+    private userExplorationPermissionsService: UserExplorationPermissionsService,
+    private stateEditorService: StateEditorService,
+    private explorationFeaturesService: ExplorationFeaturesService,
+    private routerService: RouterService,
+    public stateCardIsCheckpointService: StateCardIsCheckpointService,
+    private explorationInitStateNameService: ExplorationInitStateNameService,
+    private explorationWarningsService: ExplorationWarningsService,
+    private focusManagerService: FocusManagerService,
+    private stateEditorRefreshService: StateEditorRefreshService,
+    private loaderService: LoaderService,
+    private graphDataService: GraphDataService,
+    private joyride: JoyrideService,
+    private versionHistoryService: VersionHistoryService,
+    private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+    private pageContextService: PageContextService,
+    private skillBackendApiService: SkillBackendApiService,
+    private alertsService: AlertsService
+  ) {}
+
+  private smoothScrollTo(targetY: number, duration: number): void {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const step = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+
+      // Calculate and set the next scroll position.
+      if (elapsedTime < duration) {
+        // Use easeInOutQuad easing function for smooth animation.
+        const progress = elapsedTime / duration;
+        const easeProgress =
+          progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        window.scrollTo(0, startY + difference * easeProgress);
+        requestAnimationFrame(step);
+      } else {
+        // Ensure we arrive exactly at target.
+        window.scrollTo(0, targetY);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
+  startTutorial(): void {
+    this.tutorialInProgress = true;
+    this.joyride
+      .startTour({
+        steps: this.joyRideSteps,
+        stepDefaultPosition: 'top',
+        themeColor: '#212f23',
+      })
+      .subscribe(
+        value => {
+          // This code make the joyride visible over navbar
+          // by overriding the properties of joyride-step__holder class.
+          const joyrideStepHolder = document.querySelector<HTMLElement>(
+            '.joyride-step__holder'
+          );
+          if (joyrideStepHolder) {
+            joyrideStepHolder.style.zIndex = '1020';
+          }
+
+          const joyrideStepCounter = document.querySelector<HTMLElement>(
+            '.joyride-step__counter'
+          );
+          if (joyrideStepCounter) {
+            joyrideStepCounter.tabIndex = 0;
+          }
+
+          const joyrideTitle = document.querySelector<HTMLElement>(
+            '.e2e-test-joyride-title'
+          );
+          joyrideTitle?.focus();
+
+          if (value.number === 1) {
+            this.smoothScrollTo(0, 1000);
+          }
+
+          if (value.number === 2) {
+            this.smoothScrollTo(0, 1000);
+
+            const joyrideStepCounter = document.querySelector<HTMLElement>(
+              '.joyride-step__counter'
+            );
+            if (joyrideStepCounter) {
+              joyrideStepCounter.tabIndex = 0;
+            }
+
+            const joyrideTitle = document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title'
+            );
+            joyrideTitle?.focus();
+          }
+
+          if (value.number === 4) {
+            let idToScrollTo = true
+              ? this._ID_TUTORIAL_PREVIEW_TAB
+              : this._ID_TUTORIAL_STATE_INTERACTION;
+
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
+
+            const joyrideStepCounter = document.querySelector<HTMLElement>(
+              '.joyride-step__counter'
+            );
+            if (joyrideStepCounter) {
+              joyrideStepCounter.tabIndex = 0;
+            }
+
+            const joyrideTitle = document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title'
+            );
+            joyrideTitle?.focus();
+          }
+
+          if (value.number === 5) {
+            this.smoothScrollTo(0, 1000);
+          }
+
+          if (value.number === 6) {
+            let idToScrollTo = true
+              ? this._ID_TUTORIAL_PREVIEW_TAB
+              : this._ID_TUTORIAL_STATE_INTERACTION;
+
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
+
+            const joyrideStepCounter = document.querySelector<HTMLElement>(
+              '.joyride-step__counter'
+            );
+            if (joyrideStepCounter) {
+              joyrideStepCounter.tabIndex = 0;
+            }
+
+            const joyrideTitle = document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title'
+            );
+            joyrideTitle?.focus();
+          }
+        },
+        () => {},
+        () => {
+          this.siteAnalyticsService.registerFinishTutorialEvent(
+            this.explorationId
+          );
+          this.leaveTutorial();
+        }
+      );
+  }
+
+  // // Remove save from tutorial if user does not has edit rights for
+  // // exploration since in that case Save Draft button will not be
+  // // visible on the create page.
+  removeTutorialSaveButtonIfNoPermissions(): void {
+    this.userExplorationPermissionsService
+      .getPermissionsAsync()
+      .then(permissions => {
+        if (!permissions.canEdit) {
+          this.joyRideSteps = [
+            'editorTabTourContainer',
+            'editorTabTourContentEditorTab',
+            'editorTabTourSlideStateInteractionEditorTab',
+            'editorTabTourStateResponsesTab',
+            'editorTabTourPreviewTab',
+            'editorTabTourTutorialComplete',
+          ];
+        }
+      });
+  }
+
+  leaveTutorial(): void {
+    this.joyride.closeTour();
+    this.editabilityService.onEndTutorial();
+    this.stateTutorialFirstTimeService.markEditorTutorialFinished();
+    this.tutorialInProgress = false;
+  }
+
+  private getValidActiveStateName(): string {
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (!activeStateName) {
+      throw new Error('Expected active state name to be non-null.');
+    }
+    return activeStateName;
+  }
+
+  saveInteractionData(displayedValue: InteractionData): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveInteractionId(
+      activeStateName,
+      cloneDeep(displayedValue.interactionId ?? null)
+    );
+    this.stateEditorService.setInteractionId(
+      cloneDeep(displayedValue.interactionId ?? null)
+    );
+
+    this.explorationStatesService.saveInteractionCustomizationArgs(
+      activeStateName,
+      cloneDeep(displayedValue.customizationArgs)
+    );
+    this.stateEditorService.setInteractionCustomizationArgs(
+      cloneDeep(displayedValue.customizationArgs)
+    );
+  }
+
+  saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveInteractionAnswerGroups(
+      activeStateName,
+      cloneDeep(newAnswerGroups)
+    );
+
+    this.stateEditorService.setInteractionAnswerGroups(
+      cloneDeep(newAnswerGroups)
+    );
+    this.recomputeGraph();
+  }
+
+  saveInteractionDefaultOutcome(newOutcome: Outcome): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveInteractionDefaultOutcome(
+      activeStateName,
+      cloneDeep(newOutcome)
+    );
+
+    this.stateEditorService.setInteractionDefaultOutcome(cloneDeep(newOutcome));
+    this.recomputeGraph();
+  }
+
+  saveNextContentIdIndex(): void {
+    this.explorationNextContentIdIndexService.saveDisplayedValue();
+  }
+
+  saveSolution(displayedValue: Solution | SubtitledHtml): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveSolution(
+      activeStateName,
+      cloneDeep(displayedValue) as SubtitledHtml
+    );
+
+    this.stateEditorService.setInteractionSolution(
+      cloneDeep(displayedValue) as Solution
+    );
+  }
+
+  saveHints(displayedValue: Hint[]): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveHints(
+      activeStateName,
+      cloneDeep(displayedValue)
+    );
+
+    this.stateEditorService.setInteractionHints(cloneDeep(displayedValue));
+  }
+
+  saveSolicitAnswerDetails(displayedValue: boolean): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveSolicitAnswerDetails(
+      activeStateName,
+      cloneDeep(displayedValue)
+    );
+
+    this.stateEditorService.setSolicitAnswerDetails(cloneDeep(displayedValue));
+  }
+
+  navigateToState(stateName: string): void {
+    this.routerService.navigateToMainTab(stateName);
+  }
+
+  areParametersEnabled(): boolean {
+    return this.explorationFeaturesService.areParametersEnabled();
+  }
+
+  onChangeCardIsCheckpoint(): void {
+    const activeStateName = this.getValidActiveStateName();
+    let displayedValue = this.stateCardIsCheckpointService.displayed;
+    this.explorationStatesService.saveCardIsCheckpoint(
+      activeStateName,
+      cloneDeep(displayedValue)
+    );
+    this.stateEditorService.setCardIsCheckpoint(cloneDeep(displayedValue));
+    this.stateCardIsCheckpointService.saveDisplayedValue();
+  }
+
+  isEditable(): boolean {
+    return this.editabilityService.isEditable();
+  }
+
+  getStateContentPlaceholder(): string {
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (!activeStateName) {
+      return 'You can speak to the learner here, then ask them a question.';
+    }
+    if (activeStateName === this.explorationInitStateNameService.savedMemento) {
+      return (
+        'This is the first card of your exploration. Use this space ' +
+        'to introduce your topic and engage the learner, then ask ' +
+        'them a question.'
+      );
+    } else {
+      return 'You can speak to the learner here, then ask them a question.';
+    }
+  }
+
+  getStateContentSaveButtonPlaceholder(): string {
+    return 'Save Content';
+  }
+
+  addState(newStateName: string): void {
+    this.explorationStatesService.addState(newStateName, () => {});
+  }
+
+  refreshWarnings(): void {
+    this.explorationWarningsService.updateWarnings();
+  }
+
+  getLastEditedVersionNumberInCaseOfError(): number {
+    return (
+      this.versionHistoryService.fetchedStateVersionNumbers[
+        this.versionHistoryService.getCurrentPositionInStateVersionHistoryList()
+      ] ?? 0
+    );
+  }
+
+  populateMisconceptionsForState(skillId: string): void {
+    this.misconceptionsBySkill = {};
+    this.skillBackendApiService.fetchSkillAsync(skillId).then(
+      skillResponse => {
+        this.misconceptionsBySkill[skillResponse.skill.getId()] =
+          skillResponse.skill.getMisconceptions();
+        this.stateEditorService.setMisconceptionsBySkill(
+          this.misconceptionsBySkill
+        );
+        this.stateEditorService.onUpdateMisconceptions.emit();
+      },
+      error => {
+        this.alertsService.addWarning(error);
+      }
+    );
+  }
+
+  initStateEditor(): void {
+    this.stateName = this.stateEditorService.getActiveStateName();
+    this.stateEditorService.setStateNames(
+      this.explorationStatesService.getStateNames()
+    );
+    this.stateEditorService.setInQuestionMode(false);
+
+    let stateData = this.stateName
+      ? this.explorationStatesService.getState(this.stateName)
+      : null;
+    if (stateData && stateData.linkedSkillId) {
+      this.populateMisconceptionsForState(stateData.linkedSkillId);
+    }
+
+    if (this.stateName && stateData) {
+      // This.stateEditorService.checkEventListenerRegistrationStatus()
+      // returns true if the event listeners of the state editor child
+      // components have been registered.
+      // In this case 'stateEditorInitialized' is broadcasted so that:
+      // 1. state-editor directive can initialise the child
+      //    components of the state editor.
+      // 2. state-interaction-editor directive can initialise the
+      //    child components of the interaction editor.
+
+      if (
+        this.stateEditorService.checkEventListenerRegistrationStatus() &&
+        this.explorationStatesService.isInitialized()
+      ) {
+        let stateData = this.explorationStatesService.getState(this.stateName);
+        this.stateEditorService.onStateEditorInitialized.emit(stateData);
+      }
+
+      let content = this.explorationStatesService.getStateContentMemento(
+        this.stateName
+      );
+      if (content.html || stateData.interaction.id) {
+        this.interactionIsShown = true;
+      }
+
+      this.versionHistoryService.resetStateVersionHistory();
+      this.validationErrorIsShown = false;
+      this.versionHistoryService.insertStateVersionHistoryData(
+        this.versionHistoryService.getLatestVersionOfExploration(),
+        stateData,
+        ''
+      );
+
+      const latestVersion =
+        this.versionHistoryService.getLatestVersionOfExploration();
+      if (latestVersion !== null) {
+        this.versionHistoryBackendApiService
+          .fetchStateVersionHistoryAsync(
+            this.pageContextService.getExplorationId() ?? '',
+            stateData.name ?? '',
+            latestVersion
+          )
+          .then(response => {
+            if (response !== null) {
+              this.versionHistoryService.insertStateVersionHistoryData(
+                response.lastEditedVersionNumber,
+                response.stateInPreviousVersion,
+                response.lastEditedCommitterUsername
+              );
+            } else {
+              this.validationErrorIsShown = true;
+            }
+          });
+      }
+
+      this.loaderService.hideLoadingScreen();
+      // $timeout is used to ensure that focus acts only after
+      // element is visible in DOM.
+      setTimeout(() => this.windowOnload(), 100);
+    }
+
+    if (this.editabilityService.inTutorialMode()) {
+      this.startTutorial();
+    }
+  }
+
+  windowOnload(): void {
+    this.TabName = this.routerService.getActiveTabName();
+    if (this.TabName === 'main') {
+      this.focusManagerService.setFocus('oppiaEditableSection');
+    }
+    if (this.TabName === 'feedback') {
+      this.focusManagerService.setFocus('newThreadButton');
+    }
+    if (this.TabName === 'history') {
+      this.focusManagerService.setFocus('usernameInputField');
+    }
+  }
+
+  recomputeGraph(): void {
+    this.graphDataService.recompute();
+  }
+
+  saveStateContent(displayedValue: SubtitledHtml): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveStateContent(
+      activeStateName,
+      cloneDeep(displayedValue)
+    );
+    // Show the interaction when the text content is saved, even if no
+    // content is entered.
+    this.interactionIsShown = true;
+  }
+
+  saveLinkedSkillId(displayedValue: string): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.explorationStatesService.saveLinkedSkillId(
+      activeStateName,
+      cloneDeep(displayedValue)
+    );
+
+    this.stateEditorService.setLinkedSkillId(cloneDeep(displayedValue));
+    if (this.stateEditorService.getLinkedSkillId()) {
+      this.populateMisconceptionsForState(
+        this.stateEditorService.getLinkedSkillId() ?? ''
+      );
+    }
+    this.stateEditorService.onChangeLinkedSkillId.emit();
+  }
+
+  saveInapplicableSkillMisconceptionIds(displayedValue: string[]): void {
+    const activeStateName = this.getValidActiveStateName();
+    this.stateEditorService.setInapplicableSkillMisconceptionIds(
+      cloneDeep(displayedValue)
+    );
+    this.explorationStatesService.saveInapplicableSkillMisconceptionIds(
+      activeStateName,
+      displayedValue
+    );
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.stateEditorRefreshService.onRefreshStateEditor.subscribe(() => {
+        this.initStateEditor();
+      })
+    );
+
+    this.explorationStatesService.registerOnStatesChangedCallback(() => {
+      if (this.explorationStatesService.getStates()) {
+        this.stateEditorService.setStateNames(
+          this.explorationStatesService.getStateNames()
+        );
+      }
+    });
+
+    this.interactionIsShown = false;
+    this.removeTutorialSaveButtonIfNoPermissions();
+    this.generateContentIdService.init(
+      () => {
+        let indexToUse = this.explorationNextContentIdIndexService.displayed;
+        this.explorationNextContentIdIndexService.displayed += 1;
+        return indexToUse;
+      },
+      () => {
+        this.explorationNextContentIdIndexService.restoreFromMemento();
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}

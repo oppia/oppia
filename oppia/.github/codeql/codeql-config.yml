@@ -1,0 +1,14 @@
+name: "CodeQL Security Analysis"
+
+paths-ignore:
+  # TODO(#16763): The use of SHA-1 in this file causes CodeQL to throw the error
+  # "Use of a broken or weak cryptographic hashing algorithm on sensitive data."
+  # The results of the function using SHA-1 are stored in some places, but the
+  # function is not used for enciphering and preimage attacks are not a big risk
+  # for SHA-1. We can migrate to a stronger cryptographic algorithm, replacing
+  # all SHA-1, but that would require changes to the existing data we have.
+  - core/utils.py
+  # This file is ignored because it is a test file that represents an invalid
+  # merge conflict (and thus is not a valid Python file). Including it in the
+  # list of files to be scanned causes CodeQL to run into a parsing error.
+  - scripts/linters/test_files/invalid_merge_conflict.py

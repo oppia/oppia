@@ -1,0 +1,41 @@
+<h2>v0.0.1 (unminified)</h2>
+<p>For instructions: see the README file in /assets/scripts.</p>
+<p>
+  NB: When you complete an exploration the text "Exploration completed" should
+  appear in the paragraph below it. This checks that events are being sent from
+  the Oppia iframe to the containing page.
+</p>
+
+<script src="/assets/scripts/oppia-player-0.0.1.js"></script>
+<script src="/assets/scripts/embedding_tests.js"></script>
+
+<div>
+  <h3>Iframe embedding</h3>
+  <iframe src="/embed/exploration/12" width="700" height="600">
+  </iframe>
+</div>
+
+<div class="e2e-test-standard">
+  <h3>Standard embedding of the latest version</h3>
+  <oppia oppia-id="12"></oppia>
+</div>
+
+<div class="e2e-test-old-version">
+  <h3>Standard embedding of version 1 of the exploration with deferred loading</h3>
+  <oppia oppia-id="12" autoload="false" exploration-version="1"></oppia>
+</div>
+
+<div class="e2e-test-missing-id">
+  <h3>ERROR: No oppia id specified</h3>
+  <oppia></oppia>
+</div>
+
+<div class="e2e-test-invalid-id">
+  <h3>ERROR: 404 error</h3>
+  <oppia oppia-id="fake_id"></oppia>
+</div>
+
+<div class="e2e-test-invalid-id-deferred">
+  <h3>ERROR: 404 error with deferred loading</h3>
+  <oppia oppia-id="fake_id" autoload="false"></oppia>
+</div>

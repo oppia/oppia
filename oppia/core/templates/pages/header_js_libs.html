@@ -1,0 +1,19 @@
+<!-- NOTE: Please contact @vojtechjelinek or @srijanreddy98 before modifying the file.
+     This is to ensure that all footer/header libs are properly synced across these five files:
+     index.html, index.prod.html, header_css_libs.html, header_js_libs.html and footer_js_libs.html-->
+<% if (CAN_SEND_ANALYTICS_EVENTS) { %>
+  <!--
+    Note that gtag.js is downloaded for each script tag. However, the
+    downloaded files are different because we use different IDs in the
+    query parameters to download them.
+  -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<%= GA_ANALYTICS_ID %>"></script>
+
+  <!-- Google Tag Manager -->
+  <script async src="https://www.googletagmanager.com/gtm.js?id=<%= GTM_ANALYTICS_ID %>"></script>
+<% } %>
+<!-- This code is used for inserting webpack bundles
+    https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+<% for (var chunk in htmlWebpackPlugin.files.js) { %>
+  <link rel="preload" as="script" href="<%= htmlWebpackPlugin.files.js[chunk] %>">
+<% } %>

@@ -1,0 +1,5 @@
+core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts
+core/templates/pages/exploration-editor-page/exploration-editor-page.module.ts
+core/templates/pages/story-editor-page/story-editor-page.module.ts
+core/templates/pages/topic-editor-page/topic-editor-page.module.ts
+core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts

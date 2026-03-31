@@ -1,0 +1,746 @@
+<div class="improvements-tab-container">
+  <div class="improvements-tab-header-wrapper">
+    <div class="improvements-tab-header">
+      <div class="improvements-tab-overview">
+        <div class="improvements-tab-overview-header">
+          <h1 class="improvements-tab-header-title">Overview</h1>
+          <a class="improvements-tab-view-resolved-tasks" href="#">
+            <img class="improvements-tab-time-machine" [src]="timeMachineImageUrl">
+            <span class="improvements-tab-text">View Resolved Tasks</span>
+            <i class="material-icons improvements-tab-chevron-right-icon">
+              chevron_right
+            </i>
+          </a>
+        </div>
+        <div class="improvements-tab-overview-body">
+          <div class="improvements-tab-summary">
+            <div class="improvements-pending-summary">
+              <strong class="improvements-tab-count">
+                {{ getNumTasks() }}
+              </strong>
+              <p class="improvements-tab-units"
+                 [ngPlural]="getNumTasks()">
+                <ng-template ngPluralCase="one">
+                  Improvement pending
+                </ng-template>
+                <ng-template ngPluralCase="other">
+                  Total Improvements pending
+                </ng-template>
+              </p>
+            </div>
+            <div class="improvements-tab-exploration-health-summary"
+                 [ngClass]="['improvements-tab-' + getExplorationHealth()]">
+              <span class="improvements-tab-outer-dot">
+                <span class="improvements-tab-inner-dot">&nbsp;</span>
+              </span>
+              <p class="improvements-tab-exploration-health e2e-test-improvements-tab-health"
+                 [innerText]="getExplorationHealth()">
+              </p>
+            </div>
+          </div>
+          <ul class="improvements-tab-navigation" *ngIf="getNumTasks() > 0">
+            <li class="improvements-tab-navigation-item"
+                *ngIf="getNumExpLevelTasks() > 0">
+              <a class="improvements-tab-task-scope" href="#">
+                <span class="improvements-tab-dot-warning">&nbsp;</span>
+                <strong class="improvements-tab-scope-number">
+                  {{ getNumExpLevelTasks() }}
+                </strong>
+                <span class="improvements-tab-scope-content">
+                  exploration-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
+              </a>
+            </li>
+            <li class="improvements-tab-navigation-item"
+                *ngIf="getNumConceptLevelTasks() > 0">
+              <a class="improvements-tab-task-scope" href="#">
+                <span class="improvements-tab-dot-warning">&nbsp;</span>
+                <strong class="improvements-tab-scope-number">
+                  {{ getNumConceptLevelTasks() }}
+                </strong>
+                <span class="improvements-tab-scope-content">
+                  concept-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
+              </a>
+            </li>
+            <li class="improvements-tab-navigation-item" *ngIf="getNumCardLevelTasks() > 0">
+              <a class="improvements-tab-task-scope"
+                 href="#card-level-improvements"
+                 target="_self">
+                <span [ngClass]="'improvements-tab-dot-' + getExplorationHealth()">
+                  &nbsp;
+                </span>
+                <strong class="improvements-tab-scope-number">
+                  {{ getNumCardLevelTasks() }}
+                </strong>
+                <span class="improvements-tab-scope-content">
+                  card-level
+                </span>
+                <i class="material-icons improvements-tab-chevron-right-icon">
+                  chevron_right
+                </i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="improvements-tab-completion-rate">
+        <oppia-completion-graph [completionRate]="completionRate"></oppia-completion-graph>
+        <p class="improvements-tab-value">
+          {{ completionRateAsPercent }}
+        </p>
+        <p class="improvements-tab-label">
+          Exploration Completion Rate
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="improvements-tab-body">
+    <div class="improvements-tab-level"
+         *ngIf="getNumCardLevelTasks() > 0">
+      <div class="improvements-tab-level-header"
+           name="card-level-improvements">
+        card-level improvements
+      </div>
+      <hr>
+      <div *ngFor="let stateTasks of allStateTasks;index as index">
+        <div class="improvements-tab-state-groups e2e-test-improvements-tab-state-group"
+             *ngIf="getNumCardLevelTasksForState(stateTasks.stateName) > 0">
+          <div class="improvements-tab-state-header">
+            <div class="improvements-tab-collapse-arrow">
+              <a class="improvements-tab-collapse-arrow-button"
+                 (click)="toggleStateTasks(stateTasks.stateName)">
+                <i class="material-icons">
+                  keyboard_arrow_{{isStateTasksVisible(stateTasks.stateName) ? 'down' : 'up'}}
+                </i>
+              </a>
+            </div>
+            <div class="improvements-tab-state-details">
+              <div class="improvements-tab-state-link">
+                <a class="improvements-tab-state-link-a"
+                   (click)="navigateToStateEditor(stateTasks.stateName)">
+                  {{ stateTasks.stateName }}
+                </a>
+              </div>
+              <div class="improvements-tab-state-stats">
+                <div class="improvements-tab-state-retention">
+                  {{ getStateRetentionPercent(stateTasks.stateName) }} Current Retention
+                </div>
+                <div class="improvements-tab-state-num-issues">
+                  <strong>
+                    {{ getNumCardLevelTasksForState(stateTasks.stateName) }}
+                  </strong>
+                  <span [ngPlural]="getNumCardLevelTasksForState(stateTasks.stateName)">
+                    <ng-template ngPluralCase="one">issue found</ng-template>
+                    <ng-template ngPluralCase="other">issues found</ng-template>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="improvements-tab-state-body"
+               [hidden]="!(isStateTasksVisible(stateTasks.stateName))">
+            <oppia-needs-guiding-responses-task *ngIf="stateTasks.ngrTask.isOpen()"
+                                                [task]="stateTasks.ngrTask"
+                                                [stats]="stateTasks.supportingStats">
+            </oppia-needs-guiding-responses-task>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .improvements-tab-container {
+    background-color: #eee;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    overflow: scroll;
+    padding: 0;
+    width: 100%;
+  }
+
+  .improvements-tab-header-wrapper {
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    margin: auto;
+    width: 100%;
+  }
+
+  .improvements-tab-header {
+    align-items: center;
+    display: flex;
+    justify-content: start;
+    margin: auto;
+    max-width: 1238px;
+  }
+
+  .improvements-tab-completion-rate {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    height: 100px;
+    margin: 79px 0 50px 84px;
+    position: relative;
+    width: 184px;
+  }
+
+  .improvements-tab-completion-rate svg.completion-bar {
+    background: none;
+    flex-grow: 1;
+    height: 64px;
+    width: 128px;
+  }
+
+  .improvements-tab-completion-rate p.improvements-tab-value {
+    bottom: 35px;
+    color: rgba(0,0,0,0.54);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    height: 28px;
+    letter-spacing: 0;
+    line-height: 28px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    text-align: center;
+    vertical-align: bottom;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .improvements-tab-completion-rate p.improvements-tab-label {
+    color: rgba(0,0,0,0.54);
+    flex-grow: 0;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    height: 24px;
+    letter-spacing: 0;
+    line-height: 24px;
+    margin: 11px 0 0 0;
+    padding: 0;
+    text-align: center;
+    z-index: 1;
+  }
+
+  .improvements-tab-overview {
+    flex-grow: 1;
+    max-width: 774px;
+    padding: 39px 0 50px 0;
+  }
+
+  .improvements-tab-overview-header {
+    display: flex;
+    margin-bottom: 16px;
+  }
+
+  .improvements-tab-overview-header h1.improvements-tab-header-title {
+    color: rgba(0,0,0,0.87);
+    flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    height: 24px;
+    letter-spacing: 0.33px;
+    line-height: 24px;
+    margin: 0;
+    padding: 0;
+    text-transform: uppercase;
+  }
+
+  .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks {
+    color: #00829b;
+    display: inline-flex;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    height: 18px;
+    letter-spacing: 0;
+    line-height: 16px;
+    margin: 4px 0 2px 0;
+    text-decoration: none;
+  }
+
+  .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks :hover {
+    text-decoration: none;
+  }
+
+  .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks img.improvements-tab-time-machine {
+    display: inline-block;
+    height: 18px;
+    line-height: 18px;
+    margin-right: 10px;
+  }
+
+  .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks span.improvements-tab-text {
+    color: #00829b;
+    display: inline-block;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 16px;
+    padding: 1px 0;
+    text-transform: uppercase;
+  }
+
+  .improvements-tab-overview-header a.improvements-tab-view-resolved-tasks i.improvements-tab-chevron-right-icon {
+    display: inline-block;
+    font-size: 24px;
+    height: 18px;
+    line-height: 16px;
+    padding: 1px 0;
+    width: 16px;
+  }
+
+  .improvements-tab-overview-body {
+    background-color: #f5f5f5;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 2px;
+    box-sizing: border-box;
+    display: flex;
+    height: 121px;
+    margin: 0 6px 0 65px;
+    min-width: 502px;
+  }
+
+  .improvements-tab-summary {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 25px 17px 15px 17px;
+  }
+
+  .improvements-tab-summary div.improvements-pending-summary {
+    color: rgba(25,24,24,0.7);
+    display: inline-flex;
+    flex-grow: 1;
+    vertical-align: bottom;
+  }
+
+  .improvements-tab-summary div.improvements-pending-summary strong.improvements-tab-count {
+    display: inline-block;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    height: 32px;
+    letter-spacing: 0.37px;
+    line-height: 28px;
+    text-align: center;
+    width: 24px;
+  }
+
+  .improvements-tab-summary div.improvements-pending-summary p.improvements-tab-units {
+    display: inline-block;
+    flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.47px;
+    line-height: 19px;
+    margin: 6px 7px 7px 7px;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary {
+    display: inline-flex;
+    flex-grow: 0;
+    height: 21px;
+    line-height: 16px;
+    vertical-align: bottom;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary span.improvements-tab-outer-dot {
+    border-radius: 50%;
+    display: inline-block;
+    height: 16px;
+    margin: 3px 14px 3px 10px;
+    padding: 0;
+    width: 16px;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary span.improvements-tab-outer-dot span.improvements-tab-inner-dot {
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    margin: 3px;
+    padding: 0;
+    width: 10px;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary p.improvements-tab-exploration-health {
+    display: inline-block;
+    flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    height: 16px;
+    letter-spacing: 0.23px;
+    line-height: 16px;
+    margin: 3px 0 3px 0;
+    text-transform: uppercase;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-healthy span.improvements-tab-outer-dot {
+    background-color: rgba(65,152,137,0.37);
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-healthy span.improvements-tab-outer-dot span.improvements-tab-inner-dot {
+    background-color: #419848;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-healthy p.improvements-tab-exploration-health {
+    color: #419848;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-warning span.improvements-tab-outer-dot {
+    background-color: rgba(242,169,0,0.28);
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-warning span.improvements-tab-outer-dot span.improvements-tab-inner-dot {
+    background-color: #f2a900;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-warning p.improvements-tab-exploration-health {
+    color: #f2a900;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-critical span.improvements-tab-outer-dot {
+    background-color: rgba(209,11,35,0.28);
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-critical span.improvements-tab-outer-dot span.improvements-tab-inner-dot {
+    background-color: #d10b23;
+  }
+
+  .improvements-tab-summary div.improvements-tab-exploration-health-summary.improvements-tab-critical p.improvements-tab-exploration-health {
+    color: #d10b23;
+  }
+
+  .improvements-tab-navigation {
+    align-items: stretch;
+    border-left: 2px solid rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    height: 100%;
+    justify-content: stretch;
+    margin: 0;
+    padding: 0;
+    width: 212px;
+  }
+
+  .improvements-tab-navigation-item {
+    align-items: center;
+    background-color: #f5f5f5;
+    display: flex;
+    flex: 1 1 auto;
+    list-style: none;
+  }
+
+  .improvements-tab-navigation-item + .improvements-tab-navigation-item {
+    border-top: 2px solid rgba(0,0,0,0.06);
+  }
+
+  .improvements-tab-navigation-item a.improvements-tab-task-scope {
+    color: #00829b;
+    display: inline-flex;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.23px;
+    line-height: 16px;
+  }
+
+  .improvements-tab-navigation-item a.improvements-tab-task-scope:hover {
+    text-decoration: none;
+  }
+
+  .improvements-tab-navigation-item span.improvements-tab-dot-healthy {
+    background-color: #419848;
+    border-radius: 50%;
+    display: inline-block;
+    height: 8px;
+    margin: 4px 6px 4px 12px;
+    width: 8px;
+  }
+
+  .improvements-tab-navigation-item span.improvements-tab-dot-warning {
+    background-color: #f2a900;
+    border-radius: 50%;
+    display: inline-block;
+    height: 8px;
+    margin: 4px 6px 4px 12px;
+    width: 8px;
+  }
+
+  .improvements-tab-navigation-item span.improvements-tab-dot-critical {
+    background-color: #d10b23;
+    border-radius: 50%;
+    display: inline-block;
+    height: 8px;
+    margin: 4px 6px 4px 12px;
+    width: 8px;
+  }
+
+  .improvements-tab-navigation-item a.improvements-tab-task-scope strong.improvements-tab-scope-number {
+    display: inline-block;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-weight: bold;
+    width: 25px;
+  }
+
+  .improvements-tab-navigation-item a.improvements-tab-task-scope span.improvements-tab-scope-content {
+    display: inline-block;
+    width: 129px;
+  }
+
+  .improvements-tab-navigation-item a.improvements-tab-task-scope i.improvements-tab-chevron-right-icon {
+    display: inline-block;
+    font-size: 14px;
+    height: 9px;
+    width: 6px;
+  }
+
+  .improvements-tab-body {
+    background-color: #eee;
+    margin: 66px auto;
+    max-width: 1238px;
+    padding: 0;
+    width: 100%;
+  }
+
+  .improvements-tab-body hr {
+    margin: 0;
+  }
+
+  .improvements-tab-level {
+    margin-bottom: 31px;
+    margin-top: 67px;
+  }
+
+  .improvements-tab-level-header {
+    color: rgba(0, 0, 0, 0.87);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.333333px;
+    line-height: 23px;
+    margin-bottom: 17px;
+    text-transform: uppercase;
+  }
+
+  .improvements-tab-state-groups {
+    margin-left: 8px;
+    margin-top: 48px;
+  }
+
+  .improvements-tab-state-header {
+    display: flex;
+    margin-bottom: 19px;
+    margin-right: 362px;
+  }
+
+  .improvements-tab-collapse-arrow {
+    color: #000;
+    flex-grow: 0;
+    height: 100%;
+    width: 40px;
+  }
+
+  .improvements-tab-collapse-arrow-button {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    width: 24px;
+  }
+
+  .improvements-tab-state-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .improvements-tab-state-link {
+    color: #004c76;
+    flex-grow: 0;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: bold;
+    height: 21px;
+    letter-spacing: 0.36px;
+    line-height: 21px;
+  }
+
+  .improvements-tab-state-stats {
+    display: flex;
+    margin-top: 8px;
+  }
+
+  .improvements-tab-state-retention {
+    color: #686868;
+    flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.28px;
+    line-height: 16px;
+    text-align: left;
+  }
+
+  .improvements-tab-state-num-issues {
+    color: #686868;
+    flex-grow: 1;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: normal;
+    letter-spacing: 0.341333px;
+    line-height: 19px;
+    margin-right: 44px;
+    text-align: right;
+  }
+
+  .improvements-tab-state-groups hr {
+    border-top: 3px solid rgba(0, 0, 0, 0.12);
+    margin-right: 362px;
+  }
+
+  .improvements-tab-state-body {
+    margin-left: 48px;
+  }
+
+  .improvements-tab-task-container {
+    margin-bottom: 8px;
+    margin-top: 40px;
+  }
+
+  .improvements-tab-task-header {
+    display: flex;
+  }
+
+  .improvements-tab-task-health-bar {
+    height: 38px;
+    margin: 2px 26px 2px 0;
+    width: 10px;
+  }
+
+  .improvements-tab-task-health-bar.improvements-tab-critical {
+    background: #d10b23;
+  }
+
+  .improvements-tab-task-overview {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 25px;
+  }
+
+  .improvements-tab-task-overview-title {
+    color: rgba(0, 0, 0, 0.87);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    height: 21px;
+    letter-spacing: 0.375px;
+    line-height: 21px;
+  }
+
+  .improvements-tab-task-overview-summary {
+    color: rgba(0, 0, 0, 0.541327);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: normal;
+    height: 19px;
+    letter-spacing: 0.32px;
+    line-height: 19px;
+  }
+
+  .improvements-tab-task-body {
+    align-items: flex-start;
+    display: flex;
+  }
+
+  .improvements-tab-task-details {
+    background: #fff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.24);
+    flex-grow: 1;
+    margin-left: 28px;
+    margin-right: 62px;
+    padding: 22px 32px 40px 40px;
+  }
+
+  .improvements-tab-task-details-header {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
+  .improvements-tab-task-details .oppia-visualization-sorted-tiles {
+    margin: 24px 0 12px 0;
+  }
+
+  .improvements-tab-task-actions {
+    color: #00829b;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: bold;
+    letter-spacing: 0.28px;
+    line-height: 19px;
+    text-align: right;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .improvements-tab-task-actions .material-icons.improvements-tab-east-icon {
+    height: 13px;
+    line-height: 13px;
+  }
+
+  .improvements-tab-task-suggestions {
+    background: #e7ebec;
+    border: 1px solid #e0e0e0;
+    box-sizing: border-box;
+    flex-grow: 0;
+    width: 300px;
+  }
+
+  .improvements-tab-suggestions-header {
+    color: #303030;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.75px;
+    line-height: 15px;
+    margin: 16px 0 16px 20px;
+    text-transform: uppercase;
+  }
+
+  .improvements-tab-suggestions-content {
+    color: rgba(0, 0, 0, 0.541327);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    letter-spacing: 0.234375px;
+    line-height: 18px;
+    margin: 0 16px 16px 24px;
+  }
+</style>

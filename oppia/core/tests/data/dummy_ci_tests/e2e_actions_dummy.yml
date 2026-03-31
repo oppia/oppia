@@ -1,0 +1,12 @@
+name: End-to-End tests
+jobs:
+  e2e_test:
+    strategy:
+      matrix:
+        suite:
+          - name: threeWords
+          - name: fourWords
+    steps:
+      - name: Run E2E test ${{ matrix.suite }}
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_e2e_tests --suite=${{ matrix.suite }}

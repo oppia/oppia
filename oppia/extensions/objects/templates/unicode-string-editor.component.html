@@ -1,0 +1,29 @@
+<span *ngIf="!largeInput">
+  <span *ngIf="!active && !alwaysEditable">
+    {{ value }}
+    (<a href="#" onclick="return false;" (click)="openEditor()">Edit</a>)
+  </span>
+
+  <span *ngIf="active || alwaysEditable">
+    <input *ngIf="!largeInput" type="text" [(ngModel)]="value" (ngModelChange)="updateLocalValue($event)" class="form-control">
+    <button type="button" class="btn btn-secondary" *ngIf="!alwaysEditable" (click)="replaceValue(value)">
+      Close
+    </button>
+  </span>
+</span>
+
+<div *ngIf="largeInput">
+  <div *ngIf="!active && !alwaysEditable">
+    <textarea disabled="true">
+      {{ value }}
+    </textarea>
+    (<a href="#" onclick="return false;" (click)="openEditor()">Edit</a>)
+  </div>
+
+  <div *ngIf="active || alwaysEditable">
+    <textarea [(ngModel)]="value" (ngModelChange)="updateLocalValue($event)"></textarea>
+    <button type="button" class="btn btn-secondary"  *ngIf="!alwaysEditable" (click)="replaceValue(value)">
+      Close
+    </button>
+  </div>
+</div>

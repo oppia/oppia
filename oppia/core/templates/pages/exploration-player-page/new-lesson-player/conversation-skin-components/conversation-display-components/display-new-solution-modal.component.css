@@ -1,0 +1,50 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-learner-hint-and-solution-modal-title {
+  color: #0d48a1;
+  font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
+  font-size: 1.25em;
+  font-weight: 400;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.oppia-learner-hint-and-solution-modal-body {
+  word-wrap: break-word;
+}
+
+.oppia-learner-solution-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px;
+}
+
+.mat-button.oppia-learner-got-it-button {
+  align-items: center;
+  background-color: #00786d;
+  border: none !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  color: white;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 500;
+  height: 35px;
+  min-width: 0;
+  outline: none !important;
+  padding: 6px 12px;
+  text-transform: uppercase;
+}
+
+.mat-button.oppia-learner-got-it-button:hover {
+  background-color: #00655a;
+}
+
+.mat-button.oppia-learner-got-it-button:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}

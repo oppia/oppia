@@ -1,0 +1,45 @@
+<p class="oppia-mobile-back-to-parent" (click)="navigateToStoryEditor()">
+  <i class="fa fa-angle-left"></i>
+  <span class="story-node-breadcrumb">Back to Story</span>
+</p>
+<div class="story-chapter-name">
+  <span class="story-name e2e-test-back-to-story-editor-button" (click)="navigateToStoryEditor()">
+    {{ story.getTitle() }} /
+  </span>
+  <span class="chapter-name">
+    {{ node.getTitle() }}
+  </span>
+</div>
+<div *ngIf="node">
+  <oppia-story-node-editor [nodeId]="node.getId()"
+                           [thumbnailFilename]="node.getThumbnailFilename()"
+                           [thumbnailBgColor]="node.getThumbnailBgColor()"
+                           [outline]="node.getOutline()"
+                           [description]="node.getDescription()"
+                           [explorationId]="node.getExplorationId()"
+                           [outlineIsFinalized]="node.getOutlineStatus()"
+                           [destinationNodeIds]="node.getDestinationNodeIds()"
+                           [prerequisiteSkillIds]="node.getPrerequisiteSkillIds()"
+                           [acquiredSkillIds]="node.getAcquiredSkillIds()"
+                           [plannedPublicationDateMsecs]="node.getPlannedPublicationDateMsecs()">
+  </oppia-story-node-editor>
+</div>
+<style>
+  .story-node-breadcrumb {
+    margin-left: 2%;
+  }
+  .story-chapter-name {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
+  }
+  .story-name {
+    color: #666;
+    cursor: pointer;
+  }
+  @media screen and (max-width: 768px) {
+    .story-chapter-name {
+      display: none;
+    }
+  }
+</style>

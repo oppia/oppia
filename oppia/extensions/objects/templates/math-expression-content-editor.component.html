@@ -1,0 +1,22 @@
+<div *ngIf="!active && !alwaysEditable">
+  <textarea disabled="true">
+    {{localValue.label}}
+  </textarea>
+  (<a href="#" (click)="openEditor()">Edit</a>)
+</div>
+
+<div *ngIf="active || alwaysEditable">
+  <div>
+    <textarea [ngModel]="localValue.label" (ngModelChange)="debouncedUpdate$.next($event)" placeholder="Enter a math expression using LaTeX, e.g. '\frac{x}{y}'"></textarea>
+  </div>
+  <span tabindex="0">
+    Preview:
+    <span *ngIf="localValue.label" [oppiaMathJax]="localValue.label" [attr.aria-label]="localValue.label">
+    </span>
+  </span>
+  <span *ngIf="!localValue.label" [oppiaMathJax]="placeholderText" class="text-secondary">
+  </span>
+  <button type="button" class="btn btn-secondary"  *ngIf="!alwaysEditable" (click)="replaceValue(localValue.label)">
+    Close
+  </button>
+</div>

@@ -1,0 +1,343 @@
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the Exploration object factory.
+ */
+
+import {TestBed} from '@angular/core/testing';
+
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {
+  Exploration,
+  ExplorationBackendDict,
+} from 'domain/exploration/exploration.model';
+import {StateBackendDict, State} from 'domain/state/state.model';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {LoggerService} from 'services/contextual/logger.service';
+import {UrlInterpolationService} from '../utilities/url-interpolation.service';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
+import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
+
+describe('Exploration', () => {
+  let exploration: Exploration;
+  let ls: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
+  let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
+  let firstState: StateBackendDict;
+  let secondState: StateBackendDict;
+  let mockReadOnlyExplorationData: FetchExplorationBackendResponse;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe],
+    });
+    ls = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+
+    firstState = {
+      content: {
+        content_id: 'content',
+        html: 'content',
+      },
+      inapplicable_skill_misconception_ids: [],
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: '',
+            },
+          },
+          rows: {value: 1},
+          catchMisspellings: {
+            value: false,
+          },
+        },
+        default_outcome: {
+          dest: 'new state',
+          dest_if_really_stuck: null,
+          feedback: {} as SubtitledHtmlBackendDict,
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        id: 'TextInput',
+        solution: null,
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      classifier_model_id: null,
+      card_is_checkpoint: false,
+      linked_skill_id: null,
+    };
+    secondState = {
+      content: {
+        content_id: 'content',
+        html: 'more content',
+      },
+      inapplicable_skill_misconception_ids: [],
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          recommendedExplorationIds: {value: []},
+        },
+        default_outcome: {
+          dest: 'new state',
+          dest_if_really_stuck: null,
+          feedback: {} as SubtitledHtmlBackendDict,
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        id: 'EndExploration',
+        solution: null,
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      classifier_model_id: null,
+      card_is_checkpoint: false,
+      linked_skill_id: null,
+    };
+
+    mockReadOnlyExplorationData = {
+      can_edit: true,
+      exploration: {
+        init_state_name: 'Introduction',
+        param_changes: [],
+        param_specs: {},
+        states: {
+          'first state': firstState,
+          'second state': secondState,
+        },
+        title: 'Dummy Title',
+        language_code: 'en',
+        objective: 'Dummy Objective',
+        next_content_id_index: 4,
+      },
+      exploration_metadata: {
+        title: 'Dummy Title',
+        category: 'Dummy Category',
+        objective: 'Dummy Objective',
+        language_code: 'en',
+        tags: [],
+        blurb: 'Dummy Blurb',
+        author_notes: 'Dummy Notes',
+        states_schema_version: 0,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: true,
+        edits_allowed: true,
+      },
+      exploration_id: '1',
+      is_logged_in: true,
+      session_id: '0',
+      version: 0,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      record_playthrough_probability: 1,
+      draft_change_list_id: 1,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 0,
+      furthest_reached_checkpoint_state_name: '',
+      most_recently_reached_checkpoint_state_name: '',
+      most_recently_reached_checkpoint_exp_version: 1,
+      displayable_language_codes: ['en'],
+    };
+
+    const explorationDict: ExplorationBackendDict = {
+      title: 'My Title',
+      init_state_name: 'Introduction',
+      language_code: 'en',
+      auto_tts_enabled: false,
+      states: {
+        'first state': firstState,
+        'second state': secondState,
+      },
+      param_specs: {},
+      param_changes: [],
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      version: 1,
+      draft_change_list_id: 0,
+      next_content_id_index: 4,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        edits_allowed: true,
+      },
+    };
+
+    exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      ls,
+      urlInterpolationService
+    );
+    exploration.setInitialStateName('first state');
+    loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
+  });
+
+  it('should get the language code of an exploration', () => {
+    expect(exploration.getLanguageCode()).toBe('en');
+  });
+
+  it('should correctly get the content html', () => {
+    expect(exploration.getUninterpolatedContentHtml('first state')).toEqual(
+      'content'
+    );
+  });
+
+  it('should correctly get the interaction from an exploration', () => {
+    expect(exploration.getInteraction('first state')).toEqual(
+      Interaction.createFromBackendDict(firstState.interaction)
+    );
+    expect(exploration.getInteraction('second state')).toEqual(
+      Interaction.createFromBackendDict(secondState.interaction)
+    );
+
+    expect(exploration.getInteraction('invalid state')).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: ' + 'invalid state'
+    );
+  });
+
+  it('should correctly get the interaction id from an exploration', () => {
+    expect(exploration.getInteractionId('first state')).toBe('TextInput');
+    expect(exploration.getInteractionId('second state')).toBe('EndExploration');
+
+    expect(exploration.getInteractionId('invalid state')).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: ' + 'invalid state'
+    );
+  });
+
+  it(
+    'should correctly get the interaction customization args from an' +
+      ' exploration',
+    () => {
+      expect(
+        exploration.getInteractionCustomizationArgs('invalid state')
+      ).toBeNull();
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        'Invalid state name: ' + 'invalid state'
+      );
+
+      expect(
+        exploration.getInteractionCustomizationArgs('first state')
+      ).toEqual({
+        placeholder: {
+          value: new SubtitledUnicode('', 'ca_placeholder_0'),
+        },
+        rows: {
+          value: 1,
+        },
+        catchMisspellings: {
+          value: false,
+        },
+      });
+      expect(
+        exploration.getInteractionCustomizationArgs('second state')
+      ).toEqual({
+        recommendedExplorationIds: {
+          value: [],
+        },
+      });
+    }
+  );
+
+  it('should correctly check when an exploration has inline display mode', () => {
+    expect(exploration.isInteractionInline('first state')).toBe(true);
+    expect(exploration.isInteractionInline('first state')).toBe(true);
+
+    expect(exploration.isInteractionInline('invalid state')).toBe(true);
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: invalid state'
+    );
+  });
+
+  it('should get and set initial state of an exploration', () => {
+    expect(exploration.getInitialState()).toEqual(
+      State.createFromBackendDict('first state', firstState)
+    );
+
+    exploration.setInitialStateName('second state');
+    expect(exploration.getInitialState()).toEqual(
+      State.createFromBackendDict('second state', secondState)
+    );
+  });
+
+  it(
+    'should get author recommended exploration ids according by if state' +
+      ' is terminal in an exploration',
+    () => {
+      expect(exploration.isStateTerminal('first state')).toBe(false);
+      expect(() => {
+        exploration.getAuthorRecommendedExpIds('first state');
+      }).toThrowError(
+        'Tried to get recommendations for a non-terminal state: ' +
+          'first state'
+      );
+
+      expect(exploration.isStateTerminal('second state')).toBe(true);
+      expect(exploration.getAuthorRecommendedExpIds('second state')).toEqual(
+        []
+      );
+    }
+  );
+
+  it('should return correct list of translatable objects', () => {
+    expect(exploration.getTranslatableObjects().length).toEqual(2);
+  });
+
+  it(
+    'should create a exploration for given exploration' + 'backend response',
+    () => {
+      const responseExploration =
+        Exploration.createFromExplorationBackendResponse(
+          mockReadOnlyExplorationData,
+          ls,
+          urlInterpolationService
+        );
+
+      expect(responseExploration.getLanguageCode()).toBe('en');
+      expect(responseExploration.getInteraction('first state')).toEqual(
+        Interaction.createFromBackendDict(firstState.interaction)
+      );
+      expect(responseExploration.getInteraction('second state')).toEqual(
+        Interaction.createFromBackendDict(secondState.interaction)
+      );
+      expect(responseExploration.getInteraction('invalid state')).toBeNull();
+    }
+  );
+});

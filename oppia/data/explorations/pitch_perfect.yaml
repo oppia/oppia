@@ -1,0 +1,3457 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Music
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Pitch Trainer-1
+language_code: en
+objective: practice listening to and transcribing musical pitches
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Choice from Interval-1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Where would you like to go next?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_4
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Continue with the Interval Trainer.</p>
+          - content_id: ca_choices_6
+            html: <p>Go back to the Pitch Trainer.</p>
+          - content_id: ca_choices_7
+            html: <p>Move on to the Melody Trainer.</p>
+          - content_id: ca_choices_8
+            html: <p>No, thanks. I'm done for now.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Interval Trainer-2
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's keep matching intervals for now.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Choice from Interval-2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Where would you like to go from here?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Interval Trainer-3
+          feedback:
+            content_id: feedback_1
+            html: <p>Practice makes perfect!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>Now it's getting interesting!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_3
+            html: <p>I already miss you...</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_4
+            html: <p>Sounds good to me!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Continue with Interval Trainer.</p>
+          - content_id: ca_choices_6
+            html: <p>Go to Pitch Trainer.</p>
+          - content_id: ca_choices_7
+            html: <p>Go to Melody Trainer.</p>
+          - content_id: ca_choices_8
+            html: <p>No thanks, I'm done for now</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Interval Trainer-3
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's keep matching intervals for now.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Choice from Interval-3:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>You've really come a long way. Where would you like to go next?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_1
+            html: <p>I think you can handle this. You ears are definitely warmed up
+              now.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>Good choice. It's always smart to review what you've learned.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: <p>Good choice. It's always smart to review what you've learned.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_4
+            html: <p>So long, farewell, auf Wiedersehen, good night!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Move on to Melody Trainer.</p>
+          - content_id: ca_choices_6
+            html: <p>Go to Pitch Trainer.</p>
+          - content_id: ca_choices_7
+            html: <p>Restart Interval Trainer.</p>
+          - content_id: ca_choices_8
+            html: <p>No thanks, I'm done for now.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Melody Trainer-1
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's move on to the Melody Trainer.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Choice from Melody-1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Where would you like to go?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Melody Trainer-2
+          feedback:
+            content_id: feedback_1
+            html: <p>Now we're cookin!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: "<p>Good choice. It never hurts to do a recap.\xC2\_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_3
+            html: <p>Good choice. It never hurts to do a recap.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_4
+            html: <p>You should be proud. You've come a long way from where we started.
+              Come back anytime!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Continue with the Melody Trainer.</p>
+          - content_id: ca_choices_6
+            html: <p>Go to the Interval Trainer.</p>
+          - content_id: ca_choices_7
+            html: <p>Go to the Pitch Trainer.</p>
+          - content_id: ca_choices_8
+            html: <p>No, thanks. I'm done for now.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Melody Trainer-2
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's keep matching melodies.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Choice from Melody-2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Great job! That's as far as we're going to go with this exploration,
+        but there's still a lot more you can learn. Next time you hear a song on the
+        radio, try to pick out intervals that sound familiar. Just remember, ear training
+        is a life long journey and you'll get significantly better at it with just
+        a little effort. Thanks for playing!</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_1
+            html: <p>Good choice. It's always a good idea to go over things you've
+              learned.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_2
+            html: <p>Good choice. It's always a good idea to go over things you've
+              learned.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Choice from Melody-2
+          feedback:
+            content_id: feedback_3
+            html: <p>Good choice. It's always a good idea to go over things you've
+              learned.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_4
+            html: <p>Thanks for hanging around and flexing your ear muscles. See you
+              next time!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Replay Melody Trainer.</p>
+          - content_id: ca_choices_6
+            html: <p>Go to Interval Trainer.</p>
+          - content_id: ca_choices_7
+            html: <p>Go to Pitch Trainer.</p>
+          - content_id: ca_choices_8
+            html: <p>I'm done for now.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Interval Trainer-1
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's review some intervals.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Choice from Pitch-2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>You're getting the hang of this! The world is your oyster, where do
+        you want to go?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_1
+            html: <p>Sounds like a plan.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>Now your ears are getting warmed up!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: <p>Bold move. I like your style.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_4
+            html: <p>Thanks for stopping by! Come back anytime.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Continue with Pitch Trainer.</p>
+          - content_id: ca_choices_6
+            html: "<p>Move on to Interval Trainer.\xC2\_</p>"
+          - content_id: ca_choices_7
+            html: <p>Go to Melody Trainer.</p>
+          - content_id: ca_choices_8
+            html: <p>No thanks, I'm done for now.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Pitch Trainer-3
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's keep matching pitches for now.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Choice from Pitch-3:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Alright you've got that down pretty well. What do you want to try next?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_1
+            html: <p>Sounds good to me. This is getting exciting!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>I think you can handle this now. Your ears are all warmed up.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: <p>Sounds good to me. Practice makes perfect!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_4
+            html: <p>Thanks for playing. We look forward to seeing you next time!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Move on to Interval Trainer.</p>
+          - content_id: ca_choices_6
+            html: <p>Move on to Melody Trainer.</p>
+          - content_id: ca_choices_7
+            html: <p>Replay Pitch Trainer.</p>
+          - content_id: ca_choices_8
+            html: <p>No thanks, I'm done for now.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Interval Trainer-1
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's move on to the Interval Trainer.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  Choice-1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Now that you have an idea of how this is going to work, where do you
+        want to go with it? I think its best to start with individual pitches, then
+        move to intervals, and work with melodies last after your ears have warmed
+        up. You, however, are a free thinking individual, and should go wherever your
+        heart desires. Where would you like to boldly go?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_1
+            html: "<p>Sounds good to me.\xC2\_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>Let's do this!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: <p>Bold move. I like your style.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_4
+            html: <p>Thanks for playing! Come back anytime.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>Pitch Trainer</p>
+          - content_id: ca_choices_6
+            html: <p>Interval Trainer</p>
+          - content_id: ca_choices_7
+            html: <p>Melody Trainer</p>
+          - content_id: ca_choices_8
+            html: <p>No thanks, I'm done for now.</p>
+        showChoicesInShuffledOrder:
+          value: false
+      default_outcome:
+        dest: Pitch Trainer-2
+        feedback:
+          content_id: default_outcome
+          html: <p>Let's keep matching pitches for now.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    next_content_id_index: 9
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  Interval Trainer-1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Great job! If you can match one note, it shouldn't be hard to match\
+        \ two, right? Two notes make up what is called an interval. There are a few\
+        \ different kinds but you don't have to worry about remembering them all just\
+        \ yet. Let's just start with a few common ones.\xC2\_</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice from Interval-1
+          feedback:
+            content_id: feedback_1
+            html: <p>Perfect! In fact, this interval is called a Perfect Fifth. I
+              like to use familiar songs to remember the way intervals sound. Can
+              you think of a melody that starts with these two notes? The Star Wars
+              theme is good example.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>Oops! There are too many notes on the staff. Melodies are just
+              around the corner.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 2
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: <p>You're getting close. One of the notes in your sequence is incorrect.
+              Listen to the desired sequence and compare it to yours. Once you find
+              the note that doesn't match, move it to the desired pitch.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+          rule_type: IsEqualToExceptFor
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_4
+            html: <p>This is the right interval, just not the right pitches. We call
+              this a transposition of the original sequence. Try moving both notes
+              up just a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            y: -4
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_5
+            html: <p>This is the right interval, just not the right pitches. We call
+              this a transposition of the original sequence. Try moving both notes
+              up just a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            y: -2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_6
+            html: <p>This is the right interval, just not the right pitches. We call
+              this a transposition of the original sequence. Try moving both notes
+              down just a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            y: 1
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_7
+            html: <p>This is the right interval, just not the right pitches. We call
+              this a transposition of the original sequence. Try moving both notes
+              down just a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            y: 3
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_8
+            html: <p>This is the right interval, just not the right pitches. We call
+              this a transposition of the original sequence. Try moving both notes
+              down just a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            y: 5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_9
+            html: <p>This is the right interval, just not the right pitches. We call
+              this a transposition of the original sequence. Try moving both notes
+              down a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            y: 8
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-1
+          feedback:
+            content_id: feedback_10
+            html: <p>This is the right interval, just not the right pitches. We call
+              this a transposition of the original sequence. Try moving both notes
+              down a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            y: 10
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: B4
+      default_outcome:
+        dest: Interval Trainer-1
+        feedback:
+          content_id: default_outcome
+          html: "<p>Not quite there yet. Listen to the desired sequence again and\
+            \ make your selection. You can compare it with your note as many times\
+            \ as you like using the play buttons.\xC2\_</p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 11
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+  Interval Trainer-2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>You've come a long way! Let's keep it up and see where it takes us.
+        Listen to the desired interval and try to match it on the staff.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice from Interval-2
+          feedback:
+            content_id: feedback_1
+            html: <p>Very good, you'll be a pro in no time! This interval is called
+              a Perfect Fourth. I like to remember it as the first two notes of the
+              melody for "Here Comes the Bride".</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_2
+            html: <p>Oops! There are too many notes on the staff. Remember, an interval
+              is made up of only two notes.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 2
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_3
+            html: <p>You're getting close. One of the notes in your sequence is incorrect.
+              Listen to the desired sequence and compare it to yours. Once you find
+              the note that doesn't match, move it to the desired pitch.<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+          rule_type: IsEqualToExceptFor
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_4
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes up a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -9
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_5
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes up a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -7
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_6
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes up a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_7
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes up just a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_8
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes down just a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: 2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_9
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes down a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: 3
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-2
+          feedback:
+            content_id: feedback_10
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes down a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: 5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: A4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: D5
+      default_outcome:
+        dest: Interval Trainer-2
+        feedback:
+          content_id: default_outcome
+          html: <p>It's okay, practice makes perfect. Try as many times as you like.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 11
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+  Interval Trainer-3:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Great! Now that we have a good feel for the Perfect intervals, let's
+        try something a bit more challenging. Listen to the desired interval and try
+        to match it on the staff.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice from Interval-3
+          feedback:
+            content_id: feedback_1
+            html: "<p>Well done! That interval is called a Major Sixth. Some people\
+              \ remember it as the first two notes of \"My bonnie lies over the ocean\"\
+              , but I remember it as the first two of the three \"NBC Chimes\".\xC2\
+              \_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-3
+          feedback:
+            content_id: feedback_2
+            html: <p>Oops! There are too many notes on the staff. Remember, an interval
+              is made up of only two notes.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 2
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-3
+          feedback:
+            content_id: feedback_3
+            html: <p>You've very close. One of the notes in your sequence is still
+              off. Listen to the desired sequence again and compare it to yours. Once
+              you find the note that doesn't match, move it to the desired pitch.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+          rule_type: IsEqualToExceptFor
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-3
+          feedback:
+            content_id: feedback_4
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes down a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            y: 2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-3
+          feedback:
+            content_id: feedback_5
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes down a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            y: 5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-3
+          feedback:
+            content_id: feedback_6
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right pitches. We call this a transposition of the original sequence.
+              Try moving both notes down a bit.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            y: 7
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Interval Trainer-3
+          feedback:
+            content_id: feedback_7
+            html: <p>You're ear is pretty good! This is the right interval, just not
+              the right octave. An octave is 7 scale steps, either up or down, from
+              a given note. We call this a transposition of the original sequence.
+              Try moving both notes down an octave.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A4
+            y: 12
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: C4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: A4
+      default_outcome:
+        dest: Interval Trainer-3
+        feedback:
+          content_id: default_outcome
+          html: "<p>Not quite there yet. Listen to the desired sequence again and\
+            \ make your selection. You can compare it with your note as many times\
+            \ as you like using the play buttons.\xC2\_</p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+  Melody Trainer-1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Well you've traveled far, haven't you? Let's try our ears at a few
+        melodies. Don't worry about the rhythm for now, we're just going to focus
+        on matching the pitches. Listen to the desired sequence and match them on
+        the staff.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice from Melody-1
+          feedback:
+            content_id: feedback_1
+            html: <p>You got it! This is the first phrase of the "Simpson's Theme"
+              or "Maria", if you like West Side Story. The first two notes are called
+              a tritone. I like to sing this melody in my head when I'm trying to
+              remember what an tritone sounds like.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>There are too many notes on the staff. Compare your sequence
+              with the desired sequence to hear where you've added an extra note.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 3
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: <p>There aren't enough notes on the staff yet. Compare your sequence
+              with the desired sequence to hear where you should add a note.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            a: 1
+            b: 2
+          rule_type: HasLengthInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_4
+            html: "<p>You're very close. One of the notes in your sequence is not\
+              \ correct. Listen to the desired sequence and compare it to yours. Once\
+              \ you find the note that doesn't match, move it to the desired pitch.\xC2\
+              \_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+          rule_type: IsEqualToExceptFor
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_5
+            html: "<p>You've got quite an ear on you. That is the right melody but\
+              \ it's been transposed down a Perfect Fourth. Try moving all the notes\
+              \ up a bit.\xC2\_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            y: -5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-1
+          feedback:
+            content_id: feedback_6
+            html: "<p>You've got quite an ear on you. That is almost the right melody\
+              \ but it's been transposed down a Perfect Fourth and there is one note\
+              \ still not right. Try moving all the notes up a bit and then comparing\
+              \ your sequence with the desired sequence to find the wrong note.\xC2\
+              \_</p>"
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: B4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            y: 5
+          rule_type: IsTranspositionOfExceptFor
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: F4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: B4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: C5
+      default_outcome:
+        dest: Melody Trainer-1
+        feedback:
+          content_id: default_outcome
+          html: <p>Try again. Listen to the desired sequence and make your selection.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+  Melody Trainer-2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>You've got the hang of it! Let's try another melody. Listen to the\
+        \ desired sequence and try to match it on the staff. \xC2\_</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice from Melody-2
+          feedback:
+            content_id: feedback_1
+            html: <p>Well done! This is the first five notes of Beethoven's 3rd symphony.
+              The first two notes are a Major Third and I like to use this melody
+              to remember the way it sounds.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: G4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-2
+          feedback:
+            content_id: feedback_2
+            html: <p>There are too many notes on the staff. Compare your sequence
+              with the desired sequence to hear where you've added an extra note.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 5
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-2
+          feedback:
+            content_id: feedback_3
+            html: <p>There aren't enough notes on the staff yet. Compare your sequence
+              with the desired sequence to hear where you should add a note.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            a: 1
+            b: 4
+          rule_type: HasLengthInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-2
+          feedback:
+            content_id: feedback_4
+            html: <p>You're very close. One of the notes in your sequence is still
+              off. Listen to the desired sequence and compare it to yours. Once you
+              find the note that doesn't match, move it to the desired pitch.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: G4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+          rule_type: IsEqualToExceptFor
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-2
+          feedback:
+            content_id: feedback_5
+            html: <p>That's some ear you've got on you! This is the right melody,
+              just not the right pitches. It's actually a Perfect Fourth lower. We
+              call this a transposition of the original melody. Try moving all the
+              notes up a Fourth.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: G4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            y: -5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-2
+          feedback:
+            content_id: feedback_6
+            html: <p>That's some ear you've got on you! This is the right melody,
+              just not the right pitches. It's actually a Perfect Fifth lower. We
+              call this a transposition of the original melody. Try moving all the
+              notes down a Fifth.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: G4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            y: -7
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Melody Trainer-2
+          feedback:
+            content_id: feedback_7
+            html: <p>That's some ear you've got on you! This is almost the right melody,
+              just not the right pitches and there is one note that is still off.
+              It's actually a Perfect Fouth higher. We call this a transposition of
+              the original melody. Try moving all the notes down a Fourth and then
+              compare your sequence to the desired sequence to find the note that
+              doesn't match up.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: G4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+            y: 5
+          rule_type: IsTranspositionOfExceptFor
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: C5
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E5
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: C5
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: G4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: C5
+      default_outcome:
+        dest: Melody Trainer-2
+        feedback:
+          content_id: default_outcome
+          html: <p>It's okay, keep trying and you'll get it soon.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 8
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+  Pitch Trainer-1:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>In this exploration, we're going to learn the basics of music theory.\
+        \ Now don't be afraid, it's not all that hard, and the good thing is, you've\
+        \ been training your ear for it your whole life.\_</p><p>\_</p><p>Music is\
+        \ made up of notes and rests. Listen to the desired sequence of notes by pressing\
+        \ the button, artfully named, \"Play Desired Sequence\", and then try to match\
+        \ it by dragging notes onto the staff.\_</p><p>\_</p><p>For now let's start\
+        \ small with just one note. Don't worry about getting it right the first time.\
+        \ Your ears will grow with time.</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice-1
+          feedback:
+            content_id: feedback_1
+            html: <p>That's right! That note is D5.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_2
+            html: <p>Oops! There are too many notes on the staff. Let's not get ahead
+              of ourselves just yet.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_3
+            html: <p>Your ear is pretty good! This is the right note, just the wrong
+              octave. An octave is 7 scale steps, either up or down, from a given
+              pitch. Try moving the note down an octave.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -12
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_4
+            html: <p>You're very close, just a little too high. Give it another shot!<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: 2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_5
+            html: <p>You're very close, just a little too high. Give it another shot!<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: 3
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_6
+            html: <p>Your choice is a bit too high. Give it another go!<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: 5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_7
+            html: <p>Your choice is a bit too high. Give it another go!<br></p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: 7
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_8
+            html: <p>You're very close, just a little too low. Give it another try!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_9
+            html: <p>You're very close, just a little too low. Give it another try!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -3
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_10
+            html: <p>Your choice is a bit too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_11
+            html: <p>Your choice is a bit too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -7
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_12
+            html: <p>Your choice is a bit too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -9
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_13
+            html: <p>Your choice is much too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -10
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-1
+          feedback:
+            content_id: feedback_14
+            html: <p>Your choice is much too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: D5
+            y: -14
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: D5
+      default_outcome:
+        dest: Pitch Trainer-1
+        feedback:
+          content_id: default_outcome
+          html: "<p>Not quite there yet. Listen to the desired sequence again and\
+            \ make your selection. You can compare it with your note as many times\
+            \ as you like using the play buttons.\xC2\_<br></p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 15
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+  Pitch Trainer-2:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: "<p>Listen to the desired note and make your selection. You can compare\
+        \ your note with the desired one as many times as you like before submitting.\xC2\
+        \_</p>"
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice from Pitch-2
+          feedback:
+            content_id: feedback_1
+            html: <p>Very good! You've done this before, haven't you?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_2
+            html: <p>Oops! There are too many notes on the staff. I can tell you're
+              excited, but don't worry, we'll get there.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_3
+            html: <p>Your ear is pretty good! This is the right note, just the wrong
+              octave. An octave is 7 scale steps, either up or down, from a given
+              pitch. Try moving the note up an octave.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 12
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_4
+            html: <p>Very close, you're just a bit too low. Give it another try!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: -1
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_5
+            html: <p>Very close, you're just a bit too low. Give it another try!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: -3
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_6
+            html: <p>Your choice is just a bit too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: -5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_7
+            html: <p>Very close, your choice is just a bit too high. Give it another
+              go!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_8
+            html: <p>Very close, your choice is just a bit too high. Give it another
+              shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 4
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_9
+            html: <p>Your choice is just a bit too high. Give it another go!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 6
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_10
+            html: <p>Your choice is just a bit too high. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 7
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_11
+            html: <p>Your choice is just a bit too high. Give it another go!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 9
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_12
+            html: <p>Your choice is much too high. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 11
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_13
+            html: <p>Your choice is much too high. Give it another go!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 14
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-2
+          feedback:
+            content_id: feedback_14
+            html: <p>Your choice is much too high. Give it another go!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: F4
+            y: 16
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: F4
+      default_outcome:
+        dest: Pitch Trainer-2
+        feedback:
+          content_id: default_outcome
+          html: "<p>Not quite there yet. Listen to the desired sequence again and\
+            \ make your selection. You can compare it with your note as many times\
+            \ as you like using the play buttons.\xC2\_</p>"
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 15
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+  Pitch Trainer-3:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Let's match one last pitch before we move on. Listen to the desired
+        note and make your selection. You may want to think outside of the box for
+        this one.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Choice from Pitch-3
+          feedback:
+            content_id: feedback_1
+            html: <p>You got it! When a note goes above or below the staff, the staff
+              is extended with what are called ledger lines.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_2
+            html: <p>Oops! There are too many notes on the staff. I can tell you're
+              excited, but don't worry, we'll get there.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            k: 1
+          rule_type: IsLongerThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_3
+            html: <p>Your ear is pretty good! this is the right note, just the wrong
+              octave. An octave is 7 scale steps, either up or down, from a given
+              pitch. Try moving the note up an octave.</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -12
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_4
+            html: <p>Very close, your choice is just a bit too low. Give it another
+              shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -2
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_5
+            html: <p>Very close, your choice is just a bit too low. Give it another
+              go!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -4
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_6
+            html: <p>Your choice is just a bit too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -5
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_7
+            html: <p>Your choice is just a bit too low. Give it another go!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -7
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_8
+            html: <p>Your choice is a bit too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -9
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_9
+            html: <p>Your choice is much too low. Give it another try!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -10
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_10
+            html: <p>Your choice is much too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -14
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_11
+            html: <p>Your choice is much too low. Give it another try!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -16
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_12
+            html: <p>Your choice is much too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -17
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_13
+            html: <p>Your choice is much too low. Give it another try!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -19
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Pitch Trainer-3
+          feedback:
+            content_id: feedback_14
+            html: <p>Your choice is much too low. Give it another shot!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: A5
+            y: -21
+          rule_type: IsTranspositionOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: A5
+      default_outcome:
+        dest: Pitch Trainer-3
+        feedback:
+          content_id: default_outcome
+          html: <p>It's okay, practice makes perfect. Try as many times as you like.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    next_content_id_index: 15
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_14: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+        feedback_8: {}
+        feedback_9: {}
+states_schema_version: 42
+tags: []
+title: Pitch Perfect

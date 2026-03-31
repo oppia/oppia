@@ -1,0 +1,482 @@
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""File for compiling and checking typescript."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+
+from scripts import common
+
+import yaml
+from typing import List, Optional, Sequence
+
+# Contains the name of all files that are not strictly typed.
+# This list must be kept up-to-date; the changes (only remove) should be done
+# manually.
+# Please keep the list in alphabetical order.
+# NOTE TO DEVELOPERS: do not add any new files to this list.
+# pylint: disable=line-too-long, single-line-pragma
+TS_STRICT_EXCLUDE_PATHS = [
+    'core/templates/base-components/base-content.component.spec.ts',
+    'core/templates/base-components/footer-donate-volunteer.component.spec.ts',
+    'core/templates/base-components/oppia-footer.component.spec.ts',
+    'core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts',
+    'core/templates/components/button-directives/hint-and-solution-buttons.component.spec.ts',
+    'core/templates/components/checkpoint-celebration-modal/checkpoint-celebration-modal.component.spec.ts',
+    'core/templates/components/code-mirror/codemirror-mergeview.component.spec.ts',
+    'core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.spec.ts',
+    'core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.spec.ts',
+    'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
+    'core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.spec.ts',
+    'core/templates/components/forms/custom-forms-directives/image-receiver.component.spec.ts',
+    'core/templates/components/forms/custom-forms-directives/image-uploader-modal.component.spec.ts',
+    'core/templates/components/forms/custom-forms-directives/object-editor.directive.ts',
+    'core/templates/components/forms/forms-templates/mark-translations-as-needing-update-modal.component.spec.ts',
+    'core/templates/components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec.ts',
+    'core/templates/components/forms/schema-based-editors/schema-based-editor.component.spec.ts',
+    'core/templates/components/forms/validators/schema-validators.spec.ts',
+    'core/templates/components/interaction-display/interaction-display.component.spec.ts',
+    'core/templates/components/interaction-display/interaction-display.component.ts',
+    'core/templates/components/language-banner/language-banner.component.spec.ts',
+    'core/templates/components/oppia-angular-root.component.spec.ts',
+    'core/templates/components/oppia-angular-root.component.ts',
+    'core/templates/components/question-directives/question-editor/question-editor.component.spec.ts',
+    'core/templates/components/question-directives/question-editor/question-editor.component.ts',
+    'core/templates/components/question-directives/questions-list/questions-list.component.spec.ts',
+    'core/templates/components/question-directives/questions-list/questions-list.component.ts',
+    'core/templates/components/shared-component.module.ts',
+    'core/templates/components/state-directives/answer-group-editor/answer-group-editor.component.spec.ts',
+    'core/templates/components/state-directives/answer-group-editor/answer-group-editor.component.ts',
+    'core/templates/components/state-directives/rule-editor/rule-editor.component.spec.ts',
+    'core/templates/components/state-directives/rule-editor/rule-editor.component.ts',
+    'core/templates/components/state-editor/state-editor.component.ts',
+    'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.spec.ts',
+    'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.ts',
+    'core/templates/components/summary-tile/learner-topic-summary-tile.component.spec.ts',
+    'core/templates/domain/admin/admin-backend-api.service.spec.ts',
+    'core/templates/domain/classroom/classroom-backend-api.service.spec.ts',
+    'core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts',
+    'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
+    'core/templates/domain/exploration/param-type.model.spec.ts',
+    'core/templates/domain/exploration/read-only-exploration-backend-api.service.spec.ts',
+    'core/templates/domain/exploration/states.model.spec.ts',
+    'core/templates/domain/exploration/written-translation.model.spec.ts',
+    'core/templates/domain/objects/objects-domain.constants.spec.ts',
+    'core/templates/domain/question/diagnostic-test-questions.model.spec.ts',
+    'core/templates/domain/question/editable-question-backend-api.service.spec.ts',
+    'core/templates/domain/question/pretest-question-backend-api.service.spec.ts',
+    'core/templates/domain/question/question-backend-api.service.spec.ts',
+    'core/templates/domain/question/question-update.service.ts',
+    'core/templates/domain/statistics/learner-answer-info.model.ts',
+    'core/templates/domain/topic/topic-creation-backend-api.service.spec.ts',
+    'core/templates/domain/topic/topic-update.service.spec.ts',
+    'core/templates/domain/topic/topic-update.service.ts',
+    'core/templates/domain/voiceover/voiceover-backend-api.service.spec.ts',
+    'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.spec.ts',
+    'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.ts',
+    'core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.spec.ts',
+    'core/templates/pages/admin-page/misc-tab/admin-misc-tab.component.spec.ts',
+    'core/templates/pages/admin-page/roles-tab/admin-roles-tab.component.spec.ts',
+    'core/templates/pages/classroom-admin-page/classroom-admin-page.component.spec.ts',
+    'core/templates/pages/classroom-page/classroom-page.module.ts',
+    'core/templates/pages/collection-editor-page/editor-tab/collection-node-creator.component.ts',
+    'core/templates/pages/collection-player-page/collection-player-page.component.ts',
+    'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.ts',
+    'core/templates/pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-stats-backend-api.service.spec.ts',
+    'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts',
+    'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.ts',
+    'core/templates/pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component.spec.ts',
+    'core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.spec.ts',
+    'core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts',
+    'core/templates/pages/contributor-dashboard-page/services/question-suggestion-backend-api.service.spec.ts',
+    'core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts',
+    'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
+    'core/templates/pages/creator-dashboard-page/modal-templates/upload-activity-modal.component.spec.ts',
+    'core/templates/pages/diagnostic-test-player-page/diagnostic-test-player.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/editor-tab/state-name-editor/state-name-editor.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/editor-tab/state-version-history/state-version-history.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/exploration-editor-page.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/exploration-editor-page.component.ts',
+    'core/templates/pages/exploration-editor-page/exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component.ts',
+    'core/templates/pages/exploration-editor-page/feedback-tab/feedback-tab.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts',
+    'core/templates/pages/exploration-editor-page/history-tab/history-tab.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/history-tab/history-tab.component.ts',
+    'core/templates/pages/exploration-editor-page/history-tab/services/compare-versions.service.spec.ts',
+    'core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.ts',
+    'core/templates/pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/modal-templates/state-version-history-modal.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.ts',
+    'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.ts',
+    'core/templates/pages/exploration-editor-page/services/exploration-save.service.spec.ts',
+    'core/templates/pages/exploration-editor-page/services/exploration-states.service.ts',
+    'core/templates/pages/exploration-editor-page/services/router.service.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.spec.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/voiceover-card/voiceover-card.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/audio-bar.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/progress-nav.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/input-response-pair.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/learner-answer-info-card.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/ratings-and-recommendations.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component.spec.ts',
+    'core/templates/pages/exploration-player-page/current-lesson-player/templates/lesson-information-card-modal.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-input-response-pair.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progess-modal.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/supplemental-card.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/header-components/player-header.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.component.spec.ts',
+    'core/templates/pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component.spec.ts',
+    'core/templates/pages/exploration-player-page/services/answer-classification.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/audio-preloader.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/checkpoint-celebration-utility.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/concept-card-manager.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/content-translation-manager.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/conversation-flow.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/current-interaction.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/diagnostic-test-player-engine.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/exploration-engine.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/exploration-engine.service.ts',
+    'core/templates/pages/exploration-player-page/services/exploration-initialization.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/extract-image-filenames-from-model.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/image-preloader.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/learner-answer-info.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/player-position.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/player-transcript.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/question-player-engine.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/question-player-engine.service.ts',
+    'core/templates/pages/exploration-player-page/services/voiceover-player.service.spec.ts',
+    'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.spec.ts',
+    'core/templates/pages/learner-dashboard-page/old-progress-tab.component.spec.ts',
+    'core/templates/pages/library-page/classroom-card/classroom-card.component.spec.ts',
+    'core/templates/pages/library-page/library-page.component.spec.ts',
+    'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts',
+    'core/templates/pages/login-page/login-page.component.spec.ts',
+    'core/templates/pages/moderator-page/moderator-page.component.spec.ts',
+    'core/templates/pages/oppia-root/app-error-handler.ts',
+    'core/templates/pages/oppia-root/routing/app.routing.module.ts',
+    'core/templates/pages/release-coordinator-page/features-tab/features-tab.component.spec.ts',
+    'core/templates/pages/release-coordinator-page/release-coordinator-page.component.spec.ts',
+    'core/templates/pages/skill-editor-page/editor-tab/skill-concept-card-editor/skill-concept-card-editor.component.spec.ts',
+    'core/templates/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/skill-misconceptions-editor.component.spec.ts',
+    'core/templates/pages/skill-editor-page/editor-tab/skill-prerequisite-skills-editor/skill-prerequisite-skills-editor.component.spec.ts',
+    'core/templates/pages/skill-editor-page/navbar/skill-editor-navbar.component.spec.ts',
+    'core/templates/pages/skill-editor-page/skill-editor-access.guard.spec.ts',
+    'core/templates/pages/skill-editor-page/skill-editor-page.component.spec.ts',
+    'core/templates/pages/skill-editor-page/skill-editor-page.component.ts',
+    'core/templates/pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.spec.ts',
+    'core/templates/pages/splash-page/splash-page.module.ts',
+    'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.spec.ts',
+    'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts',
+    'core/templates/pages/story-editor-page/editor-tab/story-editor.component.spec.ts',
+    'core/templates/pages/story-editor-page/editor-tab/story-editor.component.ts',
+    'core/templates/pages/story-editor-page/editor-tab/story-node-editor.component.spec.ts',
+    'core/templates/pages/story-editor-page/editor-tab/story-node-editor.component.ts',
+    'core/templates/pages/story-editor-page/modal-templates/new-chapter-title-modal.component.spec.ts',
+    'core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.spec.ts',
+    'core/templates/pages/story-editor-page/services/story-editor-state.service.spec.ts',
+    'core/templates/pages/story-editor-page/story-editor-page.component.spec.ts',
+    'core/templates/pages/story-editor-page/story-editor-page.component.ts',
+    'core/templates/pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component.spec.ts',
+    'core/templates/pages/subtopic-viewer-page/subtopic-viewer-auth.guard.spec.ts',
+    'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.spec.ts',
+    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.spec.ts',
+    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts',
+    'core/templates/pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component.spec.ts',
+    'core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.spec.ts',
+    'core/templates/pages/topic-editor-page/subtopic-editor/add-study-guide-section.component.spec.ts',
+    'core/templates/pages/topic-editor-page/subtopic-editor/study-guide-section-editor.component.spec.ts',
+    'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.spec.ts',
+    'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
+    'core/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.spec.ts',
+    'core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.spec.ts',
+    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard.spec.ts',
+    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.component.spec.ts',
+    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts',
+    'core/templates/pages/voiceover-admin-page/voiceover-admin-page.component.spec.ts',
+    'core/templates/services/date-time-format.service.spec.ts',
+    'core/templates/services/entity-voiceovers.services.spec.ts',
+    'core/templates/services/exploration-features.service.spec.ts',
+    'core/templates/services/exploration-improvements-task-registry.service.spec.ts',
+    'core/templates/services/exploration-improvements.service.spec.ts',
+    'core/templates/services/improvements.service.spec.ts',
+    'core/templates/services/insert-script.service.spec.ts',
+    'core/templates/services/local-storage.service.spec.ts',
+    'core/templates/services/oppia-rte-parser.service.spec.ts',
+    'core/templates/services/oppia-rte-parser.service.ts',
+    'core/templates/services/question-validation.service.spec.ts',
+    'core/templates/services/request-interceptor.service.spec.ts',
+    'core/templates/services/rte-helper-modal.component.spec.ts',
+    'core/templates/services/rte-helper-modal.component.ts',
+    'core/templates/services/rte-helper.service.spec.ts',
+    'core/templates/services/site-analytics.service.spec.ts',
+    'core/templates/services/speech-synthesis-chunker.service.spec.ts',
+    'core/templates/services/state-interaction-stats.service.spec.ts',
+    'core/templates/services/state-top-answers-stats.service.spec.ts',
+    'core/templates/services/voiceover-language-management-service.spec.ts',
+    'core/tests/puppeteer-acceptance-tests/utilities/user/logged-in-user.ts',
+    'extensions/interactions/FractionInput/directives/fraction-input-validation.service.spec.ts',
+    'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.spec.ts',
+    'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
+    'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
+    'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
+    'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component.ts',
+    'extensions/interactions/MusicNotesInput/directives/oppia-response-music-notes-input.component.ts',
+    'extensions/interactions/MusicNotesInput/directives/oppia-short-response-music-notes-input.component.ts',
+    'extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.spec.ts',
+    'extensions/objects/object-components.module.ts',
+    'extensions/objects/templates/image-editor.component.spec.ts',
+    'extensions/objects/templates/image-editor.component.ts',
+    'extensions/objects/templates/math-expression-content-editor.component.spec.ts',
+    'extensions/objects/templates/svg-editor.component.spec.ts',
+    'extensions/objects/templates/svg-editor.component.ts',
+    'extensions/rich_text_components/rte-output-display.component.ts',
+    'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts',
+]
+# pylint: enable=line-too-long, single-line-pragma
+
+_PARSER = argparse.ArgumentParser(
+    description="""
+Run the script from the oppia root folder:
+    python -m scripts.run_typescript_checks
+Note that the root folder MUST be named 'oppia'.
+"""
+)
+
+_PARSER.add_argument(
+    '--strict_checks',
+    help='optional; if specified, compiles typescript using strict config.',
+    action='store_true',
+)
+
+COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
+TSCONFIG_FILEPATH = 'tsconfig.json'
+STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
+TEMP_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-strict.json'
+TYPE_TESTS_TSCONFIG_FILEPATH = os.path.join('typings', 'tests', 'tsconfig.json')
+PREFIXES = ('core', 'extensions', 'typings')
+
+
+def validate_compiled_js_dir() -> None:
+    """Validates that compiled JS dir matches out dir in tsconfig."""
+    with open(TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
+        config_data = json.load(f)
+        out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+    if out_dir != COMPILED_JS_DIR:
+        raise Exception(
+            'COMPILED_JS_DIR: %s does not match the output directory '
+            'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir)
+        )
+
+
+def compile_temp_strict_tsconfig(
+    config_path: str, error_messages: List[str]
+) -> None:
+    """Compiles temporary strict TS config with files those are neither
+    strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If there are any
+    errors, we restores the original config.
+
+    Args:
+        config_path: str. The config that should be used to run the typescript
+            checks.
+        error_messages: List[str]. A list of error messages produced by
+            compiling the strict typescript config.
+    """
+    # Generate file names from the error messages.
+    errors = [x.strip() for x in error_messages]
+    # Remove the empty lines and error explanation lines.
+    errors = [x for x in errors if x.startswith(PREFIXES)]
+    # Remove error explanation lines.
+    errors = [x.split('(', 1)[0] for x in errors]
+    # Remove the duplicate occurrences of the file names.
+    files_with_errors = sorted(set(errors))
+
+    # List of missing files that are neither strictly typed nor present in
+    # TS_STRICT_EXCLUDE_PATHS.
+    files_not_type_strict = []
+    for filename in files_with_errors:
+        if filename not in TS_STRICT_EXCLUDE_PATHS:
+            files_not_type_strict.append(filename)
+
+    # Add "typings" folder to get global imports while compiling.
+    files_not_type_strict.append('typings')
+
+    # Update "include" field of temp-tsconfig-strict.json with files those
+    # are neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
+    # Example: List "files_not_type_strict".
+    with open(STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
+        strict_ts_config = yaml.safe_load(f)
+        strict_ts_config['include'] = files_not_type_strict
+
+    with open(TEMP_STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8') as f:
+        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+        f.write('\n')
+
+    # Compile temp-tsconfig-strict.json with files those are neither strictly
+    # typed nor present in TS_STRICT_EXCLUDE_PATHS. All those files
+    # present inside include property.
+    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+    validate_compiled_js_dir()
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
+    cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert process.stdout is not None
+    error_messages = list(iter(process.stdout.readline, ''))
+
+    # Remove temporary strict TS config.
+    if os.path.exists(TEMP_STRICT_TSCONFIG_FILEPATH):
+        os.remove(TEMP_STRICT_TSCONFIG_FILEPATH)
+
+    if error_messages:
+        print('\n%s' % '\n'.join(error_messages))
+        print(
+            '%s Errors found during compilation.\n'
+            % (len([x for x in error_messages if x.startswith(PREFIXES)]))
+        )
+        sys.exit(1)
+    else:
+        print('Compilation successful!')
+
+
+def compile_and_check_typescript(config_path: str) -> None:
+    """Compiles typescript files and checks the compilation errors.
+
+    Args:
+        config_path: str. The config that should be used to run the typescript
+            checks.
+    """
+    # We need to create an empty hashes.json file for the build so that
+    # we don't get the error "assets/hashes.json file doesn't exist".
+    common.write_hashes_json_file({})
+    # Set strict TS config include property to ["core", "extensions", "typings"]
+    # This make sure to restore include property to its original value after the
+    # checks get aborted mid-way.
+    with open(STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
+        strict_ts_config = yaml.safe_load(f)
+        strict_ts_config['include'] = PREFIXES
+
+    with open(STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8') as f:
+        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+        f.write('\n')
+
+    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+    validate_compiled_js_dir()
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
+    print('Compiling and testing typescript...')
+    cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert process.stdout is not None
+    error_messages = list(iter(process.stdout.readline, ''))
+
+    if config_path == STRICT_TSCONFIG_FILEPATH:
+        compile_temp_strict_tsconfig(
+            TEMP_STRICT_TSCONFIG_FILEPATH, error_messages
+        )
+    else:
+        if error_messages:
+            print('Errors found during compilation\n')
+            print('\n'.join(error_messages))
+            sys.exit(1)
+        else:
+            print('Compilation successful!')
+
+
+def run_typescript_type_tests() -> None:
+    """Runs the TypeScript type tests in typings/tests."""
+    print('Running TypeScript type tests.')
+
+    # Use the TypeScript compiler to check types in the test directory.
+    cmd = [
+        './node_modules/.bin/tsc',
+        '--project',
+        TYPE_TESTS_TSCONFIG_FILEPATH,
+    ]
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert task.stdout is not None
+    assert task.stderr is not None
+    # Reads and prints realtime output from the subprocess until it terminates.
+    stdout_output = task.stdout.read()
+    stderr_output = task.stderr.read()
+    task.wait()
+
+    print(stdout_output.decode('utf-8'), end='')
+    print(stderr_output.decode('utf-8'), end='')
+
+    if task.returncode != 0:
+        sys.exit(1)
+
+    print('Done!')
+
+
+def main(args: Optional[Sequence[str]] = None) -> None:
+    """Run the typescript checks."""
+    parsed_args = _PARSER.parse_args(args=args)
+
+    # Run the type tests first (they're fast, around ~3 seconds).
+    run_typescript_type_tests()
+
+    # Then run the main TypeScript compilation checks.
+    compile_and_check_typescript(
+        STRICT_TSCONFIG_FILEPATH
+        if parsed_args.strict_checks
+        else TSCONFIG_FILEPATH
+    )
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when run_typescript_checks.py is used as a script.
+if __name__ == '__main__':  # pragma: no cover
+    main()

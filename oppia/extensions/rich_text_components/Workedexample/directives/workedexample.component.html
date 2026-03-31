@@ -1,0 +1,69 @@
+<div class="example-box">
+  <strong class="example-title">Example</strong>
+  <div class="protractor-panel-body">
+    <oppia-rte-output-display class="e2e-test-workedexample-question" [rteString]="question">
+    </oppia-rte-output-display>
+  </div>
+</div>
+
+<div class="solution-box">
+  <strong class="solution-title"
+          (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
+          [attr.tabindex]="allowSolutionToBeCollapsed ? '0' : null"
+          [attr.role]="allowSolutionToBeCollapsed ? 'button' : null"
+          [attr.aria-expanded]="allowSolutionToBeCollapsed ? !isSolutionCollapsed : null"
+          [ngClass]="{'collapsed-title': allowSolutionToBeCollapsed && isSolutionCollapsed}"
+          (keydown.enter)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
+          (keydown.space)="allowSolutionToBeCollapsed ? changeSolutionState() : null">
+    <span *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed">Solution (click to reveal)</span>
+    <span *ngIf="!allowSolutionToBeCollapsed || !isSolutionCollapsed">Solution</span>
+    <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons e2e-test-expand-workedexample icon-expand-workedexample">expand_more</i>
+    <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons e2e-test-collapse-workedexample icon-collapse-workedexample">expand_less</i>
+  </strong>
+  <div class="protractor-panel-body" *ngIf="!isSolutionCollapsed">
+    <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
+    </oppia-rte-output-display>
+  </div>
+</div>
+
+<style>
+  .example-box {
+    background: rgba(13, 72, 161, 0.05);
+    border: 2px solid #0d48a1;
+    border-radius: 4px;
+    border-top: 8px solid #0d48a1;
+    margin-bottom: 6px;
+    padding: 10px;
+  }
+
+  .example-title {
+    color: #0d48a1;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  .solution-box {
+    border: 1px solid #c55f45;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    padding: 10px;
+  }
+
+  .solution-title {
+    align-items: center;
+    color: #c55f45;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .solution-title.collapsed-title {
+    margin-bottom: 0;
+  }
+
+  .icon-expand-workedexample, .icon-collapse-workedexample {
+    cursor: pointer;
+    margin-left: auto;
+  }
+</style>

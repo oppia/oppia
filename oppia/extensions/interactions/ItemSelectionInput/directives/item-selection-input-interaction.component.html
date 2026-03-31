@@ -1,0 +1,64 @@
+<div class="item-selection-input-form-container">
+  <form>
+    <small class="item-selection-info-text" *ngIf="displayCheckboxes">
+      <span *ngIf="exactSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_EXACT' | translate: {
+                    exactChoiceNumber: minAllowableSelectionCount,
+                    messageFormat: true
+        }"></span>
+      </span>
+
+      <span *ngIf="notEnoughSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH' | translate: {
+                    minChoiceNumber: minAllowableSelectionCount,
+                    messageFormat: true
+        }"></span>
+      </span>
+
+      <span *ngIf="preventAdditionalSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE' | translate: {
+                    maxAllowableSelectionCount: maxAllowableSelectionCount,
+                    messageFormat: true
+        }"></span>
+      </span>
+
+      <span *ngIf="!notEnoughSelections && !preventAdditionalSelections && !exactSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_MORE' | translate"></span>
+      </span>
+    </small>
+    <div class="e2e-test-item-selection-input-container" *ngFor="let choice of choices; index as idx">
+      <div *ngIf="displayCheckboxes">
+        <label dir="auto" class="item-selection-input-item e2e-test-item-selection-input-item">
+          <mat-checkbox class="item-selection-input-checkbox e2e-test-item-selection-input-checkbox"
+                        [(ngModel)]="userSelections[choice]"
+                        [checked]="userSelections[choice]"
+                        (change)="onToggleCheckbox()"
+                        [disabled]="preventAdditionalSelections && !userSelections[choice]"
+                        tabindex="0"
+                        [ngModelOptions]="{standalone: true}">
+            <span dir="auto">
+              <oppia-rte-output-display class="e2e-test-item-selection-option" [rteString]="choice">
+              </oppia-rte-output-display>
+            </span>
+          </mat-checkbox>
+        </label>
+      </div>
+
+      <div *ngIf="!displayCheckboxes">
+        <button class="multiple-choice-option" (click)="submitMultipleChoiceAnswer($event, idx)">
+          <div class="multiple-choice-radio-button-container">
+            <span class="multiple-choice-outer-radio-button">
+              <span class="multiple-choice-inner-radio-button"></span>
+            </span>
+          </div>
+          <div class="multiple-choice-content-container">
+            <span>
+              <oppia-rte-output-display class="e2e-test-multiple-choice-option" [rteString]="choice">
+              </oppia-rte-output-display>
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

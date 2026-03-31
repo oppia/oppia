@@ -1,0 +1,17 @@
+<style>
+  .oppia-rule-edit-feedback {
+    margin: 20px 0 20px 0;
+    position: relative;
+  }
+</style>
+<div class="oppia-rule-edit-feedback e2e-test-feedback-bubble">
+  <div class="oppia-rule-details-header">
+    <strong>Oppia tells the learner...</strong>
+  </div>
+  <span *ngIf="!this.outcome.hasNonemptyFeedback()">
+    <em>No feedback specified.</em>
+  </span>
+
+  <schema-based-editor [schema]="OUTCOME_FEEDBACK_SCHEMA" [ngModel]="outcome.feedback.html" (ngModelChange)="updateHtml($event)">
+  </schema-based-editor>
+</div>

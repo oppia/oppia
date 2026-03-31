@@ -1,0 +1,235 @@
+<div class="oppia-lost-changes e2e-test-oppia-lost-changes">
+  <ul>
+    <li *ngFor="let lostChange of lostChanges">
+      <span *ngIf="lostChange.cmd === 'add_state'">
+        Added state: {{ lostChange.stateName }}
+      </span>
+      <span *ngIf="lostChange.cmd === 'rename_state'">
+        Renamed state: {{ lostChange.oldStateName }} to {{ lostChange.newStateName }}
+      </span>
+      <span *ngIf="lostChange.cmd === 'delete_state'">
+        Deleted state: {{ lostChange.stateName }}
+      </span>
+      <div *ngIf="lostChange.cmd === 'edit_state_property'">
+        <strong>Edits to state:</strong> {{ lostChange.stateName }}
+        <div>
+          <strong>Edits to property:</strong> {{ lostChange.propertyName }}
+        </div>
+        <ng-container [ngSwitch]="lostChange.propertyName">
+          <div *ngSwitchCase="'content'">
+            <div *ngIf="!lostChange.isNewValueEmpty()" class="state-edit-desc">
+              <strong>Edited content: </strong>
+              <div class="content" [innerHTML]="lostChange.newValue.html">
+              </div>
+            </div>
+            <div *ngIf="lostChange.isNewValueEmpty()" class="state-edit-desc">
+              <strong>Removed content: </strong>
+              <div class="content" [innerHTML]="lostChange.oldValue.html">
+              </div>
+            </div>
+          </div>
+
+          <div *ngSwitchCase="'widget_id'" class="state-edit-desc">
+            <span *ngIf="lostChange.isAddingInteraction()">
+              <strong>Added Interaction: </strong>
+              {{ lostChange.newValue }}
+            </span>
+
+            <span *ngIf="lostChange.isEndingExploration()">
+              Ended Exploration
+            </span>
+
+            <span *ngIf="!lostChange.isOldValueEmpty()">
+              <strong>Deleted Interaction: </strong>
+              {{ lostChange.oldValue }}
+            </span>
+          </div>
+
+          <div *ngSwitchCase="'widget_customization_args'" class="state-edit-desc">
+            <span *ngIf="lostChange.isOldValueEmpty()">
+              Added Interaction Customizations
+            </span>
+            <span *ngIf="!lostChange.isOldValueEmpty() && lostChange.isNewValueEmpty()">
+              Removed Interaction Customizations
+            </span>
+            <span *ngIf="!lostChange.isOldValueEmpty() && !lostChange.isNewValueEmpty()">
+              Edited Interaction Customizations
+            </span>
+          </div>
+
+          <div *ngSwitchCase="'answer_groups'"  class="state-edit-desc">
+            <span *ngIf="lostChange.getRelativeChangeToGroups() === 'added'">
+              Added answer group
+            </span>
+
+            <span *ngIf="lostChange.getRelativeChangeToGroups() === 'edited'">
+              Edited answer group
+            </span>
+
+            <span *ngIf="lostChange.getRelativeChangeToGroups() === 'deleted'">
+              Deleted answer group
+            </span>
+          </div>
+
+          <div *ngSwitchCase="'default_outcome'">
+            <div *ngIf="lostChange.getRelativeChangeToGroups() === 'added'" class="state-edit-desc default-outcome">
+              Added default outcome:
+              <p class="sub-edit">
+                <i>Destination: </i>{{ lostChange.newValue.dest }}
+              </p>
+              <div class="sub-edit">
+                <i>Feedback: </i>
+                <div class="feedback">
+                  {{ lostChange.newValue.feedback.html }}
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="lostChange.getRelativeChangeToGroups() === 'edited'" class="state-edit-desc default-outcome">
+              Edited default outcome:
+              <p class="sub-edit" *ngIf="!lostChange.isDestEqual()">
+                <i>Destination: </i>{{ lostChange.newValue.dest }}
+              </p>
+
+              <div class="sub-edit" *ngIf="!lostChange.isFeedbackEqual()">
+                <i>Feedback: </i>
+                <div class="feedback">
+                  {{ lostChange.newValue.feedback.html }}
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="lostChange.getRelativeChangeToGroups() === 'deleted'" class="state-edit-desc">
+              Deleted default outcome
+            </div>
+          </div>
+
+          <div *ngSwitchCase="'hints'"  class="state-edit-desc">
+            <div *ngIf="lostChange.getRelativeChangeToGroups() === 'added'">
+              Added hints
+              <ul>
+                <li *ngFor="let hint of lostChange.newValue" [innerHTML]="hint.hint_content.html"></li>
+              </ul>
+            </div>
+
+            <span *ngIf="lostChange.getRelativeChangeToGroups() === 'edited'">
+              Edited hints
+              <ul>
+                <li *ngFor="let hint of lostChange.newValue" [innerHTML]="hint.hint_content.html"></li>
+              </ul>
+            </span>
+
+            <span *ngIf="lostChange.getRelativeChangeToGroups() === 'deleted'">
+              Deleted hints
+            </span>
+          </div>
+
+          <div *ngSwitchCase="'solution'"  class="state-edit-desc">
+            <div *ngIf="lostChange.isOldValueEmpty()" class="state-edit-desc">
+              <strong>Added Solution: </strong>
+              <div class="sub-edit">
+                <i>Answer is exclusive: </i>{{ lostChange.newValue.answer_is_exclusive }}
+              </div>
+              <div class="sub-edit">
+                <i>Correct Answer: </i>
+                <div class="correct_answer">
+                  {{ lostChange.newValue.correct_answer }}
+                </div>
+              </div>
+              <div class="sub-edit">
+                <i>Explanation: </i>
+                <div class="explanation" [innerHTML]="lostChange.newValue.explanation.html">
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!lostChange.isNewValueEmpty() && !lostChange.isOldValueEmpty()" class="state-edit-desc">
+              <strong>Edited solution: </strong>
+              <div class="sub-edit" >
+                <i>Answer is exclusive: </i>{{ lostChange.newValue.answer_is_exclusive }}
+              </div>
+              <div class="sub-edit">
+                <i>Correct Answer: </i>
+                <div class="correct_answer">
+                  {{ lostChange.newValue.correct_answer }}
+                </div>
+              </div>
+              <div class="sub-edit">
+                <i>Explanation: </i>
+                <div class="explanation" [innerHTML]="lostChange.newValue.explanation.html">
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="lostChange.isNewValueEmpty()" class="state-edit-desc">
+              <span>Removed solution</span>
+            </div>
+          </div>
+
+        </ng-container>
+      </div>
+      <div *ngIf="lostChange.cmd === 'edit_exploration_property'">
+        <ng-container [ngSwitch]="lostChange.propertyName">
+          <div *ngSwitchCase="'title'">
+            <div *ngIf="!lostChange.isNewValueEmpty()">
+              <strong>New title: </strong>{{lostChange.newValue}}
+            </div>
+            <div *ngIf="lostChange.isNewValueEmpty()">
+              <strong>Removed title</strong>
+            </div>
+          </div>
+          <div *ngSwitchCase="'category'">
+            <div *ngIf="!lostChange.isNewValueEmpty()">
+              <strong>New category: </strong>{{lostChange.newValue}}
+            </div>
+            <div *ngIf="lostChange.isNewValueEmpty()">
+              <strong>Removed category</strong>
+            </div>
+          </div>
+          <div *ngSwitchCase="'objective'">
+            <div *ngIf="!lostChange.isNewValueEmpty()">
+              <strong>New objective: </strong>{{lostChange.newValue}}
+            </div>
+            <div *ngIf="lostChange.isNewValueEmpty()">
+              <strong>Removed objective</strong>
+            </div>
+          </div>
+          <div *ngSwitchCase="'language_code'">
+            <div *ngIf="!lostChange.isNewValueEmpty()">
+              <strong>New language code: </strong >{{lostChange.getLanguage()}}
+            </div>
+            <div *ngIf="lostChange.isNewValueEmpty()">
+              <strong>Removed language code</strong>
+            </div>
+          </div>
+          <div *ngSwitchCase="'init_state_name'">
+            <div *ngIf="!lostChange.isNewValueEmpty()">
+              <strong>New name of first card: </strong>{{lostChange.newValue}}
+            </div>
+          </div>
+          <div *ngSwitchCase="'tags'">
+            <div *ngIf="!lostChange.isNewValueEmpty()">
+              <strong>New tags: </strong>{{lostChange.newValue}}
+            </div>
+            <div *ngIf="lostChange.isNewValueEmpty()">
+              <strong>Removed tags</strong>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div *ngIf="lostChange.cmd === 'add_written_translation'">
+        <strong>Change in translation</strong>
+        <div class="sub-edit">
+          <div class="language_code">
+            <i>Language Code: </i> {{lostChange.getLanguage()}}
+          </div>
+          <div class="content_id">
+            <i>Content id: </i> {{lostChange.contentId}}
+          </div>
+          <div class="translation">
+            <i>Translation: </i> <span [innerHTML]="lostChange.translationHTML"></span>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>

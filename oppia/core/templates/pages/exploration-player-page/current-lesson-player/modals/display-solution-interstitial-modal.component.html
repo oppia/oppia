@@ -1,0 +1,89 @@
+<div class="oppia-learner-solution-interstitial-modal-title">
+  <span [innerHTML]="'I18N_WARNING_MODAL_TITLE' | translate"></span>
+</div>
+
+<div class="modal-body">
+  <span class="oppia-learner-solution-interstitial-modal-body">
+    <span [innerHTML]="'I18N_WARNING_MODAL_DESCRIPTION' | translate"></span>
+  </span>
+</div>
+
+<div class="oppia-learner-solution-container">
+  <button mat-button class="oppia-modal-cancel-button ms-auto" (click)="cancel()">
+    <span [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></span>
+  </button>
+  <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button e2e-test-continue-to-solution-btn"
+          (click)="confirm()">
+    <span [innerHTML]="'I18N_SHOW_SOLUTION_BUTTON' | translate"></span>
+  </button>
+</div>
+<span class="clearfix"></span>
+
+<style>
+  .oppia-learner-solution-interstitial-modal-title {
+    color: #00786d;
+    font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
+    font-size: 1.75em;
+    font-weight: bold;
+    padding-top: 20px;
+    text-align: center;
+  }
+
+  .oppia-learner-solution-interstitial-modal-body {
+    word-wrap: break-word;
+  }
+
+  .oppia-learner-solution-container {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    justify-content: flex-end;
+    padding: 16px 20px;
+  }
+
+  .mat-button.oppia-modal-cancel-button {
+    align-items: center;
+    background: #9a9a9a;
+    border: none !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    color: #fff;
+    display: inline-flex;
+    font-weight: 500;
+    height: 35px;
+    min-width: 0;
+    outline: none !important;
+    padding: 6px 12px;
+    text-transform: uppercase;
+  }
+
+  .mat-button.oppia-modal-cancel-button:focus,
+  .mat-button.oppia-modal-cancel-button:hover {
+    background: #7a7a7a;
+  }
+
+  .mat-button.oppia-learner-got-it-button {
+    align-items: center;
+    background: #00786d;
+    border: none !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    color: #fff;
+    display: inline-flex;
+    font-weight: 500;
+    height: 35px;
+    min-width: 0;
+    outline: none !important;
+    padding: 6px 12px;
+    text-transform: uppercase;
+  }
+
+  .mat-button.oppia-learner-got-it-button:focus,
+  .mat-button.oppia-learner-got-it-button:hover {
+    background: #00655a;
+  }
+
+  .clearfix {
+    clear: both;
+  }
+</style>
