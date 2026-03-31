@@ -327,6 +327,7 @@ def search(
             {
                 'multi_match': {
                     'query': query_string,
+                    'fields': ['title^3', 'objective^2']
                 }
             }
         ]

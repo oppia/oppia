@@ -216,6 +216,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'query': {
                         'bool': {
                             'must': [{'multi_match': {'query': 'query'}}],
+                            'fields': ['title^3', 'objective^2'],
                             'filter': [
                                 {
                                     'match': {
