@@ -475,10 +475,7 @@ class HelperFunctionsTests(unittest.TestCase):
             cmd, *args, **kwargs
         ):
             """Mock subprocess.run for GitHub CLI commands."""
-            # Here we use object because MagicMock is a complex dynamic mock that does not fit into any more specific type annotation.
-            mock_process: object = (
-                mock.MagicMock()
-            )  # pylint: disable=object-class-used
+            mock_process = mock.MagicMock()
             if 'help' in cmd:
                 mock_process.returncode = 0
             elif 'auth' in cmd and 'token' in cmd:
@@ -507,8 +504,7 @@ class HelperFunctionsTests(unittest.TestCase):
             cmd, *args, **kwargs
         ):
             """Mock subprocess.run with gh CLI not installed."""
-            # Here we use type Any because mocks are dynamic and don't fit specific types.
-            mock_process: Any = mock.MagicMock()
+            mock_process = mock.MagicMock()
             mock_process.returncode = 1
             return mock_process
 
@@ -535,10 +531,7 @@ class HelperFunctionsTests(unittest.TestCase):
             cmd, *args, **kwargs
         ):
             """Mock subprocess.run for GitHub CLI."""
-            # Here we use object because MagicMock does not fit specific types.
-            mock_process: object = (
-                mock.MagicMock()
-            )  # pylint: disable=object-class-used
+            mock_process = mock.MagicMock()
             if 'help' in cmd:
                 mock_process.returncode = 0
             elif 'auth' in cmd and 'token' in cmd:
@@ -563,10 +556,7 @@ class HelperFunctionsTests(unittest.TestCase):
 
     def test_run_graphql_query_non_200_status(self) -> None:
         """Test run_graphql_query with non-200 HTTP status."""
-        # Here we use object because MagicMock does not fit specific types.
-        mock_response: object = (
-            mock.MagicMock()
-        )  # pylint: disable=object-class-used
+        mock_response = mock.MagicMock()
         mock_response.__enter__.return_value.getcode.return_value = 400
         mock_response.__enter__.return_value.read.return_value = json.dumps(
             {'errors': 'Invalid query'}
