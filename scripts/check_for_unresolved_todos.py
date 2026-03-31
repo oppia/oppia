@@ -360,7 +360,7 @@ def check_if_todo_is_associated_with_issue(
 def append_todos_to_file(
     repository_path: str,
     todos: List[todo_finder.TodoDict],
-    _github_perma_link_url: str,
+    github_perma_link_url: str,
     issue_number: int,
 ) -> None:
     """Appends to the todo list file with the todos information and the github
@@ -369,7 +369,7 @@ def append_todos_to_file(
     Args:
         repository_path: str. The path to the repository.
         todos: List[TodoDict]. The todos to generate the file with.
-        _github_perma_link_url: str. The github perma link url.
+        github_perma_link_url: str. The github perma link url.
         issue_number: int. The issue number that the todos are associated with.
     """
     with open(
@@ -383,7 +383,10 @@ def append_todos_to_file(
             todos, key=lambda todo: (todo['file_path'], todo['line_number'])
         ):
             relative_path = todo['file_path'].replace(repository_path, '', 1)
-            file.write(f'- oppia/{relative_path}:L{todo["line_number"]}\n')
+            file.write(
+                f'- {github_perma_link_url}/{relative_path}'
+                f'#L{todo["line_number"]}\n'
+            )
 
 
 def log_unresolved_todos_failure(

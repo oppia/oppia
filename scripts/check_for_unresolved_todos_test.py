@@ -142,12 +142,15 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         self.assertEqual(
             mock_stdout.getvalue().splitlines(), expected_failure_log_lines
         )
+        expected_github_perma_link = (
+            'https://github.com/oppia/oppia/blob/abcdefg'
+        )
         expected_unresolved_todo_list_lines = [
             'The following TODOs are unresolved for this issue #4151:',
-            '- oppia/file1.txt:L4',
-            '- oppia/file1.txt:L11',
-            '- oppia/file1.txt:L13',
-            '- oppia/file2.txt:L3',
+            f'- {expected_github_perma_link}/file1.txt#L4',
+            f'- {expected_github_perma_link}/file1.txt#L11',
+            f'- {expected_github_perma_link}/file1.txt#L13',
+            f'- {expected_github_perma_link}/file2.txt#L3',
         ]
         with open(
             'dummy_directory/unresolved_todo_list.txt', 'r', encoding='utf-8'
@@ -234,16 +237,19 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         self.assertEqual(
             mock_stdout.getvalue().splitlines(), expected_failure_log_lines
         )
+        expected_github_perma_link = (
+            'https://github.com/oppia/oppia/blob/abcdefg'
+        )
         expected_unresolved_todo_list_lines = [
             'The following TODOs are unresolved for this issue #4151:',
-            '- oppia/file1.txt:L4',
-            '- oppia/file1.txt:L11',
-            '- oppia/file1.txt:L13',
-            '- oppia/file2.txt:L3',
+            f'- {expected_github_perma_link}/file1.txt#L4',
+            f'- {expected_github_perma_link}/file1.txt#L11',
+            f'- {expected_github_perma_link}/file1.txt#L13',
+            f'- {expected_github_perma_link}/file2.txt#L3',
             'The following TODOs are unresolved for this issue #4156:',
-            '- oppia/file1.txt:L6',
+            f'- {expected_github_perma_link}/file1.txt#L6',
             'The following TODOs are unresolved for this issue #4153:',
-            '- oppia/file1.txt:L7',
+            f'- {expected_github_perma_link}/file1.txt#L7',
         ]
         with open(
             'dummy_directory/unresolved_todo_list.txt', 'r', encoding='utf-8'
