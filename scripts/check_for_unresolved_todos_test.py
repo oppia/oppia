@@ -317,9 +317,8 @@ class HelperFunctionsTests(unittest.TestCase):
 
         with mock.patch(
             'urllib.request.urlopen', return_value=mock_response
-        ), mock.patch.object(
-            check_for_unresolved_todos,
-            'get_github_api_authorization_header',
+        ), mock.patch(
+            'scripts.check_for_unresolved_todos.get_github_api_authorization_header',
             return_value='Bearer test_token',
         ):
             result = check_for_unresolved_todos.run_graphql_query('test query')
@@ -483,15 +482,10 @@ class HelperFunctionsTests(unittest.TestCase):
                 mock_process.returncode = 0
             return mock_process
 
-        def mock_env_get(key, default=None):  # pylint: disable=unused-argument
-            """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
-            return default
-
-        with mock.patch.object(
-            check_for_unresolved_todos.os.environ, 'get', mock_env_get
-        ), mock.patch.object(
-            check_for_unresolved_todos.subprocess,
-            'run',
+        with mock.patch.dict(
+            check_for_unresolved_todos.os.environ, {}, clear=True
+        ), mock.patch(
+            'scripts.check_for_unresolved_todos.subprocess.run',
             side_effect=mock_subprocess_run,
         ):
             token = check_for_unresolved_todos.get_github_auth_token()
@@ -508,15 +502,10 @@ class HelperFunctionsTests(unittest.TestCase):
             mock_process.returncode = 1
             return mock_process
 
-        def mock_env_get(key, default=None):  # pylint: disable=unused-argument
-            """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
-            return default
-
-        with mock.patch.object(
-            check_for_unresolved_todos.os.environ, 'get', mock_env_get
-        ), mock.patch.object(
-            check_for_unresolved_todos.subprocess,
-            'run',
+        with mock.patch.dict(
+            check_for_unresolved_todos.os.environ, {}, clear=True
+        ), mock.patch(
+            'scripts.check_for_unresolved_todos.subprocess.run',
             side_effect=mock_subprocess_run,
         ):
             with self.assertRaisesRegex(
@@ -538,15 +527,10 @@ class HelperFunctionsTests(unittest.TestCase):
                 mock_process.returncode = 1
             return mock_process
 
-        def mock_env_get(key, default=None):  # pylint: disable=unused-argument
-            """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
-            return default
-
-        with mock.patch.object(
-            check_for_unresolved_todos.os.environ, 'get', mock_env_get
-        ), mock.patch.object(
-            check_for_unresolved_todos.subprocess,
-            'run',
+        with mock.patch.dict(
+            check_for_unresolved_todos.os.environ, {}, clear=True
+        ), mock.patch(
+            'scripts.check_for_unresolved_todos.subprocess.run',
             side_effect=mock_subprocess_run,
         ):
             with self.assertRaisesRegex(
@@ -564,9 +548,8 @@ class HelperFunctionsTests(unittest.TestCase):
 
         with mock.patch(
             'urllib.request.urlopen', return_value=mock_response
-        ), mock.patch.object(
-            check_for_unresolved_todos,
-            'get_github_api_authorization_header',
+        ), mock.patch(
+            'scripts.check_for_unresolved_todos.get_github_api_authorization_header',
             return_value='Bearer test_token',
         ):
             with self.assertRaisesRegex(
@@ -579,9 +562,8 @@ class HelperFunctionsTests(unittest.TestCase):
         """Test run_graphql_query with network request exception."""
         with mock.patch(
             'urllib.request.urlopen', side_effect=Exception('Network error')
-        ), mock.patch.object(
-            check_for_unresolved_todos,
-            'get_github_api_authorization_header',
+        ), mock.patch(
+            'scripts.check_for_unresolved_todos.get_github_api_authorization_header',
             return_value='Bearer test_token',
         ):
             with self.assertRaisesRegex(
