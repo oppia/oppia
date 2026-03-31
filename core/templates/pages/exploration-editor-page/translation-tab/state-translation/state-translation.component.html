@@ -91,7 +91,11 @@
         </div>
       </li>
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_CUSTOMIZATION_ARGS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_CUSTOMIZATION_ARGS)}" aria-label="Interaction content" role="button">
-        <div (click)="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" [attr.tabindex]="!isDisabled(TAB_ID_CUSTOMIZATION_ARGS) ? '0' : '-1'" (keydown.enter)="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" [ngStyle]="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-translation-tabs-text">
+        <div (click)="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)"
+             [attr.tabindex]="!isDisabled(TAB_ID_CUSTOMIZATION_ARGS) ? '0' : '-1'"
+             (keydown.enter)="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)"
+             [ngStyle]="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)"
+             class="oppia-translation-tabs-text e2e-test-translation-interaction-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-tab-needs-update"
                 tabindex="0"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
@@ -149,7 +153,7 @@
         </span>
       </span>
     </div>
-    <div *ngIf="isActive(TAB_ID_CUSTOMIZATION_ARGS)" class="translation-state-content">
+    <div *ngIf="isActive(TAB_ID_CUSTOMIZATION_ARGS)" class="translation-state-content e2e-test-interaction-text">
       <h3 tabindex="0">Preview - {{INTERACTION_SPECS[stateInteractionId].name}}</h3>
       <oppia-rte-output-display class="oppia-translation-state-content-html-data" [rteString]="interactionPreviewHtml">
       </oppia-rte-output-display>
