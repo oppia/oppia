@@ -261,6 +261,10 @@ describe('Logged-In Learner - Manage Goals', function () {
     await loggedInUser.expectGoalsTabButtonToBeVisible();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.expectGoalsTabButtonToBeActive();
+    await loggedInUser.waitForElementToStabilize(
+      '.e2e-test-learner-dashboard-sidebar'
+    );
+    await loggedInUser.waitForElementToStabilize('.e2e-test-goals-section');
 
     await loggedInUser.expectScreenshotToMatch(
       'goalsTabSidebarHighlighted',
