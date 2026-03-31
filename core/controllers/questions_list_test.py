@@ -197,6 +197,30 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             expected_status_int=404,
         )
 
+    def test_get_questions_ignores_none_summaries(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        def mock_get_displayable_question_skill_link_details(
+            unused_question_count: int,
+            unused_skill_ids: list[str],
+            unused_offset: int,
+        ) -> tuple[list[None], list[None]]:
+            return [None], [None]
+
+        with self.swap(
+            question_services,
+            'get_displayable_question_skill_link_details',
+            mock_get_displayable_question_skill_link_details,
+        ):
+            json_response = self.get_json(
+                '%s/%s?offset=0'
+                % (feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id)
+            )
+
+        self.assertEqual(json_response['question_summary_dicts'], [])
+        self.assertFalse(json_response['more'])
+        self.logout()
+
 
 class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
 
