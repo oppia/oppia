@@ -1,10 +1,6 @@
 {
   "suites": [
     {
-      "name": "blog",
-      "module": "core/tests/webdriverio_desktop/blog.js"
-    },
-    {
       "name": "collections",
       "module": "core/tests/webdriverio_desktop/collections.js"
     },
@@ -27,10 +23,6 @@
     {
       "name": "explorationHistoryTab",
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
-    },
-    {
-      "name": "explorationTranslationTab",
-      "module": "core/tests/webdriverio_desktop/explorationTranslationTab.js"
     },
     {
       "name": "learner",

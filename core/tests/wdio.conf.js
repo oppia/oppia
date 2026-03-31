@@ -29,10 +29,6 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
-  blog: [
-    './core/tests/webdriverio_desktop/blog.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
@@ -55,10 +51,6 @@ var suites = {
 
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
-  ],
-
-  explorationTranslationTab: [
-    './core/tests/webdriverio_desktop/explorationTranslationTab.js'
   ],
 
   learner: [

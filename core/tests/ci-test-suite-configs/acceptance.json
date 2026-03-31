@@ -21,6 +21,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts"
     },
     {
+      "name": "interested-partner-organization/view-the-blog",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts"
+    },
+    {
       "name": "interested-volunteer/apply-to-become-a-volunteer",
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-volunteer/apply-to-become-a-volunteer.spec.ts"
     },
