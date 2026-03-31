@@ -116,10 +116,10 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
       await loggedOutUser.expectContinueToNextCardButtonToBePresent();
       await loggedOutUser.continueToNextCard();
 
-      // TODO: Verify checkpoint behavior. Currently, the expected behavior is not observed (see issue #24066).
+      // TODO(#24066): Verify checkpoint behavior. Currently, the expected behavior is not observed.
 
       // Complete lesson.
-      // TODO: Confetti poppup behavior. Currently, the expected behavior is not observed .
+      // Confetti poppup behavior. Currently, the expected behavior is not observed.
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
