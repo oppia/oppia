@@ -568,7 +568,11 @@ class HelperFunctionsTests(unittest.TestCase):
 
     def test_run_graphql_query_non_200_status(self) -> None:
         """Test run_graphql_query with non-200 HTTP status."""
-        mock_response = mock.MagicMock()
+        # Here we use object because MagicMock is a complex dynamic mock
+        # that doesn't fit into any more specific type annotation.
+        mock_response: object = (
+            mock.MagicMock()
+        )  # pylint: disable=object-class-used
         mock_response.__enter__.return_value.getcode.return_value = 400
         mock_response.__enter__.return_value.read.return_value = json.dumps(
             {'errors': 'Invalid query'}
