@@ -2675,7 +2675,21 @@ export class LoggedOutUser extends BaseUser {
    * because the donor box is an iframe and a third-party service.
    */
   async isDonorBoxVisbleOnDonatePage(): Promise<void> {
-    const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    const donorBox = await this.page.waitForSelector(donorBoxIframe, {
+      visible: true,
+    });
+    await this.page.waitForFunction(
+      selector => {
+        const element = document.querySelector(selector);
+        if (!element) {
+          return false;
+        }
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      },
+      {},
+      donorBoxIframe
+    );
     if (!donorBox) {
       throw new Error('The donor box is not visible on the donate page.');
     } else {
