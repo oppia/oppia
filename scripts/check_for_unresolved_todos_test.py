@@ -471,9 +471,12 @@ class HelperFunctionsTests(unittest.TestCase):
     def test_get_github_auth_token_with_gh_cli_fallback(self) -> None:
         """Test get_github_auth_token with GitHub CLI fallback."""
 
+        # pylint: disable=unused-argument
         def mock_subprocess_run(cmd, *args, **kwargs):
             """Mock subprocess.run for GitHub CLI commands."""
-            mock_process = mock.MagicMock()
+            mock_process: object = (
+                mock.MagicMock()
+            )  # pylint: disable=object-class-used; Here we use object because MagicMock is a dynamic mock object
             if 'help' in cmd:
                 mock_process.returncode = 0
             elif 'auth' in cmd and 'token' in cmd:
@@ -481,6 +484,7 @@ class HelperFunctionsTests(unittest.TestCase):
                 mock_process.returncode = 0
             return mock_process
 
+        # pylint: disable=unused-argument
         def mock_env_get(key, default=None):
             """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
             return default
@@ -498,12 +502,17 @@ class HelperFunctionsTests(unittest.TestCase):
     def test_get_github_auth_token_gh_cli_not_installed(self) -> None:
         """Test get_github_auth_token when GitHub CLI is not installed."""
 
+        # pylint: disable=unused-argument
         def mock_subprocess_run(cmd, *args, **kwargs):
             """Mock subprocess.run with gh CLI not installed."""
-            mock_process = mock.MagicMock()
-            mock_process.returncode = 1  # Command failed
+            mock_process: object = (
+                mock.MagicMock()
+            )  # pylint: disable=object-class-used; Here we use object because MagicMock is a dynamic mock object
+            # Command failed
+            mock_process.returncode = 1
             return mock_process
 
+        # pylint: disable=unused-argument
         def mock_env_get(key, default=None):
             """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
             return default
@@ -523,15 +532,20 @@ class HelperFunctionsTests(unittest.TestCase):
     def test_get_github_auth_token_gh_cli_auth_failed(self) -> None:
         """Test get_github_auth_token when GitHub CLI auth fails."""
 
+        # pylint: disable=unused-argument
         def mock_subprocess_run(cmd, *args, **kwargs):
             """Mock subprocess.run for GitHub CLI."""
-            mock_process = mock.MagicMock()
+            mock_process: object = (
+                mock.MagicMock()
+            )  # pylint: disable=object-class-used; Here we use object because MagicMock is a dynamic mock object
             if 'help' in cmd:
                 mock_process.returncode = 0
             elif 'auth' in cmd and 'token' in cmd:
-                mock_process.returncode = 1  # Auth failed
+                # Auth failed
+                mock_process.returncode = 1
             return mock_process
 
+        # pylint: disable=unused-argument
         def mock_env_get(key, default=None):
             """Mock environment without GH_TOKEN or GITHUB_TOKEN."""
             return default
