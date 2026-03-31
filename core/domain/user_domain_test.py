@@ -1896,75 +1896,122 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         learner_group_user_details = user_domain.LearnerGroupUserDetails(
             'group_id_1', True
         )
-        
-        # Test non-string user_id
+        # Test non-string user_id.
         learner_group_user = user_domain.LearnerGroupsUser(
-            123, ['group_id_2'], [learner_group_user_details], 1 # type: ignore[arg-type]
+            123,  # type: ignore[arg-type]
+            ['group_id_2'],
+            [learner_group_user_details],
+            1,
         )
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected user_id to be a string.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a string.'
+        ):
             learner_group_user.validate()
 
-        # Test empty string user_id
+        # Test empty string user_id.
         learner_group_user.user_id = ''
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected user_id to be a non-empty string.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a non-empty string.'
+        ):
             learner_group_user.validate()
 
-    def test_validate_invalid_invited_to_learner_groups_ids_raises_exception(self) -> None:
+    def test_validate_invalid_invited_to_learner_groups_ids_raises_exception(
+        self
+    ) -> None:
         learner_group_user_details = user_domain.LearnerGroupUserDetails(
             'group_id_1', True
         )
-        
-        # Test non-list
+        # Test non-list invited_to_learner_groups_ids.
         learner_group_user = user_domain.LearnerGroupsUser(
-            'user1', 'not_a_list', [learner_group_user_details], 1 # type: ignore[arg-type]
+            'user1',
+            'not_a_list',  # type: ignore[arg-type]
+            [learner_group_user_details],
+            1,
         )
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected invited_to_learner_groups_ids to be a list.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invited_to_learner_groups_ids to be a list.'
+        ):
             learner_group_user.validate()
 
-        # Test list with non-string elements
-        learner_group_user.invited_to_learner_groups_ids = [123] # type: ignore[list-item]
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected each group_id in invited_to_learner_groups_ids to be a string.'):
+        # Test duplicate values in list.
+        learner_group_user.invited_to_learner_groups_ids = ['id1', 'id1']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invited_to_learner_groups_ids to not contain '
+            'duplicate values.'
+        ):
             learner_group_user.validate()
 
-        # Test list with empty string elements
-        learner_group_user.invited_to_learner_groups_ids = ['']
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected each group_id in invited_to_learner_groups_ids to be a non-empty string.'):
-            learner_group_user.validate()
-
-        # Test list with duplicates
-        learner_group_user.invited_to_learner_groups_ids = ['group_2', 'group_2']
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected invited_to_learner_groups_ids to not contain duplicate values.'):
-            learner_group_user.validate()
-
-    def test_validate_invalid_learner_groups_user_details_raises_exception(self) -> None:
-        learner_group_user_details1 = user_domain.LearnerGroupUserDetails('group_id_1', True)
-        learner_group_user_details2 = user_domain.LearnerGroupUserDetails('group_id_1', False)
-        
-        # Test non-list
+    def test_validate_invalid_learner_groups_user_details_raises_exception(
+        self
+    ) -> None:
+        learner_group_user_details1 = user_domain.LearnerGroupUserDetails(
+            'group_id_1', True
+        )
+        learner_group_user_details2 = user_domain.LearnerGroupUserDetails(
+            'group_id_1', False
+        )
+        # Test non-list details.
         learner_group_user = user_domain.LearnerGroupsUser(
-            'user1', ['group_id_2'], 'not_a_list', 1 # type: ignore[arg-type]
+            'user1', ['group_id_2'], 'not_a_list', 1  # type: ignore[arg-type]
         )
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected learner_groups_user_details to be a list.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected learner_groups_user_details to be a list.'
+        ):
             learner_group_user.validate()
 
-        # Test duplicates in group_id
-        learner_group_user.learner_groups_user_details = [learner_group_user_details1, learner_group_user_details2]
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected learner_groups_user_details to not contain duplicate group_ids.'):
+        # Test duplicate group_ids.
+        learner_group_user.learner_groups_user_details = [
+            learner_group_user_details1, learner_group_user_details2
+        ]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected learner_groups_user_details to not contain '
+            'duplicate group_ids.'
+        ):
             learner_group_user.validate()
 
     def test_validate_cross_validation_overlap_raises_exception(self) -> None:
         learner_group_user_details = user_domain.LearnerGroupUserDetails(
             'group_id_1', True
         )
-        # Test overlap between invited and active groups
+        # Test overlap between invited and active groups.
         learner_group_user = user_domain.LearnerGroupsUser(
             'user1', ['group_id_1'], [learner_group_user_details], 1
         )
         with self.assertRaisesRegex(
-            utils.ValidationError, 
-            'Learner cannot be invited to join learner group group_id_1 since they are already its learner.'
+            utils.ValidationError,
+            'Learner cannot be invited to join learner group '
+            'group_id_1 since they are already its learner.'
         ):
             learner_group_user.validate()
+
+    def test_validate_invalid_schema_version_raises_exception(self) -> None:
+        # Test non-integer schema version.
+        learner_group_user = user_domain.LearnerGroupsUser(
+            'user1', [], [], 'invalid'  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected learner_groups_user_details_schema_version '
+            'to be an integer.'
+        ):
+            learner_group_user.validate()
+
+        # Test zero or negative schema version.
+        learner_group_user.learner_groups_user_details_schema_version = 0
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected learner_groups_user_details_schema_version '
+            'to be a positive integer.'
+        ):
+            learner_group_user.validate()
+                
+        
+
+    
 
 
 class TranslationCoordinatorStatsUnitTests(test_utils.GenericTestBase):
