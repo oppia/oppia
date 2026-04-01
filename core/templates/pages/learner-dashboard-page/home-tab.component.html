@@ -112,7 +112,7 @@
             </ng-container>
           </oppia-card-display>
           <!--TODO(#18384): Learner Group (Recommended cards)Styling: https://www.figma.com/design/YWe7SqfUVjxlJLKTUn0UZa/Project-2?node-id=4405-61681&t=8H8GSGQJk3lUxOBc-0 (links to Figma frame) -->
-          <oppia-card-display *ngIf="hasMultipleUnfinishedPublished &&
+          <oppia-card-display class="e2e-test-learner-dash-recommended-section" *ngIf="hasMultipleUnfinishedPublished &&
           storySummariesWithAvailableNodes.size > 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="storySummariesWithAvailableNodes.size" [displayMaxWidth]="'fit-content'">
             <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
               <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">

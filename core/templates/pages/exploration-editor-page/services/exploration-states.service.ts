@@ -67,6 +67,8 @@ import {
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import constants from 'assets/constants';
+import {AppConstants} from 'app.constants';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -284,10 +286,9 @@ export class ExplorationStatesService {
 
   markTranslationAndVoiceoverNeedsUpdate(contentId: string): void {
     this.changeListService.markTranslationsAsNeedingUpdate(contentId);
-    this.entityVoiceoversService.markManualVoiceoverAsNeedingUpdate(contentId);
     this.changeListService.markVoiceoversAsNeedingUpdate(
       contentId,
-      this.entityVoiceoversService.languageCode
+      constants.DEFAULT_LANGUAGE_CODE
     );
   }
 
@@ -297,7 +298,7 @@ export class ExplorationStatesService {
 
     this.changeListService.removeVoiceovers(
       contentId,
-      this.entityVoiceoversService.languageCode
+      AppConstants.DEFAULT_LANGUAGE_CODE
     );
     this.entityVoiceoversService.removeAllVoiceoversForContent(contentId);
   }
@@ -406,7 +407,7 @@ export class ExplorationStatesService {
   saveStateProperty(
     stateName: string,
     backendName: 'widget_id',
-    newValue: string
+    newValue: string | null
   ): void;
   saveStateProperty(
     stateName: string,
@@ -627,7 +628,7 @@ export class ExplorationStatesService {
     return this.getStatePropertyMemento(stateName, 'widget_id');
   }
 
-  saveInteractionId(stateName: string, newInteractionId: string): void {
+  saveInteractionId(stateName: string, newInteractionId: string | null): void {
     this.saveStateProperty(stateName, 'widget_id', newInteractionId);
     this.stateInteractionSavedCallbacks.forEach(callback => {
       callback(this._states.getState(stateName));

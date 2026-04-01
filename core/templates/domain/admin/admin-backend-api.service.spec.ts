@@ -146,9 +146,9 @@ describe('Admin backend api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    abas = TestBed.get(AdminBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    csrfService = TestBed.get(CsrfTokenService);
+    abas = TestBed.inject(AdminBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
     adminDataObject = {

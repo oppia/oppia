@@ -38,6 +38,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {LoaderService} from 'services/loader.service';
 import {UrlService} from 'services/contextual/url.service';
 import {BlogHomePageConstants} from './blog-home-page.constants';
+import {Router, ActivatedRoute} from '@angular/router';
 
 import './blog-home-page.component.css';
 
@@ -83,26 +84,53 @@ export class BlogHomePageComponent implements OnInit {
     private blogHomePageBackendApiService: BlogHomePageBackendApiService,
     private alertsService: AlertsService,
     private loaderService: LoaderService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
+
     this.oppiaAvatarImgUrl =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
+
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE =
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
+
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH =
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
-    if (this.urlService.getUrlParams().hasOwnProperty('q')) {
-      this.searchPageIsActive = true;
-      this.filterWasUsed = true;
-      this.updateSearchFieldsBasedOnUrlQuery();
-    } else {
-      this.loadInitialBlogHomePageData();
-    }
+
+    this.route.queryParams.subscribe(params => {
+      this.page = params.page ? Number(params.page) : 1;
+
+      this.calculateFirstPostOnPageNum(
+        this.page,
+        BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+      );
+
+      this.calculateLastPostOnPageNum(
+        this.page,
+        BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+      );
+
+      if (params.q || params.tags) {
+        this.searchPageIsActive = true;
+        this.filterWasUsed = true;
+
+        this.searchQuery = params.q || '';
+        this.selectedTags = params.tags
+          ? params.tags.replace(/[()"]/g, '').split(' OR ')
+          : [];
+
+        this.loadPage();
+      } else {
+        this.loadInitialBlogHomePageData();
+      }
+    });
+
     this.searchQueryChanged
       .pipe(debounceTime(1000), distinctUntilChanged())
       .subscribe(model => {
@@ -110,24 +138,21 @@ export class BlogHomePageComponent implements OnInit {
         this.onSearchQueryChangeExec();
       });
 
-    // Notify the function that handles overflow in case the
-    // search elements load after it has already been run.
     this.blogPostSearchService.onSearchBarLoaded.emit();
 
-    // Called when the first batch of search results is retrieved from
-    // the server.
     this.directiveSubscriptions.add(
       this.blogPostSearchService.onInitialSearchResultsLoaded.subscribe(
         (response: SearchResponseData) => {
           this.blogPostSummaries = [];
-          this.page = 1;
-          this.firstPostOnPageNum = 1;
+
           if (response.blogPostSummariesList.length > 0) {
             this.noResultsFound = false;
+            this.totalBlogPosts = response.totalMatchingBlogPosts;
             this.loadSearchResultsPageData(response);
           } else {
             this.noResultsFound = true;
           }
+
           this.listOfDefaultTags = response.listOfDefaultTags;
           this.loaderService.hideLoadingScreen();
         }
@@ -140,20 +165,8 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   loadSearchResultsPageData(data: SearchResponseData): void {
-    this.blogPostSummaries = this.blogPostSummaries.concat(
-      data.blogPostSummariesList
-    );
+    this.blogPostSummaries = data.blogPostSummariesList;
     this.searchOffset = data.searchOffset;
-    if (this.searchOffset) {
-      // As search offset is not null, there are more search result pages to
-      // load. Therefore for pagination to show that more results are available,
-      // total number of blog post is one more than the number of blog posts
-      // loaded as number of pages is automatically calculated using total
-      // collection size and number of blog posts to show on a page.
-      this.totalBlogPosts = this.blogPostSummaries.length + 1;
-    } else {
-      this.totalBlogPosts = this.blogPostSummaries.length;
-    }
     this.calculateLastPostOnPageNum(
       this.page,
       this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
@@ -164,6 +177,9 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   loadInitialBlogHomePageData(): void {
+    let offset =
+      (this.page - 1) *
+      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
     if (this.filterWasUsed) {
       this.blogPostSearchService.resetSearchState();
       this.page = 1;
@@ -173,34 +189,36 @@ export class BlogHomePageComponent implements OnInit {
       this.totalBlogPosts = 0;
       this.showBlogPostCardsLoadingScreen = false;
     }
-    this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync('0').then(
-      (data: BlogHomePageData) => {
-        if (data.numOfPublishedBlogPosts) {
-          this.totalBlogPosts = data.numOfPublishedBlogPosts;
-          this.noResultsFound = false;
-          this.blogPostSummaries = data.blogPostSummaryDicts;
-          this.blogPostSummariesToShow = this.blogPostSummaries;
-          this.calculateLastPostOnPageNum(
-            this.page,
-            this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-          );
-        } else {
-          this.noResultsFound = true;
+    this.blogHomePageBackendApiService
+      .fetchBlogHomePageDataAsync(String(offset))
+      .then(
+        (data: BlogHomePageData) => {
+          if (data.numOfPublishedBlogPosts) {
+            this.totalBlogPosts = data.numOfPublishedBlogPosts;
+            this.noResultsFound = false;
+            this.blogPostSummaries = data.blogPostSummaryDicts;
+            this.blogPostSummariesToShow = this.blogPostSummaries;
+            this.calculateLastPostOnPageNum(
+              this.page,
+              this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+            );
+          } else {
+            this.noResultsFound = true;
+          }
+          this.listOfDefaultTags = data.listOfDefaultTags;
+          this.loaderService.hideLoadingScreen();
+        },
+        errorResponse => {
+          if (
+            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
+          ) {
+            this.alertsService.addWarning(
+              'Failed to get blog home page data.Error: ' +
+                `${errorResponse.error.error}`
+            );
+          }
         }
-        this.listOfDefaultTags = data.listOfDefaultTags;
-        this.loaderService.hideLoadingScreen();
-      },
-      errorResponse => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
-        ) {
-          this.alertsService.addWarning(
-            'Failed to get blog home page data.Error: ' +
-              `${errorResponse.error.error}`
-          );
-        }
-      }
-    );
+      );
   }
 
   loadMoreBlogPostSummaries(offset: number): void {
@@ -208,14 +226,8 @@ export class BlogHomePageComponent implements OnInit {
       .fetchBlogHomePageDataAsync(String(offset))
       .then(
         (data: BlogHomePageData) => {
-          this.blogPostSummaries = this.blogPostSummaries.concat(
-            data.blogPostSummaryDicts
-          );
+          this.blogPostSummaries = data.blogPostSummaryDicts;
           this.selectBlogPostSummariesToShow();
-          this.calculateLastPostOnPageNum(
-            this.page,
-            this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-          );
           this.showBlogPostCardsLoadingScreen = false;
         },
         errorResponse => {
@@ -232,28 +244,66 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   loadPage(): void {
-    if (this.blogPostSummaries.length < this.firstPostOnPageNum) {
-      this.showBlogPostCardsLoadingScreen = true;
-      if (!this.searchPageIsActive) {
-        this.loadMoreBlogPostSummaries(this.firstPostOnPageNum - 1);
-      } else {
-        this.blogPostSearchService.loadMoreData(
-          data => {
-            this.loadSearchResultsPageData(data);
-          },
-          _isCurrentlyFetchingResults => {
+    this.showBlogPostCardsLoadingScreen = true;
+
+    if (!this.searchPageIsActive) {
+      let offset = this.firstPostOnPageNum - 1;
+      this.loadMoreBlogPostSummaries(offset);
+    } else {
+      const pageSize = this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH;
+      const offset = (this.page - 1) * pageSize;
+
+      const params = new URLSearchParams();
+      if (this.searchQuery) {
+        params.set('q', this.searchQuery);
+      }
+      if (this.selectedTags.length > 0) {
+        params.set(
+          'tags',
+          '(' + this.selectedTags.map(tag => `"${tag}"`).join(' OR ') + ')'
+        );
+      }
+      params.set('offset', offset.toString());
+
+      this.blogHomePageBackendApiService
+        .fetchBlogPostSearchResultAsync('?' + params.toString())
+        .then(data => {
+          if (data.blogPostSummariesList.length === 0) {
+            this.disableNextPageButton = true;
+            this.showBlogPostCardsLoadingScreen = false;
+            this.noResultsFound = true;
+            return;
+          }
+
+          this.blogPostSummaries = data.blogPostSummariesList;
+          this.blogPostSummariesToShow = this.blogPostSummaries;
+          this.totalBlogPosts = data.totalMatchingBlogPosts;
+          this.listOfDefaultTags = data.listOfDefaultTags;
+
+          this.calculateLastPostOnPageNum(this.page, pageSize);
+          this.showBlogPostCardsLoadingScreen = false;
+          this.noResultsFound = false;
+        })
+        .catch(error => {
+          if (this.blogPostSummaries.length === 0) {
             this.alertsService.addWarning(
               'No more search resutls found. End of search results.'
             );
           }
-        );
-      }
-    } else {
-      this.selectBlogPostSummariesToShow();
+
+          this.showBlogPostCardsLoadingScreen = false;
+          this.loaderService.hideLoadingScreen();
+        });
     }
   }
 
   onPageChange(page = this.page): void {
+    this.page = page;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {page: page},
+      queryParamsHandling: 'merge',
+    });
     if (!this.searchPageIsActive) {
       this.calculateFirstPostOnPageNum(
         page,
@@ -278,10 +328,7 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   selectBlogPostSummariesToShow(): void {
-    this.blogPostSummariesToShow = this.blogPostSummaries.slice(
-      this.firstPostOnPageNum - 1,
-      this.lastPostOnPageNum
-    );
+    this.blogPostSummariesToShow = this.blogPostSummaries;
   }
 
   calculateFirstPostOnPageNum(pageNum: number, pageSize: number): void {
@@ -304,37 +351,54 @@ export class BlogHomePageComponent implements OnInit {
 
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
+
+    let currentParams = this.route.snapshot.queryParams;
+
+    const currentQuery = currentParams.q || '';
+    const currentTags = currentParams.tags ? currentParams.tags.split(',') : [];
+    const currentPage = currentParams.page || '1';
+
+    const isQueryChanged =
+      currentQuery !== this.searchQuery ||
+      currentTags.join(',') !== this.selectedTags.join(',');
+
     if (this.searchQuery === '' && this.selectedTags.length === 0) {
-      this.loadInitialBlogHomePageData();
-      this.windowRef.nativeWindow.history.pushState({}, '', '/blog');
+      this.searchPageIsActive = false;
+      this.filterWasUsed = false;
+      this.page = 1;
+      this.firstPostOnPageNum = 1;
+      this.blogPostSummaries = [];
+      this.totalBlogPosts = 0;
+
+      this.router.navigate(['/blog']);
       return;
     }
+
+    this.searchPageIsActive = true;
+
     this.blogPostSearchService.executeSearchQuery(
       this.searchQuery,
       this.selectedTags,
       () => {
-        let searchUrlQueryString =
-          this.blogPostSearchService.getSearchUrlQueryString(
-            this.searchQuery,
-            this.selectedTags
-          );
-        let url = new URL(this.windowRef.nativeWindow.location.toString());
-        let siteLangCode: string | null = url.searchParams.get('lang');
-        url.search = '?q=' + searchUrlQueryString;
-        if (
-          this.windowRef.nativeWindow.location.pathname === '/blog/search/find'
-        ) {
-          if (siteLangCode) {
-            url.searchParams.append('lang', siteLangCode);
-          }
-          this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
-        } else {
-          url.pathname = 'blog/search/find';
-          if (siteLangCode) {
-            url.searchParams.append('lang', siteLangCode);
-          }
-          this.windowRef.nativeWindow.location.href = url.toString();
+        const pageToUse = isQueryChanged ? '1' : currentPage;
+
+        if (isQueryChanged) {
+          this.page = 1;
+          this.firstPostOnPageNum = 1;
         }
+
+        this.router.navigate(['/blog/search/find'], {
+          queryParams: {
+            q: this.searchQuery,
+            tags:
+              this.selectedTags.length > 0
+                ? '(' +
+                  this.selectedTags.map(tag => `"${tag}"`).join(' OR ') +
+                  ')'
+                : '',
+            page: pageToUse,
+          },
+        });
       },
       errorResponse => {
         this.alertsService.addWarning(
@@ -348,19 +412,18 @@ export class BlogHomePageComponent implements OnInit {
     return this.windowDimensionsService.getWidth() <= 1024;
   }
 
-  updateSearchFieldsBasedOnUrlQuery(): void {
-    let newSearchQuery: UrlSearchQuery;
-    newSearchQuery =
+  updateSearchFieldsBasedOnUrlQuery(loadPageAfterUpdate = false): void {
+    const newSearchQuery: UrlSearchQuery =
       this.blogPostSearchService.updateSearchFieldsBasedOnUrlQuery(
         this.windowRef.nativeWindow.location.search
       );
 
-    if (
-      this.searchQuery !== newSearchQuery.searchQuery ||
-      this.selectedTags !== newSearchQuery.selectedTags
-    ) {
-      this.searchQuery = newSearchQuery.searchQuery;
-      this.selectedTags = newSearchQuery.selectedTags;
+    this.searchQuery = newSearchQuery.searchQuery;
+    this.selectedTags = newSearchQuery.selectedTags;
+
+    if (loadPageAfterUpdate) {
+      this.loadPage();
+    } else {
       this.onSearchQueryChangeExec();
     }
   }

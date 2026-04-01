@@ -93,6 +93,7 @@
 /core/templates/services/assets-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-voiceovers.services.ts @oppia/lace-frontend-reviewers
+/core/templates/services/voiceover-regeneration-task-mapping-service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/voiceover-language-management-service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/automatic-voiceover-highlight-service.ts @oppia/lace-frontend-reviewers
 
@@ -303,11 +304,15 @@
 /core/templates/domain/promo_bar/ @oppia/lace-frontend-reviewers
 /core/templates/filters/ @oppia/lace-frontend-reviewers
 /core/templates/services/attribution.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component.css @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner-module.ts  @oppia/lace-frontend-reviewers
 
 
 # Global frontend services
 /core/templates/services/alerts.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/chapter-progress-loader.service*.ts @oppia/lace-frontend-reviewers 
+/core/templates/services/chapter-progress-loader.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/chapter-label-visibility.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/date-time-format.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/extension-tag-assembler.service*.ts @oppia/lace-frontend-reviewers
@@ -318,6 +323,7 @@
 /core/templates/services/page-title.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/prevent-page-unload-event.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/promo-bar-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/sign-in-event.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/site-analytics.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/utils.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/stateful/background-mask.service*.ts @oppia/lace-frontend-reviewers
@@ -505,6 +511,7 @@
 
 # Cloud task run.
 /core/domain/cloud_task_domain*.py @oppia/lace-backend-reviewers
+/core/domain/voiceover_cloud_task_services*.py @oppia/lace-backend-reviewers
 /core/templates/domain/cloud-task/cloud-task-run.model*.ts @oppia/lace-frontend-reviewers
 
 # Infrastructure.
