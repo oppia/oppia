@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import (
-    stats_domain_errors as domain_errors,
-)
+from core.domain import stats_domain_errors as domain_errors
 from core.tests import test_utils
 
 

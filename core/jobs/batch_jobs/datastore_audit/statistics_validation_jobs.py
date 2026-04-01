@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import exp_fetchers, stats_domain
+from core.domain import exp_domain, exp_fetchers, stats_domain
 from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
 from core.jobs.types import job_run_result, statistics_validation_errors
 from core.platform import models
@@ -61,8 +61,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         """Returns model-level validation functions."""
 
         return [
-            self.validate_exploration_reference,
-            self.validate_state_name_according_exploration,
+            self.validate_exploration_relation,
             self.validate_range_of_exp_version,
         ]
 
@@ -97,48 +96,54 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
                 )
             )
 
-    def validate_exploration_reference(
+    def validate_exploration_relation(
         self, model: base_models.BaseModel
+    ) -> Iterator[job_run_result.JobRunResult]:
+        """Checks exploration reference."""
+        assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
+        exploration = None
+        try:
+            with datastore_services.get_ndb_context():
+                exploration = exp_fetchers.get_exploration_by_id(
+                    exploration_id=model.exp_id, version=model.exp_version
+                )
+
+            yield from self._validate_exploration_reference(model, exploration)
+            if exploration is None:
+                return
+
+            yield from self._validate_state_name_according_exploration(
+                model, exploration
+            )
+
+        except Exception as e:
+            yield (
+                statistics_validation_errors.ExplorationDoesNotExistError(
+                    str(e), model
+                )
+            )
+
+    def _validate_exploration_reference(
+        self, model: base_models.BaseModel, exploration: exp_domain.Exploration
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks if exp_id corresponds to a valid exploration."""
         assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
-        try:
-            with datastore_services.get_ndb_context():
-                exploration = exp_fetchers.get_exploration_by_id(
-                    exploration_id=model.exp_id, version=model.exp_version
-                )
-
-            if exploration is None:
-                yield (
-                    statistics_validation_errors.InvalidExplorationIdError(
-                        model
-                    )
-                )
-        except Exception:
+        assert isinstance(exploration, exp_domain.Exploration)
+        if exploration is None:
             yield (
                 statistics_validation_errors.InvalidExplorationIdError(model)
             )
 
-    def validate_state_name_according_exploration(
-        self, model: base_models.BaseModel
+    def _validate_state_name_according_exploration(
+        self, model: base_models.BaseModel, exploration: exp_domain.Exploration
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks state_name should be valid key in states of exploration."""
         assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
-        try:
-            with datastore_services.get_ndb_context():
-                exploration = exp_fetchers.get_exploration_by_id(
-                    exploration_id=model.exp_id, version=model.exp_version
-                )
-            assert exploration is not None
+        assert isinstance(exploration, exp_domain.Exploration)
+        assert exploration is not None
 
-            if model.state_name not in exploration.states:
-                yield (
-                    statistics_validation_errors.InvalidStateNameError(model)
-                )
-        except Exception:
-            yield (
-                statistics_validation_errors.InvalidExplorationIdError(model)
-            )
+        if model.state_name not in exploration.states:
+            yield (statistics_validation_errors.InvalidStateNameError(model))
 
     def validate_range_of_exp_version(
         self, model: base_models.BaseModel
@@ -148,6 +153,8 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         """
         assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
         try:
+            # Latest version of exploration retrieval is needed to check
+            # the exp_version field.
             with datastore_services.get_ndb_context():
                 exploration = exp_fetchers.get_exploration_by_id(
                     exploration_id=model.exp_id
@@ -160,7 +167,9 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
                         exploration.version, model
                     )
                 )
-        except Exception:
+        except Exception as e:
             yield (
-                statistics_validation_errors.InvalidExplorationIdError(model)
+                statistics_validation_errors.ExplorationDoesNotExistError(
+                    str(e), model
+                )
             )

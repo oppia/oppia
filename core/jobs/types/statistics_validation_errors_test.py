@@ -51,11 +51,13 @@ class AnswerSubmittedEventLogEntryModelValidationErrorsTest(
         model = base_models.BaseModel(id='test_id')
         model.exp_id = 'test_exp_id'
 
-        error = statistics_validation_errors.ExplorationDoesNotExistError(model)
+        error = statistics_validation_errors.ExplorationDoesNotExistError(
+            'error_message', model
+        )
 
         self.assertEqual(
             'ExplorationDoesNotExistError in BaseModel(id="test_id"): '
-            'exp_id test_exp_id does not correspond to a valid ExplorationModel',
+            'exp_id test_exp_id does not correspond to a valid ExplorationModel, found error=error_message',
             error.stderr,
         )
 

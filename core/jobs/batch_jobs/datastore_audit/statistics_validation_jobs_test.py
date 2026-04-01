@@ -21,13 +21,8 @@ from __future__ import annotations
 from unittest import mock
 
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs.datastore_audit import (
-    statistics_validation_jobs,
-)
-from core.jobs.types import (
-    job_run_result,
-    statistics_validation_errors,
-)
+from core.jobs.batch_jobs.datastore_audit import statistics_validation_jobs
+from core.jobs.types import job_run_result, statistics_validation_errors
 from core.platform import models
 from core.tests import test_utils
 
@@ -81,8 +76,13 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         )
         self.put_multi([model])
 
+        error_message = (
+            'Entity for class ExplorationModel with id expX not found'
+        )
         invalid_exp_error = (
-            statistics_validation_errors.InvalidExplorationIdError(model).stderr
+            statistics_validation_errors.ExplorationDoesNotExistError(
+                error_message, model
+            ).stderr
         )
 
         self.assert_job_output_is(
@@ -90,8 +90,7 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
                 job_run_result.JobRunResult.as_stderr(
                     '\n'.join(
                         [
-                            f'InvalidExplorationIdError: {invalid_exp_error}',
-                            invalid_exp_error,
+                            f'ExplorationDoesNotExistError: {invalid_exp_error}',
                             invalid_exp_error,
                         ]
                     )
@@ -119,21 +118,21 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         self.put_multi([model])
 
         invalid_exp_error = (
-            statistics_validation_errors.InvalidExplorationIdError(model).stderr
+            statistics_validation_errors.ExplorationDoesNotExistError(
+                '', model
+            ).stderr
         )
-
         mock_get_exploration_by_id.return_value = None
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
                     '\n'.join(
                         [
-                            f'InvalidExplorationIdError: {invalid_exp_error}',
-                            invalid_exp_error,
+                            f'ExplorationDoesNotExistError: {invalid_exp_error}',
                             invalid_exp_error,
                         ]
                     )
-                ),
+                )
             ]
         )
 
@@ -161,9 +160,10 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
             model,
         ).stderr
 
-        invalid_exp_error = (
-            statistics_validation_errors.InvalidExplorationIdError(model).stderr
-        )
+        invalid_exp_with_version_error = statistics_validation_errors.ExplorationDoesNotExistError(
+            'Entity for class ExplorationSnapshotContentModel with id exp1--1 not found',
+            model,
+        ).stderr
 
         exp_version_error = (
             statistics_validation_errors.ExpVersionOutOfRangeError(
@@ -174,15 +174,10 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    '\n'.join(
-                        [
-                            f'InvalidExplorationIdError: {invalid_exp_error}',
-                            invalid_exp_error,
-                        ]
-                    )
+                    f'DomainValidationError: {domain_error}'
                 ),
                 job_run_result.JobRunResult.as_stderr(
-                    f'DomainValidationError: {domain_error}'
+                    f'ExplorationDoesNotExistError: {invalid_exp_with_version_error}'
                 ),
                 job_run_result.JobRunResult.as_stderr(
                     f'ExpVersionOutOfRangeError: {exp_version_error}'
@@ -246,18 +241,14 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
                 1, model
             ).stderr
         )
-        invalid_exp_error = (
-            statistics_validation_errors.InvalidExplorationIdError(model).stderr
-        )
+        invalid_exp_with_version_error = statistics_validation_errors.ExplorationDoesNotExistError(
+            'Entity for class ExplorationSnapshotContentModel with id exp1-10 not found',
+            model,
+        ).stderr
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    '\n'.join(
-                        [
-                            f'InvalidExplorationIdError: {invalid_exp_error}',
-                            invalid_exp_error,
-                        ]
-                    )
+                    f'ExplorationDoesNotExistError: {invalid_exp_with_version_error}'
                 ),
                 job_run_result.JobRunResult.as_stderr(
                     f'ExpVersionOutOfRangeError: {exp_version_range_error}'

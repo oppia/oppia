@@ -42,9 +42,11 @@ class ExplorationDoesNotExistError(base_validation_errors.BaseValidationError):
     """Error class for invalid exploration reference."""
 
     def __init__(
-        self, model: stats_models.AnswerSubmittedEventLogEntryModel
+        self,
+        error_message: str,
+        model: stats_models.AnswerSubmittedEventLogEntryModel,
     ) -> None:
-        message = f'exp_id {model.exp_id} does not correspond to a valid ExplorationModel'
+        message = f'exp_id {model.exp_id} does not correspond to a valid ExplorationModel, found error={error_message}'
         super().__init__(message, model)
 
 
