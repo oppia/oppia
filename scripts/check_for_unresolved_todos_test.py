@@ -176,6 +176,37 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR,
         )
 
+    def test_get_unresolved_todos_should_fail_without_github_output(
+        self,
+    ) -> None:
+        """Test get_unresolved_todos with no GITHUB_OUTPUT env variable."""
+        mock_stdout = io.StringIO()
+        swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
+        with mock.patch.dict(
+            os.environ, {}, clear=True
+        ), swap_stdout_write, self.assertRaisesRegex(
+            Exception,
+            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR,
+        ):
+            check_for_unresolved_todos.main(
+                [
+                    '--repository_path=dummy_directory',
+                    '--issue=4151',
+                    '--commit_sha=abcdefg',
+                ]
+            )
+
+        expected_failure_log_lines = [
+            'The following TODOs are unresolved for this issue #4151:',
+            '- file1.txt:L4',
+            '- file1.txt:L11',
+            '- file1.txt:L13',
+            '- file2.txt:L3',
+        ]
+        self.assertEqual(
+            mock_stdout.getvalue().splitlines(), expected_failure_log_lines
+        )
+
     def test_get_unresolved_todos_by_pull_request_should_fail(self) -> None:
         mock_stdout = io.StringIO()
 
@@ -492,6 +523,12 @@ class HelperFunctionsTests(unittest.TestCase):
         ):
             token = check_for_unresolved_todos.get_github_auth_token()
             self.assertEqual(token, 'cli_test_token')
+
+    def test_get_github_auth_token_from_environment_variable(self) -> None:
+        """Test get_github_auth_token with token from environment variables."""
+        with mock.patch.dict(os.environ, {'GH_TOKEN': 'env_test_token'}):
+            token = check_for_unresolved_todos.get_github_auth_token()
+            self.assertEqual(token, 'env_test_token')
 
     def test_get_github_auth_token_gh_cli_not_installed(self) -> None:
         """Test get_github_auth_token when GitHub CLI is not installed."""
