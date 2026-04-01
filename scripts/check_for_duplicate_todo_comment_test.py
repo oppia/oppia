@@ -46,7 +46,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             content = (
                 f"""
-                The following TODOs are unresolved for this issue #4175:
+                {check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=4175)}
                 [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
                 [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
                 [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)
@@ -58,7 +58,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             content = (
                 f"""
-                The following TODOs are unresolved for this issue #4176:
+                {check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=4176)}
                 [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
                 [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
                 """
@@ -69,7 +69,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             content = (
                 f"""
-                The following TODOs are unresolved for this issue #4177:
+                {check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=4177)}
                 [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
                 [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
                 [oppia/scripts/common.py#L41]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L41)
@@ -81,7 +81,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             content = (
                 f"""
-                The following TODOs are unresolved for this issue #4177:
+                {check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=4177)}
                 [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
                 [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
                 [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)
@@ -127,7 +127,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
-                The following TODOs are unresolved for this issue #4176:
+                {check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=4176)}
                 [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L38)
                 [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L39)
                 [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_TWO}/scripts/common.py#L40)
@@ -160,7 +160,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
-                The following TODOs are unresolved for this issue #4177:
+                {check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=4177)}
                 [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
                 [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
                 [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)
@@ -195,7 +195,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) -> Optional[check_for_unresolved_todos.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
-                The following TODOs are unresolved for this issue #4177:
+                {check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=4177)}
                 [oppia/scripts/common.py#L38]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38)
                 [oppia/scripts/common.py#L39]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39)
                 [oppia/scripts/common.py#L40]({GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40)

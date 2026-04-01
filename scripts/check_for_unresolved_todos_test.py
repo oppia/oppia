@@ -94,7 +94,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
         with swap_stdout_write, self.assertRaisesRegex(
             Exception,
-            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR,
+            check_for_unresolved_todos.UNRESOLVED_TASKS_PRESENT_INDICATOR,
         ):
             check_for_unresolved_todos.main(
                 [
@@ -104,7 +104,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 ]
             )
         expected_failure_log_lines = [
-            'The following TODOs are unresolved for this issue #4151:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4151
+            ),
             '- file1.txt:L4',
             '- file1.txt:L11',
             '- file1.txt:L13',
@@ -122,7 +124,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
         with swap_stdout_write, self.assertRaisesRegex(
             Exception,
-            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR,
+            check_for_unresolved_todos.UNRESOLVED_TASKS_PRESENT_INDICATOR,
         ):
             check_for_unresolved_todos.main(
                 [
@@ -133,7 +135,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 ]
             )
         expected_failure_log_lines = [
-            'The following TODOs are unresolved for this issue #4151:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4151
+            ),
             '- file1.txt:L4',
             '- file1.txt:L11',
             '- file1.txt:L13',
@@ -146,7 +150,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             'https://github.com/oppia/oppia/blob/abcdefg'
         )
         expected_unresolved_todo_list_lines = [
-            'The following TODOs are unresolved for this issue #4151:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4151
+            ),
             f'- {expected_github_perma_link}/file1.txt#L4',
             f'- {expected_github_perma_link}/file1.txt#L11',
             f'- {expected_github_perma_link}/file1.txt#L13',
@@ -173,7 +179,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             )
         self.assertEqual(
             mock_stdout.getvalue().strip(),
-            check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR,
+            check_for_unresolved_todos.UNRESOLVED_TASKS_NOT_PRESENT_INDICATOR,
         )
 
     def test_get_unresolved_todos_should_fail_without_github_output(
@@ -186,7 +192,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             os.environ, {}, clear=True
         ), swap_stdout_write, self.assertRaisesRegex(
             Exception,
-            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR,
+            check_for_unresolved_todos.UNRESOLVED_TASKS_PRESENT_INDICATOR,
         ):
             check_for_unresolved_todos.main(
                 [
@@ -197,7 +203,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             )
 
         expected_failure_log_lines = [
-            'The following TODOs are unresolved for this issue #4151:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4151
+            ),
             '- file1.txt:L4',
             '- file1.txt:L11',
             '- file1.txt:L13',
@@ -244,7 +252,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         with swap_stdout_write, swap_fetch_linked_issues_for_pull_request:
             with self.assertRaisesRegex(
                 Exception,
-                check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR,
+                check_for_unresolved_todos.UNRESOLVED_TASKS_PRESENT_INDICATOR,
             ):
                 check_for_unresolved_todos.main(
                     [
@@ -255,14 +263,20 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                     ]
                 )
         expected_failure_log_lines = [
-            'The following TODOs are unresolved for this issue #4151:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4151
+            ),
             '- file1.txt:L4',
             '- file1.txt:L11',
             '- file1.txt:L13',
             '- file2.txt:L3',
-            'The following TODOs are unresolved for this issue #4156:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4156
+            ),
             '- file1.txt:L6',
-            'The following TODOs are unresolved for this issue #4153:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4153
+            ),
             '- file1.txt:L7',
         ]
         self.assertEqual(
@@ -272,14 +286,20 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             'https://github.com/oppia/oppia/blob/abcdefg'
         )
         expected_unresolved_todo_list_lines = [
-            'The following TODOs are unresolved for this issue #4151:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4151
+            ),
             f'- {expected_github_perma_link}/file1.txt#L4',
             f'- {expected_github_perma_link}/file1.txt#L11',
             f'- {expected_github_perma_link}/file1.txt#L13',
             f'- {expected_github_perma_link}/file2.txt#L3',
-            'The following TODOs are unresolved for this issue #4156:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4156
+            ),
             f'- {expected_github_perma_link}/file1.txt#L6',
-            'The following TODOs are unresolved for this issue #4153:',
+            check_for_unresolved_todos.UNRESOLVED_TASKS_HEADING_TEMPLATE.format(
+                issue_number=4153
+            ),
             f'- {expected_github_perma_link}/file1.txt#L7',
         ]
         with open(

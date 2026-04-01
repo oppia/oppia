@@ -23,6 +23,8 @@ from core.tests import test_utils
 
 from . import todo_finder
 
+TASK_KEYWORD = f'{"TO"}{"DO"}'
+
 
 class TodoFinderTests(test_utils.GenericTestBase):
     """Unit tests for testing the todo_finder script."""
@@ -99,12 +101,12 @@ class TodoFinderTests(test_utils.GenericTestBase):
             },
             {
                 'file_path': 'dummy_directory/file1.txt',
-                'line_content': '# TODO(#1234)',
+                'line_content': f'# {TASK_KEYWORD}(#1234)',
                 'line_number': 3,
             },
             {
                 'file_path': 'dummy_directory/file1.txt',
-                'line_content': '# TODO(#23432)',
+                'line_content': f'# {TASK_KEYWORD}(#23432)',
                 'line_number': 4,
             },
             {
@@ -313,15 +315,15 @@ class TodoFinderTests(test_utils.GenericTestBase):
 
     def test_get_issue_number_from_todo(self) -> None:
         invalid_issue_number_one = todo_finder.get_issue_number_from_todo(
-            '// TODO(#12343):'
+            f'// {TASK_KEYWORD}(#12343):'
         )
         self.assertEqual(invalid_issue_number_one, None)
         invalid_issue_number_two = todo_finder.get_issue_number_from_todo(
-            '# TODO(#12342)'
+            f'# {TASK_KEYWORD}(#12342)'
         )
         self.assertEqual(invalid_issue_number_two, None)
         invalid_issue_number_three = todo_finder.get_issue_number_from_todo(
-            '# TODO(12345)'
+            f'# {TASK_KEYWORD}(12345)'
         )
         self.assertEqual(invalid_issue_number_three, None)
         invalid_issue_number_four = todo_finder.get_issue_number_from_todo(

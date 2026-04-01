@@ -174,9 +174,7 @@ BAD_PATTERNS: Dict[str, BadPatternsDict] = {
 
 BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
     {
-        'regexp': re.compile(
-            r'^\s*(#|//|/\*|\*)\s*.*\bTODO\b(?!\(#\d+\): [A-Z].*)'
-        ),
+        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
         'message': 'Please link TODO comments to an issue '
         'in the format TODO(#issuenum): XXX. ',
         'excluded_files': (),

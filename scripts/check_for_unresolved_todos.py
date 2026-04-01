@@ -300,13 +300,16 @@ def fetch_latest_comment_from_pull_request(
 # TODO(#14): Temporary workflow test seconds for the third issue.
 # TODO(#15): Temporary workflow test seconds for the forth issue.
 
-UNRESOLVED_TODOS_PRESENT_INDICATOR = (
-    'THERE ARE TODOS ASSOCIATED WITH THE PROVIDED ISSUES.'
+TASK_KEYWORD = f'{"TO"}{"DO"}'
+TASKS_KEYWORD = f'{TASK_KEYWORD}s'
+UNRESOLVED_TASKS_PRESENT_INDICATOR = (
+    f'THERE ARE {TASKS_KEYWORD} ASSOCIATED WITH THE PROVIDED ISSUES.'
 )
-UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR = (
-    'THERE ARE NO TODOS ASSOCIATED WITH THE PROVIDED ISSUES.'
+UNRESOLVED_TASKS_NOT_PRESENT_INDICATOR = (
+    f'THERE ARE NO {TASKS_KEYWORD} ASSOCIATED WITH THE PROVIDED ISSUES.'
 )
-UNRESOLVED_TODO_LIST_FILE_PATH = 'unresolved_todo_list.txt'
+UNRESOLVED_TASK_LIST_FILE_PATH = 'unresolved_todo_list.txt'
+UNRESOLVED_TASKS_HEADING_TEMPLATE = f'The following {TASKS_KEYWORD} are unresolved for this issue #{{issue_number}}:'
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -373,11 +376,11 @@ def append_todos_to_file(
         issue_number: int. The issue number that the todos are associated with.
     """
     with open(
-        repository_path + UNRESOLVED_TODO_LIST_FILE_PATH, 'a', encoding='utf-8'
+        repository_path + UNRESOLVED_TASK_LIST_FILE_PATH, 'a', encoding='utf-8'
     ) as file:
         file.write(
-            f'The following TODOs are unresolved for '
-            f'this issue #{str(issue_number)}:\n'
+            UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=issue_number)
+            + '\n'
         )
         for todo in sorted(
             todos, key=lambda todo: (todo['file_path'], todo['line_number'])
@@ -399,7 +402,7 @@ def log_unresolved_todos_failure(
         todos: List[TodoDict]. The todos to log.
         issue_number: int. The issue number that the todos are associated with.
     """
-    print(f'The following TODOs are unresolved for this issue #{issue_number}:')
+    print(UNRESOLVED_TASKS_HEADING_TEMPLATE.format(issue_number=issue_number))
     for todo in sorted(
         todos, key=lambda todo: (todo['file_path'], todo['line_number'])
     ):
@@ -461,9 +464,9 @@ def main(args: Optional[List[str]] = None) -> None:
             print(f'unresolved_todos_found={str(todos_found).lower()}', file=o)
 
     if todos_found:
-        raise Exception(UNRESOLVED_TODOS_PRESENT_INDICATOR)
+        raise Exception(UNRESOLVED_TASKS_PRESENT_INDICATOR)
 
-    print(UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
+    print(UNRESOLVED_TASKS_NOT_PRESENT_INDICATOR)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

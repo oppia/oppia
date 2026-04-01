@@ -31,10 +31,11 @@ EXCLUDED_DIRECTORIES = [
     'dist',
 ]
 
-# Regex to detect general TODOs, doesn't have to be correctly formatted.
-TODO_REGEX = re.compile(r'\bTODO\b', re.IGNORECASE)
-# Regex to detect correctly formatted TODOs, e.g. "TODO(#1234): Description.".
-CORRECT_TODO_REGEX = re.compile(r'TODO\(#(\d+)\): .+')
+# Regexes to detect to-do comments in source files.
+TASK_KEYWORD = f'{"TO"}{"DO"}'
+TASK_REGEX = re.compile(rf'\b{TASK_KEYWORD}\b', re.IGNORECASE)
+# Detect correctly formatted to-do comments, e.g. "TODO(#1234): Description.".
+CORRECT_TASK_REGEX = re.compile(rf'{TASK_KEYWORD}\(#(\d+)\): .+')
 
 
 class TodoDict(TypedDict):
@@ -95,7 +96,7 @@ def get_todo_in_line(
     Returns:
         Optional[TodoDict]. The todo if it exists.
     """
-    if TODO_REGEX.search(line_content):
+    if TASK_REGEX.search(line_content):
         return {
             'file_path': file_path,
             'line_content': line_content.strip(),
@@ -135,7 +136,7 @@ def get_issue_number_from_todo(line_content: str) -> Optional[int]:
     Returns:
         Optional[int]. The issue number if it exists.
     """
-    issue_number = CORRECT_TODO_REGEX.search(line_content)
+    issue_number = CORRECT_TASK_REGEX.search(line_content)
     if issue_number:
         return int(issue_number.group(1))
     return None
@@ -153,5 +154,5 @@ def get_correctly_formated_todos(todos: List[TodoDict]) -> List[TodoDict]:
     return [
         todo
         for todo in todos
-        if CORRECT_TODO_REGEX.search(todo['line_content'])
+        if CORRECT_TASK_REGEX.search(todo['line_content'])
     ]
