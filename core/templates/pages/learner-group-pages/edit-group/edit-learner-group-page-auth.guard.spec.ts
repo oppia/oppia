@@ -66,6 +66,10 @@ describe('EditLearnerGroupPageAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
   it('should allow access if validation succeeds', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
