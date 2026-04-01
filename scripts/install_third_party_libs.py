@@ -40,7 +40,6 @@ from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
 
-
 from typing import Final
 
 from . import clean, common
@@ -196,13 +195,17 @@ def install_gcloud_sdk() -> None:
             # If the google cloud version is updated here, the corresponding
             # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
             # should also be updated.
-            if common.OS_NAME == 'Linux':
+            if common.is_linux_os():
                 gcloud_os_name = 'linux'
-            elif common.OS_NAME == 'Darwin':
+            elif common.is_mac_os():
                 gcloud_os_name = 'darwin'
             else:
                 raise Exception('Unsupported OS: %s' % common.OS_NAME)
 
+            # We use x86_64 as the architecture name for both x86_64 and amd64,
+            # as both are technically 64-bit x86 based systems. For ARM-based
+            # systems (like Apple M-series chips), we use 'arm'. For all other
+            # architectures, we fall back to 'x86' as a safe default.
             if common.ARCHITECTURE in ('x86_64', 'amd64'):
                 gcloud_arch_name = 'x86_64'
             elif common.ARCHITECTURE == 'arm64':
@@ -447,10 +450,12 @@ def main() -> None:
     # proceed to other setup tasks that require them.
     install_python_dev_dependencies.main(['--assert_compiled'])
 
-    from scripts import (
+    # We import these modules here after dev dependencies are installed to
+    # ensure that the required libraries are available in the environment.
+    from scripts import (  # pylint: disable=wrong-import-position
         install_dependencies_json_packages,
         install_python_prod_dependencies,
-    )  # pylint: disable=wrong-import-position
+    )
 
     # Import the hook scripts here (after dev deps are installed) so that
     # they are only loaded when running the installer.

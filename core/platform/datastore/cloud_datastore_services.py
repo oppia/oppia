@@ -21,6 +21,11 @@ from __future__ import annotations
 import contextlib
 import logging
 import time
+
+from core import utils
+from core.platform import models
+
+from google.cloud import ndb
 from typing import (
     Any,
     ContextManager,
@@ -32,11 +37,6 @@ from typing import (
     TypeVar,
     Union,
 )
-
-from google.cloud import ndb
-
-from core import utils
-from core.platform import models
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -133,6 +133,9 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
             return ndb.get_multi(keys)
         except Exception as e:
             logging.exception('Exception raised: %s', e)
+            # A short sleep is added here to allow the system to recover or for
+            # transient issues (like port release delay or network congestion)
+            # to resolve before the next retry attempt.
             time.sleep(0.01)
             continue
     raise Exception('get_multi failed after %s retries' % MAX_GET_RETRIES)
