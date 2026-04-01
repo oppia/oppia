@@ -155,7 +155,7 @@
     "@types/diff-match-patch": "^1.0.32",
     "@types/howler": "^2.2.2",
     "@webcomponents/custom-elements": "^1.5.1",
-    "bootstrap": "5.3.3",
+    "bootstrap": "^5.3.3",
     "browserify-zlib": "^0.2.0",
     "chai": "^4.2.0",
     "codemirror": "^5.61.0",
