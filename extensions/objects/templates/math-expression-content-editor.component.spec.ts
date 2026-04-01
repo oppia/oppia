@@ -37,16 +37,13 @@ import {
   InsertScriptService,
 } from 'services/insert-script.service';
 
-interface MathExpressionContentEditorComponentWithPrivates {
-  insertScriptService: InsertScriptService;
-}
-
 describe('MathExpressionContentEditorComponent', () => {
   let component: MathExpressionContentEditorComponent;
   let fixture: ComponentFixture<MathExpressionContentEditorComponent>;
   const originalMathJax = window.MathJax;
   let externalRteSaveService: ExternalRteSaveService;
   let alertsService: AlertsService;
+  let insertScriptService: InsertScriptService;
   let mockOnExternalRteSaveEventEmitter = new EventEmitter();
   let svgElement: {
     setAttribute: (txt: string, temp: string) => void;
@@ -104,6 +101,7 @@ describe('MathExpressionContentEditorComponent', () => {
     alertsService = TestBed.inject(AlertsService);
     externalRteSaveService = TestBed.inject(ExternalRteSaveService);
     fixture = TestBed.createComponent(MathExpressionContentEditorComponent);
+    insertScriptService = TestBed.inject(InsertScriptService);
     component = fixture.componentInstance;
     // The equation used for testing is x/y.
     component.value = {
@@ -265,16 +263,14 @@ describe('MathExpressionContentEditorComponent', () => {
 
   it('should close editor if the expression is not editable on initialisation', fakeAsync(() => {
     spyOn(component, 'closeEditor');
-    const loadScriptSpy = spyOn(
-      (component as unknown as MathExpressionContentEditorComponentWithPrivates)
-        .insertScriptService,
-      'loadScript'
-    ).and.callFake((script: KNOWN_SCRIPTS, callback: () => void) => {
-      if (script === KNOWN_SCRIPTS.MATHJAX) {
-        callback();
+    const loadScriptSpy = spyOn(insertScriptService, 'loadScript').and.callFake(
+      (script: KNOWN_SCRIPTS, callback: () => void) => {
+        if (script === KNOWN_SCRIPTS.MATHJAX) {
+          callback();
+        }
+        return true;
       }
-      return true;
-    });
+    );
     component.alwaysEditable = false;
 
     component.ngOnInit();
