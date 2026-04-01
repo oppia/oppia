@@ -19,7 +19,12 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain, exp_services, rights_manager, state_domain
+from core.domain import (
+    draft_upgrade_services,
+    exp_domain,
+    rights_manager,
+    state_domain,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_drafts_migration_job
 from core.jobs.types import job_run_result
@@ -56,6 +61,7 @@ class MigrateExplorationDraftsJobTests(
             language_code='en',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name='Introduction',
+            version=2,
             states={
                 'Introduction': state_domain.State.create_default_state(
                     'Introduction',
@@ -86,24 +92,42 @@ class MigrateExplorationDraftsJobTests(
                     'new_value': {'html': 'Old content format'},
                 }
             ],
+            draft_change_list_exp_version=1,
             draft_change_list_last_updated=None,
         )
         user_data_model.update_timestamps()
         user_data_model.put()
 
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='DRAFT PROCESSED SUCCESS: 1')]
-        )
+        new_change_list = [{'cmd': 'upgraded_cmd'}]
+        with self.swap_to_always_return(
+            draft_upgrade_services,
+            'try_upgrading_draft_to_exp_version',
+            new_change_list,
+        ):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='DRAFT PROCESSED SUCCESS: 1'
+                    )
+                ]
+            )
 
         migrated_model = user_models.ExplorationUserDataModel.get(
             self.USER_ID, self.EXP_ID
         )
 
         assert migrated_model is not None
-        self.assertIsNotNone(migrated_model.draft_change_list)
+        self.assertEqual(migrated_model.draft_change_list, new_change_list)
+        self.assertEqual(migrated_model.draft_change_list_exp_version, 2)
 
     def test_migrates_draft_updates_model_when_changes_detected(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+
+        exp_model = exp_models.ExplorationModel.get(self.EXP_ID)
+        exp_model.version = 2
+        exp_model.update_timestamps()
+        exp_model.put()
+
         old_draft_list = [{'cmd': 'old_cmd'}]
         user_data_model = self.create_model(
             user_models.ExplorationUserDataModel,
@@ -111,14 +135,15 @@ class MigrateExplorationDraftsJobTests(
             user_id=self.USER_ID,
             exploration_id=self.EXP_ID,
             draft_change_list=old_draft_list,
+            draft_change_list_exp_version=1,
             draft_change_list_last_updated=None,
         )
         user_data_model.update_timestamps()
         user_data_model.put()
         new_change_list = [{'cmd': 'new_cmd'}]
         with self.swap_to_always_return(
-            exp_services,
-            'migrate_draft_change_list_to_latest_schema',
+            draft_upgrade_services,
+            'try_upgrading_draft_to_exp_version',
             new_change_list,
         ):
             self.assert_job_output_is(
@@ -146,6 +171,7 @@ class MigrateExplorationDraftsJobTests(
             language_code='en',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name='Introduction',
+            version=2,
             states={
                 'Introduction': state_domain.State.create_default_state(
                     'Introduction',
@@ -162,6 +188,7 @@ class MigrateExplorationDraftsJobTests(
             user_id=self.USER_ID,
             exploration_id=self.EXP_ID,
             draft_change_list=[],
+            draft_change_list_exp_version=1,
         )
 
         result_item = exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(  # pylint: disable=protected-access
@@ -183,6 +210,7 @@ class MigrateExplorationDraftsJobTests(
             language_code='en',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name='Introduction',
+            version=2,
             states={},
         )
         user_model = self.create_model(
@@ -191,6 +219,7 @@ class MigrateExplorationDraftsJobTests(
             user_id=self.USER_ID,
             exploration_id=self.EXP_ID,
             draft_change_list=[{'cmd': 'some_cmd'}],
+            draft_change_list_exp_version=1,
         )
 
         # Here we use object because we do not care about the argument types
@@ -199,8 +228,8 @@ class MigrateExplorationDraftsJobTests(
             raise Exception('Migration failed')
 
         with self.swap(
-            exp_services,
-            'migrate_draft_change_list_to_latest_schema',
+            draft_upgrade_services,
+            'try_upgrading_draft_to_exp_version',
             mock_migrate_error,
         ):
             result_item = exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(  # pylint: disable=protected-access
@@ -209,6 +238,41 @@ class MigrateExplorationDraftsJobTests(
 
         self.assertTrue(result_item.is_err())
         self.assertIn('Migration failed', str(result_item.unwrap_err()[1]))
+
+    def test_migrate_draft_returns_error_for_incompatible_commits(self) -> None:
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_ID,
+            title='title',
+            category='category',
+            language_code='en',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            init_state_name='Introduction',
+            version=2,
+            states={},
+        )
+        user_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id='%s.%s' % (self.USER_ID, self.EXP_ID),
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID,
+            draft_change_list=[{'cmd': 'some_cmd'}],
+            draft_change_list_exp_version=1,
+        )
+
+        with self.swap_to_always_return(
+            draft_upgrade_services,
+            'try_upgrading_draft_to_exp_version',
+            None,
+        ):
+            result_item = exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(  # pylint: disable=protected-access
+                user_model, exp_model
+            )
+
+        self.assertTrue(result_item.is_err())
+        self.assertIn(
+            'due to incompatible commits', str(result_item.unwrap_err()[1])
+        )
 
     def test_skips_users_without_drafts(self) -> None:
         exp_model = self.create_model(
@@ -219,6 +283,7 @@ class MigrateExplorationDraftsJobTests(
             language_code='en',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name='Introduction',
+            version=2,
             states={
                 'Introduction': state_domain.State.create_default_state(
                     'Introduction',
@@ -242,6 +307,7 @@ class MigrateExplorationDraftsJobTests(
             user_id='user_2',
             exploration_id=self.EXP_ID,
             draft_change_list=None,
+            draft_change_list_exp_version=1,
         )
         no_draft_model.update_timestamps()
         no_draft_model.put()
@@ -263,6 +329,12 @@ class AuditMigrateExplorationDraftsJobTests(
 
     def test_audits_draft_successfully_without_saving(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+
+        exp_model = exp_models.ExplorationModel.get(self.EXP_ID)
+        exp_model.version = 2
+        exp_model.update_timestamps()
+        exp_model.put()
+
         old_draft_list = [{'cmd': 'old_cmd'}]
         user_data_model = self.create_model(
             user_models.ExplorationUserDataModel,
@@ -270,6 +342,7 @@ class AuditMigrateExplorationDraftsJobTests(
             user_id=self.USER_ID,
             exploration_id=self.EXP_ID,
             draft_change_list=old_draft_list,
+            draft_change_list_exp_version=1,
             draft_change_list_last_updated=None,
         )
         user_data_model.update_timestamps()
@@ -277,15 +350,22 @@ class AuditMigrateExplorationDraftsJobTests(
 
         new_change_list = [{'cmd': 'new_cmd'}]
         with self.swap_to_always_return(
-            exp_services,
-            'migrate_draft_change_list_to_latest_schema',
+            draft_upgrade_services,
+            'try_upgrading_draft_to_exp_version',
             new_change_list,
         ):
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
                         stdout='DRAFT PROCESSED SUCCESS: 1'
-                    )
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout=(
+                            f'AUDIT MIGRATED DRAFT - User ID: {self.USER_ID}, '
+                            f'Exploration ID: {self.EXP_ID}, '
+                            f'Upgraded to Exp Version: 2'
+                        )
+                    ),
                 ]
             )
 
@@ -295,3 +375,4 @@ class AuditMigrateExplorationDraftsJobTests(
 
         assert unmigrated_model is not None
         self.assertEqual(unmigrated_model.draft_change_list, old_draft_list)
+        self.assertEqual(unmigrated_model.draft_change_list_exp_version, 1)

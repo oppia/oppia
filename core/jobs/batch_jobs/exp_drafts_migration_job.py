@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import exp_fetchers, exp_services
+from core.domain import draft_upgrade_services, exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -57,35 +57,41 @@ class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
     ) -> result.Result[
         Tuple[str, user_models.ExplorationUserDataModel], Tuple[str, Exception]
     ]:
-        """Migrates the draft change list within an ExplorationUserDataModel.
-
-        Args:
-            user_model: ExplorationUserDataModel. The user data model containing
-                the draft.
-            exp_model: ExplorationModel. The associated exploration model.
-
-        Returns:
-            Result. A Result object containing the (id, updated_model) on
-            success, or (id, Exception) on failure.
-        """
+        """Migrates the draft change list within an ExplorationUserDataModel."""
         try:
             # If there are no drafts, skip.
             if not user_model.draft_change_list:
                 return result.Ok((user_model.id, user_model))
 
-            # Retrieve the full exploration object from the model.
-            exploration = exp_fetchers.get_exploration_from_model(exp_model)
+            current_draft_version = user_model.draft_change_list_exp_version
+            target_exp_version = exp_model.version
 
-            # Use domain service to check/migrate the draft.
+            # If the draft is already at the latest version, no migration needed.
+            if current_draft_version == target_exp_version:
+                return result.Ok((user_model.id, user_model))
+
             updated_draft_change_list = (
-                exp_services.migrate_draft_change_list_to_latest_schema(
-                    user_model.draft_change_list, exploration
+                draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                    user_model.draft_change_list,
+                    current_draft_version,
+                    target_exp_version,
+                    exp_model.id,
                 )
             )
 
-            # If the draft changed, update the model.
+            if updated_draft_change_list is None:
+                return result.Err(
+                    (
+                        user_model.id,
+                        Exception(
+                            f"Draft migration dropped/failed for user {user_model.user_id} on exp {exp_model.id} due to incompatible commits."
+                        ),
+                    )
+                )
+
             if updated_draft_change_list != user_model.draft_change_list:
                 user_model.draft_change_list = updated_draft_change_list
+                user_model.draft_change_list_exp_version = target_exp_version
 
             return result.Ok((user_model.id, user_model))
 
@@ -188,3 +194,21 @@ class AuditMigrateExplorationDraftsJob(MigrateExplorationDraftsJob):
     """Job that audits the migration of exploration drafts without saving."""
 
     DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        migrated_models, job_run_results = (
+            self.pipeline | 'Migrate Drafts' >> MigrateExplorationDrafts()
+        )
+
+        audit_logs = migrated_models | 'Format Audit Logs' >> beam.Map(
+            lambda model: job_run_result.JobRunResult.as_stdout(
+                f'AUDIT MIGRATED DRAFT - User ID: {model.user_id}, '
+                f'Exploration ID: {model.exploration_id}, '
+                f'Upgraded to Exp Version: {model.draft_change_list_exp_version}'
+            )
+        )
+
+        return (
+            job_run_results,
+            audit_logs,
+        ) | 'Flatten Results' >> beam.Flatten()
