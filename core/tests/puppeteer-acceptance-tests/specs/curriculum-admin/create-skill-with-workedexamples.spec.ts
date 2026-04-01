@@ -19,8 +19,8 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const ROLES = testConstants.Roles;
 
