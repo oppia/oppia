@@ -61,6 +61,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
 @Component({
   selector: 'oppia-new-conversation-skin',
@@ -133,7 +134,8 @@ export class NewConversationSkinComponent {
     private checkpointProgressService: CheckpointProgressService,
     private conversationFlowService: ConversationFlowService,
     private chapterProgressService: ChapterProgressService,
-    private mobileMenuService: MobileMenuService
+    private mobileMenuService: MobileMenuService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   ngOnInit(): void {
@@ -189,6 +191,8 @@ export class NewConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+          // Reset showInteraction when a new card opens after stuck state redirect.
+          this.showInteraction = true;
           let pathnameArray = this.urlService.getPathname().split('/');
 
           if (
@@ -208,6 +212,13 @@ export class NewConversationSkinComponent {
             }
           }
 
+          // The continueToReviseStateButtonIsVisible should not be set for 'Continue'
+          // interaction, because the Continue button is already visible and
+          // clicking it should simply move to the next state, not trigger
+          // potentially dangerous stuck redirection logic.
+          if (newCard.getInteractionId() === 'Continue') {
+            return;
+          }
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;
           });
@@ -286,11 +297,11 @@ export class NewConversationSkinComponent {
       this.isLoggedIn = userInfo.isLoggedIn();
       this.conversationFlowService.setIsLoggedIn(this.isLoggedIn);
 
-      this.windowRef.nativeWindow.addEventListener('beforeunload', e => {
+      this.preventPageUnloadEventService.addListener(() => {
         let redirectToRefresherExplorationConfirmed =
           this.conversationFlowService.getRedirectToRefresherExplorationConfirmed();
         if (redirectToRefresherExplorationConfirmed) {
-          return;
+          return false;
         }
         if (
           this.conversationFlowService.getHasInteractedAtLeastOnce() &&
@@ -303,18 +314,14 @@ export class NewConversationSkinComponent {
             this.learnerParamsService.getAllParams()
           );
 
-          let confirmationMessage =
-            'Please save your progress before navigating away from the' +
-            ' page; else, you will lose your exploration progress.';
-          (e || this.windowRef.nativeWindow.event).returnValue =
-            confirmationMessage;
-          return confirmationMessage;
+          return true;
         }
+        return false;
       });
 
       let pid =
         this.localStorageService.getUniqueProgressIdOfLoggedOutLearner();
-      if (pid && this.isLoggedIn) {
+      if (pid && this.isLoggedIn && this.explorationId) {
         await this.editableExplorationBackendApiService.changeLoggedOutProgressToLoggedInProgressAsync(
           this.explorationId,
           pid
@@ -423,6 +430,7 @@ export class NewConversationSkinComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.preventPageUnloadEventService.removeListener();
   }
 
   getAnswerIsBeingProcessed(): boolean {
@@ -502,6 +510,12 @@ export class NewConversationSkinComponent {
   }
 
   triggerRedirectionToStuckState(): void {
+    // Save the current state name before redirecting so that after
+    // completing the revision, the learner can navigate back to it.
+    const currentStateName = this.conversationFlowService
+      .getDisplayedCard()
+      .getStateName();
+    this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
     let nextStateCard = this.conversationFlowService.getNextCardIfStuck();
     if (nextStateCard) {

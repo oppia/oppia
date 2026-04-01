@@ -20,7 +20,6 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const ROLES = testConstants.Roles;
 
@@ -28,24 +27,12 @@ ConsoleReporter.setConsoleErrorsToIgnore([/[\s\S]*/]);
 
 describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
-  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
-    );
-
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    // Enable the feature flag.
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_worked_examples_rte_component'
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
