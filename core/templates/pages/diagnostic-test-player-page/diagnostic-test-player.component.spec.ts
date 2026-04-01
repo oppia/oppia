@@ -47,6 +47,9 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {LoaderService} from 'services/loader.service';
 
 class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  onTranslationChange: EventEmitter<string> = new EventEmitter();
+  onDefaultLangChange: EventEmitter<string> = new EventEmitter();
   instant(key: string, interpolateParams?: Object): string {
     return key;
   }
@@ -144,7 +147,7 @@ const topicData1: CreatorTopicSummary = new CreatorTopicSummary(
   'math',
   'public/img.webp',
   'red',
-  'add',
+  'topic_1_url_fragment',
   1,
   1,
   [5, 4],
@@ -169,7 +172,7 @@ const topicData2: CreatorTopicSummary = new CreatorTopicSummary(
   'math',
   'public/img1.png',
   'green',
-  'div',
+  'math',
   1,
   1,
   [5, 4],
@@ -184,6 +187,7 @@ const dummyClassroomData = new ClassroomData(
   'dummy',
   'dummy',
   'dummy',
+  true,
   true,
   {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
   {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
@@ -440,6 +444,7 @@ describe('Diagnostic test player component', () => {
       'dummy',
       'dummy',
       'dummy',
+      true,
       true,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
