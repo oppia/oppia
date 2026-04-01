@@ -174,18 +174,12 @@ BAD_PATTERNS: Dict[str, BadPatternsDict] = {
 
 BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
     {
-        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
+        'regexp': re.compile(
+            r'^\s*(#|//|/\*|\*)\s*.*\bTODO\b(?!\(#\d+\): [A-Z].*)'
+        ),
         'message': 'Please link TODO comments to an issue '
         'in the format TODO(#issuenum): XXX. ',
-        'excluded_files': (
-            'todo_finder.py',
-            'todo_finder_test.py',
-            'check_for_duplicate_todo_comment.py',
-            'check_for_duplicate_todo_comment_test.py',
-            'check_for_unresolved_todos.py',
-            'check_for_unresolved_todos_test.py',
-            'todo_check.yml',
-        ),
+        'excluded_files': (),
         'excluded_dirs': (),
     }
 ]
