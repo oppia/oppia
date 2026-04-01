@@ -128,7 +128,6 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks if exp_id corresponds to a valid exploration."""
         assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
-        assert isinstance(exploration, exp_domain.Exploration)
         if exploration is None:
             yield (
                 statistics_validation_errors.InvalidExplorationIdError(model)
@@ -143,7 +142,7 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
         assert exploration is not None
 
         if model.state_name not in exploration.states:
-            yield (statistics_validation_errors.InvalidStateNameError(model))
+            yield statistics_validation_errors.InvalidStateNameError(model)
 
     def validate_range_of_exp_version(
         self, model: base_models.BaseModel

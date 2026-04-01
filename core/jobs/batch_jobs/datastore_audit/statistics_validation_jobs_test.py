@@ -118,6 +118,9 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         self.put_multi([model])
 
         invalid_exp_error = (
+            statistics_validation_errors.InvalidExplorationIdError(model).stderr
+        )
+        does_not_exist_error = (
             statistics_validation_errors.ExplorationDoesNotExistError(
                 '', model
             ).stderr
@@ -126,13 +129,11 @@ class AnswerSubmittedEventLogEntryModelValidationJobTest(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
-                    '\n'.join(
-                        [
-                            f'ExplorationDoesNotExistError: {invalid_exp_error}',
-                            invalid_exp_error,
-                        ]
-                    )
-                )
+                    f'InvalidExplorationIdError: {invalid_exp_error}'
+                ),
+                job_run_result.JobRunResult.as_stderr(
+                    f'ExplorationDoesNotExistError: {does_not_exist_error}'
+                ),
             ]
         )
 
