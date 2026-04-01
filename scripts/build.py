@@ -288,6 +288,13 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
                     'removed does not exist.' % env_variable
                 )
             content = re.sub('  %s: ".*"\n' % env_variable, '', content)
+    # In app_dev.yaml, MathJax is served from the Angular dev build output
+    # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
+    # to the prod build output (dist/oppia-angular-prod/).
+    content = content.replace(
+        'static_dir: dist/oppia-angular/assets/mathjax',
+        'static_dir: dist/oppia-angular-prod/assets/mathjax',
+    )
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with open(APP_YAML_FILEPATH, 'w+', encoding='utf-8') as prod_yaml_file:
@@ -1415,67 +1422,6 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
     print('Build completed.')
 
 
-def vendor_ckeditor_from_npm() -> None:
-    """Copy CKEditor4 + BootstrapCK from node_modules into
-    third_party/static using versioned directories + stable aliases.
-
-    This reads package.json from each npm package to create a
-    versioned directory (e.g. third_party/static/ckeditor-4.16.1) and
-    also writes stable aliases (third_party/static/ckeditor).
-    """
-
-    def _get_package_version(package_path: str) -> str:
-        package_json_path = os.path.join(package_path, 'package.json')
-        with open(package_json_path, 'r', encoding='utf-8') as f:
-            return json.load(f)['version']
-
-    print('Vendoring CKEditor4 from npm...')
-
-    ckeditor_src = os.path.join('node_modules', 'ckeditor4')
-    bootstrap_src = os.path.join('node_modules', 'ckeditor4-bootstrapck')
-
-    if not os.path.isdir(ckeditor_src):
-        raise Exception('ckeditor4 not installed. Run npm install.')
-
-    if not os.path.isdir(bootstrap_src):
-        raise Exception('ckeditor4-bootstrapck not installed.')
-
-    ckeditor_version = _get_package_version(ckeditor_src)
-    bootstrap_version = _get_package_version(bootstrap_src)
-
-    ckeditor_versioned = os.path.join(
-        THIRD_PARTY_STATIC_DIR, f'ckeditor-{ckeditor_version}'
-    )
-    bootstrap_versioned = os.path.join(
-        THIRD_PARTY_STATIC_DIR, f'ckeditor-bootstrapck-{bootstrap_version}'
-    )
-
-    ckeditor_alias = os.path.join(THIRD_PARTY_STATIC_DIR, 'ckeditor')
-    bootstrap_alias = os.path.join(
-        THIRD_PARTY_STATIC_DIR, 'ckeditor-bootstrapck'
-    )
-
-    # Remove old copies
-    for path in [
-        ckeditor_versioned,
-        bootstrap_versioned,
-        ckeditor_alias,
-        bootstrap_alias,
-    ]:
-        if os.path.exists(path):
-            shutil.rmtree(path)
-
-    # Copy versioned
-    shutil.copytree(ckeditor_src, ckeditor_versioned)
-    shutil.copytree(bootstrap_src, bootstrap_versioned)
-
-    # Create stable runtime aliases
-    shutil.copytree(ckeditor_versioned, ckeditor_alias)
-    shutil.copytree(bootstrap_versioned, bootstrap_alias)
-
-    print('CKEditor vendored successfully.')
-
-
 def generate_python_package() -> None:
     """Generates Python package using setup.py."""
 
@@ -1516,12 +1462,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
-    # Vendor CKEditor4 from node_modules into third_party/static so that
-    # subsequent build steps can find it.
-    try:
-        vendor_ckeditor_from_npm()
-    except Exception:
-        print('Warning: vendoring CKEditor4 failed; continuing build.')
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the

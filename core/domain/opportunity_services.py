@@ -21,7 +21,6 @@ from __future__ import annotations
 import collections
 import datetime
 import logging
-from typing import Dict, List, Optional, Sequence, Tuple
 
 from core import feature_flag_list, feconf
 from core.constants import constants
@@ -40,6 +39,8 @@ from core.domain import (
     translation_services,
 )
 from core.platform import models
+
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -95,13 +96,15 @@ def get_exploration_opportunity_summary_from_model(
         + model.language_codes_with_assigned_voice_artists
     )
     supported_language_codes = set(
-        language["id"] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
     )
-    missing_language_codes = list(supported_language_codes - set_of_all_languages)
+    missing_language_codes = list(
+        supported_language_codes - set_of_all_languages
+    )
     if missing_language_codes:
         logging.info(
-            "Missing language codes %s in exploration opportunity model with "
-            "id %s" % (missing_language_codes, model.id)
+            'Missing language codes %s in exploration opportunity model with '
+            'id %s' % (missing_language_codes, model.id)
         )
 
     new_incomplete_translation_language_codes = (
@@ -181,7 +184,9 @@ def _save_multi_exploration_opportunity_summary(
             summary object.
     """
     exploration_opportunity_summary_model_list = (
-        _construct_new_opportunity_summary_models(exploration_opportunity_summary_list)
+        _construct_new_opportunity_summary_models(
+            exploration_opportunity_summary_list
+        )
     )
     (
         opportunity_models.ExplorationOpportunitySummaryModel.update_timestamps_multi(
@@ -214,10 +219,14 @@ def create_exp_opportunity_summary(
     # TODO(#13903): Find a way to reduce runtime of computing the complete
     # languages.
     complete_translation_language_list = (
-        translation_services.get_languages_with_complete_translation(exploration)
+        translation_services.get_languages_with_complete_translation(
+            exploration
+        )
     )
     # TODO(#13912): Revisit voiceover language logic.
-    language_codes_needing_voice_artists = set(complete_translation_language_list)
+    language_codes_needing_voice_artists = set(
+        complete_translation_language_list
+    )
     incomplete_translation_language_codes = (
         _compute_exploration_incomplete_translation_languages(
             complete_translation_language_list
@@ -236,25 +245,29 @@ def create_exp_opportunity_summary(
         feconf.TranslatableEntityType.EXPLORATION, exploration
     )
 
-    story_node = story.story_contents.get_node_with_corresponding_exp_id(exploration.id)
+    story_node = story.story_contents.get_node_with_corresponding_exp_id(
+        exploration.id
+    )
 
     # TODO(#7376): Once the voiceover application functionality is
     # implemented change this method such that it also populates the
     # language_codes_with_assigned_voice_artists with the required data.
 
-    exploration_opportunity_summary = opportunity_domain.ExplorationOpportunitySummary(
-        exploration.id,
-        topic.id,
-        topic.name,
-        story.id,
-        story.title,
-        story_node.title,
-        content_count,
-        incomplete_translation_language_codes,
-        translation_counts,
-        list(language_codes_needing_voice_artists),
-        [],
-        {},
+    exploration_opportunity_summary = (
+        opportunity_domain.ExplorationOpportunitySummary(
+            exploration.id,
+            topic.id,
+            topic.name,
+            story.id,
+            story.title,
+            story_node.title,
+            content_count,
+            incomplete_translation_language_codes,
+            translation_counts,
+            list(language_codes_needing_voice_artists),
+            [],
+            {},
+        )
     )
 
     # Asynchronously regenerates voiceovers for exploration contents in English
@@ -266,7 +279,7 @@ def create_exp_opportunity_summary(
     ):
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                "FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION"
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
             ],
             taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
             exploration.id,
@@ -290,7 +303,7 @@ def _compute_exploration_incomplete_translation_languages(
         alphabetically.
     """
     audio_language_codes = set(
-        language["id"] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
     )
     incomplete_translation_language_codes = audio_language_codes - set(
         complete_translation_languages
@@ -298,7 +311,9 @@ def _compute_exploration_incomplete_translation_languages(
     return sorted(list(incomplete_translation_language_codes))
 
 
-def add_new_exploration_opportunities(story_id: str, exp_ids: List[str]) -> None:
+def add_new_exploration_opportunities(
+    story_id: str, exp_ids: List[str]
+) -> None:
     """Adds new exploration opportunity into the model.
 
     Args:
@@ -333,7 +348,9 @@ def _create_exploration_opportunities(
         exploration_opportunity_summary_list.append(
             create_exp_opportunity_summary(topic, story, exploration)
         )
-    _save_multi_exploration_opportunity_summary(exploration_opportunity_summary_list)
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
+    )
 
 
 def compute_opportunity_models_with_updated_exploration(
@@ -361,8 +378,8 @@ def compute_opportunity_models_with_updated_exploration(
             complete_translation_language_list.append(language_code)
 
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
-    exploration_opportunity_summary = get_exploration_opportunity_summary_from_model(
-        model
+    exploration_opportunity_summary = (
+        get_exploration_opportunity_summary_from_model(model)
     )
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
@@ -371,10 +388,15 @@ def compute_opportunity_models_with_updated_exploration(
             complete_translation_language_list
         )
     )
-    if updated_exploration.language_code in incomplete_translation_language_codes:
+    if (
+        updated_exploration.language_code
+        in incomplete_translation_language_codes
+    ):
         # Remove exploration language from incomplete translation languages list
         # as an exploration does not need a translation in its own language.
-        incomplete_translation_language_codes.remove(updated_exploration.language_code)
+        incomplete_translation_language_codes.remove(
+            updated_exploration.language_code
+        )
     exploration_opportunity_summary.incomplete_translation_language_codes = (
         incomplete_translation_language_codes
     )
@@ -400,7 +422,9 @@ def compute_opportunity_models_with_updated_exploration(
 
     exploration_opportunity_summary.validate()
 
-    return _construct_new_opportunity_summary_models([exploration_opportunity_summary])
+    return _construct_new_opportunity_summary_models(
+        [exploration_opportunity_summary]
+    )
 
 
 def update_translation_opportunity_with_accepted_suggestion(
@@ -414,27 +438,63 @@ def update_translation_opportunity_with_accepted_suggestion(
         language_code: str. The language code of the accepted translation
             suggestion.
     """
-    model = opportunity_models.ExplorationOpportunitySummaryModel.get(exploration_id)
-    exp_opportunity_summary = get_exploration_opportunity_summary_from_model(model)
+    model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+        exploration_id
+    )
+    exp_opportunity_summary = get_exploration_opportunity_summary_from_model(
+        model
+    )
 
-    if language_code in exp_opportunity_summary.translation_counts:
-        exp_opportunity_summary.translation_counts[language_code] += 1
+    # Capture the old stored count before recounting for audit tracking.
+    old_translation_count = exp_opportunity_summary.translation_counts.get(
+        language_code, 0
+    )
+
+    # Recount the translations to ensure that the counts are accurate and to
+    # prevent any double counting of translations.
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    current_translation_counts = translation_services.get_translation_counts(
+        feconf.TranslatableEntityType.EXPLORATION, exploration
+    )
+
+    if language_code in current_translation_counts:
+        exp_opportunity_summary.translation_counts[language_code] = (
+            current_translation_counts[language_code]
+        )
     else:
-        exp_opportunity_summary.translation_counts[language_code] = 1
+        exp_opportunity_summary.translation_counts[language_code] = 0
 
     if (
         exp_opportunity_summary.content_count
         == exp_opportunity_summary.translation_counts[language_code]
     ):
-        exp_opportunity_summary.incomplete_translation_language_codes.remove(
+        if (
             language_code
-        )
+            in exp_opportunity_summary.incomplete_translation_language_codes
+        ):
+            exp_opportunity_summary.incomplete_translation_language_codes.remove(
+                language_code
+            )
         exp_opportunity_summary.language_codes_needing_voice_artists.append(
             language_code
         )
 
     exp_opportunity_summary.validate()
     _save_multi_exploration_opportunity_summary([exp_opportunity_summary])
+
+    audit_model = (
+        opportunity_models.ExplorationOpportunitySummaryAuditModel.create_new(
+            exploration_id=exploration_id,
+            language_code=language_code,
+            action='translation_accepted',
+            old_translation_count=old_translation_count,
+            new_translation_count=exp_opportunity_summary.translation_counts[
+                language_code
+            ],
+            content_count=exp_opportunity_summary.content_count,
+        )
+    )
+    audit_model.put()
 
 
 def update_exploration_opportunities_with_story_changes(
@@ -457,7 +517,9 @@ def update_exploration_opportunities_with_story_changes(
         # Ruling out the possibility of None for mypy type checking.
         assert exp_opportunity_model is not None
         exploration_opportunity_summary = (
-            get_exploration_opportunity_summary_from_model(exp_opportunity_model)
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_model
+            )
         )
         exploration_opportunity_summary.story_title = story.title
         node = story.story_contents.get_node_with_corresponding_exp_id(
@@ -466,9 +528,13 @@ def update_exploration_opportunities_with_story_changes(
         exploration_opportunity_summary.chapter_title = node.title
         exploration_opportunity_summary.validate()
 
-        exploration_opportunity_summary_list.append(exploration_opportunity_summary)
+        exploration_opportunity_summary_list.append(
+            exploration_opportunity_summary
+        )
 
-    _save_multi_exploration_opportunity_summary(exploration_opportunity_summary_list)
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
+    )
 
 
 def delete_exploration_opportunities(exp_ids: List[str]) -> None:
@@ -500,7 +566,9 @@ def delete_exploration_opportunities_corresponding_to_topic(
         topic_id: str. The ID of the topic.
     """
     exp_opportunity_models = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(topic_id)
+        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+            topic_id
+        )
     )
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         list(exp_opportunity_models)
@@ -527,11 +595,15 @@ def update_exploration_opportunities(
         model_ids_need_update |= set(unchanged_exp_ids)
     else:
         for exp_id in unchanged_exp_ids:
-            new_node = new_story.story_contents.get_node_with_corresponding_exp_id(
-                exp_id
+            new_node = (
+                new_story.story_contents.get_node_with_corresponding_exp_id(
+                    exp_id
+                )
             )
-            old_node = old_story.story_contents.get_node_with_corresponding_exp_id(
-                exp_id
+            old_node = (
+                old_story.story_contents.get_node_with_corresponding_exp_id(
+                    exp_id
+                )
             )
             if old_node.title != new_node.title:
                 model_ids_need_update.add(exp_id)
@@ -550,7 +622,9 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
     Args:
         story_id: str. The ID of the story.
     """
-    exp_opprtunity_model_class = opportunity_models.ExplorationOpportunitySummaryModel
+    exp_opprtunity_model_class = (
+        opportunity_models.ExplorationOpportunitySummaryModel
+    )
     exp_opportunity_models: Sequence[
         opportunity_models.ExplorationOpportunitySummaryModel
     ] = (
@@ -563,7 +637,9 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
 
 def get_translation_opportunities(
     language_code: str, topic_name: Optional[str], cursor: Optional[str]
-) -> Tuple[List[opportunity_domain.ExplorationOpportunitySummary], Optional[str], bool]:
+) -> Tuple[
+    List[opportunity_domain.ExplorationOpportunitySummary], Optional[str], bool
+]:
     """Returns a list of opportunities available for translation in a specific
     language.
 
@@ -587,17 +663,12 @@ def get_translation_opportunities(
                 batch. If False, there are no further results after this batch.
     """
     page_size = constants.OPPORTUNITIES_PAGE_SIZE
-    start_index = int(cursor) if cursor else 0
-
-    exp_opportunity_models_query = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_all()
-    )
-    if topic_name:
-        exp_opportunity_models_query = exp_opportunity_models_query.filter(
-            opportunity_models.ExplorationOpportunitySummaryModel.topic_name
-            == topic_name
+    exp_opportunity_summary_models, cursor, more = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
+            page_size, cursor, language_code, topic_name
         )
-    exp_opportunity_summary_models = exp_opportunity_models_query.fetch()
+    )
+    opportunity_summaries = []
     opportunity_summary_exp_ids = [
         opportunity.id for opportunity in exp_opportunity_summary_models
     ]
@@ -608,41 +679,21 @@ def get_translation_opportunities(
                 opportunity_summary_exp_ids, language_code
             )
         )
-    filtered_opportunity_summaries = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         opportunity_summary = get_exploration_opportunity_summary_from_model(
             exp_opportunity_summary_model
         )
-        if (
-            language_code in opportunity_summary.incomplete_translation_language_codes
-            or opportunity_summary.translation_counts.get(language_code, 0) > 0
-        ):
-            if opportunity_summary.id in exp_id_to_in_review_count:
-                # Compute the translation_in_review_counts domain object field
-                # adhoc. Note that this field is not persisted and is only used
-                # in the frontend.
-                # TODO(#14833): Compute this value in the backend controller
-                # instead.
-                opportunity_summary.translation_in_review_counts = {
-                    language_code: exp_id_to_in_review_count[opportunity_summary.id]
-                }
-            filtered_opportunity_summaries.append(opportunity_summary)
-
-    filtered_opportunity_summaries.sort(
-        key=lambda opportunity_summary: (
-            opportunity_summary.topic_name,
-            opportunity_summary.story_title,
-            opportunity_summary.chapter_title,
-        )
-    )
-
-    page_of_opportunities = filtered_opportunity_summaries[
-        start_index : start_index + page_size
-    ]
-    next_index = start_index + page_size
-    more = next_index < len(filtered_opportunity_summaries)
-    next_cursor = str(next_index) if more else ""
-    return page_of_opportunities, next_cursor, more
+        if opportunity_summary.id in exp_id_to_in_review_count:
+            # Compute the translation_in_review_counts domain object field
+            # adhoc. Note that this field is not persisted and is only used in
+            # the frontend.
+            # TODO(#14833): Compute this value in the backend controller
+            # instead.
+            opportunity_summary.translation_in_review_counts = {
+                language_code: exp_id_to_in_review_count[opportunity_summary.id]
+            }
+        opportunity_summaries.append(opportunity_summary)
+    return opportunity_summaries, cursor, more
 
 
 def _build_exp_id_to_translation_suggestion_in_review_count(
@@ -724,7 +775,9 @@ def get_exploration_opportunity_summary_by_id(
     )
     if exp_opportunity_summary_model is None:
         return None
-    return get_exploration_opportunity_summary_from_model(exp_opportunity_summary_model)
+    return get_exploration_opportunity_summary_from_model(
+        exp_opportunity_summary_model
+    )
 
 
 def get_exploration_opportunity_summaries_by_topic_id(
@@ -743,7 +796,9 @@ def get_exploration_opportunity_summaries_by_topic_id(
     """
     opportunity_summaries = []
     exp_opportunity_summary_models = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(topic_id)
+        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+            topic_id
+        )
     )
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         opportunity_summary = get_exploration_opportunity_summary_from_model(
@@ -753,7 +808,9 @@ def get_exploration_opportunity_summaries_by_topic_id(
     return opportunity_summaries
 
 
-def update_opportunities_with_new_topic_name(topic_id: str, topic_name: str) -> None:
+def update_opportunities_with_new_topic_name(
+    topic_id: str, topic_name: str
+) -> None:
     """Updates the exploration opportunity summary models with new topic name.
 
     Args:
@@ -761,20 +818,28 @@ def update_opportunities_with_new_topic_name(topic_id: str, topic_name: str) -> 
         topic_name: str. The new topic name.
     """
     exp_opportunity_models = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(topic_id)
+        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+            topic_id
+        )
     )
 
     exploration_opportunity_summary_list = []
     for exp_opportunity_model in exp_opportunity_models:
         exploration_opportunity_summary = (
-            get_exploration_opportunity_summary_from_model(exp_opportunity_model)
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_model
+            )
         )
         exploration_opportunity_summary.topic_name = topic_name
         exploration_opportunity_summary.validate()
 
-        exploration_opportunity_summary_list.append(exploration_opportunity_summary)
+        exploration_opportunity_summary_list.append(
+            exploration_opportunity_summary
+        )
 
-    _save_multi_exploration_opportunity_summary(exploration_opportunity_summary_list)
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
+    )
 
 
 def get_skill_opportunity_from_model(
@@ -821,7 +886,9 @@ def get_skill_opportunities(
     )
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
-        skill_opportunity = get_skill_opportunity_from_model(skill_opportunity_model)
+        skill_opportunity = get_skill_opportunity_from_model(
+            skill_opportunity_model
+        )
         opportunities.append(skill_opportunity)
     return opportunities, cursor, more
 
@@ -843,7 +910,9 @@ def get_skill_opportunities_by_ids(
     opportunities: Dict[str, Optional[opportunity_domain.SkillOpportunity]] = {
         opportunity_id: None for opportunity_id in ids
     }
-    skill_opportunity_models = opportunity_models.SkillOpportunityModel.get_multi(ids)
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(ids)
+    )
 
     for skill_opportunity_model in skill_opportunity_models:
         if skill_opportunity_model is not None:
@@ -864,16 +933,19 @@ def create_skill_opportunity(skill_id: str, skill_description: str) -> None:
         Exception. If a SkillOpportunityModel corresponding to the supplied
             skill_id already exists.
     """
-    skill_opportunity_model = opportunity_models.SkillOpportunityModel.get_by_id(
-        skill_id
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
     )
     if skill_opportunity_model is not None:
         raise Exception(
-            "SkillOpportunity corresponding to skill ID %s already exists." % (skill_id)
+            'SkillOpportunity corresponding to skill ID %s already exists.'
+            % (skill_id)
         )
 
-    questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-        constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0
+    questions, _ = (
+        question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+            constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0
+        )
     )
     skill_opportunity = opportunity_domain.SkillOpportunity(
         skill_id=skill_id,
@@ -938,8 +1010,8 @@ def _get_skill_opportunity(
         SkillOpportunity with the supplied skill_id, or None if it does not
         exist.
     """
-    skill_opportunity_model = opportunity_models.SkillOpportunityModel.get_by_id(
-        skill_id
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
     )
     if skill_opportunity_model is not None:
         return get_skill_opportunity_from_model(skill_opportunity_model)
@@ -953,8 +1025,8 @@ def delete_skill_opportunity(skill_id: str) -> None:
         skill_id: str. The skill_id corresponding to the to-be-deleted
             SkillOpportunityModel.
     """
-    skill_opportunity_model = opportunity_models.SkillOpportunityModel.get_by_id(
-        skill_id
+    skill_opportunity_model = (
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
     )
     if skill_opportunity_model is not None:
         opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
@@ -969,8 +1041,8 @@ def increment_question_counts(skill_ids: List[str], delta: int) -> None:
             SkillOpportunityModel(s).
         delta: int. The delta for which to increment each question_count.
     """
-    updated_skill_opportunities = _get_skill_opportunities_with_updated_question_counts(
-        skill_ids, delta
+    updated_skill_opportunities = (
+        _get_skill_opportunities_with_updated_question_counts(skill_ids, delta)
     )
     _save_skill_opportunities(updated_skill_opportunities)
 
@@ -1026,8 +1098,8 @@ def _get_skill_opportunities_with_updated_question_counts(
         list(SkillOpportunity). The updated SkillOpportunities.
     """
     updated_skill_opportunities = []
-    skill_opportunity_models = opportunity_models.SkillOpportunityModel.get_multi(
-        skill_ids
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(skill_ids)
     )
     for skill_opportunity_model in skill_opportunity_models:
         if skill_opportunity_model is not None:
@@ -1062,7 +1134,9 @@ def regenerate_opportunities_related_to_topic(
     """
     if delete_existing_opportunities:
         exp_opportunity_models = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(topic_id)
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+                topic_id
+            )
         )
         opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
             list(exp_opportunity_models)
@@ -1080,13 +1154,15 @@ def regenerate_opportunities_related_to_topic(
         else:
             exp_ids += story.story_contents.get_all_linked_exp_ids()
 
-    exp_ids_to_exp = exp_fetchers.get_multiple_explorations_by_id(exp_ids, strict=False)
+    exp_ids_to_exp = exp_fetchers.get_multiple_explorations_by_id(
+        exp_ids, strict=False
+    )
     non_existing_exp_ids = set(exp_ids) - set(exp_ids_to_exp.keys())
 
     if len(non_existing_exp_ids) > 0 or len(non_existing_story_ids) > 0:
         raise Exception(
-            "Failed to regenerate opportunities for topic id: %s, "
-            "missing_exp_with_ids: %s, missing_story_with_ids: %s"
+            'Failed to regenerate opportunities for topic id: %s, '
+            'missing_exp_with_ids: %s, missing_story_with_ids: %s'
             % (topic_id, list(non_existing_exp_ids), non_existing_story_ids)
         )
 
@@ -1097,10 +1173,14 @@ def regenerate_opportunities_related_to_topic(
         assert story is not None
         for exp_id in story.story_contents.get_all_linked_exp_ids():
             exploration_opportunity_summary_list.append(
-                create_exp_opportunity_summary(topic, story, exp_ids_to_exp[exp_id])
+                create_exp_opportunity_summary(
+                    topic, story, exp_ids_to_exp[exp_id]
+                )
             )
 
-    _save_multi_exploration_opportunity_summary(exploration_opportunity_summary_list)
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
+    )
     return len(exploration_opportunity_summary_list)
 
 

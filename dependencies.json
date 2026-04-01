@@ -54,12 +54,19 @@
         "fontsPath": "webfonts"
       }
     },
-    "mathJax": {
-      "version": "2.7.5",
+    "ckeditor": {
+      "version": "4.12.1",
       "downloadFormat": "zip",
-      "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
-      "rootDirPrefix": "MathJax-",
-      "targetDirPrefix": "MathJax-"
+      "url": "https://github.com/ckeditor/ckeditor4-releases/archive/4.12.1.zip",
+      "rootDirPrefix": "ckeditor4-releases-",
+      "targetDirPrefix": "ckeditor-"
+    },
+    "ckeditorBootstrapCK": {
+      "version": "1.0.0",
+      "downloadFormat": "zip",
+      "url": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.zip",
+      "rootDirPrefix": "BootstrapCK4-Skin-",
+      "targetDirPrefix": "ckeditor-bootstrapck-"
     }
   }
 }
