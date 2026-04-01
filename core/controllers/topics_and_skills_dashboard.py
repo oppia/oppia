@@ -73,13 +73,9 @@ class TopicsAndSkillsDashboardPageDataHandler(
         for topic_summary in topic_summary_dicts:
             topic_rights = topic_rights_dict[topic_summary['id']]
             if topic_rights:
-                topic_summary['is_published'] = (
-                    topic_rights.topic_is_published
-                )
+                topic_summary['is_published'] = topic_rights.topic_is_published
                 topic_summary['can_edit_topic'] = (
-                    topic_services.check_can_edit_topic(
-                        self.user, topic_rights
-                    )
+                    topic_services.check_can_edit_topic(self.user, topic_rights)
                 )
 
         classrooms = classroom_config_services.get_all_classrooms()

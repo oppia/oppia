@@ -209,8 +209,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/%s'
-            % (feconf.STORY_EDITOR_DATA_URL_PREFIX, second_story_id)
+            '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, second_story_id)
         )
         self.assertEqual(json_response['story_dict']['id'], second_story_id)
         self.assertFalse(json_response['story_is_published'])
