@@ -216,8 +216,9 @@ describe('Contributor Certificate Download Modal Component', () => {
     const today = new Date();
     const fromDate = new Date();
     const toDate = new Date();
-    fromDate.setDate(today.getDate() - 2);
+    fromDate.setDate(today.getDate() - 1);
     toDate.setDate(today.getDate() - 1);
+
     component.fromDate = fromDate.toDateString();
     component.toDate = toDate.toDateString();
 
@@ -245,7 +246,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     flushMicrotasks();
 
     expect(component.errorsFound).toBe(true);
-    expect(component.certificateDownloading).toBe(false);
+    expect(component.isDownloading).toBe(false);
     expect(component.errorMessage).toBe('Error message');
   }));
 
@@ -264,6 +265,234 @@ describe('Contributor Certificate Download Modal Component', () => {
       component.createCertificate(certificateData);
       tick();
     }).toThrowError();
+  });
+
+  it('should print certificate when data is available', fakeAsync(() => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate');
+
+    component.printCertificate();
+
+    expect(component.isPrinting).toBeTrue();
+    expect(component.isCancelled).toBeFalse();
+
+    flushMicrotasks();
+
+    expect(component.createCertificate).toHaveBeenCalledWith(
+      certificateData,
+      true
+    );
+    expect(component.isPrinting).toBeFalse();
+  }));
+
+  it('should show error when printing with no contributions', fakeAsync(() => {
+    component.fromDate = '2020/01/01';
+    component.toDate = '2020/01/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(emptyCertificateDataResponse));
+
+    component.printCertificate();
+
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual(
+      'There are no contributions for the given date range.'
+    );
+    expect(component.isPrinting).toBeFalse();
+  }));
+
+  it('should handle errors in printCertificate', fakeAsync(() => {
+    const mockError = new HttpErrorResponse({error: {error: 'Print error'}});
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    component.printCertificate();
+
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.isPrinting).toBeFalse();
+    expect(component.errorMessage).toBe('Print error');
+  }));
+
+  it('should not proceed with print if cancelled', fakeAsync(() => {
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate');
+
+    component.printCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.createCertificate).not.toHaveBeenCalled();
+  }));
+
+  it('should not proceed with download if cancelled', fakeAsync(() => {
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
+    spyOn(component, 'createCertificate');
+
+    component.downloadCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.createCertificate).not.toHaveBeenCalled();
+  }));
+
+  it('should not show error if download is cancelled during error', fakeAsync(() => {
+    const mockError = new HttpErrorResponse({error: {error: 'Network error'}});
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    component.downloadCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.errorsFound).toBeFalse();
+  }));
+
+  it('should not show error if print is cancelled during error', fakeAsync(() => {
+    const mockError = new HttpErrorResponse({error: {error: 'Network error'}});
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    component.printCertificate();
+    component.close();
+
+    flushMicrotasks();
+
+    expect(component.isCancelled).toBeTrue();
+    expect(component.errorsFound).toBeFalse();
+  }));
+
+  it('should return true for isDownloadDisabled when downloading', () => {
+    component.isDownloading = true;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return true for isDownloadDisabled when printing', () => {
+    component.isPrinting = true;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return true for isDownloadDisabled when errors found', () => {
+    component.errorsFound = true;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return true for isDownloadDisabled when dates are undefined', () => {
+    component.fromDate = undefined as unknown as string;
+    expect(component.isDownloadDisabled).toBeTrue();
+  });
+
+  it('should return false for isDownloadDisabled when everything is valid', () => {
+    component.isDownloading = false;
+    component.isPrinting = false;
+    component.errorsFound = false;
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    expect(component.isDownloadDisabled).toBeFalse();
+  });
+
+  it('should set isCancelled to true when close is called', () => {
+    spyOn(activeModal, 'close');
+    expect(component.isCancelled).toBeFalse();
+    component.close();
+    expect(component.isCancelled).toBeTrue();
+    expect(activeModal.close).toHaveBeenCalled();
+  });
+
+  it('should show error for invalid date range when fromDate is not set', () => {
+    component.fromDate = '' as unknown as string;
+    component.toDate = '2022/10/31';
+
+    component.validateDate();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual('Invalid date range.');
+  });
+
+  it('should show error for invalid date range when toDate is not set', () => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '' as unknown as string;
+
+    component.validateDate();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual('Invalid date range.');
+  });
+
+  it('should return true for disableDownloadButton when toDate is undefined', () => {
+    component.toDate = undefined as unknown as string;
+    expect(component.disableDownloadButton()).toBeTrue();
+  });
+
+  it('should trigger print flow when createCertificate is called with isPrinting true', () => {
+    const mockBlob = new Blob(['image'], {type: 'image/png'});
+    const mockUrl = 'blob:mock-url';
+    const mockIframe = document.createElement('iframe');
+
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: () => {},
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+      }),
+      toBlob: (cb: (blob: Blob | null) => void) => cb(mockBlob),
+      toDataURL: () => '',
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'iframe') {
+        return mockIframe;
+      }
+      return document.createElement(tag);
+    });
+
+    spyOn(URL, 'createObjectURL').and.returnValue(mockUrl);
+    spyOn(URL, 'revokeObjectURL');
+    spyOn(document.body, 'appendChild');
+    spyOn(document.body, 'removeChild');
+
+    component.createCertificate(certificateData, true);
+
+    const image = new Image();
+    image.dispatchEvent(new Event('load'));
   });
 
   afterEach(() => {
