@@ -44,7 +44,9 @@ export class CertificateDownloadModalComponent {
   toDate!: string;
   errorMessage!: string;
   errorsFound = false;
-  certificateDownloading = false;
+  isDownloading = false;
+  isPrinting = false;
+  isCancelled = false;
   datesSelected = false;
 
   CERTIFICATE_WIDTH: number = 1500;
@@ -71,6 +73,7 @@ export class CertificateDownloadModalComponent {
   ) {}
 
   close(): void {
+    this.isCancelled = true;
     this.activeModal.close();
   }
 
@@ -85,7 +88,7 @@ export class CertificateDownloadModalComponent {
     today.setHours(0, 0, 0, 0);
     const toDate = new Date(this.toDate);
     toDate.setHours(0, 0, 0, 0);
-    if (!this.fromDate || !this.toDate || new Date(this.fromDate) >= toDate) {
+    if (!this.fromDate || !this.toDate || new Date(this.fromDate) > toDate) {
       this.errorsFound = true;
       this.errorMessage = 'Invalid date range.';
       return;
@@ -99,11 +102,21 @@ export class CertificateDownloadModalComponent {
     this.errorsFound = false;
     this.errorMessage = '';
   }
+  get isDownloadDisabled(): boolean {
+    return (
+      this.isDownloading ||
+      this.isPrinting ||
+      this.disableDownloadButton() ||
+      this.errorsFound
+    );
+  }
 
-  downloadCertificate(): void {
+  printCertificate(): void {
     this.errorsFound = false;
     this.errorMessage = '';
-    this.certificateDownloading = true;
+    this.isPrinting = true;
+    this.isCancelled = false;
+
     this.contributionAndReviewService
       .downloadContributorCertificateAsync(
         this.username,
@@ -113,6 +126,44 @@ export class CertificateDownloadModalComponent {
         this.toDate
       )
       .then((response: ContributorCertificateResponse) => {
+        if (this.isCancelled) {
+          return;
+        }
+        if (response.certificate_data) {
+          this.createCertificate(response.certificate_data, true);
+        } else {
+          this.errorsFound = true;
+          this.errorMessage =
+            'There are no contributions for the given date range.';
+        }
+        this.isPrinting = false;
+      })
+      .catch((err: HttpErrorResponse) => {
+        if (this.isCancelled) {
+          return;
+        }
+        this.errorsFound = true;
+        this.isPrinting = false;
+        this.errorMessage = err.error.error;
+      });
+  }
+  downloadCertificate(): void {
+    this.errorsFound = false;
+    this.errorMessage = '';
+    this.isDownloading = true;
+    this.isCancelled = false;
+    this.contributionAndReviewService
+      .downloadContributorCertificateAsync(
+        this.username,
+        this.suggestionType,
+        this.languageCode,
+        this.fromDate,
+        this.toDate
+      )
+      .then((response: ContributorCertificateResponse) => {
+        if (this.isCancelled) {
+          return;
+        }
         if (response.certificate_data) {
           this.createCertificate(response.certificate_data);
         } else {
@@ -120,11 +171,14 @@ export class CertificateDownloadModalComponent {
           this.errorMessage =
             'There are no contributions for the given date range.';
         }
-        this.certificateDownloading = false;
+        this.isDownloading = false;
       })
       .catch((err: HttpErrorResponse) => {
+        if (this.isCancelled) {
+          return;
+        }
         this.errorsFound = true;
-        this.certificateDownloading = false;
+        this.isDownloading = false;
         this.errorMessage = err.error.error;
       });
   }
@@ -133,7 +187,10 @@ export class CertificateDownloadModalComponent {
     return this.fromDate === undefined || this.toDate === undefined;
   }
 
-  createCertificate(info: ContributorCertificateInfo): void {
+  createCertificate(
+    info: ContributorCertificateInfo,
+    isPrinting: boolean = false
+  ): void {
     const canvas = document.createElement('canvas');
     const currentDate = new Date();
     // Intl.DateTimeFormatOptions is used to enable language sensitive date
@@ -310,11 +367,31 @@ export class CertificateDownloadModalComponent {
       ctx.fillText('SIGNATURE', this.SIGNATURE_BASE_COORDINATE, linePosition);
       ctx.fillText('DATE', this.DATE_BASE_COORDINATE, linePosition);
 
-      // Create an HTML link and clicks on it to download.
-      const link = document.createElement('a');
-      link.download = 'certificate.png';
-      link.href = canvas.toDataURL();
-      link.click();
+      if (isPrinting) {
+        canvas.toBlob(blob => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+
+            iframe.onload = () => {
+              iframe.contentWindow?.print();
+              setTimeout(() => {
+                document.body.removeChild(iframe);
+                URL.revokeObjectURL(url);
+              }, 1000);
+            };
+          }
+        });
+      } else {
+        // Create an HTML link and clicks on it to download.
+        const link = document.createElement('a');
+        link.download = 'certificate.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      }
     };
   }
 
