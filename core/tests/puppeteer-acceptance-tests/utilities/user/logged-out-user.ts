@@ -2678,7 +2678,7 @@ export class LoggedOutUser extends BaseUser {
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
     if (!this.isViewportAtMobileWidth()) {
       await this.page.waitForFunction(
-        selector => {
+        (selector: string) => {
           const element = document.querySelector(selector);
           if (!element) {
             return false;
