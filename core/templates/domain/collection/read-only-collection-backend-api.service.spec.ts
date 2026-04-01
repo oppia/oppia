@@ -37,7 +37,7 @@ describe('Read only collection backend API service', () => {
     meta_name: 'meta_name',
     can_edit: false,
     meta_description: 'meta_description',
-    collection: {
+    collection_dict: {
       id: '0',
       title: 'Collection Under Test',
       category: 'Test',
@@ -119,7 +119,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    var collectionObject = Collection.create(sampleDataResults.collection);
+    var collectionObject = Collection.create(sampleDataResults.collection_dict);
 
     expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();
@@ -177,7 +177,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    var collectionObject = Collection.create(sampleDataResults.collection);
+    var collectionObject = Collection.create(sampleDataResults.collection_dict);
 
     expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();

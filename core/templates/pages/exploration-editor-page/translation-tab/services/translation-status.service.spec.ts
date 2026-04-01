@@ -194,6 +194,7 @@ describe('Translation status service', () => {
           },
           confirmed_unclassified_answers: [],
         },
+        inapplicable_skill_misconception_ids: [],
         linked_skill_id: null,
         solicit_answer_details: false,
         classifier_model_id: null,
@@ -253,6 +254,7 @@ describe('Translation status service', () => {
           },
           confirmed_unclassified_answers: [],
         },
+        inapplicable_skill_misconception_ids: [],
         linked_skill_id: null,
         solicit_answer_details: false,
         classifier_model_id: null,
@@ -277,6 +279,7 @@ describe('Translation status service', () => {
           default_outcome: null,
           confirmed_unclassified_answers: [],
         },
+        inapplicable_skill_misconception_ids: [],
         linked_skill_id: null,
         solicit_answer_details: false,
         classifier_model_id: null,
@@ -341,10 +344,11 @@ describe('Translation status service', () => {
         content_8: {
           manual: manualVoiceover8,
         },
-      }
+      },
+      {}
     );
 
-    entityVoiceoversService.init('exp_id', 'exploration', 5);
+    entityVoiceoversService.init('exp_id', 'exploration', 5, 'en');
     entityVoiceoversService.setLanguageCode('en');
     entityVoiceoversService.setActiveLanguageAccentCode('en-US');
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
@@ -487,10 +491,11 @@ describe('Translation status service', () => {
           manual: voiceover2,
           auto: undefined,
         },
-      }
+      },
+      {}
     );
 
-    entityVoiceoversService.init('exp_id', 'exploration', 5);
+    entityVoiceoversService.init('exp_id', 'exploration', 5, 'en');
     entityVoiceoversService.setLanguageCode('en');
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
 
@@ -817,9 +822,9 @@ describe('Translation status service', () => {
       },
     } as FeatureStatusChecker);
 
-    expect(
-      tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
-    ).toBeFalse();
+    expect(tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()).toBe(
+      false
+    );
   });
 
   it('should enable voiceover regeneration feature flag', () => {
@@ -829,8 +834,8 @@ describe('Translation status service', () => {
       },
     } as FeatureStatusChecker);
 
-    expect(
-      tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
-    ).toBeTrue();
+    expect(tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()).toBe(
+      true
+    );
   });
 });
