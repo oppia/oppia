@@ -76,7 +76,7 @@
       </button>
     </div>
   </div>
-  <div class="oppia-translation-progress">
+  <div class="oppia-translation-progress" [attr.dir]="isTranslationLanguageRTL() ? 'rtl' : 'ltr'">
     <div class="e2e-test-progress-info">
       <strong>Exploration {{ inVoiceoverMode ? 'voiceover' : 'translation' }} progress:</strong>
     </div>
