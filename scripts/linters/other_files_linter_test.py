@@ -47,12 +47,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.dependencies_file = io.StringIO('{"dependencies":{"frontend":{}}}')
         self.package_file = io.StringIO(
             '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2",'
-            '"guppy-dev":"git+https://github.com/oppia/guppy#c1ef610",'
+            '"guppy-dev":"git+https://github.com/oppia/guppy#f509e",'
             '"midi": "git+https://github.com/oppia/miDI.js#c26eb"}}'
         )
 
         self.files_in_typings_dir = [
-            'guppy-defs-c1ef610.d.ts',
+            'guppy-defs-f509e.d.ts',
             'skulpt-defs-0.2.d.ts',
             'midi-defs-c26eb.d.ts',
             'nerdamer-defs-0.6.d.ts',
@@ -299,7 +299,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assert_same_list_elements(
                 [
                     'Type definitions for Guppy are not up to date. The '
-                    'current version of Guppy is c1ef610 and the type definitions '
+                    'current version of Guppy is f509e and the type definitions '
                     'are for version 0.2. Please refer typings/README.md '
                     'for more details.'
                 ],
