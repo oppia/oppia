@@ -243,6 +243,30 @@ describe('Automatic voiceover highlight service', () => {
     ).toBe('highlightId3');
   });
 
+  it('should match very short highlight intervals with tolerance', () => {
+    automaticVoiceoverHighlightService.sentenceHighlightIntervalList = [
+      {
+        highlightSentenceId: 'highlightId1',
+        startTimeInSecs: 0.05,
+        endTimeInSecs: 0.05,
+      },
+      {
+        highlightSentenceId: 'highlightId2',
+        startTimeInSecs: 0.2,
+        endTimeInSecs: 0.5,
+      },
+    ];
+
+    expect(
+      automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(0.1)
+    ).toBe('highlightId1');
+
+    // Outside tolerance, no stale highlight should be returned.
+    expect(
+      automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(0.16)
+    ).toBeUndefined();
+  });
+
   it('should pronounce correctly for superscripts', () => {
     // Mock AppConstants for math symbol pronunciations.
     const mathSymbolPronunciations = {
