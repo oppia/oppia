@@ -32,7 +32,14 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
-import {KNOWN_SCRIPTS} from 'services/insert-script.service';
+import {
+  KNOWN_SCRIPTS,
+  InsertScriptService,
+} from 'services/insert-script.service';
+
+interface MathExpressionContentEditorComponentWithPrivates {
+  insertScriptService: InsertScriptService;
+}
 
 describe('MathExpressionContentEditorComponent', () => {
   let component: MathExpressionContentEditorComponent;
@@ -259,7 +266,7 @@ describe('MathExpressionContentEditorComponent', () => {
   it('should close editor if the expression is not editable on initialisation', fakeAsync(() => {
     spyOn(component, 'closeEditor');
     const loadScriptSpy = spyOn(
-      (component as unknown as {insertScriptService: {loadScript: Function}})
+      (component as unknown as MathExpressionContentEditorComponentWithPrivates)
         .insertScriptService,
       'loadScript'
     ).and.callFake((script: KNOWN_SCRIPTS, callback: () => void) => {
