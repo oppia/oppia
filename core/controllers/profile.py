@@ -37,7 +37,7 @@ from core.domain import (
     wipeout_service,
 )
 
-from typing import Any, Callable, Dict, Optional, TypedDict
+from typing import Any, Callable, Dict, List, Optional, TypedDict
 
 
 class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -261,10 +261,34 @@ class MailingListSubscriptionHandler(
         self.render_json({'status': status})
 
 
-class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class PreferencesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of PreferencesHandler's
+    normalized_payload dictionary.
+    """
+
+    updates: List[Dict[str, Any]]
+
+
+class PreferencesHandler(
+    base.BaseHandler[
+        PreferencesHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Provides data for the preferences page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'updates': {
+                'schema': {
+                    'type': 'list',
+                    'items': {'type': 'dict'},
+                }
+            }
+        },
+    }
 
     # Here we use type Any because we don't know the data type of input.
     def __validate_data_type(
@@ -353,7 +377,8 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def put(self) -> None:
         """Handles PUT requests."""
         assert self.user_id is not None
-        updates = self.payload['updates']
+        assert self.normalized_payload is not None
+        updates = self.normalized_payload['updates']
         bulk_email_signup_message_should_be_shown = False
         user_settings = user_services.get_user_settings(self.user_id)
 

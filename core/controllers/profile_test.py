@@ -666,6 +666,40 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                 )
         self.logout()
 
+    def test_put_without_updates_key_raises_schema_validation_error(
+        self,
+    ) -> None:
+        """Test that a PUT request without the 'updates' key is rejected
+        by schema validation.
+        """
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {'invalid_key': 'invalid_value'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(response['status_code'], 400)
+        self.logout()
+
+    def test_put_with_non_list_updates_raises_schema_validation_error(
+        self,
+    ) -> None:
+        """Test that a PUT request where 'updates' is not a list is
+        rejected by schema validation.
+        """
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': 'not_a_list'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(response['status_code'], 400)
+        self.logout()
+
 
 class LongUserBioHandlerTests(test_utils.GenericTestBase):
     USERNAME_A: Final = 'a'
