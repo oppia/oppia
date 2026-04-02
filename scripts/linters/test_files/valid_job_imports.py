@@ -87,6 +87,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     audit_threads_with_missing_suggestions_jobs,
 )
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    cleanup_duplicate_translation_suggestions_jobs,
+)
 
 
 class FakeClass:

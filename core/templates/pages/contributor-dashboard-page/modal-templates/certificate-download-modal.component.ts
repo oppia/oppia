@@ -266,6 +266,16 @@ export class CertificateDownloadModalComponent {
       linePosition += 100;
 
       if (this.suggestionType === 'translate_content') {
+        // Determine time display: use minutes if less than 1 hour,
+        // otherwise use hours.
+        let timeDisplay: string;
+        if (info.contribution_hours < 1) {
+          const minutes = Math.round(info.contribution_hours * 60);
+          timeDisplay = minutes === 1 ? '1 minute' : minutes + ' minutes';
+        } else {
+          timeDisplay = info.contribution_hours + ' hours';
+        }
+
         const certificateContentData: CertificateContentData[] = [
           {
             text:
@@ -284,17 +294,16 @@ export class CertificateDownloadModalComponent {
           },
           {
             text:
-              'This certificate confirms that ' +
-              this.username +
-              ' has contributed ' +
-              info.contribution_hours +
-              ' hours ' +
-              'worth of',
+              'This certificate confirms the completion of ' +
+              info.contribution_word_count +
+              ' words of translated content,',
             linePosition: (linePosition += 80),
           },
           {
             text:
-              'translations from ' +
+              'representing ' +
+              timeDisplay +
+              ' of service from ' +
               info.from_date +
               ' to ' +
               info.to_date +
