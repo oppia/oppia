@@ -1,5 +1,6 @@
 {
     "1": [
+        "scripts.check_unused_i18n_keys_test",
         "core.jobs.transforms.job_result_transforms_test",
         "scripts.linters.run_lint_checks_test",
         "core.controllers.base_test",
@@ -268,7 +269,9 @@
         "core.jobs.batch_jobs.suggestion_stats_computation_jobs_test",
         "core.jobs.batch_jobs.user_stats_computation_jobs_test",
         "core.jobs.batch_jobs.math_interactions_audit_jobs_test",
+        "core.jobs.batch_jobs.number_with_units_audit_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
+        "core.jobs.batch_jobs.translation_audit_jobs_test",
         "core.jobs.batch_jobs.collection_info_jobs_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
@@ -323,6 +326,7 @@
         "core.jobs.batch_jobs.story_migration_jobs_test",
         "core.jobs.batch_jobs.email_deletion_jobs_test",
         "core.jobs.batch_jobs.topic_migration_jobs_test",
+        "core.jobs.batch_jobs.blog_author_details_migration_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
         "core.jobs.io.cache_io_test",
@@ -411,8 +415,9 @@
         "core.domain.voiceover_regeneration_services_test",
         "core.platform.speech_synthesis.azure_speech_synthesis_services_test",
         "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test",
-        "core.jobs.batch_jobs.audit_topics_with_hanging_stories_job_test",
+        "core.jobs.batch_jobs.audit_non_existent_threads_messages_jobs_test",
         "conftest_test",
-        "core.jobs.batch_jobs.remove_hanging_story_references_job_test"
+        "core.jobs.batch_jobs.audit_threads_with_missing_suggestions_jobs_test",
+        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test"
     ]
 }
