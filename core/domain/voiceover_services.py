@@ -28,6 +28,7 @@ from core.domain import (
     email_manager,
     exp_domain,
     exp_fetchers,
+    exp_services,
     state_domain,
     taskqueue_services,
     translation_domain,
@@ -1181,13 +1182,26 @@ def regenerate_voiceovers_on_exploration_update(
     for change in exploration_change_diff:
         cmd = change.get('cmd')
         if cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-            # CMD_EDIT_STATE_PROPERTY is used to fetch the updated content for
-            # the English language.
-            updated_content = change['new_value']['html']
-            content_id = change['new_value']['content_id']
-            language_code_to_contents_mapping.setdefault('en', {})[
-                content_id
-            ] = updated_content
+            # Here we use cast because the from_dict() method returns a object of
+            # type BaseChange, which is a parent class for ExplorationChange.
+            # This cast assures the static type checker that the 'change_object'
+            # variable is of type ExplorationChange, allowing us to access its
+            # specific attributes and methods without type errors.
+            change_object = cast(
+                exp_domain.ExplorationChange,
+                exp_domain.ExplorationChange.from_dict(change),
+            )
+            content_id_to_content_values = exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change_object
+            )
+
+            for (
+                content_id,
+                content_value,
+            ) in content_id_to_content_values.items():
+                language_code_to_contents_mapping.setdefault('en', {})[
+                    content_id
+                ] = content_value
         elif cmd == exp_domain.CMD_EDIT_TRANSLATION:
             # CMD_EDIT_TRANSLATION is used to fetch the updated content for
             # the translations in other languages.
