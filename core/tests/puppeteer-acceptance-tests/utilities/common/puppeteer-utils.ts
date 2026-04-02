@@ -1087,20 +1087,6 @@ export class BaseUser {
     const specName = process.env.SPEC_NAME;
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
-    // Wait for web fonts and paint frames so text layout is stable in screenshots.
-    await currentPage.evaluate(async () => {
-      const doc = document as Document & {fonts?: {ready: Promise<void>}};
-      if (doc.fonts !== undefined) {
-        await doc.fonts.ready;
-      }
-      await new Promise<void>(resolve => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-      });
-    });
     // To wait for all images to load and the page to be stable.
     await currentPage.waitForTimeout(5000);
 
