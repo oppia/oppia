@@ -127,10 +127,12 @@ oppia-conversation-skin .supplemental-card-parent-container {
   margin-right: 10px;
 }
 
-oppia-conversation-skin .oppia-button-raised.mat-raised-raised {
+button.oppia-button-raised.e2e-test-next-lesson-button.mat-focus-indicator.mat-raised-button.mat-button-base {
   align-items: center;
   background-color: #0d48a1;
   display: flex;
+  border: none;
+  padding: 0;
   height: 32px;
   justify-content: center;
   width: 32px;
@@ -138,6 +140,7 @@ oppia-conversation-skin .oppia-button-raised.mat-raised-raised {
 
 oppia-conversation-skin .oppia-button-icon {
   color: #fff;
+  font-size: 42px;
 }
 
 .oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
