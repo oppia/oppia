@@ -1,14 +1,100 @@
 name: 'Install Chrome'
 description: 'Installs Chrome for use in tests'
-
 runs:
   using: 'composite'
   steps:
     - id: install-chrome
-      name: Install Chrome
-      # Installs a pinned version of Chrome for Testing from:
-      # https://github.com/GoogleChromeLabs/chrome-for-testing
-      uses: browser-actions/setup-chrome@v2
+      name: Install Chrome (retries on error)
+      uses: nick-fields/retry@v3
+      env:
+        # Must be a version available from the Chrome for Testing repository:
+        # https://googlechromelabs.github.io/chrome-for-testing/
+        CHROME_VERSION: "147.0.7727.50"
       with:
-        chrome-version: '145.0.7632.116'
-        install-dependencies: true
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        timeout_minutes: 10
+        command: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnspr4 \
+            libnss3 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2 \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libappindicator3-1 \
+            libdbus-1-3 \
+            libexpat1 \
+            libfontconfig1 \
+            libgcc1 \
+            libglib2.0-0 \
+            libgtk-3-0 \
+            libstdc++6 \
+            libx11-6 \
+            libx11-xcb1 \
+            libxcb1 \
+            libxcb-dri3-0 \
+            libxext6 \
+            libxi6 \
+            libxrender1 \
+            libxtst6
+            libxss1
+
+          CHROME_URL="https://storage.googleapis.com/chrome-for-testing-public/${{ env.CHROME_VERSION }}/linux64/chrome-linux64.zip"
+          echo "Downloading Chrome from: $CHROME_URL"
+          curl -L -o chrome-linux64.zip "$CHROME_URL"
+
+          # Extract and install Chrome to /opt/google/chrome.
+
+          unzip -q chrome-linux64.zip
+          sudo mkdir -p /opt/google/chrome
+          sudo cp -r chrome-linux64/* /opt/google/chrome/
+          sudo chmod +x /opt/google/chrome/chrome
+
+          sudo tee /usr/local/bin/google-chrome > /dev/null << 'EOF'
+          #!/bin/bash
+          exec /opt/google/chrome/chrome --disable-setuid-sandbox "$@"
+          EOF
+          sudo chmod +x /usr/local/bin/google-chrome
+
+          chrome_version=$(google-chrome --version 2>&1 | tr -cd '[:digit:].')
+          echo "Installed Chrome version: $chrome_version"
+          [[ "$chrome_version" == "${{ env.CHROME_VERSION }}"* ]] || {
+            echo "Error: Installed Chrome version ($chrome_version) does not match desired version (${{ env.CHROME_VERSION }})."
+            exit 1
+          }
+
+    # -----------------------------------------------------------------------
+    # Diagnostic step: only runs if the install step above fails.
+    # Logs any missing shared libraries so you know exactly which packages
+    # to add to the apt-get install list in the step above.
+    # -----------------------------------------------------------------------
+    - id: diagnose-missing-libs
+      name: Diagnose missing Chrome dependencies (runs on failure)
+      if: failure()
+      shell: bash
+      run: |
+        echo "===== ldd diagnostic for Chrome binary ====="
+        ldd /opt/google/chrome/chrome 2>&1 | grep -i "not found" || echo "No missing libraries detected by ldd."
+
+        echo ""
+        echo "===== chrome --version output ====="
+        /opt/google/chrome/chrome --version 2>&1 || true
+
+        echo ""
+        echo "===== dpkg missing-deps check ====="
+        # List any unmet dependencies for packages we just installed
+        sudo dpkg --configure -a 2>&1 || true
+        sudo apt-get install -f --dry-run 2>&1 || true
+        
