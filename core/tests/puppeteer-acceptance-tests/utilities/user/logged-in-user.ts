@@ -1950,25 +1950,6 @@ export class LoggedInUser extends BaseUser {
     root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
   ): Promise<void> {
     await this.page.waitForSelector(learnerDashSelectors[selector].heading);
-    await this.page.waitForFunction(
-      (headingSelector: string, expectedHeadingTexts: string[]) => {
-        const headings = Array.from(document.querySelectorAll(headingSelector));
-        const visibleHeadingTexts = headings
-          .filter(heading => {
-            const style = window.getComputedStyle(heading as HTMLElement);
-            return style.display !== 'none' && style.visibility !== 'hidden';
-          })
-          .map(heading => heading.textContent?.trim())
-          .filter((text): text is string => Boolean(text));
-
-        return expectedHeadingTexts.every(expectedText =>
-          visibleHeadingTexts.includes(expectedText)
-        );
-      },
-      {},
-      learnerDashSelectors[selector].heading,
-      expectedTexts
-    );
 
     const allElements =
       (await root?.$$(learnerDashSelectors[selector].heading)) ?? [];
