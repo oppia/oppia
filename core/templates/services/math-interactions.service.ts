@@ -101,7 +101,7 @@ export class MathInteractionsService {
         ' function(s) cannot be empty. Please enter a variable/number in it.';
     }
     if (errorMessage === 'Not a prefix operator.') {
-      return "Please enter a complete multiplication expression. The '*' symbol cannot be used alone.";
+      return 'Invalid multiplication expression. The "*" symbol cannot be used alone. Please include a number or variable before it (e.g., 2 * x).';
     }
     return errorMessage;
   }
