@@ -210,7 +210,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Oppia 部落格| Oppia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "歡迎來到 Oppia 部落格！",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "顯示搜尋結果",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "顯示全部搜尋結果的 <[startingNumber]> - <[endingNumber]> 個結果。",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "顯示 <[totalNumber]> 篇裡的 <[startingNumber]> - <[endingNumber]> 篇文章。",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "增加縮圖圖片",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "正文",
