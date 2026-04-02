@@ -208,7 +208,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Blog Oppia | Oppia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Selamat datang di Blog Oppia!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Menampilkan Hasil Pencarian",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Menampilkan <[startingNumber]> - <[endingNumber]> dari total hasil pencarian.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Menampilkan <[startingNumber]> - <[endingNumber]> dari <[totalNumber]> postingan",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Tambahkan Gambar Thumbnail",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "Isi",
