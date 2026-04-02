@@ -261,7 +261,6 @@ describe('Logged-Out Learner', function () {
 
     // Continue to next card.
     await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.page.waitForTimeout(10000);
     expect(await loggedOutLearner.isFractionInputDisplayPresent()).toBe(true);
 
     expect(await loggedOutLearner.isBackButtonPresent()).toBe(true);
