@@ -6689,8 +6689,8 @@ export class LoggedOutUser extends BaseUser {
       );
     }, checkpointSelector);
 
-    // Return 0-based index if found, otherwise 0 or -1.
-    return focusIndex;
+    // Return 1-based index if found, otherwise 0.
+    return focusIndex + 1;
   }
   /**
    * Expect no color node in checkpoint bar.
@@ -6849,7 +6849,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Whether the given node is color (completed).
-   * @param nodeNumber - Zero-based index of the node.
+   * @param nodeNumber - One-based index of the node.
    */
   async isCheckpointNodeColor(nodeNumber: number): Promise<boolean> {
     await this.page.waitForSelector(checkpointSelector);
@@ -6857,7 +6857,7 @@ export class LoggedOutUser extends BaseUser {
     const isColored = await this.page.evaluate(
       (selector, index) => {
         const nodes = document.querySelectorAll(selector);
-        const targetNode = nodes[index];
+        const targetNode = nodes[index - 1];
 
         if (!targetNode) {
           return false;

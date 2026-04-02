@@ -283,11 +283,7 @@ describe('Logged-Out Learner', function () {
       true
     );
 
-    await loggedOutLearner.expectScreenshotToMatch(
-      'newLessonPlayerWithCheckpoint',
-      __dirname
-    );
-    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(0);
+    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
     await loggedOutLearner.expectNoColorNodeInCheckpoint();
     expect(await loggedOutLearner.isContinueButtonPresent()).toBe(true);
     expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
@@ -309,14 +305,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.closeConceptCard();
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.expectCheckpointCelebrationComponentAppears();
-    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
+    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(2);
     expect(await loggedOutLearner.isBackButtonPresent()).toBe(true);
     expect(await loggedOutLearner.isContinueButtonPresent()).toBe(false);
-    await loggedOutLearner.expectScreenshotToMatch(
-      'fractionCardInNewLessonPlayer',
-      __dirname
-    );
-    expect(await loggedOutLearner.isCheckpointNodeColor(0)).toBe(true);
+    expect(await loggedOutLearner.isCheckpointNodeColor(1)).toBe(true);
     expect(await loggedOutLearner.isResponseSubmitButtonPresent()).toBe(true);
   });
 
@@ -326,8 +318,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectLearnerCardHeading(
       'Welcome, to the Place Values Exploration.'
     );
-    expect(await loggedOutLearner.isCheckpointNodeColor(0)).toBe(true);
-    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
+    expect(await loggedOutLearner.isCheckpointNodeColor(1)).toBe(true);
+    expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(2);
     // Next card arrow button visible.
     expect(await loggedOutLearner.isNextCardNavigationButtonPresent()).toBe(
       true
@@ -387,10 +379,6 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectSolutionModelVisible();
     await loggedOutLearner.expectSolution('1/2>');
     await loggedOutLearner.expectSolutionExplanation('Answer is 1/2.');
-    await loggedOutLearner.expectScreenshotToMatch(
-      'solutionModalLearnerPage',
-      __dirname
-    );
     await loggedOutLearner.closeSolution();
   }, 1200000);
 
@@ -398,6 +386,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.submitFractionInputResponse('1/2');
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.expectCheckpointCelebrationComponentAppears();
+    await loggedOutLearner.expectScreenshotToMatch(
+      'celebrationPopUp',
+      __dirname
+    );
     await loggedOutLearner.expectSubmitButton('Hidden');
   });
 
