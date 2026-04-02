@@ -1455,6 +1455,9 @@ describe('New Conversation skin component', () => {
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       true
     );
+    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+      false
+    );
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
@@ -1834,6 +1837,9 @@ describe('New Conversation skin component', () => {
       'has loaded',
     () => {
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
         false
       );
       spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(

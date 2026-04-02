@@ -81,6 +81,7 @@ export class NewConversationSkinComponent {
   directiveSubscriptions = new Subscription();
 
   _editorPreviewMode!: boolean;
+  _storyEditorPreviewMode!: boolean;
 
   isLoggedIn!: boolean;
   voiceoversAreLoaded: boolean = false;
@@ -141,6 +142,8 @@ export class NewConversationSkinComponent {
   ngOnInit(): void {
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
+    this._storyEditorPreviewMode =
+      this.pageContextService.isInStoryEditorPreviewMode();
     this.correctnessFooterIsShown =
       !this.pageContextService.isInDiagnosticTestPlayerPage();
 
@@ -257,7 +260,7 @@ export class NewConversationSkinComponent {
           // the end of the exploration.
           if (
             !this._editorPreviewMode &&
-            !this.pageContextService.isInStoryEditorPreviewMode() &&
+            !this._storyEditorPreviewMode &&
             nextCard.isTerminal()
           ) {
             const currentEngineService =
