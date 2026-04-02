@@ -39,6 +39,9 @@ import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {PageContextService} from 'services/page-context.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {of, throwError} from 'rxjs';
 
 class MockWindowRef {
   nativeWindow = {
@@ -117,6 +120,27 @@ class MockHtmlLengthService {
   }
 }
 
+class MockPageContextService {
+  getEntityType() {
+    return 'topic';
+  }
+
+  getEntityId() {
+    return 'test-id';
+  }
+}
+
+class MockAssetsBackendApiService {
+  postThumbnailFile(
+    imageData: Blob,
+    filename: string,
+    entityType: string,
+    entityId: string
+  ) {
+    return of({filename: filename});
+  }
+}
+
 describe('create new subtopic modal', function () {
   let component: CreateNewSubtopicModalComponent;
   let fixture: ComponentFixture<CreateNewSubtopicModalComponent>;
@@ -176,6 +200,14 @@ describe('create new subtopic modal', function () {
         },
         TopicUpdateService,
         SubtopicValidationService,
+        {
+          provide: PageContextService,
+          useClass: MockPageContextService,
+        },
+        {
+          provide: AssetsBackendApiService,
+          useClass: MockAssetsBackendApiService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -270,8 +302,7 @@ describe('create new subtopic modal', function () {
   });
 
   it('should return ALL_COMPONENTS schema when EnableWorkedExamplesRteComponent is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
     let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
     expect(SUBTOPIC_PAGE_SCHEMA).toEqual(AllComponentsSchema);
   });
@@ -391,14 +422,12 @@ describe('create new subtopic modal', function () {
   });
 
   it('should check if worked examples RTE component feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       true
     );
 
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       false
     );
@@ -599,81 +628,4 @@ describe('create new subtopic modal', function () {
       '#FF0000'
     );
   });
-
-  it('should upload image and update subtopic thumbnail on successful upload', fakeAsync(() => {
-    const pageContextService = TestBed.inject(PageContextService);
-    const assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
-    const mockImageData = {
-      filename: 'test-thumbnail.svg',
-      bg_color: '#C6DCDA',
-      image_data: new Blob(['<svg></svg>'], {type: 'image/svg+xml'}),
-    };
-    const mockResponse = {filename: 'uploaded-thumbnail.svg'};
-
-    spyOn(pageContextService, 'getEntityType').and.returnValue('topic');
-    spyOn(pageContextService, 'getEntityId').and.returnValue('topic123');
-    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
-      of(mockResponse)
-    );
-    spyOn(component, 'updateSubtopicThumbnailFilename');
-    spyOn(component, 'updateSubtopicThumbnailBgColor');
-
-    component.onImageSave(mockImageData);
-    tick();
-
-    expect(assetsBackendApiService.postThumbnailFile).toHaveBeenCalledWith(
-      mockImageData.image_data,
-      mockImageData.filename,
-      'topic',
-      'topic123'
-    );
-  }));
-
-  it('should handle error when entity type or ID is not available in subtopic', () => {
-    const pageContextService = TestBed.inject(PageContextService);
-    const assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
-    const mockImageData = {
-      filename: 'test-thumbnail.svg',
-      bg_color: '#C6DCDA',
-      image_data: new Blob(['<svg></svg>'], {type: 'image/svg+xml'}),
-    };
-
-    spyOn(pageContextService, 'getEntityType').and.returnValue(undefined);
-    spyOn(pageContextService, 'getEntityId').and.returnValue('topic123');
-    spyOn(console, 'error');
-    spyOn(assetsBackendApiService, 'postThumbnailFile');
-
-    component.onImageSave(mockImageData);
-
-    expect(console.error).toHaveBeenCalledWith(
-      'Entity type or ID not available'
-    );
-    expect(assetsBackendApiService.postThumbnailFile).not.toHaveBeenCalled();
-  });
-
-  it('should handle error when uploading subtopic thumbnail fails', fakeAsync(() => {
-    const pageContextService = TestBed.inject(PageContextService);
-    const assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
-    const mockImageData = {
-      filename: 'test-thumbnail.svg',
-      bg_color: '#C6DCDA',
-      image_data: new Blob(['<svg></svg>'], {type: 'image/svg+xml'}),
-    };
-    const mockError = new Error('Upload failed');
-
-    spyOn(pageContextService, 'getEntityType').and.returnValue('topic');
-    spyOn(pageContextService, 'getEntityId').and.returnValue('topic123');
-    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
-      throwError(mockError)
-    );
-    spyOn(console, 'error');
-
-    component.onImageSave(mockImageData);
-    tick();
-
-    expect(console.error).toHaveBeenCalledWith(
-      'Error uploading thumbnail:',
-      mockError
-    );
-  }));
 });

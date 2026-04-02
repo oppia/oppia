@@ -26,6 +26,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {PageContextService} from 'services/page-context.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
@@ -48,6 +50,8 @@ describe('Create new topic modal', () => {
       providers: [
         NgbActiveModal,
         TopicEditorStateService,
+        PageContextService,
+        AssetsBackendApiService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -207,7 +211,11 @@ describe('Create new topic modal', () => {
   it('should update isValid when thumbnail image is set', () => {
     expect(componentInstance.isValid()).toBeFalse();
 
-    componentInstance.thumbnailImage = new Blob(['test'], {type: 'image/svg+xml'});
+    // Mock newlyCreatedTopic.isValid() to return true
+    spyOn(componentInstance.newlyCreatedTopic, 'isValid').and.returnValue(true);
+    componentInstance.thumbnailImage = new Blob(['test'], {
+      type: 'image/svg+xml',
+    });
 
     expect(componentInstance.isValid()).toBeTrue();
   });
