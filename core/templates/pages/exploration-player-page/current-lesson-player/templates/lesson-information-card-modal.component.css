@@ -74,6 +74,7 @@
   color: #fff;
   font-size: 12px;
   height: 18px;
+  margin-bottom: 5px;
   width: 18px;
 }
 
@@ -106,9 +107,9 @@
   margin-top: 20px;
 }
 
-/* This is necessary so that long usernames don't overflow the tooltip. */
 .oppia-lesson-exploration-progress-info .tooltip-inner {
   max-width: none;
+  white-space: nowrap;
 }
 
 .oppia-info-card-tag-icon {
@@ -117,7 +118,12 @@
 }
 
 .oppia-info-card-exploration-contributors-profile {
-  justify-content: flex-end;
+  align-items: center;
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  list-style-type: none;
+  margin: 0;
   padding: 0;
 }
 
@@ -126,10 +132,14 @@
 }
 
 .learn-info-card-star {
-  margin: 5px
+  margin: 5px;
+  vertical-align: middle;
 }
 
-.oppia-lesson-exploration-progress-info .card-metrics li .far {
+.oppia-lesson-exploration-progress-info .card-metrics li .far,
+.oppia-lesson-exploration-progress-info .card-metrics li .fas,
+.oppia-lesson-exploration-progress-info .oppia-contributors-icon {
+  cursor: default;
   font-size: 24px;
   margin: 5px;
   vertical-align: middle;
@@ -143,6 +153,7 @@
 .named-contributors-container .contributor-0 {
   list-style: none;
   position: absolute;
+  top: 3px;
   z-index: 2;
 }
 
@@ -150,6 +161,7 @@
   list-style: none;
   margin-left: 14px;
   position: absolute;
+  top: 3px;
 }
 
 .oppia-lesson-exploration-progress-info .card-metrics {
@@ -172,8 +184,6 @@
 
 .oppia-lesson-exploration-progress-info .oppia-contributors-icon {
   cursor: default;
-  margin-right: 0.3125rem;
-  width: 24px;
 }
 
 .oppia-lesson-info-card .row.center {
@@ -207,6 +217,8 @@
   align-items: center;
   display: flex;
   flex-direction: row;
+  height: 34px;
+  position: relative;
   width: 36px;
 }
 

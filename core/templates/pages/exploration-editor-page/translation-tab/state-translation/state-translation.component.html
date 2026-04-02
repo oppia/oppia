@@ -138,7 +138,7 @@
   </div>
 
   <div *ngIf="!isVoiceoverModeActive()" class="oppia-state-content-header">Original content</div>
-  <div class="translation-state-contents">
+  <div class="translation-state-contents" [attr.dir]="isTranslationLanguageRTL() ? 'rtl' : 'ltr'">
     <div *ngIf="isActive(TAB_ID_CONTENT)" class="translation-state-content e2e-test-content-text">
       <span>
         <span *ngIf="!getRequiredHtml(stateContent)" class="oppia-placeholder" tabindex="0">
