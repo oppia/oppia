@@ -128,13 +128,13 @@ export class BlogAdminPageComponent implements OnInit {
         this.refreshFormData();
         setTimeout(() => {
           this.statusMessage = '';
-        }, 3000);
+        }, 10000);
       })
       .catch(errorResponse => {
         this.statusMessage = errorResponse.error?.error || errorResponse;
         setTimeout(() => {
           this.statusMessage = '';
-        }, 3000);
+        }, 10000);
       });
     this.adminTaskManagerService.finishTask();
   }
@@ -151,13 +151,13 @@ export class BlogAdminPageComponent implements OnInit {
         this.refreshFormData();
         setTimeout(() => {
           this.statusMessage = '';
-        }, 3000);
+        }, 10000);
       },
       error => {
         this.statusMessage = 'User is not a blog editor.';
         setTimeout(() => {
           this.statusMessage = '';
-        }, 3000);
+        }, 10000);
       }
     );
   }
@@ -205,14 +205,14 @@ export class BlogAdminPageComponent implements OnInit {
           this.adminTaskManagerService.finishTask();
           setTimeout(() => {
             this.statusMessage = '';
-          }, 3000);
+          }, 10000);
         },
         errorResponse => {
           this.statusMessage = 'Server error: ' + errorResponse;
           this.adminTaskManagerService.finishTask();
           setTimeout(() => {
             this.statusMessage = '';
-          }, 3000);
+          }, 10000);
         }
       );
   }
