@@ -265,24 +265,6 @@ describe('Logged-In Learner - Manage Goals', function () {
       '.e2e-test-learner-dashboard-sidebar'
     );
     await loggedInUser.waitForElementToStabilize('.e2e-test-goals-section');
-    await loggedInUser.page.evaluate(async () => {
-      const doc = document as Document & {fonts?: {ready: Promise<void>}};
-      const root = document.documentElement;
-      root.style.setProperty('text-size-adjust', '100%');
-      root.style.setProperty('-webkit-text-size-adjust', '100%');
-
-      if (doc.fonts !== undefined) {
-        await doc.fonts.ready;
-      }
-
-      await new Promise<void>(resolve => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-      });
-    });
 
     await loggedInUser.expectScreenshotToMatch(
       'goalsTabSidebarHighlighted',
