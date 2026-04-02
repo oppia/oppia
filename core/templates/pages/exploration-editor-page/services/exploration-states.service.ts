@@ -23,6 +23,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import set from 'lodash/set';
 
 import {Interaction} from 'domain/exploration/interaction.model';
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
@@ -82,16 +83,6 @@ interface ContentExtractors {
 }
 
 type SupportedStatePropertyValues = StatePropertyValues | string[] | null;
-type BackendConversionName =
-  | 'answer_groups'
-  | 'content'
-  | 'default_outcome'
-  | 'hints'
-  | 'param_changes'
-  | 'param_specs'
-  | 'solution'
-  | 'written_translations'
-  | 'widget_customization_args';
 
 @Injectable({
   providedIn: 'root',
@@ -246,7 +237,7 @@ export class ExplorationStatesService {
 
   _verifyChangesInitialContents(
     backendName: string,
-    value: StatePropertyValues
+    value: SupportedStatePropertyValues
   ): void {
     let contents: TranslatableField[];
 
@@ -489,46 +480,23 @@ export class ExplorationStatesService {
     newValue: SupportedStatePropertyValues
   ): void {
     let oldValue = this.getStatePropertyMemento(stateName, backendName);
-    let newBackendValue = cloneDeep(newValue);
-    let oldBackendValue = cloneDeep(oldValue);
-
-    if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
-      newBackendValue = this.convertToBackendRepresentation(
-        newValue as StatePropertyValues,
-        backendName as BackendConversionName
-      );
-      oldBackendValue = this.convertToBackendRepresentation(
-        oldValue as StatePropertyValues,
-        backendName as BackendConversionName
-      );
-    }
+    let newBackendValue = this._getBackendValue(backendName, newValue);
+    let oldBackendValue = this._getBackendValue(backendName, oldValue);
     if (!isEqual(oldValue, newValue)) {
       this.changeListService.editStateProperty(
         stateName,
         backendName,
-        newBackendValue as StatePropertyDictValues,
-        oldBackendValue as StatePropertyDictValues
+        newBackendValue,
+        oldBackendValue
       );
 
       let newStateData = this._getStates().getState(stateName);
       let accessorList = this.PROPERTY_REF_DATA[backendName];
       if (this.contentChangesCanAffectTranslations) {
-        this._verifyChangesInitialContents(
-          backendName,
-          newValue as StatePropertyValues
-        );
+        this._verifyChangesInitialContents(backendName, newValue);
       }
 
-      let propertyRef: SupportedStatePropertyValues | State = newStateData;
-      for (let i = 0; i < accessorList.length - 1; i++) {
-        propertyRef = (
-          propertyRef as Record<string, SupportedStatePropertyValues>
-        )[accessorList[i]];
-      }
-
-      (propertyRef as Record<string, SupportedStatePropertyValues>)[
-        accessorList[accessorList.length - 1]
-      ] = cloneDeep(newValue);
+      set(newStateData, accessorList, cloneDeep(newValue));
 
       // We do not refresh the state editor immediately after the interaction
       // id alone is saved, because the customization args dict will be
@@ -540,13 +508,38 @@ export class ExplorationStatesService {
     }
   }
 
+  private _getBackendValue(
+    backendName: StatePropertyNames,
+    value: SupportedStatePropertyValues
+  ): StatePropertyDictValues {
+    if (this._isBackendConversionName(backendName)) {
+      return this.convertToBackendRepresentation(
+        value as StatePropertyValues,
+        backendName
+      );
+    }
+    return cloneDeep(value) as StatePropertyDictValues;
+  }
+
+  private _isBackendConversionName(
+    backendName: StatePropertyNames
+  ): backendName is Exclude<
+    keyof ExplorationStatesService['_BACKEND_CONVERSIONS'],
+    'written_translations'
+  > {
+    return this._BACKEND_CONVERSIONS.hasOwnProperty(backendName);
+  }
+
   convertToBackendRepresentation(
     frontendValue: StatePropertyValues,
-    backendName: BackendConversionName
-  ): StatePropertyValues | null {
+    backendName: Exclude<
+      keyof ExplorationStatesService['_BACKEND_CONVERSIONS'],
+      'written_translations'
+    >
+  ): StatePropertyDictValues {
     let conversionFunction = this._BACKEND_CONVERSIONS[backendName] as (
       value: StatePropertyValues
-    ) => StatePropertyValues | null;
+    ) => StatePropertyDictValues;
     return conversionFunction(frontendValue);
   }
 

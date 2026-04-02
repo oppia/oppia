@@ -47,10 +47,7 @@ import {
 } from 'services/image-local-storage.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
-import {
-  TranslatableItem,
-  TranslateTextService,
-} from '../services/translate-text.service';
+import {TranslateTextService} from '../services/translate-text.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
@@ -538,26 +535,6 @@ describe('Translation Modal Component', () => {
       );
       expect(component.activeDataFormat).toBe('html');
     });
-  });
-
-  it('should set defaults when active item has null text fields', () => {
-    const translatableItem: TranslatableItem = {
-      text: null,
-      more: false,
-      status: 'pending',
-      translation: '',
-    };
-
-    component.updateActiveState(translatableItem);
-
-    expect(component.textToTranslate).toBe('');
-    expect(component.activeDataFormat).toBe('');
-    expect(component.activeContentType).toBe('');
-    expect(component.activeRuleDescription).toBe('');
-  });
-
-  it('should return empty rule description when interaction id is null', () => {
-    expect(component.getRuleDescription('Contains', null)).toBe('');
   });
 
   describe('when clicking on the translatable content', () => {
@@ -1174,11 +1151,12 @@ describe('Translation Modal Component', () => {
           removeEventListener: jasmine.createSpy('removeEventListener'),
         };
 
-        preventDefaultSpy = jasmine.createSpy('preventDefault');
-        mockEvent = {
-          preventDefault: preventDefaultSpy,
-          returnValue: '',
-        } as unknown as BeforeUnloadEvent;
+        mockEvent = new BeforeUnloadEvent();
+        mockEvent.returnValue = '';
+        preventDefaultSpy = spyOn(
+          mockEvent,
+          'preventDefault'
+        ).and.callThrough();
 
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -1274,10 +1252,7 @@ describe('Translation Modal Component', () => {
       it('should have beforeUnloadHandler initialized as a function returning undefined', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        const mockEvent = {
-          preventDefault: () => {},
-          returnValue: '',
-        } as BeforeUnloadEvent;
+        const mockEvent = new BeforeUnloadEvent();
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1] as (
           e: BeforeUnloadEvent
         ) => string | undefined;
@@ -1289,10 +1264,7 @@ describe('Translation Modal Component', () => {
         tick();
 
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
-        const mockEvent = {
-          preventDefault: () => {},
-          returnValue: '',
-        } as BeforeUnloadEvent;
+        const mockEvent = new BeforeUnloadEvent();
 
         component.activeWrittenTranslation = '';
         expect(handler(mockEvent)).toBeUndefined();

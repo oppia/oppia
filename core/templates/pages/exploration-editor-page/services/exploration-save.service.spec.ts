@@ -71,13 +71,6 @@ class MockPlatformFeatureService {
   };
 }
 
-type SiteAnalyticsServiceWithPrivateMethod = SiteAnalyticsService & {
-  _sendEventToGoogleAnalytics: (
-    eventName: string,
-    eventParameters?: Record<string, string | number | boolean>
-  ) => void;
-};
-
 describe(
   'Exploration save service ' +
     'when draft changes are present and there ' +
@@ -184,10 +177,6 @@ describe(
       spyOn(
         siteAnalyticsService,
         'registerSavePlayableExplorationEvent'
-      ).and.stub();
-      spyOn(
-        siteAnalyticsService as SiteAnalyticsServiceWithPrivateMethod,
-        '_sendEventToGoogleAnalytics'
       ).and.stub();
     });
 
@@ -378,10 +367,6 @@ describe(
       spyOn(
         siteAnalyticsService,
         'registerSavePlayableExplorationEvent'
-      ).and.stub();
-      spyOn(
-        siteAnalyticsService as SiteAnalyticsServiceWithPrivateMethod,
-        '_sendEventToGoogleAnalytics'
       ).and.stub();
     });
 
@@ -592,10 +577,6 @@ describe(
       spyOn(
         siteAnalyticsService,
         'registerSavePlayableExplorationEvent'
-      ).and.stub();
-      spyOn(
-        siteAnalyticsService as SiteAnalyticsServiceWithPrivateMethod,
-        '_sendEventToGoogleAnalytics'
       ).and.stub();
     });
 
@@ -941,10 +922,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
     spyOn(
       siteAnalyticsService,
       'registerSavePlayableExplorationEvent'
-    ).and.stub();
-    spyOn(
-      siteAnalyticsService as SiteAnalyticsServiceWithPrivateMethod,
-      '_sendEventToGoogleAnalytics'
     ).and.stub();
   });
 
