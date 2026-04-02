@@ -116,14 +116,35 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    redis_full_profile = get_oppia_redis_client().memory_stats()
-    memory_stats = caching_domain.MemoryCacheStats(
-        redis_full_profile.get('total.allocated', 0),
-        redis_full_profile.get('peak.allocated', 0),
-        redis_full_profile.get('keys.count', 0),
+    client = get_oppia_redis_client()
+    try:
+        redis_full_profile = client.memory_stats()
+    except Exception:
+        # Fallback for Redis versions that don't support memory stats command.
+        redis_full_profile = {}
+
+    # Redis 7.2.2 might use different keys or missing some keys.
+    # Standard info memory can also be used as fallback.
+    # Here we use MyPy ignore because the redis-py stubs in this environment
+    # do not correctly recognize the 'info' method on the Redis client.
+    info = client.info(section='memory')  # type: ignore[attr-defined]
+
+    total_allocated = redis_full_profile.get(
+        'total.allocated', info.get('used_memory', 0)
+    )
+    peak_allocated = redis_full_profile.get(
+        'peak.allocated', info.get('used_memory_peak', 0)
+    )
+    # Keys.count is still usually available in memory_stats.
+    # Here we use MyPy ignore because the redis-py stubs in this environment
+    # do not correctly recognize the 'dbsize' method on the Redis client.
+    keys_count = redis_full_profile.get(
+        'keys.count', client.dbsize()  # type: ignore[attr-defined]
     )
 
-    return memory_stats
+    return caching_domain.MemoryCacheStats(
+        total_allocated, peak_allocated, keys_count
+    )
 
 
 def flush_caches() -> None:

@@ -205,8 +205,10 @@ def install_gcloud_sdk() -> None:
             # We use x86_64 as the architecture name for both x86_64 and amd64,
             # as both are technically 64-bit x86 based systems. For ARM-based
             # systems (like Apple M-series chips), we use 'arm'. For all other
-            # architectures, we fall back to 'x86' as a safe default.
-            if common.ARCHITECTURE in ('x86_64', 'amd64'):
+            # architectures, we fall back to 'x86' as a safe default for 32-bit
+            # systems, which is the only other architecture supported by the
+            # Google Cloud SDK.
+            if common.is_x64_architecture():
                 gcloud_arch_name = 'x86_64'
             elif common.ARCHITECTURE == 'arm64':
                 gcloud_arch_name = 'arm'
@@ -450,8 +452,11 @@ def main() -> None:
     # proceed to other setup tasks that require them.
     install_python_dev_dependencies.main(['--assert_compiled'])
 
-    # We import these modules here after dev dependencies are installed to
-    # ensure that the required libraries are available in the environment.
+    # These imports are deferred until after install_python_dev_dependencies.main()
+    # is called. This is because the libraries being imported (like google-cloud-sdk)
+    # may not be installed in the environment yet when the script first starts.
+    # By importing them here, we ensure that they are only resolved after their
+    # installation is confirmed.
     from scripts import (  # pylint: disable=wrong-import-position
         install_dependencies_json_packages,
         install_python_prod_dependencies,
