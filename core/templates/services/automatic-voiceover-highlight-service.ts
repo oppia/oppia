@@ -33,6 +33,10 @@ interface SentenceHighlightInterval {
   providedIn: 'root',
 })
 export class AutomaticVoiceoverHighlightService {
+  // Small buffer time added because audio time is checked at intervals
+  // (e.g., checking every 100ms might miss very short tokens like 50ms).
+  private static readonly HIGHLIGHT_MATCH_TOLERANCE_SECS = 0.08;
+
   public languageCode!: string;
   public activeContentId!: string;
 
@@ -68,6 +72,10 @@ export class AutomaticVoiceoverHighlightService {
   }): void {
     this.highlightIdToSentenceMap = highlightIdToSentenceMap;
     this.removeSpacesAndTransformMathSymbols();
+  }
+
+  getUnmodifiedSentenceByHighlightId(highlightId: string): string {
+    return this.highlightIdToSentenceMap[highlightId];
   }
 
   removeSpacesAndTransformMathSymbols(): void {
@@ -301,6 +309,24 @@ export class AutomaticVoiceoverHighlightService {
         );
       }
     );
+
+    // Fallback logic for very short intervals that might be skipped
+    // above. For example, a 50ms token can be missed if checks happen every
+    // 100ms, so we allow a small extra time window.
+    if (!currentsentenceIdAndInterval) {
+      currentsentenceIdAndInterval = this.sentenceHighlightIntervalList.find(
+        sentenceIdAndInterval => {
+          return (
+            currentAudioPlayerTimeInSecs >=
+              sentenceIdAndInterval.startTimeInSecs &&
+            currentAudioPlayerTimeInSecs <=
+              sentenceIdAndInterval.endTimeInSecs +
+                AutomaticVoiceoverHighlightService.HIGHLIGHT_MATCH_TOLERANCE_SECS
+          );
+        }
+      );
+    }
+
     return currentsentenceIdAndInterval?.highlightSentenceId;
   }
 }
