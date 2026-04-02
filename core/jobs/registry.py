@@ -50,7 +50,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     delete_duplicate_content_ids_jobs,
     dummy_jobs,
     email_deletion_jobs,
-    exp_drafts_migration_job,
     exp_migration_jobs,
     exp_search_indexing_jobs,
     exploration_voiceover_sync_jobs,

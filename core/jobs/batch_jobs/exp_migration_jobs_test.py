@@ -22,6 +22,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
+    draft_upgrade_services,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -51,17 +52,23 @@ if MYPY:  # pragma: no cover
         opportunity_models,
         stats_models,
         translation_models,
+        user_models,
     )
 
-(exp_models, opportunity_models, stats_models, translation_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.EXPLORATION,
-            models.Names.OPPORTUNITY,
-            models.Names.STATISTICS,
-            models.Names.TRANSLATION,
-        ]
-    )
+(
+    exp_models,
+    opportunity_models,
+    stats_models,
+    translation_models,
+    user_models,
+) = models.Registry.import_models(
+    [
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.STATISTICS,
+        models.Names.TRANSLATION,
+        models.Names.USER,
+    ]
 )
 
 
@@ -683,6 +690,116 @@ class MigrateExplorationJobTests(
                 ]
             )
 
+    def test_migrates_draft_successfully(self) -> None:
+        user_id = 'user_1'
+        self.save_new_valid_exploration(self.NEW_EXP_ID, user_id)
+        exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
+
+        draft_id = '%s.%s' % (user_id, self.NEW_EXP_ID)
+        user_data_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id=draft_id,
+            user_id=user_id,
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=[{'cmd': 'edit_state_property'}],
+            draft_change_list_exp_version=exp_model.version - 1,
+        )
+        user_data_model.update_timestamps()
+        user_data_model.put()
+
+        new_change_list = [{'cmd': 'migrated_cmd'}]
+        with self.swap_to_always_return(
+            draft_upgrade_services,
+            'try_upgrading_draft_to_exp_version',
+            new_change_list,
+        ):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='EXP PROCESSED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='DRAFT PROCESSED SUCCESS: 1'
+                    ),
+                ]
+            )
+
+        migrated_model = user_models.ExplorationUserDataModel.get(draft_id)
+        self.assertEqual(migrated_model.draft_change_list, new_change_list)
+        self.assertEqual(
+            migrated_model.draft_change_list_exp_version, exp_model.version
+        )
+
+    def test_skips_up_to_date_drafts(self) -> None:
+        user_id = 'user_1'
+        self.save_new_valid_exploration(self.NEW_EXP_ID, user_id)
+        exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
+
+        draft_id = '%s.%s' % (user_id, self.NEW_EXP_ID)
+        user_data_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id=draft_id,
+            user_id=user_id,
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=[{'cmd': 'some_cmd'}],
+            draft_change_list_exp_version=exp_model.version,
+        )
+        user_data_model.update_timestamps()
+        user_data_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='DRAFT PROCESSED SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_migrate_draft_returns_error_on_incompatible_commits(self) -> None:
+        user_id = 'user_1'
+        self.save_new_valid_exploration(self.NEW_EXP_ID, user_id)
+        exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
+
+        draft_id = '%s.%s' % (user_id, self.NEW_EXP_ID)
+        user_data_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id=draft_id,
+            user_id=user_id,
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=[{'cmd': 'some_cmd'}],
+            draft_change_list_exp_version=exp_model.version - 1,
+        )
+        user_data_model.update_timestamps()
+        user_data_model.put()
+
+        with self.swap_to_always_return(
+            draft_upgrade_services, 'try_upgrading_draft_to_exp_version', None
+        ):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stderr=(
+                            f'DRAFT PROCESSED ERROR: "(\'{draft_id}\', Exception(\''
+                            f'Draft migration dropped/failed for user {user_id} on exp '
+                            f'{self.NEW_EXP_ID} due to incompatible commits.\'))": 1'
+                        )
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='EXP PROCESSED SUCCESS: 1'
+                    ),
+                ]
+            )
+
 
 # Exploration migration backend tests with BEAM jobs involves creating and
 # publishing the exploration. This requires a ElasticSearch stub for running
@@ -1044,6 +1161,60 @@ class AuditExplorationMigrationJobTests(
                     ),
                 )
             ]
+        )
+
+    def test_audits_draft_successfully_with_detailed_logs_and_no_save(
+        self,
+    ) -> None:
+        user_id = 'user_1'
+        self.save_new_valid_exploration(self.NEW_EXP_ID, user_id)
+        exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
+
+        draft_id = '%s.%s' % (user_id, self.NEW_EXP_ID)
+        old_draft_list = [{'cmd': 'old_cmd'}]
+        user_data_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id=draft_id,
+            user_id=user_id,
+            exploration_id=self.NEW_EXP_ID,
+            draft_change_list=old_draft_list,
+            draft_change_list_exp_version=exp_model.version - 1,
+        )
+        user_data_model.update_timestamps()
+        user_data_model.put()
+
+        new_change_list = [{'cmd': 'new_cmd'}]
+        with self.swap_to_always_return(
+            draft_upgrade_services,
+            'try_upgrading_draft_to_exp_version',
+            new_change_list,
+        ):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='EXP PROCESSED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='DRAFT PROCESSED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout=(
+                            f'AUDIT MIGRATED DRAFT - User ID: {user_id}, '
+                            f'Exploration ID: {self.NEW_EXP_ID}, '
+                            f'Upgraded to Exp Version: {exp_model.version}'
+                        )
+                    ),
+                ]
+            )
+
+        unmigrated_model = user_models.ExplorationUserDataModel.get(draft_id)
+        self.assertEqual(unmigrated_model.draft_change_list, old_draft_list)
+        self.assertEqual(
+            unmigrated_model.draft_change_list_exp_version,
+            exp_model.version - 1,
         )
 
 
