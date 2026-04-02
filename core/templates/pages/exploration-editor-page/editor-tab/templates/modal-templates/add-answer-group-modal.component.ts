@@ -114,8 +114,13 @@ export class AddAnswerGroupModalComponent
     this.addState.emit(event);
   }
 
-  updateTaggedMisconception(taggedMisconception: TaggedMisconception): void {
-    this.tmpTaggedSkillMisconceptionId = `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`;
+  updateTaggedMisconception(
+    taggedMisconception: TaggedMisconception | null
+  ): void {
+    this.tmpTaggedSkillMisconceptionId =
+      taggedMisconception !== null
+        ? `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`
+        : null;
   }
 
   isSelfLoopWithNoFeedback(tmpOutcome: Outcome): boolean {
