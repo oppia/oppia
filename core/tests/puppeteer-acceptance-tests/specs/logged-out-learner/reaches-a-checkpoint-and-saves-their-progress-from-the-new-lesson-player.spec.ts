@@ -171,12 +171,12 @@ describe('Logged-Out Learner', function () {
       'learner@example.com',
       'learner'
     );
-    await loggedOutLearner.expectProgressRemainderModal();
+    await loggedOutLearner.expectProgressReminderModalToBeVisible();
     await loggedOutLearner.clickOnLessonResumeButton();
-    expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
+    expect(await loggedOutLearner.isSaveLessonProgressButtonVisible()).toBe(
       false
     );
-    await loggedOutLearner.expectProfileAvatarVisible();
+    expect(await loggedOutLearner.isProfileAvatarVisible()).toBe(true);
     expect(await loggedOutLearner.expectSignInButton()).toBe(false);
   });
   afterAll(async function () {

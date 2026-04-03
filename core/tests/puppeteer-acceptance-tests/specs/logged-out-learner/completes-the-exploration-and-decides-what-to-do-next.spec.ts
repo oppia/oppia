@@ -285,7 +285,7 @@ describe('Logged-Out Learner', function () {
         'learner@example.com',
         'learner'
       );
-      await loggedOutLearner.expectProgressRemainderModal();
+      await loggedOutLearner.expectProgressReminderModalToBeVisible();
       await loggedOutLearner.clickOnLessonResumeButton();
     },
     // Setup takes more time than default.
@@ -308,10 +308,10 @@ describe('Logged-Out Learner', function () {
       true
     );
 
-    expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
+    expect(await loggedOutLearner.isSaveLessonProgressButtonVisible()).toBe(
       true
     );
-    expect(await loggedOutLearner.expectProfileAvatarVisible()).toBe(false);
+    expect(await loggedOutLearner.isProfileAvatarVisible()).toBe(false);
     expect(await loggedOutLearner.expectSignInButton()).toBe(true);
 
     await loggedOutLearner.clickOnContinueButton();
@@ -319,10 +319,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.clickOnContinueButton();
 
-    expect(await loggedOutLearner.expectSignUpOrLoginButton()).toBe(true);
-    expect(await loggedOutLearner.expectNextLessonButton()).toBe(true);
-    expect(await loggedOutLearner.expectCheckReivewCardButton()).toBe(true);
-    expect(await loggedOutLearner.expectDoMorePracticeButton()).toBe(true);
+    expect(await loggedOutLearner.isSignUpOrLoginButtonVisible()).toBe(true);
+    expect(await loggedOutLearner.isNextLessonButtonVisible()).toBe(true);
+    expect(await loggedOutLearner.isCheckReivewCardButtonVisible()).toBe(true);
+    expect(await loggedOutLearner.isDoMorePracticeButtonVisible()).toBe(true);
 
     await loggedOutLearner.rightClickOnNextLessonButtonAndOpenNewTab(
       'Chapter 2: Exploration 1'

@@ -111,16 +111,16 @@ describe('Logged-Out Learner', function () {
   it('should be able to share the lesson using copy link', async function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
-    await loggedOutLearner.expectTextPresentOnPage('Close options');
+    await loggedOutLearner.isTextPresentOnPage('Close options');
     // Expect lesson description is present on the page.
-    await loggedOutLearner.expectTextPresentOnPage(
+    await loggedOutLearner.isTextPresentOnPage(
       'Learn basic Mathematics including Place Values'
     );
     // Expect Share and Feedback button is visible.
-    await loggedOutLearner.expectTextPresentOnPage('Share this lesson');
-    await loggedOutLearner.expectTextPresentOnPage('Feedback');
+    await loggedOutLearner.isTextPresentOnPage('Share this lesson');
+    await loggedOutLearner.isTextPresentOnPage('Feedback');
     // Expect report button is not displayed.
-    expect(await loggedOutLearner.expectReportButton()).toBe(false);
+    expect(await loggedOutLearner.isReportButtonVisible()).toBe(false);
 
     // Click on share and copy link.
     await loggedOutLearner.clickShareLessonButton();
@@ -135,7 +135,7 @@ describe('Logged-Out Learner', function () {
     const newBrowserTab = await loggedOutLearner.openCopiedLink();
 
     // Expect lesson name present in new tab.
-    await loggedOutLearner.expectTextPresentOnPage(
+    await loggedOutLearner.isTextPresentOnPage(
       'What are the Place Values?',
       newBrowserTab
     );
@@ -169,8 +169,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickShareLessonButton();
     await loggedOutLearner.expectShareLessonModal();
 
-    await loggedOutLearner.clickLessonAttribution();
-    await loggedOutLearner.expectTextPresentOnPage(
+    await loggedOutLearner.clickOnHowToAttributeThisLesson();
+    await loggedOutLearner.isTextPresentOnPage(
       'Generate Creative Commons Attribution'
     );
     await loggedOutLearner.verifyAttributionText(

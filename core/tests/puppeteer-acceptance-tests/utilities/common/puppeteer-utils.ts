@@ -670,9 +670,13 @@ export class BaseUser {
   /**
    * Checks if a given word is present on the page.
    * @param {string} word - The word to check.
+   * @param {Page} page - Optional. The page to find the content.
    */
-  async isTextPresentOnPage(text: string): Promise<boolean> {
-    const pageContent = await this.page.content();
+  async isTextPresentOnPage(
+    text: string,
+    page: Page = this.page
+  ): Promise<boolean> {
+    const pageContent = await page.content();
     return pageContent.includes(text);
   }
 

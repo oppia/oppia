@@ -286,16 +286,16 @@ describe('Logged-Out Learner', function () {
     expect(await loggedOutLearner.getCheckpointFocusNodeNumber()).toBe(1);
     await loggedOutLearner.expectNoColorNodeInCheckpoint();
     expect(await loggedOutLearner.isContinueButtonPresent()).toBe(true);
-    expect(await loggedOutLearner.isSaveLessonProgressButtonPresent()).toBe(
+    expect(await loggedOutLearner.isSaveLessonProgressButtonVisible()).toBe(
       true
     );
   });
 
   it('should be able to check the concept card', async function () {
-    await loggedOutLearner.expectConceptCardButton();
+    await loggedOutLearner.expectConceptCardButtonToBePresent();
 
     // Open concept card.
-    await loggedOutLearner.openConceptCard();
+    await loggedOutLearner.clickOnConceptCard();
     await loggedOutLearner.expectConceptCardContent(
       'Review material text content for skill-1'
     );
@@ -371,9 +371,9 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickOnElementWithText('View Solution');
 
     await loggedOutLearner.expectWarningModalBeforeViewSolution();
-    expect(
-      await loggedOutLearner.expectTextPresentOnPage('SHOW SOLUTION')
-    ).toBe(true);
+    expect(await loggedOutLearner.isTextPresentOnPage('SHOW SOLUTION')).toBe(
+      true
+    );
     await loggedOutLearner.clickOnShowSolutionButton();
 
     await loggedOutLearner.expectSolutionModelVisible();

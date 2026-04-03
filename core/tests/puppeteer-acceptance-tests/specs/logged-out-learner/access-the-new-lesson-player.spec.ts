@@ -122,7 +122,7 @@ describe('Logged-Out Learner', function () {
 
     const isMobileViewport = loggedOutLearner.isViewportAtMobileWidth();
     if (!isMobileViewport) {
-      await loggedOutLearner.expectTextPresentOnPage('Open options');
+      await loggedOutLearner.isTextPresentOnPage('Open options');
     }
     await loggedOutLearner.expectScreenshotToMatch(
       'lessonPlayerPage',

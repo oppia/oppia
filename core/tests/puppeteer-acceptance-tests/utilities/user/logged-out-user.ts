@@ -665,6 +665,10 @@ const ratingStarsSelector = '.e2e-test-conversation-skin-final-ratings-display';
 const suggestedLessonTitleSelector = '.exploration-summary-btn p';
 const showSolutionButton = '.oppia-learner-got-it-button';
 const shareModal = 'oppia-share-lesson-modal';
+const completedNodeSelector =
+  '.progress-bar-container .completed-checkpoint-node';
+const newLessonProgressBarContainer = '.progress-bar-container';
+const containerSelector = '.hint-solution-individual-container';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -5893,28 +5897,21 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectSidebarCollapsedState(): Promise<void> {
     const isViewportAtMobileWidth = this.isViewportAtMobileWidth();
-    expect(await this.expectTextPresentOnPage('Close options')).toBe(false);
+    expect(await this.isTextPresentOnPage('Close options')).toBe(false);
+    expect(await this.isTextPresentOnPage('Close options')).toBe(false);
     if (!isViewportAtMobileWidth) {
-      expect(await this.expectTextPresentOnPage('Open options')).toBe(true);
+      expect(await this.isTextPresentOnPage('Open options')).toBe(true);
     }
 
-    expect(await this.expectTextPresentOnPage('Share this lesson')).toBe(false);
-    expect(await this.expectTextPresentOnPage('Feedback')).toBe(false);
+    expect(await this.isTextPresentOnPage('Share this lesson')).toBe(false);
+    expect(await this.isTextPresentOnPage('Feedback')).toBe(false);
   }
 
   /**
    * Verifies that the report button is visible in the lesson player sidebar.
    */
-  async expectReportButton(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(lessonReportButtonSelector, {
-        visible: true,
-        timeout: 5000,
-      });
-      return true;
-    } catch {
-      return false;
-    }
+  async isReportButtonVisible(): Promise<boolean> {
+    return await this.isElementVisible(lessonReportButtonSelector, true);
   }
   /**
    * Open 'Open Options' in new lesson player page.
@@ -5941,10 +5938,7 @@ export class LoggedOutUser extends BaseUser {
    * Expect the share lesson modal visible.
    */
   async expectShareLessonModal(): Promise<void> {
-    await this.page.waitForSelector(shareModal, {
-      visible: true,
-    });
-    showMessage('Share lesson modal appeared');
+    await this.expectElementToBeVisible(shareModal, true);
   }
 
   /**
@@ -6175,7 +6169,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Generates lesson attribution
    */
-  async clickLessonAttribution(): Promise<void> {
+  async clickOnHowToAttributeThisLesson(): Promise<void> {
     await this.page.waitForSelector(generateLessonAttributionSelector, {
       visible: true,
     });
@@ -6183,41 +6177,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Verifies the text/value inside the given selector.
-   *
-   * @param textSelector - CSS selector of the element (e.g., textarea).
-   * @param expectedText - Expected text/value to match.
-   */
-  async verifyText(textSelector: string, expectedText: string): Promise<void> {
-    await this.page.waitForSelector(textSelector, {
-      visible: true,
-    });
-
-    const actualText = await this.page.$eval(textSelector, el => {
-      if (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement) {
-        return el.value;
-      }
-      return el.textContent;
-    });
-
-    const trimmedExpected = expectedText.trim();
-    const trimmedActual = actualText ? actualText.trim() : '';
-
-    if (!trimmedActual || !trimmedActual.includes(trimmedExpected)) {
-      throw new Error(
-        `Text did not match.\nExpected: ${trimmedExpected}\nFound: ${trimmedActual}`
-      );
-    }
-
-    showMessage(`Text matched: ${trimmedActual}`);
-  }
-
-  /**
    * Verify attribution text.
    * @param expectedAttributionText - Expected text in attribution.
    */
   async verifyAttributionText(expectedAttributionText: string): Promise<void> {
-    await this.verifyText(attributionTextSelector, expectedAttributionText);
+    await this.expectTextContentToMatch(
+      attributionTextSelector,
+      expectedAttributionText
+    );
   }
 
   /**
@@ -6266,7 +6233,7 @@ export class LoggedOutUser extends BaseUser {
    * @param htmlContent - HTML content to embed in webpage.
    */
   async verifyEmbedHTMLContent(htmlContent: string): Promise<void> {
-    await this.verifyText(attributionTextSelector, htmlContent);
+    await this.expectTextContentToMatch(attributionTextSelector, htmlContent);
   }
 
   /**
@@ -6317,7 +6284,10 @@ export class LoggedOutUser extends BaseUser {
       'oppia-customizable-thank-you-modal .modal-body p';
 
     // Wait for the modal message to appear.
-    await this.page.waitForSelector(SuccessMessageselector, {visible: true});
+    await this.page.waitForSelector(SuccessMessageselector, {
+      visible: true,
+      timeout: 10000,
+    });
 
     // Extract text content from the modal only.
     const text = await this.page.$eval(
@@ -6403,9 +6373,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.click(languageDropdown);
     const languageItemSelector = `.e2e-test-i18n-language-${languageCode}`;
     await this.page.waitForSelector(languageItemSelector, {visible: true});
-    await this.page.click(languageItemSelector);
-    await this.waitForNetworkIdle();
-    await this.waitForPageToFullyLoad();
+    await this.clickAndWaitForNavigation(languageItemSelector, true);
 
     // Post check: check if value has changed to new language.
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -6454,19 +6422,11 @@ export class LoggedOutUser extends BaseUser {
    * Verifies that the continue button is visible on the current card.
    */
   async isContinueButtonPresent(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(continueButtonSelector, {
-        visible: true,
-        timeout: 5000,
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
+    return await this.isElementVisible(continueButtonSelector, true);
   }
 
   /**
-   * Checks if new audio control button is visible in  new lesson player.
+   * Expects the new audio control button to be visible in new lesson player.
    */
   async expectNewAudioControlButtonVisible(): Promise<void> {
     await this.expectElementToBeVisible(newAudioControlButton);
@@ -6661,20 +6621,6 @@ export class LoggedOutUser extends BaseUser {
     );
   }
   /**
-   * Verify a given text is visible to the user on the page.
-   * @param {string} text - The text to check
-   * @param {Page} page - Optional. The page to find the content.
-   */
-  async expectTextPresentOnPage(
-    text: string,
-    page: Page = this.page
-  ): Promise<boolean> {
-    // Use evaluate to get the visible text of the body.
-    const bodyText = await page.evaluate(() => document.body.innerText);
-    return bodyText.includes(text);
-  }
-
-  /**
    * Get the checkpoint focused node number (1-indexed).
    * This identifies the node currently marked as "in-progress".
    */
@@ -6697,11 +6643,8 @@ export class LoggedOutUser extends BaseUser {
    * This verifies that no nodes are marked as 'completed' or 'in-progress'.
    */
   async expectNoColorNodeInCheckpoint(): Promise<void> {
-    const completedNodeSelector =
-      '.progress-bar-container .completed-checkpoint-node';
-
     // Wait for the container to ensure the bar has actually rendered.
-    await this.page.waitForSelector('.progress-bar-container');
+    await this.page.waitForSelector(newLessonProgressBarContainer);
 
     const coloredNodesCount = await this.page.evaluate(sel1 => {
       const completed = document.querySelectorAll(sel1).length;
@@ -6717,42 +6660,35 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to check presence of save progress button in lesson player.
    */
-  async isSaveLessonProgressButtonPresent(): Promise<boolean> {
-    try {
-      const element = await this.page.waitForXPath(
-        '//button[contains(text(), "Save")]',
-        {
-          visible: true,
-          timeout: 5000,
-        }
-      );
-      return element !== null;
-    } catch {
-      return false;
-    }
+  async isSaveLessonProgressButtonVisible(): Promise<boolean> {
+    return await this.isElementVisible(
+      'xpath///button[contains(normalize-space(), "Save")]',
+      true
+    );
   }
 
   /**
    * Expect the concept card button in conversation.
    */
-  async expectConceptCardButton(): Promise<boolean> {
+  async expectConceptCardButtonToBePresent(): Promise<void> {
     try {
       // Wait for few minutes to see the concept card.
       await this.page.waitForSelector(conceptCardButton, {
         visible: true,
         timeout: 120000,
       });
-      return true;
+      showMessage('Concept card button appeared successfully.');
     } catch (error) {
-      showMessage(`Error: ${error}`);
-      return false;
+      throw new Error(
+        `Timed out waiting for concept card button (${conceptCardButton}) to be visible in the conversation.`
+      );
     }
   }
 
   /**
    * Open concept card from new lesson player.
    */
-  async openConceptCard(): Promise<void> {
+  async clickOnConceptCard(): Promise<void> {
     await this.page.waitForSelector(conceptCardButton, {
       visible: true,
     });
@@ -6856,15 +6792,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to check presence of back button in new lesson player.
    */
   async isBackButtonPresent(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(cardBackButton, {
-        visible: true,
-        timeout: 5000,
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
+    return await this.isElementVisible(cardBackButton, true);
   }
 
   /**
@@ -6897,15 +6825,7 @@ export class LoggedOutUser extends BaseUser {
    * Whether response submit button is present.
    */
   async isResponseSubmitButtonPresent(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(submitResponseButton, {
-        visible: true,
-        timeout: 50000,
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
+    return await this.isElementVisible(submitResponseButton, true);
   }
 
   /**
@@ -6925,15 +6845,7 @@ export class LoggedOutUser extends BaseUser {
    * Whether the next card navigation button visible.
    */
   async isNextCardNavigationButtonPresent(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(nextCardNavigationButton, {
-        visible: true,
-        timeout: 5000,
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
+    return await this.isElementVisible(nextCardNavigationButton, true);
   }
 
   /**
@@ -7029,7 +6941,6 @@ export class LoggedOutUser extends BaseUser {
     buttonLabel: string,
     expectedText: string
   ): Promise<void> {
-    const containerSelector = '.hint-solution-individual-container';
     if (this.isViewportAtMobileWidth()) {
       await this.scrollToBottomOfPage();
     }
@@ -7265,7 +7176,7 @@ export class LoggedOutUser extends BaseUser {
       expectedTexts.temporaryLinkPrompt
     );
 
-    await this.expectTextPresentOnPage('Copy');
+    await this.isTextPresentOnPage('Copy');
     showMessage('Save progress modal displayed');
   }
 
@@ -7366,7 +7277,10 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
   }
 
-  async expectProgressRemainderModal(): Promise<void> {
+  /**
+   * Expect the lesson progress remainder model to be visible.
+   */
+  async expectProgressReminderModalToBeVisible(): Promise<void> {
     await this.page.waitForSelector(progressRemainderModalSelector, {
       visible: true,
     });
@@ -7387,7 +7301,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Expect the profile avatar to be visible in the navigation bar.
    */
-  async expectProfileAvatarVisible(): Promise<boolean> {
+  async isProfileAvatarVisible(): Promise<boolean> {
     try {
       await this.page.waitForSelector(profileAvatarSelector, {visible: true});
 
@@ -7401,8 +7315,10 @@ export class LoggedOutUser extends BaseUser {
           'Profile avatar is visible but the image source is invalid.'
         );
       }
+      showMessage('Profile avatar is visible');
       return true;
     } catch (error) {
+      showMessage('Profile avatar is not visible');
       return false;
     }
   }
@@ -7430,61 +7346,29 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Expect the next lesson button.
    */
-  async expectNextLessonButton(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(nextSuggestedLessonButton, {
-        visible: true,
-      });
-      showMessage('Next lesson button present');
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async isNextLessonButtonVisible(): Promise<boolean> {
+    return await this.isElementVisible(nextSuggestedLessonButton, true);
   }
 
   /**
    * Expect the Check Review Card button
    */
-  async expectCheckReivewCardButton(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(reviewCardButton, {
-        visible: true,
-      });
-      showMessage('Check review card button present');
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async isCheckReivewCardButtonVisible(): Promise<boolean> {
+    return await this.isElementVisible(reviewCardButton, true);
   }
 
   /**
    * Expect 'Do More Practice' button visible.
    */
-  async expectDoMorePracticeButton(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(morePracticeButton, {
-        visible: true,
-      });
-      showMessage('Do more practise button present');
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async isDoMorePracticeButtonVisible(): Promise<boolean> {
+    return await this.isElementVisible(morePracticeButton, true);
   }
 
   /**
    * Expect signup or login button present.
    */
-  async expectSignUpOrLoginButton(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(signUpOrLoginButton, {
-        visible: true,
-      });
-      showMessage('Signup or login button is present');
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async isSignUpOrLoginButtonVisible(): Promise<boolean> {
+    return await this.isElementVisible(signUpOrLoginButton, true);
   }
 
   /**
@@ -7633,23 +7517,14 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
 
-    await this.page.click(signUpOrLoginButton);
-    await this.page.waitForNavigation();
+    await this.clickAndWaitForNavigation(signUpOrLoginButton, true);
   }
 
   /**
    * Is fraction input display visible.
    */
-  async isFractionInputDisplayPresent(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(fractionInputSelector, {
-        visible: true,
-      });
-      showMessage('Fraction input textarea is visible');
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async isFactionInteractionVisible(): Promise<boolean> {
+    return this.isElementVisible(fractionInputSelector, true);
   }
 
   /**
@@ -7666,24 +7541,14 @@ export class LoggedOutUser extends BaseUser {
    * Expect the 'Go to library' button.
    */
   async expectGoToLibraryButton(): Promise<void> {
-    await this.page.waitForSelector(gotoLibraryButton, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(gotoLibraryButton, true);
   }
 
   /**
    * Whether rating stars visible.
    */
   async isRatingStarsVisible(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(ratingStarsSelector, {
-        visible: true,
-      });
-      showMessage('Rating stars is visible');
-      return true;
-    } catch (error) {
-      return false;
-    }
+    return await this.isElementVisible(ratingStarsSelector, true);
   }
 
   /**
