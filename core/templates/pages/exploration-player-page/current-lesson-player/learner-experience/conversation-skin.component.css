@@ -70,7 +70,8 @@ oppia-conversation-skin .supplemental-card-parent-container {
   max-width: 650px;
   /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
       below should be changed to match. */
-  min-width: 360px;
+  /* This min-width is set to auto to prevent the supplemental card from overflowing on small mobile devices (e.g. iPhone SE). */
+  min-width: auto;
   position: relative;
   width: 42%;
   z-index: 3;
@@ -173,7 +174,8 @@ oppia-conversation-skin .oppia-button-icon {
   .conversation-skin-supplemental-card-container {
     left: 50%;
     margin: 60px auto 0 auto;
-    min-width: 360px;
+    /* This min-width is set to auto to prevent the supplemental card from overflowing on small mobile devices (e.g. iPhone SE). */
+    min-width: auto;
     position: absolute;
     transform: translateX(-50%);
     width: 100%;

@@ -1673,7 +1673,22 @@ export class CurriculumAdmin extends TopicManager {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        this.page.click(mobileOptionsDropdown);
+        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
+        await this.page.click(mobileOptionsDropdown);
+        try {
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true, timeout: 10000}
+          );
+        } catch (error) {
+          await this.page.click(mobileOptionsDropdown);
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true}
+          );
+        }
+        // Ensure layout fully stabilized.
+        await this.waitForPageToFullyLoad();
       }
     } else {
       await this.page.waitForSelector(explorationSettingsTab, {visible: true});
@@ -2428,10 +2443,28 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
-    await this.clickOnElementWithSelector(topicSelector);
+
+    await this.page.waitForSelector(topicSelector, {visible: true});
+    const options = await this.page.$$(topicSelector);
+    let foundOption = false;
+
+    for (const option of options) {
+      const text = await option.evaluate(el => el.textContent?.trim());
+      if (text === topicName) {
+        await this.clickOnElement(option);
+        foundOption = true;
+        break;
+      }
+    }
+
+    if (!foundOption) {
+      throw new Error(`Could not find topic option matching: ${topicName}`);
+    }
+
     await this.page.waitForSelector(openTopicDropdownButton);
 
-    // Wait for the topic to appear in the classroom before adding prerequisites.
+    await this.waitForNetworkIdle(); // Wait for the topic to appear in the classroom before adding prerequisites.
+
     // Increased timeout to 60s because addTopicId makes an async API call that can take time.
     await this.page.waitForFunction(
       (
