@@ -1025,6 +1025,21 @@ export class BaseUser {
   }
 
   /**
+   * Disables CSS transitions and animations on learner dashboard navigation
+   * controls to reduce screenshot flakiness from class re-application.
+   */
+  async disableLearnerDashboardNavTransitions(): Promise<void> {
+    await this.page.addStyleTag({
+      content: `
+        .oppia-learner-dash-sidebar_position * {
+          transition: none !important;
+          animation: none !important;
+        }
+      `,
+    });
+  }
+
+  /**
    * This function waits until a page is fully rendered.
    * It does so via checking every second if the size of the HTML content of the page is stable.
    * If the size is stable for at least 3 checks, it considers the page fully rendered.

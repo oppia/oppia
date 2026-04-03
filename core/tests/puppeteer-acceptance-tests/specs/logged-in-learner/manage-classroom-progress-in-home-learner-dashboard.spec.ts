@@ -148,6 +148,7 @@ describe('Logged-In Learner', function () {
         2
       );
 
+      await loggedInLearner.disableLearnerDashboardNavTransitions();
       await loggedInLearner.expectScreenshotToMatch(
         'learnerDashboardHomeTab',
         __dirname
@@ -200,6 +201,7 @@ describe('Logged-In Learner', function () {
       ['Continue where you left off', 'Learn Something New'],
       'tabSection'
     );
+    await loggedInLearner.disableLearnerDashboardNavTransitions();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter1AndRecommendedForYouChapter2',
       __dirname
@@ -244,6 +246,7 @@ describe('Logged-In Learner', function () {
     );
 
     await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.disableLearnerDashboardNavTransitions();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter2AndRecommendedForYouChapter3',
       __dirname
@@ -270,6 +273,7 @@ describe('Logged-In Learner', function () {
     );
 
     await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.disableLearnerDashboardNavTransitions();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter3AndRecommendedForYouChapter4',
       __dirname
@@ -297,6 +301,7 @@ describe('Logged-In Learner', function () {
     );
 
     await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.disableLearnerDashboardNavTransitions();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter4AndRecommendedForYouChapter5',
       __dirname
@@ -323,6 +328,7 @@ describe('Logged-In Learner', function () {
       'Congratulations for completing this lesson!'
     );
     await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.disableLearnerDashboardNavTransitions();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter5AndRecommendedForYouChapter6',
       __dirname
@@ -344,6 +350,7 @@ describe('Logged-In Learner', function () {
     );
 
     await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.disableLearnerDashboardNavTransitions();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter6AndNoRecommendedForYouChapter',
       __dirname
