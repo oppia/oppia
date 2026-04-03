@@ -130,11 +130,11 @@ oppia-conversation-skin .supplemental-card-parent-container {
 button.oppia-button-raised.e2e-test-next-lesson-button.mat-focus-indicator.mat-raised-button.mat-button-base {
   align-items: center;
   background-color: #0d48a1;
-  display: flex;
   border: none;
-  padding: 0;
+  display: flex;
   height: 32px;
   justify-content: center;
+  padding: 0;
   width: 32px;
 }
 
