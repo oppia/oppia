@@ -173,6 +173,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
+    } else if (node.nodeName === 'SPAN') {
+      let text = '';
+      node.childNodes.forEach(child => {
+        text += this.getReadableTextFromNode(child);
+      });
+      return text;
+    } else {
+      return '';
     }
   }
 
@@ -228,6 +236,25 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       } else {
         // The earliest parent tag that contains texts that should be voiceovered.
         let textContent = '';
+        let nodeTemp = node.cloneNode();
+        if (currentNodeName === 'LI') {
+          const meaningfulChildren = Array.from(node.childNodes).filter(
+            child =>
+              !(
+                child.nodeType === Node.TEXT_NODE &&
+                child.textContent?.trim() === ''
+              )
+          );
+          const hasParagraphChild = meaningfulChildren.some(
+            child => child.nodeName === 'P'
+          );
+          if (hasParagraphChild) {
+            // Just recurse into children without wrapping the LI itself.
+            let nodeTemp = node.cloneNode();
+            updatedChildNodes.forEach(child => nodeTemp.appendChild(child));
+            return nodeTemp;
+          }
+        }
 
         for (let tempChildNode of updatedChildNodes) {
           textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
@@ -270,8 +297,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
             nextSentenceOffset += currentText;
           }
         }
-
-        let nodeTemp = node.cloneNode();
 
         for (let spanNode of spanNodeList) {
           let textInsideSpanTag = '';
@@ -579,7 +604,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       );
     for (let i = 0; i < elements.length; i++) {
       let element = elements[i] as HTMLElement;
-      if (element.textContent === textContent) {
+      let readableText = this.getReadableTextFromNode(element as Node);
+      if (readableText === textContent) {
         return element;
       }
     }

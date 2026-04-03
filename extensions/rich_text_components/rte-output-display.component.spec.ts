@@ -301,6 +301,20 @@ describe('RTE display component', () => {
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
+  it('should correctly wrap html content inside span tag for highlighting', fakeAsync(() => {
+    let rteString = '<li><p>Hello world!</p></li>';
+    let expectedOutputWrappedString =
+      '<li><p><span class="highlightBlock1">Hello world!</span></p></li>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
   it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
     let rteString = '<p>Hi world! I am a content creator.</p>';
     let expectedOutputWrappedString =
@@ -510,6 +524,23 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should be able to get empty text from div node', () => {
+    let node = document.createElement('div');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML =
+      '<oppia-noninteractive-image ' +
+      'alt-with-value="Oppia Arabic Blogpost Graphic" ' +
+      'caption-with-value="&amp;quot;&amp;quot;" ' +
+      'filepath-with-value="&amp;quot;' +
+      'blog_post_image_height_326_width_490.svg&amp;quot;">' +
+      '</oppia-noninteractive-image>';
+    let expectedString = '';
+    let readableText = component.decodeHtmlEntities(
+      component.getReadableTextFromNode(node.childNodes[0])
+    );
+    expect(readableText).toBe(expectedString);
+  });
+
   it('should be able to get readable text from non-interactive math node', () => {
     let node = document.createElement('p');
     // eslint-disable-next-line oppia/no-inner-html
@@ -589,13 +620,13 @@ describe('RTE display component', () => {
 
       let document = TestBed.inject(DOCUMENT);
 
-      let previousElement = document.createElement('p');
+      let previousElement = document.createElement('span');
       // eslint-disable-next-line oppia/no-inner-html
       previousElement.innerHTML = 'Hello world';
       previousElement.style.backgroundColor =
         component.backgroundColorOfHighlightedSentence;
 
-      let currentElement = document.createElement('p');
+      let currentElement = document.createElement('span');
       // eslint-disable-next-line oppia/no-inner-html
       currentElement.innerHTML = 'New element';
       currentElement.style.backgroundColor = '';
