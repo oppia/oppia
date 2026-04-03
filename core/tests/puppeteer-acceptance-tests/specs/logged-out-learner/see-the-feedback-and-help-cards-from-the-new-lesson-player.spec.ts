@@ -384,12 +384,9 @@ describe('Logged-Out Learner', function () {
 
   it('should be able to submit the correct answer and see the celebration pop-up', async function () {
     await loggedOutLearner.submitFractionInputResponse('1/2');
+    await loggedOutLearner.expectCorrectFeedbackCelebrationComponentAppears();
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.expectCheckpointCelebrationComponentAppears();
-    await loggedOutLearner.expectScreenshotToMatch(
-      'celebrationPopUp',
-      __dirname
-    );
     await loggedOutLearner.expectSubmitButton('Hidden');
   });
 

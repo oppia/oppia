@@ -6833,6 +6833,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expect correct feedback celebration appears.
+   */
+  async expectCorrectFeedbackCelebrationComponentAppears(): Promise<void> {
+    await this.page.waitForSelector(celebrationSelector, {
+      visible: true,
+    });
+
+    const celebrationText = await this.page.$eval(celebrationSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (!celebrationText || !celebrationText.includes('Correct')) {
+      throw new Error(
+        `Expected celebration text 'Correct' but found '${celebrationText}'`
+      );
+    }
+    showMessage('Correct feedback celebration modal appeared');
+  }
+
+  /**
    * Function to check presence of back button in new lesson player.
    */
   async isBackButtonPresent(): Promise<boolean> {
