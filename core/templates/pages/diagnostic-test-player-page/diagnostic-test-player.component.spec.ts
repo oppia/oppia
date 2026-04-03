@@ -309,6 +309,7 @@ describe('Diagnostic test player component', () => {
   }));
 
   it('should not get recommended topics if classroomData is not initialized', () => {
+    expect(component.classroomData).toBeUndefined();
     component.getRecommendedTopicSummaries(['test']);
     expect(component.recommendedTopicSummaries).toEqual([]);
   });

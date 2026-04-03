@@ -82,7 +82,11 @@ interface ContentExtractors {
   ) => TranslatableField[];
 }
 
-type SupportedStatePropertyValues = StatePropertyValues | string[] | null;
+type SupportedStatePropertyValues =
+  | StatePropertyValues
+  | State['inapplicableSkillMisconceptionIds']
+  | State['linkedSkillId']
+  | State['name'];
 
 @Injectable({
   providedIn: 'root',
@@ -227,7 +231,7 @@ export class ExplorationStatesService {
 
   _extractContentIds(
     backendName: string,
-    value: StatePropertyValues
+    value: SupportedStatePropertyValues
   ): Set<string> {
     let contents: TranslatableField[] = this._CONTENT_EXTRACTORS[backendName](
       value as BaseTranslatableObject | BaseTranslatableObject[]
@@ -387,9 +391,12 @@ export class ExplorationStatesService {
       this._getStates().getState(stateName);
     try {
       accessorList.forEach((key: string) => {
-        propertyRef = (
-          propertyRef as Record<string, SupportedStatePropertyValues>
-        )[key];
+        if (typeof propertyRef !== 'object' || propertyRef === null) {
+          throw new Error(
+            `Cannot read key "${key}" from non-object state property value.`
+          );
+        }
+        propertyRef = Reflect.get(propertyRef, key);
       });
     } catch (e) {
       let additionalInfo =
@@ -406,7 +413,7 @@ export class ExplorationStatesService {
       throw e;
     }
 
-    return cloneDeep(propertyRef) as SupportedStatePropertyValues;
+    return cloneDeep(propertyRef);
   }
 
   saveStateProperty(
@@ -513,12 +520,21 @@ export class ExplorationStatesService {
     value: SupportedStatePropertyValues
   ): StatePropertyDictValues {
     if (this._isBackendConversionName(backendName)) {
-      return this.convertToBackendRepresentation(
-        value as StatePropertyValues,
-        backendName
-      );
+      return this.convertToBackendRepresentation(value, backendName);
     }
-    return cloneDeep(value) as StatePropertyDictValues;
+
+    if (
+      typeof value === 'boolean' ||
+      typeof value === 'string' ||
+      value === null ||
+      Array.isArray(value)
+    ) {
+      return cloneDeep(value) as StatePropertyDictValues;
+    }
+
+    throw new Error(
+      `Unsupported non-converted state property value for ${backendName}.`
+    );
   }
 
   private _isBackendConversionName(
@@ -531,14 +547,14 @@ export class ExplorationStatesService {
   }
 
   convertToBackendRepresentation(
-    frontendValue: StatePropertyValues,
+    frontendValue: SupportedStatePropertyValues,
     backendName: Exclude<
       keyof ExplorationStatesService['_BACKEND_CONVERSIONS'],
       'written_translations'
     >
   ): StatePropertyDictValues {
     let conversionFunction = this._BACKEND_CONVERSIONS[backendName] as (
-      value: StatePropertyValues
+      value: SupportedStatePropertyValues
     ) => StatePropertyDictValues;
     return conversionFunction(frontendValue);
   }
