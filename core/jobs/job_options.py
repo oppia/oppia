@@ -78,6 +78,7 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             # Needed by GoogleCloudOptions.
             project=oppia_project_id,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
+            service_account_email=feconf.DATAFLOW_SERVICE_ACCOUNT_EMAIL,
             temp_location=(
                 feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id
             ),

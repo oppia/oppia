@@ -543,6 +543,15 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
+# This email is used to uniquely identify ALL of our Apache Beam job workers.
+# This is necessary because those workers require additional permissions to
+# read/write from our Firebawse Authentication Server. The prod email account is
+# not shared here and will be injected during the release process.
+#
+# NOTE TO RELEASE COORDINATORS: Replace this service account email with the
+# correct service account email when switching to the prod server.
+DATAFLOW_SERVICE_ACCOUNT_EMAIL = 'test-dataflow-service-account@example.com'
+
 OPPIA_VERSION = '3.5.0'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
