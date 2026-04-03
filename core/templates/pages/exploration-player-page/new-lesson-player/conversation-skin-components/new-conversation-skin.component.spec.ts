@@ -2656,40 +2656,10 @@ describe('New Conversation skin component', () => {
     spyOn(componentInstance, 'initializePage');
 
     let mockOnPlayerStateChange = new EventEmitter();
-    let mockOnNewCardOpened = new EventEmitter();
-    let mockOnHintsExhausted = new EventEmitter();
-    let mockOnLearnerReallyStuck = new EventEmitter();
-    let mockOnLearnerGetsReallyStuck = new EventEmitter();
-    let mockOnHintConsumed = new EventEmitter();
-    let mockOnSolutionViewedEventEmitter = new EventEmitter();
-
     spyOnProperty(
       conversationFlowService,
       'onPlayerStateChange'
     ).and.returnValue(mockOnPlayerStateChange);
-    spyOnProperty(playerPositionService, 'onNewCardOpened').and.returnValue(
-      mockOnNewCardOpened
-    );
-    spyOnProperty(
-      hintsAndSolutionManagerService,
-      'onHintsExhausted'
-    ).and.returnValue(mockOnHintsExhausted);
-    spyOnProperty(
-      hintsAndSolutionManagerService,
-      'onLearnerReallyStuck'
-    ).and.returnValue(mockOnLearnerReallyStuck);
-    spyOnProperty(
-      conceptCardManagerService,
-      'onLearnerGetsReallyStuck'
-    ).and.returnValue(mockOnLearnerGetsReallyStuck);
-    spyOnProperty(
-      hintsAndSolutionManagerService,
-      'onHintConsumed'
-    ).and.returnValue(mockOnHintConsumed);
-    spyOnProperty(
-      hintsAndSolutionManagerService,
-      'onSolutionViewedEventEmitter'
-    ).and.returnValue(mockOnSolutionViewedEventEmitter);
 
     const nextCard = new StateCard(
       null,
@@ -2705,12 +2675,70 @@ describe('New Conversation skin component', () => {
     conversationFlowService.setDisplayedCard(displayedCard);
 
     componentInstance.ngOnInit();
+    // 'End' is the state name emitted; completion depends on interaction id 'EndExploration'.
     mockOnPlayerStateChange.emit('End');
-    tick(100);
+    flush();
 
     expect(
       statsReportingService.recordExplorationCompleted
     ).not.toHaveBeenCalled();
+  }));
+
+  it('should record exploration completed when not in story editor preview mode', fakeAsync(() => {
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
+      false
+    );
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null
+    );
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+    spyOn(componentInstance, 'initializePage');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
+
+    let mockOnPlayerStateChange = new EventEmitter();
+    spyOnProperty(
+      conversationFlowService,
+      'onPlayerStateChange'
+    ).and.returnValue(mockOnPlayerStateChange);
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      0
+    );
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+
+    const nextCard = new StateCard(
+      null,
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'EndExploration', null),
+      [],
+      '',
+      null
+    );
+    conversationFlowService.setNextStateCard(nextCard);
+    conversationFlowService.setHasInteractedAtLeastOnce(true);
+    conversationFlowService.setDisplayedCard(displayedCard);
+
+    componentInstance.ngOnInit();
+    // 'End' is the state name emitted; completion depends on interaction id 'EndExploration'.
+    mockOnPlayerStateChange.emit('End');
     flush();
+
+    expect(statsReportingService.recordExplorationCompleted).toHaveBeenCalled();
   }));
 });
