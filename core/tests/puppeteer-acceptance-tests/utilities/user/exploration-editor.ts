@@ -7164,13 +7164,8 @@ export class ExplorationEditor extends BaseUser {
     explorationId: string
   ): Promise<void> {
     const selector = `a[href="/create/${explorationId}"]`;
-
     await this.page.waitForSelector(selector, {visible: true});
-
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-      this.page.click(selector),
-    ]);
+    await this.clickAndWaitForNavigation(selector, true);
   }
 
   /**
