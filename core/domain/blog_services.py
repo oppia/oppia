@@ -1133,3 +1133,22 @@ def update_blog_author_details(
     blog_author_model.author_bio = author_bio
     blog_author_model.update_timestamps()
     blog_author_model.put()
+def get_blog_post_read_event_log_entry(
+    blog_post_id: str,
+    created_on: datetime.datetime
+) -> blog_domain.BlogPostReadEventLogEntry:
+    """Returns a BlogPostReadEventLogEntry domain object.
+
+    Args:
+        blog_post_id: str. The unique ID of the blog post that was read.
+        created_on: datetime.datetime. The timestamp of the read event.
+
+    Returns:
+        BlogPostReadEventLogEntry. The domain object.
+    """
+    entry = blog_domain.BlogPostReadEventLogEntry(
+        blog_post_id=blog_post_id,
+        created_on=created_on
+    )
+    entry.validate()
+    return entry
