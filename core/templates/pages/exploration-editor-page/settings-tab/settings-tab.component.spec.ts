@@ -1389,7 +1389,7 @@ describe('Settings Tab Component', () => {
 
       it('should return false when exploration title is only whitespace', () => {
         explorationTitleService.init('   ');
-        expect(component.isTitlePresent()).toBe(true);
+        expect(component.isTitlePresent()).toBe(false);
       });
     });
   });
