@@ -103,7 +103,6 @@ import {EditorFirstTimeEventsService} from './services/editor-first-time-events.
 import {EditabilityService} from 'services/editability.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EventBusService} from 'app-events/event-bus.service';
 import {ExplorationCategoryService} from './services/exploration-category.service';
 import {ExplorationDataBackendApiService} from './services/exploration-data-backend-api.service';
@@ -173,7 +172,6 @@ import {ValidatorsService} from 'services/validators.service';
 import {VersionHistoryBackendApiService} from './services/version-history-backend-api.service';
 import {VersionHistoryService} from './services/version-history.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
-import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @NgModule({
@@ -322,7 +320,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     EditabilityService,
     EditableExplorationBackendApiService,
     EntityTranslationsService,
-    EntityVoiceoversService,
     EventBusService,
     ExplorationCategoryService,
     ExplorationDataBackendApiService,
@@ -394,7 +391,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     VersionHistoryBackendApiService,
     VersionHistoryService,
     VoiceoverBackendApiService,
-    VoiceoverPlayerService,
     WindowDimensionsService,
   ],
 })
