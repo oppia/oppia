@@ -35,6 +35,11 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
+const opportunitySearchInputSelector = '.e2e-test-search-input';
+const opportunitySearchClearButtonSelector = '.e2e-test-search-clear-button';
+const opportunityListEmptyAvailabilityMessageSelector =
+  '.e2e-test-opportunity-list-empty-availability-message';
+
 Error.stackTraceLimit = 30;
 
 describe('Practice Question Submitter', function () {
@@ -86,6 +91,7 @@ describe('Practice Question Submitter', function () {
       'Addition and Subtraction',
       'Addition'
     );
+
     await curriculumAdmin.addStoryToTopic(
       'The Broken Calculator',
       'the-broken-calculator',
@@ -118,6 +124,59 @@ describe('Practice Question Submitter', function () {
       'Arithmetic Operations'
     );
   }, 600000);
+
+  it('should be able to search for skills in submit question tab', async function () {
+    await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
+    await questionSubmitter.switchToTabInContributionDashboard(
+      'Submit Question'
+    );
+
+    await questionSubmitter.expectOpportunityToBePresent(
+      'Addition',
+      'Arithmetic Operations'
+    );
+
+    await questionSubmitter.typeInInputField(
+      opportunitySearchInputSelector,
+      'ADDITION'
+    );
+    await questionSubmitter.expectOpportunityToBePresent(
+      'Addition',
+      'Arithmetic Operations'
+    );
+
+    await questionSubmitter.clearAllTextFrom(opportunitySearchInputSelector);
+    await questionSubmitter.typeInInputField(
+      opportunitySearchInputSelector,
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.expectOpportunityToBePresent(
+      'Addition',
+      'Arithmetic Operations'
+    );
+
+    await questionSubmitter.clearAllTextFrom(opportunitySearchInputSelector);
+    await questionSubmitter.typeInInputField(
+      opportunitySearchInputSelector,
+      'nonexistent skill'
+    );
+    await questionSubmitter.expectTranslationOpportunitiesToBePresent(false);
+    await questionSubmitter.expectElementToBeVisible(
+      opportunityListEmptyAvailabilityMessageSelector
+    );
+
+    await questionSubmitter.expectElementToBeVisible(
+      opportunitySearchClearButtonSelector
+    );
+    await questionSubmitter.clickOnElementWithSelector(
+      opportunitySearchClearButtonSelector
+    );
+
+    await questionSubmitter.expectOpportunityToBePresent(
+      'Addition',
+      'Arithmetic Operations'
+    );
+  });
 
   it('should be able to submit practice questions', async function () {
     // Go to the contribution dashboard.
