@@ -4162,20 +4162,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.validate()
 
-        exploration.states_schema_version = None  # type: ignore[assignment]
+        exploration.states_schema_version = None
         with self.assertRaisesRegex(
-            Exception, 'This exploration has no states schema version.'
+          Exception, 'This exploration has no states schema version.'
         ):
-            exploration.validate()
+          exploration.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
-    
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
-    def test_validate_exploration_next_content_id_index(self) -> None:
+      # TODO(#13059): Here we use MyPy ignore because after we fully type
+      # the codebase we plan to get rid of the tests that intentionally test
+      # wrong inputs that we can normally catch by typing.
+      # TODO(#13059): Here we use MyPy ignore because after we fully type
+      # the codebase we plan to get rid of the tests that intentionally test
+      # wrong inputs that we can normally catch by typing.
+      def test_validate_exploration_next_content_id_index(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id',
             'user@example.com',

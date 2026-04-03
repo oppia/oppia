@@ -1,4 +1,5 @@
 # coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2282,8 +2283,9 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
         yaml_with_no_schema_version = (
             (
                 """
-            author_notes: ''
-            blurb: ''
+        author_notes: ''
+        auto_tts_enabled: true
+        blurb: ''
         category: Category
         edits_allowed: true
         init_state_name: Introduction
@@ -2767,76 +2769,76 @@ param_changes: []
 param_specs: {}
 schema_version: %d
 states:
-    %s:
-        card_is_checkpoint: true
-        classifier_model_id: null
-        content:
-            content_id: content_0
-            html: ''
-        inapplicable_skill_misconception_ids: []
-        interaction:
-            answer_groups: []
-            confirmed_unclassified_answers: []
-            customization_args:
-                catchMisspellings:
-                    value: false
-                placeholder:
-                    value:
-                        content_id: ca_placeholder_2
-                        unicode_str: ''
-                rows:
-                    value: 1
-            default_outcome:
-                dest: %s
-                dest_if_really_stuck: null
-                feedback:
-                    content_id: default_outcome_1
-                    html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-            hints: []
-            id: TextInput
-            solution: null
-        linked_skill_id: null
+  %s:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: ''
+    inapplicable_skill_misconception_ids: []
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        catchMisspellings:
+          value: false
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: %s
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-        solicit_answer_details: false
-    New state:
-        card_is_checkpoint: false
-        classifier_model_id: null
-        content:
-            content_id: content_3
-            html: %s
-        inapplicable_skill_misconception_ids: []
-        interaction:
-            answer_groups: []
-            confirmed_unclassified_answers: []
-            customization_args:
-                catchMisspellings:
-                    value: false
-                placeholder:
-                    value:
-                        content_id: ca_placeholder_5
-                        unicode_str: ''
-                rows:
-                    value: 1
-            default_outcome:
-                dest: New state
-                dest_if_really_stuck: null
-                feedback:
-                    content_id: default_outcome_4
-                    html: ''
-                labelled_as_correct: false
-                missing_prerequisite_skill_id: null
-                param_changes: []
-                refresher_exploration_id: null
-            hints: []
-            id: TextInput
-            solution: null
-        linked_skill_id: null
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    solicit_answer_details: false
+  New state:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_3
+      html: %s
+    inapplicable_skill_misconception_ids: []
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        catchMisspellings:
+          value: false
+        placeholder:
+          value:
+            content_id: ca_placeholder_5
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: New state
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_4
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-        solicit_answer_details: false
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    solicit_answer_details: false
 states_schema_version: %d
 tags: []
 title: A title
@@ -2851,9 +2853,8 @@ version: 2
             feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
     )
-
     UPDATED_YAML_CONTENT = """author_notes: ''
-    UPDATED_YAML_CONTENT = """author_notes: ''
+auto_tts_enabled: false
 blurb: ''
 category: Algebra
 edits_allowed: true
@@ -3391,19 +3392,13 @@ version: 3
         )
 
 
+
 class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
     contents.
     """
 
-    _SAMPLE_INIT_STATE_CONTENT: str = (
-        (
-            """card_is_checkpoint: true
-classifier_model_id: null
-content:
-  content_id: content_0
-  html: ''
 inapplicable_skill_misconception_ids: []
 interaction:
   answer_groups: []
@@ -3435,8 +3430,43 @@ param_changes: []
 solicit_answer_details: false
 """
         )
-        % (feconf.DEFAULT_INIT_STATE_NAME)
-    )
+        _SAMPLE_INIT_STATE_CONTENT: str = (
+                """card_is_checkpoint: true
+classifier_model_id: null
+content:
+    content_id: content_0
+    html: ''
+inapplicable_skill_misconception_ids: []
+interaction:
+    answer_groups: []
+    confirmed_unclassified_answers: []
+    customization_args:
+        catchMisspellings:
+            value: false
+        placeholder:
+            value:
+                content_id: ca_placeholder_2
+                unicode_str: ''
+        rows:
+            value: 1
+    default_outcome:
+        dest: %s
+        dest_if_really_stuck: null
+        feedback:
+            content_id: default_outcome_1
+            html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+    hints: []
+    id: TextInput
+    solution: null
+linked_skill_id: null
+param_changes: []
+solicit_answer_details: false
+""" % (feconf.DEFAULT_INIT_STATE_NAME)
+        )
 
     SAMPLE_EXPORTED_DICT: Final = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
@@ -7584,7 +7614,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     def test_get_recently_published_exp_summaries(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_1_ID, self.owner_id)
-        SAMPLE_EXPLORATION_YAML: str = (
+        self.save_new_valid_exploration(self.EXP_2_ID, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
         rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
         rights_manager.publish_exploration(self.owner, self.EXP_2_ID)
@@ -7717,8 +7747,8 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 
     UPGRADED_EXP_YAML: Final = (
         (
-    # ...existing code...
             """author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: category
 edits_allowed: true
@@ -8493,7 +8523,69 @@ title: Old Title
             exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME
         )
 
-    
+    def test_update_exploration_auto_tts_enabled(self) -> None:
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.auto_tts_enabled, False)
+        exp_services.update_exploration(
+            self.albert_id,
+            self.NEW_EXP_ID,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'auto_tts_enabled',
+                        'new_value': False,
+                    }
+                )
+            ],
+            'Changed auto_tts_enabled.',
+        )
+
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.auto_tts_enabled, False)
+
+        # Check that the property can be changed when working
+        # on old version.
+        # Add change to upgrade the version.
+        exp_services.update_exploration(
+            self.albert_id,
+            self.NEW_EXP_ID,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'title',
+                        'new_value': 'new title',
+                    }
+                )
+            ],
+            'Changed title.',
+        )
+
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'auto_tts_enabled',
+                    'new_value': True,
+                }
+            )
+        ]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list
+        )
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.albert_id,
+            self.NEW_EXP_ID,
+            change_list,
+            'Changed auto_tts_enabled again.',
+        )
+
+        # Assert that final version consists all the changes.
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.title, 'new title')
+        self.assertEqual(exploration.auto_tts_enabled, True)
 
     def test_update_old_exploration_version_remains_editable(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -11150,12 +11242,11 @@ class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
     EXP_ID: Final = 'exp_id0'
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
-author_notes: ''
-    # ...existing code...
     SAMPLE_EXPLORATION_YAML: str = (
-    author_notes: ''
         """
-    blurb: ''
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
 category: Category
 edits_allowed: true
 init_state_name: Introduction
@@ -11545,11 +11636,10 @@ class SyncLoggedInAndLoggedOutProgressTests(test_utils.GenericTestBase):
     UNIQUE_PROGRESS_URL_ID: Final = 'pid123'
 
     SAMPLE_EXPLORATION_YAML: str = (
-author_notes: ''
-    # ...existing code...
         """
-    author_notes: ''
-    blurb: ''
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
 category: Category
 edits_allowed: true
 init_state_name: Introduction
@@ -12880,6 +12970,7 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'tags': [],
+            'auto_tts_enabled': False,
             'next_content_id_index': 2,
             'edits_allowed': True,
             'states': {

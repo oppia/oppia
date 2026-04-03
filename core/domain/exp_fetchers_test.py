@@ -643,6 +643,7 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     NEW_EXP_ID: Final = 'exp_id1'
     STATES_AT_V41 = {
         'Introduction': {

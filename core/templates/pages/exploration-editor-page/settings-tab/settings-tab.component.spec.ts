@@ -175,8 +175,8 @@ describe('Settings Tab Component', () => {
                   states_schema_version: 50,
                   init_state_name: 'Introduction',
                   param_specs: {},
-                    param_changes: [],
-                    edits_allowed: true,
+                  param_changes: [],
+                  edits_allowed: true,
                 },
               }),
             autosaveChangeListAsync() {

@@ -82,7 +82,7 @@ describe('Learner Local Nav Component ', () => {
       init_state_name: '',
       param_specs: {},
       param_changes: [],
-        edits_allowed: true,
+      edits_allowed: true,
     },
     exploration_id: 'test_id',
     is_logged_in: true,

@@ -66,8 +66,8 @@ describe('Audio preloader service', () => {
 
   let explorationDict: ExplorationBackendDict = {
     draft_change_list_id: 1,
-      draft_changes: [],
-      version: 1,
+    draft_changes: [],
+    version: 1,
     is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',

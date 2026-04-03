@@ -523,8 +523,8 @@ export class ExplorationEngineService {
    *
    * @param {ExplorationBackendDict} explorationDict - The backend dictionary containing exploration data.
    * @param {number | null} explorationVersion - The current version of the exploration.
-  * @param {string | null} preferredAudioLanguage - The learner's preferred audio language.
-  * @param {string[]} preferredContentLanguageCodes - List of preferred content languages for translations.
+   * @param {string | null} preferredAudioLanguage - The learner's preferred audio language.
+   * @param {string[]} preferredContentLanguageCodes - List of preferred content languages for translations.
    * @param {string[]} displayableLanguageCodes - List of available content languages for display.
    * @param {(stateCard: StateCard, label: string) => void} successCallback - Callback to execute after
    *   loading the initial state, receiving the generated StateCard and focus label.

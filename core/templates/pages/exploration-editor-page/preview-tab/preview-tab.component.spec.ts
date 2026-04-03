@@ -103,7 +103,6 @@ describe('Preview Tab Component', () => {
   let stateName = 'State1';
   let changeObjectName = 'change';
   let exploration = {
-    
     draft_changes: [],
     is_version_of_draft_valid: false,
     init_state_name: stateName,
