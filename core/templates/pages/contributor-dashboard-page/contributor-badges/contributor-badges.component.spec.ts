@@ -246,6 +246,17 @@ describe('Contributor badge component', () => {
         expect(component.questionReviewBadges.length).toBeGreaterThan(0);
       }));
 
+      it(
+        'should mark languages as reviewable when they have both submission ' +
+          'and review stats',
+        fakeAsync(() => {
+          expect(component.selectedLanguage).toBe('Akan');
+          expect(component.userCanReviewTranslationSuggestion).toBeTrue();
+          expect(component.reviewableLanguages).toContain('Akan');
+          expect(component.reviewableLanguages).toContain('Spanish');
+        })
+      );
+
       it('should toggle language dropdown when user clicks on it', fakeAsync(() => {
         component.dropdownShown = false;
 
