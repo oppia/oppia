@@ -1059,6 +1059,20 @@ describe('SvgEditor with image save destination as local storage', () => {
     expect(component.canvas.renderAll).toHaveBeenCalled();
   });
 
+  it('should return early from setCanvasDimensions if canvas is not initialized', () => {
+    const originalCanvas = component.canvas;
+    // This throws "Type 'null' is not assignable to type 'Canvas'". We need
+    // to suppress this error because we need to test the null canvas guard.
+    // @ts-ignore
+    component.canvas = null;
+
+    // Should not throw and should return early.
+    expect(() => component.setCanvasDimensions()).not.toThrowError();
+
+    // Restore canvas for cleanup.
+    component.canvas = originalCanvas;
+  });
+
   it('should handle text object loading with horizontal boundary and missing styles', () => {
     const mockElement = {
       childNodes: [
@@ -1079,10 +1093,12 @@ describe('SvgEditor with image save destination as local storage', () => {
     } as unknown as fabric.Object;
 
     component.diagramWidth = 450;
+    // This throws "Property 'loadTextObject' is private". We need to
+    // suppress this error because we need to test the private method directly.
     // @ts-ignore
     component.loadTextObject(mockElement, mockObj);
 
-    // loadTextObject adds the text to the canvas.
+    // LoadTextObject adds the text to the canvas.
     const addedText = component.canvas.getObjects()[
       component.canvas.getObjects().length - 1
     ] as fabric.Textbox;
