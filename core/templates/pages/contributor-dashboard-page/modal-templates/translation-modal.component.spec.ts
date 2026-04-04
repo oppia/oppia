@@ -1151,12 +1151,11 @@ describe('Translation Modal Component', () => {
           removeEventListener: jasmine.createSpy('removeEventListener'),
         };
 
-        mockEvent = new BeforeUnloadEvent();
-        mockEvent.returnValue = '';
-        preventDefaultSpy = spyOn(
-          mockEvent,
-          'preventDefault'
-        ).and.callThrough();
+        preventDefaultSpy = jasmine.createSpy('preventDefault');
+        mockEvent = {
+          preventDefault: preventDefaultSpy,
+          returnValue: '',
+        } as BeforeUnloadEvent;
 
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -1252,7 +1251,10 @@ describe('Translation Modal Component', () => {
       it('should have beforeUnloadHandler initialized as a function returning undefined', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        const mockEvent = new BeforeUnloadEvent();
+        const mockEvent = {
+          preventDefault: () => {},
+          returnValue: '',
+        } as BeforeUnloadEvent;
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1] as (
           e: BeforeUnloadEvent
         ) => string | undefined;
@@ -1264,7 +1266,10 @@ describe('Translation Modal Component', () => {
         tick();
 
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
-        const mockEvent = new BeforeUnloadEvent();
+        const mockEvent = {
+          preventDefault: () => {},
+          returnValue: '',
+        } as BeforeUnloadEvent;
 
         component.activeWrittenTranslation = '';
         expect(handler(mockEvent)).toBeUndefined();

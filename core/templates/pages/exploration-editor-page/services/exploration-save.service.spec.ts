@@ -883,6 +883,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
               location: {
                 reload() {},
               },
+              gtag: () => {},
             },
           },
         },

@@ -22,7 +22,6 @@ import {ImagesData} from 'services/image-local-storage.service';
 
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
 import {
-  ContentIdToContentMapping,
   StateNamesToContentIdMapping,
   TranslatableTexts,
 } from 'domain/opportunity/translatable-texts.model';
@@ -34,7 +33,7 @@ import {
 export interface TranslatableItem {
   translation: string | string[];
   status: Status;
-  text: string | string[] | null;
+  text: string | string[];
   more: boolean;
   dataFormat?: string;
   contentType?: string;
@@ -66,16 +65,16 @@ export class TranslateTextService {
   PENDING: Status = 'pending';
   SUBMITTED: Status = 'submitted';
   stateWiseContents: StateNamesToContentIdMapping = {};
-  stateWiseContentIds: Record<string, string[]> = {};
+  stateWiseContentIds: {[stateName: string]: string[]} = {};
   stateNamesList: string[] = [];
   stateAndContent: StateAndContent[] = [];
   activeIndex = this.STARTING_INDEX;
-  activeExpId: string = '';
-  activeExpVersion: string = '';
+  activeExpId: string | null = null;
+  activeExpVersion: string | null = null;
   activeContentId: string | null = null;
   activeStateName: string | null = null;
   activeContentText: string | string[] | null = null;
-  activeContentStatus: Status = this.PENDING;
+  activeContentStatus: Status = 'pending';
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
@@ -122,7 +121,7 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-    text: string | string[] | null,
+    text: string | string[],
     more: boolean,
     status: Status,
     translation: string | string[]
@@ -142,10 +141,7 @@ export class TranslateTextService {
       text: text,
       more: more,
       status: status,
-      translation:
-        dataFormat !== undefined && this._isSetDataFormat(dataFormat)
-          ? []
-          : translation,
+      translation: this._isSetDataFormat(dataFormat || '') ? [] : translation,
       dataFormat: dataFormat,
       contentType: contentType,
       interactionId: interactionId,
@@ -171,8 +167,7 @@ export class TranslateTextService {
         for (const stateName in this.stateWiseContents) {
           let stateHasText: boolean = false;
           const contentIds: string[] = [];
-          const contentIdToContentMapping: ContentIdToContentMapping =
-            this.stateWiseContents[stateName];
+          const contentIdToContentMapping = this.stateWiseContents[stateName];
           for (const contentId in contentIdToContentMapping) {
             const translatableItem = contentIdToContentMapping[contentId];
             if (translatableItem.content === '') {
@@ -209,10 +204,10 @@ export class TranslateTextService {
   }
 
   getTextToTranslate(): TranslatableItem {
-    const text = this._getNextText();
-    const stateAndContent = this.stateAndContent[this.activeIndex];
-    const status = stateAndContent?.status ?? this.PENDING;
-    const translation = stateAndContent?.translation ?? '';
+    const text = this._getNextText() ?? '';
+    const {status = this.PENDING, translation = ''} = {
+      ...this.stateAndContent[this.activeIndex],
+    };
     return this._getUpdatedTextToTranslate(
       text,
       this._isMoreTextAvailableForTranslation(),
@@ -222,10 +217,10 @@ export class TranslateTextService {
   }
 
   getPreviousTextToTranslate(): TranslatableItem {
-    const text = this._getPreviousText();
-    const stateAndContent = this.stateAndContent[this.activeIndex];
-    const status = stateAndContent?.status ?? this.PENDING;
-    const translation = stateAndContent?.translation ?? '';
+    const text = this._getPreviousText() ?? '';
+    const {status = this.PENDING, translation = ''} = {
+      ...this.stateAndContent[this.activeIndex],
+    };
     return this._getUpdatedTextToTranslate(
       text,
       this._isPreviousTextAvailableForTranslation(),
@@ -242,13 +237,25 @@ export class TranslateTextService {
     successCallback: () => void,
     errorCallback: (reason: string) => void
   ): void {
-    if (this.activeStateName === null || this.activeContentId === null) {
+    const activeIndexAtSubmission = this.activeIndex;
+    const activeStateNameAtSubmission = this.activeStateName;
+    const activeContentIdAtSubmission = this.activeContentId;
+
+    if (
+      activeStateNameAtSubmission === null ||
+      activeContentIdAtSubmission === null ||
+      this.activeExpId === null ||
+      this.activeExpVersion === null
+    ) {
       return;
     }
-    const activeStateContentMapping =
-      this.stateWiseContents[this.activeStateName];
-    const activeContent = activeStateContentMapping?.[this.activeContentId];
-    if (!activeContent) {
+
+    const contentToTranslateAtSubmission =
+      this.stateWiseContents[activeStateNameAtSubmission]?.[
+        activeContentIdAtSubmission
+      ]?.content;
+
+    if (contentToTranslateAtSubmission === undefined) {
       return;
     }
 
@@ -256,20 +263,26 @@ export class TranslateTextService {
       .suggestTranslatedTextAsync(
         this.activeExpId,
         this.activeExpVersion,
-        this.activeContentId,
-        this.activeStateName,
+        activeContentIdAtSubmission,
+        activeStateNameAtSubmission,
         languageCode,
-        activeContent.content,
+        contentToTranslateAtSubmission,
         translation,
         imagesData,
         dataFormat
       )
       .then(
         () => {
-          const stateAndContent = this.stateAndContent[this.activeIndex];
-          if (stateAndContent) {
-            stateAndContent.status = this.SUBMITTED;
-            stateAndContent.translation = translation;
+          const submittedStateAndContent =
+            this.stateAndContent[activeIndexAtSubmission];
+          if (
+            submittedStateAndContent &&
+            submittedStateAndContent.stateName ===
+              activeStateNameAtSubmission &&
+            submittedStateAndContent.contentID === activeContentIdAtSubmission
+          ) {
+            submittedStateAndContent.status = this.SUBMITTED;
+            submittedStateAndContent.translation = translation;
           }
           successCallback();
         },
