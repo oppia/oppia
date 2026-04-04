@@ -2280,92 +2280,44 @@ describe('Conversation skin component', () => {
     }));
   });
 
-  it('should not record exploration completed in story editor preview mode', fakeAsync(() => {
+  const runExplorationCompletionTest = (
+    inPreviewMode: boolean,
+    expectCalled: boolean
+  ) => {
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
     spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
-      true
+      inPreviewMode
     );
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
-    spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       null
     );
     spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
-    spyOn(urlService, 'isIframed').and.returnValue(false);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(imagePreloaderService, 'onStateChange');
-    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
-      false
-    );
-    spyOn(componentInstance, 'initializePage');
-
-    let mockOnPlayerStateChange = new EventEmitter();
-    spyOnProperty(
-      conversationFlowService,
-      'onPlayerStateChange'
-    ).and.returnValue(mockOnPlayerStateChange);
-
-    const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      '',
-      null
-    );
-    conversationFlowService.setNextStateCard(nextCard);
-    conversationFlowService.setHasInteractedAtLeastOnce(true);
-    conversationFlowService.setDisplayedCard(displayedCard);
-
-    componentInstance.ngOnInit();
-    // 'End' is the state name emitted; completion depends on interaction id 'EndExploration'.
-    mockOnPlayerStateChange.emit('End');
-    flush();
-
-    expect(
-      statsReportingService.recordExplorationCompleted
-    ).not.toHaveBeenCalled();
-  }));
-
-  it('should record exploration completed when not in story editor preview mode', fakeAsync(() => {
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-      false
-    );
-    spyOn(pageContextService, 'isInStoryEditorPreviewMode').and.returnValue(
-      false
-    );
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
     spyOn(statsReportingService, 'recordExplorationCompleted');
-    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
-      null
-    );
-    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
-    spyOn(urlService, 'isIframed').and.returnValue(false);
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(imagePreloaderService, 'onStateChange');
-    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
-      false
-    );
-    spyOn(componentInstance, 'initializePage');
-    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
-    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
 
-    let mockOnPlayerStateChange = new EventEmitter();
-    spyOnProperty(
-      conversationFlowService,
-      'onPlayerStateChange'
-    ).and.returnValue(mockOnPlayerStateChange);
+    spyOn(componentInstance, 'initializePage');
+
     spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
       explorationEngineService
     );
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
     spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
       0
     );
-    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+
+    let mockOnPlayerStateChange = new EventEmitter();
+    spyOnProperty(
+      conversationFlowService,
+      'onPlayerStateChange'
+    ).and.returnValue(mockOnPlayerStateChange);
 
     const nextCard = new StateCard(
       null,
@@ -2376,15 +2328,31 @@ describe('Conversation skin component', () => {
       '',
       null
     );
+
     conversationFlowService.setNextStateCard(nextCard);
     conversationFlowService.setHasInteractedAtLeastOnce(true);
     conversationFlowService.setDisplayedCard(displayedCard);
 
     componentInstance.ngOnInit();
-    // 'End' is the state name emitted; completion depends on interaction id 'EndExploration'.
     mockOnPlayerStateChange.emit('End');
     flush();
 
-    expect(statsReportingService.recordExplorationCompleted).toHaveBeenCalled();
+    if (expectCalled) {
+      expect(
+        statsReportingService.recordExplorationCompleted
+      ).toHaveBeenCalled();
+    } else {
+      expect(
+        statsReportingService.recordExplorationCompleted
+      ).not.toHaveBeenCalled();
+    }
+  };
+
+  it('should not record exploration completed in story editor preview mode', fakeAsync(() => {
+    runExplorationCompletionTest(true, false);
+  }));
+
+  it('should record exploration completed when not in story editor preview mode', fakeAsync(() => {
+    runExplorationCompletionTest(false, true);
   }));
 });
