@@ -1153,11 +1153,12 @@ describe('Translation Modal Component', () => {
           removeEventListener: jasmine.createSpy('removeEventListener'),
         };
 
-        const mockBeforeUnloadEvent = jasmine.createSpyObj<MockBeforeUnloadEvent>(
-          'mockBeforeUnloadEvent',
-          ['preventDefault'],
-          {returnValue: ''}
-        );
+        const mockBeforeUnloadEvent =
+          jasmine.createSpyObj<MockBeforeUnloadEvent>(
+            'mockBeforeUnloadEvent',
+            ['preventDefault'],
+            {returnValue: ''}
+          );
         mockEvent = mockBeforeUnloadEvent;
         preventDefaultSpy = mockBeforeUnloadEvent.preventDefault as jasmine.Spy;
 
