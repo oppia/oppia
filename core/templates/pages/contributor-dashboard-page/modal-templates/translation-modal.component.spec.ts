@@ -1136,8 +1136,13 @@ describe('Translation Modal Component', () => {
         removeEventListener: jasmine.Spy;
       }
 
+      interface MockBeforeUnloadEvent {
+        preventDefault: () => void;
+        returnValue: string;
+      }
+
       let mockWindow: MockWindow;
-      let mockEvent: BeforeUnloadEvent;
+      let mockEvent: MockBeforeUnloadEvent;
       let preventDefaultSpy: jasmine.Spy;
       let translationLanguageService: TranslationLanguageService;
 
@@ -1148,9 +1153,13 @@ describe('Translation Modal Component', () => {
           removeEventListener: jasmine.createSpy('removeEventListener'),
         };
 
-        mockEvent = new Event('beforeunload') as BeforeUnloadEvent;
-        preventDefaultSpy = spyOn(mockEvent, 'preventDefault');
-        mockEvent.returnValue = '';
+        const mockBeforeUnloadEvent = jasmine.createSpyObj<MockBeforeUnloadEvent>(
+          'mockBeforeUnloadEvent',
+          ['preventDefault'],
+          {returnValue: ''}
+        );
+        mockEvent = mockBeforeUnloadEvent;
+        preventDefaultSpy = mockBeforeUnloadEvent.preventDefault as jasmine.Spy;
 
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -1289,7 +1298,7 @@ describe('Translation Modal Component', () => {
         tick();
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         component.activeWrittenTranslation = '';
-        handler(mockEvent);
+        handler(mockEvent as BeforeUnloadEvent);
         expect(preventDefaultSpy).not.toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
@@ -1299,7 +1308,7 @@ describe('Translation Modal Component', () => {
         tick();
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         component.activeWrittenTranslation = 'Some unsaved text';
-        handler(mockEvent);
+        handler(mockEvent as BeforeUnloadEvent);
         expect(preventDefaultSpy).toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
