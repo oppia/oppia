@@ -1044,4 +1044,49 @@ describe('SvgEditor with image save destination as local storage', () => {
       expect(component.diagramStatus).toBe('editing');
     }
   );
+
+  it('should set canvas dimensions correctly', () => {
+    spyOn(component.canvas, 'setHeight');
+    spyOn(component.canvas, 'setWidth');
+    spyOn(component.canvas, 'renderAll');
+
+    component.diagramHeight = 500;
+    component.diagramWidth = 600;
+    component.setCanvasDimensions();
+
+    expect(component.canvas.setHeight).toHaveBeenCalledWith(500);
+    expect(component.canvas.setWidth).toHaveBeenCalledWith(600);
+    expect(component.canvas.renderAll).toHaveBeenCalled();
+  });
+
+  it('should handle text object loading with horizontal boundary and missing styles', () => {
+    const mockElement = {
+      childNodes: [
+        {
+          nodeName: 'tspan',
+          childNodes: [{nodeValue: 'test'}],
+          style: {fill: '', stroke: '', strokeWidth: ''},
+        },
+      ],
+    } as unknown as Element;
+    const mockObj = {
+      toObject: () => ({
+        left: 500, // Greater than diagramWidth (450)
+        top: 50,
+        width: 100,
+      }),
+      get: (attr: string) => null,
+    } as unknown as fabric.Object;
+
+    component.diagramWidth = 450;
+    // @ts-ignore
+    component.loadTextObject(mockElement, mockObj);
+
+    // loadTextObject adds the text to the canvas.
+    const addedText = component.canvas.getObjects()[
+      component.canvas.getObjects().length - 1
+    ] as fabric.Textbox;
+    expect(addedText.left).toBe(450 - (addedText.width || 0));
+    expect(addedText.fill).toBe('#000');
+  });
 });
