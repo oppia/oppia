@@ -320,9 +320,10 @@ oppia-search-bar .oppia-input-group {
     padding-left: 0;
   }
 }
-oppia-search-bar .oppia-search-bar-category-selector .dropdown-menu {
-  transform: none !important;
-  top: 100% !important;
-  left: 0 !important;
-  margin-top: 0 !important;
+@media (max-width: 767px) {
+  .oppia-search-bar .oppia-search-bar-category-selector .dropdown-menu {
+    transform: none !important;
+    top: 100% !important;
+    left: 0 !important;
+  }
 }
