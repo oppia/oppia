@@ -1650,6 +1650,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 target_ids=target_ids,
+                language_code=self.translation_language_code,
             )
         )
         assert first_page_results is not None
@@ -1664,6 +1665,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 target_ids=target_ids,
+                language_code=self.translation_language_code,
             )
         )
         assert second_page_results is not None
