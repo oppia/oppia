@@ -19,15 +19,13 @@
 from __future__ import annotations
 
 import datetime
-import json
-import os
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     email_manager,
     exp_domain,
     exp_fetchers,
+    exp_services,
     state_domain,
     taskqueue_services,
     translation_domain,
@@ -57,7 +55,7 @@ if MYPY:  # pragma: no cover
 MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST = 5
 
 
-def _get_entity_voiceovers_from_model(
+def get_entity_voiceovers_from_model(
     entity_voiceovers_model: voiceover_models.EntityVoiceoversModel,
 ) -> voiceover_domain.EntityVoiceovers:
     """Returns the EntityVoiceovers domain object from its model representation
@@ -108,7 +106,7 @@ def get_voiceovers_for_given_language_accent_code(
     )
 
     if entity_voiceovers_model:
-        return _get_entity_voiceovers_from_model(entity_voiceovers_model)
+        return get_entity_voiceovers_from_model(entity_voiceovers_model)
     return voiceover_domain.EntityVoiceovers.create_empty(
         entity_type=entity_type,
         entity_id=entity_id,
@@ -141,7 +139,7 @@ def get_entity_voiceovers_for_given_exploration(
 
     for model_instance in entity_voiceovers_models:
         entity_voiceovers_objects.append(
-            _get_entity_voiceovers_from_model(model_instance)
+            get_entity_voiceovers_from_model(model_instance)
         )
     return entity_voiceovers_objects
 
@@ -305,7 +303,7 @@ def compute_voiceover_related_change(
                 # English content was modified, so all associated
                 # voiceovers must be marked as needing update.
                 if (
-                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    language_code != constants.constants.DEFAULT_LANGUAGE_CODE
                     and entity_voiceovers.language_accent_code
                     not in language_accent_codes
                 ):
@@ -332,7 +330,7 @@ def compute_voiceover_related_change(
                 # English content was modified, so all associated
                 # voiceovers must be removed.
                 if (
-                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    language_code != constants.constants.DEFAULT_LANGUAGE_CODE
                     and entity_voiceovers.language_accent_code
                     not in language_accent_codes
                 ):
@@ -565,14 +563,10 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
         language-accent pairs that Oppia may support for
         voiceovers (manual and auto).
     """
-    file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
+    language_accent_master_list: Dict[str, Dict[str, str]] = (
+        constants.language_accent_master_list_constants
     )
-    with open(file_path, 'r', encoding='utf-8') as f:
-        language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
-            f.read()
-        )
-        return language_accent_master_list
+    return language_accent_master_list
 
 
 def get_language_accent_codes_to_descriptions() -> Dict[str, str]:
@@ -633,14 +627,10 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         for voiceover generation, while 'voice_code' signifies the desired
         voice type.
     """
-    file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
+    autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
+        constants.autogeneratable_language_accent_constants
     )
-    with open(file_path, 'r', encoding='utf-8') as f:
-        autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
-            json.loads(f.read())
-        )
-        return autogeneratable_language_accent_list
+    return autogeneratable_language_accent_list
 
 
 def get_autogeneratable_language_accent_codes() -> List[str]:
@@ -1181,13 +1171,26 @@ def regenerate_voiceovers_on_exploration_update(
     for change in exploration_change_diff:
         cmd = change.get('cmd')
         if cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-            # CMD_EDIT_STATE_PROPERTY is used to fetch the updated content for
-            # the English language.
-            updated_content = change['new_value']['html']
-            content_id = change['new_value']['content_id']
-            language_code_to_contents_mapping.setdefault('en', {})[
-                content_id
-            ] = updated_content
+            # Here we use cast because the from_dict() method returns a object of
+            # type BaseChange, which is a parent class for ExplorationChange.
+            # This cast assures the static type checker that the 'change_object'
+            # variable is of type ExplorationChange, allowing us to access its
+            # specific attributes and methods without type errors.
+            change_object = cast(
+                exp_domain.ExplorationChange,
+                exp_domain.ExplorationChange.from_dict(change),
+            )
+            content_id_to_content_values = exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change_object
+            )
+
+            for (
+                content_id,
+                content_value,
+            ) in content_id_to_content_values.items():
+                language_code_to_contents_mapping.setdefault('en', {})[
+                    content_id
+                ] = content_value
         elif cmd == exp_domain.CMD_EDIT_TRANSLATION:
             # CMD_EDIT_TRANSLATION is used to fetch the updated content for
             # the translations in other languages.
@@ -1316,7 +1319,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     exploration_version = exploration.version
     exploration_title = exploration.title
 
-    if language_code == constants.DEFAULT_LANGUAGE_CODE:
+    if language_code == constants.constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
         language_code_to_contents_mapping.update(
             extract_english_voiceover_texts_from_exploration(exploration)

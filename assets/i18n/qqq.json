@@ -210,7 +210,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Title displayed on the browser tab when on the blog home page.",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Text displayed in the blog home page - Heading on Blog Homepage-Welcome to the Oppia Blog!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Text displayed in the blog home page afer search- Heading above search results being shown on blog homepage search results page.",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Text displayed in the blog home page after search for blog posts is performed - Text that displays the number of blog posts being displayed on the search results page.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Text displayed in the blog home page after search for blog posts is performed - Text that displays the number of blog posts being displayed on the search results page out of the total search results.",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Text displayed in the blog post editor page. - Text of the button that allows the user to upload thumbnail image for the blog post.",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "Text displayed in the blog post editor page. -Heading Text before the input field to enter blog post content.",
