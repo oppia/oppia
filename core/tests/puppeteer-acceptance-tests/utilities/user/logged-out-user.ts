@@ -6662,7 +6662,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async isSaveLessonProgressButtonVisible(): Promise<boolean> {
     return await this.isElementVisible(
-      'xpath///button[contains(normalize-space(), "Save")]'
+      'xpath///button[normalize-space(text())="Save"]'
     );
   }
 
@@ -7265,18 +7265,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Expect the sign-in button present in new lesson player.
+   * Check whether the login button is present in new lesson player.
    */
-  async expectSignInButton(): Promise<boolean> {
-    try {
-      await this.page.waitForSelector(loginButtonSelector, {
-        visible: true,
-        timeout: 5000,
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async isLoginButtonPresent(): Promise<boolean> {
+    return await this.isElementVisible(loginButtonSelector, true);
   }
 
   /**
@@ -7611,6 +7603,8 @@ export class LoggedOutUser extends BaseUser {
     );
     // Simulate Ctrl + Click
     // Use 'Control' for Windows/Linux or 'Meta' for Mac.
+    // Ctrl + Click is required to open the community library
+    // in a new page via the button click.
     const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
 
     await this.page.keyboard.down(modifier);
@@ -7624,7 +7618,6 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('New tab page was not created successfully');
     }
 
-    await newTabPage.bringToFront();
     await newTabPage.waitForNavigation({
       waitUntil: 'networkidle0',
     });
@@ -7671,6 +7664,8 @@ export class LoggedOutUser extends BaseUser {
     );
 
     // Perform Ctrl + Click.
+    // Ctrl + Click is required to open the next lesson
+    // in a new page via the button click.
     const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
 
     await this.page.keyboard.down(modifier);
