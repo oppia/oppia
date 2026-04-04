@@ -22,6 +22,9 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
+const COOKIE_BANNER_ACCEPT_BUTTON_SELECTOR =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
+
 describe('Interested Parent', function () {
   let parentUser: LoggedOutUser;
 
@@ -32,6 +35,20 @@ describe('Interested Parent', function () {
   it('should learn about the organization', async function () {
     // Visit splash page.
     await parentUser.navigateToSplashPage();
+    if (await parentUser.page.$(COOKIE_BANNER_ACCEPT_BUTTON_SELECTOR)) {
+      await parentUser.clickOnElementWithSelector(
+        COOKIE_BANNER_ACCEPT_BUTTON_SELECTOR
+      );
+      parentUser.userHasAcceptedCookies = true;
+      await parentUser.page.waitForSelector(
+        COOKIE_BANNER_ACCEPT_BUTTON_SELECTOR,
+        {
+          hidden: true,
+          timeout: 10000,
+        }
+      );
+    }
+    await parentUser.waitForPageToFullyLoad();
     await parentUser.expectScreenshotToMatch('homePage', __dirname);
 
     // Visit the About Oppia page from navbar.
@@ -81,6 +98,20 @@ describe('Interested Parent', function () {
 
     // Visit the For Parents / Teachers page from navbar.
     await parentUser.clickTeachButtonInAboutMenuOnNavbar();
+    if (await parentUser.page.$(COOKIE_BANNER_ACCEPT_BUTTON_SELECTOR)) {
+      await parentUser.clickOnElementWithSelector(
+        COOKIE_BANNER_ACCEPT_BUTTON_SELECTOR
+      );
+      parentUser.userHasAcceptedCookies = true;
+      await parentUser.page.waitForSelector(
+        COOKIE_BANNER_ACCEPT_BUTTON_SELECTOR,
+        {
+          hidden: true,
+          timeout: 10000,
+        }
+      );
+    }
+    await parentUser.waitForPageToFullyLoad();
     await parentUser.expectScreenshotToMatch(
       'parentsOrTeachersPage',
       __dirname
