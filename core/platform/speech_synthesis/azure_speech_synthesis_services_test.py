@@ -42,9 +42,9 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
-            lambda _: 'azure_key',
+            lambda _, oppia_project_id: 'azure_key',
             expected_args=[
-                ('AZURE_TTS_API_KEY',),
+                ('AZURE_TTS_API_KEY', None),
             ],
         )
 
@@ -200,7 +200,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         plaintext = 'This is a test text'
         language_accent_code = 'en-US'
 
-        mock_audio_data = b''
+        mock_audio_data = None
         mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
         mock_error_details = (
             'WebSocket upgrade failed: Authentication error (401). '
@@ -238,7 +238,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
                 plaintext, language_accent_code
             )
         )
-        mock_audio_data = b''
+        mock_audio_data = None
 
         mock_speech_config_instance = mock_speech_config.return_value
         mock_speech_config_instance.set_speech_synthesis_output_format = (
@@ -284,6 +284,168 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
                 ssml_text
             )
         )
+
+        self.assertEqual(result_binary_data, mock_audio_data)
+        self.assertEqual(result_audio_offsets, mock_word_boundaries)
+        self.assertEqual(result_error, error_details)
+
+    @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
+    @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
+    @mock.patch(
+        'core.platform.speech_synthesis.'
+        'azure_speech_synthesis_services.WordBoundaryCollection'
+    )
+    def test_regenerate_speech_from_text_failed_due_to_multiple_requests(
+        self,
+        mock_word_boundary_collection: mock.Mock,
+        mock_speech_config: mock.Mock,
+        mock_speech_synthesizer: mock.Mock,
+    ) -> None:
+        plaintext = 'This is a test text'
+        language_accent_code = 'en-US'
+        mock_audio_data = None
+
+        mock_speech_config_instance = mock_speech_config.return_value
+        mock_speech_config_instance.set_speech_synthesis_output_format = (
+            mock.MagicMock()
+        )
+        mock_speech_synthesizer_instance = mock_speech_synthesizer.return_value
+        mock_speech_synthesis_result = mock.MagicMock()
+        mock_speech_synthesis_result.audio_data = mock_audio_data
+        mock_cancellation_details = mock.MagicMock()
+
+        error_details = (
+            'WebSocket upgrade failed: Too many requests (429). Please check '
+            'subscription information and region name. USP state: Sending. '
+            'Received audio size: 0 bytes'
+        )
+        mock_cancellation_details.reason = speechsdk.CancellationReason.Error
+        mock_cancellation_details.error_details = error_details
+        mock_cancellation_details.error_code = (
+            speechsdk.CancellationErrorCode.TooManyRequests
+        )
+
+        mock_speech_synthesis_result.reason = speechsdk.ResultReason.Canceled
+        mock_speech_synthesis_result.cancellation_details = (
+            mock_cancellation_details
+        )
+        (
+            mock_speech_synthesizer_instance.speak_ssml_async.return_value.get.return_value
+        ) = mock_speech_synthesis_result
+        mock_word_boundary_instance = mock.MagicMock()
+        mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
+        mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
+        mock_word_boundary_collection.return_value = mock_word_boundary_instance
+
+        with self.swap_api_key_secrets_return_secret:
+            result_binary_data, result_audio_offsets, result_error = (
+                azure_speech_synthesis_services.regenerate_speech_from_text(
+                    plaintext, language_accent_code
+                )
+            )
+
+        self.assertEqual(result_binary_data, mock_audio_data)
+        self.assertEqual(result_audio_offsets, mock_word_boundaries)
+        self.assertEqual(result_error, error_details)
+
+    @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
+    @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
+    @mock.patch(
+        'core.platform.speech_synthesis.'
+        'azure_speech_synthesis_services.WordBoundaryCollection'
+    )
+    def test_regenerate_speech_from_text_failed_due_to_end_of_stream(
+        self,
+        mock_word_boundary_collection: mock.Mock,
+        mock_speech_config: mock.Mock,
+        mock_speech_synthesizer: mock.Mock,
+    ) -> None:
+        plaintext = 'This is a test text'
+        language_accent_code = 'en-US'
+        mock_audio_data = None
+
+        mock_speech_config_instance = mock_speech_config.return_value
+        mock_speech_config_instance.set_speech_synthesis_output_format = (
+            mock.MagicMock()
+        )
+        mock_speech_synthesizer_instance = mock_speech_synthesizer.return_value
+        mock_speech_synthesis_result = mock.MagicMock()
+        mock_speech_synthesis_result.audio_data = mock_audio_data
+        mock_cancellation_details = mock.MagicMock()
+
+        error_details = 'Speech synthesis was canceled for reason: CancellationReason.EndOfStream'
+        mock_cancellation_details.reason = (
+            speechsdk.CancellationReason.EndOfStream
+        )
+
+        mock_speech_synthesis_result.reason = speechsdk.ResultReason.Canceled
+        mock_speech_synthesis_result.cancellation_details = (
+            mock_cancellation_details
+        )
+        (
+            mock_speech_synthesizer_instance.speak_ssml_async.return_value.get.return_value
+        ) = mock_speech_synthesis_result
+        mock_word_boundary_instance = mock.MagicMock()
+        mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
+        mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
+        mock_word_boundary_collection.return_value = mock_word_boundary_instance
+
+        with self.swap_api_key_secrets_return_secret:
+            result_binary_data, result_audio_offsets, result_error = (
+                azure_speech_synthesis_services.regenerate_speech_from_text(
+                    plaintext, language_accent_code
+                )
+            )
+
+        self.assertEqual(result_binary_data, mock_audio_data)
+        self.assertEqual(result_audio_offsets, mock_word_boundaries)
+        self.assertEqual(result_error, error_details)
+
+    @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
+    @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
+    @mock.patch(
+        'core.platform.speech_synthesis.'
+        'azure_speech_synthesis_services.WordBoundaryCollection'
+    )
+    def test_regenerate_speech_from_text_failed_due_to_unknown_reason(
+        self,
+        mock_word_boundary_collection: mock.Mock,
+        mock_speech_config: mock.Mock,
+        mock_speech_synthesizer: mock.Mock,
+    ) -> None:
+        plaintext = 'This is a test text'
+        language_accent_code = 'en-US'
+        mock_audio_data = None
+
+        mock_speech_config_instance = mock_speech_config.return_value
+        mock_speech_config_instance.set_speech_synthesis_output_format = (
+            mock.MagicMock()
+        )
+        mock_speech_synthesizer_instance = mock_speech_synthesizer.return_value
+        mock_speech_synthesis_result = mock.MagicMock()
+        mock_speech_synthesis_result.audio_data = mock_audio_data
+        mock_cancellation_details = mock.MagicMock()
+
+        error_details = (
+            'Speech synthesis failed for reason: UnknownCancellationReason'
+        )
+        mock_cancellation_details.reason = 'UnknownCancellationReason'
+
+        mock_speech_synthesis_result.reason = 'UnknownCancellationReason'
+        (
+            mock_speech_synthesizer_instance.speak_ssml_async.return_value.get.return_value
+        ) = mock_speech_synthesis_result
+        mock_word_boundary_instance = mock.MagicMock()
+        mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
+        mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
+        mock_word_boundary_collection.return_value = mock_word_boundary_instance
+
+        with self.swap_api_key_secrets_return_secret:
+            result_binary_data, result_audio_offsets, result_error = (
+                azure_speech_synthesis_services.regenerate_speech_from_text(
+                    plaintext, language_accent_code
+                )
+            )
 
         self.assertEqual(result_binary_data, mock_audio_data)
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
@@ -400,6 +562,19 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             self._get_ssml_content(expected_main_content, language_accent_code),
         )
 
+        plaintext = 'Hello - welcome to Oppia!'
+        expected_main_content = 'Hello - welcome to Oppia!'
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code
+            )
+        )
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code),
+        )
+
         plaintext = 'Find the value of 5 + 3.'
         expected_main_content = (
             'Find the value of 5 <say-as interpret-as="math">plus</say-as> 3.'
@@ -417,8 +592,8 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         plaintext = 'Find the value of 15 / 5.'
         expected_main_content = (
-            'Find the value of 15 <say-as interpret-as="math">divided by'
-            '</say-as> 5.'
+            'Find the value of 15<say-as interpret-as="math">divided by'
+            '</say-as>5.'
         )
 
         ssml_content = (

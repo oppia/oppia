@@ -118,11 +118,7 @@ describe('Logged-In Learner', function () {
       'tabSection'
     );
     await loggedInLearner.expectElementsToBePresentInRLD(
-      [
-        'Lessons in progress',
-        "Topics available in Oppia's Classroom",
-        'Lesson you saved for later',
-      ],
+      ['Lessons in progress', 'Lesson you saved for later'],
       'cardDisplay'
     );
 
