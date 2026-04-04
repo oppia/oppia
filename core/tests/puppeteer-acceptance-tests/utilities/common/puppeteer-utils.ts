@@ -373,15 +373,100 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.typeInInputField('input.e2e-test-username-input', username);
-    await this.clickOnElementWithSelector(
-      'input.e2e-test-agree-to-terms-checkbox'
+    const usernameSelector = 'input.e2e-test-username-input';
+    const termsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
+    const registerButtonSelector = 'button.e2e-test-register-user';
+    let selectedUsername = username;
+
+    await this.typeInInputField(usernameSelector, selectedUsername);
+
+    await this.page.waitForFunction(
+      (selector: string, expectedUsername: string) => {
+        const usernameInput = document.querySelector(
+          selector
+        ) as HTMLInputElement | null;
+        return (usernameInput?.value || '').trim() === expectedUsername;
+      },
+      {},
+      usernameSelector,
+      selectedUsername
     );
-    await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])'
+
+    await this.clickOnElementWithSelector(termsCheckboxSelector);
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const checkbox = document.querySelector(selector) as HTMLInputElement;
+        return Boolean(checkbox?.checked);
+      },
+      {},
+      termsCheckboxSelector
     );
+
+    let isRegisterButtonEnabled = false;
+    for (let attempt = 0; attempt < 5 && !isRegisterButtonEnabled; attempt++) {
+      if (attempt > 0) {
+        selectedUsername = `${username}${Date.now().toString().slice(-4)}${attempt}`;
+        await this.page.evaluate(
+          (
+            nextUsername: string,
+            usernameSelector: string,
+            checkboxSelector: string
+          ) => {
+            const usernameInput = document.querySelector(
+              usernameSelector
+            ) as HTMLInputElement | null;
+            if (usernameInput) {
+              usernameInput.focus();
+              usernameInput.value = nextUsername;
+              usernameInput.dispatchEvent(new Event('input', {bubbles: true}));
+              usernameInput.dispatchEvent(new Event('change', {bubbles: true}));
+              usernameInput.blur();
+            }
+
+            const checkbox = document.querySelector(
+              checkboxSelector
+            ) as HTMLInputElement | null;
+            if (checkbox && !checkbox.checked) {
+              checkbox.click();
+            }
+          },
+          selectedUsername,
+          usernameSelector,
+          termsCheckboxSelector
+        );
+      }
+
+      isRegisterButtonEnabled = await this.page
+        .waitForFunction(
+          (selector: string) => {
+            const button = document.querySelector(
+              selector
+            ) as HTMLButtonElement | null;
+            if (!button) {
+              return false;
+            }
+
+            const isDisabled =
+              button.disabled ||
+              button.hasAttribute('disabled') ||
+              button.classList.contains('disabled');
+
+            return !isDisabled;
+          },
+          {timeout: 8000},
+          registerButtonSelector
+        )
+        .then(() => true)
+        .catch(() => false);
+    }
+
+    if (!isRegisterButtonEnabled) {
+      throw new Error('Sign-up submit button did not become enabled.');
+    }
+
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
-    this.username = username;
+    this.username = selectedUsername;
     this.email = email;
   }
 
