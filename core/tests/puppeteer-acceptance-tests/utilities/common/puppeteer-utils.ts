@@ -365,18 +365,7 @@ export class BaseUser {
     }
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
-    // Simple retry for navigation timeout (max 2 tries)
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        await this.clickAndWaitForNavigation('Sign In');
-        break;
-      } catch (err) {
-        if (attempt === 1) {
-          throw err;
-        }
-        await this.page.waitForTimeout(1500);
-      }
-    }
+    await this.clickAndWaitForNavigation('Sign In');
   }
 
   /**
@@ -504,155 +493,17 @@ export class BaseUser {
       typeof selector === 'string'
         ? await this.page.waitForSelector(selector)
         : selector;
-    // Simple retry for transient non-clickable state (max 2 tries)
-    for (let attempt = 0; attempt < 2; attempt++) {
-      // Only close the welcome modal, not all .modal-content modals.
-      const welcomeModal = await this.page.$('.e2e-test-welcome-modal');
-      if (welcomeModal) {
-        const closeBtn = await welcomeModal.$('.e2e-test-close-welcome-modal');
-        if (closeBtn) {
-          await closeBtn.click();
-          await this.page.waitForTimeout(100);
-        }
-      }
-      try {
-        await this.page.waitForFunction(
-          isElementClickable,
-          {timeout: 90000},
-          element
-        );
-        return;
-      } catch (error) {
-        if (attempt === 1) {
-          if (error instanceof Error) {
-            await this.page.evaluate(isElementClickable, element, true, true);
-            error.message =
-              `Element ${elementDesc} took too long to be clickable.\n` +
-              'Original Error:\n' +
-              error.message;
-          }
-          throw error;
-        }
-        await this.page.waitForTimeout(1500);
     try {
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
-        const clickabilityDiagnostics = await this.page.evaluate(
-          (targetElement: Element) => {
-            const describeElement = (el: Element | null): string => {
-              if (!el) {
-                return 'none';
-              }
-
-              const tag = el.tagName.toLowerCase();
-              const id = el.id ? `#${el.id}` : '';
-              const classNames = el.className
-                ? String(el.className).trim().split(/\s+/).filter(Boolean)
-                : [];
-              const classes =
-                classNames.length > 0 ? `.${classNames.join('.')}` : '';
-              return `<${tag}${id}${classes}>`;
-            };
-
-            const rect = targetElement.getBoundingClientRect();
-            const inViewport =
-              rect.top <= window.innerHeight &&
-              rect.bottom > 0 &&
-              rect.left <= window.innerWidth &&
-              rect.right > 0;
-
-            const isNativeDisabled =
-              (targetElement instanceof HTMLButtonElement ||
-                targetElement instanceof HTMLInputElement ||
-                targetElement instanceof HTMLSelectElement ||
-                targetElement instanceof HTMLTextAreaElement ||
-                targetElement instanceof HTMLOptionElement) &&
-              targetElement.disabled;
-            const isAriaDisabled =
-              targetElement.getAttribute('aria-disabled') === 'true' ||
-              targetElement.closest('[aria-disabled="true"]') !== null;
-            const isDisabled = isNativeDisabled || isAriaDisabled;
-
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const centerTopElement = document.elementFromPoint(
-              centerX,
-              centerY
-            );
-            const firstClientRect = targetElement.getClientRects()[0];
-            const firstRectTopElement = firstClientRect
-              ? document.elementFromPoint(
-                  firstClientRect.left + firstClientRect.width / 2,
-                  firstClientRect.top + firstClientRect.height / 2
-                )
-              : null;
-
-            const isCoveredByOtherElement = [
-              centerTopElement,
-              firstRectTopElement,
-            ]
-              .filter(Boolean)
-              .some(topElement => {
-                if (!topElement) {
-                  return false;
-                }
-                return (
-                  topElement !== targetElement &&
-                  !targetElement.contains(topElement) &&
-                  !topElement.contains(targetElement)
-                );
-              });
-
-            const blockingElement =
-              [centerTopElement, firstRectTopElement]
-                .filter(
-                  topElement =>
-                    topElement &&
-                    topElement !== targetElement &&
-                    !targetElement.contains(topElement) &&
-                    !topElement.contains(targetElement)
-                )
-                .map(topElement => describeElement(topElement))[0] ?? 'none';
-
-            const reasons: string[] = [];
-            if (isDisabled) {
-              reasons.push('Element is disabled.');
-            }
-            if (!inViewport) {
-              reasons.push('Element is not in the viewport.');
-            }
-            if (isCoveredByOtherElement) {
-              reasons.push(`Element is blocked by ${blockingElement}.`);
-            }
-
-            return {
-              reasons,
-              isDisabled,
-              inViewport,
-              isCoveredByOtherElement,
-              blockingElement,
-            };
-          },
-          element
-        );
         await this.page.evaluate(isElementClickable, element, true, true);
-
-        const reasonsText =
-          clickabilityDiagnostics.reasons.length > 0
-            ? clickabilityDiagnostics.reasons
-                .map(
-                  (reason: string, index: number) => `${index + 1}. ${reason}`
-                )
-                .join('\n')
-            : 'No specific reason detected from diagnostics.';
-
         error.message =
           `Element ${elementDesc} took too long to be clickable.\n` +
-          `Detected reasons:\n${reasonsText}\n` +
           'Original Error:\n' +
           error.message;
       }
+      throw error;
     }
   }
 
@@ -803,7 +654,6 @@ export class BaseUser {
     useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
-      timeout: 90000,
     }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
