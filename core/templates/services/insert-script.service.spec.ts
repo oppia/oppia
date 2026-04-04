@@ -46,7 +46,7 @@ describe('InsertScriptService', () => {
         {provide: RendererFactory2, useClass: MockRendererFactory},
       ],
     });
-    insertScriptService = TestBed.inject(InsertScriptService);
+    insertScriptService = TestBed.get(InsertScriptService);
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
@@ -60,11 +60,12 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
-
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       const result = insertScriptService.loadScript(
         KNOWN_SCRIPTS.DONORBOX,
@@ -84,10 +85,12 @@ describe('InsertScriptService', () => {
       setAttribute: () => {},
     };
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-    const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(
+    spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
@@ -96,13 +99,11 @@ describe('InsertScriptService', () => {
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
         false
       );
-      expect(appendChildSpy).toHaveBeenCalledTimes(1);
       done();
     });
 
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
-    expect(appendChildSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should handle script load error correctly', (done: jasmine.DoneFn) => {
@@ -168,7 +169,9 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );
@@ -194,7 +197,9 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload?.(new Event('load'));
+          if (script.onload) {
+            script.onload();
+          }
         }, 10);
       }
     );

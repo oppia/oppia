@@ -25,6 +25,7 @@ import {
   HtmlLengthService,
 } from 'services/html-length.service';
 import {AppConstants} from 'app.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
@@ -72,7 +73,8 @@ export class StudyGuideSectionEditorComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private topicEditorStateService: TopicEditorStateService,
     private topicUpdateService: TopicUpdateService,
-    private htmlLengthService: HtmlLengthService
+    private htmlLengthService: HtmlLengthService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -85,11 +87,25 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   // Remove this function when the schema-based editor
   // is migrated to Angular 2+.
   getContentSchema(): HtmlFormSchema {
+    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
+      this.STUDY_GUIDE_SECTION_CONTENT_FORM_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          rte_component_config_id: 'ALL_COMPONENTS',
+          rows: 100,
+        },
+      };
+    }
     return this.STUDY_GUIDE_SECTION_CONTENT_FORM_SCHEMA;
   }
 
   getHeadingSchema(): HtmlFormSchema {
     return this.STUDY_GUIDE_SECTION_HEADING_FORM_SCHEMA;
+  }
+
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
   }
 
   updateLocalHeading($event: string): void {

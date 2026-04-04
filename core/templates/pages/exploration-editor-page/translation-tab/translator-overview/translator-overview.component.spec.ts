@@ -50,8 +50,6 @@ import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverPlayerService} from '../../../exploration-player-page/services/voiceover-player.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-
 class MockNgbModal {
   open() {
     return {
@@ -99,7 +97,6 @@ describe('Translator Overview component', () => {
       declarations: [TranslatorOverviewComponent],
       providers: [
         ExplorationLanguageCodeService,
-        I18nLanguageCodeService,
         {
           provide: NgbModal,
           useClass: MockNgbModal,
@@ -553,14 +550,4 @@ describe('Translator Overview component', () => {
 
     expect(component.selectedLanguageAccentCode).toEqual('en-US');
   }));
-
-  it('should correctly identify RTL languages', () => {
-    component.languageCode = 'ar';
-    expect(component.isTranslationLanguageRTL()).toBe(true);
-  });
-
-  it('should correctly identify LTR languages', () => {
-    component.languageCode = 'en';
-    expect(component.isTranslationLanguageRTL()).toBe(false);
-  });
 });

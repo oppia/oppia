@@ -21,10 +21,7 @@ import {Injectable} from '@angular/core';
 import {ImagesData} from 'services/image-local-storage.service';
 
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
-import {
-  StateNamesToContentIdMapping,
-  TranslatableTexts,
-} from 'domain/opportunity/translatable-texts.model';
+import {TranslatableTexts} from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
@@ -35,10 +32,10 @@ export interface TranslatableItem {
   status: Status;
   text: string | string[];
   more: boolean;
-  dataFormat?: string;
-  contentType?: string;
-  interactionId?: string | null;
-  ruleType?: string | null;
+  dataFormat: string;
+  contentType: string;
+  interactionId?: string;
+  ruleType?: string;
 }
 
 export type Status = 'pending' | 'submitted';
@@ -52,8 +49,8 @@ export class StateAndContent {
     public translation: string | string[],
     public dataFormat: string,
     public contentType: string,
-    public interactionId?: string | null,
-    public ruleType?: string | null
+    public interactionId?: string,
+    public ruleType?: string
   ) {}
 }
 
@@ -62,25 +59,25 @@ export class StateAndContent {
 })
 export class TranslateTextService {
   STARTING_INDEX = -1;
-  PENDING: Status = 'pending';
-  SUBMITTED: Status = 'submitted';
-  stateWiseContents: StateNamesToContentIdMapping = {};
-  stateWiseContentIds: {[stateName: string]: string[]} = {};
-  stateNamesList: string[] = [];
-  stateAndContent: StateAndContent[] = [];
+  PENDING = 'pending';
+  SUBMITTED = 'submitted';
+  stateWiseContents = {};
+  stateWiseContentIds = {};
+  stateNamesList = [];
+  stateAndContent = [];
   activeIndex = this.STARTING_INDEX;
-  activeExpId: string | null = null;
-  activeExpVersion: string | null = null;
-  activeContentId: string | null = null;
-  activeStateName: string | null = null;
-  activeContentText: string | string[] | null = null;
-  activeContentStatus: Status = 'pending';
+  activeExpId;
+  activeExpVersion;
+  activeContentId;
+  activeStateName: string;
+  activeContentText: string;
+  activeContentStatus: Status;
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
   ) {}
 
-  private _getNextText(): string | string[] | null {
+  private _getNextText(): string | string[] {
     if (this.stateAndContent.length === 0) {
       return null;
     }
@@ -91,7 +88,7 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] | null {
+  private _getPreviousText(): string | string[] {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
       return null;
     }
@@ -124,7 +121,7 @@ export class TranslateTextService {
     text: string | string[],
     more: boolean,
     status: Status,
-    translation: string | string[]
+    translation: string
   ): TranslatableItem {
     const {
       dataFormat,
@@ -134,14 +131,14 @@ export class TranslateTextService {
     }: {
       dataFormat?: string;
       contentType?: string;
-      interactionId?: string | null;
-      ruleType?: string | null;
+      interactionId?: string;
+      ruleType?: string;
     } = this.stateAndContent[this.activeIndex] || {};
     return {
       text: text,
       more: more,
       status: status,
-      translation: this._isSetDataFormat(dataFormat || '') ? [] : translation,
+      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
       dataFormat: dataFormat,
       contentType: contentType,
       interactionId: interactionId,
@@ -166,7 +163,7 @@ export class TranslateTextService {
         this.activeExpVersion = translatableTexts.explorationVersion;
         for (const stateName in this.stateWiseContents) {
           let stateHasText: boolean = false;
-          const contentIds: string[] = [];
+          const contentIds = [];
           const contentIdToContentMapping = this.stateWiseContents[stateName];
           for (const contentId in contentIdToContentMapping) {
             const translatableItem = contentIdToContentMapping[contentId];
@@ -204,7 +201,7 @@ export class TranslateTextService {
   }
 
   getTextToTranslate(): TranslatableItem {
-    const text = this._getNextText() ?? '';
+    const text = this._getNextText();
     const {status = this.PENDING, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
@@ -217,7 +214,7 @@ export class TranslateTextService {
   }
 
   getPreviousTextToTranslate(): TranslatableItem {
-    const text = this._getPreviousText() ?? '';
+    const text = this._getPreviousText();
     const {status = this.PENDING, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
@@ -237,53 +234,23 @@ export class TranslateTextService {
     successCallback: () => void,
     errorCallback: (reason: string) => void
   ): void {
-    const activeIndexAtSubmission = this.activeIndex;
-    const activeStateNameAtSubmission = this.activeStateName;
-    const activeContentIdAtSubmission = this.activeContentId;
-
-    if (
-      activeStateNameAtSubmission === null ||
-      activeContentIdAtSubmission === null ||
-      this.activeExpId === null ||
-      this.activeExpVersion === null
-    ) {
-      return;
-    }
-
-    const contentToTranslateAtSubmission =
-      this.stateWiseContents[activeStateNameAtSubmission]?.[
-        activeContentIdAtSubmission
-      ]?.content;
-
-    if (contentToTranslateAtSubmission === undefined) {
-      return;
-    }
-
     this.translateTextBackendApiService
       .suggestTranslatedTextAsync(
         this.activeExpId,
         this.activeExpVersion,
-        activeContentIdAtSubmission,
-        activeStateNameAtSubmission,
+        this.activeContentId,
+        this.activeStateName,
         languageCode,
-        contentToTranslateAtSubmission,
+        this.stateWiseContents[this.activeStateName][this.activeContentId]
+          .content,
         translation,
         imagesData,
         dataFormat
       )
       .then(
         () => {
-          const submittedStateAndContent =
-            this.stateAndContent[activeIndexAtSubmission];
-          if (
-            submittedStateAndContent &&
-            submittedStateAndContent.stateName ===
-              activeStateNameAtSubmission &&
-            submittedStateAndContent.contentID === activeContentIdAtSubmission
-          ) {
-            submittedStateAndContent.status = this.SUBMITTED;
-            submittedStateAndContent.translation = translation;
-          }
+          this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
+          this.stateAndContent[this.activeIndex].translation = translation;
           successCallback();
         },
         errorResponse => {

@@ -244,7 +244,6 @@ describe('Blog Post Search Service', () => {
         searchOffset: 2,
         blogPostSummariesList: [],
         listOfDefaultTags: [],
-        totalMatchingBlogPosts: 0,
       };
       testSubscriptions = new Subscription();
       testSubscriptions.add(
@@ -304,7 +303,6 @@ describe('Blog Post Search Service', () => {
         searchOffset: 1,
         blogPostSummariesList: [],
         listOfDefaultTags: [],
-        totalMatchingBlogPosts: 0,
       };
 
       it('should successfully load more data', fakeAsync(() => {
@@ -351,7 +349,6 @@ describe('Blog Post Search Service', () => {
           searchOffset: null,
           blogPostSummariesList: [],
           listOfDefaultTags: [],
-          totalMatchingBlogPosts: 0,
         };
         spyOn(
           blogHomePageBackendApiService,

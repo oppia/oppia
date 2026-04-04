@@ -63,10 +63,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         super().__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
-            options=job_options.JobOptions(
-                namespace=self.namespace,
-                oppia_project_id='dev-project-id',
-            ),
+            options=job_options.JobOptions(namespace=self.namespace),
         )
         self._pipeline_context_stack: Optional[contextlib.ExitStack] = None
 
