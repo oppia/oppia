@@ -5897,14 +5897,14 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectSidebarCollapsedState(): Promise<void> {
     const isViewportAtMobileWidth = this.isViewportAtMobileWidth();
-    expect(await this.isTextPresentOnPage('Close options')).toBe(false);
-    expect(await this.isTextPresentOnPage('Close options')).toBe(false);
+    expect(await this.isTextVisibleToUser('Close options')).toBe(false);
+    expect(await this.isTextVisibleToUser('Close options')).toBe(false);
     if (!isViewportAtMobileWidth) {
-      expect(await this.isTextPresentOnPage('Open options')).toBe(true);
+      expect(await this.isTextVisibleToUser('Open options')).toBe(true);
     }
 
-    expect(await this.isTextPresentOnPage('Share this lesson')).toBe(false);
-    expect(await this.isTextPresentOnPage('Feedback')).toBe(false);
+    expect(await this.isTextVisibleToUser('Share this lesson')).toBe(false);
+    expect(await this.isTextVisibleToUser('Feedback')).toBe(false);
   }
 
   /**
@@ -6662,11 +6662,25 @@ export class LoggedOutUser extends BaseUser {
    */
   async isSaveLessonProgressButtonVisible(): Promise<boolean> {
     return await this.isElementVisible(
-      'xpath///button[contains(normalize-space(), "Save")]',
-      true
+      'xpath///button[contains(normalize-space(), "Save")]'
     );
   }
 
+  /**
+   * Validates that text is rendered and visible to the user.
+   * NOTE: This retrieves the 'innerText' of the body, which mimics how
+   * a human sees the page. It excludes HTML tags and hidden content (like scripts).
+   * @param {string} text - The visible string to look for.
+   * @param {Page} page - The Puppeteer page instance.
+   */
+  async isTextVisibleToUser(
+    text: string,
+    page: Page = this.page
+  ): Promise<boolean> {
+    // We use page.evaluate to access the DOM's innerText property directly.
+    const visibleText = await page.evaluate(() => document.body.innerText);
+    return visibleText.includes(text);
+  }
   /**
    * Expect the concept card button in conversation.
    */
@@ -7176,7 +7190,7 @@ export class LoggedOutUser extends BaseUser {
       expectedTexts.temporaryLinkPrompt
     );
 
-    await this.isTextPresentOnPage('Copy');
+    await this.isTextVisibleToUser('Copy');
     showMessage('Save progress modal displayed');
   }
 

@@ -669,14 +669,13 @@ export class BaseUser {
 
   /**
    * Checks if a given word is present on the page.
+   * NOTE: This searches the raw HTML markup. It will return 'true' if the
+   * text exists in a <script> block, a CSS class name, or an 'id', even if
+   * the text is never shown to the user on screen.
    * @param {string} word - The word to check.
-   * @param {Page} page - Optional. The page to find the content.
    */
-  async isTextPresentOnPage(
-    text: string,
-    page: Page = this.page
-  ): Promise<boolean> {
-    const pageContent = await page.content();
+  async isTextPresentOnPage(text: string): Promise<boolean> {
+    const pageContent = await this.page.content();
     return pageContent.includes(text);
   }
 

@@ -371,7 +371,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickOnElementWithText('View Solution');
 
     await loggedOutLearner.expectWarningModalBeforeViewSolution();
-    expect(await loggedOutLearner.isTextPresentOnPage('SHOW SOLUTION')).toBe(
+    expect(await loggedOutLearner.isTextVisibleToUser('SHOW SOLUTION')).toBe(
       true
     );
     await loggedOutLearner.clickOnShowSolutionButton();

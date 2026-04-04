@@ -111,8 +111,8 @@ describe('Logged-Out Learner', function () {
 
     // Open Feedback popup and check "Stay Anonymous" text isn't visible.
     await loggedOutLearner.clickFeedbackButton();
-    await loggedOutLearner.isTextPresentOnPage('Give feedback on this lesson');
-    expect(await loggedOutLearner.isTextPresentOnPage('Stay anonymous')).toBe(
+    await loggedOutLearner.isTextVisibleToUser('Give feedback on this lesson');
+    expect(await loggedOutLearner.isTextVisibleToUser('Stay anonymous')).toBe(
       false
     );
     await loggedOutLearner.expectStayAnonymousCheckboxToBePresent(false);

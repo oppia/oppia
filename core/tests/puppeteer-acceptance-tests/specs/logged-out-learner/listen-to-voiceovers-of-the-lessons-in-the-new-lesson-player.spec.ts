@@ -208,7 +208,7 @@ describe('Logged-Out Learner', function () {
     const isMobileViewPort = loggedOutLearner.isViewportAtMobileWidth();
 
     if (!isMobileViewPort) {
-      expect(await loggedOutLearner.isTextPresentOnPage('Listen in')).toBe(
+      expect(await loggedOutLearner.isTextVisibleToUser('Listen in')).toBe(
         false
       );
     }
@@ -217,7 +217,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.waitForPageToFullyLoad();
     if (!isMobileViewPort) {
-      expect(await loggedOutLearner.isTextPresentOnPage('Listen in')).toBe(
+      expect(await loggedOutLearner.isTextVisibleToUser('Listen in')).toBe(
         true
       );
     }

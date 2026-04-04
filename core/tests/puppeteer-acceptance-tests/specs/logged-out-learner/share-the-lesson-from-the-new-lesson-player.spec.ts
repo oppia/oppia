@@ -111,14 +111,14 @@ describe('Logged-Out Learner', function () {
   it('should be able to share the lesson using copy link', async function () {
     await loggedOutLearner.playLesson(explorationId);
     await loggedOutLearner.clickOpenOptions();
-    await loggedOutLearner.isTextPresentOnPage('Close options');
+    await loggedOutLearner.isTextVisibleToUser('Close options');
     // Expect lesson description is present on the page.
-    await loggedOutLearner.isTextPresentOnPage(
+    await loggedOutLearner.isTextVisibleToUser(
       'Learn basic Mathematics including Place Values'
     );
     // Expect Share and Feedback button is visible.
-    await loggedOutLearner.isTextPresentOnPage('Share this lesson');
-    await loggedOutLearner.isTextPresentOnPage('Feedback');
+    await loggedOutLearner.isTextVisibleToUser('Share this lesson');
+    await loggedOutLearner.isTextVisibleToUser('Feedback');
     // Expect report button is not displayed.
     expect(await loggedOutLearner.isReportButtonVisible()).toBe(false);
 
@@ -135,7 +135,7 @@ describe('Logged-Out Learner', function () {
     const newBrowserTab = await loggedOutLearner.openCopiedLink();
 
     // Expect lesson name present in new tab.
-    await loggedOutLearner.isTextPresentOnPage(
+    await loggedOutLearner.isTextVisibleToUser(
       'What are the Place Values?',
       newBrowserTab
     );
@@ -170,7 +170,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectShareLessonModal();
 
     await loggedOutLearner.clickOnHowToAttributeThisLesson();
-    await loggedOutLearner.isTextPresentOnPage(
+    await loggedOutLearner.isTextVisibleToUser(
       'Generate Creative Commons Attribution'
     );
     await loggedOutLearner.verifyAttributionText(
