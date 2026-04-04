@@ -9,7 +9,8 @@
             <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
                 [innerHTML]="'I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
             </h3>
-            <ngb-pagination [collectionSize]="totalBlogPosts"
+            <ngb-pagination *ngIf="totalBlogPosts > 0"
+                            [collectionSize]="totalBlogPosts"
                             [(page)]="page"
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
@@ -38,14 +39,10 @@
         <div *ngIf="searchPageIsActive">
           <div class="d-flex align-items-baseline">
             <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
-                *ngIf="searchOffset"
-                [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum}">
-            </h3>
-            <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
-                *ngIf="!searchOffset"
                 [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
             </h3>
-            <ngb-pagination [collectionSize]="totalBlogPosts"
+            <ngb-pagination *ngIf="totalBlogPosts > 0"
+                            [collectionSize]="totalBlogPosts"
                             [(page)]="page"
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH"
@@ -141,7 +138,7 @@
       </div>
     </div>
     <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen" class="d-flex">
-      <ngb-pagination *ngIf="!searchPageIsActive"
+      <ngb-pagination *ngIf="!searchPageIsActive && totalBlogPosts > 0"
                       [collectionSize]="totalBlogPosts"
                       [(page)]="page"
                       [maxSize]="2"
@@ -159,7 +156,7 @@
           <i class="fa fa-angle-right text-center w-100" aria-hidden="true"></i>
         </ng-template>
       </ngb-pagination>
-      <ngb-pagination *ngIf="searchPageIsActive"
+      <ngb-pagination *ngIf="searchPageIsActive && totalBlogPosts > 0"
                       [collectionSize]="totalBlogPosts"
                       [(page)]="page"
                       [maxSize]="2"
