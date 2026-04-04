@@ -23,10 +23,10 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    draft_upgrade_services,
     exp_domain,
     exp_fetchers,
     exp_services,
-    draft_upgrade_services,
 )
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -276,6 +276,11 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         return (transformed_exp_objects_list, job_run_results)
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all ExplorationUserDataModels, checks if they have
     valid drafts, and performs migration if the schema is outdated.
@@ -360,22 +365,27 @@ class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
                 exp_models.ExplorationModel.get_all(include_deleted=False)
             )
             | 'Key ExpModels by ID'
-            >> beam.WithKeys(
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda m: m.id
-            )  # pylint: disable=no-value-for-parameter
+            )
         )
         user_models_keyed_by_exp_id = (
             user_data_models
             | 'Key UserData by Exp ID'
-            >> beam.WithKeys(
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda m: m.exploration_id
-            )  # pylint: disable=no-value-for-parameter
+            )
         )
 
-        joined_models = {
-            'user_data': user_models_keyed_by_exp_id,
-            'exploration': exploration_models,
-        } | 'Join UserData and Exploration' >> beam.CoGroupByKey()
+        joined_models = (
+            {
+                'user_data': user_models_keyed_by_exp_id,
+                'exploration': exploration_models,
+            }
+            | 'Join UserData and Exploration' >> beam.CoGroupByKey()
+            | 'Get rid of joined ID'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
 
         migrated_results = joined_models | 'Migrate Drafts' >> beam.FlatMap(
             lambda item: [
@@ -389,7 +399,8 @@ class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
             migrated_results
             | 'Filter OK results' >> beam.Filter(lambda r: r.is_ok())
             | 'Unwrap user models' >> beam.Map(lambda r: r.unwrap())
-            | 'Extract models' >> beam.Values()
+            | 'Extract models'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         job_run_results = (
