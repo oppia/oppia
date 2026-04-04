@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 /**
  * @fileoverview Acceptance test for LO.13: View collection - logged-out learner.
  *
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  * Test LO.13 (View collection) — needs lessonCreator + logged-out learner:
  * Setup: create & publish 2 explorations + 1 collection
  * Navigate to library → find collection
