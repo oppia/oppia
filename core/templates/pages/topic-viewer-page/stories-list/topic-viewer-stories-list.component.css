@@ -106,3 +106,11 @@ stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs i {
     padding-top: 0;
   }
 }
+
+stories-list.topic-preview-mode .oppia-stories-list-container .oppia-page-card {
+  box-sizing: border-box;
+  margin: 0;
+  padding-bottom: 30px;
+  padding-top: 24px;
+  width: 100%;
+}

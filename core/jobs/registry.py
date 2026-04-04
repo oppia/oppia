@@ -45,9 +45,10 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     audit_non_existent_threads_messages_jobs,
     audit_stories_with_disconnected_node_ids_job,
     audit_threads_with_missing_suggestions_jobs,
-    audit_topics_with_hanging_stories_job,
+    blog_author_details_migration_jobs,
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
+    cleanup_duplicate_translation_suggestions_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
     delete_duplicate_content_ids_jobs,
@@ -61,7 +62,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
-    remove_hanging_story_references_job,
     skill_inspection_jobs,
     skill_migration_jobs,
     story_migration_jobs,
@@ -69,10 +69,12 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     suggestion_migration_jobs,
     suggestion_stats_computation_jobs,
     topic_migration_jobs,
+    translation_audit_jobs,
     translation_migration_jobs,
     user_bios_change_jobs,
     user_stats_computation_jobs,
     user_validation_jobs,
+    voiceover_synthesis_jobs,
 )
 
 from typing import List, Type
