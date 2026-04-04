@@ -1000,4 +1000,69 @@ describe('Opportunities List Component', () => {
       }
     );
   });
+  describe('applySearch', () => {
+    beforeEach(() => {
+      component.opportunities = [
+        {
+          id: 'search_1',
+          heading: 'Math Skills',
+          subheading: 'Algebra basics',
+          topicName: 'Topic 1',
+          labelText: 'text',
+          labelColor: 'red',
+          progressPercentage: 50,
+          inReviewCount: 0,
+          totalCount: 100,
+          translationsCount: 50,
+          actionButtonTitle: '',
+          isPinned: false,
+        },
+        {
+          id: 'search_2',
+          heading: 'Science Skills',
+          subheading: 'Biology and cells',
+          topicName: 'Topic 2',
+          labelText: 'text',
+          labelColor: 'blue',
+          progressPercentage: 50,
+          inReviewCount: 0,
+          totalCount: 100,
+          translationsCount: 50,
+          actionButtonTitle: '',
+          isPinned: false,
+        },
+      ] as ExplorationOpportunity[];
+    });
+
+    it('should filter opportunities based on search query matching the heading', () => {
+      component.searchQuery = 'math';
+      component.applySearch();
+
+      expect(component.visibleOpportunities.length).toBe(1);
+      expect(component.visibleOpportunities.heading).toBe('Math Skills');
+    });
+
+    it('should filter opportunities based on search query matching the subheading', () => {
+      component.searchQuery = 'biology';
+      component.applySearch();
+
+      expect(component.visibleOpportunities.length).toBe(1);
+      expect(component.visibleOpportunities.heading).toBe('Science Skills');
+    });
+
+    it('should be case-insensitive when searching', () => {
+      component.searchQuery = 'SCIENCE';
+      component.applySearch();
+
+      expect(component.visibleOpportunities.length).toBe(1);
+      expect(component.visibleOpportunities.heading).toBe('Science Skills');
+    });
+
+    it('should return all opportunities if search query is empty', () => {
+      component.searchQuery = '';
+      component.applySearch();
+
+      expect(component.visibleOpportunities.length).toBe(2);
+    });
+  });
 });

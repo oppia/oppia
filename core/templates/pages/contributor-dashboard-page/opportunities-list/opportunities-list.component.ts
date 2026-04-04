@@ -49,6 +49,7 @@ export class OpportunitiesListComponent {
 
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
+  @Input() showSearchBar: boolean = true;
 
   @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
@@ -71,6 +72,7 @@ export class OpportunitiesListComponent {
   more: boolean = false;
   userIsOnLastPage: boolean = true;
   languageCode: string = '';
+  searchQuery: string = '';
 
   constructor(
     private zone: NgZone,
@@ -299,5 +301,14 @@ export class OpportunitiesListComponent {
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
     this.fetchAndLoadOpportunities();
+  }
+
+  applySearch(): void {
+    const query = this.searchQuery.toLowerCase();
+    this.visibleOpportunities = this.opportunities.filter(opportunity => {
+      const headingText = opportunity?.heading?.toLowerCase() ?? '';
+      const subheadingText = opportunity?.subheading?.toLowerCase() ?? '';
+      return headingText.includes(query) || subheadingText.includes(query);
+    });
   }
 }
