@@ -33,7 +33,6 @@ import {
 import {NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {
   TranslationModalComponent,
   TranslationOpportunity,
@@ -174,9 +173,7 @@ describe('Translation Modal Component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    OppiaAngularRootComponent.pageContextService =
-      TestBed.inject(PageContextService);
-    pageContextService = OppiaAngularRootComponent.pageContextService;
+    pageContextService = TestBed.inject(PageContextService);
   }));
 
   beforeEach(() => {
@@ -1151,11 +1148,9 @@ describe('Translation Modal Component', () => {
           removeEventListener: jasmine.createSpy('removeEventListener'),
         };
 
-        preventDefaultSpy = jasmine.createSpy('preventDefault');
-        mockEvent = {
-          preventDefault: preventDefaultSpy,
-          returnValue: '',
-        } as BeforeUnloadEvent;
+        mockEvent = new Event('beforeunload') as BeforeUnloadEvent;
+        preventDefaultSpy = spyOn(mockEvent, 'preventDefault');
+        mockEvent.returnValue = '';
 
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -1251,10 +1246,7 @@ describe('Translation Modal Component', () => {
       it('should have beforeUnloadHandler initialized as a function returning undefined', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        const mockEvent = {
-          preventDefault: () => {},
-          returnValue: '',
-        } as BeforeUnloadEvent;
+        const mockEvent = new Event('beforeunload') as BeforeUnloadEvent;
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1] as (
           e: BeforeUnloadEvent
         ) => string | undefined;
@@ -1266,10 +1258,7 @@ describe('Translation Modal Component', () => {
         tick();
 
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
-        const mockEvent = {
-          preventDefault: () => {},
-          returnValue: '',
-        } as BeforeUnloadEvent;
+        const mockEvent = new Event('beforeunload') as BeforeUnloadEvent;
 
         component.activeWrittenTranslation = '';
         expect(handler(mockEvent)).toBeUndefined();
