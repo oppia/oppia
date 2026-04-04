@@ -247,13 +247,19 @@ describe('Contributor badge component', () => {
       }));
 
       it(
-        'should mark languages as reviewable when they have both submission ' +
-          'and review stats',
+        'should show review and correction badges when a language has both ' +
+          'submission and review stats',
         fakeAsync(() => {
-          expect(component.selectedLanguage).toBe('Akan');
+          component.selectLanguageOption('Spanish');
+
           expect(component.userCanReviewTranslationSuggestion).toBeTrue();
-          expect(component.reviewableLanguages).toContain('Akan');
           expect(component.reviewableLanguages).toContain('Spanish');
+          expect(
+            component.translationBadges['Spanish'].review.length
+          ).toBeGreaterThan(0);
+          expect(
+            component.translationBadges['Spanish'].correction.length
+          ).toBeGreaterThan(0);
         })
       );
 
