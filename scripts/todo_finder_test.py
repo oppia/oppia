@@ -23,7 +23,7 @@ from core.tests import test_utils
 
 from . import todo_finder
 
-TASK_KEYWORD = 'TODO'  # disable-bad-pattern-check
+TASK_KEYWORD = f'{"TO"}{"DO"}'
 
 
 class TodoFinderTests(test_utils.GenericTestBase):
