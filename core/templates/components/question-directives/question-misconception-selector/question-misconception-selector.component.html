@@ -23,7 +23,7 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
   <button class="btn btn-secondary misconception-button e2e-test-no-misconception-button"
           (click)="selectNoMisconception()"
           [ngClass]="{'misconception-button-selected': selectedMisconception === null}">
-    <strong class="d-inline">(No misconception)</strong>
+    <strong class="d-inline">No misconception</strong>
   </button>
 </div>
 <div *ngIf="selectedMisconception !== null" (click)="toggleMisconceptionFeedbackUsage()" (keydown.space)="toggleMisconceptionFeedbackUsage()" tabindex="0" class="misconception-feedback-usage-container">

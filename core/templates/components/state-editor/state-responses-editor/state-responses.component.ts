@@ -360,9 +360,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   ): void {
     const taggedSkillMisconceptionId =
       taggedMisconception !== null
-        ? taggedMisconception.skillId +
-          '-' +
-          taggedMisconception.misconceptionId
+        ? `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`
         : null;
     this.responsesService.updateActiveAnswerGroup(
       {
