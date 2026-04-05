@@ -255,10 +255,10 @@ describe('Contributor badge component', () => {
           expect(component.userCanReviewTranslationSuggestion).toBeTrue();
           expect(component.reviewableLanguages).toContain('Spanish');
           expect(
-            component.translationBadges['Spanish'].review.length
+            component.translationBadges.Spanish.review.length
           ).toBeGreaterThan(0);
           expect(
-            component.translationBadges['Spanish'].correction.length
+            component.translationBadges.Spanish.correction.length
           ).toBeGreaterThan(0);
         })
       );
