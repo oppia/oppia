@@ -76,6 +76,9 @@ export class SvgEditorComponent implements OnInit {
   // modal dimensions.
   CANVAS_WIDTH = 494;
   CANVAS_HEIGHT = 368;
+  // Expose constant for use in template.
+  SVG_EDITOR_TOOLBAR_HEIGHT_PX =
+    SvgEditorConstants.SVG_EDITOR_TOOLBAR_HEIGHT_PX;
   drawMode = this.DRAW_MODE_NONE;
   polygonMode = this.CLOSED_POLYGON_MODE;
   isTouchDevice = this.deviceInfoService.hasTouchEvents();
@@ -655,6 +658,14 @@ export class SvgEditorComponent implements OnInit {
       this.canvas.getObjects(),
       {canvas: this.canvas}
     );
+    // Only scale wide images to fit the canvas width. Tall/narrow images
+    // should not be scaled to width as this causes them to exceed the
+    // canvas height and get clipped.
+    const selectionWidth = temporarySelection.width ?? 0;
+    const selectionHeight = temporarySelection.height ?? 0;
+    if (selectionWidth > selectionHeight) {
+      temporarySelection.scaleToWidth(this.canvas.getWidth());
+    }
     temporarySelection.center();
     this.canvas.setActiveObject(temporarySelection);
     this.canvas.discardActiveObject();
@@ -1692,6 +1703,12 @@ export class SvgEditorComponent implements OnInit {
     });
   }
 
+  // Sets the canvas dimensions based on diagramHeight and diagramWidth which
+  // are controlled by the user through the dimension inputs. Previously, this
+  // method used imagePreloaderService.getDimensionsOfImage() to get dimensions
+  // from the saved image, but that approach didn't work for new/edited images
+  // where the user has changed the dimensions. Using diagramHeight/diagramWidth
+  // ensures the canvas always matches what the user has specified.
   setCanvasDimensions(): void {
     if (!this.canvas) {
       return;
