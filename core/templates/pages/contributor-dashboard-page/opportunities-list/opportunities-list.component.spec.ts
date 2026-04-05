@@ -1039,7 +1039,7 @@ describe('Opportunities List Component', () => {
       component.applySearch();
 
       expect(component.visibleOpportunities.length).toBe(1);
-      expect(component.visibleOpportunities.heading).toBe('Math Skills');
+      expect(component.visibleOpportunities[0].heading).toBe('Math Skills');
     });
 
     it('should filter opportunities based on search query matching the subheading', () => {
@@ -1047,7 +1047,7 @@ describe('Opportunities List Component', () => {
       component.applySearch();
 
       expect(component.visibleOpportunities.length).toBe(1);
-      expect(component.visibleOpportunities.heading).toBe('Science Skills');
+      expect(component.visibleOpportunities[0].heading).toBe('Science Skills');
     });
 
     it('should be case-insensitive when searching', () => {
@@ -1055,7 +1055,7 @@ describe('Opportunities List Component', () => {
       component.applySearch();
 
       expect(component.visibleOpportunities.length).toBe(1);
-      expect(component.visibleOpportunities.heading).toBe('Science Skills');
+      expect(component.visibleOpportunities[0].heading).toBe('Science Skills');
     });
 
     it('should return all opportunities if search query is empty', () => {
