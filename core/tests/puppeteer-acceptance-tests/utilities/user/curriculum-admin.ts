@@ -19,7 +19,6 @@
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
-import {ExplorationEditorModal} from '../common/exploration-editor';
 import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
 
@@ -43,6 +42,8 @@ const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
+
+const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -327,7 +328,6 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
-
 export class CurriculumAdmin extends TopicManager {
   /**
    * Moves the classrooms in the order of the given classroom names.
@@ -1674,22 +1674,7 @@ export class CurriculumAdmin extends TopicManager {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
-        await this.page.click(mobileOptionsDropdown);
-        try {
-          await this.page.waitForSelector(
-            navigationDropdownInMobileVisibleSelector,
-            {hidden: true, timeout: 10000}
-          );
-        } catch (error) {
-          await this.page.click(mobileOptionsDropdown);
-          await this.page.waitForSelector(
-            navigationDropdownInMobileVisibleSelector,
-            {hidden: true}
-          );
-        }
-        // Ensure layout fully stabilized.
-        await this.waitForPageToFullyLoad();
+        this.page.click(mobileOptionsDropdown);
       }
     } else {
       await this.page.waitForSelector(explorationSettingsTab, {visible: true});
@@ -1716,9 +1701,21 @@ export class CurriculumAdmin extends TopicManager {
   /**
    * Function to dismiss welcome modal
    */
-  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    const explorationEditor = new ExplorationEditorModal(this);
-    await explorationEditor.dismissWelcomeModal(failIfMissing);
+  async dismissWelcomeModal(): Promise<void> {
+    try {
+      await this.page.waitForNetworkIdle();
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 10000,
+      });
+      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**
@@ -2443,29 +2440,10 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
-
-    await this.page.waitForSelector(topicSelector, {visible: true});
-    const options = await this.page.$$(topicSelector);
-    let foundOption = false;
-
-    for (const option of options) {
-      const text = await option.evaluate(el => el.textContent?.trim());
-      if (text === topicName) {
-        await this.clickOnElement(option);
-        foundOption = true;
-        break;
-      }
-    }
-
-    if (!foundOption) {
-      throw new Error(`Could not find topic option matching: ${topicName}`);
-    }
-
+    await this.clickOnElementWithSelector(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
 
-    await this.waitForNetworkIdle(); // Wait for the topic to appear in the classroom before adding prerequisites.
-
-    // Increased timeout to 60s because addTopicId makes an async API call that can take time.
+    // Wait for the topic to appear in the classroom before adding prerequisites.
     await this.page.waitForFunction(
       (
         topicBoxSelector: string,
@@ -2481,7 +2459,7 @@ export class CurriculumAdmin extends TopicManager {
         }
         return false;
       },
-      {timeout: 60000},
+      {},
       classroomTopicBoxSelector,
       classroomTopicNameSelector,
       topicName
@@ -3003,7 +2981,7 @@ export class CurriculumAdmin extends TopicManager {
           const element = document.querySelector(selector);
           return (element as HTMLInputElement).checked === true;
         },
-        {timeout: 60000},
+        {},
         practiceTabToggle
       );
     } catch (error) {

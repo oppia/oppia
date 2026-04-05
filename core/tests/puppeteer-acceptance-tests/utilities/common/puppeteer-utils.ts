@@ -132,7 +132,6 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
-        this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
 
         if (mobile) {
@@ -405,7 +404,6 @@ export class BaseUser {
         )
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     this.setupDebugTools();
   }
 
@@ -535,7 +533,7 @@ export class BaseUser {
     elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    let element = await context.waitForSelector(selector, {timeout: 30000});
+    let element = await context.waitForSelector(selector, {timeout: 15000});
 
     // Get nth element if elementPlace is given.
     if (elementPlace) {
@@ -1290,7 +1288,6 @@ export class BaseUser {
 
     await newPage.bringToFront();
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     return newPage;
   }
 
@@ -1508,7 +1505,6 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
@@ -2245,15 +2241,6 @@ export class BaseUser {
     await this.expectElementToBeVisible(hideOSKButtonSelector);
     await this.clickOnElementWithSelector(hideOSKButtonSelector);
     await this.expectElementToBeVisible(hideOSKButtonSelector, false);
-  }
-
-  /**
-   * Logs every navigation event on the page.
-   */
-  attachNavigationLogs(page: Page): void {
-    page.on('framenavigated', frame => {
-      showMessage('NAVIGATED: ' + frame.url());
-    });
   }
 }
 

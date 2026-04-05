@@ -1552,6 +1552,121 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Verifies that the "Item Selection" interaction rejects negative values for
+   * the "Minimum number of selections permitted" and "Maximum number of
+   * selections permitted" fields by asserting that the "Save Interaction"
+   * button is disabled when negative inputs are entered.
+   *
+   * Related issues: #25613 (LC.2 CUJ) and Bug #16667.
+   *
+   * The core assertion is wrapped in a try...finally block so the modal is
+   * always closed before returning, even if the assertion throws. This
+   * prevents state from leaking into subsequent tests.
+   */
+  async expectItemSelectionToRejectNegativeValues(): Promise<void> {
+    // Open the Add Interaction modal.
+    await this.page.waitForSelector(addInteractionButton, {visible: true});
+    await this.clickOnElementWithSelector(addInteractionButton);
+
+    // Verify the "Choose Interaction" modal is open.
+    await this.expectModalTitleToBe('Choose Interaction');
+
+    // Navigate to the "Item Selection" interaction tab and click the tile.
+    await this.changeTabInInteractionSelectionModal(
+      INTERACTION_TYPES.ITEM_SELECTION
+    );
+    await this.waitForNetworkIdle();
+    await this.clickOnElementWithText(INTERACTION_TYPES.ITEM_SELECTION);
+
+    // Verify the "Customize Interaction (Item Selection)" modal is open.
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Item Selection)'
+    );
+
+    // Wait for the customization body and its inputs to appear.
+    await this.page.waitForSelector(customizeInteractionBodySelector);
+    const inputSelector = `${customizeInteractionBodySelector} input`;
+    await this.page.waitForSelector(inputSelector);
+    const inputElements = await this.page.$$(inputSelector);
+
+    if (inputElements.length < 2) {
+      throw new Error(
+        'Expected at least two numeric input fields (min and max selection ' +
+          `count) in the Item Selection customization modal, but found ` +
+          `${inputElements.length}.`
+      );
+    }
+
+    try {
+      // --- Minimum number of selections field (index 0) ---
+      // Clear the default value and type a negative number.
+      const minInput = inputElements[0];
+      await minInput.click({clickCount: 3});
+      await this.page.keyboard.press('Backspace');
+      await minInput.type('-4');
+
+      // --- Maximum number of selections field (index 1) ---
+      // Clear the default value and type a negative number.
+      const maxInput = inputElements[1];
+      await maxInput.click({clickCount: 3});
+      await this.page.keyboard.press('Backspace');
+      await maxInput.type('-2');
+
+      // Allow Angular's change-detection cycle to react to the new values.
+      await this.page.waitForTimeout(500);
+
+      // Assert that the "Save Interaction" button is disabled.
+      // The button carries the selector `button.e2e-test-save-interaction` and
+      // its disabled state is controlled by `isSaveInteractionButtonEnabled()`,
+      // which returns false whenever there are outstanding validation warnings
+      // (e.g. values below the schema's `is_at_least` threshold).
+      const isSaveButtonDisabled = await this.page.$eval(
+        saveInteractionButton,
+        (el: Element) => (el as HTMLButtonElement).disabled
+      );
+
+      expect(isSaveButtonDisabled).toBe(true);
+      showMessage(
+        'Confirmed: "Save Interaction" button is disabled for negative ' +
+          'min/max values in the Item Selection interaction.'
+      );
+    } finally {
+      // Atomic teardown: find and click the Cancel button by its text content.
+      // Searching by text is the most resilient approach — it is unaffected by
+      // CSS class changes or overlapping-element pointer errors.
+      await this.page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const cancelButton = buttons.find(
+          btn => btn.textContent?.trim() === 'Cancel'
+        );
+        if (cancelButton) {
+          cancelButton.click();
+        }
+      });
+
+      // Wait for the Angular ngb-modal-window host element to disappear.
+      // If the modal still has not closed after 5 s (e.g. a confirmation
+      // dialog intercepted the click), fall back to a full page reload so
+      // the remaining 13 tests start with a completely clean screen.
+      try {
+        await this.page.waitForSelector('ngb-modal-window', {
+          hidden: true,
+          timeout: 5000,
+        });
+      } catch (e) {
+        await this.page.reload({
+          waitUntil: ['networkidle0', 'domcontentloaded'],
+        });
+      }
+
+      showMessage(
+        'Item Selection "Customize Interaction" modal dismissed after ' +
+          'negative-value validation check.'
+      );
+    }
+  }
+
+  /**
    * Function to customize the text input interaction.
    * @param placeHolderText - The placeholder text for the text input.
    * @param heightInRows - The height of the text input in rows.

@@ -233,6 +233,12 @@ describe('Exploration Editor', function () {
   it('should be able to use "Item Selection" interaction', async function () {
     // Add a item selection interaction.
     await explorationEditor.updateCardContent('Select correct item.');
+
+    // Verify that the "Item Selection" interaction rejects negative values for
+    // the min/max selection count fields before creating the valid interaction.
+    // This validates the UI guard described in Issue #25613 and Bug #16667.
+    await explorationEditor.expectItemSelectionToRejectNegativeValues();
+
     // Add Item Selection interaction. Also, check for modal "Choose Interaction"
     // and "Customize Interaction (Item Selection)".
     await explorationEditor.addInteraction(
