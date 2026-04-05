@@ -54,7 +54,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
         'category': '',
-        
         'states': {
             'Introduction': {
                 'card_is_checkpoint': True,

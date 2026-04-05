@@ -3668,46 +3668,14 @@ version: 3
         )
 
 
-
 class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
     contents.
     """
 
-inapplicable_skill_misconception_ids: []
-interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
-    catchMisspellings:
-      value: false
-    placeholder:
-      value:
-        content_id: ca_placeholder_2
-        unicode_str: ''
-    rows:
-      value: 1
-  default_outcome:
-    dest: %s
-    dest_if_really_stuck: null
-    feedback:
-      content_id: default_outcome_1
-      html: ''
-    labelled_as_correct: false
-    missing_prerequisite_skill_id: null
-    param_changes: []
-    refresher_exploration_id: null
-  hints: []
-  id: TextInput
-  solution: null
-linked_skill_id: null
-param_changes: []
-solicit_answer_details: false
-"""
-        )
-        _SAMPLE_INIT_STATE_CONTENT: str = (
-                """card_is_checkpoint: true
+    _SAMPLE_INIT_STATE_CONTENT: str = (
+        """card_is_checkpoint: true
 classifier_model_id: null
 content:
     content_id: content_0
@@ -3741,8 +3709,9 @@ interaction:
 linked_skill_id: null
 param_changes: []
 solicit_answer_details: false
-""" % (feconf.DEFAULT_INIT_STATE_NAME)
-        )
+"""
+        % (feconf.DEFAULT_INIT_STATE_NAME)
+    )
 
     SAMPLE_EXPORTED_DICT: Final = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
@@ -8022,8 +7991,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     NEW_EXP_ID: Final = 'exp_id1'
 
     UPGRADED_EXP_YAML: Final = (
-        (
-            """author_notes: ''
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -8098,7 +8066,6 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """
-        )
         % (
             feconf.DEFAULT_INIT_STATE_NAME.encode('utf-8'),
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,

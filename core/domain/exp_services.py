@@ -1007,7 +1007,7 @@ def apply_change_list(
                     exploration.update_init_state_name(
                         edit_init_state_name_cmd.new_value
                     )
-                
+
                 elif change.property_name == 'next_content_id_index':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type

@@ -957,7 +957,6 @@ class EditExplorationPropertyInitStateNameCmd(ExplorationChange):
     old_value: str
 
 
-
 class EditExplorationPropertyNextContentIdIndexCmd(ExplorationChange):
     """Class representing the ExplorationChange's
     CMD_EDIT_EXPLORATION_PROPERTY command with
@@ -1949,8 +1948,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 % self.param_specs
             )
 
-
-
         if not isinstance(self.next_content_id_index, int):
             raise utils.ValidationError(
                 'Expected next_content_id_index to be an int, received '
@@ -2554,8 +2551,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if old_init_state_name in self.states:
             self.states[old_init_state_name].card_is_checkpoint = False
         self.init_state.card_is_checkpoint = True
-
-
 
     def update_next_content_id_index(self, next_content_id_index: int) -> None:
         """Update the interaction next content id index attribute.
@@ -7066,7 +7061,9 @@ class ExplorationMetadata:
                 ps_name: ps_value.to_dict()
                 for (ps_name, ps_value) in self.param_specs.items()
             },
-            'param_changes': [p_change.to_dict() for p_change in self.param_changes],
+            'param_changes': [
+                p_change.to_dict() for p_change in self.param_changes
+            ],
             'edits_allowed': self.edits_allowed,
         }
 

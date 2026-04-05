@@ -2581,7 +2581,7 @@ class GenericTestBase(AppEngineTestBase):
 
     SAMPLE_YAML_CONTENT: str = (
         (
-              """author_notes: ''
+            """author_notes: ''
 blurb: ''
 category: Category
 edits_allowed: true

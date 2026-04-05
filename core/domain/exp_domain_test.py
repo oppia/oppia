@@ -4148,9 +4148,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_states_schema_version(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id',
@@ -4164,17 +4161,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.states_schema_version = None
         with self.assertRaisesRegex(
-          Exception, 'This exploration has no states schema version.'
+            Exception, 'This exploration has no states schema version.'
         ):
-          exploration.validate()
+            exploration.validate()
 
-      # TODO(#13059): Here we use MyPy ignore because after we fully type
-      # the codebase we plan to get rid of the tests that intentionally test
-      # wrong inputs that we can normally catch by typing.
-      # TODO(#13059): Here we use MyPy ignore because after we fully type
-      # the codebase we plan to get rid of the tests that intentionally test
-      # wrong inputs that we can normally catch by typing.
-      def test_validate_exploration_next_content_id_index(self) -> None:
+    def test_validate_exploration_next_content_id_index(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id',
             'user@example.com',
@@ -4185,6 +4176,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.validate()
 
+        # Here we use MyPy ignore because this test intentionally assigns an
+        # invalid type to verify runtime validation.
         exploration.next_content_id_index = '5'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected next_content_id_index to be an int, received 5'
@@ -5356,7 +5349,8 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
-    SAMPLE_YAML_CONTENT: str = """blurb: ''
+    SAMPLE_YAML_CONTENT: str = (
+        """blurb: ''
 category: Category
 edits_allowed: true
 init_state_name: %s
@@ -5425,13 +5419,15 @@ states:
     tags: []
     title: Title
     version: 0
-    """ % (
-          feconf.DEFAULT_INIT_STATE_NAME,
-          exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-          feconf.DEFAULT_INIT_STATE_NAME,
-          feconf.DEFAULT_INIT_STATE_NAME,
-          feconf.CURRENT_STATE_SCHEMA_VERSION,
+    """
+        % (
+            feconf.DEFAULT_INIT_STATE_NAME,
+            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
+    )
     YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = """author_notes: ''
   blurb: ''
 category: Category
@@ -5694,8 +5690,9 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
+
     YAML_CONTENT_V46: Final = (
-    """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -5838,7 +5835,7 @@ title: Title
 """
     )
     YAML_CONTENT_V47: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -5982,7 +5979,7 @@ title: Title
     )
 
     YAML_CONTENT_V48: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -6125,7 +6122,7 @@ title: Title
 """
     )
     YAML_CONTENT_V49: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -6270,7 +6267,7 @@ title: Title
 """
     )
     YAML_CONTENT_V50: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -6418,7 +6415,7 @@ title: Title
 """
     )
     YAML_CONTENT_V51: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -6567,7 +6564,7 @@ title: Title
     )
 
     YAML_CONTENT_V52: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -6715,7 +6712,7 @@ title: Title
 """
     )
     YAML_CONTENT_V53: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -6863,7 +6860,7 @@ title: Title
 """
     )
     YAML_CONTENT_V54: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 edits_allowed: true
@@ -7000,7 +6997,7 @@ title: Title
 """
     )
     YAML_CONTENT_V55: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -7137,7 +7134,7 @@ title: Title
     )
 
     YAML_CONTENT_V56: Final = (
-      """author_notes: ''
+        """author_notes: ''
   blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -7943,7 +7940,7 @@ version: 0
     ) -> None:
         """Tests the migration of DragAndDropSortInput rule inputs."""
         sample_yaml_content: str = (
-          """author_notes: ''
+            """author_notes: ''
     blurb: ''
 category: Category
 edits_allowed: true
@@ -8071,7 +8068,7 @@ title: Title
         )
 
         latest_sample_yaml_content: str = (
-          """author_notes: ''
+            """author_notes: ''
 blurb: ''
 category: Category
 edits_allowed: true
@@ -8191,7 +8188,7 @@ version: 0
     ) -> None:
         """Tests the migration of unicode written translations rule inputs."""
         sample_yaml_content: str = (
-          """author_notes: ''
+            """author_notes: ''
 blurb: ''
 category: Category
 edits_allowed: true
@@ -8281,7 +8278,7 @@ title: Title
         )
 
         latest_sample_yaml_content: str = (
-          """author_notes: ''
+            """author_notes: ''
 blurb: ''
 category: Category
 edits_allowed: true
@@ -8363,7 +8360,7 @@ version: 0
         """
 
         sample_yaml_content_for_lab_as_correct: str = (
-          """author_notes: ''
+            """author_notes: ''
 blurb: ''
 category: ''
 edits_allowed: true
@@ -8470,7 +8467,7 @@ title: ''
         )
 
         latest_sample_yaml_content_for_lab_as_correct: str = (
-          """author_notes: ''
+            """author_notes: ''
 blurb: ''
 category: ''
 edits_allowed: true
@@ -17838,10 +17835,10 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'tags',
-                'old_value': ['old_value'],
-                'new_value': ['new'],
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'tags',
+                    'old_value': ['old_value'],
+                    'new_value': ['new'],
                 }
             ),
             exp_domain.ExplorationChange(
@@ -17898,10 +17895,10 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                'cmd': 'edit_state_property',
-                'property_name': 'confirmed_unclassified_answers',
-                'state_name': 'Introduction',
-                'new_value': ['test'],
+                    'cmd': 'edit_state_property',
+                    'property_name': 'confirmed_unclassified_answers',
+                    'state_name': 'Introduction',
+                    'new_value': ['test'],
                 }
             ),
             exp_domain.ExplorationChange(
@@ -17972,10 +17969,10 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                'property_name': 'tags',
-                'cmd': 'edit_exploration_property',
-                'old_value': ['old_value'],
-                'new_value': ['new'],
+                    'property_name': 'tags',
+                    'cmd': 'edit_exploration_property',
+                    'old_value': ['old_value'],
+                    'new_value': ['new'],
                 }
             ),
             exp_domain.ExplorationChange(
@@ -18028,7 +18025,6 @@ class ExplorationChangesMergeabilityUnitTests(
                     'new_value': 'A new category',
                 }
             ),
-            
             exp_domain.ExplorationChange(
                 {
                     'property_name': 'tags',
@@ -20009,7 +20005,6 @@ class OldVersionExploration(translation_domain.BaseTranslatableObject):
             'param_changes': self.param_changes,
             'param_specs': self.param_specs,
             'tags': self.tags,
-
             'states': {
                 state_name: (
                     state.to_dict() if hasattr(state, 'to_dict') else state

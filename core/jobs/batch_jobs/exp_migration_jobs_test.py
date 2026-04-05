@@ -511,7 +511,6 @@ class MigrateExplorationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
@@ -1934,7 +1933,7 @@ class ExpSnapshotsMigrationJobTests(
             author_notes=EXP_V46_DICT['author_notes'],
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
-                states=EXP_V46_DICT['states'],
+            states=EXP_V46_DICT['states'],
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
