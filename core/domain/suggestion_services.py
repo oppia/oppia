@@ -971,6 +971,9 @@ def accept_suggestion(
         )
         and suggestion.change_cmd.cmd == 'add_written_translation'
     ):
+        # Here voiceover regeneration can run in the background (asynchronous),
+        # allowing translation reviewers to continue accepting or rejecting
+        # translations without being blocked.
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
                 'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
