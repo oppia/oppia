@@ -204,7 +204,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
       return;
     }
     let taggedMisconception = {
-      skillId: this.selectedMisconceptionSkillId as string,
+      skillId: this.selectedMisconceptionSkillId,
       misconceptionId: this.selectedMisconception.getId(),
     };
     this.saveTaggedMisconception.emit(taggedMisconception);
