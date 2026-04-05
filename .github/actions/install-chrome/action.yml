@@ -7,8 +7,6 @@ runs:
       name: Install Chrome (retries on error)
       uses: nick-fields/retry@v3
       env:
-        # Must be a version available from the Chrome for Testing repository:
-        # https://googlechromelabs.github.io/chrome-for-testing/
         CHROME_VERSION: "147.0.7727.50"
       with:
         max_attempts: 3
@@ -48,14 +46,12 @@ runs:
             libxext6 \
             libxi6 \
             libxrender1 \
-            libxtst6
+            libxtst6 \
             libxss1
 
           CHROME_URL="https://storage.googleapis.com/chrome-for-testing-public/${{ env.CHROME_VERSION }}/linux64/chrome-linux64.zip"
           echo "Downloading Chrome from: $CHROME_URL"
           curl -L -o chrome-linux64.zip "$CHROME_URL"
-
-          # Extract and install Chrome to /opt/google/chrome.
 
           unzip -q chrome-linux64.zip
           sudo mkdir -p /opt/google/chrome
@@ -75,11 +71,6 @@ runs:
             exit 1
           }
 
-    # -----------------------------------------------------------------------
-    # Diagnostic step: only runs if the install step above fails.
-    # Logs any missing shared libraries so you know exactly which packages
-    # to add to the apt-get install list in the step above.
-    # -----------------------------------------------------------------------
     - id: diagnose-missing-libs
       name: Diagnose missing Chrome dependencies (runs on failure)
       if: failure()
@@ -94,7 +85,6 @@ runs:
 
         echo ""
         echo "===== dpkg missing-deps check ====="
-        # List any unmet dependencies for packages we just installed
         sudo dpkg --configure -a 2>&1 || true
         sudo apt-get install -f --dry-run 2>&1 || true
         
