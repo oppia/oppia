@@ -636,6 +636,7 @@ EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
 EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
+EMAIL_INTENT_VOICEOVER_AUDIT = 'voiceover_audit'
 
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'

@@ -1563,6 +1563,13 @@ URLS.extend(
             r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
             cron.CronMailReviewerNewSuggestionsHandler,
         ),
+        get_redirect_route(
+            r'/cron/voiceovers/audit', cron.CronVoiceoverAuditHandler
+        ),
+        get_redirect_route(
+            r'/cron/voiceovers/mail_audit_report',
+            cron.CronMailVoiceoverAuditReportHandler
+        ),
     )
 )
 

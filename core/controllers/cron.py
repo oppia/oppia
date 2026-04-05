@@ -37,6 +37,7 @@ from core.jobs.batch_jobs import (
     exp_recommendation_computation_jobs,
     exp_search_indexing_jobs,
     user_stats_computation_jobs,
+    voiceover_audit_jobs,
 )
 
 from typing import DefaultDict, Dict, List
@@ -417,4 +418,68 @@ class CronMailChapterPublicationsNotificationsHandler(
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
             admin_ids, chapter_notifications_stories_list
         )
+        return self.render_json({})
+
+
+class CronVoiceoverAuditHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for starting the voiceover audit Beam job."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Starts the voiceover audit job."""
+        beam_job_services.run_beam_job(
+            job_class=voiceover_audit_jobs.AuditMissingVoiceoversJob
+        )
+        return self.render_json({})
+
+
+class CronMailVoiceoverAuditReportHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for mailing the voiceover audit report."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Sends the voiceover audit report."""
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if not server_can_send_emails:
+            return self.render_json({})
+
+        # Find the latest finished AuditMissingVoiceoversJob.
+        all_runs = beam_job_services.get_beam_job_runs()
+        audit_runs = [
+            run for run in all_runs 
+            if run.job_name == 'AuditMissingVoiceoversJob' 
+            and run.job_state == 'DONE'
+        ]
+        
+        if not audit_runs:
+            return self.render_json({})
+        
+        # Latest run.
+        audit_runs.sort(key=lambda r: r.created_on, reverse=True)
+        latest_run = audit_runs[0]
+        
+        # Get results.
+        result = beam_job_services.get_beam_job_run_result(latest_run.job_id)
+        findings = []
+        for line in result.stdout.split('\n'):
+            if line.startswith('Missing: '):
+                findings.append(line[len('Missing: '):])
+        
+        email_manager.send_voiceover_audit_report_email(findings)
         return self.render_json({})

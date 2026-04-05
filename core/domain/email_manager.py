@@ -262,6 +262,18 @@ VOICEOVER_ADMINS_REGENERATION_NOTIFICATION_EMAIL: Dict[str, str] = {
     'email_subject': 'Report on Automatic Voiceovers Generated for %s',
 }
 
+VOICEOVER_AUDIT_REPORT_EMAIL_DATA: Dict[str, str] = {
+    'email_body_template': (
+        'Hi Voiceover team,<br><br>'
+        'The weekly voiceover audit has been completed. '
+        'Below is a summary of the missing or stale voiceovers in curated lessons:<br><br>'
+        '<ul>%s</ul><br>'
+        'Please take the necessary actions to provide voiceovers for these contents.<br><br>'
+        'Thank you.'
+    ),
+    'email_subject': 'Weekly Voiceover Audit Report',
+}
+
 VOICEOVER_ADMIN_GOOGLE_GROUP: Final = 'voiceovers-leads@oppia.org'
 VOICEOVER_TECH_LEADS_GOOGLE_GROUP: Final = 'voiceover-tech-support@oppia.org'
 
@@ -3408,3 +3420,47 @@ def send_emails_to_voiceover_tech_leads(
     )
 
     _delete_voiceover_error_attachments(filename_to_path)
+
+
+def send_voiceover_audit_report_email(
+    missing_voiceovers_findings: List[str]
+) -> None:
+    """Sends an email to the voiceover team leads with the audit report.
+
+    Args:
+        missing_voiceovers_findings: list(str). A list of strings where each
+            string contains information about a missing voiceover.
+    """
+    if not missing_voiceovers_findings:
+        email_body = (
+            'Hi Voiceover team,<br><br>'
+            'The weekly voiceover audit has been completed and no missing '
+            'voiceovers were found in curated lessons.<br><br>'
+            'Thank you.'
+        )
+    else:
+        findings_html = ''
+        for finding in missing_voiceovers_findings:
+            findings_html += '<li>%s</li>' % finding
+        email_body = VOICEOVER_AUDIT_REPORT_EMAIL_DATA['email_body_template'] % (
+            findings_html
+        )
+
+    email_subject = VOICEOVER_AUDIT_REPORT_EMAIL_DATA['email_subject']
+
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        )
+    )
+
+    receipient_id = 'voiceovers-leads'
+    _send_email(
+        receipient_id,
+        feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_VOICEOVER_AUDIT,
+        email_subject,
+        email_body,
+        str(system_email_address),
+        recipient_email=VOICEOVER_ADMIN_GOOGLE_GROUP,
+    )
