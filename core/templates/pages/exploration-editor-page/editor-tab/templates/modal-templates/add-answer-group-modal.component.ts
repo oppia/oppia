@@ -51,7 +51,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface TaggedMisconception {
-  skillId: string;
+  skillId: string | null;
   misconceptionId: number;
 }
 
