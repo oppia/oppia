@@ -6662,7 +6662,13 @@ export class ExplorationEditor extends BaseUser {
       .replace('Oppia tells the learner...', '')
       .trim();
 
-    expect(feedbackTextWithoutPrefix).toBe(expectedFeedback);
+    // Strip icon glyphs (for example material-icon private-use characters)
+    // that can appear before feedback text in mobile layouts.
+    const normalizedFeedbackText = feedbackTextWithoutPrefix
+      .replace(/[\uE000-\uF8FF]/g, '')
+      .trim();
+
+    expect(normalizedFeedbackText).toBe(expectedFeedback);
   }
 
   /**

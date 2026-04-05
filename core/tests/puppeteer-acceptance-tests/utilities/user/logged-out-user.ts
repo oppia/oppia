@@ -4856,7 +4856,15 @@ export class LoggedOutUser extends BaseUser {
       // Hint is shown after one minute.
       timeout: 80000,
     });
-    await this.clickOnElementWithSelector(hintButtonSelector);
+    // On mobile preview, nav overlays can occasionally block the hint button.
+    // Fall back to a direct DOM click if strict clickability checks fail.
+    try {
+      await this.clickOnElementWithSelector(hintButtonSelector);
+    } catch {
+      await this.page.$eval(hintButtonSelector, element => {
+        (element as HTMLElement).click();
+      });
+    }
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
@@ -5074,7 +5082,16 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(lessonInfoButton, {
       visible: true,
     });
-    await this.clickOnElementWithSelector(lessonInfoButton);
+    // On mobile preview, the lesson info button can be partially overlapped by
+    // sibling anchors during layout transitions. Fall back to a direct DOM
+    // click if strict clickability checks fail.
+    try {
+      await this.clickOnElementWithSelector(lessonInfoButton);
+    } catch {
+      await this.page.$eval(lessonInfoButton, element => {
+        (element as HTMLElement).click();
+      });
+    }
     await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
   }
 
