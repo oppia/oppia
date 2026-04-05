@@ -46,10 +46,25 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             str,
             'Namespace for isolating the NDB operations during tests.',
         ),
+        'oppia_project_id': (
+            str,
+            'The ID of the Google Cloud Project for Oppia.',
+        ),
+    }
+
+    # A subset of Dataflow pipeline options related to resource utilization.
+    # For the complete list of available options, refer to:
+    # https://docs.cloud.google.com/dataflow/docs/reference/pipeline-options#resource_utilization
+    DATAFLOW_RESOURCE_OPTIONS = {
+        'max_num_workers',
+        'num_workers',
+        'autoscaling_algorithm',
     }
 
     def __init__(
-        self, flags: Optional[List[str]] = None, **job_options: Optional[str]
+        self,
+        flags: Optional[List[str]] = None,
+        **job_options: Optional[str | int],
     ) -> None:
         """Initializes a new JobOptions instance.
 
@@ -64,7 +79,10 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
         Raises:
             ValueError. Unsupported job option(s).
         """
-        unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
+        allowed_options = set(self.JOB_OPTIONS.keys()).union(
+            self.DATAFLOW_RESOURCE_OPTIONS
+        )
+        unsupported_options = set(job_options).difference(allowed_options)
         if unsupported_options:
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError(
