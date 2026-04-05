@@ -82,6 +82,9 @@ export class TranslationTopicSelectorComponent implements OnInit {
    */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    if (!this.dropdownRef?.nativeElement) {
+      return;
+    }
     const targetElement = event.target as HTMLElement;
     if (
       targetElement &&

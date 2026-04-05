@@ -116,7 +116,7 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
       this.optionsFilter = '';
       this.filteredOptions = this.options;
       setTimeout(() => {
-        this.filterDivRef.nativeElement.focus();
+        this.filterDivRef?.nativeElement?.focus?.();
       }, 1);
     }
   }
@@ -140,6 +140,9 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
    */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    if (!this.dropdownRef?.nativeElement) {
+      return;
+    }
     const targetElement = event.target as HTMLElement;
     if (
       targetElement &&
