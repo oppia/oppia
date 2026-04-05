@@ -34,10 +34,11 @@ from core.domain import (
     voiceover_services,
 )
 from core.platform import models
+from core.platform.speech_synthesis import dev_mode_speech_synthesis_services
 from core.tests import test_utils
 
 import bs4
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -418,6 +419,58 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
                     exploration_id, content_html, language_accent_code, filename
                 )
             )
+
+    def test_should_get_empty_audio_sucessfully_in_sync(self) -> None:
+        content_html = '<p></p>'
+        exploration_id = 'exp_id'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        def _mock_regenerate_speech_from_text(
+            _text: str,
+            _language_accent_code: str,
+            _oppia_project_id: Optional[str] = None,
+        ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
+
+            return (b'', [], '')
+
+        with self.swap(
+            dev_mode_speech_synthesis_services,
+            'regenerate_speech_from_text',
+            _mock_regenerate_speech_from_text,
+        ):
+            audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+                exploration_id, content_html, language_accent_code, filename
+            )
+        self.assertEqual(audio_offset_list, [])
+
+    def test_should_get_empty_audio_sucessfully_in_async(self) -> None:
+        content_html = '<p></p>'
+        exploration_id = 'exp_id'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        def _mock_regenerate_speech_from_text(
+            _text: str,
+            _language_accent_code: str,
+            _oppia_project_id: Optional[str] = None,
+        ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
+
+            return (b'', [], '')
+
+        with self.swap(
+            dev_mode_speech_synthesis_services,
+            'regenerate_speech_from_text',
+            _mock_regenerate_speech_from_text,
+        ):
+            audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+                exploration_id,
+                content_html,
+                language_accent_code,
+                filename,
+                'dev-project-id',
+            )
+        self.assertEqual(audio_offset_list, [])
 
     def test_should_be_able_to_get_new_voiceover_filename(self) -> None:
         content_id = 'content_0'

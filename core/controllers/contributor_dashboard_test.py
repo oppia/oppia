@@ -152,6 +152,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
         self.expected_opportunity_dict_2 = {
@@ -162,6 +163,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
         self.expected_opportunity_dict_3 = {
@@ -172,6 +174,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {},
             'translation_in_review_counts': {},
+            'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
 
@@ -677,6 +680,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
             expected_opp_dict_2 = {
@@ -687,6 +691,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
 
@@ -779,6 +784,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'reviewer_only_content_count': 0,
                 'is_pinned': True,
             }
             expected_opp_dict_2 = {
@@ -789,6 +795,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'content_count': 2,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'reviewer_only_content_count': 0,
                 'is_pinned': False,
             }
 
@@ -1024,6 +1031,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'content_count': 4,
                     'translation_counts': {},
                     'translation_in_review_counts': {},
+                    'reviewer_only_content_count': 0,
                     'is_pinned': False,
                 }
             ],
@@ -1142,6 +1150,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'content_count': 4,
                     'translation_counts': {},
                     'translation_in_review_counts': {},
+                    'reviewer_only_content_count': 0,
                     'is_pinned': False,
                 }
             ],

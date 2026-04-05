@@ -168,10 +168,21 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
                 'exploration_model': exploration_models,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Convert to lists'
+            >> beam.Map(
+                lambda objects: {
+                    'suggestion_models': list(objects['suggestion_models']),
+                    'exploration_model': list(objects['exploration_model']),
+                }
+            )
             | 'Filter unwanted exploration'
             >> beam.Filter(
-                lambda objects: len(objects['suggestion_models']) != 0
+                lambda objects: (
+                    len(objects['suggestion_models']) > 0
+                    and len(objects['exploration_model']) > 0
+                )
             )
             | 'Transform and migrate model'
             >> beam.Map(

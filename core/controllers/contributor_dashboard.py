@@ -412,6 +412,7 @@ class ReviewableOpportunitiesHandler(
         for item in exp_opp_summaries.values():
             if item is not None:
                 ordered_exp_opp_summaries[item.id] = item
+
         return list(ordered_exp_opp_summaries.values())
 
 
