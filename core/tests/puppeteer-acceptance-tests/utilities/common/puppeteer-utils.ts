@@ -401,7 +401,10 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.reload({waitUntil: ['networkidle0', 'load']});
+    await this.page.reload({
+      waitUntil: ['networkidle2', 'load'],
+      timeout: 60000,
+    });
   }
 
   /**
@@ -796,7 +799,7 @@ export class BaseUser {
     useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
-      timeout: 90000,
+      timeout: 60000,
     }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
@@ -948,7 +951,10 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
-    await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
+    await this.page.goto(url, {
+      waitUntil: ['networkidle2', 'load'],
+      timeout: 60000,
+    });
 
     if (verifyURL) {
       await this.page.waitForFunction(
