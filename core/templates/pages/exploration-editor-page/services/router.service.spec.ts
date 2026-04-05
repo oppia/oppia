@@ -327,7 +327,7 @@ describe('Router Service', () => {
       },
     });
 
-    expect(routerService.isLocationSetToNonStateEditorTab()).toBeTrue();
+    expect(routerService.isLocationSetToNonStateEditorTab()).toBe(true);
 
     flush();
     discardPeriodicTasks();
@@ -398,26 +398,17 @@ describe('Router Service', () => {
   }));
 
   it('should navigate to main tab when current location state is null', () => {
-    const service = routerService as unknown as {
-      _savePendingChanges: () => void;
-      _getCurrentStateFromLocationPath: () => string | null;
-      _actuallyNavigate: (slug: string, state: string | null) => void;
-      _activeTabName: string;
-      TABS: {MAIN: {name: string}};
-      SLUG_GUI: string;
-      navigateToMainTab: (state: string | null) => void;
-    };
-
-    spyOn(service, '_savePendingChanges');
-    spyOn(service, '_getCurrentStateFromLocationPath').and.returnValue(null);
+    spyOn(routerService, '_savePendingChanges');
+    spyOn(routerService, '_getCurrentStateFromLocationPath').and.returnValue(
+      null
+    );
     spyOn(document, 'querySelector').and.returnValue(null);
-    const navigateSpy = spyOn(service, '_actuallyNavigate');
-    service._activeTabName = service.TABS.MAIN.name;
+    const navigateSpy = spyOn(routerService, '_actuallyNavigate');
 
-    service.navigateToMainTab('newState');
+    routerService.navigateToMainTab('newState');
 
-    expect(service._savePendingChanges).toHaveBeenCalled();
-    expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
+    expect(routerService._savePendingChanges).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith('gui', 'newState');
   });
 
   it('should not navigate to main tab', () => {
