@@ -1,7 +1,7 @@
-// Code - third_party/static/guppy-f509e1/src/guppy.js
-// This guppy version corresponds to the commit on Aug 19 2020.
+// Code - node_modules/guppy-dev/src/guppy.js
+// This guppy version corresponds to commit 2de6408 on Mar 24 2026.
 // For reference, visit:
-// https://github.com/oppia/guppy/tree/f509e155dc66f6310737c328cbfbc35b85194be2
+// https://github.com/oppia/guppy/tree/2de6408a8dabbc137c192760ae44848c34a4b135
 
 interface GuppyConfig {
   events?: Object;

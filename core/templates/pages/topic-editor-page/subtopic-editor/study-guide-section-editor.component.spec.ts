@@ -25,20 +25,11 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {StudyGuideSectionEditorComponent} from './study-guide-section-editor.component';
 import {HtmlLengthService} from 'services/html-length.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockHtmlLengthService {
   computeHtmlLength(html: string, calculationType: string): number {
     return html.length;
   }
-}
-
-class MockPlatformFeatureService {
-  status = {
-    EnableWorkedExamplesRteComponent: {
-      isEnabled: false,
-    },
-  };
 }
 
 describe('Study Guide Section editor component', () => {
@@ -48,7 +39,6 @@ describe('Study Guide Section editor component', () => {
   let topicUpdateService: TopicUpdateService;
   let sampleStudyGuide: StudyGuide;
   let htmlLengthService: HtmlLengthService;
-  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
     htmlLengthService = new MockHtmlLengthService();
@@ -60,10 +50,6 @@ describe('Study Guide Section editor component', () => {
         {
           provide: HtmlLengthService,
           useValue: htmlLengthService,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
         },
         TopicEditorStateService,
         TopicUpdateService,
@@ -77,7 +63,6 @@ describe('Study Guide Section editor component', () => {
     component = fixture.componentInstance;
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     topicUpdateService = TestBed.inject(TopicUpdateService);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     sampleStudyGuide = new StudyGuide(
       '10',
@@ -233,35 +218,6 @@ describe('Study Guide Section editor component', () => {
     );
     expect(component.getHeadingSchema()).toEqual(
       component.STUDY_GUIDE_SECTION_HEADING_FORM_SCHEMA
-    );
-  });
-
-  it('should get content schema with ALL_COMPONENTS when feature is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
-
-    const schema = component.getContentSchema();
-
-    expect(schema).toEqual({
-      type: 'html',
-      ui_config: {
-        rte_component_config_id: 'ALL_COMPONENTS',
-        rows: 100,
-      },
-    });
-  });
-
-  it('should check if EnableWorkedExamplesRteComponent feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      true
-    );
-
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      false
     );
   });
 
