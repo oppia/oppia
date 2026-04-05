@@ -1,4 +1,4 @@
-# Copyright 2024 The Oppia Authors. All Rights Reserved.
+﻿# Copyright 2024 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ EXCLUDED_DIRECTORIES = [
 ]
 
 # Regexes to detect to-do comments in source files.
-TASK_KEYWORD = f'{"TO"}{"DO"}'
+TASK_KEYWORD = 'TODO'  # disable-bad-pattern-check
 TASK_REGEX = re.compile(rf'\b{TASK_KEYWORD}\b', re.IGNORECASE)
 # Detect correctly formatted to-do comments, e.g. "TODO(#1234): Description.".
 CORRECT_TASK_REGEX = re.compile(rf'{TASK_KEYWORD}\(#(\d+)\): .+')

@@ -289,18 +289,7 @@ def fetch_latest_comment_from_pull_request(
     return next(iter(latest_comment_nodes), None)
 
 
-# TODO(#9): Temporary workflow test first.
-# TODO(#9): Temporary workflow test SECOND.
-# TODO(#9): Temporary workflow test third.
-# TODO(#9): Temporary workflow test forth.
-# TODO(#9): Temporary workflow test FIVE.
-# TODO(#11): Temporary workflow test firsts.
-# TODO(#11): Temporary workflow test seconds.
-# TODO(#13): Temporary workflow test seconds for the second issue.
-# TODO(#14): Temporary workflow test seconds for the third issue.
-# TODO(#15): Temporary workflow test seconds for the forth issue.
-
-TASK_KEYWORD = f'{"TO"}{"DO"}'
+TASK_KEYWORD = 'TODO'  # disable-bad-pattern-check
 TASKS_KEYWORD = f'{TASK_KEYWORD}s'
 UNRESOLVED_TASKS_PRESENT_INDICATOR = (
     f'THERE ARE {TASKS_KEYWORD} ASSOCIATED WITH THE PROVIDED ISSUES.'
