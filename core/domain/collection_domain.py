@@ -1670,3 +1670,146 @@ class CollectionSummary:
             )
 
         self.contributor_ids = list(self.contributors_summary.keys())
+
+class CollectionCommitLogEntry:
+    """Domain object for a collection commit log entry."""
+
+    def __init__(
+            self,
+            instance_id,
+            user_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            collection_id,
+            post_commit_status,
+            post_commit_is_private,
+            version,
+            created_on,
+            last_updated):
+        """Initializes a CollectionCommitLogEntry domain object.
+
+        Args:
+            instance_id: str. The unique ID of this commit log entry.
+            user_id: str. The user ID of the committer.
+            commit_type: str. The type of commit e.g. 'create', 'edit'.
+            commit_message: str|None. The message describing the commit.
+            commit_cmds: list. List of commit command dicts.
+            collection_id: str. The ID of the collection that was committed.
+            post_commit_status: str. The status after commit e.g. 'public'.
+            post_commit_is_private: bool. Whether collection is private.
+            version: int. The collection version after this commit.
+            created_on: datetime.datetime. When the commit was created.
+            last_updated: datetime.datetime. When this entry was last updated.
+        """
+        self.id = instance_id
+        self.user_id = user_id
+        self.commit_type = commit_type
+        self.commit_message = commit_message
+        self.commit_cmds = commit_cmds
+        self.collection_id = collection_id
+        self.post_commit_status = post_commit_status
+        self.post_commit_is_private = post_commit_is_private
+        self.version = version
+        self.created_on = created_on
+        self.last_updated = last_updated
+
+    def validate(self):
+        """Validates the CollectionCommitLogEntry domain object.
+
+        Raises:
+            utils.ValidationError. The user_id is not a non-empty string.
+            utils.ValidationError. The commit_type is not a non-empty string.
+            utils.ValidationError. The commit_cmds is not a list.
+            utils.ValidationError. The collection_id is not a non-empty string.
+            utils.ValidationError. The post_commit_status is not a string.
+            utils.ValidationError. The post_commit_is_private is not a bool.
+            utils.ValidationError. The version is not a positive integer.
+        """
+        if not isinstance(self.user_id, str) or not self.user_id:
+            raise utils.ValidationError(
+                'Expected user_id to be a non-empty string, received: %s'
+                % self.user_id)
+        if not isinstance(self.commit_type, str) or not self.commit_type:
+            raise utils.ValidationError(
+                'Expected commit_type to be a non-empty string, received: %s'
+                % self.commit_type)
+        if not isinstance(self.commit_cmds, list):
+            raise utils.ValidationError(
+                'Expected commit_cmds to be a list, received: %s'
+                % self.commit_cmds)
+        if (not isinstance(self.collection_id, str)
+                or not self.collection_id):
+            raise utils.ValidationError(
+                'Expected collection_id to be a non-empty string, '
+                'received: %s' % self.collection_id)
+        if (not isinstance(self.post_commit_status, str)
+                or not self.post_commit_status):
+            raise utils.ValidationError(
+                'Expected post_commit_status to be a non-empty string, '
+                'received: %s' % self.post_commit_status)
+        if not isinstance(self.post_commit_is_private, bool):
+            raise utils.ValidationError(
+                'Expected post_commit_is_private to be a bool, received: %s'
+                % self.post_commit_is_private)
+        if not isinstance(self.version, int) or self.version < 1:
+            raise utils.ValidationError(
+                'Expected version to be a positive integer, received: %s'
+                % self.version)
+        
+class CollectionProgress:
+    """Domain object for a learner's progress through a collection."""
+
+    def __init__(
+            self,
+            instance_id,
+            user_id,
+            collection_id,
+            completed_explorations):
+        """Initializes a CollectionProgress domain object.
+
+        Args:
+            instance_id: str. The unique ID of this progress record.
+            user_id: str. The ID of the learner.
+            collection_id: str. The ID of the collection being tracked.
+            completed_explorations: list(str). List of completed exploration
+                IDs within the collection.
+        """
+        self.id = instance_id
+        self.user_id = user_id
+        self.collection_id = collection_id
+        self.completed_explorations = completed_explorations
+
+    def validate(self):
+        """Validates the CollectionProgress domain object.
+
+        Raises:
+            utils.ValidationError. The user_id is not a non-empty string.
+            utils.ValidationError. The collection_id is not a non-empty string.
+            utils.ValidationError. The completed_explorations is not a list.
+            utils.ValidationError. Any entry in completed_explorations is not
+                a non-empty string.
+            utils.ValidationError. completed_explorations has duplicates.
+        """
+        if not isinstance(self.user_id, str) or not self.user_id:
+            raise utils.ValidationError(
+                'Expected user_id to be a non-empty string, received: %s'
+                % self.user_id)
+        if not isinstance(self.collection_id, str) or not self.collection_id:
+            raise utils.ValidationError(
+                'Expected collection_id to be a non-empty string, '
+                'received: %s' % self.collection_id)
+        if not isinstance(self.completed_explorations, list):
+            raise utils.ValidationError(
+                'Expected completed_explorations to be a list, received: %s'
+                % self.completed_explorations)
+        for exp_id in self.completed_explorations:
+            if not isinstance(exp_id, str) or not exp_id:
+                raise utils.ValidationError(
+                    'Expected each exploration ID to be a non-empty '
+                    'string, received: %s' % exp_id)
+        if len(set(self.completed_explorations)) != len(
+                self.completed_explorations):
+            raise utils.ValidationError(
+                'completed_explorations contains duplicate exploration IDs.')
+        

@@ -2388,3 +2388,71 @@ class LearnerAnswerInfo:
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
+
+class AnswerSubmittedEventLogEntry:
+    """Domain object for an answer submitted event log entry."""
+
+    def __init__(
+            self,
+            exp_id,
+            exp_version,
+            state_name,
+            session_id,
+            time_spent_in_state_secs,
+            is_feedback_useful,
+            created_on):
+        """Initializes an AnswerSubmittedEventLogEntry domain object.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+            exp_version: int. The version of the exploration.
+            state_name: str. The name of the state where answer was submitted.
+            session_id: str. The ID of the learner's session.
+            time_spent_in_state_secs: float. Seconds spent on this state.
+            is_feedback_useful: bool. Whether the feedback was useful.
+            created_on: datetime.datetime. When the event was recorded.
+        """
+        self.exp_id = exp_id
+        self.exp_version = exp_version
+        self.state_name = state_name
+        self.session_id = session_id
+        self.time_spent_in_state_secs = time_spent_in_state_secs
+        self.is_feedback_useful = is_feedback_useful
+        self.created_on = created_on
+
+    def validate(self):
+        """Validates the AnswerSubmittedEventLogEntry domain object.
+
+        Raises:
+            utils.ValidationError. The exp_id is not a non-empty string.
+            utils.ValidationError. The exp_version is not a positive integer.
+            utils.ValidationError. The state_name is not a non-empty string.
+            utils.ValidationError. The session_id is not a non-empty string.
+            utils.ValidationError. The time_spent_in_state_secs is negative.
+            utils.ValidationError. The is_feedback_useful is not a bool.
+        """
+        if not isinstance(self.exp_id, str) or not self.exp_id:
+            raise utils.ValidationError(
+                'Expected exp_id to be a non-empty string, received: %s'
+                % self.exp_id)
+        if not isinstance(self.exp_version, int) or self.exp_version < 1:
+            raise utils.ValidationError(
+                'Expected exp_version to be a positive integer, received: %s'
+                % self.exp_version)
+        if not isinstance(self.state_name, str) or not self.state_name:
+            raise utils.ValidationError(
+                'Expected state_name to be a non-empty string, received: %s'
+                % self.state_name)
+        if not isinstance(self.session_id, str) or not self.session_id:
+            raise utils.ValidationError(
+                'Expected session_id to be a non-empty string, received: %s'
+                % self.session_id)
+        if (not isinstance(self.time_spent_in_state_secs, (int, float))
+                or self.time_spent_in_state_secs < 0):
+            raise utils.ValidationError(
+                'Expected time_spent_in_state_secs to be a non-negative '
+                'number, received: %s' % self.time_spent_in_state_secs)
+        if not isinstance(self.is_feedback_useful, bool):
+            raise utils.ValidationError(
+                'Expected is_feedback_useful to be a bool, received: %s'
+                % self.is_feedback_useful)
