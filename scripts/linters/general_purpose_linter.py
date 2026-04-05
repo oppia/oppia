@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from typing import Dict, Final, List, Pattern, Tuple, TypedDict
+from typing import Dict, Final, List, Pattern, Set, Tuple, TypedDict
 
 from .. import build, common, concurrent_task_utils
 from . import js_ts_linter, linter_utils, warranted_angular_security_bypasses
@@ -118,6 +118,23 @@ CONFIG_FILE_PATHS: Final = (
     'webpack.config.ts',
     'webpack.dev.config.ts',
     'webpack.prod.config.ts',
+)
+
+ASSETS_CONSTANTS_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'assets', 'constants.ts'
+)
+RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'assets', 'rich_text_components_definitions.ts'
+)
+RTE_COMPONENT_CONFIGS_CONTENT_REGEX: Final = re.compile(
+    r'"RTE_COMPONENT_CONFIGS"\s*:\s*\{(?P<configs_content>.*?)\}\s*,?',
+    re.DOTALL,
+)
+RTE_COMPONENT_CONFIG_NAME_REGEX: Final = re.compile(
+    r'"(?P<config_name>[A-Z0-9_]+)"\s*:'
+)
+RTE_COMPONENT_CONFIG_ID_REGEX: Final = re.compile(
+    r'"rte_component_config_id"\s*:\s*"(?P<config_id>[^"]+)"'
 )
 
 BAD_STRINGS_CONSTANTS: Dict[str, BadStringsConstantsDict] = {
@@ -695,6 +712,82 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
+    def check_rte_component_config_ids(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that all RTE component config ids are valid."""
+        name = 'RTE component config ids'
+        error_messages: List[str] = []
+        failed = False
+
+        should_run_check = any(
+            filepath.replace('\\', '/').endswith(
+                (
+                    'assets/constants.ts',
+                    'assets/rich_text_components_definitions.ts',
+                )
+            )
+            for filepath in self.all_filepaths
+        )
+        if not should_run_check:
+            return concurrent_task_utils.TaskResult(
+                name, failed, error_messages, error_messages
+            )
+
+        constants_content = ''.join(
+            self.file_cache.readlines(ASSETS_CONSTANTS_FILEPATH)
+        )
+        configs_match = RTE_COMPONENT_CONFIGS_CONTENT_REGEX.search(
+            constants_content
+        )
+        valid_config_ids: Set[str] = set()
+        if configs_match is not None:
+            valid_config_ids = {
+                config_name_match.group('config_name')
+                for config_name_match in RTE_COMPONENT_CONFIG_NAME_REGEX.finditer(
+                    configs_match.group('configs_content')
+                )
+            }
+
+        if not valid_config_ids:
+            failed = True
+            error_messages.append(
+                '%s --> Could not find valid keys under '
+                '"RTE_COMPONENT_CONFIGS" in constants.ts.'
+                % ASSETS_CONSTANTS_FILEPATH
+            )
+            return concurrent_task_utils.TaskResult(
+                name, failed, error_messages, error_messages
+            )
+
+        for line_num, line in enumerate(
+            self.file_cache.readlines(
+                RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH
+            ),
+            start=1,
+        ):
+            config_id_match = RTE_COMPONENT_CONFIG_ID_REGEX.search(line)
+            if config_id_match is None:
+                continue
+            config_id = config_id_match.group('config_id')
+            if config_id in valid_config_ids:
+                continue
+            failed = True
+            error_messages.append(
+                '%s --> Line %s: The value of "rte_component_config_id" '
+                'in ui_config should match one of the keys in '
+                'assets/constants.ts -> RTE_COMPONENT_CONFIGS. Found "%s".'
+                % (
+                    RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH,
+                    line_num,
+                    config_id,
+                )
+            )
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages
+        )
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -718,6 +811,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             self.check_newline_at_eof(),
             self.check_extra_js_files(),
             self.check_disallowed_flags(),
+            self.check_rte_component_config_ids(),
         ]
         return task_results
 
