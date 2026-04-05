@@ -3726,8 +3726,16 @@ export class ExplorationEditor extends BaseUser {
     // Get all state node groups (not just labels) since we need to click the
     // background rect which has the click handler.
     const stateNodeGroupSelector = '.e2e-test-node';
-    await this.page.waitForSelector(stateNodeGroupSelector);
-    elements = await this.page.$$(stateNodeGroupSelector);
+    const scopedStateNodeGroupSelector = this.isViewportAtMobileWidth()
+      ? `${explorationStateGraphModalSelector} ${stateNodeGroupSelector}`
+      : stateNodeGroupSelector;
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        visible: true,
+      });
+    }
+    await this.page.waitForSelector(scopedStateNodeGroupSelector);
+    elements = await this.page.$$(scopedStateNodeGroupSelector);
 
     const cardNames = await Promise.all(
       elements.map(element =>
@@ -3743,13 +3751,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let nodeGroup: ElementHandle<Element> | null = null;
-    if (this.isViewportAtMobileWidth()) {
-      nodeGroup = elements[cardIndex + elements.length / 2];
-    } else {
-      nodeGroup = elements[cardIndex];
-    }
-
+    const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
     if (!nodeGroup) {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
@@ -3761,6 +3763,9 @@ export class ExplorationEditor extends BaseUser {
         `Could not find clickable background for card: ${cardName}`
       );
     }
+    await nodeBackground.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
     await this.clickOnElement(nodeBackground);
     await this.waitForNetworkIdle({idleTime: 1000});
 
