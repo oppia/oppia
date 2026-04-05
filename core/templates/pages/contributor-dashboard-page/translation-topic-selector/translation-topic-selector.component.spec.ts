@@ -146,4 +146,16 @@ describe('Translation language selector', () => {
 
     expect(component.setActiveTopicName.emit).toHaveBeenCalledWith('Topic 1');
   });
+
+  it('should not throw on document click when dropdownRef is unavailable', () => {
+    (component as {dropdownRef?: unknown}).dropdownRef = undefined;
+    const fakeClickAwayEvent = new MouseEvent('click');
+    Object.defineProperty(fakeClickAwayEvent, 'target', {
+      value: document.createElement('div'),
+    });
+
+    expect(() =>
+      component.onDocumentClick(fakeClickAwayEvent)
+    ).not.toThrowError();
+  });
 });

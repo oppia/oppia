@@ -377,6 +377,27 @@ describe('Translation language selector', () => {
     ]);
   });
 
+  it('should not throw when toggling dropdown without filterDivRef', fakeAsync(() => {
+    (component as {filterDivRef?: ElementRef}).filterDivRef = undefined;
+    expect(() => {
+      component.toggleDropdown();
+      flush();
+    }).not.toThrowError();
+    expect(component.dropdownShown).toBe(true);
+  }));
+
+  it('should not throw on document click when dropdownRef is unavailable', () => {
+    (component as {dropdownRef?: ElementRef}).dropdownRef = undefined;
+    const fakeClickAwayEvent = new MouseEvent('click');
+    Object.defineProperty(fakeClickAwayEvent, 'target', {
+      value: document.createElement('div'),
+    });
+
+    expect(() =>
+      component.onDocumentClick(fakeClickAwayEvent)
+    ).not.toThrowError();
+  });
+
   it('should not auto-populate preferred language when all languages is selected', fakeAsync(() => {
     preferredLanguageCode = 'fr';
     component.includeAllOption = true;
