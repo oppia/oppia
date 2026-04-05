@@ -162,7 +162,6 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
             returnDict,
             0,
             null,
-            false,
             [],
             [],
             () => {

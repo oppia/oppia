@@ -8766,9 +8766,9 @@ title: Old Title
             exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME
         )
 
-    def test_update_exploration_auto_tts_enabled(self) -> None:
+    def test_update_exploration_edits_allowed(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, False)
+        self.assertEqual(exploration.edits_allowed, True)
         exp_services.update_exploration(
             self.albert_id,
             self.NEW_EXP_ID,
@@ -8776,16 +8776,16 @@ title: Old Title
                 exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'auto_tts_enabled',
+                        'property_name': 'edits_allowed',
                         'new_value': False,
                     }
                 )
             ],
-            'Changed auto_tts_enabled.',
+            'Changed edits_allowed.',
         )
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.auto_tts_enabled, False)
+        self.assertEqual(exploration.edits_allowed, False)
 
         # Check that the property can be changed when working
         # on old version.
@@ -8809,7 +8809,7 @@ title: Old Title
             exp_domain.ExplorationChange(
                 {
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'auto_tts_enabled',
+                    'property_name': 'edits_allowed',
                     'new_value': True,
                 }
             )
@@ -8822,13 +8822,13 @@ title: Old Title
             self.albert_id,
             self.NEW_EXP_ID,
             change_list,
-            'Changed auto_tts_enabled again.',
+            'Changed edits_allowed again.',
         )
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
-        self.assertEqual(exploration.auto_tts_enabled, True)
+        self.assertEqual(exploration.edits_allowed, True)
 
     def test_update_old_exploration_version_remains_editable(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

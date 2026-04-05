@@ -4159,7 +4159,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.validate()
 
-        exploration.states_schema_version = None
+        # Here we use MyPy ignore because this test intentionally assigns an
+        # invalid type to verify runtime validation.
+        exploration.states_schema_version = None  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'This exploration has no states schema version.'
         ):

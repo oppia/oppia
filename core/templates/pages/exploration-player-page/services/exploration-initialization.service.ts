@@ -91,7 +91,6 @@ export class ExplorationInitializationService {
         explorationData,
         null,
         null,
-        null,
         [],
         [],
         callback
