@@ -1592,7 +1592,7 @@ export class ExplorationEditor extends BaseUser {
     if (inputElements.length < 2) {
       throw new Error(
         'Expected at least two numeric input fields (min and max selection ' +
-          `count) in the Item Selection customization modal, but found ` +
+          'count) in the Item Selection customization modal, but found ' +
           `${inputElements.length}.`
       );
     }
