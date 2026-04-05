@@ -60,6 +60,7 @@ def run_beam_job(
             raise ValueError('Must specify the job class or name to run')
 
     run_synchronously = constants.EMULATOR_MODE
+
     run_model = jobs_manager.run_job(job_class, run_synchronously)
 
     return get_beam_job_run_from_model(run_model)

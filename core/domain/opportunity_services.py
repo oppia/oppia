@@ -123,6 +123,11 @@ def get_exploration_opportunity_summary_from_model(
         model.language_codes_needing_voice_artists,
         model.language_codes_with_assigned_voice_artists,
         {},
+        (
+            model.reviewer_only_content_count
+            if model.reviewer_only_content_count is not None
+            else 0
+        ),
         False,
     )
 
@@ -162,6 +167,9 @@ def _construct_new_opportunity_summary_models(
             ),
             language_codes_with_assigned_voice_artists=(
                 opportunity_summary.language_codes_with_assigned_voice_artists
+            ),
+            reviewer_only_content_count=(
+                opportunity_summary.reviewer_only_content_count
             ),
         )
 
@@ -240,6 +248,7 @@ def create_exp_opportunity_summary(
         language_codes_needing_voice_artists.add(exploration.language_code)
 
     content_count = exploration.get_content_count()
+    reviewer_only_content_count = exploration.get_reviewer_only_content_count()
     translation_counts = translation_services.get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION, exploration
     )
@@ -266,6 +275,7 @@ def create_exp_opportunity_summary(
             list(language_codes_needing_voice_artists),
             [],
             {},
+            reviewer_only_content_count,
         )
     )
 
@@ -390,6 +400,9 @@ def compute_opportunity_models_with_updated_exploration(
     )
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
+    exploration_opportunity_summary.reviewer_only_content_count = (
+        updated_exploration.get_reviewer_only_content_count()
+    )
     incomplete_translation_language_codes = (
         _compute_exploration_incomplete_translation_languages(
             complete_translation_language_list
@@ -686,6 +699,7 @@ def get_translation_opportunities(
                 opportunity_summary_exp_ids, language_code
             )
         )
+
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         opportunity_summary = get_exploration_opportunity_summary_from_model(
             exp_opportunity_summary_model
@@ -699,6 +713,7 @@ def get_translation_opportunities(
             opportunity_summary.translation_in_review_counts = {
                 language_code: exp_id_to_in_review_count[opportunity_summary.id]
             }
+
         opportunity_summaries.append(opportunity_summary)
     return opportunity_summaries, cursor, more
 
