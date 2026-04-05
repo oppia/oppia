@@ -26,7 +26,6 @@ import {
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HtmlSchema {
   type: 'html';
@@ -62,10 +61,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
   skillEditorWorkedExampleLimit: number =
     AppConstants.SKILL_EDITOR_WORKED_EXAMPLE_LIMIT;
 
-  constructor(
-    private changeDetectorRef: ChangeDetectorRef,
-    private platformFeatureService: PlatformFeatureService
-  ) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.COMPONENT_NAME_EXPLANATION = AppConstants.COMPONENT_NAME_EXPLANATION;
@@ -77,14 +73,6 @@ export class ReviewMaterialEditorComponent implements OnInit {
   // Remove this function when the schema-based editor
   // is migrated to Angular 2+.
   getSchema(): HtmlSchema {
-    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
-      this.HTML_SCHEMA = {
-        type: 'html',
-        ui_config: {
-          rte_component_config_id: 'ALL_COMPONENTS',
-        },
-      };
-    }
     return this.HTML_SCHEMA;
   }
 
@@ -104,11 +92,6 @@ export class ReviewMaterialEditorComponent implements OnInit {
       matches && matches.length > this.skillEditorWorkedExampleLimit
     );
     return this.workedExampleLimitExceeded;
-  }
-
-  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
-      .isEnabled;
   }
 
   openConceptCardExplanationEditor(): void {
