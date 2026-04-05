@@ -18,202 +18,195 @@
 import {RendererFactory2} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {
-    InsertScriptService,
-    KNOWN_SCRIPTS,
+  InsertScriptService,
+  KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
 
 class MockRenderer {
-    createElement(tag: string) {
-        return document.createElement(tag);
-    }
-    appendChild(parent: HTMLElement, newChild: HTMLElement) {
-        parent.appendChild(newChild);
-    }
+  createElement(tag: string) {
+    return document.createElement(tag);
+  }
+  appendChild(parent: HTMLElement, newChild: HTMLElement) {
+    parent.appendChild(newChild);
+  }
 }
 
 class MockRendererFactory {
-    createRenderer() {
-        return new MockRenderer();
-    }
+  createRenderer() {
+    return new MockRenderer();
+  }
 }
 
 describe('InsertScriptService', () => {
-    let insertScriptService: InsertScriptService;
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            providers: [
-                InsertScriptService,
-                {provide: RendererFactory2, useClass: MockRendererFactory},
-            ],
-        });
-        insertScriptService = TestBed.inject(InsertScriptService);
+  let insertScriptService: InsertScriptService;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        InsertScriptService,
+        {provide: RendererFactory2, useClass: MockRendererFactory},
+      ],
     });
+    insertScriptService = TestBed.inject(InsertScriptService);
+  });
 
-    it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
-        const mockScriptElement: Partial<HTMLScriptElement> = {
-            onload: null,
-            onerror: null,
-            src: '',
-            setAttribute: () => {},
-        };
-        spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-        spyOn(document.body, 'appendChild').and.callFake(
-            (script: HTMLScriptElement) => {
-                setTimeout(() => {
-                    script.onload?.(new Event('load'));
-                }, 10);
-            }
-        );
-
-        insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
-            const result = insertScriptService.loadScript(
-                KNOWN_SCRIPTS.DONORBOX,
-                () => {
-                    expect(result).toBe(false);
-                    done();
-                }
-            );
-        });
-    });
-
-    it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
-        const mockScriptElement: Partial<HTMLScriptElement> = {
-            onload: null,
-            onerror: null,
-            src: '',
-            setAttribute: () => {},
-        };
-        spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-        const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(
-            (script: HTMLScriptElement) => {
-                setTimeout(() => {
-                    script.onload?.(new Event('load'));
-                }, 10);
-            }
-        );
-
-        insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
-            expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
-                false
-            );
-            expect(appendChildSpy).toHaveBeenCalledTimes(1);
-            done();
-        });
-
-        const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
-        expect(result).toBe(true);
-        expect(appendChildSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('should handle script load error correctly', (done: jasmine.DoneFn) => {
-        const mockScriptElement: Partial<HTMLScriptElement> = {
-            onload: null,
-            onerror: null,
-            src: '',
-            setAttribute: () => {},
-        };
-
-        spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-
-        spyOn(document.body, 'appendChild').and.callFake(
-            (script: HTMLScriptElement) => {
-                setTimeout(() => {
-                    script.onerror(new ErrorEvent('error'));
-                }, 10);
-            }
-        );
-
-        const result = insertScriptService.loadScript(
-            KNOWN_SCRIPTS.DONORBOX,
-            () => {
-                fail(
-                    'onLoadCb should not be called when the script fails to load.'
-                );
-            }
-        );
-
-        expect(result).toBe(true);
-
+  it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
         setTimeout(() => {
-            expect(
-                // eslint-disable-next-line dot-notation
-                insertScriptService['partiallyLoadedScripts'].has(
-                    KNOWN_SCRIPTS.DONORBOX
-                )
-            ).toBe(false);
-            done();
-        }, 20);
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
+
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
+      const result = insertScriptService.loadScript(
+        KNOWN_SCRIPTS.DONORBOX,
+        () => {
+          expect(result).toBe(false);
+          done();
+        }
+      );
+    });
+  });
+
+  it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
+
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
+      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
+        false
+      );
+      expect(appendChildSpy).toHaveBeenCalledTimes(1);
+      done();
     });
 
-    it('should return false for unknown scripts', () => {
-        const mockScriptElement: Partial<HTMLScriptElement> = {
-            onload: null,
-            onerror: null,
-            src: '',
-            setAttribute: () => {},
-        };
-        spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-        spyOn(document.body, 'appendChild').and.callFake(() => {});
-        const result = insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN);
-        expect(result).toBe(false);
+    const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+    expect(result).toBe(true);
+    expect(appendChildSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should handle script load error correctly', (done: jasmine.DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onerror(new ErrorEvent('error'));
+        }, 10);
+      }
+    );
+
+    const result = insertScriptService.loadScript(
+      KNOWN_SCRIPTS.DONORBOX,
+      () => {
+        fail('onLoadCb should not be called when the script fails to load.');
+      }
+    );
+
+    expect(result).toBe(true);
+
+    setTimeout(() => {
+      expect(
+        // eslint-disable-next-line dot-notation
+        insertScriptService['partiallyLoadedScripts'].has(
+          KNOWN_SCRIPTS.DONORBOX
+        )
+      ).toBe(false);
+      done();
+    }, 20);
+  });
+
+  it('should return false for unknown scripts', () => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(() => {});
+    const result = insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN);
+    expect(result).toBe(false);
+  });
+
+  it('should load MATHJAX script correctly', (done: jasmine.DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
+
+    const result = insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
+      expect(mockScriptElement.src).toContain(
+        '/assets/mathjax/MathJax.js?config=TeX-AMS_SVG'
+      );
+      done();
     });
 
-    it('should load MATHJAX script correctly', (done: jasmine.DoneFn) => {
-        const mockScriptElement: Partial<HTMLScriptElement> = {
-            onload: null,
-            onerror: null,
-            src: '',
-            setAttribute: () => {},
-        };
+    expect(result).toBe(true);
+  });
 
-        spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-        spyOn(document.body, 'appendChild').and.callFake(
-            (script: HTMLScriptElement) => {
-                setTimeout(() => {
-                    script.onload?.(new Event('load'));
-                }, 10);
-            }
-        );
+  it('should insert script into html', (done: jasmine.DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
 
-        const result = insertScriptService.loadScript(
-            KNOWN_SCRIPTS.MATHJAX,
-            () => {
-                expect(mockScriptElement.src).toContain(
-                    '/assets/mathjax/MathJax.js?config=TeX-AMS_SVG'
-                );
-                done();
-            }
-        );
-
-        expect(result).toBe(true);
+    const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+    expect(result).toBe(true);
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
+      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
+        false
+      );
+      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN)).toBe(false);
+      done();
     });
-
-    it('should insert script into html', (done: jasmine.DoneFn) => {
-        const mockScriptElement: Partial<HTMLScriptElement> = {
-            onload: null,
-            onerror: null,
-            src: '',
-            setAttribute: () => {},
-        };
-        spyOn(document, 'createElement').and.returnValue(mockScriptElement);
-        spyOn(document.body, 'appendChild').and.callFake(
-            (script: HTMLScriptElement) => {
-                setTimeout(() => {
-                    script.onload?.(new Event('load'));
-                }, 10);
-            }
-        );
-
-        const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
-        expect(result).toBe(true);
-        insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
-            expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
-                false
-            );
-            expect(insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN)).toBe(
-                false
-            );
-            done();
-        });
-    });
+  });
 });
