@@ -82,12 +82,6 @@ interface ContentExtractors {
   ) => TranslatableField[];
 }
 
-type SupportedStatePropertyValues =
-  | StatePropertyValues
-  | State['inapplicableSkillMisconceptionIds']
-  | State['linkedSkillId']
-  | State['name'];
-
 @Injectable({
   providedIn: 'root',
 })
@@ -231,7 +225,7 @@ export class ExplorationStatesService {
 
   _extractContentIds(
     backendName: string,
-    value: SupportedStatePropertyValues
+    value: StatePropertyValues
   ): Set<string> {
     let contents: TranslatableField[] = this._CONTENT_EXTRACTORS[backendName](
       value as BaseTranslatableObject | BaseTranslatableObject[]
@@ -241,7 +235,7 @@ export class ExplorationStatesService {
 
   _verifyChangesInitialContents(
     backendName: string,
-    value: SupportedStatePropertyValues
+    value: StatePropertyValues
   ): void {
     let contents: TranslatableField[];
 
@@ -381,13 +375,13 @@ export class ExplorationStatesService {
   getStatePropertyMemento(
     stateName: string,
     backendName: StatePropertyNames
-  ): SupportedStatePropertyValues;
+  ): StatePropertyValues;
   getStatePropertyMemento(
     stateName: string,
     backendName: StatePropertyNames
-  ): SupportedStatePropertyValues {
+  ): StatePropertyValues {
     let accessorList: string[] = this.PROPERTY_REF_DATA[backendName];
-    let propertyRef: SupportedStatePropertyValues | State =
+    let propertyRef: StatePropertyValues | State =
       this._getStates().getState(stateName);
     try {
       accessorList.forEach((key: string) => {
@@ -484,7 +478,7 @@ export class ExplorationStatesService {
   saveStateProperty(
     stateName: string,
     backendName: StatePropertyNames,
-    newValue: SupportedStatePropertyValues
+    newValue: StatePropertyValues
   ): void {
     let oldValue = this.getStatePropertyMemento(stateName, backendName);
     let newBackendValue = this._getBackendValue(backendName, newValue);
@@ -517,7 +511,7 @@ export class ExplorationStatesService {
 
   private _getBackendValue(
     backendName: StatePropertyNames,
-    value: SupportedStatePropertyValues
+    value: StatePropertyValues
   ): StatePropertyDictValues {
     if (this._isBackendConversionName(backendName)) {
       return this.convertToBackendRepresentation(value, backendName);
@@ -547,14 +541,14 @@ export class ExplorationStatesService {
   }
 
   convertToBackendRepresentation(
-    frontendValue: SupportedStatePropertyValues,
+    frontendValue: StatePropertyValues,
     backendName: Exclude<
       keyof ExplorationStatesService['_BACKEND_CONVERSIONS'],
       'written_translations'
     >
   ): StatePropertyDictValues {
     let conversionFunction = this._BACKEND_CONVERSIONS[backendName] as (
-      value: SupportedStatePropertyValues
+      value: StatePropertyValues
     ) => StatePropertyDictValues;
     return conversionFunction(frontendValue);
   }

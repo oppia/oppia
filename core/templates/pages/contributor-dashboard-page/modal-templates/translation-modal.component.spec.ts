@@ -88,6 +88,11 @@ class MockImageLocalStorageService {
   }
 }
 
+interface MockBeforeUnloadEvent {
+  preventDefault: () => void;
+  returnValue: string;
+}
+
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
   let translateTextService: TranslateTextService;
@@ -348,10 +353,12 @@ describe('Translation Modal Component', () => {
 
   it('should use a no-op beforeUnloadHandler before initialization', () => {
     component.ngOnDestroy();
-    const handler = mockWindow.removeEventListener.calls.argsFor(0)[1] as (
-      event: BeforeUnloadEvent
-    ) => string | undefined;
-    const event = new Event('beforeunload') as BeforeUnloadEvent;
+    const handler = mockWindow.removeEventListener.calls.argsFor(0)[1];
+    const event = jasmine.createSpyObj<MockBeforeUnloadEvent>(
+      'mockBeforeUnloadEvent',
+      ['preventDefault'],
+      {returnValue: ''}
+    );
 
     expect(handler(event)).toBeUndefined();
   });
@@ -1136,14 +1143,8 @@ describe('Translation Modal Component', () => {
         removeEventListener: jasmine.Spy;
       }
 
-      interface MockBeforeUnloadEvent {
-        preventDefault: () => void;
-        returnValue: string;
-      }
-
       let mockWindow: MockWindow;
-      let mockEvent: MockBeforeUnloadEvent;
-      let preventDefaultSpy: jasmine.Spy;
+      let mockEvent: jasmine.SpyObj<MockBeforeUnloadEvent>;
       let translationLanguageService: TranslationLanguageService;
 
       beforeEach(() => {
@@ -1153,14 +1154,11 @@ describe('Translation Modal Component', () => {
           removeEventListener: jasmine.createSpy('removeEventListener'),
         };
 
-        const mockBeforeUnloadEvent =
-          jasmine.createSpyObj<MockBeforeUnloadEvent>(
-            'mockBeforeUnloadEvent',
-            ['preventDefault'],
-            {returnValue: ''}
-          );
-        mockEvent = mockBeforeUnloadEvent;
-        preventDefaultSpy = mockBeforeUnloadEvent.preventDefault as jasmine.Spy;
+        mockEvent = jasmine.createSpyObj<MockBeforeUnloadEvent>(
+          'mockBeforeUnloadEvent',
+          ['preventDefault'],
+          {returnValue: ''}
+        );
 
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -1256,10 +1254,7 @@ describe('Translation Modal Component', () => {
       it('should have beforeUnloadHandler initialized as a function returning undefined', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        const mockEvent = new Event('beforeunload') as BeforeUnloadEvent;
-        const handler = mockWindow.addEventListener.calls.argsFor(0)[1] as (
-          e: BeforeUnloadEvent
-        ) => string | undefined;
+        const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         expect(handler(mockEvent)).toBeUndefined();
       }));
 
@@ -1268,7 +1263,6 @@ describe('Translation Modal Component', () => {
         tick();
 
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
-        const mockEvent = new Event('beforeunload') as BeforeUnloadEvent;
 
         component.activeWrittenTranslation = '';
         expect(handler(mockEvent)).toBeUndefined();
@@ -1299,8 +1293,8 @@ describe('Translation Modal Component', () => {
         tick();
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         component.activeWrittenTranslation = '';
-        handler(mockEvent as BeforeUnloadEvent);
-        expect(preventDefaultSpy).not.toHaveBeenCalled();
+        handler(mockEvent);
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
 
@@ -1309,8 +1303,8 @@ describe('Translation Modal Component', () => {
         tick();
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         component.activeWrittenTranslation = 'Some unsaved text';
-        handler(mockEvent as BeforeUnloadEvent);
-        expect(preventDefaultSpy).toHaveBeenCalled();
+        handler(mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
     });
