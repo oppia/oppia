@@ -727,7 +727,10 @@ class MigrateExplorationJobTests(
                 ]
             )
 
-        migrated_model = user_models.ExplorationUserDataModel.get(draft_id)
+        migrated_model = user_models.ExplorationUserDataModel.get(
+            user_id, self.NEW_EXP_ID
+        )
+        assert migrated_model is not None
         self.assertEqual(migrated_model.draft_change_list, new_change_list)
         self.assertEqual(
             migrated_model.draft_change_list_exp_version, exp_model.version
@@ -1210,7 +1213,10 @@ class AuditExplorationMigrationJobTests(
                 ]
             )
 
-        unmigrated_model = user_models.ExplorationUserDataModel.get(draft_id)
+        unmigrated_model = user_models.ExplorationUserDataModel.get(
+            user_id, self.NEW_EXP_ID
+        )
+        assert unmigrated_model is not None
         self.assertEqual(unmigrated_model.draft_change_list, old_draft_list)
         self.assertEqual(
             unmigrated_model.draft_change_list_exp_version,
