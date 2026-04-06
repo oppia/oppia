@@ -74,18 +74,18 @@
           <ng-container *ngFor="let topicSummary of recommendedTopicSummaries">
             <div *ngIf="topicSummary.getUrlFragment()"
                  class="oppia-topic-summary-tile e2e-test-recommended-topic-summary-tile">
-            <oppia-topic-summary-tile [topicSummary]="topicSummary"
-                                      [classroomUrlFragment]="classroomUrlFragment"
-                                      [isPublished]="topicSummary.isTopicPublished()">
-            </oppia-topic-summary-tile>
-            <div class="oppia-start-button">
-              <button class="btn oppia-start-topic-button" (click)="getRecommendationAcceptanceEvent(topicSummary.getName())">
-                <a class="oppia-anchor-tag-under-button"
-                   [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
-                  {{getTopicButtonText(topicSummary.getName())}}
-                </a>
-              </button>
-            </div>
+              <oppia-topic-summary-tile [topicSummary]="topicSummary"
+                                        [classroomUrlFragment]="classroomUrlFragment"
+                                        [isPublished]="topicSummary.isTopicPublished()">
+              </oppia-topic-summary-tile>
+              <div class="oppia-start-button">
+                <button class="btn oppia-start-topic-button" (click)="getRecommendationAcceptanceEvent(topicSummary.getName())">
+                  <a class="oppia-anchor-tag-under-button"
+                     [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
+                    {{getTopicButtonText(topicSummary.getName())}}
+                  </a>
+                </button>
+              </div>
             </div>
           </ng-container>
         </div>

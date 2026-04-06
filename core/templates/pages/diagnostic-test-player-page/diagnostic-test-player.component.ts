@@ -17,22 +17,24 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
-import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
-import {ClassroomData} from 'domain/classroom/classroom-data.model';
-import {Subscription} from 'rxjs';
-import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {TranslateService} from '@ngx-translate/core';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {AppConstants} from 'app.constants';
 import {Router} from '@angular/router';
-import {LoaderService} from 'services/loader.service';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
+
+import {AppConstants} from 'app.constants';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+
+import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
+import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',

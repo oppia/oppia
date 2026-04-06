@@ -16,35 +16,36 @@
  * @fileoverview Tests for the diagnostic test player component.
  */
 
+import {HttpErrorResponse} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
-  fakeAsync,
   TestBed,
+  fakeAsync,
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {ClassroomData} from 'domain/classroom/classroom-data.model';
-import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
-import {TranslateService} from '@ngx-translate/core';
-import {EventEmitter} from '@angular/core';
 import {Router} from '@angular/router';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {HttpErrorResponse} from '@angular/common/http';
-import {AlertsService} from 'services/alerts.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {SignInEventService} from 'services/sign-in-event.service';
+import {TranslateService} from '@ngx-translate/core';
+
+import {AppConstants} from 'app.constants';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AlertsService} from 'services/alerts.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {LoaderService} from 'services/loader.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {SignInEventService} from 'services/sign-in-event.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+
+import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
+import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
+import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
