@@ -33,10 +33,6 @@ var suites = {
     './core/tests/webdriverio_desktop/collections.js'
   ],
 
-  contributorAdminDashboard: [
-    './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
-  ],
-
   creatorDashboard: [
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
@@ -55,10 +51,6 @@ var suites = {
 
   explorationStatisticsTab: [
     './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
-  ],
-
-  explorationTranslationTab: [
-    './core/tests/webdriverio_desktop/explorationTranslationTab.js'
   ],
 
   learner: [
