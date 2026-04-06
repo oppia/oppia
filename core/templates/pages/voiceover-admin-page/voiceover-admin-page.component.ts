@@ -62,8 +62,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     private ngbModal: NgbModal,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private cdr: ChangeDetectorRef,
-    private languageUtilService: LanguageUtilService,
-    private changeDetectorRef: ChangeDetectorRef
+    private languageUtilService: LanguageUtilService
   ) {}
 
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
@@ -77,7 +76,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   languageAccentCodeIsPresent: boolean = false;
   languageAccentMasterList!: LanguageAccentMasterList;
   cloudSupportedLanguageAccentCodes: string[] = [];
-  languageAccentCodeForRegeneration: string | null = null;
   columnsToDisplay: string[] = [
     'voiceArtist',
     'languageCode',
@@ -137,8 +135,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.pageIsInitialized = true;
         this.cdr.detectChanges();
       });
-
-    this.getLanguageAccentForRegeneration();
   }
 
   initializeLanguageAccentCodesFields(
@@ -450,45 +446,5 @@ export class VoiceoverAdminPageComponent implements OnInit {
       return 'Voiceover regeneration for the exploration in the chosen language accent';
     }
     return '';
-  }
-
-  addLanguageAccentCodeForRegeneration(): void {
-    console.log(this.languageAccentCodeForRegeneration);
-    this.voiceoverBackendApiService
-      .addLanguageAccentCodeForRegenerationAsync(
-        this.languageAccentCodeForRegeneration as string
-      )
-      .then(() => {});
-  }
-
-  markVoiceoverRegenerationForAccentAsComplete(): void {
-    this.voiceoverBackendApiService
-      .markLanguageAccentCodeForRegenerationCompleteAsync()
-      .then(() => {
-        this.languageAccentCodeForRegeneration = null;
-        this.cdr.detectChanges();
-      });
-  }
-
-  getLanguageAccentForRegeneration() {
-    this.voiceoverBackendApiService
-      .getLanguageAccentCodeForRegenerationAsync()
-      .then(response => {
-        this.languageAccentCodeForRegeneration = response;
-        this.cdr.detectChanges();
-        console.log(response);
-      });
-  }
-
-  getLanguageAccentCodesThatSupportAutogeneration(): string[] {
-    if (!this?.languageAccentCodesToSupportsAutogeneration) {
-      return [];
-    }
-    return Object.keys(
-      this?.languageAccentCodesToSupportsAutogeneration
-    ).filter(
-      languageAccentCode =>
-        this.languageAccentCodesToSupportsAutogeneration[languageAccentCode]
-    );
   }
 }

@@ -414,30 +414,4 @@ export class VoiceoverBackendApiService {
       .post<void>(regenerateVoiceoversForExplorationUrl, {})
       .toPromise();
   }
-
-  async addLanguageAccentCodeForRegenerationAsync(
-    languageAccentCode: string
-  ): Promise<void> {
-    return this.http
-      .post<void>(VoiceoverDomainConstants.LANGUAGE_ACCENT_REGENERATION_URL, {
-        language_accent_code: languageAccentCode,
-      })
-      .toPromise();
-  }
-
-  async getLanguageAccentCodeForRegenerationAsync(): Promise<string> {
-    return this.http
-      .get<{language_accent_code: string}>(
-        VoiceoverDomainConstants.LANGUAGE_ACCENT_REGENERATION_URL
-      )
-      .toPromise()
-      .then(response => response.language_accent_code);
-  }
-
-  async markLanguageAccentCodeForRegenerationCompleteAsync(): Promise<void> {
-    console.log('Marking language accent code regeneration as complete');
-    return this.http
-      .delete<void>(VoiceoverDomainConstants.LANGUAGE_ACCENT_REGENERATION_URL)
-      .toPromise();
-  }
 }

@@ -22,6 +22,7 @@ import datetime
 
 from core import constants, feconf
 from core.domain import (
+    beam_job_services,
     email_manager,
     exp_domain,
     exp_fetchers,
@@ -35,6 +36,7 @@ from core.domain import (
     voiceover_domain,
     voiceover_regeneration_services,
 )
+from core.jobs.batch_jobs import synthesize_voiceover_by_language_accent_jobs
 from core.platform import models
 from core.storage.voiceover import gae_models
 
@@ -545,11 +547,81 @@ def save_language_accent_support(
         )
     )
 
+    existing_language_accent_mapping = (
+        voiceover_autogeneration_policy_model.language_codes_mapping
+        if voiceover_autogeneration_policy_model is not None
+        and voiceover_autogeneration_policy_model.language_codes_mapping
+        is not None
+        else {}
+    )
+
     voiceover_autogeneration_policy_model.language_codes_mapping = (
         language_codes_mapping
     )
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
+
+    new_accent_code = get_new_auto_voiceover_accent(
+        existing_language_accent_mapping,
+        language_codes_mapping,
+    )
+
+    if new_accent_code:
+        beam_job_services.run_beam_job(
+            job_class=(
+                synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob
+            ),
+            parameterized_args={'language_accent_code': new_accent_code},
+        )
+
+
+def get_new_auto_voiceover_accent(
+    existing_language_accent_mapping: Dict[str, Dict[str, bool]],
+    updated_language_accent_mapping: Dict[str, Dict[str, bool]],
+) -> Optional[str]:
+    """Returns the newly added language-accent code enabled for automatic
+    voiceover regeneration, if any.
+
+    Args:
+        existing_language_accent_mapping: dict(str, dict(str, bool)). Mapping of
+            language codes to their accent configurations before the update.
+            Each accent code maps to a boolean indicating whether automatic
+            voiceover generation is enabled.
+        updated_language_accent_mapping: dict(str, dict(str, bool)). Mapping of
+            language codes to their accent configurations after the update.
+            Each accent code maps to a boolean indicating whether automatic
+            voiceover generation is enabled.
+
+    Returns:
+        Optional[str]. The newly added language-accent code enabled for automatic
+        voiceover regeneration, or None if no such accent was added.
+    """
+    existing_autogeneratable_accents = set()
+    updated_autogenerayable_accents = set()
+
+    for accent_mapping in existing_language_accent_mapping.values():
+        for (
+            language_accent_code,
+            supports_autogeneration,
+        ) in accent_mapping.items():
+            if supports_autogeneration:
+                existing_autogeneratable_accents.add(language_accent_code)
+
+    for accent_mapping in updated_language_accent_mapping.values():
+        for (
+            language_accent_code,
+            supports_autogeneration,
+        ) in accent_mapping.items():
+            if supports_autogeneration:
+                updated_autogenerayable_accents.add(language_accent_code)
+
+    new_accents_set = (
+        updated_autogenerayable_accents - existing_autogeneratable_accents
+    )
+
+    if new_accents_set:
+        return new_accents_set.pop()
+    return None
 
 
 def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:

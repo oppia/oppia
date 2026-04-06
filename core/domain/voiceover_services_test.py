@@ -781,6 +781,61 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(autogeneratable_accents_for_hindi, [])
 
+    def test_get_new_auto_voiceover_accent_returns_new_enabled_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-IN': True},
+            'hi': {'hi-IN': False},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            existing_language_accent_mapping,
+            updated_language_accent_mapping,
+        )
+
+        self.assertEqual(new_accent_code, 'en-IN')
+
+    def test_get_new_auto_voiceover_accent_returns_enabled_existing_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': True},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            existing_language_accent_mapping,
+            updated_language_accent_mapping,
+        )
+
+        self.assertEqual(new_accent_code, 'hi-IN')
+
+    def test_get_new_auto_voiceover_accent_returns_none_when_no_new_enabled_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+        }
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-IN': False},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            existing_language_accent_mapping,
+            updated_language_accent_mapping,
+        )
+
+        self.assertIsNone(new_accent_code)
+
 
 class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
     """Unit tests to validate the language-accent information saved as
