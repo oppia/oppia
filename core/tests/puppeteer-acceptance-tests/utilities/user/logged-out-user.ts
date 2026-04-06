@@ -7116,13 +7116,14 @@ export class LoggedOutUser extends BaseUser {
       const options = await this.page.$$(unselectedFilterOptionsSelector);
       for (const option of options) {
         const text = await option.evaluate(el => el.textContent?.trim());
-        if (text === language) {
-          await this.clickOnElement(option);
-          break;
-        }
+        await this.clickOnElement(option);
+        break;
       }
     }
     showMessage(`Selected languages: ${languages.join(', ')}`);
+  }
+
+  /**
    * Navigates to the blog page via the navbar (About > Blog).
    */
   async navigateToBlogPageViaNavbar(): Promise<void> {
