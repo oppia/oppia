@@ -4593,33 +4593,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to navigate to the improvements tab.
-   */
-  async navigateToImprovementsTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      // Handle mobile navigation.
-      const element = await this.page.$(mobileNavbarOptions);
-      if (!element) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-      }
-      await this.page.waitForSelector(mobileNavbarDropdown, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
-      // Note: Mobile improvements tab button would go here if needed.
-      // For now, fall through to desktop logic.
-    }
-
-    // Desktop navigation.
-    await this.page.waitForSelector(improvementsTabButton, {
-      visible: true,
-    });
-    await this.clickOnElementWithSelector(improvementsTabButton);
-    await this.waitForPageToFullyLoad();
-  }
-
-  /**
    * Function to verify that the improvements tab is hidden.
    * @param visible - Expected visibility.
    */
