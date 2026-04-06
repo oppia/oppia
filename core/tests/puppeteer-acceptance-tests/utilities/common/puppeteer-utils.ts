@@ -647,7 +647,7 @@ export class BaseUser {
     elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    let element = await context.waitForSelector(selector, {timeout: 15000});
+    let element = await context.waitForSelector(selector, {timeout: 30000});
 
     // Get nth element if elementPlace is given.
     if (elementPlace) {
