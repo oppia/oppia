@@ -2720,3 +2720,65 @@ class StoryPublicationTimeliness:
         self.topic_name = topic_name
         self.overdue_chapters = overdue_chapters
         self.upcoming_chapters = upcoming_chapters
+
+
+class StoryProgress:
+    """Domain object for the progress a user has made within a story, including all
+    nodes which have been completed within the context of the story.
+    """
+
+    def __init__(
+        self, user_id: str, story_id: str, completed_node_ids: List[str]
+    ) -> None:
+        """Constructs a StoryProgress domain object.
+
+        Args:
+            user_id: str. The unique id of the user.
+            story_id: str. The unique id of the story.
+            completed_node_ids: list(str). The list of strings which
+                represent the ids of the completed nodes in the story.
+        """
+        self.user_id = user_id
+        self.story_id = story_id
+        self.completed_node_ids = completed_node_ids
+
+    def validate(self) -> None:
+        """Validates various properties of the StoryProgress object.
+        Raises:
+            ValidationError. One or more attributes of story are invalid.
+        """
+
+        if self.user_id is None:
+            raise utils.ValidationError('Expected \'user_id\' to not be None')
+        utils.require_valid_name(self.user_id, 'the user ID', allow_empty=False)
+
+        if self.story_id is None:
+            raise utils.ValidationError('Expected \'story_id\' to not be None')
+        utils.require_valid_name(
+            self.story_id, 'the story ID', allow_empty=False
+        )
+
+        if not isinstance(self.completed_node_ids, list):
+            raise utils.ValidationError(
+                'Expected \'completed_node_ids\' to be a list,'
+                'received %s' % self.completed_node_ids
+            )
+
+        seen_nodes = set()
+        for node in self.completed_node_ids:
+            if not isinstance(node, str):
+                raise utils.ValidationError(
+                    'Expected each node in \'completed_node_ids\' to be a string, received '
+                    '\'%s\'' % node
+                )
+            if not node:
+                raise utils.ValidationError(
+                    'Expected each node in \'completed_node_ids\' to be a non-empty string,'
+                    'received empty string'
+                )
+            if node in seen_nodes:
+                raise utils.ValidationError(
+                    'Duplicate node ID \'%s\' found in \'completed_node_ids\''
+                    % node
+                )
+            seen_nodes.add(node)
