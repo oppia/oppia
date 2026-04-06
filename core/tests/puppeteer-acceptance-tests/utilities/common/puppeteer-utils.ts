@@ -1877,10 +1877,10 @@ export class BaseUser {
         selector,
         parentElement
       );
-      await selectElement.click();
+      await this.clickOnElement(selectElement);
 
       // Select the option.
-      await this.page.waitForSelector('mat-option');
+      await this.page.waitForSelector('mat-option', {visible: true});
       const options = await this.page.$$('mat-option');
       const optionTexts: string[] = [];
 
@@ -1902,7 +1902,7 @@ export class BaseUser {
       }
 
       // Click on the option.
-      await optionElement.click();
+      await this.clickOnElement(optionElement);
 
       // Verify the value of the select is updated.
       await this.expectTextContentToBe(selector, value);
