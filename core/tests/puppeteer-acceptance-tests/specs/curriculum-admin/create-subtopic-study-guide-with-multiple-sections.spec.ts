@@ -47,9 +47,6 @@ describe('Curriculum Admin', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_restructured_study_guides'
     );
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_worked_examples_rte_component'
-    );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Addition and Subtraction', 'addsub');

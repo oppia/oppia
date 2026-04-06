@@ -43,7 +43,7 @@
     "en-SG": {"service": "Azure", "voice_code": "en-SG-LunaNeural"},
     "en-TZ": {"service": "Azure", "voice_code": "en-TZ-ImaniNeural"},
     "en-US": {
-        "service": "Azure", "voice_code": "en-US-JennyMultilingualNeural"
+        "service": "Azure", "voice_code": "en-US-AvaMultilingualNeural"
     },
     "en-ZA": {"service": "Azure", "voice_code": "en-ZA-LeahNeural"},
     "es-AR": {"service": "Azure", "voice_code": "es-AR-ElenaNeural"},
