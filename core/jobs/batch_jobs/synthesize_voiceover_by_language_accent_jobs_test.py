@@ -605,37 +605,3 @@ class VoiceoverSynthesisByAccentJobRunTests(
             ]
 
             self.assert_job_output_is(expected_output)
-
-
-class VoiceoverSynthesisByAccentAuditJobRunTests(
-    VoiceoverSynthesisByAccentBaseClass
-):
-    """Tests for VoiceoverSynthesisByAccentAuditJob."""
-
-    JOB_CLASS: Type[
-        synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentAuditJob
-    ] = (
-        synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentAuditJob
-    )
-
-    def test_should_regenerate_voiceover_successfully(self) -> None:
-        self._create_data_for_testing()
-        self._set_language_accent_code('en-US')
-
-        expected_output_1 = (
-            'Exploration ID: exploration_id_1.\n'
-            'EntityVoiceovers ID: exploration-exploration_id_1-2-en-US.\n'
-            'Total content IDs processed: 4. Total characters processed: 101.\n'
-        )
-
-        expected_output_2 = (
-            'Exploration ID: exploration_id_2.\n'
-            'EntityVoiceovers ID: exploration-exploration_id_2-2-en-US.\n'
-            'Total content IDs processed: 4. Total characters processed: 103.\n'
-        )
-
-        expected_output = [
-            job_run_result.JobRunResult(stdout=expected_output_1, stderr=''),
-            job_run_result.JobRunResult(stdout=expected_output_2, stderr=''),
-        ]
-        self.assert_job_output_is(expected_output)

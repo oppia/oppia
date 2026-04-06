@@ -22,6 +22,7 @@ from core import feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
+    beam_job_services,
     exp_fetchers,
     feature_flag_services,
     opportunity_services,
@@ -31,6 +32,7 @@ from core.domain import (
     voiceover_regeneration_services,
     voiceover_services,
 )
+from core.jobs.batch_jobs import synthesize_voiceover_by_language_accent_jobs
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -115,7 +117,19 @@ class VoiceoverLanguageCodesMappingHandler(
             'language_codes_mapping'
         ]
 
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            language_codes_mapping
+        )
+
+        if new_accent_code:
+            beam_job_services.run_beam_job(
+                job_class=(
+                    synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob
+                ),
+                parameterized_args={'language_accent_code': new_accent_code},
+            )
         voiceover_services.save_language_accent_support(language_codes_mapping)
+
         self.render_json(self.values)
 
 

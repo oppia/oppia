@@ -637,9 +637,3 @@ class VoiceoverSynthesisByAccentJob(base_jobs.JobBase):
         return status_strings | 'Format results' >> beam.Map(
             job_run_result.JobRunResult.as_stdout
         )
-
-
-class VoiceoverSynthesisByAccentAuditJob(VoiceoverSynthesisByAccentJob):
-    """Audit job for VoiceoverSynthesisByAccentJob."""
-
-    DATASTORE_UPDATES_ALLOWED = False

@@ -788,14 +788,16 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
             'en': {'en-US': True},
             'hi': {'hi-IN': False},
         }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
         updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
             'en': {'en-US': True, 'en-IN': True},
             'hi': {'hi-IN': False},
         }
 
         new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
-            existing_language_accent_mapping,
-            updated_language_accent_mapping,
+            updated_language_accent_mapping
         )
 
         self.assertEqual(new_accent_code, 'en-IN')
@@ -807,14 +809,16 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
             'en': {'en-US': True},
             'hi': {'hi-IN': False},
         }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
         updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
             'en': {'en-US': True},
             'hi': {'hi-IN': True},
         }
 
         new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
-            existing_language_accent_mapping,
-            updated_language_accent_mapping,
+            updated_language_accent_mapping
         )
 
         self.assertEqual(new_accent_code, 'hi-IN')
@@ -825,13 +829,15 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
             'en': {'en-US': True},
         }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
         updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
             'en': {'en-US': True, 'en-IN': False},
         }
 
         new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
-            existing_language_accent_mapping,
-            updated_language_accent_mapping,
+            updated_language_accent_mapping
         )
 
         self.assertIsNone(new_accent_code)

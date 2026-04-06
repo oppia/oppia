@@ -332,7 +332,6 @@ def does_job_requires_limiting_workers(job_name: str) -> bool:
         'VoiceoverSynthesisJob',
         'VoiceoverSynthesisAuditJob',
         'VoiceoverSynthesisByAccentJob',
-        'VoiceoverSynthesisByAccentAuditJob',
         # The below job is used in unit tests.
         'VoiceoverSynthesisForTestingJob',
     ]
