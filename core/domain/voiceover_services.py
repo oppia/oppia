@@ -38,7 +38,7 @@ from core.domain import (
 from core.platform import models
 from core.storage.voiceover import gae_models
 
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Optional, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -588,8 +588,8 @@ def get_new_auto_voiceover_accent(
         is not None
         else {}
     )
-    existing_autogeneratable_accents = set()
-    updated_autogenerayable_accents = set()
+    existing_autogeneratable_accents: Set[str] = set()
+    updated_autogenerayable_accents: Set[str] = set()
 
     for accent_mapping in existing_language_accent_mapping.values():
         for (
