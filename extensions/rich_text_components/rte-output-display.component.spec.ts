@@ -315,6 +315,25 @@ describe('RTE display component', () => {
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
+  it('should correctly wrap custom oppia tags inside span tag for highlighting', fakeAsync(() => {
+    let rteString =
+      '<p><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link></p>' +
+      '<p>Hello world. This is the second sentence.</p>';
+
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1"><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link></span></p>' +
+      '<p><span class="highlightBlock2">Hello world.</span><span> </span><span class="highlightBlock3">This is the second sentence.</span></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
   it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
     let rteString = '<p>Hi world! I am a content creator.</p>';
     let expectedOutputWrappedString =

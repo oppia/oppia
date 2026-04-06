@@ -256,6 +256,26 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
+        let costomNodeAsChildInParentNode = false;
+        for (let tempChildNode of updatedChildNodes) {
+          if (this.customOppiaTags.includes(tempChildNode.nodeName)) {
+            costomNodeAsChildInParentNode = true;
+            break;
+          }
+        }
+
+        if (costomNodeAsChildInParentNode) {
+          let nodeTemp = node.cloneNode();
+          let spanTagElement = document.createElement('span');
+          updatedChildNodes.forEach(child => spanTagElement.appendChild(child));
+          spanTagElement.classList.add(`highlightBlock${this.index}`);
+          this.highlightIdToSentenceText[`highlightBlock${this.index}`] =
+            this.getReadableTextFromNode(spanTagElement);
+          this.index++;
+          nodeTemp.appendChild(spanTagElement);
+          return nodeTemp;
+        }
+
         for (let tempChildNode of updatedChildNodes) {
           textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
         }
