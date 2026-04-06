@@ -910,10 +910,28 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`
       );
-      await this.clickOnElementWithSelector(closeSaveModalButton);
-      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
-        hidden: true,
-      });
+
+      let modalIsClosed = false;
+      for (let i = 0; i < 3; i++) {
+        await this.clickOnElementWithSelector(closeSaveModalButton);
+        try {
+          await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+            hidden: true,
+            timeout: 2000,
+          });
+          modalIsClosed = true;
+          break;
+        } catch (e) {
+          // Retry clicking if the modal is still open after 2 seconds.
+        }
+      }
+
+      if (!modalIsClosed) {
+        throw new Error(
+          'Action failed: oppia-topic-editor-save-modal failed to hide.'
+        );
+      }
+
       if (topicName) {
         await this.openTopicEditor(topicName);
       }
@@ -929,8 +947,27 @@ export class CurriculumAdmin extends TopicManager {
         `${closeSaveModalButton}:not([disabled])`,
         {visible: true}
       );
-      await this.clickOnElementWithSelector(closeSaveModalButton);
-      await this.page.waitForSelector(modalDiv, {hidden: true});
+
+      let modalIsClosed = false;
+      for (let i = 0; i < 3; i++) {
+        await this.clickOnElementWithSelector(closeSaveModalButton);
+        try {
+          await this.page.waitForSelector(modalDiv, {
+            hidden: true,
+            timeout: 2000,
+          });
+          modalIsClosed = true;
+          break;
+        } catch (e) {
+          // Retry clicking if the modal is still open after 2 seconds.
+        }
+      }
+
+      if (!modalIsClosed) {
+        throw new Error(
+          `Action failed: ${modalDiv} failed to hide within the allocated time.`
+        );
+      }
     }
   }
 
