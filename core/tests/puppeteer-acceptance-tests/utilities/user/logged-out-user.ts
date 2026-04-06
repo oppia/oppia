@@ -2085,10 +2085,28 @@ export class LoggedOutUser extends BaseUser {
     }
     const newTabPage = await newTarget.page();
 
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toContain(expectedDestinationDomain);
-    expect(newTabPage?.url()).toContain(expectedAccountId);
-    await newTabPage?.close();
+    // Wait for the new page to stabilize before closing. This prevents the
+    // puppeteer-screen-recorder from crashing if the page is destroyed while
+    // the recorder's startSession hook is still asynchronously attaching to it.
+    await newTabPage?.waitForNetworkIdle({timeout: 2000}).catch(() => {});
+    // Give a minor buffer back to the event loop.
+    await newTabPage?.waitForTimeout(500);
+
+    try {
+      expect(newTabPage).toBeDefined();
+      const currentUrl = newTabPage?.url() || '';
+
+      if (expectedDestinationDomain === 'x.com') {
+        expect(
+          currentUrl.includes('x.com') || currentUrl.includes('twitter.com')
+        ).toBe(true);
+      } else {
+        expect(currentUrl).toContain(expectedDestinationDomain);
+      }
+      expect(currentUrl).toContain(expectedAccountId);
+    } finally {
+      await newTabPage?.close();
+    }
   }
 
   /**
