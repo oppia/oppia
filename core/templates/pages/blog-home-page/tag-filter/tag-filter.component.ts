@@ -31,8 +31,9 @@ import {FormControl} from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
+  filter,
   map,
-  skip,
+  pairwise,
   startWith,
 } from 'rxjs/operators';
 import {Observable} from 'rxjs';
@@ -115,9 +116,8 @@ export class TagFilterComponent implements OnInit {
     this.tagFilter.valueChanges
       .pipe(
         startWith(this.tagFilter.value),
-        map(value => value?.trim() ?? ''),
-        distinctUntilChanged(),
-        skip(1)
+        map(value => value.trim() ?? ''),
+        distinctUntilChanged()
       )
       .subscribe(value => {
         this.tagFilterInputChange.emit(value);
