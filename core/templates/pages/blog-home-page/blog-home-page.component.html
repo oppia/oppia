@@ -129,6 +129,7 @@
           </h4>
           <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0" [(listOfDefaultTags)]="listOfDefaultTags"
           [(selectedTags)]="selectedTags" [smallScreenViewIsActive]="isSmallScreenViewActive()"
+          (tagFilterInputChange)="pendingTagFilterInput = $event"
           >
           </oppia-tag-filter>
           <button class="e2e-test-search-submit-btn btn primary-button" (click)="onSearchQueryChangeExec()">

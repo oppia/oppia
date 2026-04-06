@@ -110,4 +110,16 @@ describe('Tag Filter component', () => {
 
     expect(component.selectedTags).toEqual(['tag2', 'tag3']);
   });
+
+  it('should emit trimmed tag filter input value', () => {
+    spyOn(component.tagFilterInputChange, 'emit');
+    component.listOfDefaultTags = ['Community'];
+
+    component.ngOnInit();
+    component.tagFilter.setValue('  Community  ');
+
+    expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith(
+      'Community'
+    );
+  });
 });
