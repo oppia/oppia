@@ -589,7 +589,7 @@ def get_new_auto_voiceover_accent(
         else {}
     )
     existing_autogeneratable_accents: Set[str] = set()
-    updated_autogenerayable_accents: Set[str] = set()
+    updated_autogeneratable_accents: Set[str] = set()
 
     for accent_mapping in existing_language_accent_mapping.values():
         for (
@@ -605,10 +605,10 @@ def get_new_auto_voiceover_accent(
             supports_autogeneration,
         ) in accent_mapping.items():
             if supports_autogeneration:
-                updated_autogenerayable_accents.add(language_accent_code)
+                updated_autogeneratable_accents.add(language_accent_code)
 
     new_accents_set = (
-        updated_autogenerayable_accents - existing_autogeneratable_accents
+        updated_autogeneratable_accents - existing_autogeneratable_accents
     )
 
     if new_accents_set:
