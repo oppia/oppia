@@ -122,4 +122,29 @@ describe('Tag Filter component', () => {
       'Community'
     );
   });
+
+  it('should not emit when only whitespace input is typed', () => {
+    spyOn(component.tagFilterInputChange, 'emit');
+    component.listOfDefaultTags = ['Community'];
+
+    component.ngOnInit();
+    component.tagFilter.setValue(' ');
+    component.tagFilter.setValue('   ');
+
+    expect(component.tagFilterInputChange.emit).not.toHaveBeenCalled();
+  });
+
+  it('should emit empty value when whitespace clears meaningful input', () => {
+    spyOn(component.tagFilterInputChange, 'emit');
+    component.listOfDefaultTags = ['Community'];
+
+    component.ngOnInit();
+    component.tagFilter.setValue('Community');
+    component.tagFilter.setValue('   ');
+
+    expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith(
+      'Community'
+    );
+    expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith('');
+  });
 });

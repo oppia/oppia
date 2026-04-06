@@ -32,6 +32,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   map,
+  skip,
   startWith,
 } from 'rxjs/operators';
 import {Observable} from 'rxjs';
@@ -111,9 +112,16 @@ export class TagFilterComponent implements OnInit {
   ngOnInit(): void {
     this.refreshSearchDropDownTags();
 
-    this.tagFilter.valueChanges.subscribe(value => {
-      this.tagFilterInputChange.emit(value?.trim() ?? '');
-    });
+    this.tagFilter.valueChanges
+      .pipe(
+        startWith(this.tagFilter.value),
+        map(value => value?.trim() ?? ''),
+        distinctUntilChanged(),
+        skip(1)
+      )
+      .subscribe(value => {
+        this.tagFilterInputChange.emit(value);
+      });
 
     this.filteredTags
       .pipe(
