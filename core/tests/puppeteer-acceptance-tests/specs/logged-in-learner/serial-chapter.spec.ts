@@ -321,6 +321,7 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.navigateToLearnerDashboard();
 
+      await loggedInLearner1.disableLearnerDashboardNavTransitions();
       await loggedInLearner1.expectScreenshotToMatch(
         'Chap2InProgressSectionChap3InRecommendedSection',
         __dirname
