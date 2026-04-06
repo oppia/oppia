@@ -354,10 +354,6 @@ export class BlogHomePageComponent implements OnInit {
     this.loaderService.showLoadingScreen('Loading');
 
     const hasUnselectedTagInput = this.pendingTagFilterInput.trim().length > 0;
-
-    // The tags s from suggestions. If only raw
-    // free text is entered in the tags field, searching should not silently
-    // behave like an unfiltered search.
     if (
       hasUnselectedTagInput &&
       this.selectedTags.length === 0 &&
