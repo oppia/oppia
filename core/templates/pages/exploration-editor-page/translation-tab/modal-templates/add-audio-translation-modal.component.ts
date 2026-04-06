@@ -100,8 +100,9 @@ export class AddAudioTranslationModalComponent
             }
           },
           errorResponse => {
-            this.errorMessage =
-              errorResponse.error || this.ERROR_MESSAGE_BAD_FILE_UPLOAD;
+            this.errorMessage = this.extractUserFacingError(
+              errorResponse.error
+            );
             this.uploadedFile = null;
             this.saveButtonText = this.BUTTON_TEXT_SAVE;
             this.saveInProgress = false;
@@ -109,6 +110,24 @@ export class AddAudioTranslationModalComponent
         );
       }
     }
+  }
+
+  // Strips technical prefixes from backend schema validation errors
+  // so only human-readable messages are shown to the user.
+  private extractUserFacingError(rawError: string | undefined): string {
+    if (!rawError) {
+      return this.ERROR_MESSAGE_BAD_FILE_UPLOAD;
+    }
+
+    // Strip the "At '<url>' these errors are happening:\n" prefix.
+    const headerPattern = /^At '.*' these errors are happening:\n/;
+    let cleaned = rawError.replace(headerPattern, '');
+
+    // Strip "Schema validation for '<field>' failed: " from each line.
+    const schemaPattern = /Schema validation for '[^']+' failed: /g;
+    cleaned = cleaned.replace(schemaPattern, '');
+
+    return cleaned.trim() || this.ERROR_MESSAGE_BAD_FILE_UPLOAD;
   }
 
   ngOnInit(): void {
