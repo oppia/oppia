@@ -18,7 +18,7 @@
 
 import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {AppConstants} from 'app.constants'; // KEEP THIS IMPORT. AppConstants.OPPORTUNITIES_PAGE_SIZE is used in the tests.
+import {AppConstants} from 'app.constants';
 import {
   ContributionAndReviewService,
   FetchSuggestionsResponse,
@@ -131,12 +131,12 @@ describe('Contribution and review service', () => {
   describe('getUserCreatedQuestionSuggestionsAsync', () => {
     const defaultOpportunitiesPageSize = AppConstants.OPPORTUNITIES_PAGE_SIZE;
     afterAll(() => {
-      // Reset the OPPORTUNITIES_PAGE_SIZE to its original value for tests.
-      // We use Object.defineProperty because it's read-only.
-      Object.defineProperty(AppConstants, 'OPPORTUNITIES_PAGE_SIZE', {
-        value: defaultOpportunitiesPageSize,
-        writable: true,
-      });
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = defaultOpportunitiesPageSize;
     });
 
     it('should return available question suggestions and opportunity details', () => {
@@ -156,15 +156,21 @@ describe('Contribution and review service', () => {
     });
 
     it('should fetch one page ahead and cache extra results', fakeAsync(() => {
-      Object.defineProperty(AppConstants, 'OPPORTUNITIES_PAGE_SIZE', {
-        value: 2,
-        writable: true,
-      });
-      // Return more than a page's worth of results (3 results for a page size of 2).
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = 2;
+
+      // Return more than a page's worth of results (3 results for a page size
+      // of 2).
       fetchSuggestionsAsyncSpy.and.returnValue(
         Promise.resolve(multiplePageBackendFetchResponse)
       );
 
+      // Only the first 2 results should be returned and the extra result
+      // should be cached.
       cars
         .getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then(response => {
@@ -225,10 +231,12 @@ describe('Contribution and review service', () => {
     }));
 
     it('should reset offset', fakeAsync(() => {
-      Object.defineProperty(AppConstants, 'OPPORTUNITIES_PAGE_SIZE', {
-        value: 2,
-        writable: true,
-      });
+      // This throws "Cannot assign to 'OPPORTUNITIES_PAGE_SIZE' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'OPPORTUNITIES_PAGE_SIZE' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.OPPORTUNITIES_PAGE_SIZE = 2;
 
       // Return more than a page's worth of results (3 results for a page size
       // of 2).
@@ -282,6 +290,7 @@ describe('Contribution and review service', () => {
             from_date: '1 Nov 2022',
             to_date: '1 Dec 2022',
             contribution_hours: 1.0,
+            contribution_word_count: 300,
             team_lead: 'Test User',
             language: 'Hindi',
           },
@@ -306,6 +315,47 @@ describe('Contribution and review service', () => {
           expect(definedData.from_date).toEqual('1 Nov 2022');
           expect(definedData.to_date).toEqual('1 Dec 2022');
           expect(definedData.contribution_hours).toEqual(1.0);
+          expect(definedData.contribution_word_count).toEqual(300);
+          expect(definedData.team_lead).toEqual('Test User');
+          expect(definedData.language).toEqual('Hindi');
+        });
+
+      expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
+    });
+
+    it('should download the contributor certificate when contribution time is less than 1 hour', async () => {
+      downloadContributorCertificateAsyncSpy.and.returnValue(
+        Promise.resolve({
+          certificate_data: {
+            from_date: '1 Nov 2022',
+            to_date: '1 Dec 2022',
+            contribution_hours: 0.01,
+            contribution_word_count: 3,
+            team_lead: 'Test User',
+            language: 'Hindi',
+          },
+        })
+      );
+
+      await cars
+        .downloadContributorCertificateAsync(
+          'user',
+          'translate_content',
+          'hi',
+          '2022-01-01',
+          '2022-01-02'
+        )
+        .then(response => {
+          const data = response.certificate_data;
+
+          expect(data).not.toBeNull();
+
+          // Type assertion needed to satisfy type checker.
+          const definedData = data as ContributorCertificateInfo;
+          expect(definedData.from_date).toEqual('1 Nov 2022');
+          expect(definedData.to_date).toEqual('1 Dec 2022');
+          expect(definedData.contribution_hours).toEqual(0.01);
+          expect(definedData.contribution_word_count).toEqual(3);
           expect(definedData.team_lead).toEqual('Test User');
           expect(definedData.language).toEqual('Hindi');
         });
