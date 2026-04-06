@@ -22,7 +22,6 @@ import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import './save-progress-modal.component.css';
 
@@ -41,7 +40,6 @@ export class SaveProgressModalComponent {
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
     private ngbActiveModal: NgbActiveModal,
-    private siteAnalyticsService: SiteAnalyticsService,
     private signInEventService: SignInEventService
   ) {}
 

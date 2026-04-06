@@ -16,7 +16,6 @@
  * @fileoverview Component for login required message.
  */
 
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -35,7 +34,6 @@ export class LoginRequiredMessageComponent {
   OPPIA_AVATAR_IMAGE_URL!: string;
 
   constructor(
-    private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
     private readonly windowRef: WindowRef,

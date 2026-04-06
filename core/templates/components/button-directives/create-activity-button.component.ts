@@ -21,7 +21,6 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
@@ -40,7 +39,6 @@ export class CreateActivityButtonComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private siteAnalyticsService: SiteAnalyticsService,
     private urlService: UrlService,
     private explorationCreationService: ExplorationCreationService,
     private ngbModal: NgbModal,

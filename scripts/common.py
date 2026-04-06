@@ -29,8 +29,6 @@ import socket
 import ssl
 import subprocess
 import sys
-
-# Used for EAGAIN retries.
 import time
 from http import client
 from urllib import error as urlerror
@@ -839,7 +837,6 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
             return
         except OSError as e:
             if e.errno == errno.EAGAIN:
-                time.sleep(0.01)
                 continue
 
             raise
