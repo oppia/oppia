@@ -2749,19 +2749,16 @@ class StoryProgress:
         """
 
         if self.user_id is None:
-
             raise utils.ValidationError('Expected \'user_id\' to not be None')
         utils.require_valid_name(self.user_id, 'the user ID', allow_empty=False)
 
         if self.story_id is None:
-
             raise utils.ValidationError('Expected \'story_id\' to not be None')
         utils.require_valid_name(
             self.story_id, 'the story ID', allow_empty=False
         )
 
         if not isinstance(self.completed_node_ids, list):
-
             raise utils.ValidationError(
                 'Expected \'completed_node_ids\' to be a list,'
                 'received %s' % self.completed_node_ids
@@ -2769,20 +2766,17 @@ class StoryProgress:
 
         seen_nodes = set()
         for node in self.completed_node_ids:
-
             if not isinstance(node, str):
                 raise utils.ValidationError(
                     'Expected each node in \'completed_node_ids\' to be a string, received '
                     '\'%s\'' % node
                 )
             if not node:
-
                 raise utils.ValidationError(
                     'Expected each node in \'completed_node_ids\' to be a non-empty string,'
                     'received empty string'
                 )
             if node in seen_nodes:
-
                 raise utils.ValidationError(
                     'Duplicate node ID \'%s\' found in \'completed_node_ids\''
                     % node
