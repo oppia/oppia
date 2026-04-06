@@ -194,7 +194,6 @@ describe('ExplorationInitializationService', () => {
       {param_changes: [], states: {}},
       null,
       null,
-      null,
       [],
       [],
       callback
@@ -424,7 +423,6 @@ describe('ExplorationInitializationService', () => {
       }),
       1,
       null,
-      true,
       [],
       [],
       callback

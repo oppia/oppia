@@ -456,7 +456,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -486,7 +485,6 @@ describe('Exploration engine service ', () => {
           explorationDict,
           null,
           null,
-          true,
           ['en'],
           [],
           initSuccessCb
@@ -519,7 +517,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -543,7 +540,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         () => {}
@@ -561,7 +557,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       initSuccessCb
@@ -582,7 +577,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       initSuccessCb
@@ -685,7 +679,6 @@ describe('Exploration engine service ', () => {
           explorationDict,
           1,
           null,
-          true,
           ['en'],
           [],
           initSuccessCb
@@ -735,7 +728,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -788,7 +780,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         submitAnswerSuccessCb
@@ -851,7 +842,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         successCallback
@@ -905,7 +895,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         submitAnswerSuccessCb
@@ -972,7 +961,6 @@ describe('Exploration engine service ', () => {
           explorationDict,
           1,
           null,
-          true,
           ['en'],
           [],
           initSuccessCb
@@ -1020,7 +1008,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         submitAnswerSuccessCb
@@ -1104,7 +1091,6 @@ describe('Exploration engine service ', () => {
           explorationDict,
           1,
           null,
-          true,
           ['en'],
           [],
           initSuccessCb
@@ -1158,7 +1144,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -1210,7 +1195,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -1329,7 +1313,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -1379,7 +1362,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       () => {}
@@ -1416,7 +1398,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         2,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -1448,7 +1429,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -1503,7 +1483,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
@@ -1535,7 +1514,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       initSuccessCb
@@ -1579,7 +1557,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       initSuccessCb
@@ -1592,7 +1569,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       initSuccessCb
@@ -1633,7 +1609,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       initSuccessCb
@@ -1666,7 +1641,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       initSuccessCb
@@ -1688,7 +1662,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       () => {}
@@ -1716,7 +1689,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       () => {}
@@ -1746,7 +1718,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       () => {}
@@ -1767,7 +1738,6 @@ describe('Exploration engine service ', () => {
       explorationDict,
       1,
       null,
-      true,
       ['en'],
       [],
       () => {}
@@ -1796,7 +1766,6 @@ describe('Exploration engine service ', () => {
         explorationDict,
         1,
         null,
-        true,
         ['en'],
         [],
         initSuccessCb
