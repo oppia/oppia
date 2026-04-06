@@ -180,9 +180,13 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             'get_multi failed after %s retries'
             % cloud_datastore_services.MAX_GET_RETRIES
         )
+        import time
+
         with self.swap_to_always_raise(
             ndb, 'get_multi', Exception('Mock key error')
-        ), self.swap(logging, 'exception', _mock_logging_function):
+        ), self.swap(logging, 'exception', _mock_logging_function), self.swap(
+            time, 'sleep', lambda _: None
+        ):
             with self.assertRaisesRegex(Exception, error_msg):
                 cloud_datastore_services.get_multi(dummy_keys)
         self.assertEqual(

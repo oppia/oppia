@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import os
+from unittest import mock
 
 from core import feconf
 from core.platform.cache import redis_cache_services
@@ -34,6 +35,24 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertIsNotNone(memory_stats.total_allocated_in_bytes)
         self.assertIsNotNone(memory_stats.peak_memory_usage_in_bytes)
         self.assertIsNotNone(memory_stats.total_number_of_keys_stored)
+
+    @mock.patch.object(redis_cache_services, 'get_oppia_redis_client')
+    def test_memory_stats_fallback_on_exception(
+        self, mock_get_client: mock.MagicMock
+    ) -> None:
+        mock_client = mock.MagicMock()
+        mock_client.memory_stats.side_effect = Exception('Mock exception')
+        mock_client.info.return_value = {
+            'used_memory': 1024,
+            'used_memory_peak': 2048,
+        }
+        mock_client.dbsize.return_value = 5
+        mock_get_client.return_value = mock_client
+
+        memory_stats = redis_cache_services.get_memory_cache_stats()
+        self.assertEqual(memory_stats.total_allocated_in_bytes, 1024)
+        self.assertEqual(memory_stats.peak_memory_usage_in_bytes, 2048)
+        self.assertEqual(memory_stats.total_number_of_keys_stored, 5)
 
     def test_flush_cache_wipes_cache_clean(self) -> None:
         redis_cache_services.flush_caches()

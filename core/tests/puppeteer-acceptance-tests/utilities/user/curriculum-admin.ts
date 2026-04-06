@@ -2443,28 +2443,10 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
-
-    await this.page.waitForSelector(topicSelector, {visible: true});
-    const options = await this.page.$$(topicSelector);
-    let foundOption = false;
-
-    for (const option of options) {
-      const text = await option.evaluate(el => el.textContent?.trim());
-      if (text === topicName) {
-        await this.clickOnElement(option);
-        foundOption = true;
-        break;
-      }
-    }
-
-    if (!foundOption) {
-      throw new Error(`Could not find topic option matching: ${topicName}`);
-    }
-
+    await this.clickOnElementWithSelector(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
 
-    await this.waitForNetworkIdle(); // Wait for the topic to appear in the classroom before adding prerequisites.
-
+    // Wait for the topic to appear in the classroom before adding prerequisites.
     // Increased timeout to 60s because addTopicId makes an async API call that can take time.
     await this.page.waitForFunction(
       (
