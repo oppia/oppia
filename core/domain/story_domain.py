@@ -2744,6 +2744,7 @@ class StoryProgress:
 
     def validate(self) -> None:
         """Validates various properties of the StoryProgress object.
+
         Raises:
             ValidationError. One or more attributes are invalid.
         """
