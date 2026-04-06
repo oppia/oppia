@@ -69,6 +69,7 @@ def get_mypy_cmd(files: Optional[List[str]]) -> List[str]:
         excluded_files_regex = '|'.join(EXCLUDED_DIRECTORIES)
         cmd = [
             mypy_cmd,
+            '--warn-unreachable',
             '--exclude',
             excluded_files_regex,
             '--config-file',

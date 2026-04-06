@@ -45,19 +45,29 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
+        collection_models,
         datastore_services,
+        exp_models,
         story_models,
         topic_models,
         user_models,
     )
 
-(user_models, topic_models, story_models) = models.Registry.import_models(
-    [models.Names.USER, models.Names.TOPIC, models.Names.STORY]
+(user_models, topic_models, story_models, collection_models, exp_models) = (
+    models.Registry.import_models(
+        [
+            models.Names.USER,
+            models.Names.TOPIC,
+            models.Names.STORY,
+            models.Names.COLLECTION,
+            models.Names.EXPLORATION,
+        ]
+    )
 )
 datastore_services = models.Registry.import_datastore_services()
 
@@ -214,16 +224,22 @@ def _save_completed_activities(
         'learnt_topic_ids': activities_completed.learnt_topic_ids,
     }
 
-    completed_activities_model = user_models.CompletedActivitiesModel.get_by_id(
-        activities_completed.id
+    completed_activities_model = cast(
+        Optional[user_models.CompletedActivitiesModel],
+        user_models.CompletedActivitiesModel.get_by_id(activities_completed.id),
     )
     if completed_activities_model is not None:
         completed_activities_model.populate(**activities_completed_dict)
         completed_activities_model.update_timestamps()
         completed_activities_model.put()
     else:
-        activities_completed_dict['id'] = activities_completed.id
-        user_models.CompletedActivitiesModel(**activities_completed_dict).put()
+        user_models.CompletedActivitiesModel(
+            id=activities_completed.id,
+            exploration_ids=activities_completed.exploration_ids,
+            collection_ids=activities_completed.collection_ids,
+            story_ids=activities_completed.story_ids,
+            learnt_topic_ids=activities_completed.learnt_topic_ids,
+        ).put()
 
 
 def _save_incomplete_activities(
@@ -2084,14 +2100,13 @@ def get_learner_dashboard_activities(
     )
 
     # If completed model is present.
-    if learner_progress_models[0][0]:
-        # Here assert is used to narrow down the type from Model to
-        # CompletedActivitiesModel.
-        assert isinstance(
-            learner_progress_models[0][0], user_models.CompletedActivitiesModel
-        )
+    completed_activities_model = cast(
+        Optional[user_models.CompletedActivitiesModel],
+        learner_progress_models[0][0],
+    )
+    if completed_activities_model is not None:
         activities_completed = _get_completed_activities_from_model(
-            learner_progress_models[0][0]
+            completed_activities_model
         )
         completed_exploration_ids: List[str] = (
             activities_completed.exploration_ids
@@ -2108,14 +2123,13 @@ def get_learner_dashboard_activities(
         learnt_topic_ids = []
 
     # If incomplete model is present.
-    if learner_progress_models[1][0]:
-        # Here assert is used to narrow down the type from Model to
-        # IncompleteActivitiesModel.
-        assert isinstance(
-            learner_progress_models[1][0], user_models.IncompleteActivitiesModel
-        )
+    incomplete_activities_model = cast(
+        Optional[user_models.IncompleteActivitiesModel],
+        learner_progress_models[1][0],
+    )
+    if incomplete_activities_model is not None:
         incomplete_activities = _get_incomplete_activities_from_model(
-            learner_progress_models[1][0]
+            incomplete_activities_model
         )
         incomplete_exploration_ids: List[str] = (
             incomplete_activities.exploration_ids
@@ -2132,15 +2146,14 @@ def get_learner_dashboard_activities(
         partially_learnt_topic_ids = []
 
     # If learner playlist model is present.
-    if learner_progress_models[2][0]:
-        # Here assert is used to narrow down the type from Model to
-        # LearnerPlaylistModel.
-        assert isinstance(
-            learner_progress_models[2][0], user_models.LearnerPlaylistModel
-        )
+    learner_playlist_model = cast(
+        Optional[user_models.LearnerPlaylistModel],
+        learner_progress_models[2][0],
+    )
+    if learner_playlist_model is not None:
         learner_playlist = (
             learner_playlist_services.get_learner_playlist_from_model(
-                learner_progress_models[2][0]
+                learner_playlist_model
             )
         )
         exploration_playlist_ids: List[str] = learner_playlist.exploration_ids
@@ -2150,14 +2163,12 @@ def get_learner_dashboard_activities(
         collection_playlist_ids = []
 
     # If learner goals model is present.
-    if learner_progress_models[3][0]:
-        # Here assert is used to narrow down the type from Model to
-        # LearnerGoalsModel.
-        assert isinstance(
-            learner_progress_models[3][0], user_models.LearnerGoalsModel
-        )
+    learner_goals_model = cast(
+        Optional[user_models.LearnerGoalsModel], learner_progress_models[3][0]
+    )
+    if learner_goals_model is not None:
         learner_goals = learner_goals_services.get_learner_goals_from_model(
-            learner_progress_models[3][0]
+            learner_goals_model
         )
         topic_ids_to_learn: List[str] = learner_goals.topic_ids_to_learn
     else:
@@ -2233,35 +2244,39 @@ def get_topics_and_stories_progress(
             + untracked_topic_ids
         )
     )
-    activity_models = (
+    activity_models = cast(
+        Tuple[
+            List[Optional[topic_models.TopicSummaryModel]],
+            List[Optional[story_models.StorySummaryModel]],
+        ],
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('TopicSummaryModel', unique_topic_ids),
                 ('StorySummaryModel', completed_story_ids),
             ]
-        )
+        ),
     )
 
     topic_id_to_model_dict: Dict[str, topic_domain.TopicSummary] = {}
-    for model in activity_models[0]:
-        if model is not None:
-            # Here assert is used to narrow down the type of modal from Model
-            # to TopicSummaryModel.
-            assert isinstance(model, topic_models.TopicSummaryModel)
-            topic_id_to_model_dict[model.id] = (
-                topic_fetchers.get_topic_summary_from_model(model)
+    for topic_summary_model in activity_models[0]:
+        if topic_summary_model is not None:
+            assert isinstance(
+                topic_summary_model, topic_models.TopicSummaryModel
+            )
+            topic_id_to_model_dict[topic_summary_model.id] = (
+                topic_fetchers.get_topic_summary_from_model(topic_summary_model)
             )
 
     completed_story_models = activity_models[1]
 
     completed_story_summaries: List[Optional[story_domain.StorySummary]] = []
-    for model in completed_story_models:
-        if model is not None:
-            # Here assert is used to narrow down the type of modal from Model
-            # to StorySummaryModel.
-            assert isinstance(model, story_models.StorySummaryModel)
+    for story_summary_model in completed_story_models:
+        if story_summary_model is not None:
+            story_model = cast(
+                story_models.StorySummaryModel, story_summary_model
+            )
             completed_story_summaries.append(
-                story_fetchers.get_story_summary_from_model(model)
+                story_fetchers.get_story_summary_from_model(story_model)
             )
         else:
             completed_story_summaries.append(None)
@@ -2441,19 +2456,22 @@ def get_collection_progress(
             + collection_playlist_ids
         )
     )
-    activity_models = (
+    activity_models = cast(
+        Tuple[List[Optional[collection_models.CollectionSummaryModel]],],
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [('CollectionSummaryModel', unique_collection_ids)]
-        )
+        ),
     )
 
     collection_id_to_model_dict: Dict[
         str, collection_domain.CollectionSummary
     ] = {}
-    for model in activity_models[0]:
-        if model is not None:
-            collection_id_to_model_dict[model.id] = (
-                collection_services.get_collection_summary_from_model(model)
+    for collection_summary_model in activity_models[0]:
+        if collection_summary_model is not None:
+            collection_id_to_model_dict[collection_summary_model.id] = (
+                collection_services.get_collection_summary_from_model(
+                    collection_summary_model
+                )
             )
 
     incomplete_collection_summaries = [
@@ -2584,17 +2602,20 @@ def get_exploration_progress(
             + exploration_playlist_ids
         )
     )
-    activity_models = (
+    activity_models = cast(
+        Tuple[List[Optional[exp_models.ExpSummaryModel]],],
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [('ExpSummaryModel', unique_exploration_ids)]
-        )
+        ),
     )
 
     exploration_id_to_model_dict: Dict[str, exp_domain.ExplorationSummary] = {}
-    for model in activity_models[0]:
-        if model is not None:
-            exploration_id_to_model_dict[model.id] = (
-                exp_fetchers.get_exploration_summary_from_model(model)
+    for exploration_summary_model in activity_models[0]:
+        if exploration_summary_model is not None:
+            exploration_id_to_model_dict[exploration_summary_model.id] = (
+                exp_fetchers.get_exploration_summary_from_model(
+                    exploration_summary_model
+                )
             )
 
     incomplete_exp_summaries = [

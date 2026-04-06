@@ -3223,14 +3223,16 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    translation_html = cast(
+        Union[str, List[str]], suggestion.change_cmd.translation_html
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
@@ -3399,14 +3401,16 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    translation_html = cast(
+        Union[str, List[str]], suggestion.change_cmd.translation_html
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
 
     suggestion_is_accepted = (
@@ -3562,14 +3566,16 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    if isinstance(suggestion.change_cmd.translation_html, list):
-        for content in suggestion.change_cmd.translation_html:
+    translation_html = cast(
+        Union[str, List[str]], suggestion.change_cmd.translation_html
+    )
+
+    if isinstance(translation_html, list):
+        for content in translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
-        content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change_cmd.translation_html
-        )
+        content_plain_text = html_cleaner.strip_html_tags(translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
@@ -3731,8 +3737,13 @@ def update_question_contribution_stats_at_submission(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_submitter_total_stat_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
-            suggestion.author_id
+        question_submitter_total_stat_model = cast(
+            Optional[
+                suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            ],
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
+                suggestion.author_id
+            ),
         )
 
         if question_submitter_total_stat_model is None:
@@ -3845,8 +3856,13 @@ def update_question_contribution_stats_at_review(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_submitter_total_stat_model = suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
-            suggestion.author_id
+        question_submitter_total_stat_model = cast(
+            Optional[
+                suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            ],
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_by_id(
+                suggestion.author_id
+            ),
         )
 
         if question_submitter_total_stat_model is None:
@@ -3954,8 +3970,13 @@ def update_question_review_stats(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        question_reviewer_total_stat_model = suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
-            suggestion.final_reviewer_id
+        question_reviewer_total_stat_model = cast(
+            Optional[
+                suggestion_models.QuestionReviewerTotalContributionStatsModel
+            ],
+            suggestion_models.QuestionReviewerTotalContributionStatsModel.get_by_id(
+                suggestion.final_reviewer_id
+            ),
         )
 
         if question_reviewer_total_stat_model is None:

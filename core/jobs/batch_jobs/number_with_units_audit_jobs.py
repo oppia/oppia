@@ -22,7 +22,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable
+from typing import Iterable, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -111,23 +111,32 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
         if interaction_dict.get('id') != 'NumberWithUnits':
             return
 
-        answer_groups = interaction_dict.get('answer_groups', [])
+        answer_groups: object = interaction_dict.get('answer_groups', [])
         if not isinstance(answer_groups, list):
             return
 
         for answer_group in answer_groups:
+            answer_group = cast(object, answer_group)
             if not isinstance(answer_group, dict):
                 continue
-            for rule_spec in answer_group.get('rule_specs', []):
+            rule_specs: object = answer_group.get('rule_specs', [])
+            if not isinstance(rule_specs, list):
+                continue
+            for rule_spec in rule_specs:
+                rule_spec = cast(object, rule_spec)
                 if not isinstance(rule_spec, dict):
                     continue
-                inputs = rule_spec.get('inputs', {})
+                inputs: object = rule_spec.get('inputs', {})
                 if not isinstance(inputs, dict):
                     continue
-                number_with_units = inputs.get('f')
+                number_with_units: object = inputs.get('f')
                 if not isinstance(number_with_units, dict):
                     continue
-                for unit_dict in number_with_units.get('units', []):
+                units: object = number_with_units.get('units', [])
+                if not isinstance(units, list):
+                    continue
+                for unit_dict in units:
+                    unit_dict = cast(object, unit_dict)
                     if not isinstance(unit_dict, dict):
                         continue
                     unit_name = unit_dict.get('unit')

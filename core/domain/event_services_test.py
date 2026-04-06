@@ -36,6 +36,8 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
+from typing import cast
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
@@ -87,10 +89,10 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.ExplorationActualStartEventLogEntryModel,
+            all_models.get(),
+        )
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
         self.assertEqual(model.session_id, 'session_id')
@@ -110,10 +112,9 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.SolutionHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.SolutionHitEventLogEntryModel, all_models.get()
+        )
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
         self.assertEqual(model.session_id, 'session_id')
@@ -135,10 +136,9 @@ class StartExplorationEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StartExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.StartExplorationEventLogEntryModel, all_models.get()
+        )
         self.assertEqual(model.event_type, feconf.EVENT_TYPE_START_EXPLORATION)
         self.assertEqual(model.exploration_id, 'exp_id')
         self.assertEqual(model.exploration_version, 1)
@@ -172,10 +172,10 @@ class MaybeLeaveExplorationEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel,
+            all_models.get(),
+        )
         self.assertEqual(
             model.event_type, feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
         )
@@ -212,10 +212,10 @@ class CompleteExplorationEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.CompleteExplorationEventLogEntryModel,
+            all_models.get(),
+        )
         self.assertEqual(
             model.event_type, feconf.EVENT_TYPE_COMPLETE_EXPLORATION
         )
@@ -242,10 +242,9 @@ class RateExplorationEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.RateExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.RateExplorationEventLogEntryModel, all_models.get()
+        )
         self.assertEqual(model.event_type, feconf.EVENT_TYPE_RATE_EXPLORATION)
         self.assertEqual(model.exploration_id, 'exp_id')
         self.assertEqual(model.rating, 3)
@@ -270,10 +269,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StateHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(stats_models.StateHitEventLogEntryModel, all_models.get())
         self.assertEqual(model.exploration_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
         self.assertEqual(model.session_id, 'session_id')
@@ -295,10 +291,9 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StateCompleteEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.StateCompleteEventLogEntryModel, all_models.get()
+        )
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
         self.assertEqual(model.session_id, 'session_id')
@@ -323,10 +318,10 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel,
+            all_models.get(),
+        )
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
         self.assertEqual(model.state_name, 'state_name')
@@ -455,9 +450,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
 
         all_models = stats_models.ExplorationStatsModel.get_all()
         self.assertEqual(all_models.count(), 1)
-        model = all_models.get()
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(stats_models.ExplorationStatsModel, all_models.get())
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
 
@@ -537,10 +530,9 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.AnswerSubmittedEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
+        model = cast(
+            stats_models.AnswerSubmittedEventLogEntryModel, all_models.get()
+        )
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
 

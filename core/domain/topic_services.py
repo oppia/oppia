@@ -1035,25 +1035,25 @@ def apply_change_list(
                 change.cmd
                 == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY
             ):
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(change.subtopic_id, int)
+                # Here we use cast because BaseChange.__getattr__
+                # returns str, but subtopic_id is actually an int at
+                # runtime for subtopic page change commands.
+                subtopic_id = cast(int, change.subtopic_id)
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, change.subtopic_id
+                        topic_id, subtopic_id
                     )
                 )
                 study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, change.subtopic_id
+                        topic_id, subtopic_id
                     )
                 )
                 if (modified_subtopic_pages[subtopic_page_id] is None) or (
-                    change.subtopic_id in deleted_subtopic_ids
+                    subtopic_id in deleted_subtopic_ids
                 ):
                     raise Exception(
-                        'The subtopic with id %s doesn\'t exist'
-                        % (change.subtopic_id)
+                        'The subtopic with id %s doesn\'t exist' % (subtopic_id)
                     )
 
                 if (
@@ -1089,11 +1089,9 @@ def apply_change_list(
                                 study_guide_id
                             ].update_section_content
                         )(
-                            (
-                                update_study_guide_sections_content_cmd.new_value.get(
-                                    'html'
-                                )
-                            ),
+                            update_study_guide_sections_content_cmd.new_value[
+                                'html'
+                            ],
                             'section_content_1',
                         )
 
@@ -2488,13 +2486,14 @@ def populate_topic_model_fields(
 
 
 def populate_topic_summary_model_fields(
-    topic_summary_model: topic_models.TopicSummaryModel,
+    topic_summary_model: Optional[topic_models.TopicSummaryModel],
     topic_summary: topic_domain.TopicSummary,
 ) -> topic_models.TopicSummaryModel:
     """Populate topic summary model with the data from topic summary object.
 
     Args:
-        topic_summary_model: TopicSummaryModel. The model to populate.
+        topic_summary_model: TopicSummaryModel|None. The model to populate,
+            or None if a new model needs to be created.
         topic_summary: TopicSummary. The topic summary domain object which
             should be used to populate the model.
 
@@ -2683,10 +2682,18 @@ def get_all_published_story_exploration_ids(
     mappings = []
     ids_of_topic_summaries_without_mapping: List[str] = []
     for summary in fetched_topic_summaries:
-        if summary.published_story_exploration_mapping is None:
+        # Here we use cast because
+        # published_story_exploration_mapping is typed as
+        # Dict[str, List[str]], but at runtime older records may
+        # have None before the field is backfilled.
+        mapping_value = cast(
+            Optional[Dict[str, List[str]]],
+            summary.published_story_exploration_mapping,
+        )
+        if mapping_value is None:
             ids_of_topic_summaries_without_mapping.append(summary.id)
         else:
-            mappings.append(summary.published_story_exploration_mapping)
+            mappings.append(mapping_value)
     if len(ids_of_topic_summaries_without_mapping) > 0:
         topics_without_mapping = topic_fetchers.get_topics_by_ids(
             ids_of_topic_summaries_without_mapping

@@ -178,21 +178,20 @@ class DraftUpgradeUtil:
                 if 'choices' in new_value.keys():
                     # Here we use cast because we are narrowing down the type
                     # from various customization args value types to List[
-                    # SubtitledHtmlDict] type, and this is done because here
-                    # we are accessing 'choices' keys over customization_args
-                    # and every customization arg that has a 'choices' key will
-                    # contain values of type List[SubtitledHtmlDict].
+                    # Union[state_domain.SubtitledHtmlDict, str]] type, and this is
+                    # done because here we are accessing 'choices' keys over
+                    # customization_args and every customization arg that has a
+                    # 'choices' key will contain values of type
+                    # List[Union[state_domain.SubtitledHtmlDict, str]].
                     subtitled_html_new_value_dicts = cast(
-                        List[state_domain.SubtitledHtmlDict],
+                        List[Union[state_domain.SubtitledHtmlDict, str]],
                         new_value['choices']['value'],
                     )
                     for value_index, value in enumerate(
                         subtitled_html_new_value_dicts
                     ):
                         if isinstance(value, dict) and 'html' in value:
-                            subtitled_html_new_value_dicts[value_index][
-                                'html'
-                            ] = conversion_fn(value['html'])
+                            value['html'] = conversion_fn(value['html'])
                         elif isinstance(value, str):
                             subtitled_html_new_value_dicts[value_index] = (
                                 conversion_fn(value)
@@ -1071,15 +1070,21 @@ class DraftUpgradeUtil:
                 change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ID
                 and (change.new_value == 'MathExpressionInput')
             )
-            answer_groups_change_condition = (
+            answer_groups_change_condition = False
+
+            if (
                 change.property_name
                 == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                and isinstance(change.new_value, list)
-                and (
-                    change.new_value[0]['rule_specs'][0]['rule_type']
-                    == ('IsMathematicallyEquivalentTo')
+            ):
+                new_value_list = cast(
+                    List[state_domain.AnswerGroupDict], change.new_value
                 )
-            )
+
+                if new_value_list and (
+                    new_value_list[0]['rule_specs'][0]['rule_type']
+                    == 'IsMathematicallyEquivalentTo'
+                ):
+                    answer_groups_change_condition = True
             if interaction_id_change_condition or (
                 answer_groups_change_condition
             ):

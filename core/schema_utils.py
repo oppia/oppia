@@ -200,10 +200,6 @@ def normalize_against_schema(
             raise Exception(
                 'Could not convert %s to int: %s' % (type(obj).__name__, obj)
             ) from e
-        assert isinstance(obj, numbers.Integral), (
-            'Expected int, received %s' % obj
-        )
-        assert isinstance(obj, int), 'Expected int, received %s' % obj
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
         # TODO(#14028): Use just one type.
