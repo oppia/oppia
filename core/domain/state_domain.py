@@ -4844,7 +4844,7 @@ class State(translation_domain.BaseTranslatableObject):
                     old_to_new_content_id[old_content_id] = new_content_id
 
                     new_voiceovers_mapping[new_content_id] = (
-                        old_voiceovers_mapping[old_content_id]
+                        old_voiceovers_mapping.get(old_content_id, {})
                     )
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.

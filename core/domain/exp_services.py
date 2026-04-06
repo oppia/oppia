@@ -1008,6 +1008,16 @@ def apply_change_list(
                         edit_init_state_name_cmd.new_value
                     )
 
+                elif change.property_name == 'edits_allowed':
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyEditsAllowedCmd.
+                    edit_edits_allowed_cmd = cast(
+                        exp_domain.EditExplorationPropertyEditsAllowedCmd,
+                        change,
+                    )
+                    exploration.edits_allowed = edit_edits_allowed_cmd.new_value
+
                 elif change.property_name == 'next_content_id_index':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type

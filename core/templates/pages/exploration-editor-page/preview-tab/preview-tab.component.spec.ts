@@ -363,7 +363,7 @@ describe('Preview Tab Component', () => {
     explorationInitStateNameService.savedMemento = 'state';
     spyOn(numberAttemptsService, 'reset').and.stub();
     spyOn(explorationEngineService, 'init').and.callFake(
-      (value, value1, value2, value3, value4, value5, callback) => {
+      (value, value1, value2, value3, value4, callback) => {
         // This throws "Type 'null' is not assignable to type 'State'."
         // We need to suppress this error because of the need to test
         // validations.

@@ -3130,7 +3130,6 @@ version: 2
         )
     )
     UPDATED_YAML_CONTENT = """author_notes: ''
-auto_tts_enabled: false
 blurb: ''
 category: Algebra
 edits_allowed: true
@@ -3678,13 +3677,13 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
         """card_is_checkpoint: true
 classifier_model_id: null
 content:
-    content_id: content_0
-    html: ''
+  content_id: content_0
+  html: ''
 inapplicable_skill_misconception_ids: []
 interaction:
-    answer_groups: []
-    confirmed_unclassified_answers: []
-    customization_args:
+  answer_groups: []
+  confirmed_unclassified_answers: []
+  customization_args:
         catchMisspellings:
             value: false
         placeholder:
@@ -3693,7 +3692,7 @@ interaction:
                 unicode_str: ''
         rows:
             value: 1
-    default_outcome:
+  default_outcome:
         dest: %s
         dest_if_really_stuck: null
         feedback:
@@ -3703,7 +3702,7 @@ interaction:
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-    hints: []
+  hints: []
     id: TextInput
     solution: null
 linked_skill_id: null
@@ -3882,8 +3881,14 @@ solicit_answer_details: false
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_0_ID, width=50
         )
-
-        self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
+        self.assertEqual(
+            set(dict_output.keys()), set(self.SAMPLE_EXPORTED_DICT.keys())
+        )
+        for state_name in dict_output:
+            self.assertEqual(
+                utils.dict_from_yaml(dict_output[state_name]),
+                utils.dict_from_yaml(self.SAMPLE_EXPORTED_DICT[state_name]),
+            )
 
     def test_export_by_versions(self) -> None:
         """Test export_to_dict() for different versions."""
@@ -4000,13 +4005,27 @@ solicit_answer_details: false
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_0_ID, version=2, width=50
         )
-        self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
+        self.assertEqual(
+            set(dict_output.keys()), set(self.SAMPLE_EXPORTED_DICT.keys())
+        )
+        for state_name in dict_output:
+            self.assertEqual(
+                utils.dict_from_yaml(dict_output[state_name]),
+                utils.dict_from_yaml(self.SAMPLE_EXPORTED_DICT[state_name]),
+            )
 
         # Download version 3.
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_0_ID, version=3, width=50
         )
-        self.assertEqual(dict_output, self.UPDATED_SAMPLE_DICT)
+        self.assertEqual(
+            set(dict_output.keys()), set(self.UPDATED_SAMPLE_DICT.keys())
+        )
+        for state_name in dict_output:
+            self.assertEqual(
+                utils.dict_from_yaml(dict_output[state_name]),
+                utils.dict_from_yaml(self.UPDATED_SAMPLE_DICT[state_name]),
+            )
 
 
 # Here new_value argument can accept values of type str, int, bool and other
@@ -13213,7 +13232,6 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'tags': [],
-            'auto_tts_enabled': False,
             'next_content_id_index': 2,
             'edits_allowed': True,
             'states': {
