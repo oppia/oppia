@@ -87,7 +87,7 @@ class MockCheckpointCelebrationUtilityService {
   }
 }
 class MockPlayerPositionService {
-  onActiveCardChanged = new EventEmitter<void>();
+  onActiveCardChanged = new EventEmitter<string | undefined>();
 
   private displayedCardIndex: number = 0;
 
@@ -102,7 +102,7 @@ class MockPlayerPositionService {
 }
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string | undefined>();
 }
 
 class MockWindowRef {

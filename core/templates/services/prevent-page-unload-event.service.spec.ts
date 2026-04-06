@@ -23,7 +23,7 @@ import {EventEmitter} from '@angular/core';
 import {SignInEventService} from 'services/sign-in-event.service';
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string | undefined>();
 }
 
 describe('Prevent page unload event service', function () {

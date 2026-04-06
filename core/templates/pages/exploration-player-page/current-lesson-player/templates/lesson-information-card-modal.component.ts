@@ -281,7 +281,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
-      this.signInEventService.onUserSignIn.emit();
+      this.signInEventService.onUserSignIn.emit('lessonInformationCardModal');
       // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
       // rather than manually being triggered by buttons.
       this.siteAnalyticsService.registerStartLoginEvent(

@@ -66,7 +66,7 @@ describe('Login required message component', () => {
         {
           provide: SignInEventService,
           useValue: {
-            onUserSignIn: new EventEmitter<void>(),
+            onUserSignIn: new EventEmitter<string | undefined>(),
           },
         },
         {

@@ -63,7 +63,7 @@ class MockWindowRef {
 }
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string | undefined>();
 }
 
 describe('SaveProgressModalComponent', () => {

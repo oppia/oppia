@@ -105,7 +105,7 @@ class MockWindowRef {
 }
 
 class MockAuthService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string | undefined>();
 }
 
 describe('New Conversation skin component', () => {

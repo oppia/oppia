@@ -95,7 +95,7 @@ class MockWindowRef {
 }
 
 class MockSignInEventService {
-  onUserSignIn = new EventEmitter<void>();
+  onUserSignIn = new EventEmitter<string | undefined>();
 }
 
 describe('TopNavigationBarComponent', () => {
@@ -154,7 +154,7 @@ describe('TopNavigationBarComponent', () => {
     number_of_unread_threads: 10,
   };
 
-  let mockResizeEmitter: EventEmitter<void>;
+  let mockResizeEmitter: EventEmitter<string | undefined>;
 
   beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
