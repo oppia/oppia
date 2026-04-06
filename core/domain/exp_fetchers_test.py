@@ -644,7 +644,10 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
 
+    OLD_EXP_ID: Final = 'exp_id0'
     NEW_EXP_ID: Final = 'exp_id1'
+    UPGRADED_EXP_YAML: str
+    albert_id: str
     STATES_AT_V41 = {
         'Introduction': {
             'classifier_model_id': None,
@@ -717,6 +720,67 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
             'written_translations': {'translations_mapping': {'content': {}}},
         },
     }
+
+    ALBERT_EMAIL: Final = 'albert@example.com'
+    ALBERT_NAME: Final = 'albert'
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+        # Create exploration that uses an old states schema version and ensure
+        # it is properly converted.
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
+        )
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
+        )
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.OLD_EXP_ID,
+                title='Old Title',
+                category='Art',
+                objective='Exp objective...',
+            )
+            exploration_model = exp_models.ExplorationModel(id=self.OLD_EXP_ID)
+            exp_services.populate_exp_model_fields(
+                exploration_model, exploration
+            )
+
+        exploration_model.states = self.STATES_AT_V41
+        rights_manager.create_new_exploration_rights(
+            exploration_model.id, self.albert_id
+        )
+        exploration_model.commit(self.albert_id, 'Created new exploration.', [])
+        exp_services.regenerate_exploration_summary_with_new_contributor(
+            self.OLD_EXP_ID, self.albert_id
+        )
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration_model.id, exploration_model.version
+        )
+
+        # Create standard exploration that should not be converted.
+        new_exp = self.save_new_valid_exploration(
+            self.NEW_EXP_ID, self.albert_id
+        )
+        self._up_to_date_yaml = new_exp.to_yaml()
+
+        # Clear the cache to prevent fetches of old data under the previous
+        # state schema version scheme.
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION,
+            None,
+            [self.OLD_EXP_ID, self.NEW_EXP_ID],
+        )
+
+        old_exp_yaml = exp_fetchers.get_exploration_by_id(
+            self.OLD_EXP_ID
+        ).to_yaml()
+        self.UPGRADED_EXP_YAML = old_exp_yaml.rsplit('version: 1\n', 1)[0]
 
     def test_migration_with_invalid_state_schema(self) -> None:
         self.save_new_valid_exploration('fake_eid', self.albert_id)
