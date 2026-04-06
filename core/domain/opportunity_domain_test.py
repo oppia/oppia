@@ -57,6 +57,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                         'language_codes_needing_voice_artists': ['en'],
                         'language_codes_with_assigned_voice_artists': ['hi'],
                         'translation_in_review_counts': {},
+                        'reviewer_only_content_count': 0,
                         'is_pinned': False,
                     }
                 )
@@ -84,6 +85,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'language_codes_needing_voice_artists': ['en'],
             'language_codes_with_assigned_voice_artists': [],
             'translation_in_review_counts': {},
+            'reviewer_only_content_count': 0,
             'is_pinned': False,
         }
 
@@ -105,6 +107,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'content_count': 5,
                 'translation_counts': {},
                 'translation_in_review_counts': {},
+                'reviewer_only_content_count': 0,
                 'is_pinned': False,
             },
         )
