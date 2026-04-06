@@ -34,15 +34,18 @@ if MYPY:  # pragma: no cover
 email_services = models.Registry.import_email_services()
 
 
-def _is_email_valid(email_address: str) -> bool:
+def _is_email_valid(email_address: Optional[str]) -> bool:
     """Determines whether an email address is valid.
 
     Args:
-        email_address: str. Email address to check.
+        email_address: str|None. Email address to check.
 
     Returns:
         bool. Whether the specified email address is valid.
     """
+    if email_address is None:
+        return False
+
     stripped_address = email_address.strip()
     if not stripped_address:
         return False
