@@ -46,7 +46,6 @@ describe('Version history service', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     versionHistoryService.insertMetadataVersionHistoryData(
@@ -78,7 +77,6 @@ describe('Version history service', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     versionHistoryService.insertMetadataVersionHistoryData(
@@ -233,7 +231,6 @@ describe('Version history service', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     versionHistoryService.insertMetadataVersionHistoryData(
@@ -405,7 +402,6 @@ describe('Version history service', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     versionHistoryService.insertMetadataVersionHistoryData(
@@ -501,7 +497,6 @@ describe('Version history service', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     versionHistoryService.insertMetadataVersionHistoryData(
@@ -663,7 +658,6 @@ describe('Version history service', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     versionHistoryService.insertMetadataVersionHistoryData(
@@ -700,7 +694,6 @@ describe('Version history service', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     versionHistoryService.insertMetadataVersionHistoryData(

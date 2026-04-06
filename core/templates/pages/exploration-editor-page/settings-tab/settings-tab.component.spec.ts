@@ -1390,7 +1390,6 @@ describe('Settings Tab Component', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
     spyOn(
@@ -1462,7 +1461,6 @@ describe('Settings Tab Component', () => {
         'Introduction',
         new ParamSpecs({}),
         [],
-        false,
         true
       );
       spyOn(

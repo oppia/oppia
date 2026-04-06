@@ -85,7 +85,6 @@ describe('Metadata version history modal', () => {
       'Introduction',
       new ParamSpecs({}),
       [],
-      false,
       true
     );
   });
@@ -96,7 +95,7 @@ describe('Metadata version history modal', () => {
       'canShowBackwardMetadataDiffData'
     ).and.returnValue(true);
 
-    expect(component.canExploreBackwardVersionHistory()).toBeTrue();
+    expect(component.canExploreBackwardVersionHistory()).toBe(true);
   });
 
   it('should get whether we can explore forward version history', () => {
@@ -105,7 +104,7 @@ describe('Metadata version history modal', () => {
       'canShowForwardMetadataDiffData'
     ).and.returnValue(true);
 
-    expect(component.canExploreForwardVersionHistory()).toBeTrue();
+    expect(component.canExploreForwardVersionHistory()).toBe(true);
   });
 
   it('should get the last edited version number', () => {
@@ -315,12 +314,12 @@ describe('Metadata version history modal', () => {
       'fetchMetadataVersionHistoryAsync'
     ).and.resolveTo(null);
 
-    expect(component.validationErrorIsShown).toBeFalse();
+    expect(component.validationErrorIsShown).toBe(false);
 
     component.fetchPreviousVersionHistory();
     tick();
 
-    expect(component.validationErrorIsShown).toBeTrue();
+    expect(component.validationErrorIsShown).toBe(true);
   }));
 
   it('should update the left and right side yaml strings on initialization', fakeAsync(() => {
