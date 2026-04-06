@@ -198,7 +198,6 @@ describe('InsertScriptService', () => {
         }, 10);
       }
     );
-
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
