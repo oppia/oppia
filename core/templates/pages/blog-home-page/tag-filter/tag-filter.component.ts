@@ -31,9 +31,7 @@ import {FormControl} from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
-  filter,
   map,
-  pairwise,
   startWith,
 } from 'rxjs/operators';
 import {Observable} from 'rxjs';
