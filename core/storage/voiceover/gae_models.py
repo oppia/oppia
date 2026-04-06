@@ -455,39 +455,3 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
             voiceover_filename=voiceover_filename,
             audio_offset_list=audio_offset_list,
         )
-
-
-class LanguageAccentForAutogenerationModel(base_models.BaseModel):
-    """Model to store language accent code for which voiceover regeneration
-    needs to be done.
-
-    There should only be one instance of this class, and it is keyed by
-    VOICEOVER_AUTOGENERATION_BY_ACCENT_ID.
-    """
-
-    # Language accent code for which voiceover regeneration needs to be done.
-    language_accent_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
-        """Model does not contain user data."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            },
-        )

@@ -518,31 +518,6 @@ def save_entity_voiceovers(
     entity_voiceovers_model.put()
 
 
-def get_updated_language_accents(
-    old_language_codes_mapping, new_language_codes_mapping
-):
-    initial_language_accent_set = set()
-    updated_language_accent_set = set()
-
-    for accent_mapping in old_language_codes_mapping.values():
-        for (
-            language_accent_code,
-            supports_autogeneration,
-        ) in accent_mapping.items():
-            if supports_autogeneration:
-                initial_language_accent_set.add(language_accent_code)
-
-    for accent_mapping in new_language_codes_mapping.values():
-        for (
-            language_accent_code,
-            supports_autogeneration,
-        ) in accent_mapping.items():
-            if supports_autogeneration:
-                updated_language_accent_set.add(language_accent_code)
-
-    return updated_language_accent_set - initial_language_accent_set
-
-
 def save_language_accent_support(
     language_codes_mapping: Dict[str, Dict[str, bool]],
 ) -> None:
@@ -1408,53 +1383,4 @@ def generate_voiceover_from_translated_content(
         language_code_to_contents_mapping,
         datetime.datetime.utcnow().isoformat(),
         feconf.SYSTEM_COMMITTER_ID,
-    )
-
-
-def get_language_accent_for_bulk_autogeneration():
-    """Fetches the language accent code input by the admin for bulk regeneration.
-
-    Returns:
-        str. The language accent code input by the admin for bulk regeneration.
-    """
-    voiceover_autogeneration_by_accent_model = (
-        voiceover_models.LanguageAccentForAutogenerationModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_BY_ACCENT_ID,
-            strict=False,
-        )
-    )
-    if voiceover_autogeneration_by_accent_model is not None:
-        return voiceover_autogeneration_by_accent_model.language_accent_code
-    return None
-
-
-def save_language_accent_code_for_bulk_autogeneration(
-    language_accent_code: str,
-) -> None:
-    """Saves the language accent code input by the admin for bulk regeneration.
-
-    Args:
-        language_accent_code: str. The language accent code input by the admin
-            for bulk regeneration.
-    """
-    voiceover_autogeneration_by_accent_model = (
-        voiceover_models.LanguageAccentForAutogenerationModel(
-            id=voiceover_models.VOICEOVER_AUTOGENERATION_BY_ACCENT_ID,
-            language_accent_code=language_accent_code,
-        )
-    )
-    voiceover_autogeneration_by_accent_model.update_timestamps()
-    voiceover_autogeneration_by_accent_model.put()
-
-
-def mark_voiceover_regeneration_for_accent_as_complete() -> None:
-    """Marks the voiceover regeneration for the given language accent code as
-    complete.
-
-    Args:
-        language_accent_code: str. The language accent code for which the
-            voiceover regeneration is marked as complete.
-    """
-    voiceover_models.LanguageAccentForAutogenerationModel.delete_by_id(
-        voiceover_models.VOICEOVER_AUTOGENERATION_BY_ACCENT_ID
     )

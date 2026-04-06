@@ -61,6 +61,18 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
         'autoscaling_algorithm',
     }
 
+    # Historically, Beam jobs get data from the datastore and process it.
+    # In some cases, we may want to run parameterized Beam jobs that get data
+    # from other sources. For example, in the case of bulk regeneration of
+    # voiceovers by language accent, we want to pass language accent code as a
+    # parameter to the Beam job.
+    SPECIAL_JOB_OPTIONS = {
+        'language_accent_code': (
+            str,
+            'Language-accent code to scope voiceover synthesis jobs.',
+        ),
+    }
+
     def __init__(
         self,
         flags: Optional[List[str]] = None,
@@ -80,7 +92,7 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             ValueError. Unsupported job option(s).
         """
         allowed_options = set(self.JOB_OPTIONS.keys()).union(
-            self.DATAFLOW_RESOURCE_OPTIONS
+            self.DATAFLOW_RESOURCE_OPTIONS, self.SPECIAL_JOB_OPTIONS
         )
         unsupported_options = set(job_options).difference(allowed_options)
         if unsupported_options:
@@ -89,6 +101,7 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
                 'Unsupported option(s): %s' % joined_unsupported_options
             )
         oppia_project_id = app_identity_services.get_application_id()
+
         assert isinstance(oppia_project_id, str)
         super().__init__(
             # Needed by PipelineOptions.
@@ -121,6 +134,14 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             parser: argparse.ArgumentParser. An ArgumentParser instance.
         """
         for option_name, (option_type, option_doc) in cls.JOB_OPTIONS.items():
+            parser.add_argument(
+                '--%s' % option_name, help=option_doc, type=option_type
+            )
+
+        for option_name, (
+            option_type,
+            option_doc,
+        ) in cls.SPECIAL_JOB_OPTIONS.items():
             parser.add_argument(
                 '--%s' % option_name, help=option_doc, type=option_type
             )

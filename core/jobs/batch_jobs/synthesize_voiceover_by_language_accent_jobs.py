@@ -42,17 +42,15 @@ from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Union, cast
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
-        cloud_task_models,
         datastore_services,
         exp_models,
         translation_models,
         voiceover_models,
     )
 
-(cloud_task_models, exp_models, translation_models, voiceover_models) = (
+(exp_models, translation_models, voiceover_models) = (
     models.Registry.import_models(
         [
-            models.Names.CLOUD_TASK,
             models.Names.EXPLORATION,
             models.Names.TRANSLATION,
             models.Names.VOICEOVER,
@@ -70,16 +68,26 @@ datastore_services = models.Registry.import_datastore_services()
 class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
     """A DoFn that generates voiceovers for a given exploration."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        oppia_project_id: Optional[str] = None,
+        language_accent_code: Optional[str] = None,
+    ) -> None:
         super().__init__()
         logging.info(
             'Voiceover synthesis log: Initializing GenerateVoiceoversFn.'
         )
 
-        self.oppia_project_id = 'oppia_project_id'
+        self.oppia_project_id = oppia_project_id
         logging.info(
-            'Voiceover synthesis log: Setting oppia project ID from args: %s',
-            self.oppia_project_id,
+            'Voiceover synthesis log: Setting oppia project ID from args: %s'
+            % self.oppia_project_id,
+        )
+
+        self.language_accent_code = language_accent_code
+        logging.info(
+            'Voiceover synthesis log: Setting language accent code from args: %s'
+            % self.language_accent_code,
         )
 
     def process(
@@ -96,12 +104,9 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         autogeneration_policy_model: (
             voiceover_models.VoiceoverAutogenerationPolicyModel
         ),
-        language_accent_for_autogeneration_model: (
-            voiceover_models.LanguageAccentForAutogenerationModel
-        ),
     ) -> Iterator[
         Union[
-            Optional[voiceover_models.EntityVoiceoversModel],
+            voiceover_models.EntityVoiceoversModel,
             beam.pvalue.TaggedOutput[str],
         ]
     ]:
@@ -114,35 +119,15 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
                 to a list of corresponding models.
             autogeneration_policy_model: VoiceoverAutogenerationPolicyModel.
                 The voiceover autogeneration policy model.
-            language_accent_for_autogeneration_model: LanguageAccentForAutogenerationModel.
-                The language accent for autogeneration model.
 
         Yields:
             EntityVoiceoversModel. The generated entity voiceover models.
             str. The status string for the voiceover generation process.
         """
         entity_id = combined_models[0]
-        with datastore_services.get_ndb_context():
-            try:
-                language_accent_to_generate = (
-                    language_accent_for_autogeneration_model.language_accent_code
-                )
-
-            except Exception as e:
-                error = (
-                    'Not able to fetch language accent for autogeneration model. Error: %s'
-                    % str(e)
-                )
-                logging.error(
-                    'Voiceover synthesis log: Not able to fetch language accent for autogeneration model. Verify the model exists and has the correct properties. Error: %s'
-                    % str(e)
-                )
-                language_accent_to_generate = None
-        # Check language_accent_for_autogeneration_model must be in policy model.
-
         logging.info(
-            'Voiceover synthesis log: Generating voiceovers for exploration ID: %s',
-            entity_id,
+            'Voiceover synthesis log: Processing exploration with ID: %s'
+            % entity_id
         )
         # Here we use cast because we are narrowing down the type of
         # exploration field in combined_models to Exploration model.
@@ -164,42 +149,37 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         )
 
         entity_voiceovers_list, status_string = (
-            VoiceoverSynthesisJob.generate_voiceovers_for_exploration(
+            VoiceoverSynthesisByAccentJob.generate_voiceovers_for_exploration(
                 exploration_model=exploration_model,
                 entity_translation_models=entity_translation_models,
                 entity_voiceover_models=entity_voiceover_models,
                 voiceover_policy_model=autogeneration_policy_model,
-                language_accent_to_generate=language_accent_to_generate,
+                language_accent_code_to_generate=self.language_accent_code,
+                oppia_project_id=self.oppia_project_id,
             )
         )
 
         logging.info(
-            'Voiceover synthesis log: Completed generating voiceovers for exploration ID: %s',
-            entity_id,
+            'Voiceover synthesis log: Completed generating voiceovers for exploration ID: %s'
+            % entity_id
         )
 
         # Yield entity voiceovers to main output.
-        if entity_voiceovers_list:
-            for entity_voiceovers in entity_voiceovers_list:
-                yield entity_voiceovers
-        else:
-            if error:
-                status_string = (
-                    'No voiceovers generated due to error: %s.\n Check LanguageAccentForAutogenerationModel and its fields.'
-                    % error
-                )
-            else:
-                status_string = (
-                    'No voiceovers generated for language accent: %s.'
-                    % language_accent_to_generate
-                )
+        for entity_voiceovers in entity_voiceovers_list:
+            yield entity_voiceovers
+
+        if len(entity_voiceovers_list) == 0:
+            status_string += (
+                'No voiceovers generated for language accent: %s.'
+                % self.language_accent_code
+            )
             yield None
 
         # Yield status string to tagged side output.
         yield beam.pvalue.TaggedOutput('status', status_string)
 
 
-class VoiceoverSynthesisJob(base_jobs.JobBase):
+class VoiceoverSynthesisByAccentJob(base_jobs.JobBase):
     """A one-off job to generate voiceovers for all curated explorations in
     English and other supported translated languages.
     """
@@ -241,7 +221,8 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             voiceover_models.EntityVoiceoversModel
         ],
         voiceover_policy_model: voiceover_models.VoiceoverAutogenerationPolicyModel,
-        language_accent_to_generate,
+        language_accent_code_to_generate: Optional[str] = None,
+        oppia_project_id: Optional[str] = None,
     ) -> Tuple[Sequence[voiceover_models.EntityVoiceoversModel], str]:
         """Generates voiceovers in English and all translated languages,
         covering every supported accent for the given exploration.
@@ -255,6 +236,8 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 entity voiceover models related to the exploration.
             voiceover_policy_model: VoiceoverAutogenerationPolicyModel. The
                 voiceover autogeneration policy model.
+            language_accent_code_to_generate: str. The language accent code for which to
+                generate voiceovers.
             oppia_project_id: Optional[str]. The Google Cloud Project ID.
                 Explicitly required when running on Beam Dataflow, as workers
                 cannot retrieve the ID from environment variables.
@@ -264,6 +247,10 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             EntityVoiceoversModels that were updated or created.
         """
         logs_during_voiceover_generation = ''
+
+        logs_during_voiceover_generation += (
+            'Exploration ID: %s.\n' % exploration_model.id
+        )
 
         entity_translations_list = []
         entity_voiceovers_list = []
@@ -292,6 +279,11 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             # Converting EntityVoiceoversModels to domain objects.
             for entity_voiceover_model in list(entity_voiceover_models):
                 if entity_voiceover_model.entity_version != exploration.version:
+                    continue
+                if (
+                    entity_voiceover_model.language_accent_code
+                    != language_accent_code_to_generate
+                ):
                     continue
                 entity_voiceovers_list.append(
                     voiceover_services.get_entity_voiceovers_from_model(
@@ -334,14 +326,15 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         autogeneratable_language_codes_mapping: Dict[str, List[str]] = {}
 
         for language_code, accent_mapping in language_codes_mapping.items():
-            autogeneratable_language_codes_mapping[language_code] = []
             for accent_code, is_autogeneratable in accent_mapping.items():
-                if accent_code != language_accent_to_generate:
-                    continue
-                if is_autogeneratable:
-                    autogeneratable_language_codes_mapping[
-                        language_code
-                    ].append(accent_code)
+                if (
+                    is_autogeneratable
+                    and accent_code == language_accent_code_to_generate
+                ):
+                    autogeneratable_language_codes_mapping[language_code] = [
+                        accent_code
+                    ]
+                    break
 
         # A dictionary where each key is a language code, and each value is a
         # content mapping dictionary. The content mapping dictionary contains
@@ -357,6 +350,16 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             voiceover_services.extract_translated_voiceover_texts_from_entity_translations(
                 entity_translations_list
             )
+        )
+
+        logging.info(
+            'Voiceover synthesis log: language_code_to_contents_mapping: %s',
+            language_code_to_contents_mapping,
+        )
+
+        logging.info(
+            'Voiceover synthesis log: autogeneratable_language_codes_mapping: %s',
+            autogeneratable_language_codes_mapping,
         )
 
         # Get all language codes that need voiceover regeneration in this
@@ -436,13 +439,14 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                                 content_html,
                                 language_accent_code,
                                 voiceover_filename,
+                                oppia_project_id,
                             )
 
                             if not sentence_tokens_with_durations:
                                 continue
 
                             voiceover = voiceover_regeneration_services.fetch_voiceover_by_filename(
-                                entity_id, voiceover_filename
+                                entity_id, voiceover_filename, oppia_project_id
                             )
 
                         number_of_characters += len(content_html)
@@ -603,23 +607,19 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             )
         )
 
-        language_accent_for_autogeneration_model = (
-            self.pipeline
-            | 'Get language accent for autogeneration model'
-            >> ndb_io.GetModels(
-                voiceover_models.LanguageAccentForAutogenerationModel.get_all()
-            )
-        )
+        custom_options = self.pipeline.options.view_as(job_options.JobOptions)
+        oppia_project_id = custom_options.oppia_project_id
+        language_accent_code = custom_options.language_accent_code
 
         voiceovers_and_status = (
             combined_models
             | 'Generate voiceovers for each exploration'
             >> beam.ParDo(
-                GenerateVoiceoversFn(),
-                beam.pvalue.AsSingleton(voiceover_policy_model),
-                beam.pvalue.AsSingleton(
-                    language_accent_for_autogeneration_model
+                GenerateVoiceoversFn(
+                    oppia_project_id=oppia_project_id,
+                    language_accent_code=language_accent_code,
                 ),
+                beam.pvalue.AsSingleton(voiceover_policy_model),
             ).with_outputs('status', main='voiceovers')
         )
 
@@ -639,7 +639,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         )
 
 
-class VoiceoverSynthesisAuditJob(VoiceoverSynthesisJob):
-    """Audit job for VoiceoverSynthesisJob."""
+class VoiceoverSynthesisByAccentAuditJob(VoiceoverSynthesisByAccentJob):
+    """Audit job for VoiceoverSynthesisByAccentJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
