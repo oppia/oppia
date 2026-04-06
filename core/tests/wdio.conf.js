@@ -30,6 +30,8 @@ var suites = {
 
   contributorAdminDashboard: [
     './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
+  collections: [
+    './core/tests/webdriverio_desktop/collections.js'
   ],
 
   creatorDashboard: [

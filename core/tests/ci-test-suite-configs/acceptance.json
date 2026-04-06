@@ -493,12 +493,12 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-a-classroom.spec.ts"
     },
     {
-      "name": "translation-coordinator/add-remove-translation-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
+      "name": "translation-coordinator/manage-contributors-translation-review-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/manage-contributors-translation-review-rights.spec.ts"
     },
     {
-      "name": "practice-question-coordinator/add-and-remove-question-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-rights.spec.ts"
+      "name": "practice-question-coordinator/manage-contributors-question-review-submission-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/manage-contributors-question-review-submission-rights.spec.ts"
     },
     {
       "name": "release-coordinator/enable-feature-flag",
