@@ -32,7 +32,7 @@ EXCLUDED_DIRECTORIES = [
 ]
 
 # Regexes to detect to-do comments in source files.
-TASK_KEYWORD = f'{"TO"}{"DO"}'
+TASK_KEYWORD = 'TODO'  # disable-bad-pattern-check
 TASK_REGEX = re.compile(rf'\b{TASK_KEYWORD}\b', re.IGNORECASE)
 # Detect correctly formatted to-do comments, e.g. "TODO(#1234): Description.".
 CORRECT_TASK_REGEX = re.compile(rf'{TASK_KEYWORD}\(#(\d+)\): .+')
