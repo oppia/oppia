@@ -229,6 +229,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
     },
     {
+      "name": "topic-manager/edit-question-modal-in-skill-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-question-modal-in-skill-dashboard.spec.ts"
+    },
+    {
       "name": "topic-manager/cannot-do-curriculum-admin-actions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
     },

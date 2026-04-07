@@ -311,6 +311,7 @@ const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
 const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
+const linkAnotherSkillToQuestionButton = '.e2e-test-link-another-skill-button';
 
 // Preview tab of the topic editor.
 const previewSubtabClass = 'e2e-test-preview-subtab';
@@ -890,6 +891,76 @@ export class TopicManager extends BaseUser {
   async saveQuestion(): Promise<void> {
     await this.clickOnElementWithSelector(saveQuestionButton);
     await this.expectElementToBeVisible(saveQuestionButton, false);
+  }
+
+  /**
+   * Save the question and expect the commit modal to appear.
+   * @param {string} commitMessage - The commit message for the question edit.
+   */
+  async saveQuestionAndExpectCommitModal(commitMessage: string): Promise<void> {
+    await this.clickOnElementWithSelector(saveQuestionButton);
+
+    await this.page.waitForSelector(commitMessageInputSelector, {
+      visible: true,
+    });
+    await this.typeInInputField(commitMessageInputSelector, commitMessage);
+    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+
+    await this.expectElementToBeVisible(saveQuestionButton, false);
+  }
+
+  /**
+   * Save the question and expect the commit modal NOT to appear.
+   */
+  async saveQuestionAndExpectNoCommitModal(): Promise<void> {
+    await this.clickOnElementWithSelector(saveQuestionButton);
+    await this.expectElementToBeVisible(saveQuestionButton, false);
+
+    // Ensure the commit modal is hidden.
+    await this.expectElementToBeVisible(commitMessageInputSelector, false);
+  }
+
+  /**
+   * Verify that the save question button is disabled.
+   * This happens when skill linkage is edited without content changes,
+   * since linkage changes are auto-saved.
+   */
+  async expectSaveQuestionButtonDisabled(): Promise<void> {
+    // Wait for any pending operations to complete.
+    await this.page.waitForTimeout(2000);
+    const saveButton = await this.page.$(saveQuestionButton);
+    if (!saveButton) {
+      throw new Error('Save question button not found');
+    }
+    const isDisabled = await this.page.evaluate(
+      (btn: Element) => (btn as HTMLButtonElement).disabled,
+      saveButton
+    );
+    if (!isDisabled) {
+      throw new Error(
+        'Expected save question button to be disabled after skill linkage change'
+      );
+    }
+  }
+
+  /**
+   * Links another skill to the currently open question.
+   * @param {string} skillName - Name of the skill to be linked.
+   */
+  async linkAnotherSkillToQuestion(skillName: string): Promise<void> {
+    await this.clickOnElementWithSelector(linkAnotherSkillToQuestionButton);
+    // Wait for the skill selector modal to load skills from API.
+    await this.page.waitForSelector(skillItem, {timeout: 60000});
+    // Type in skill name to filter.
+    await this.typeInInputField(skillNameInputSelector, skillName);
+    // Wait a moment for the filter to apply.
+    await this.page.waitForTimeout(500);
+    // Click matching skill item.
+    await this.clickOnElementWithSelector(skillItem);
+    // Confirm skill selection.
+    await this.clickOnElementWithSelector(confirmSkillButton);
+    // Wait for modal to close and button to be visible again.
+    await this.page.waitForTimeout(500);
   }
 
   /**

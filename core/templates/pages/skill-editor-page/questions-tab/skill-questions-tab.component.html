@@ -1,12 +1,8 @@
 <div class="questions">
-  <oppia-questions-list [allSkillSummaries]="[]"
-                        [skillDescriptionsAreShown]="false"
-                        [selectSkillModalIsShown]="false"
-                        [canEditQuestion]="true"
-                        [skillIdToRubricsObject]="skillIdToRubricsObject"
-                        [selectedSkillId]="skill?.getId()"
-                        [groupedSkillSummaries]="groupedSkillSummaries"
-                        >
+  <oppia-questions-list [allSkillSummaries]="[]" [skillDescriptionsAreShown]="false" [selectSkillModalIsShown]="false"
+    [canEditQuestion]="true" [skillIdToRubricsObject]="skillIdToRubricsObject" [selectedSkillId]="skill?.getId()"
+    [groupedSkillSummaries]="groupedSkillSummaries" [skillsCategorizedByTopics]="skillsCategorizedByTopics"
+    [untriagedSkillSummaries]="untriagedSkillSummaries">
   </oppia-questions-list>
 </div>
 

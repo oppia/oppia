@@ -99,6 +99,8 @@ export class BaseUser {
     const args: string[] = [
       '--window-size=1920,1080',
       '--use-fake-ui-for-media-stream',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
     ];
 
     const headless = process.env.HEADLESS === 'true';
