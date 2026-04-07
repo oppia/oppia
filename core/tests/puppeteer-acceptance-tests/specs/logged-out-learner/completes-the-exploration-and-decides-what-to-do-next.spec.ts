@@ -312,7 +312,7 @@ describe('Logged-Out Learner', function () {
       true
     );
     expect(await loggedOutLearner.isProfileAvatarVisible()).toBe(false);
-    expect(await loggedOutLearner.isLoginButtonPresent()).toBe(true);
+    expect(await loggedOutLearner.isLoginButtonVisible()).toBe(true);
 
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.submitFractionInputResponse('1/2');

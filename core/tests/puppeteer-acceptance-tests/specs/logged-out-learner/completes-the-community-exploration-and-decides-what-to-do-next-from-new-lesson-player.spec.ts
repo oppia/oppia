@@ -258,7 +258,7 @@ describe('Logged-Out Learner', function () {
       EXPLORATION_TITLE.COMMUNITY_LESSON_2,
       EXPLORATION_TITLE.COMMUNITY_LESSON_3,
     ]);
-    expect(await loggedOutLearner.isLoginButtonPresent()).toBe(true);
+    expect(await loggedOutLearner.isLoginButtonVisible()).toBe(true);
 
     await loggedOutLearner.clickOnGoToLibraryButtonAndVerifyPage();
   });

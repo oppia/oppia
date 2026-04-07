@@ -669,6 +669,7 @@ const completedNodeSelector =
   '.progress-bar-container .completed-checkpoint-node';
 const newLessonProgressBarContainer = '.progress-bar-container';
 const containerSelector = '.hint-solution-individual-container';
+const saveLessonProgressButton = '.e2e-test-save-progress-button';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6661,9 +6662,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to check presence of save progress button in lesson player.
    */
   async isSaveLessonProgressButtonVisible(): Promise<boolean> {
-    return await this.isElementVisible(
-      'xpath///button[normalize-space(text())="Save"]'
-    );
+    return await this.isElementVisible(saveLessonProgressButton);
   }
 
   /**
@@ -7265,9 +7264,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Check whether the login button is present in new lesson player.
+   * Check whether the login button is visible in new lesson player.
    */
-  async isLoginButtonPresent(): Promise<boolean> {
+  async isLoginButtonVisible(): Promise<boolean> {
     return await this.isElementVisible(loginButtonSelector, true);
   }
 

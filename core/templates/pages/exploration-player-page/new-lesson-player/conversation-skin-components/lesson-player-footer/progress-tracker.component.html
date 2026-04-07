@@ -1,6 +1,6 @@
 <div class="progress-tracker-container">
   <oppia-checkpoint-bar></oppia-checkpoint-bar>
-  <button *ngIf="!userIsLoggedIn" (click)="saveLoggedOutProgress()">
+  <button *ngIf="!userIsLoggedIn" (click)="saveLoggedOutProgress()" class="e2e-test-save-progress-button">
     <mat-icon>save</mat-icon> Save
   </button>
 </div>

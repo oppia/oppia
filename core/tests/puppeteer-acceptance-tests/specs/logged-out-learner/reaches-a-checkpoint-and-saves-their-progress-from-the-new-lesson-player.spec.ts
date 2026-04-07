@@ -160,7 +160,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectLearnerCardHeading(
       "What is 3/6 equal to in it's simplest form?"
     );
-    expect(await loggedOutLearner.isLoginButtonPresent()).toBe(true);
+    expect(await loggedOutLearner.isLoginButtonVisible()).toBe(true);
     await newTab.close();
   });
 
@@ -177,7 +177,7 @@ describe('Logged-Out Learner', function () {
       false
     );
     expect(await loggedOutLearner.isProfileAvatarVisible()).toBe(true);
-    expect(await loggedOutLearner.isLoginButtonPresent()).toBe(false);
+    expect(await loggedOutLearner.isLoginButtonVisible()).toBe(false);
   });
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
