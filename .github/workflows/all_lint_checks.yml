@@ -119,8 +119,8 @@ jobs:
         with:
           message: "Prettier formatting failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  black_formatter:
-    name: Frontend formatting with prettier
+  ruff_formatter:
+    name: Backend formatting with Ruff
     needs: setup_merge_sha
     runs-on: ubuntu-22.04
     # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
@@ -135,8 +135,8 @@ jobs:
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
         with:
           merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
-      - name: Black formatting
-        run: black --check .
+      - name: Ruff formatting
+        run: ruff format --check .
       - name: Explain how to fix the issue
         if: ${{ failure() }}
         run: echo "Run 'ruff format .' locally to fix formatting issues. See https://github.com/oppia/oppia/wiki/Formatters for more details."
