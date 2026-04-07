@@ -81,6 +81,7 @@ describe('Tag Filter component', () => {
         value: '',
       },
     } as ElementRef;
+    spyOn(component.tagFilter, 'setValue');
     component.selectTag({option: {viewValue: 'tag3'}});
     // Search with applied tags will be executed only when no change in tag
     // filter is done for 1500ms. We add 1ms extra to avoid flaking of test.
@@ -128,6 +129,7 @@ describe('Tag Filter component', () => {
     component.listOfDefaultTags = ['Community'];
 
     component.ngOnInit();
+    (component.tagFilterInputChange.emit as jasmine.Spy).calls.reset();
     component.tagFilter.setValue(' ');
     component.tagFilter.setValue('   ');
 
