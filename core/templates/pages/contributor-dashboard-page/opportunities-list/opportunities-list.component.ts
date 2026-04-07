@@ -73,6 +73,7 @@ export class OpportunitiesListComponent {
   userIsOnLastPage: boolean = true;
   languageCode: string = '';
   searchQuery: string = '';
+  filteredOpportunities: ExplorationOpportunity[] = [];
 
   constructor(
     private zone: NgZone,
@@ -138,6 +139,8 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
+    this.searchQuery = '';
+    this.filteredOpportunities = [];
     this.fetchAndLoadOpportunities();
     this.subscribeToPinnedOpportunities();
   }
@@ -253,6 +256,21 @@ export class OpportunitiesListComponent {
   gotoPage(pageNumber: number): void {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
+    const query = this.searchQuery.toLowerCase();
+    if (!query) {
+      this.visibleOpportunities = this.filteredOpportunities.slice(
+        startIndex,
+        endIndex
+      );
+      this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+        this.filteredOpportunities,
+        this.OPPORTUNITIES_PAGE_SIZE,
+        pageNumber,
+        false
+      );
+      this.activePageNumber = pageNumber;
+      return;
+    }
     // Load new opportunities based on endIndex as the backend can return
     // opportunities greater than the page size. See issue #14004.
     if (endIndex >= this.opportunities.length && this.more) {
@@ -305,10 +323,21 @@ export class OpportunitiesListComponent {
 
   applySearch(): void {
     const query = this.searchQuery.toLowerCase();
-    this.visibleOpportunities = this.opportunities.filter(opportunity => {
+    this.filteredOpportunities = this.opportunities.filter(opportunity => {
       const headingText = opportunity?.heading?.toLowerCase() ?? '';
       const subheadingText = opportunity?.subheading?.toLowerCase() ?? '';
       return headingText.includes(query) || subheadingText.includes(query);
     });
+    this.activePageNumber = 1;
+    this.visibleOpportunities = this.filteredOpportunities.slice(
+      0,
+      this.OPPORTUNITIES_PAGE_SIZE
+    );
+    this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+      this.filteredOpportunities,
+      this.OPPORTUNITIES_PAGE_SIZE,
+      1,
+      false
+    );
   }
 }
