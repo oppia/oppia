@@ -297,9 +297,21 @@ describe('SvgEditor', () => {
   it('should wait before updating diagram size when dom is loading', waitForAsync(
     fakeAsync(() => {
       spyOnProperty(document, 'readyState').and.returnValue('loading');
-      spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
-        setTimeout(() => handler());
-      });
+      spyOn(document, 'addEventListener').and.callFake(
+        (
+          eventName: string,
+          handler: EventListenerOrEventListenerObject | null
+        ) => {
+          const readyEvent = new Event(eventName);
+          setTimeout(() => {
+            if (typeof handler === 'function') {
+              handler(readyEvent);
+            } else {
+              handler?.handleEvent(readyEvent);
+            }
+          });
+        }
+      );
       component.ngOnInit();
       tick(10);
       component.bgPicker?.onOpen?.({} as never);
@@ -435,7 +447,7 @@ describe('SvgEditor', () => {
       return {tags: [], attrs: ['width']};
     });
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
-      data => data
+      (data: string) => data
     );
     const invalidWidthAttribute =
       '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
@@ -455,7 +467,7 @@ describe('SvgEditor', () => {
       return {tags: ['script'], attrs: []};
     });
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
-      data => data
+      (data: string) => data
     );
     const invalidSvgTag =
       '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
@@ -790,8 +802,18 @@ describe('SvgEditor', () => {
       fakeAsync(() => {
         spyOnProperty(document, 'readyState').and.returnValue('loading');
         spyOn(document, 'addEventListener').and.callFake(
-          (eventName, handler) => {
-            setTimeout(() => handler());
+          (
+            eventName: string,
+            handler: EventListenerOrEventListenerObject | null
+          ) => {
+            const readyEvent = new Event(eventName);
+            setTimeout(() => {
+              if (typeof handler === 'function') {
+                handler(readyEvent);
+              } else {
+                handler?.handleEvent(readyEvent);
+              }
+            });
           }
         );
         component.savedSvgDiagram = 'saved';
@@ -1057,4 +1079,92 @@ describe('SvgEditor with image save destination as local storage', () => {
       expect(component!.diagramStatus).toBe('editing');
     }
   );
+
+  it('should set canvas dimensions correctly', () => {
+    const componentInstance = component;
+    expect(componentInstance).not.toBeNull();
+    if (!componentInstance) {
+      fail('Expected component to be initialized.');
+      return;
+    }
+    const canvas = componentInstance.canvas;
+    expect(canvas).not.toBeNull();
+    if (!canvas) {
+      fail('Expected canvas to be initialized.');
+      return;
+    }
+    spyOn(canvas, 'setHeight');
+    spyOn(canvas, 'setWidth');
+    spyOn(canvas, 'renderAll');
+
+    componentInstance.diagramHeight = 500;
+    componentInstance.diagramWidth = 600;
+    componentInstance.setCanvasDimensions();
+
+    expect(canvas.setHeight).toHaveBeenCalledWith(500);
+    expect(canvas.setWidth).toHaveBeenCalledWith(600);
+    expect(canvas.renderAll).toHaveBeenCalled();
+  });
+
+  it('should return early from setCanvasDimensions if canvas is not initialized', () => {
+    const componentInstance = component;
+    expect(componentInstance).not.toBeNull();
+    if (!componentInstance) {
+      fail('Expected component to be initialized.');
+      return;
+    }
+    const originalCanvas = componentInstance.canvas;
+    componentInstance.canvas = null as unknown as fabric.Canvas;
+
+    // Should not throw and should return early.
+    expect(() => componentInstance.setCanvasDimensions()).not.toThrowError();
+
+    // Restore canvas for cleanup.
+    componentInstance.canvas = originalCanvas;
+  });
+
+  it('should handle text object loading with horizontal boundary and missing styles', () => {
+    const componentInstance = component;
+    expect(componentInstance).not.toBeNull();
+    if (!componentInstance) {
+      fail('Expected component to be initialized.');
+      return;
+    }
+    const canvas = componentInstance.canvas;
+    expect(canvas).not.toBeNull();
+    if (!canvas) {
+      fail('Expected canvas to be initialized.');
+      return;
+    }
+    const mockElement = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
+    const mockTspan = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    mockTspan.textContent = 'test';
+    mockElement.appendChild(mockTspan);
+    const mockObj = {
+      toObject: () => ({
+        left: 500, // Greater than diagramWidth (450)
+        top: 50,
+        width: 100,
+      }),
+      get: (attr: string) => null,
+    } as unknown as fabric.Object;
+
+    componentInstance.diagramWidth = 450;
+    // This throws "Property 'loadTextObject' is private". We need to
+    // suppress this error because we need to test the private method directly.
+    // @ts-ignore
+    componentInstance.loadTextObject(mockElement, mockObj);
+
+    // LoadTextObject adds the text to the canvas.
+    const canvasObjects = canvas.getObjects();
+    const addedText = canvasObjects[canvasObjects.length - 1] as fabric.Textbox;
+    expect(addedText.left).toBe(450 - (addedText.width || 0));
+    expect(addedText.fill).toBe('#000');
+  });
 });
