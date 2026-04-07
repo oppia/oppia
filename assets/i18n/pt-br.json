@@ -210,7 +210,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Blog da Oppia | Oppia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Bem-vindo(a) ao Blog da Oppia!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Exibindo resultados da pesquisa",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Mostrando <[startingNumber]> - <[endingNumber]>  do total de resultados da pesquisa.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Mostrando <[startingNumber]> - <[endingNumber]> de <[totalNumber]> postagens.",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Adicionar Imagem Miniatura",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "Corpo",

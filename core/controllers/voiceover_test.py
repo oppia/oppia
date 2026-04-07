@@ -272,7 +272,11 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.exploration = self.save_new_valid_exploration(
-            'exp_id', self.owner_id, title='Exploration 1'
+            'exp_id',
+            self.owner_id,
+            title='Exploration 1',
+            category=constants.constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
         )
         rights_manager.publish_exploration(self.owner, self.exploration.id)
         rights_manager.assign_role_for_exploration(
@@ -280,6 +284,35 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
             self.exploration.id,
             self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST,
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exploration.id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>This is the first card of the exploration.</p>',
+                        },
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'End State',
+                        'new_value': {
+                            'content_id': 'content_3',
+                            'html': '<p>This is the last card of the exploration.</p>',
+                        },
+                    }
+                ),
+            ],
+            'Changes content.',
         )
 
     def test_should_be_able_to_regenerate_voiceovers(self) -> None:
@@ -290,7 +323,7 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
             'language_accent_code': 'en-US',
             'state_name': 'Introduction',
             'content_id': 'content_0',
-            'exploration_version': 1,
+            'exploration_version': 2,
         }
 
         handler_url = '/regenerate_automatic_voiceover/%s' % self.exploration.id

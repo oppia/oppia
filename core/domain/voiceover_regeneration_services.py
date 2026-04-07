@@ -24,6 +24,7 @@ import html
 import io
 import json
 import logging
+import os
 import uuid
 
 from core import feconf, utils
@@ -265,11 +266,29 @@ def get_text_with_delimiters(soup: bs4.BeautifulSoup, delimiter: str) -> str:
     return ''.join(text_segments)
 
 
+def empty_voiceover_raw_audio_data() -> bytes:
+    """Provides the byte string to represent the raw audio data for an empty voiceover.
+
+    Returns:
+        bytes. The byte string representing the raw audio data for an empty
+        voiceover.
+    """
+
+    voiceover_path = os.path.join(
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, 'empty.mp3'
+    )
+
+    with open(voiceover_path, 'rb', encoding=None) as file:
+        binary_audio_data = file.read()
+    return binary_audio_data
+
+
 def synthesize_voiceover_for_html_string(
     exploration_id: str,
     content_html: str,
     language_accent_code: str,
     voiceover_filename: str,
+    oppia_project_id: Optional[str] = None,
 ) -> List[Dict[str, Union[str, float]]]:
     """The method generates automated voiceovers for the given HTML content
     using cloud service helper functions.
@@ -281,6 +300,9 @@ def synthesize_voiceover_for_html_string(
         language_accent_code: str. The language accent code for generating the
             automated voiceover.
         voiceover_filename: str. The filename for the generated voiceover.
+        oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         list(dict(str, str|float)). A list of dictionaries. Each dictionary
@@ -295,12 +317,20 @@ def synthesize_voiceover_for_html_string(
     Raises:
         Exception. Error encountered during automatic voiceover regeneration.
     """
+    # When voiceover regeneration is triggered through a Beam Dataflow job,
+    # the `oppia_project_id` is passed explicitly as an argument. This serves
+    # as a reliable indicator that the method is being invoked from a Beam job.
+    # Otherwise, the project ID is retrieved from the environment via
+    # `app_identity_service`.
+    is_called_from_beam_job = oppia_project_id is not None
+
     # Audio files are stored to the datastore in the dev env, and to GCS
     # in production.
     fs = fs_services.GcsFileSystem(
-        feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exploration_id,
+        oppia_project_id=oppia_project_id,
     )
-
     parsed_text = parse_html(content_html)
 
     content_hash_code = (
@@ -327,6 +357,10 @@ def synthesize_voiceover_for_html_string(
                 filename = cached_model.voiceover_filename
                 binary_audio_data = fs.get('%s/%s' % ('audio', filename))
                 is_cached_model_used_for_voiceovers = True
+                logging.info(
+                    'Voiceover synthesis log: Using cached voiceover for exploration ID: %s, content_html: %s'
+                    % (exploration_id, content_html)
+                )
         except Exception as e:
             cached_model = None
             logging.warning('Failed to retrieve voiceover from cache: %s' % e)
@@ -337,26 +371,50 @@ def synthesize_voiceover_for_html_string(
         try:
             binary_audio_data, audio_offset_list, error_details = (
                 speech_synthesis_services.regenerate_speech_from_text(
-                    parsed_text, language_accent_code
+                    parsed_text, language_accent_code, oppia_project_id
                 )
+            )
+            logging.info(
+                'Voiceover synthesis log: Generated new voiceover for exploration ID: %s, content_html: %s'
+                % (exploration_id, content_html)
             )
         except Exception as e:
             error_details = str(e)
-
     if error_details:
+        logging.error(
+            'Voiceover synthesis error: Error during speech synthesis for exploration ID: %s, content_html: %s. Error details: %s'
+            % (exploration_id, content_html, error_details)
+        )
         raise Exception(error_details)
 
-    tempbuffer = io.BytesIO()
-    tempbuffer.write(binary_audio_data)
-    tempbuffer.seek(0)
-    audio = mp3.MP3(tempbuffer)
-    tempbuffer.close()
+    if not binary_audio_data:
+        logging.info(
+            'Voiceover synthesis log: Empty voiceover generated for exploration ID: %s, content_html: %s'
+            % (exploration_id, content_html)
+        )
+        audio_offset_list = []
+
+        # In the Beam environment, the default audio file for empty voiceovers
+        # cannot be accessed due to filesystem limitations. Since the binary
+        # data is empty in this scenario, it is safe to return an empty list.
+        if is_called_from_beam_job:
+            return audio_offset_list
+
+        binary_audio_data = empty_voiceover_raw_audio_data()
+
+    with io.BytesIO(binary_audio_data) as tempbuffer:
+        audio = mp3.MP3(tempbuffer)
+
     mimetype = 'audio/mpeg'
     # For a strange, unknown reason, the audio variable must be
     # deleted before opening cloud storage. If not, cloud storage
     # throws a very mysterious error that entails a mutagen
     # object being recursively passed around in app engine.
     del audio
+
+    logging.info(
+        'Voiceover synthesis log: Voiceover filename: %s.' % voiceover_filename
+    )
     fs.commit(
         '%s/%s' % ('audio', voiceover_filename),
         binary_audio_data,
@@ -367,7 +425,7 @@ def synthesize_voiceover_for_html_string(
     # voiceovers in the cache.
     if cached_model is not None:
         if cached_model.plaintext != parsed_text:
-            if len(parsed_text) < len(cached_model.plaintext):
+            if len(str(parsed_text)) < len(str(cached_model.plaintext)):
                 # Since the current text is shorter than the one in the cached
                 # model, there is a higher likelihood of repetition in
                 # other content. Thus, updating the cached model to store the
@@ -542,30 +600,32 @@ def regenerate_voiceover_for_exploration_content(
 
 
 def fetch_voiceover_by_filename(
-    exploration_id: str, filename: str
+    exploration_id: str, filename: str, oppia_project_id: Optional[str] = None
 ) -> state_domain.Voiceover:
     """Fetches the voiceover by filename from the GCS file system.
 
     Args:
         exploration_id: str. The ID of the exploration.
         filename: str. The filename of the voiceover to be fetched.
+        oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         Voiceover. The fetched voiceover object.
     """
     fs = fs_services.GcsFileSystem(
-        feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exploration_id,
+        oppia_project_id=oppia_project_id,
     )
 
     binary_audio_data = fs.get('%s/%s' % ('audio', filename))
 
-    tempbuffer = io.BytesIO()
-    tempbuffer.write(binary_audio_data)
-    tempbuffer.seek(0)
-    audio = mp3.MP3(tempbuffer)
-
-    duration_secs = audio.info.length
-    audio_size_bytes = tempbuffer.getbuffer().nbytes
+    with io.BytesIO(binary_audio_data) as tempbuffer:
+        audio = mp3.MP3(tempbuffer)
+        duration_secs = audio.info.length
+        audio_size_bytes = tempbuffer.getbuffer().nbytes
 
     return state_domain.Voiceover(
         filename, audio_size_bytes, False, duration_secs
