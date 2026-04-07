@@ -120,7 +120,6 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
 
       // Complete lesson.
       // Confetti poppup behavior. Currently, the expected behavior is not observed.
-      await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
