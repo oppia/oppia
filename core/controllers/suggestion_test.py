@@ -4105,6 +4105,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'exp1': {
                     'chapter_title': 'Node1',
                     'content_count': 1,
+                    'reviewer_only_content_count': 0,
                     'id': 'exp1',
                     'is_pinned': False,
                     'story_title': 'A story',

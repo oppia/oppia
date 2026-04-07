@@ -3977,6 +3977,24 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the practice tab in the topic page.
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
+    const practiceTabLink = '.e2e-test-practice-tab-link';
+    const practiceContainer = '.e2e-test-practice-tab-container';
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(practiceTabLink, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+    await this.clickOnElementWithSelector(practiceTabLink);
+    await this.page.waitForSelector(practiceContainer, {
+      visible: true,
+      timeout: 60000,
+    });
     await this.expectElementToBeVisible(practiceTabButtonSelector);
     await this.clickOnElementWithSelector(practiceTabButtonSelector);
 
