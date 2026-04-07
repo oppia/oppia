@@ -7949,7 +7949,7 @@ version: 0
         """Tests the migration of DragAndDropSortInput rule inputs."""
         sample_yaml_content: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: Category
 edits_allowed: true
 init_state_name: (untitled state)
@@ -8573,7 +8573,7 @@ version: 0
         # pylint: disable=line-too-long
         sample_yaml_content_for_rte: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -8725,7 +8725,7 @@ title: ''
         # pylint: disable=anomalous-backslash-in-string
         latest_sample_yaml_content_for_rte: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -8854,7 +8854,7 @@ version: 0
         # pylint: disable=line-too-long
         sample_yaml_content_for_cont_and_end_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -8961,7 +8961,7 @@ title: ''
         # pylint: disable=line-too-long
         latest_sample_yaml_content_for_cont_and_end_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -9048,7 +9048,7 @@ version: 0
 
         sample_yaml_content_for_cont_and_end_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -9137,7 +9137,7 @@ title: ''
 
         latest_sample_yaml_content_for_cont_and_end_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -9226,7 +9226,7 @@ version: 0
         # pylint: disable=line-too-long
         sample_yaml_content_for_numeric_interac: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -9524,7 +9524,7 @@ title: ''
         # pylint: disable=line-too-long
         latest_sample_yaml_content_for_numeric_interac: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -9682,7 +9682,7 @@ version: 0
 
         sample_yaml_content_for_fraction_interac: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -9932,7 +9932,7 @@ title: ''
 
         latest_sample_yaml_content_for_fraction_interac: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -10093,7 +10093,7 @@ version: 0
 
         sample_yaml_content_for_fraction_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -10219,7 +10219,7 @@ title: ''
 
         latest_sample_yaml_content_for_fraction_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -10331,7 +10331,7 @@ version: 0
 
         sample_yaml_content_for_multiple_choice_interac: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -10503,7 +10503,7 @@ title: ''
 
         latest_sample_yaml_content_for_multiple_choice_interac: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -10629,7 +10629,7 @@ version: 0
         # pylint: disable=line-too-long
         sample_yaml_content_for_item_selection_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -10794,7 +10794,7 @@ title: ''
         # pylint: disable=line-too-long
         latest_sample_yaml_content_for_item_selection_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -10936,7 +10936,7 @@ version: 0
 
         sample_yaml_content_for_item_selection_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -11134,7 +11134,7 @@ version: 0
 
         latest_sample_yaml_content_for_item_selection_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -11246,7 +11246,7 @@ version: 0
 
         sample_yaml_content_for_item_selection_interac_3: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -11387,7 +11387,7 @@ version: 0
 
         latest_sample_yaml_content_for_item_selection_interac_3: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -11494,7 +11494,7 @@ version: 0
 
         sample_yaml_content_for_item_selection_interac_4: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -11607,7 +11607,7 @@ version: 0
 
         latest_sample_yaml_content_for_item_selection_interac_4: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -11716,7 +11716,7 @@ version: 0
 
         sample_yaml_content_for_drag_and_drop_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -11938,7 +11938,7 @@ title: ''
 
         latest_sample_yaml_content_for_drag_and_drop_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -12065,7 +12065,7 @@ version: 0
 
         sample_yaml_content_for_drag_and_drop_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -12211,7 +12211,7 @@ title: ''
 
         latest_sample_yaml_content_for_drag_and_drop_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -12336,7 +12336,7 @@ version: 0
 
         sample_yaml_content_for_drag_and_drop_interac_3: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -12488,7 +12488,7 @@ version: 0
 
         latest_sample_yaml_content_for_drag_and_drop_interac_3: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -12605,7 +12605,7 @@ version: 0
         """
         sample_yaml_content_for_text_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -12879,7 +12879,7 @@ title: ''
 
         latest_sample_yaml_content_for_text_interac_1: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -13063,7 +13063,7 @@ version: 0
 
         sample_yaml_content_for_text_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction
@@ -13174,7 +13174,7 @@ title: ''
 
         latest_sample_yaml_content_for_text_interac_2: str = (
             """author_notes: ''
-    blurb: ''
+blurb: ''
 category: ''
 edits_allowed: true
 init_state_name: Introduction

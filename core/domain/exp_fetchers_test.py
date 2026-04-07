@@ -653,29 +653,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'content': {'content_id': 'content', 'html': ''},
             'interaction': {
-                'answer_groups': [
-                    {
-                        'outcome': {
-                            'dest': 'End',
-                            'feedback': {
-                                'content_id': 'feedback_1',
-                                'html': '<p>Correct!</p>',
-                            },
-                            'labelled_as_correct': False,
-                            'missing_prerequisite_skill_id': None,
-                            'param_changes': [],
-                            'refresher_exploration_id': None,
-                        },
-                        'rule_specs': [
-                            {
-                                'rule_type': 'Equals',
-                                'inputs': {'x': 'InputString'},
-                            }
-                        ],
-                        'tagged_skill_misconception_id': None,
-                        'training_data': [],
-                    }
-                ],
+                'answer_groups': [],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'placeholder': {
