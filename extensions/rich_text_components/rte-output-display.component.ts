@@ -77,7 +77,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('tabs') tabsTagPortal!: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal!: TemplateRef<unknown>;
   @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<unknown>;
-  @Input() rteString!: string | null;
+  @Input() rteString: string | null = null;
+  @Input() rteStringContext: string = '';
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
@@ -88,6 +89,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
   backgroundColorOfHighlightedSentence = '#f3d140';
+  topLevelHtmlNodename = '';
 
   customOppiaTags = [
     'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
@@ -243,7 +245,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
         let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
 
-        let spanNodeList = [];
+        let spanNodeList: HTMLSpanElement[] = [];
         let spanTagElement = document.createElement('span');
         let nextSentenceOffset = '';
 
@@ -291,12 +293,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
             continue;
           }
 
-          let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
+          let elementClass = `highlightBlock${this.index}`;
+          spanNode.classList.add(elementClass);
           this.index++;
 
           nodeTemp.appendChild(spanNode);
-          this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
+          this.highlightIdToSentenceText[elementClass] = textInsideSpanTag;
         }
 
         return nodeTemp;
@@ -346,6 +348,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // eslint-disable-next-line oppia/no-inner-html
     temporaryDivElement.innerHTML = htmlString;
 
+    this.topLevelHtmlNodename =
+      temporaryDivElement.childNodes[0]?.nodeName ?? '';
+
     const finalDivElement = this.traverseNodeAndWrapSpanTags(
       temporaryDivElement,
       sentenceRegex
@@ -376,8 +381,22 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
-    if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
+    if (
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
+      this.shouldHighlightContent()
+    ) {
       this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
+
+      this.automaticVoiceoverHighlightService.setActiveContentId(
+        this.getActiveContentId()
+      );
+      this.automaticVoiceoverHighlightService.languageCode =
+        this.localStorageService.getLastSelectedTranslationLanguageCode() ||
+        AppConstants.DEFAULT_LANGUAGE_CODE;
+      this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
+        this.highlightIdToSentenceText
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
     }
 
     const domparser = new DOMParser();
@@ -494,10 +513,17 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   removePreviousHighlightedElement(): void {
-    const previousHighlightedElement = this.previousHighlightedElementId
-      ? document.getElementById(this.previousHighlightedElementId)
-      : null;
-    if (previousHighlightedElement) {
+    if (!this.previousHighlightedElementId) {
+      return;
+    }
+
+    const previousHighlightedElements = document.getElementsByClassName(
+      this.previousHighlightedElementId
+    );
+    for (let i = 0; i < previousHighlightedElements.length; i++) {
+      const previousHighlightedElement = previousHighlightedElements[
+        i
+      ] as HTMLElement;
       previousHighlightedElement.style.backgroundColor = '';
     }
     this.previousHighlightedElementId = undefined;
@@ -525,9 +551,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      const previousHighlightedElement = this.previousHighlightedElementId
-        ? document.getElementById(this.previousHighlightedElementId)
-        : null;
+      const previousHighlightedElement =
+        this.getElementMatchingClassAndTextContent(
+          this.previousHighlightedElementId
+        );
 
       const currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
@@ -536,7 +563,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const currentHighlightedSentence =
         currentElementIdToHighlight === undefined
           ? undefined
-          : this.highlightIdToSentenceText[currentElementIdToHighlight];
+          : this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
+              currentElementIdToHighlight
+            );
 
       // If previous highlighted sentence and current sentence are same, then
       // do not highlight the sentence again.
@@ -548,9 +577,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       }
 
       const currentElementToHighlight =
-        currentElementIdToHighlight === undefined
-          ? null
-          : document.getElementById(currentElementIdToHighlight);
+        this.getElementMatchingClassAndTextContent(currentElementIdToHighlight);
 
       // Highlights the current sentence being played in the audio player.
       if (currentElementToHighlight) {
@@ -570,6 +597,27 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
   }
 
+  getElementMatchingClassAndTextContent(
+    className: string | undefined
+  ): HTMLElement | null {
+    if (!className) {
+      return null;
+    }
+
+    const elements = document.getElementsByClassName(className);
+    const textContent =
+      this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
+        className
+      );
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i] as HTMLElement;
+      if (element.textContent === textContent) {
+        return element;
+      }
+    }
+    return null;
+  }
+
   getActiveContentId(): string {
     // The below if-else block is used to get the active content ID based on the
     // current page.
@@ -579,7 +627,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.pageContextService.getEditorTabContext() ===
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
     ) {
-      return this.voiceoverPlayerService.getActiveContentId();
+      return this.voiceoverPlayerService.getActiveContentId() || '';
     } else {
       return (
         this.translationTabActiveContentIdService.getActiveContentId() || ''
@@ -608,28 +656,58 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         $implicit: node,
       });
     }
-    if (node.nodeType === 'component') {
-      const portalName = (node.selector.split('oppia-noninteractive-')[1] +
-        'TagPortal') as keyof RteOutputDisplayComponent;
-      return new TemplatePortal(
-        this[portalName] as TemplateRef<unknown>,
-        this._viewContainerRef,
-        {$implicit: node.attrs}
-      );
-    }
-    if (
-      this[(node.selector + 'TagPortal') as keyof RteOutputDisplayComponent] !==
-      undefined
-    ) {
-      return new TemplatePortal(
-        this[
-          (node.selector + 'TagPortal') as keyof RteOutputDisplayComponent
-        ] as TemplateRef<unknown>,
-        this._viewContainerRef,
-        {$implicit: node}
-      );
+    const portalName =
+      node.nodeType === 'component'
+        ? (`${
+            node.selector.split('oppia-noninteractive-')[1]
+          }TagPortal` as keyof RteOutputDisplayComponent)
+        : (`${node.selector}TagPortal` as keyof RteOutputDisplayComponent);
+    const portalTemplate = this[portalName] as TemplateRef<unknown> | undefined;
+
+    if (portalTemplate !== undefined) {
+      return new TemplatePortal(portalTemplate, this._viewContainerRef, {
+        $implicit: node.nodeType === 'component' ? node.attrs : node,
+      });
     }
     return undefined as unknown as TemplatePortal<unknown>;
+  }
+
+  shouldHighlightContent(): boolean {
+    // In editor mode (i.e., not in player or preview), highlighting is
+    // generally enabled. However, these specific interactive components should
+    // be excluded because they recursively invoke this component and override
+    // highlight-related properties. Therefore, explicitly check for these tags
+    // and disable highlighting for them.
+    if (!this.isInPlayerOrPreviewPage()) {
+      if (
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT' ||
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT' ||
+        this.topLevelHtmlNodename === 'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT'
+      ) {
+        return false;
+      }
+      return true;
+    }
+
+    const currentContentId = this.getActiveContentId();
+
+    // In player/preview mode, learners can only interact with specific sections
+    // (content or feedback). Highlighting should be applied only when:
+    // 1. The active content ID belongs to the same section type, and
+    // 2. The current RTE context matches that section.
+    const isContentSectionActive =
+      currentContentId?.startsWith('content_') &&
+      this.rteStringContext === 'content';
+
+    const isFeedbackSectionActive =
+      (currentContentId?.startsWith('default_outcome') ||
+        currentContentId?.startsWith('feedback_')) &&
+      (this.rteStringContext === 'feedback' ||
+        this.rteStringContext === 'supplemental-card');
+
+    return isContentSectionActive || isFeedbackSectionActive;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -679,21 +757,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       this._updateNode();
 
-      // If the below feature flag is not enabld then the sentence highlighting
-      // feature will not work.
-      if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
-        const activeContentId = this.getActiveContentId();
-        this.automaticVoiceoverHighlightService.setActiveContentId(
-          activeContentId
-        );
-        this.automaticVoiceoverHighlightService.languageCode =
-          this.localStorageService.getLastSelectedTranslationLanguageCode() ||
-          AppConstants.DEFAULT_LANGUAGE_CODE;
-        this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
-          this.highlightIdToSentenceText
-        );
-        this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
-      }
       setTimeout(() => (this.show = true), 0);
     }
   }

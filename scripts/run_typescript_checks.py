@@ -252,7 +252,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/services/state-interaction-stats.service.spec.ts',
     'core/templates/services/state-top-answers-stats.service.spec.ts',
     'core/templates/services/voiceover-language-management-service.spec.ts',
-    'core/tests/puppeteer-acceptance-tests/utilities/user/logged-in-user.ts',
     'extensions/interactions/FractionInput/directives/fraction-input-validation.service.spec.ts',
     'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.spec.ts',
     'extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.spec.ts',

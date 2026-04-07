@@ -5,10 +5,6 @@
       "module": "core/tests/webdriverio_desktop/collections.js"
     },
     {
-      "name": "contributorAdminDashboard",
-      "module": "core/tests/webdriverio_desktop/contributorAdminDashboard.js"
-    },
-    {
       "name": "creatorDashboard",
       "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
     },
