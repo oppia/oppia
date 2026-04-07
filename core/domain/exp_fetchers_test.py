@@ -33,7 +33,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
+from typing import Dict, Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -648,7 +648,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     NEW_EXP_ID: Final = 'exp_id1'
     UPGRADED_EXP_YAML: str
     albert_id: str
-    STATES_AT_V41 = {
+    STATES_AT_V41: Dict[str, state_domain.StateDict] = {
         'Introduction': {
             'classifier_model_id': None,
             'content': {'content_id': 'content', 'html': ''},
@@ -665,7 +665,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
                     'rows': {'value': 1},
                 },
                 'default_outcome': {
-                    'dest': 'Introduction',
+                    'dest': 'End',
                     'feedback': {'content_id': 'default_outcome', 'html': ''},
                     'labelled_as_correct': False,
                     'missing_prerequisite_skill_id': None,
@@ -735,6 +735,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
             )
 
         exploration_model.states = self.STATES_AT_V41
+        exploration_model.init_state_name = 'Introduction'
         rights_manager.create_new_exploration_rights(
             exploration_model.id, self.albert_id
         )
