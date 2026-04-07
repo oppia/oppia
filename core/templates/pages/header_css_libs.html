@@ -17,13 +17,8 @@
         onload="this.onload=null;this.rel='stylesheet'">
 <% } %>
 
-<!-- Angular CLI global styles (Bootstrap, Font Awesome, oppia.css, oppia-material.css, toastr) -->
-<!-- This replaces the old third_party.css from dependencies.json. -->
-<!-- Loaded synchronously so Bootstrap CSS is applied before Angular initializes -->
-<!-- and before Puppeteer tests interact with Bootstrap modals. -->
-<!-- NOTE: In production, these paths are updated to styles.{hash}.css and -->
-<!-- vendor-styles.{hash}.css by inject_angular_css_hashes() in -->
-<!-- scripts/build.py after Angular CLI build completes. -->
+<!-- Angular CLI global styles (Bootstrap, Font Awesome, oppia.css, oppia-material.css, toastr). -->
+<!-- Production placeholders are rewritten to hashed styles/vendor-styles filenames in scripts/build.py. -->
 <% if (webpackConfig.mode === 'production') { %>
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/vendor-styles.css">
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/styles.css">
