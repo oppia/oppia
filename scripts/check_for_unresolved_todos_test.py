@@ -36,10 +36,12 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        if os.path.isdir(os.path.join(os.getcwd(), 'dummy_directory')):
-            shutil.rmtree('dummy_directory')
-        os.mkdir('dummy_directory', mode=0o777)
-        with open('dummy_directory/file1.txt', 'w', encoding='utf-8') as file:
+        if os.path.isdir(os.path.join(os.getcwd(), 'check_todos_test_dir')):
+            shutil.rmtree('check_todos_test_dir')
+        os.mkdir('check_todos_test_dir', mode=0o777)
+        with open(
+            'check_todos_test_dir/file1.txt', 'w', encoding='utf-8'
+        ) as file:
             content = (
                 """
                 Test Line 1
@@ -62,7 +64,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 """
             ).lstrip('\n')
             file.write(textwrap.dedent(content))
-        with open('dummy_directory/file2.txt', 'w', encoding='utf-8') as file:
+        with open(
+            'check_todos_test_dir/file2.txt', 'w', encoding='utf-8'
+        ) as file:
             content = (
                 """
                 Test Line 1
@@ -84,8 +88,8 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        if os.path.isdir(os.path.join(os.getcwd(), 'dummy_directory')):
-            shutil.rmtree('dummy_directory')
+        if os.path.isdir(os.path.join(os.getcwd(), 'check_todos_test_dir')):
+            shutil.rmtree('check_todos_test_dir')
 
     def test_get_unresolved_todos_no_generate_github_file_should_fail(
         self,
@@ -98,7 +102,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         ):
             check_for_unresolved_todos.main(
                 [
-                    '--repository_path=dummy_directory',
+                    '--repository_path=check_todos_test_dir',
                     '--issue=4151',
                     '--commit_sha=abcdefg',
                 ]
@@ -116,7 +120,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             mock_stdout.getvalue().splitlines(), expected_failure_log_lines
         )
         self.assertFalse(
-            os.path.exists('dummy_directory/unresolved_todo_list.txt')
+            os.path.exists('check_todos_test_dir/unresolved_todo_list.txt')
         )
 
     def test_get_unresolved_todos_should_fail(self) -> None:
@@ -128,7 +132,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         ):
             check_for_unresolved_todos.main(
                 [
-                    '--repository_path=dummy_directory',
+                    '--repository_path=check_todos_test_dir',
                     '--issue=4151',
                     '--commit_sha=abcdefg',
                     '--generate_github_file',
@@ -159,7 +163,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             f'- {expected_github_perma_link}/file2.txt#L3',
         ]
         with open(
-            'dummy_directory/unresolved_todo_list.txt', 'r', encoding='utf-8'
+            'check_todos_test_dir/unresolved_todo_list.txt',
+            'r',
+            encoding='utf-8',
         ) as file:
             self.assertEqual(
                 file.read().splitlines(), expected_unresolved_todo_list_lines
@@ -171,7 +177,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         with swap_stdout_write:
             check_for_unresolved_todos.main(
                 [
-                    '--repository_path=dummy_directory',
+                    '--repository_path=check_todos_test_dir',
                     '--issue=4157',
                     '--commit_sha=abcdefg',
                     '--generate_github_file',
@@ -196,7 +202,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         ):
             check_for_unresolved_todos.main(
                 [
-                    '--repository_path=dummy_directory',
+                    '--repository_path=check_todos_test_dir',
                     '--issue=4151',
                     '--commit_sha=abcdefg',
                 ]
@@ -256,7 +262,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             ):
                 check_for_unresolved_todos.main(
                     [
-                        '--repository_path=dummy_directory',
+                        '--repository_path=check_todos_test_dir',
                         '--pull_request=1234',
                         '--commit_sha=abcdefg',
                         '--generate_github_file',
@@ -303,7 +309,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             f'- {expected_github_perma_link}/file1.txt#L7',
         ]
         with open(
-            'dummy_directory/unresolved_todo_list.txt', 'r', encoding='utf-8'
+            'check_todos_test_dir/unresolved_todo_list.txt',
+            'r',
+            encoding='utf-8',
         ) as file:
             self.assertEqual(
                 file.read().splitlines(), expected_unresolved_todo_list_lines
