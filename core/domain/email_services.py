@@ -34,7 +34,7 @@ if MYPY:  # pragma: no cover
 email_services = models.Registry.import_email_services()
 
 
-class PermanentEmailSendingError(exception):
+class PermanentEmailSendingError(Exception):
     """Exception raised when an email cannot be sent due to a permanent 4xx error."""
 
     pass
