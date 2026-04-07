@@ -35,7 +35,6 @@ from typing import List, Optional, Sequence
 # NOTE TO DEVELOPERS: do not add any new files to this list.
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
-    'core/templates/base-components/base-content.component.spec.ts',
     'core/templates/base-components/footer-donate-volunteer.component.spec.ts',
     'core/templates/base-components/oppia-footer.component.spec.ts',
     'core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts',
@@ -256,21 +255,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/tests/puppeteer-acceptance-tests/utilities/user/logged-in-user.ts',
     'extensions/interactions/FractionInput/directives/fraction-input-validation.service.spec.ts',
     'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.spec.ts',
-    'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
-    'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
-    'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
-    'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component.ts',
-    'extensions/interactions/MusicNotesInput/directives/oppia-response-music-notes-input.component.ts',
-    'extensions/interactions/MusicNotesInput/directives/oppia-short-response-music-notes-input.component.ts',
     'extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.spec.ts',
-    'extensions/objects/object-components.module.ts',
-    'extensions/objects/templates/image-editor.component.spec.ts',
-    'extensions/objects/templates/image-editor.component.ts',
     'extensions/objects/templates/math-expression-content-editor.component.spec.ts',
-    'extensions/objects/templates/svg-editor.component.spec.ts',
-    'extensions/objects/templates/svg-editor.component.ts',
-    'extensions/rich_text_components/rte-output-display.component.ts',
-    'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 

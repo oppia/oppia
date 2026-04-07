@@ -127,8 +127,9 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     this.imageSize = this.imagePreloaderService.getDimensionsOfImage(
       this.imagePath
     );
+    const entityType = this.pageContextService.getEntityType() ?? '';
     const imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-      this.pageContextService.getEntityType(),
+      entityType,
       this.pageContextService.getEntityId(),
       this.imagePath
     );

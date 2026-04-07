@@ -257,7 +257,6 @@ describe('RTE display component', () => {
     tick(100);
     fixture.detectChanges();
     discardPeriodicTasks();
-
     expect(component.elementRef.nativeElement.innerText).toEqual(
       'HiHelloHello'
     );

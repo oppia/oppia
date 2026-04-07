@@ -56,34 +56,34 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 })
 export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
-  @ViewChild('p') pTagPortal: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
-  @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
-  @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
-  @ViewChild('li') liTagPortal: TemplateRef<unknown>;
-  @ViewChild('ul') ulTagPortal: TemplateRef<unknown>;
-  @ViewChild('pre') preTagPortal: TemplateRef<unknown>;
-  @ViewChild('strong') strongTagPortal: TemplateRef<unknown>;
-  @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
-  @ViewChild('em') emTagPortal: TemplateRef<unknown>;
-  @ViewChild('text') textTagPortal: TemplateRef<unknown>;
+  @ViewChild('p') pTagPortal!: TemplateRef<unknown>;
+  @ViewChild('h1') h1TagPortal!: TemplateRef<unknown>;
+  @ViewChild('span') spanTagPortal!: TemplateRef<unknown>;
+  @ViewChild('ol') olTagPortal!: TemplateRef<unknown>;
+  @ViewChild('li') liTagPortal!: TemplateRef<unknown>;
+  @ViewChild('ul') ulTagPortal!: TemplateRef<unknown>;
+  @ViewChild('pre') preTagPortal!: TemplateRef<unknown>;
+  @ViewChild('strong') strongTagPortal!: TemplateRef<unknown>;
+  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<unknown>;
+  @ViewChild('em') emTagPortal!: TemplateRef<unknown>;
+  @ViewChild('text') textTagPortal!: TemplateRef<unknown>;
   // Oppia Non interactive.
-  @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
-  @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
-  @ViewChild('link') linkTagPortal: TemplateRef<unknown>;
-  @ViewChild('math') mathTagPortal: TemplateRef<unknown>;
-  @ViewChild('skillreview') skillreviewTagPortal: TemplateRef<unknown>;
-  @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
-  @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
-  @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
-  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
-  @Input() rteString: string;
+  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<unknown>;
+  @ViewChild('image') imageTagPortal!: TemplateRef<unknown>;
+  @ViewChild('link') linkTagPortal!: TemplateRef<unknown>;
+  @ViewChild('math') mathTagPortal!: TemplateRef<unknown>;
+  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<unknown>;
+  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<unknown>;
+  @ViewChild('tabs') tabsTagPortal!: TemplateRef<unknown>;
+  @ViewChild('video') videoTagPortal!: TemplateRef<unknown>;
+  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<unknown>;
+  @Input() rteString!: string | null;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
 
-  highlightIdToSentenceText = {};
+  highlightIdToSentenceText: Record<string, string> = {};
   wrapped = false;
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
@@ -162,16 +162,24 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
       const encodedText = (node as Element).getAttribute('text-with-value');
+      if (encodedText === null) {
+        return '';
+      }
       const decodedText = this.decodeHtmlEntities(encodedText);
       return JSON.parse(decodedText);
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
       const encodedMathContent = (node as Element).getAttribute(
         'math_content-with-value'
       );
-      const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
-      const latexText = JSON.parse(decodedMathContent)?.raw_latex;
-      return this.parseAndConvertLatex(latexText);
+      if (encodedMathContent) {
+        const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
+        const latexText = JSON.parse(decodedMathContent)?.raw_latex;
+        if (typeof latexText === 'string') {
+          return this.parseAndConvertLatex(latexText);
+        }
+      }
     }
+    return '';
   }
 
   // The method recursively traverses the node and wraps span tags around
@@ -216,7 +224,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return [node];
         }
 
-        let currentElementReplicaNodes = [];
+        let currentElementReplicaNodes: HTMLElement[] = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
           tempElementNode.appendChild(child);
@@ -310,17 +318,22 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     this.highlightIdToSentenceText = {};
     this.previousHighlightedElementId = undefined;
 
-    let languageCode =
+    const languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode() ||
       AppConstants.DEFAULT_LANGUAGE_CODE;
 
     // Sentences in the lesson content are separated using punctuation marks
     // specific to the language.
     // The following line retrieves the punctuation marks for the current language.
+    const punctuationMarksMap =
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS;
+    const punctuationMarksLanguageCode = (
+      punctuationMarksMap.hasOwnProperty(languageCode)
+        ? languageCode
+        : AppConstants.DEFAULT_LANGUAGE_CODE
+    ) as keyof typeof AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS;
     const punctuationsForCurrentLanguage =
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
-        languageCode
-      ];
+      punctuationMarksMap[punctuationMarksLanguageCode];
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
@@ -367,8 +380,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
     }
 
-    let domparser = new DOMParser();
-    let dom = domparser.parseFromString(this.rteString, 'text/html').body;
+    const domparser = new DOMParser();
+    const dom = domparser.parseFromString(this.rteString, 'text/html').body;
     try {
       this.node = this.oppiaHtmlParserService.constructFromDomParser(dom);
     } catch (e) {
@@ -396,23 +409,27 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // of whiteSpace characters and new lines. The setTimeout is needed to run
     // it in the next clock cycle so that the view has been rendered.
     setTimeout(() => {
-      (this.elementRef.nativeElement as HTMLElement)
-        .querySelectorAll('pre')
-        .forEach(preNode => {
-          for (let i = 0; i < preNode.childNodes.length; i++) {
-            if (preNode.childNodes[i].nodeType === 8) {
+      const nativeElement = this.elementRef
+        .nativeElement as Partial<HTMLElement>;
+      if (typeof nativeElement.querySelectorAll !== 'function') {
+        return;
+      }
+      nativeElement.querySelectorAll('pre').forEach(preNode => {
+        for (let i = 0; i < preNode.childNodes.length; i++) {
+          if (preNode.childNodes[i].nodeType === 8) {
+            preNode.removeChild(preNode.childNodes[i]);
+            i--;
+            continue;
+          }
+          if (preNode.childNodes[i].nodeType === 3) {
+            const nodeValue = preNode.childNodes[i].nodeValue;
+            if (nodeValue !== null && nodeValue.replace(/\s/g, '') === '') {
               preNode.removeChild(preNode.childNodes[i]);
               i--;
-              continue;
-            }
-            if (preNode.childNodes[i].nodeType === 3) {
-              if (preNode.childNodes[i].nodeValue.replace(/\s/g, '') === '') {
-                preNode.removeChild(preNode.childNodes[i]);
-                i--;
-              }
             }
           }
-        });
+        }
+      });
     });
   }
 
@@ -477,9 +494,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   removePreviousHighlightedElement(): void {
-    let previousHighlightedElement = document.getElementById(
-      this.previousHighlightedElementId
-    );
+    const previousHighlightedElement = this.previousHighlightedElementId
+      ? document.getElementById(this.previousHighlightedElementId)
+      : null;
     if (previousHighlightedElement) {
       previousHighlightedElement.style.backgroundColor = '';
     }
@@ -508,28 +525,32 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      let previousHighlightedElement = document.getElementById(
-        this.previousHighlightedElementId
-      );
+      const previousHighlightedElement = this.previousHighlightedElementId
+        ? document.getElementById(this.previousHighlightedElementId)
+        : null;
 
-      let currentElementIdToHighlight =
+      const currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
           this.audioPlayerService.getCurrentTimeInSecs()
         );
+      const currentHighlightedSentence =
+        currentElementIdToHighlight === undefined
+          ? undefined
+          : this.highlightIdToSentenceText[currentElementIdToHighlight];
 
       // If previous highlighted sentence and current sentence are same, then
       // do not highlight the sentence again.
       if (
         this.previousHighlightedElementId === currentElementIdToHighlight &&
-        previousHighlightedElement?.textContent ===
-          this.highlightIdToSentenceText[currentElementIdToHighlight]
+        previousHighlightedElement?.textContent === currentHighlightedSentence
       ) {
         return;
       }
 
-      let currentElementToHighlight = document.getElementById(
-        currentElementIdToHighlight
-      );
+      const currentElementToHighlight =
+        currentElementIdToHighlight === undefined
+          ? null
+          : document.getElementById(currentElementIdToHighlight);
 
       // Highlights the current sentence being played in the audio player.
       if (currentElementToHighlight) {
@@ -560,7 +581,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     ) {
       return this.voiceoverPlayerService.getActiveContentId();
     } else {
-      return this.translationTabActiveContentIdService.getActiveContentId();
+      return (
+        this.translationTabActiveContentIdService.getActiveContentId() || ''
+      );
     }
   }
 
@@ -586,19 +609,27 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       });
     }
     if (node.nodeType === 'component') {
+      const portalName = (node.selector.split('oppia-noninteractive-')[1] +
+        'TagPortal') as keyof RteOutputDisplayComponent;
       return new TemplatePortal(
-        this[node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'],
+        this[portalName] as TemplateRef<unknown>,
         this._viewContainerRef,
         {$implicit: node.attrs}
       );
     }
-    if (this[node.selector + 'TagPortal'] !== undefined) {
+    if (
+      this[(node.selector + 'TagPortal') as keyof RteOutputDisplayComponent] !==
+      undefined
+    ) {
       return new TemplatePortal(
-        this[node.selector + 'TagPortal'],
+        this[
+          (node.selector + 'TagPortal') as keyof RteOutputDisplayComponent
+        ] as TemplateRef<unknown>,
         this._viewContainerRef,
         {$implicit: node}
       );
     }
+    return undefined as unknown as TemplatePortal<unknown>;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -606,6 +637,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       changes.rteString &&
       changes.rteString.previousValue !== changes.rteString.currentValue
     ) {
+      this.rteString =
+        (changes.rteString.currentValue as string | null | undefined) ?? null;
       /**
        * The following serves as an excellent example of why we shouldn't use
        * js and elementRef.nativeElement to manipulate the DOM. When doing so
@@ -635,7 +668,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         }
       }
 
-      textNodes.forEach(node => node.parentElement.removeChild(node));
+      textNodes.forEach(node => {
+        const parentNode = node.parentNode;
+        if (parentNode) {
+          parentNode.removeChild(node);
+          return;
+        }
+        node.parentElement?.removeChild(node);
+      });
 
       this._updateNode();
 
@@ -647,7 +687,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           activeContentId
         );
         this.automaticVoiceoverHighlightService.languageCode =
-          this.localStorageService.getLastSelectedTranslationLanguageCode();
+          this.localStorageService.getLastSelectedTranslationLanguageCode() ||
+          AppConstants.DEFAULT_LANGUAGE_CODE;
         this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
           this.highlightIdToSentenceText
         );

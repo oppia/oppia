@@ -28,7 +28,7 @@ import {ExplorationParamSpecsService} from 'pages/exploration-editor-page/servic
   templateUrl: './parameter-name-editor.component.html',
 })
 export class ParameterNameEditorComponent implements OnInit {
-  @Output() valueChanged = new EventEmitter();
+  @Output() valueChanged = new EventEmitter<string | null>();
   @Output() validityChange = new EventEmitter<Record<'error', boolean>>();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -40,7 +40,7 @@ export class ParameterNameEditorComponent implements OnInit {
     private explorationParamSpecsService: ExplorationParamSpecsService
   ) {}
 
-  private _validate() {
+  private _validate(): void {
     this.validityChange.emit({
       error: this.availableParamNames.length === 0 ? false : true,
     });

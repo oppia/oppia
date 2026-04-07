@@ -23,10 +23,10 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {InteractiveMultipleChoiceInputComponent} from './oppia-interactive-multiple-choice-input.component';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
@@ -36,20 +36,27 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+      interactionId: string,
+      attributes: Record<string, string>
+    ) {
+      const choices = JSON.parse(attributes.choicesWithValue).map(
+        (choice: {html: string; contentId: string}) =>
+          new SubtitledHtml(choice.html, choice.contentId)
+      );
       return {
         showChoicesInShuffledOrder: {
           value: JSON.parse(attributes.showChoicesInShuffledOrderWithValue),
         },
         choices: {
-          value: JSON.parse(attributes.choicesWithValue),
+          value: choices,
         },
       };
     }
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {
+    onSubmit(answer: InteractionAnswer, rulesService: unknown) {
       expect(answer).toBe(1);
     }
 
@@ -59,7 +66,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
     updateCurrentAnswer(answer: InteractionAnswer): void {}
 
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    registerCurrentInteraction(
+      submitAnswerFn: () => void,
+      validateExpressionFn: () => void
+    ) {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -97,15 +107,13 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component = fixture.componentInstance;
 
     let contentId: string = 'content_id';
-    let interaction = {} as Interaction;
-    let recordedVoiceovers = new RecordedVoiceovers({});
+    let interaction = {} as unknown as Interaction;
     displayedCard = new StateCard(
       'test_name',
       'content',
       'interaction',
       interaction,
       [],
-      recordedVoiceovers,
       contentId
     );
 
@@ -149,19 +157,19 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       expect(component.choices).toEqual([
         {
           originalIndex: 0,
-          choice: {html: '<p>opt1</p>', contentId: 'ca_choices_9'},
+          choice: new SubtitledHtml('<p>opt1</p>', 'ca_choices_9'),
         },
         {
           originalIndex: 1,
-          choice: {html: '<p>opt2</p>', contentId: 'ca_choices_10'},
+          choice: new SubtitledHtml('<p>opt2</p>', 'ca_choices_10'),
         },
         {
           originalIndex: 2,
-          choice: {html: '<p>opt3</p>', contentId: 'ca_choices_11'},
+          choice: new SubtitledHtml('<p>opt3</p>', 'ca_choices_11'),
         },
         {
           originalIndex: 3,
-          choice: {html: '<p>opt4</p>', contentId: 'ca_choices_12'},
+          choice: new SubtitledHtml('<p>opt4</p>', 'ca_choices_12'),
         },
       ]);
 
@@ -203,38 +211,17 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   );
 
   it('should update selected answer when user selects an option', () => {
-    let dummyMouseEvent = new MouseEvent('Mouse');
+    const dummyMouseEvent = new MouseEvent('Mouse');
+    const selectedElement = document.createElement('button');
+    const currentTargetElement = document.createElement('div');
     component.errorMessageI18nKey = 'Some error';
     spyOn(currentInteractionService, 'updateCurrentAnswer');
     spyOn(document, 'querySelector')
       .withArgs('button.multiple-choice-option.selected')
-      .and.returnValue({
-        // This throws "Type '{ add: () => void; remove: () => void; }'
-        // is missing the following properties from type 'DOMTokenList':
-        // length, value, contains, item, and 4 more". We need to suppress
-        // this error because typescript expects more
-        // properties than just one add and remove.
-        // We need only add and remove for testing purposes.
-        // @ts-expect-error
-        classList: {
-          add: () => {
-            return;
-          },
-          remove: () => {
-            return;
-          },
-        },
-      });
-    spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
-      classList: {
-        add: () => {
-          return;
-        },
-        remove: () => {
-          return;
-        },
-      },
-    });
+      .and.returnValue(selectedElement);
+    spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
+      currentTargetElement
+    );
     component.selectAnswer(dummyMouseEvent, '1');
 
     expect(component.answer).toBe(1);
@@ -257,40 +244,17 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     'should not submit answer when user selects option if user is on' +
       ' a mobile',
     () => {
-      let dummyMouseEvent = new MouseEvent('Mouse');
+      const dummyMouseEvent = new MouseEvent('Mouse');
+      const selectedElement = document.createElement('button');
+      const currentTargetElement = document.createElement('div');
       component.errorMessageI18nKey = 'Some error';
       spyOn(currentInteractionService, 'updateCurrentAnswer');
-      spyOn(document, 'querySelectorAll')
+      spyOn(document, 'querySelector')
         .withArgs('button.multiple-choice-option.selected')
-        .and.returnValue([
-          {
-            // This throws "Type '{ add: () => void; remove: () => void; }'
-            // is missing the following properties from type 'DOMTokenList':
-            // length, value, contains, item, and 4 more". We need to suppress
-            // this error because typescript expects around more
-            // properties than just one add and remove.
-            // We need only add and remove for testing purposes.
-            // @ts-expect-error
-            classList: {
-              add: () => {
-                return;
-              },
-              remove: () => {
-                return;
-              },
-            },
-          },
-        ]);
-      spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
-        classList: {
-          add: () => {
-            return;
-          },
-          remove: () => {
-            return;
-          },
-        },
-      });
+        .and.returnValue(selectedElement);
+      spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
+        currentTargetElement
+      );
       spyOn(component, 'submitAnswer');
 
       component.selectAnswer(dummyMouseEvent, '1');
