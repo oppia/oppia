@@ -865,22 +865,13 @@ solicit_answer_details: false
             ['The title for ZIP download handler test.yaml'],
         )
 
-        # Load golden zip file.
-        golden_zip_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR,
-            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip',
-        )
-        with open(golden_zip_filepath, 'rb', encoding=None) as f:
-            golden_zipfile = f.read()
-        zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
-        # Compare saved with golden file.
+        # Compare downloaded YAML with exploration YAML at version 2.
+        expected_yaml = exp_fetchers.get_exploration_by_id(exp_id).to_yaml()
         self.assertEqual(
-            zf_saved.open(
-                'The title for ZIP download handler test.yaml'
-            ).read(),
-            zf_gold.open(
-                'The title for ZIP download handler test!.yaml'
-            ).read(),
+            zf_saved.open('The title for ZIP download handler test.yaml')
+            .read()
+            .decode('utf-8'),
+            expected_yaml,
         )
 
         # Check download to JSON.

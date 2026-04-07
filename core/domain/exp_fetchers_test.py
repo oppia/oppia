@@ -666,7 +666,12 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
                             'param_changes': [],
                             'refresher_exploration_id': None,
                         },
-                        'rule_specs': [],
+                        'rule_specs': [
+                            {
+                                'rule_type': 'Equals',
+                                'inputs': {'x': 'InputString'},
+                            }
+                        ],
                         'tagged_skill_misconception_id': None,
                         'training_data': [],
                     }

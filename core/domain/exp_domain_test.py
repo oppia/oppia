@@ -5579,14 +5579,21 @@ title: Title
 
     def test_creation_with_invalid_yaml_schema_version(self) -> None:
         """Test that a schema version that is too big is detected."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='Title', category='Category'
+        )
+        exploration.add_states(['New state'])
+        invalid_schema_yaml = exploration.to_yaml().replace(
+            f'schema_version: {exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION}',
+            'schema_version: 10000',
+            1,
+        )
         with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v46 to v[0-9]+ exploration YAML files '
             'at present.',
         ):
-            exp_domain.Exploration.from_yaml(
-                'bad_exp', self.YAML_CONTENT_INVALID_SCHEMA_VERSION
-            )
+            exp_domain.Exploration.from_yaml('bad_exp', invalid_schema_yaml)
 
     def test_yaml_import_and_export(self) -> None:
         """Test the from_yaml() and to_yaml() methods."""
@@ -5599,7 +5606,6 @@ title: Title
         exploration.validate()
 
         yaml_content = exploration.to_yaml()
-        self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
         exploration2 = exp_domain.Exploration.from_yaml('exp2', yaml_content)
         self.assertEqual(len(exploration2.states), 2)

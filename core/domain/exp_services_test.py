@@ -3677,13 +3677,13 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
         """card_is_checkpoint: true
 classifier_model_id: null
 content:
-  content_id: content_0
-  html: ''
+    content_id: content_0
+    html: ''
 inapplicable_skill_misconception_ids: []
 interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
+    answer_groups: []
+    confirmed_unclassified_answers: []
+    customization_args:
         catchMisspellings:
             value: false
         placeholder:
@@ -3692,7 +3692,7 @@ interaction:
                 unicode_str: ''
         rows:
             value: 1
-  default_outcome:
+    default_outcome:
         dest: %s
         dest_if_really_stuck: null
         feedback:
@@ -3702,7 +3702,7 @@ interaction:
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-  hints: []
+    hints: []
     id: TextInput
     solution: null
 linked_skill_id: null
@@ -3884,9 +3884,9 @@ solicit_answer_details: false
         self.assertEqual(
             set(dict_output.keys()), set(self.SAMPLE_EXPORTED_DICT.keys())
         )
-        for state_name in dict_output:
+        for state_name, state_yaml in dict_output.items():
             self.assertEqual(
-                utils.dict_from_yaml(dict_output[state_name]),
+                utils.dict_from_yaml(state_yaml),
                 utils.dict_from_yaml(self.SAMPLE_EXPORTED_DICT[state_name]),
             )
 
@@ -4008,9 +4008,9 @@ solicit_answer_details: false
         self.assertEqual(
             set(dict_output.keys()), set(self.SAMPLE_EXPORTED_DICT.keys())
         )
-        for state_name in dict_output:
+        for state_name, state_yaml in dict_output.items():
             self.assertEqual(
-                utils.dict_from_yaml(dict_output[state_name]),
+                utils.dict_from_yaml(state_yaml),
                 utils.dict_from_yaml(self.SAMPLE_EXPORTED_DICT[state_name]),
             )
 
@@ -4021,9 +4021,9 @@ solicit_answer_details: false
         self.assertEqual(
             set(dict_output.keys()), set(self.UPDATED_SAMPLE_DICT.keys())
         )
-        for state_name in dict_output:
+        for state_name, state_yaml in dict_output.items():
             self.assertEqual(
-                utils.dict_from_yaml(dict_output[state_name]),
+                utils.dict_from_yaml(state_yaml),
                 utils.dict_from_yaml(self.UPDATED_SAMPLE_DICT[state_name]),
             )
 
