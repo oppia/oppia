@@ -115,26 +115,26 @@ interface ExplorationData extends ExplorationBackendDict {
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  explorationIsLinkedToStory: boolean;
-  screenIsLarge: boolean;
-  explorationId: string;
-  explorationUrl: string;
-  revertExplorationUrl: string;
-  checkRevertExplorationValidUrl: string;
-  explorationDownloadUrl: string;
-  improvementsTabIsEnabled: boolean;
+  explorationIsLinkedToStory!: boolean;
+  screenIsLarge!: boolean;
+  explorationId!: string;
+  explorationUrl!: string;
+  revertExplorationUrl!: string;
+  checkRevertExplorationValidUrl!: string;
+  explorationDownloadUrl!: string;
+  improvementsTabIsEnabled!: boolean;
   reconnectedMessageTimeoutMilliseconds: number = 4000;
   disconnectedMessageTimeoutMilliseconds: number = 5000;
   autosaveIsInProgress: boolean = false;
   connectedToInternet: boolean = true;
   explorationEditorPageHasInitialized: boolean = false;
-  activeThread: string;
-  warningsAreShown: boolean;
-  currentUserIsCurriculumAdmin: boolean;
-  currentUserIsModerator: boolean;
-  currentUser: string;
-  currentVersion: number;
-  areExplorationWarningsVisible: boolean;
+  activeThread!: string;
+  warningsAreShown!: boolean;
+  currentUserIsCurriculumAdmin!: boolean;
+  currentUserIsModerator!: boolean;
+  currentUser!: string;
+  currentVersion!: number;
+  areExplorationWarningsVisible!: boolean;
   isModalOpenable: boolean = true;
   modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 

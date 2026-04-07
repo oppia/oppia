@@ -126,8 +126,8 @@ describe('Exploration editor page component', () => {
   let ics: InternetConnectivityService;
   let pageContextService: PageContextService;
   let mockEnterEditorForTheFirstTime: EventEmitter<void>;
-  let registerAcceptTutorialModalEventSpy;
-  let registerDeclineTutorialModalEventSpy;
+  let registerAcceptTutorialModalEventSpy: any;
+  let registerDeclineTutorialModalEventSpy: any;
   let focusManagerService: FocusManagerService;
   let explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
   let entityTranslationsService: EntityTranslationsService;
@@ -140,7 +140,7 @@ describe('Exploration editor page component', () => {
   let mockOpenEditorTutorialEmitter = new EventEmitter<void>();
   let mockOpenTranslationTutorialEmitter = new EventEmitter<void>();
   let mockInitExplorationPageEmitter = new EventEmitter<void>();
-  let isLocationSetToNonStateEditorTabSpy;
+  let isLocationSetToNonStateEditorTabSpy: any;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let explorationId = 'exp1';
@@ -218,13 +218,14 @@ describe('Exploration editor page component', () => {
   class MockWindowRef {
     location = {path: '/create/2234'};
     nativeWindow = {
-      scrollTo: (value1, value2) => {},
+      nativeWindow = { 
+      scrollTo: (value1: number, value2: number) => {},
       sessionStorage: {
         promoIsDismissed: null,
-        setItem: (testKey1, testKey2) => {},
-        removeItem: testKey => {},
+        setItem: (testKey1: string, testKey2: string) => {},
+        removeItem: (testKey: string) => {},
       },
-      gtag: (value1, value2, value3) => {},
+      gtag: (value1: any, value2: any, value3: any) => {},
       navigator: {
         onLine: true,
         userAgent: null,
@@ -241,7 +242,7 @@ describe('Exploration editor page component', () => {
       },
       document: {
         documentElement: {
-          setAttribute: (value1, value2) => {},
+         setAttribute: (value1: string, value2: string) => {},
           clientWidth: null,
           clientHeight: null,
         },
@@ -253,9 +254,10 @@ describe('Exploration editor page component', () => {
           },
         },
       },
-      addEventListener: (value1, value2) => {},
+     addEventListener: (value1: string, value2: any) => {},
     };
   }
+}
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -278,7 +280,7 @@ describe('Exploration editor page component', () => {
               return explorationId;
             },
             setExplorationIsLinkedToStory: () => {},
-            setExplorationVersion: expVersion => {},
+           setExplorationVersion: (expVersion: number) => {},
             isExplorationLinkedToStory: () => {},
           },
         },
@@ -312,7 +314,7 @@ describe('Exploration editor page component', () => {
         {
           provide: ExplorationDataService,
           useValue: {
-            getDataAsync: callback => {
+           getDataAsync: (callback: (id: string, changes: any[]) => void) => {
               callback();
               return Promise.resolve(explorationData);
             },
@@ -928,7 +930,7 @@ describe('Exploration editor page component', () => {
       expect(component.revertExplorationUrl).toBe(
         '/createhandler/revert/' + explorationId
       );
-      expect(component.areExplorationWarningsVisible).toBeFalse();
+     expect(component.areExplorationWarningsVisible).toBe(false);
     });
 
     it('should navigate to feedback tab', fakeAsync(() => {
@@ -1115,13 +1117,13 @@ describe('Exploration editor page component', () => {
     );
 
     it('should toggle exploration warning visibility', () => {
-      expect(component.areExplorationWarningsVisible).toBeFalse();
+      expect(component.areExplorationWarningsVisible).toBe(false);
 
       component.toggleExplorationWarningVisibility();
-      expect(component.areExplorationWarningsVisible).toBeTrue();
+      expect(component.areExplorationWarningsVisible).toBe(true);
 
       component.toggleExplorationWarningVisibility();
-      expect(component.areExplorationWarningsVisible).toBeFalse();
+      expect(component.areExplorationWarningsVisible).toBe(false);
     });
 
     it('should get exploration url', () => {
@@ -1196,7 +1198,7 @@ describe('Exploration editor page component', () => {
       tick();
       flushMicrotasks();
 
-      expect(component.isImprovementsTabEnabled()).toBeTrue();
+      expect(component.isImprovementsTabEnabled()).toBe(true);
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
@@ -1209,7 +1211,7 @@ describe('Exploration editor page component', () => {
       tick();
       flushMicrotasks();
 
-      expect(component.isImprovementsTabEnabled()).toBeFalse();
+      expect(component.isImprovementsTabEnabled()).toBe(false);
     }));
 
     it('should react to enterEditorForTheFirstTime event', fakeAsync(() => {
@@ -1235,19 +1237,19 @@ describe('Exploration editor page component', () => {
       // Curated exploration must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(true);
       let voiceoverTabIsEnabled = component.isVoiceoverTabEnabled();
-      expect(voiceoverTabIsEnabled).toBeTrue();
+      expect(voiceoverTabIsEnabled).toBe(true);
 
       // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
       mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         false;
-      expect(component.isVoiceoverTabEnabled()).toBeFalse();
+      expect(component.isVoiceoverTabEnabled()).toBe(false);
 
       // Non curated exploration, when feature flag is enabled, must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
       mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         true;
-      expect(component.isVoiceoverTabEnabled()).toBeTrue();
+      expect(component.isVoiceoverTabEnabled()).toBe(true);
     });
   });
 });
