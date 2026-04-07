@@ -1,7 +1,7 @@
 <div class="oppia-opportunities-list">
   <div class="oppia-search-bar" *ngIf="showSearchBar">
     <div class="oppia-input-group">
-      <input type="text"
+      <input type="search"
              class="oppia-search-bar-input"
              [(ngModel)]="searchQuery"
              (ngModelChange)="!searchQuery && applySearch()"
