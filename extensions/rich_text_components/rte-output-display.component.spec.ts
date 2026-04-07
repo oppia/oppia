@@ -322,7 +322,7 @@ describe('RTE display component', () => {
 
     let expectedOutputWrappedString =
       '<p><span class="highlightBlock1"><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link></span></p>' +
-      '<p><span class="highlightBlock2">Hello world.</span><span> </span><span class="highlightBlock3">This is the second sentence.</span></p>';
+      '<p><span class="highlightBlock2">Hello world.</span> <span class="highlightBlock3">This is the second sentence.</span></p>';
 
     spyOn(
       localStorageService,
@@ -338,9 +338,89 @@ describe('RTE display component', () => {
     let rteString = '<p>Hi world! I am a content creator.</p>';
     let expectedOutputWrappedString =
       '<p><span class="highlightBlock1">Hi world!</span>' +
-      '<span> </span>' +
-      '<span class="highlightBlock2">I am a content creator.</span></p>';
+      ' <span class="highlightBlock2">I am a content creator.</span></p>';
 
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should return BR node directly while traversing', () => {
+    const brElement = document.createElement('br');
+    const result = component.traverseNodeAndWrapSpanTags(brElement, /\s+/g) as
+      | Node[]
+      | Node;
+
+    expect(Array.isArray(result)).toBeTrue();
+    expect((result as Node[]).length).toBe(1);
+    expect((result as Node[])[0]).toBe(brElement);
+  });
+
+  it('should skip empty sentence fragments for empty text nodes', () => {
+    const textNode = document.createTextNode('');
+    const result = component.traverseNodeAndWrapSpanTags(
+      textNode,
+      /(?<=[.!?])\s+/g
+    ) as Text[];
+
+    expect(result.length).toBe(0);
+  });
+
+  it('should append pending whitespace nodes after traversal loop', fakeAsync(() => {
+    let rteString = '<p>Hello world.<br></p>';
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1">Hello world.</span><br></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should preserve unmatched trailing nodes when sentence match is incomplete', () => {
+    const paragraph = document.createElement('p');
+    paragraph.appendChild(document.createTextNode('abc'));
+
+    // This regex creates empty split fragments so sentence matching is not
+    // completed, exercising the fallback path that appends leftover nodes.
+    const traversedNode = component.traverseNodeAndWrapSpanTags(
+      paragraph,
+      /abc/g
+    ) as HTMLElement;
+
+    expect(traversedNode.nodeName).toBe('P');
+    expect(traversedNode.textContent).toBe('abc');
+    expect(traversedNode.querySelector('span')).toBeNull();
+  });
+
+  it('should preserve multiple spaces between sentences while wrapping', fakeAsync(() => {
+    let rteString = '<p>My Name is Nikhil.     Thanks!</p>';
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1">My Name is Nikhil.</span>' +
+      '     <span class="highlightBlock2">Thanks!</span></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should preserve space after punctuation around custom tags', fakeAsync(() => {
+    let rteString =
+      '<p><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link>. My name is Nikhil.</p>';
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1"><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link>. My name is Nikhil.</span></p>';
     spyOn(
       localStorageService,
       'getLastSelectedTranslationLanguageCode'
