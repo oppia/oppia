@@ -1282,7 +1282,12 @@ def _get_all_recipient_ids(
                 in this thread, excluding owners of the exploration and the
                 given author.
     """
-    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False
+    )
+
+    if exploration_rights is None:
+        return ([], [])
 
     owner_ids = set(exploration_rights.owner_ids)
     participant_ids = {
@@ -1417,6 +1422,10 @@ def _add_message_to_email_buffer(
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
         thread.entity_type, thread.entity_id, thread_id, message_id
     )
+    if thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+        # We only send emails for feedback on explorations.
+        return
+
     batch_recipient_ids, other_recipient_ids = _get_all_recipient_ids(
         exploration_id, thread_id, author_id
     )

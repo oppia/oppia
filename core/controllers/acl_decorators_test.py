@@ -1514,13 +1514,14 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             'private exp',
             'some text',
         )
-        self.disabled_exp_thread_id = feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION,
-            feconf.DISABLED_EXPLORATION_IDS[0],
-            self.owner_id,
-            'disabled exp',
-            'some text',
-        )
+        with self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False):
+            self.disabled_exp_thread_id = feedback_services.create_thread(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                feconf.DISABLED_EXPLORATION_IDS[0],
+                self.owner_id,
+                'disabled exp',
+                'some text',
+            )
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
