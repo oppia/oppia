@@ -22,7 +22,7 @@ from scripts import check_for_unresolved_todos
 from typing import List, Optional
 
 COMMIT_SHA_HASH_LENGTH = 40
-TASK_KEYWORD = 'TODO'
+TASK_KEYWORD = 'TODO'  # disable-bad-pattern-check
 NEW_COMMENT_SHOULD_BE_POSTED = f'NEW {TASK_KEYWORD} COMMENT SHOULD BE POSTED'
 NEW_COMMENT_SHOULD_NOT_BE_POSTED = (
     f'THE LATEST COMMENT IS THE SAME AS THE NEW {TASK_KEYWORD} COMMENT'

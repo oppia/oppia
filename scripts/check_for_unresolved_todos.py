@@ -289,8 +289,8 @@ def fetch_latest_comment_from_pull_request(
     return next(iter(latest_comment_nodes), None)
 
 
-TASK_KEYWORD = 'TODO'
-TASKS_KEYWORD = 'TODOs'
+TASK_KEYWORD = 'TODO'  # disable-bad-pattern-check
+TASKS_KEYWORD = 'TODOs'  # disable-bad-pattern-check
 UNRESOLVED_TASKS_PRESENT_INDICATOR = (
     f'THERE ARE {TASKS_KEYWORD} ASSOCIATED WITH THE PROVIDED ISSUES.'
 )
