@@ -1241,7 +1241,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         frames: 'all',
         outputType: 'canvas',
       })
-      .then(async (frameData: any[]) => {
+      .then(async frameData => {
         const frames: string[] = [];
         for (let i = 0; i < frameData.length; i += 1) {
           const sourceCanvas = frameData[i].getImage() as HTMLCanvasElement;

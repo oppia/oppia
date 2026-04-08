@@ -579,13 +579,13 @@ export class SvgEditorComponent implements OnInit {
   loadTextObject(element: Element, obj: fabric.Object): void {
     const childNodes = Array.from(element.children) as SVGElement[];
     let value = '';
-    const coloredTextIndex: Array<{
+    const coloredTextIndex: {
       startIndex: number;
       endIndex: number;
       fill: string;
       stroke: string;
       strokeWidth: string;
-    }> = [];
+    }[] = [];
     // Extracts the text from the tspan tags and appends
     // with a \n tag to ensure that the texts are subsequent lines.
     childNodes.forEach((el: SVGElement, index: number) => {

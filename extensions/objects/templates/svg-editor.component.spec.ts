@@ -1,4 +1,3 @@
-/// <reference types="jasmine" />
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,6 @@ import {fabric} from 'fabric';
 import {AppConstants} from 'app.constants';
 import {SvgEditorConstants} from './svg-editor.constants';
 import {PolyPoint, SvgEditorComponent} from './svg-editor.component';
-declare var Picker: any;
 import {
   ComponentFixture,
   fakeAsync,
@@ -41,6 +39,11 @@ import {CsrfTokenService} from 'services/csrf-token.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.service';
 import {of} from 'rxjs';
+
+interface PickerMock {
+  setOptions: (data: {color: string}) => void;
+  onOpen: (_color?: unknown) => void;
+}
 
 const initializeMockDocument = (svgFilenameCtrl: SvgEditorComponent): void => {
   const mockDocument = document.createElement('div');
@@ -82,7 +85,7 @@ describe('SvgEditor', () => {
       return dataUrl;
     },
   };
-  // in the SVG editor.
+  // In the SVG editor.
   const samplesvg =
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
@@ -283,15 +286,16 @@ describe('SvgEditor', () => {
     component.ngOnInit();
     component.canvas = new fabric.Canvas(component.canvasID);
     component.initializeMouseEvents();
-    const mockPicker = {
-      setOptions: (data: any) => {
-        return 'The value is set.';
-      },
-      onOpen: () => {},
+    const mockPicker: PickerMock = {
+      setOptions: (_data: {color: string}) => {},
+      onOpen: (_color?: unknown) => {},
     };
-    component.fillPicker = mockPicker as any;
-    component.strokePicker = mockPicker as any;
-    component.bgPicker = mockPicker as any;
+    const typedMockPicker = mockPicker as unknown as NonNullable<
+      SvgEditorComponent['fillPicker']
+    >;
+    component.fillPicker = typedMockPicker;
+    component.strokePicker = typedMockPicker;
+    component.bgPicker = typedMockPicker;
   }));
 
   it('should wait before updating diagram size when dom is loading', waitForAsync(
@@ -749,7 +753,7 @@ describe('SvgEditor', () => {
       fixture.detectChanges();
       tick(1);
       expect(component.data.savedSvgFileName).toBe('imageFile1.svg');
-      expect((component.data.savedSvgUrl as any).toString()).toBe(dataUrl);
+      expect(component.data.savedSvgUrl).toBe(dataUrl);
       expect(component.validate()).toBe(true);
     })
   ));
@@ -781,7 +785,7 @@ describe('SvgEditor', () => {
       component.savedSvgDiagram = samplesvg;
       component.continueDiagramEditing();
       tick(100);
-      const mocktoSVG = (arg: any) => {
+      const mocktoSVG = () => {
         return '<path></path>';
       };
       const customToSVG = component.createCustomToSVG(
@@ -820,7 +824,7 @@ describe('SvgEditor', () => {
         component.savedSvgDiagram = samplesvg;
         component.continueDiagramEditing();
         tick(10);
-        const mocktoSVG = (arg: any) => {
+        const mocktoSVG = () => {
           return '<path></path>';
         };
         const customToSVG = component.createCustomToSVG(
@@ -941,12 +945,8 @@ describe('SvgEditor with image save destination as local storage', () => {
     getRawImageData: (filename: string) => {
       return dataUrl;
     },
-    saveImage: (filename: string, imageData: any) => {
-      return 'Image file save.';
-    },
-    deleteImage: (filename: string) => {
-      return 'Image file is deleted.';
-    },
+    saveImage: (filename: string, imageData: string) => {},
+    deleteImage: (filename: string) => {},
     isInStorage: (filename: string) => {
       return true;
     },
@@ -1061,22 +1061,22 @@ describe('SvgEditor with image save destination as local storage', () => {
   }));
 
   it('should save svg file to local storage created by the svg editor', () => {
-    component!.createRect();
-    component!.saveSvgFile();
-    expect(component!.data.savedSvgFileName).toBe('350_450.svg');
-    expect((component!.data.savedSvgUrl as any).toString()).toBe(dataUrl);
-    expect(component!.validate()).toBe(true);
+    component.createRect();
+    component.saveSvgFile();
+    expect(component.data.savedSvgFileName).toBe('350_450.svg');
+    expect(component.data.savedSvgUrl).toBe(dataUrl);
+    expect(component.validate()).toBe(true);
   });
 
   it(
     'should allow user to continue editing the diagram and delete the ' +
       'image from local storage',
     () => {
-      component!.data.savedSvgFileName = 'image.svg';
-      component!.savedSvgDiagram = 'saved';
-      component!.savedSvgDiagram = samplesvg;
-      component!.continueDiagramEditing();
-      expect(component!.diagramStatus).toBe('editing');
+      component.data.savedSvgFileName = 'image.svg';
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      expect(component.diagramStatus).toBe('editing');
     }
   );
 
