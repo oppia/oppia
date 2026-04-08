@@ -2691,7 +2691,9 @@ export class TopicManager extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+    await this.expectElementToBeVisible(closeSaveModalButtonSelector, false);
     await this.expectToastMessageToBe('Changes Saved.');
+    await this.waitForStaticAssetsToLoad();
     showMessage('Skill updated successful');
   }
 
