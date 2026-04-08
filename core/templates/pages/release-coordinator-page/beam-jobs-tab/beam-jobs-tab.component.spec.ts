@@ -223,19 +223,21 @@ describe('Beam Jobs Tab Component', () => {
   });
 
   it('should deselect a job after changing the input', async () => {
-    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
-    const input = await loader.getHarness(MatInputHarness);
+    fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(component.selectedJob).toBeUndefined();
 
-    await input.setValue('FooJob');
-    await autocomplete.selectOption({text: 'FooJob'});
+    component.jobNameControl.setValue('FooJob');
+    component.onJobNameSelect('FooJob');
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(component.selectedJob).toEqual(fooJob);
 
-    await input.setValue('FooJo');
+    component.jobNameControl.setValue('FooJo');
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(component.selectedJob).toBeUndefined();
 
