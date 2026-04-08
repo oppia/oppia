@@ -106,22 +106,13 @@
             {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
           </h4>
           <form class="navbar-form oppia-search-bar-form ps-0 e2e-test-search-field" role="search">
-            <div class="mb-3 d-flex">
+            <div class="mb-3">
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
                      [ngModelOptions]="{ updateOn: 'change', standalone: 'true' }"
                      aria-label="Search bar"
                      (keydown.enter)="onSearchQueryChangeExec()">
-              <div class="input-group oppia-input-group">
-                <div class="input-group-text oppia-search-bar-icon" [ngClass]="{'d-block': isSmallScreenViewActive()}">
-                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">
-                  </i>
-                  <span *ngIf="isSearchInProgress()">
-                    <i class="fas fa-sync material-icons md-18 oppia-animate-spin"></i>
-                  </span>
-                </div>
-              </div>
             </div>
           </form>
           <h4 class="d-flex flex-grow-1 search-heading">
