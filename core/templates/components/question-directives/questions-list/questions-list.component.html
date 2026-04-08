@@ -2,11 +2,11 @@
   <div *ngIf="editorIsOpen && difficultyCount" class="question-editor-parent">
     <mat-card class="oppia-page-card oppia-question-editor-page-card oppia-mobile-collapsible-card">
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header e2e-test-question-difficulty-header"
-        (click)="toggleDifficultyCard()">
+           (click)="toggleDifficultyCard()">
         <h3>Difficulty
           <img *ngIf="difficultyCount === 1" class="info-icon" src="/assets/images/learner_dashboard/info.svg"
-            matTooltip="The difficulty level of this question cannot be changed because the skill specifies only one difficulty option."
-            aria-label="Locked to one difficulty level: This skill only has one difficulty setting.">
+               matTooltip="The difficulty level of this question cannot be changed because the skill specifies only one difficulty option."
+               aria-label="Locked to one difficulty level: This skill only has one difficulty setting.">
         </h3>
         <i class="fa fa-caret-down" *ngIf="!difficultyCardIsShown" aria-hidden="true">
         </i>
@@ -14,15 +14,15 @@
         </i>
       </div>
       <div class="oppia-mobile-collapsible-card-content e2e-test-question-difficulty-container"
-        *ngIf="difficultyCardIsShown">
+           *ngIf="difficultyCardIsShown">
         <div class="list-group">
           <h4 *ngIf="difficultyCount != 1">Select Difficulty</h4>
           <div *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let index = index"
-            [class.single-option]="difficultyCount === 1" class="difficulty-selection-container">
+               [class.single-option]="difficultyCount === 1" class="difficulty-selection-container">
             <label class="list-group-item-heading">{{skillWithDifficulty.getDescription()}}</label>
             <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
-              [skillWithDifficulty]="skillWithDifficulty" [difficultyCount]="difficultyCount"
-              (skillWithDifficultyChange)="updateSkillWithDifficulty($event, index)">
+                                                [skillWithDifficulty]="skillWithDifficulty" [difficultyCount]="difficultyCount"
+                                                (skillWithDifficultyChange)="updateSkillWithDifficulty($event, index)">
             </oppia-question-difficulty-selector>
           </div>
         </div>
@@ -41,13 +41,15 @@
         </div>
       </mat-card>
       <button class="btn btn-success btn-sm e2e-test-link-another-skill-button" (click)="addSkill()"
-        *ngIf="associatedSkillSummaries.length < MAX_SKILLS_PER_QUESTION">Link Another Skill</button>
+              *ngIf="associatedSkillSummaries.length < MAX_SKILLS_PER_QUESTION">
+        Link Another Skill
+      </button>
     </div>
     <oppia-question-editor [questionId]="questionId" [misconceptionsBySkill]="misconceptionsBySkill"
-      [questionStateData]="questionStateData" [question]="question" [userCanEditQuestion]="canEditQuestion">
+                           [questionStateData]="questionStateData" [question]="question" [userCanEditQuestion]="canEditQuestion">
     </oppia-question-editor>
     <div class="alert alert-danger"
-      *ngIf="question.getStateData().interaction.id && questionValidationService.getValidationErrorMessage(question)">
+         *ngIf="question.getStateData().interaction.id && questionValidationService.getValidationErrorMessage(question)">
       {{questionValidationService.getValidationErrorMessage(question)}}
     </div>
   </div>
@@ -63,21 +65,19 @@
       </div>
       <div *ngIf="questionSummariesForOneSkill.length > 0">
         <div *ngFor="let questionSummaryForOneSkill of questionSummariesForOneSkill; let index = index"
-          class="question-list-item e2e-test-question-list-item">
+             class="question-list-item e2e-test-question-list-item">
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
-            (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
+               (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
             <div class="question-data e2e-test-edit-question-button">
               <oppia-rte-output-display class="e2e-test-question-text question-text"
-                [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
+                                        [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
-              <span
-                *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())"
-                matTooltip="Unaddressed skill misconceptions" matTooltipClass="oppia-mat-tooltip-list">
+              <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())"
+                    matTooltip="Unaddressed skill misconceptions" matTooltipClass="oppia-mat-tooltip-list">
                 ⚠️
               </span>
-              <span
-                (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(),questionSummaryForOneSkill.getSkillDifficulty());$event.stopPropagation();"
-                class="link-off-icon">
+              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(),questionSummaryForOneSkill.getSkillDifficulty());$event.stopPropagation();"
+                    class="link-off-icon">
                 <i class="fas fa-trash"></i>
               </span>
             </div>
@@ -102,48 +102,63 @@
         </div>
         <div class="checklist-item">
           <div class="checklist-item-number"
-            [ngClass]="{'checklist-item-number-active': linkedSkillsWithDifficulty.length}"><span>1</span></div>
+               [ngClass]="{'checklist-item-number-active': linkedSkillsWithDifficulty.length}">
+            <span>1</span>
+          </div>
           <div class="checklist-item-text">Difficulty</div>
         </div>
         <div class="checklist-item-separator"></div>
         <div class="checklist-item">
           <div class="checklist-item-number"
-            [ngClass]="{'checklist-item-number-active': question.getStateData().content.html.length}">2</div>
+               [ngClass]="{'checklist-item-number-active': question.getStateData().content.html.length}">
+            2
+          </div>
           <div class="checklist-item-text">Problem</div>
         </div>
         <div class="checklist-item-separator"></div>
         <div class="checklist-item">
           <div class="checklist-item-number"
-            [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.id}">3</div>
+               [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.id}">
+            3
+          </div>
           <div class="checklist-item-text">Interaction</div>
         </div>
         <div class="checklist-item-separator"></div>
         <div class="checklist-item">
           <div class="checklist-item-number"
-            [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.answerGroups.length}">4
+               [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.answerGroups.length}">
+            4
           </div>
           <div class="checklist-item-text">Answers and Responses</div>
         </div>
         <div class="checklist-item-separator"></div>
         <div class="checklist-item">
           <div class="checklist-item-number"
-            [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.hints.length}">5</div>
+               [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.hints.length}">
+            5
+          </div>
           <div class="checklist-item-text">Hints</div>
         </div>
         <div class="checklist-item-separator" *ngIf="showSolutionCheckpoint()"></div>
         <div class="checklist-item" *ngIf="showSolutionCheckpoint()">
           <div class="checklist-item-number"
-            [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.solution}">6</div>
+               [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.solution}">
+            6
+          </div>
           <div class="checklist-item-text">Solution</div>
         </div>
       </div>
     </div>
     <div class="save-question-button-container">
-      <button class="btn question-edit-cancel-button" (click)="cancel()">CANCEL</button>
+      <button class="btn btn-secondary e2e-test-cancel-question-button"
+              (click)="cancel()">
+        CANCEL
+      </button>
       <span matTooltip="To Save please add: interaction, hint, solution and address all misconceptions"
-        matTooltipClass="oppia-mat-tooltip-list" [matTooltipDisabled]="isQuestionSavable()" class="w-100">
-        <button class="btn add-question-btn question-edit-save-button e2e-test-save-question-button"
-          (click)="saveQuestion()" [disabled]="!isQuestionSavable() || questionIsBeingSaved">
+            matTooltipClass="oppia-mat-tooltip-list" [matTooltipDisabled]="isQuestionSavable()" class="w-100">
+        <button class="btn btn-success e2e-test-save-question-button"
+                [disabled]="!isQuestionSavable()"
+                (click)="saveQuestion()">
           <i class="fas fa-exclamation-triangle story-save-draft-warning" *ngIf="!isQuestionSavable()">
           </i>
           SAVE
@@ -158,7 +173,7 @@
           <h3>Create a new question</h3>
         </div>
         <button class="btn add-question-btn e2e-test-create-question-button oppia-autofocus"
-          [disabled]="selectSkillModalIsShown && !selectedSkillId" (click)="createQuestion()" focus-on="newQuestionBtn">
+                [disabled]="selectSkillModalIsShown && !selectedSkillId" (click)="createQuestion()" focus-on="newQuestionBtn">
           + ADD QUESTION
         </button>
       </div>
