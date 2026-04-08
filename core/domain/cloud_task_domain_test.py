@@ -21,10 +21,10 @@ from __future__ import annotations
 import datetime
 import uuid
 
+from typing import Dict
+
 from core.domain import cloud_task_domain
 from core.tests import test_utils
-
-from typing import Dict
 
 
 class CloudTaskDomainTests(test_utils.GenericTestBase):
@@ -101,9 +101,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             'created_on': created_on.isoformat(),
         }
 
-        cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(
-            cloud_task_run_dict
-        )
+        cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(cloud_task_run_dict)
 
         self.assertEqual(cloud_task_run.to_dict(), cloud_task_run_dict)
 
@@ -121,20 +119,14 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             }
         }
 
-        voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
-                exploration_id,
-                task_run_id,
-                language_accent_to_content_status_map,
-            )
+        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            exploration_id,
+            task_run_id,
+            language_accent_to_content_status_map,
         )
 
-        self.assertEqual(
-            voiceover_regeneration_task_mapping.exploration_id, exploration_id
-        )
-        self.assertEqual(
-            voiceover_regeneration_task_mapping.task_run_id, task_run_id
-        )
+        self.assertEqual(voiceover_regeneration_task_mapping.exploration_id, exploration_id)
+        self.assertEqual(voiceover_regeneration_task_mapping.task_run_id, task_run_id)
         self.assertEqual(
             voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
             language_accent_to_content_status_map,
@@ -153,16 +145,10 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         voiceover_regeneration_task_mapping_dict: cloud_task_domain.VoiceoverRegenerationTaskMappingDict = {
             'exploration_id': exploration_id,
             'task_run_id': task_run_id,
-            'language_accent_to_content_status_map': (
-                language_accent_to_content_status_map
-            ),
+            'language_accent_to_content_status_map': (language_accent_to_content_status_map),
         }
 
-        voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping.from_dict(
-                voiceover_regeneration_task_mapping_dict
-            )
-        )
+        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping.from_dict(voiceover_regeneration_task_mapping_dict)
 
         self.assertEqual(
             voiceover_regeneration_task_mapping.to_dict(),
@@ -173,16 +159,10 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         exploration_id = 'exp_id'
         task_run_id = 'task_run_id'
 
-        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping.create_default_voiceover_regeneration_task_mapping(
-            exploration_id, task_run_id
-        )
+        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping.create_default_voiceover_regeneration_task_mapping(exploration_id, task_run_id)
 
-        self.assertEqual(
-            voiceover_regeneration_task_mapping.exploration_id, exploration_id
-        )
-        self.assertEqual(
-            voiceover_regeneration_task_mapping.task_run_id, task_run_id
-        )
+        self.assertEqual(voiceover_regeneration_task_mapping.exploration_id, exploration_id)
+        self.assertEqual(voiceover_regeneration_task_mapping.task_run_id, task_run_id)
         self.assertEqual(
             voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
             {},
@@ -202,17 +182,13 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             },
         }
 
-        voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
-                exploration_id,
-                task_run_id,
-                language_accent_to_content_status_map,
-            )
+        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            exploration_id,
+            task_run_id,
+            language_accent_to_content_status_map,
         )
 
-        self.assertTrue(
-            voiceover_regeneration_task_mapping.are_all_voiceovers_generated()
-        )
+        self.assertTrue(voiceover_regeneration_task_mapping.are_all_voiceovers_generated())
 
         voiceover_regeneration_task_mapping.language_accent_to_content_status_map = {
             'en-US': {
@@ -221,9 +197,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             }
         }
 
-        self.assertFalse(
-            voiceover_regeneration_task_mapping.are_all_voiceovers_generated()
-        )
+        self.assertFalse(voiceover_regeneration_task_mapping.are_all_voiceovers_generated())
 
     def test_should_update_final_content_status_for_cloud_task_run(
         self,
@@ -238,17 +212,13 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             }
         }
 
-        voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
-                exploration_id,
-                task_run_id,
-                language_accent_to_content_status_map,
-            )
+        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            exploration_id,
+            task_run_id,
+            language_accent_to_content_status_map,
         )
 
-        voiceover_regeneration_task_mapping.update_final_content_status_for_cloud_task_run(
-            'en-US', ['content_1']
-        )
+        voiceover_regeneration_task_mapping.update_final_content_status_for_cloud_task_run('en-US', ['content_1'])
 
         expected_language_accent_to_content_status_map = {
             'en-US': {
@@ -268,17 +238,13 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         task_run_id = 'task_run_id'
         language_accent_to_content_status_map: Dict[str, Dict[str, str]] = {}
 
-        voiceover_regeneration_task_mapping = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
-                exploration_id,
-                task_run_id,
-                language_accent_to_content_status_map,
-            )
+        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            exploration_id,
+            task_run_id,
+            language_accent_to_content_status_map,
         )
 
-        voiceover_regeneration_task_mapping.add_language_accent_to_content_status_map(
-            'en-US', ['content_0', 'content_1']
-        )
+        voiceover_regeneration_task_mapping.add_language_accent_to_content_status_map('en-US', ['content_0', 'content_1'])
 
         expected_language_accent_to_content_status_map = {
             'en-US': {

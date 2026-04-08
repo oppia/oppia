@@ -20,6 +20,8 @@ import io
 import logging
 import urllib
 
+from typing import Dict, TypedDict
+
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -27,11 +29,10 @@ from core.domain import (
     fs_services,
     platform_parameter_domain,
     platform_parameter_list,
+    platform_parameter_services,
+    value_generators_domain,
 )
 from core.domain import platform_parameter_registry as registry
-from core.domain import platform_parameter_services, value_generators_domain
-
-from typing import Dict, TypedDict
 
 
 class ValueGeneratorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -51,11 +52,7 @@ class ValueGeneratorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.open_access
     def get(self, generator_id: str) -> None:
         """Handles GET requests."""
-        self.response.write(
-            value_generators_domain.Registry.get_generator_class_by_id(
-                generator_id
-            ).get_html_template()
-        )
+        self.response.write(value_generators_domain.Registry.get_generator_class_by_id(generator_id).get_html_template())
 
 
 class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -85,15 +82,11 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             }
         },
         'page_identifier': {'schema': {'type': 'basestring'}},
-        'asset_type': {
-            'schema': {'type': 'basestring', 'choices': _SUPPORTED_TYPES}
-        },
+        'asset_type': {'schema': {'type': 'basestring', 'choices': _SUPPORTED_TYPES}},
         'encoded_filename': {
             'schema': {
                 'type': 'basestring',
-                'validators': [
-                    {'id': 'is_regex_matched', 'regex_pattern': r'[-\w]+[.]\w+'}
-                ],
+                'validators': [{'id': 'is_regex_matched', 'regex_pattern': r'[-\w]+[.]\w+'}],
             }
         },
     }
@@ -136,11 +129,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            content_type = (
-                'image/svg+xml'
-                if file_format == 'svg'
-                else '%s/%s' % (asset_type, file_format)
-            )
+            content_type = 'image/svg+xml' if file_format == 'svg' else '%s/%s' % (asset_type, file_format)
             self.response.headers['Content-Type'] = content_type
 
             fs = fs_services.GcsFileSystem(page_context, page_identifier)
@@ -164,9 +153,7 @@ class PromoBarHandlerNormalizedPayloadDict(TypedDict):
     promo_bar_message: str
 
 
-class PromoBarHandler(
-    base.BaseHandler[PromoBarHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class PromoBarHandler(base.BaseHandler[PromoBarHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handler for the promo-bar."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -190,16 +177,8 @@ class PromoBarHandler(
         """Retrieves the configuration values for a promotional bar."""
         self.render_json(
             {
-                'promo_bar_enabled': (
-                    platform_parameter_services.get_platform_parameter_value(
-                        'promo_bar_enabled'
-                    )
-                ),
-                'promo_bar_message': (
-                    platform_parameter_services.get_platform_parameter_value(
-                        'promo_bar_message'
-                    )
-                ),
+                'promo_bar_enabled': (platform_parameter_services.get_platform_parameter_value('promo_bar_enabled')),
+                'promo_bar_message': (platform_parameter_services.get_platform_parameter_value('promo_bar_message')),
             }
         )
 
@@ -211,29 +190,14 @@ class PromoBarHandler(
         promo_bar_enabled_value = self.normalized_payload['promo_bar_enabled']
         promo_bar_message_value = self.normalized_payload['promo_bar_message']
 
-        logging.info(
-            '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
-            '%s' % (self.user_id, promo_bar_message_value)
-        )
+        logging.info('[RELEASE COORDINATOR] %s saved promo-bar config property values: %s' % (self.user_id, promo_bar_message_value))
 
-        rules_for_promo_bar_enabled_value = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
-                {'filters': [], 'value_when_matched': promo_bar_enabled_value}
-            )
-        ]
-        rules_for_promo_bar_message_value = [
-            platform_parameter_domain.PlatformParameterRule.from_dict(
-                {'filters': [], 'value_when_matched': promo_bar_message_value}
-            )
-        ]
+        rules_for_promo_bar_enabled_value = [platform_parameter_domain.PlatformParameterRule.from_dict({'filters': [], 'value_when_matched': promo_bar_enabled_value})]
+        rules_for_promo_bar_message_value = [platform_parameter_domain.PlatformParameterRule.from_dict({'filters': [], 'value_when_matched': promo_bar_message_value})]
 
-        promo_bar_enabled_parameter = registry.Registry.get_platform_parameter(
-            platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value
-        )
+        promo_bar_enabled_parameter = registry.Registry.get_platform_parameter(platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value)
 
-        promo_bar_message_parameter = registry.Registry.get_platform_parameter(
-            platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
-        )
+        promo_bar_message_parameter = registry.Registry.get_platform_parameter(platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value)
 
         registry.Registry.update_platform_parameter(
             'promo_bar_enabled',
@@ -298,8 +262,4 @@ class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             folder: str. The folder in which the image is.
             filename: str. The filename of the image.
         """
-        self.redirect(
-            fs_services.get_static_asset_url(
-                'copyrighted-images/%s/%s' % (folder, filename)
-            )
-        )
+        self.redirect(fs_services.get_static_asset_url('copyrighted-images/%s/%s' % (folder, filename)))

@@ -44,9 +44,7 @@ def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
     json_end = text_without_comments.rindex('}') + 1
     # Here we use type Any because 'json_dict' is a generic JSON object and
     # generic JSON objects are of type Dict[str, Any].
-    json_dict: Dict[str, Any] = json.loads(
-        text_without_comments[json_start:json_end]
-    )
+    json_dict: Dict[str, Any] = json.loads(text_without_comments[json_start:json_end])
     return json_dict
 
 
@@ -67,9 +65,7 @@ def remove_comments(text: str) -> str:
 # need utils.get_package_file_contents but it does not have it loaded to memory
 # yet. If called from utils we get error as `module has no attribute`.
 @overload
-def get_package_file_contents(
-    package: str, filepath: str, *, binary_mode: Literal[True]
-) -> bytes: ...
+def get_package_file_contents(package: str, filepath: str, *, binary_mode: Literal[True]) -> bytes: ...
 
 
 @overload
@@ -77,14 +73,10 @@ def get_package_file_contents(package: str, filepath: str) -> str: ...
 
 
 @overload
-def get_package_file_contents(
-    package: str, filepath: str, *, binary_mode: Literal[False]
-) -> str: ...
+def get_package_file_contents(package: str, filepath: str, *, binary_mode: Literal[False]) -> str: ...
 
 
-def get_package_file_contents(
-    package: str, filepath: str, *, binary_mode: bool = False
-) -> Union[str, bytes]:
+def get_package_file_contents(package: str, filepath: str, *, binary_mode: bool = False) -> Union[str, bytes]:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or
     rich_text_components.json. This function is needed to make loading these
@@ -106,14 +98,10 @@ def get_package_file_contents(
     """
     try:
         if binary_mode:
-            with open(
-                os.path.join(package, filepath), 'rb', encoding=None
-            ) as binary_file:
+            with open(os.path.join(package, filepath), 'rb', encoding=None) as binary_file:
                 read_binary_mode_data: bytes = binary_file.read()
                 return read_binary_mode_data
-        with open(
-            os.path.join(package, filepath), 'r', encoding='utf-8'
-        ) as file:
+        with open(os.path.join(package, filepath), 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
@@ -171,22 +159,10 @@ release_constants = Constants(  # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )
 
-autogeneratable_language_accent_constants = (
-    Constants(  # pylint:disable=invalid-name
-        json.loads(
-            get_package_file_contents(
-                'assets', 'autogeneratable_language_accent_list.json'
-            )
-        )
-    )
+autogeneratable_language_accent_constants = Constants(  # pylint:disable=invalid-name
+    json.loads(get_package_file_contents('assets', 'autogeneratable_language_accent_list.json'))
 )
 
-language_accent_master_list_constants = (
-    Constants(  # pylint:disable=invalid-name
-        json.loads(
-            get_package_file_contents(
-                'assets', 'language_accent_master_list.json'
-            )
-        )
-    )
+language_accent_master_list_constants = Constants(  # pylint:disable=invalid-name
+    json.loads(get_package_file_contents('assets', 'language_accent_master_list.json'))
 )

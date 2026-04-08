@@ -1,4 +1,5 @@
 from abc import ABCMeta
+
 from typing import ContextManager
 
 # Typing of Context's methods is taken from https://github.com/python/

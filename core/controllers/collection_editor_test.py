@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import base64
 
+from typing import Final
+
 from core import feconf
 from core.constants import constants
 from core.domain import (
@@ -29,8 +31,6 @@ from core.domain import (
     user_services,
 )
 from core.tests import test_utils
-
-from typing import Final
 
 
 class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
@@ -74,9 +74,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         system_user = user_services.get_system_user()
 
         collection_services.load_demo(self.COLLECTION_ID)
-        rights_manager.release_ownership_of_collection(
-            system_user, self.COLLECTION_ID
-        )
+        rights_manager.release_ownership_of_collection(system_user, self.COLLECTION_ID)
 
     def test_editable_collection_handler_get(self) -> None:
         allowed_usernames = [self.EDITOR_USERNAME]
@@ -85,8 +83,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Check that non-editors cannot access the editor data handler.
         # This is due to them not being allowed.
         self.get_json(
-            '%s/%s'
-            % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
+            '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
             expected_status_int=401,
         )
 
@@ -94,13 +91,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # from the editable_collection_data_handler.
         self.login(self.EDITOR_EMAIL)
 
-        json_response = self.get_json(
-            '%s/%s'
-            % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID)
-        )
-        self.assertEqual(
-            self.COLLECTION_ID, json_response['collection_dict']['id']
-        )
+        json_response = self.get_json('%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID))
+        self.assertEqual(self.COLLECTION_ID, json_response['collection_dict']['id'])
         self.logout()
 
     def test_editable_collection_handler_put_with_invalid_payload_version(
@@ -109,9 +101,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         allowed_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_collection_editors(allowed_usernames)
 
-        rights_manager.create_new_collection_rights(
-            self.COLLECTION_ID, self.owner_id
-        )
+        rights_manager.create_new_collection_rights(self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
             self.moderator,
             self.COLLECTION_ID,
@@ -134,8 +124,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             }
         ]
         json_response = self.put_json(
-            '%s/%s'
-            % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
+            '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
             {'version': None, 'change_list': sample_change_list},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -149,8 +138,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Raises error as version from payload does not match the collection
         # version.
         json_response = self.put_json(
-            '%s/%s'
-            % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
+            '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
             {'version': 2, 'change_list': sample_change_list},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -158,8 +146,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(
             json_response['error'],
-            'Trying to update version 1 of collection from version 2, '
-            'which is too old. Please reload the page and try again.',
+            'Trying to update version 1 of collection from version 2, which is too old. Please reload the page and try again.',
         )
 
         self.logout()
@@ -170,9 +157,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.set_collection_editors(allowed_usernames)
 
         # Assign viewer role to collection.
-        rights_manager.create_new_collection_rights(
-            self.COLLECTION_ID, self.owner_id
-        )
+        rights_manager.create_new_collection_rights(self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
             self.moderator,
             self.COLLECTION_ID,
@@ -188,8 +173,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         # Ensure viewers do not have access to the PUT Handler.
         self.put_json(
-            '%s/%s'
-            % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
+            '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
             self.json_dict,
             csrf_token=csrf_token,
             expected_status_int=401,
@@ -202,9 +186,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         allowed_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_collection_editors(allowed_usernames)
 
-        rights_manager.create_new_collection_rights(
-            self.COLLECTION_ID, self.owner_id
-        )
+        rights_manager.create_new_collection_rights(self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
             self.moderator,
             self.COLLECTION_ID,
@@ -218,24 +200,19 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Call get handler to return the csrf token.
         csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
-            '%s/%s'
-            % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
+            '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
             self.json_dict,
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(
-            self.COLLECTION_ID, json_response['collection_dict']['id']
-        )
+        self.assertEqual(self.COLLECTION_ID, json_response['collection_dict']['id'])
         self.assertEqual(2, json_response['collection_dict']['version'])
 
         self.logout()
 
     def test_cannot_put_long_commit_message(self) -> None:
         """Check that putting a long commit message is denied."""
-        rights_manager.create_new_collection_rights(
-            self.COLLECTION_ID, self.owner_id
-        )
+        rights_manager.create_new_collection_rights(self.COLLECTION_ID, self.owner_id)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.OWNER_EMAIL)
@@ -246,20 +223,13 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Call get handler to return the csrf token.
         csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
-            '%s/%s'
-            % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
+            '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID),
             long_message_dict,
             csrf_token=csrf_token,
             expected_status_int=400,
         )
 
-        error_msg = (
-            'At \'http://localhost/collection_editor_handler/data/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'commit_message\' failed: Validation '
-            'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
-            % long_message
-        )
+        error_msg = 'At \'http://localhost/collection_editor_handler/data/0\' these errors are happening:\nSchema validation for \'commit_message\' failed: Validation failed: has_length_at_most ({\'max_value\': 375}) for object %s' % long_message
         self.assertEqual(json_response['error'], error_msg)
 
         self.logout()
@@ -275,27 +245,19 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection_services.save_new_collection(self.owner_id, collection)
 
         # Check that collection is published correctly.
-        rights_manager.assign_role_for_collection(
-            self.owner, collection_id, self.editor_id, rights_domain.ROLE_EDITOR
-        )
+        rights_manager.assign_role_for_collection(self.owner, collection_id, self.editor_id, rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, collection_id)
 
         # Check that collection cannot be unpublished by non moderator.
-        with self.assertRaisesRegex(
-            Exception, 'This collection cannot be unpublished.'
-        ):
+        with self.assertRaisesRegex(Exception, 'This collection cannot be unpublished.'):
             rights_manager.unpublish_collection(self.owner, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
-        self.assertEqual(
-            collection_rights.status, rights_domain.ACTIVITY_STATUS_PUBLIC
-        )
+        self.assertEqual(collection_rights.status, rights_domain.ACTIVITY_STATUS_PUBLIC)
 
         # Check that collection can be unpublished by moderator.
         rights_manager.unpublish_collection(self.moderator, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
-        self.assertEqual(
-            collection_rights.status, rights_domain.ACTIVITY_STATUS_PRIVATE
-        )
+        self.assertEqual(collection_rights.status, rights_domain.ACTIVITY_STATUS_PRIVATE)
 
     def test_get_collection_rights(self) -> None:
         allowed_usernames = [self.OWNER_USERNAME]
@@ -315,9 +277,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Check that collection is published correctly.
         rights_manager.publish_collection(self.owner, collection_id)
 
-        json_response = self.get_json(
-            '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID)
-        )
+        json_response = self.get_json('%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))
 
         self.assertTrue(json_response['can_edit'])
         self.assertFalse(json_response['can_unpublish'])
@@ -336,9 +296,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection_id = collection_services.get_new_collection_id()
         exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
-        self.save_new_valid_collection(
-            collection_id, self.owner_id, exploration_id=exploration_id
-        )
+        self.save_new_valid_collection(collection_id, self.owner_id, exploration_id=exploration_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
         csrf_token = self.get_new_csrf_token()
 
@@ -366,8 +324,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(
             response_dict['error'],
-            'Trying to update version 1 of collection from version 2, '
-            'which is too old. Please reload the page and try again.',
+            'Trying to update version 1 of collection from version 2, which is too old. Please reload the page and try again.',
         )
 
         self.logout()
@@ -382,9 +339,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection_id = collection_services.get_new_collection_id()
         exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
-        self.save_new_valid_collection(
-            collection_id, self.owner_id, exploration_id=exploration_id
-        )
+        self.save_new_valid_collection(collection_id, self.owner_id, exploration_id=exploration_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
         collection = collection_services.get_collection_by_id(collection_id)
         csrf_token = self.get_new_csrf_token()
@@ -424,8 +379,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(
             response_dict['error'],
-            'Trying to update version 1 of collection from version 2, '
-            'which is too old. Please reload the page and try again.',
+            'Trying to update version 1 of collection from version 2, which is too old. Please reload the page and try again.',
         )
 
         self.logout()
@@ -438,9 +392,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection_id = 'collection_id'
         exploration_id = 'exp_id'
         self.save_new_valid_exploration(exploration_id, self.owner_id)
-        self.save_new_valid_collection(
-            collection_id, self.owner_id, exploration_id=exploration_id
-        )
+        self.save_new_valid_collection(collection_id, self.owner_id, exploration_id=exploration_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
         collection = collection_services.get_collection_by_id(collection_id)
         csrf_token = self.get_new_csrf_token()
@@ -472,9 +424,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # The b64encode accepts and returns bytes, so we first need to encode
         # the exploration_id to bytes, then decode the returned bytes back
         # to string.
-        exploration_id = base64.b64encode(
-            exploration_id.encode('utf-8')
-        ).decode('utf-8')
+        exploration_id = base64.b64encode(exploration_id.encode('utf-8')).decode('utf-8')
 
         self.get_json('/exploration/metadata_search?q=%s' % exploration_id)
         self.logout()
@@ -484,25 +434,17 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
     ) -> None:
         self.login(self.OWNER_EMAIL)
 
-        collection_rights = rights_domain.ActivityRights(
-            'Invalid_collection_id', [feconf.SYSTEM_COMMITTER_ID], [], [], []
-        )
-        swap_collection_rights = self.swap_to_always_return(
-            rights_manager, 'get_collection_rights', collection_rights
-        )
-        swap_can_edit_activity_status = self.swap_to_always_return(
-            rights_manager, 'check_can_edit_activity', True
-        )
+        collection_rights = rights_domain.ActivityRights('Invalid_collection_id', [feconf.SYSTEM_COMMITTER_ID], [], [], [])
+        swap_collection_rights = self.swap_to_always_return(rights_manager, 'get_collection_rights', collection_rights)
+        swap_can_edit_activity_status = self.swap_to_always_return(rights_manager, 'check_can_edit_activity', True)
 
         with swap_collection_rights, swap_can_edit_activity_status:
             response = self.get_json(
-                '%s/%s'
-                % (feconf.COLLECTION_RIGHTS_PREFIX, 'Invalid_collection_id'),
+                '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, 'Invalid_collection_id'),
                 expected_status_int=500,
             )
 
         self.assertEqual(
-            'No collection found for the given collection_id: '
-            'Invalid_collection_id',
+            'No collection found for the given collection_id: Invalid_collection_id',
             response['error'],
         )

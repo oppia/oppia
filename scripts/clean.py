@@ -24,15 +24,9 @@ from typing import Optional, Sequence
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-FULL_STACK_TEST_VIDEO_RECORDING_DIR = os.path.join(
-    CURR_DIR, '..', 'oppia_full_stack_test_video_recordings'
-)
-FULL_STACK_TEST_SCREENSHOT_DIR = os.path.join(
-    CURR_DIR, '..', 'oppia_full_stack_test_screenshots'
-)
-FULL_STACK_TEST_DOWNLOAD_DIR = os.path.join(
-    CURR_DIR, '..', 'oppia_acceptance_test_downloads'
-)
+FULL_STACK_TEST_VIDEO_RECORDING_DIR = os.path.join(CURR_DIR, '..', 'oppia_full_stack_test_video_recordings')
+FULL_STACK_TEST_SCREENSHOT_DIR = os.path.join(CURR_DIR, '..', 'oppia_full_stack_test_screenshots')
+FULL_STACK_TEST_DOWNLOAD_DIR = os.path.join(CURR_DIR, '..', 'oppia_acceptance_test_downloads')
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -66,7 +60,7 @@ def delete_file(filepath: str) -> None:
 
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the script to clean temporary and installed files."""
-    unused_parsed_args = _PARSER.parse_args(args=args)
+    _PARSER.parse_args(args=args)
 
     delete_directory_tree(OPPIA_TOOLS_DIR)
     delete_directory_tree(FULL_STACK_TEST_VIDEO_RECORDING_DIR)

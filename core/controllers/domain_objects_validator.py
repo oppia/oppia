@@ -20,6 +20,8 @@ handler arguments.
 
 from __future__ import annotations
 
+from typing import Dict, Mapping, Optional, Union
+
 from core import utils
 from core.constants import constants
 from core.controllers import base
@@ -39,8 +41,6 @@ from core.domain import (
     stats_domain,
 )
 
-from typing import Dict, Mapping, Optional, Union
-
 
 def validate_suggestion_change(
     obj: Mapping[str, change_domain.AcceptableChangeDictTypes],
@@ -57,34 +57,22 @@ def validate_suggestion_change(
     # ExplorationChange or QuestionSuggestionChange calls
     # validate method while initialization.
     if obj.get('cmd') is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Missing cmd key in change dict'
-        )
+        raise base.BaseHandler.InvalidInputException('Missing cmd key in change dict')
 
-    exp_change_commands = [
-        command['name']
-        for command in exp_domain.ExplorationChange.ALLOWED_COMMANDS
-    ]
-    question_change_commands = [
-        command['name']
-        for command in question_domain.QuestionChange.ALLOWED_COMMANDS
-    ]
+    exp_change_commands = [command['name'] for command in exp_domain.ExplorationChange.ALLOWED_COMMANDS]
+    question_change_commands = [command['name'] for command in question_domain.QuestionChange.ALLOWED_COMMANDS]
 
     if obj['cmd'] in exp_change_commands:
         exp_domain.ExplorationChange(obj)
     elif obj['cmd'] in question_change_commands:
         question_domain.QuestionSuggestionChange(obj)
     else:
-        raise base.BaseHandler.InvalidInputException(
-            '%s cmd is not allowed.' % obj['cmd']
-        )
+        raise base.BaseHandler.InvalidInputException('%s cmd is not allowed.' % obj['cmd'])
     return obj
 
 
 def validate_platform_params_values_for_blog_admin(
-    new_platform_parameter_values: Mapping[
-        str, platform_parameter_domain.PlatformDataTypes
-    ],
+    new_platform_parameter_values: Mapping[str, platform_parameter_domain.PlatformDataTypes],
 ) -> Mapping[str, platform_parameter_domain.PlatformDataTypes]:
     """Validates new platform parameter values.
 
@@ -102,44 +90,20 @@ def validate_platform_params_values_for_blog_admin(
     """
     for name, value in new_platform_parameter_values.items():
         if not isinstance(name, str):
-            raise Exception(
-                'Platform parameter name should be a string, received'
-                ': %s' % name
-            )
+            raise Exception('Platform parameter name should be a string, received: %s' % name)
 
         if not isinstance(value, (bool, float, int, str)):
-            raise Exception(
-                'The value of %s platform parameter is not of valid type, '
-                'it should be one of %s.'
-                % (name, str(platform_parameter_domain.PlatformDataTypes))
-            )
+            raise Exception('The value of %s platform parameter is not of valid type, it should be one of %s.' % (name, str(platform_parameter_domain.PlatformDataTypes)))
 
-        parameter = platform_parameter_registry.Registry.get_platform_parameter(
-            name
-        )
+        parameter = platform_parameter_registry.Registry.get_platform_parameter(name)
 
-        if not (
-            (isinstance(value, bool) and parameter.data_type == 'bool')
-            or (isinstance(value, str) and parameter.data_type == 'string')
-            or (isinstance(value, float) and parameter.data_type == 'number')
-            or (isinstance(value, int) and parameter.data_type == 'number')
-        ):
-            raise Exception(
-                'The value of platform parameter %s is of type \'%s\', '
-                'expected it to be of type \'%s\''
-                % (name, value, parameter.data_type)
-            )
+        if not ((isinstance(value, bool) and parameter.data_type == 'bool') or (isinstance(value, str) and parameter.data_type == 'string') or (isinstance(value, float) and parameter.data_type == 'number') or (isinstance(value, int) and parameter.data_type == 'number')):
+            raise Exception('The value of platform parameter %s is of type \'%s\', expected it to be of type \'%s\'' % (name, value, parameter.data_type))
 
-        if (
-            name
-            == platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
-        ):
+        if name == platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value:
             assert isinstance(value, int)
             if value <= 0:
-                raise Exception(
-                    'The value of %s should be greater than 0, it is %s.'
-                    % (name, value)
-                )
+                raise Exception('The value of %s should be greater than 0, it is %s.' % (name, value))
     # The new_platform_parameter_values do not represent a domain class directly
     # and in the handler these dict values are used to set platform parameters
     # individually. Hence conversion of dicts to domain objects is not required
@@ -196,9 +160,7 @@ def validate_change_dict_for_blog_post(
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title(change_dict['title'], True)
     if 'thumbnail_filename' in change_dict:
-        blog_domain.BlogPost.require_valid_thumbnail_filename(
-            change_dict['thumbnail_filename']
-        )
+        blog_domain.BlogPost.require_valid_thumbnail_filename(change_dict['thumbnail_filename'])
     if 'tags' in change_dict:
         blog_domain.BlogPost.require_valid_tags(change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
@@ -206,12 +168,8 @@ def validate_change_dict_for_blog_post(
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         assert list_of_default_tags is not None
         list_of_default_tags_value = list_of_default_tags
-        if not all(
-            tag in list_of_default_tags_value for tag in change_dict['tags']
-        ):
-            raise Exception(
-                'Invalid tags provided. Tags not in default tags list.'
-            )
+        if not all(tag in list_of_default_tags_value for tag in change_dict['tags']):
+            raise Exception('Invalid tags provided. Tags not in default tags list.')
     # The method returns a dict containing blog post properties, they are used
     # to update blog posts in the domain layer. This dict does not correspond
     # to any domain class so we are validating the fields of change_dict
@@ -231,9 +189,7 @@ def validate_state_dict(
         State. The state_dict after validation.
     """
     state_object = state_domain.State.from_dict(state_dict)
-    state_object.validate(
-        exp_param_specs_dict=None, allow_null_interaction=True
-    )
+    state_object.validate(exp_param_specs_dict=None, allow_null_interaction=True)
     # State dict is used as dictionary form in the handler and the data is not
     # transferred into the domain layer. Hence dict form of the data is returned
     # after schema validation.
@@ -307,9 +263,7 @@ def validate_task_entries(
     """
     entity_version = task_entries.get('entity_version', None)
     if entity_version is None:
-        raise base.BaseHandler.InvalidInputException(
-            'No entity_version provided'
-        )
+        raise base.BaseHandler.InvalidInputException('No entity_version provided')
     task_type = task_entries.get('task_type', None)
     if task_type is None:
         raise base.BaseHandler.InvalidInputException('No task_type provided')
@@ -341,9 +295,7 @@ def validate_aggregated_stats(
     Raises:
         InvalidInputException. Property not in aggregated stats dict.
     """
-    return stats_domain.SessionStateStats.validate_aggregated_stats_dict(
-        aggregated_stats
-    )
+    return stats_domain.SessionStateStats.validate_aggregated_stats_dict(aggregated_stats)
 
 
 def validate_suggestion_images(files: Dict[str, bytes]) -> Dict[str, bytes]:
@@ -356,9 +308,7 @@ def validate_suggestion_images(files: Dict[str, bytes]) -> Dict[str, bytes]:
         dict. Returns the dict after validation.
     """
     for filename, raw_image in files.items():
-        image_validation_services.validate_image_and_filename(
-            raw_image, filename
-        )
+        image_validation_services.validate_image_and_filename(raw_image, filename)
     # The files argument do not represent any domain class, hence dict form
     # of the data is returned from here.
     return files

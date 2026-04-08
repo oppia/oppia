@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List, Optional
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -31,9 +31,7 @@ class MultipleChoiceInput(base.BaseInteraction):
     """Interaction for multiple choice input."""
 
     name: str = 'Multiple Choice'
-    description: str = (
-        'Allows learners to select one of a list of multiple-choice options.'
-    )
+    description: str = 'Allows learners to select one of a list of multiple-choice options.'
     display_mode: str = base.DISPLAY_MODE_INLINE
     _dependency_ids: List[str] = []
     answer_type: str = 'NonnegativeInt'
@@ -67,9 +65,7 @@ class MultipleChoiceInput(base.BaseInteraction):
                         'rte_component_config_id': 'ALL_COMPONENTS',
                         'html': {
                             'hide_complex_extensions': True,
-                            'placeholder': (
-                                'Enter an option for the learner to select'
-                            ),
+                            'placeholder': ('Enter an option for the learner to select'),
                         },
                     },
                 },

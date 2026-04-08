@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+from typing import Dict, List, Literal, Optional, Tuple, overload
+
 from core.constants import constants
 from core.domain import email_manager, user_query_domain
 from core.platform import models
-
-from typing import Dict, List, Literal, Optional, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -42,12 +42,7 @@ def _get_user_query_from_model(
     Returns:
         UserQuery. User query domain object.
     """
-    attributes = {
-        predicate['backend_attr']: getattr(
-            user_query_model, predicate['backend_attr']
-        )
-        for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-    }
+    attributes = {predicate['backend_attr']: getattr(user_query_model, predicate['backend_attr']) for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION}
     user_query_params = user_query_domain.UserQueryParams(**attributes)
 
     return user_query_domain.UserQuery(
@@ -63,20 +58,14 @@ def _get_user_query_from_model(
 
 
 @overload
-def get_user_query(
-    query_id: str, *, strict: Literal[True] = ...
-) -> user_query_domain.UserQuery: ...
+def get_user_query(query_id: str, *, strict: Literal[True] = ...) -> user_query_domain.UserQuery: ...
 
 
 @overload
-def get_user_query(
-    query_id: str, *, strict: Literal[False] = ...
-) -> Optional[user_query_domain.UserQuery]: ...
+def get_user_query(query_id: str, *, strict: Literal[False] = ...) -> Optional[user_query_domain.UserQuery]: ...
 
 
-def get_user_query(
-    query_id: str, strict: bool = False
-) -> Optional[user_query_domain.UserQuery]:
+def get_user_query(query_id: str, strict: bool = False) -> Optional[user_query_domain.UserQuery]:
     """Gets the user query with some ID.
 
     Args:
@@ -88,16 +77,10 @@ def get_user_query(
         there is no user query model.
     """
     user_query_model = user_models.UserQueryModel.get(query_id, strict=strict)
-    return (
-        _get_user_query_from_model(user_query_model)
-        if user_query_model
-        else None
-    )
+    return _get_user_query_from_model(user_query_model) if user_query_model else None
 
 
-def get_recent_user_queries(
-    num_queries_to_fetch: int, cursor: Optional[str]
-) -> Tuple[List[user_query_domain.UserQuery], Optional[str]]:
+def get_recent_user_queries(num_queries_to_fetch: int, cursor: Optional[str]) -> Tuple[List[user_query_domain.UserQuery], Optional[str]]:
     """Get recent user queries.
 
     Args:
@@ -110,9 +93,7 @@ def get_recent_user_queries(
         queries and the next cursor that can be used when doing subsequent
         queries.
     """
-    user_query_models, next_cursor, _ = user_models.UserQueryModel.fetch_page(
-        num_queries_to_fetch, cursor
-    )
+    user_query_models, next_cursor, _ = user_models.UserQueryModel.fetch_page(num_queries_to_fetch, cursor)
 
     return (
         [_get_user_query_from_model(model) for model in user_query_models],
@@ -140,9 +121,7 @@ def _save_user_query(user_query: user_query_domain.UserQuery) -> str:
     }
     user_query_dict.update(dict(user_query.params._asdict()))
 
-    user_query_model = user_models.UserQueryModel.get(
-        user_query.id, strict=False
-    )
+    user_query_model = user_models.UserQueryModel.get(user_query.id, strict=False)
     if user_query_model is not None:
         user_query_model.populate(**user_query_dict)
     else:
@@ -167,9 +146,7 @@ def save_new_user_query(submitter_id: str, query_params: Dict[str, int]) -> str:
     """
     query_id = user_models.UserQueryModel.get_new_id('')
     user_query_params = user_query_domain.UserQueryParams(**query_params)
-    user_query = user_query_domain.UserQuery.create_default(
-        query_id, user_query_params, submitter_id
-    )
+    user_query = user_query_domain.UserQuery.create_default(query_id, user_query_params, submitter_id)
     return _save_user_query(user_query)
 
 
@@ -219,17 +196,11 @@ def send_email_to_qualified_users(
 
     # Store BulkEmailModel in UserBulkEmailsModel of each recipient.
     for recipient_id in recipient_ids:
-        recipient_bulk_email_model = user_models.UserBulkEmailsModel.get(
-            recipient_id, strict=False
-        )
+        recipient_bulk_email_model = user_models.UserBulkEmailsModel.get(recipient_id, strict=False)
 
         if recipient_bulk_email_model is None:
-            recipient_bulk_email_model = user_models.UserBulkEmailsModel(
-                id=recipient_id, sent_email_model_ids=[]
-            )
+            recipient_bulk_email_model = user_models.UserBulkEmailsModel(id=recipient_id, sent_email_model_ids=[])
 
-        recipient_bulk_email_model.sent_email_model_ids.append(
-            bulk_email_model_id
-        )
+        recipient_bulk_email_model.sent_email_model_ids.append(bulk_email_model_id)
         recipient_bulk_email_model.update_timestamps()
         recipient_bulk_email_model.put()

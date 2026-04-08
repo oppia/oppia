@@ -22,6 +22,8 @@ import functools
 import logging
 import re
 
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
+
 from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import base
@@ -49,8 +51,6 @@ from core.domain import (
     topic_services,
     user_services,
 )
-
-from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
 # Note: '_SelfBaseHandlerType' is a private type variable because it is only
 # supposed to denote the 'self' argument of the handler function that the
@@ -100,9 +100,7 @@ def open_access(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, *args: Any, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, *args: Any, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Gives access to everyone.
 
         Args:
@@ -132,9 +130,7 @@ def is_source_mailchimp(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_is_source_mailchimp(
-        self: _SelfBaseHandlerType, secret: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_is_source_mailchimp(self: _SelfBaseHandlerType, secret: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was generated from Mailchimp.
 
         Args:
@@ -169,9 +165,7 @@ def does_classroom_exist(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_does_classroom_exist(
-        self: _SelfBaseHandlerType, classroom_url_fragment: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_does_classroom_exist(self: _SelfBaseHandlerType, classroom_url_fragment: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if classroom url fragment provided is valid. If so, return
         handler or else redirect to the correct classroom.
 
@@ -186,9 +180,7 @@ def does_classroom_exist(
             Exception. This decorator is not expected to be used with other
                 handler types.
         """
-        classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment
-        )
+        classroom = classroom_config_services.get_classroom_by_url_fragment(classroom_url_fragment)
 
         if not classroom:
             # This decorator should only be used for JSON handlers, since all
@@ -200,10 +192,7 @@ def does_classroom_exist(
 
             # As this decorator is not expected to be used with other
             # handler types, raising an error here.
-            raise Exception(
-                'does_classroom_exist decorator is only expected to '
-                'be used with json return type handlers.'
-            )
+            raise Exception('does_classroom_exist decorator is only expected to be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
 
@@ -226,9 +215,7 @@ def can_play_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_play(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_play(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can play the exploration.
 
         Args:
@@ -244,16 +231,12 @@ def can_play_exploration(
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise self.NotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
         if exploration_rights is None:
             raise self.NotFoundException
 
-        if rights_manager.check_can_access_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_access_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.NotFoundException
@@ -278,9 +261,7 @@ def can_play_exploration_as_logged_in_user(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_play(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_play(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can play the exploration.
 
         Args:
@@ -300,16 +281,12 @@ def can_play_exploration_as_logged_in_user(
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise self.NotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
         if exploration_rights is None:
             raise self.NotFoundException
 
-        if rights_manager.check_can_access_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_access_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.NotFoundException
@@ -333,9 +310,7 @@ def can_view_skills(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_view(
-        self: _SelfBaseHandlerType, selected_skill_ids: List[str], **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_view(self: _SelfBaseHandlerType, selected_skill_ids: List[str], **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can view the skills.
 
         Args:
@@ -384,9 +359,7 @@ def can_play_collection(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_play(
-        self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_play(self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can play the collection.
 
         Args:
@@ -399,16 +372,12 @@ def can_play_collection(
         Raises:
             NotFoundException. The page is not found.
         """
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False
-        )
+        collection_rights = rights_manager.get_collection_rights(collection_id, strict=False)
 
         if collection_rights is None:
             raise self.NotFoundException
 
-        if rights_manager.check_can_access_activity(
-            self.user, collection_rights
-        ):
+        if rights_manager.check_can_access_activity(self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
             raise self.NotFoundException
@@ -433,9 +402,7 @@ def can_download_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_download(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_download(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can download the exploration.
 
         Args:
@@ -451,16 +418,12 @@ def can_download_exploration(
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.NotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
         if exploration_rights is None:
             raise self.NotFoundException
 
-        if rights_manager.check_can_access_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_access_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.NotFoundException
@@ -485,9 +448,7 @@ def can_view_exploration_stats(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_view_stats(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_view_stats(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can view the exploration stats.
 
         Args:
@@ -503,16 +464,12 @@ def can_view_exploration_stats(
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.NotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
         if exploration_rights is None:
             raise self.NotFoundException
 
-        if rights_manager.check_can_access_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_access_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.NotFoundException
@@ -536,9 +493,7 @@ def can_edit_collection(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_edit(
-        self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_edit(self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can edit the collection.
 
         Args:
@@ -556,9 +511,7 @@ def can_edit_collection(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False
-        )
+        collection_rights = rights_manager.get_collection_rights(collection_id, strict=False)
 
         if collection_rights is None:
             raise base.UserFacingExceptions.NotFoundException
@@ -567,9 +520,7 @@ def can_edit_collection(
             return handler(self, collection_id, **kwargs)
 
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to edit this collection.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to edit this collection.')
 
     return test_can_edit
 
@@ -590,9 +541,7 @@ def can_manage_email_dashboard(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_manage_emails(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_manage_emails(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access email dashboard.
 
         Args:
@@ -612,9 +561,7 @@ def can_manage_email_dashboard(
         if self.current_user_is_super_admin:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access email dashboard.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access email dashboard.')
 
     return test_can_manage_emails
 
@@ -635,9 +582,7 @@ def can_access_blog_admin_page(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_blog_admin_page(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_blog_admin_page(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access blog admin page.
 
         Args:
@@ -657,9 +602,7 @@ def can_access_blog_admin_page(
         if role_services.ACTION_ACCESS_BLOG_ADMIN_PAGE in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access blog admin page.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access blog admin page.')
 
     return test_can_access_blog_admin_page
 
@@ -681,9 +624,7 @@ def can_manage_blog_post_editors(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_manage_blog_post_editors(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_manage_blog_post_editors(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can add and remove users as blog
         post editors.
 
@@ -704,9 +645,7 @@ def can_manage_blog_post_editors(
         if role_services.ACTION_MANAGE_BLOG_POST_EDITORS in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to add or remove blog post editors.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to add or remove blog post editors.')
 
     return test_can_manage_blog_post_editors
 
@@ -727,9 +666,7 @@ def can_access_blog_dashboard(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_blog_dashboard(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_blog_dashboard(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access blog dashboard.
 
         Args:
@@ -749,9 +686,7 @@ def can_access_blog_dashboard(
         if role_services.ACTION_ACCESS_BLOG_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access blog dashboard page.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access blog dashboard page.')
 
     return test_can_access_blog_dashboard
 
@@ -772,9 +707,7 @@ def can_delete_blog_post(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_delete(
-        self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_delete(self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can delete the blog post.
 
         Args:
@@ -792,24 +725,17 @@ def can_delete_blog_post(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        blog_post_rights = blog_services.get_blog_post_rights(
-            blog_post_id, strict=False
-        )
+        blog_post_rights = blog_services.get_blog_post_rights(blog_post_id, strict=False)
 
         if not blog_post_rights:
-            raise self.NotFoundException(
-                Exception('The given blog post id is invalid.')
-            )
+            raise self.NotFoundException(Exception('The given blog post id is invalid.'))
 
         if role_services.ACTION_DELETE_ANY_BLOG_POST in self.user.actions:
             return handler(self, blog_post_id, **kwargs)
         if self.user_id in blog_post_rights.editor_ids:
             return handler(self, blog_post_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'User %s does not have permissions to delete blog post %s'
-                % (self.user_id, blog_post_id)
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('User %s does not have permissions to delete blog post %s' % (self.user_id, blog_post_id))
 
     return test_can_delete
 
@@ -830,9 +756,7 @@ def can_edit_blog_post(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_edit(
-        self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_edit(self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can edit the blog post.
 
         Args:
@@ -850,24 +774,17 @@ def can_edit_blog_post(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        blog_post_rights = blog_services.get_blog_post_rights(
-            blog_post_id, strict=False
-        )
+        blog_post_rights = blog_services.get_blog_post_rights(blog_post_id, strict=False)
 
         if not blog_post_rights:
-            raise self.NotFoundException(
-                Exception('The given blog post id is invalid.')
-            )
+            raise self.NotFoundException(Exception('The given blog post id is invalid.'))
 
         if role_services.ACTION_EDIT_ANY_BLOG_POST in self.user.actions:
             return handler(self, blog_post_id, **kwargs)
         if self.user_id in blog_post_rights.editor_ids:
             return handler(self, blog_post_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'User %s does not have permissions to edit blog post %s'
-                % (self.user_id, blog_post_id)
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('User %s does not have permissions to edit blog post %s' % (self.user_id, blog_post_id))
 
     return test_can_edit
 
@@ -888,9 +805,7 @@ def can_access_moderator_page(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_moderator_page(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_moderator_page(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access moderator page.
 
         Args:
@@ -910,9 +825,7 @@ def can_access_moderator_page(
         if role_services.ACTION_ACCESS_MODERATOR_PAGE in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access moderator page.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access moderator page.')
 
     return test_can_access_moderator_page
 
@@ -933,9 +846,7 @@ def can_access_release_coordinator_page(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_release_coordinator_page(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_release_coordinator_page(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access release coordinator
         page.
 
@@ -953,14 +864,10 @@ def can_access_release_coordinator_page(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE in (
-            self.user.actions
-        ):
+        if role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE in (self.user.actions):
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access release coordinator page.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access release coordinator page.')
 
     return test_can_access_release_coordinator_page
 
@@ -981,9 +888,7 @@ def can_access_translation_stats(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_translation_stats(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_translation_stats(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access translation stats.
 
         Args:
@@ -1000,14 +905,10 @@ def can_access_translation_stats(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
-            self.user.actions
-        ):
+        if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (self.user.actions):
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access translation stats.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access translation stats.')
 
     return test_can_access_translation_stats
 
@@ -1028,9 +929,7 @@ def can_manage_memcache(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_manage_memcache(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_manage_memcache(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can manage memcache.
 
         Args:
@@ -1050,9 +949,7 @@ def can_manage_memcache(
         if role_services.ACTION_MANAGE_MEMCACHE in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to manage memcache.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to manage memcache.')
 
     return test_can_manage_memcache
 
@@ -1073,9 +970,7 @@ def can_run_any_job(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_run_any_job(
-        self: _SelfBaseHandlerType, *args: Any, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_run_any_job(self: _SelfBaseHandlerType, *args: Any, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can run any job.
 
         Args:
@@ -1096,9 +991,7 @@ def can_run_any_job(
         if role_services.ACTION_RUN_ANY_JOB in self.user.actions:
             return handler(self, *args, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to run jobs.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to run jobs.')
 
     return test_can_run_any_job
 
@@ -1119,9 +1012,7 @@ def can_send_moderator_emails(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_send_moderator_emails(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_send_moderator_emails(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can send moderator emails.
 
         Args:
@@ -1141,9 +1032,7 @@ def can_send_moderator_emails(
         if role_services.ACTION_SEND_MODERATOR_EMAILS in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to send moderator emails.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to send moderator emails.')
 
     return test_can_send_moderator_emails
 
@@ -1164,9 +1053,7 @@ def can_manage_own_account(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_manage_account(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_manage_account(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can manage their account.
 
         Args:
@@ -1186,9 +1073,7 @@ def can_manage_own_account(
         if role_services.ACTION_MANAGE_ACCOUNT in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to manage account or preferences.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to manage account or preferences.')
 
     return test_can_manage_account
 
@@ -1209,9 +1094,7 @@ def can_access_admin_page(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_super_admin(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_super_admin(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a super admin.
 
         Args:
@@ -1229,9 +1112,7 @@ def can_access_admin_page(
             raise self.NotLoggedInException
 
         if not self.current_user_is_super_admin:
-            raise self.UnauthorizedUserException(
-                '%s is not a super admin of this application' % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
 
     return test_super_admin
@@ -1254,9 +1135,7 @@ def can_access_contributor_dashboard_admin_page(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_contributor_dashboard_admin_page(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_contributor_dashboard_admin_page(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the contributor dashboard admin page.
 
         Args:
@@ -1278,22 +1157,13 @@ def can_access_contributor_dashboard_admin_page(
             self.user_id,
         )
 
-        if new_dashboard_enabled and (
-            role_services.ACTION_ACCESS_NEW_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE
-            in self.user.actions
-        ):
+        if new_dashboard_enabled and (role_services.ACTION_ACCESS_NEW_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in self.user.actions):
             return handler(self, **kwargs)
 
-        if not new_dashboard_enabled and (
-            role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE
-            in (self.user.actions)
-        ):
+        if not new_dashboard_enabled and (role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (self.user.actions)):
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access contributor dashboard '
-            'admin page.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access contributor dashboard admin page.')
 
     return test_can_access_contributor_dashboard_admin_page
 
@@ -1315,9 +1185,7 @@ def can_manage_contributors_role(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_manage_contributors_role(
-        self: _SelfBaseHandlerType, category: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_manage_contributors_role(self: _SelfBaseHandlerType, category: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can modify contributor's role for the contributor
         dashboard page.
 
@@ -1340,21 +1208,15 @@ def can_manage_contributors_role(
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
             constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
         ]:
-            if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
-                self.user.actions
-            ):
+            if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (self.user.actions):
                 return handler(self, category, **kwargs)
         elif category == (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION):
-            if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
-                self.user.actions
-            ):
+            if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (self.user.actions):
                 return handler(self, category, **kwargs)
         else:
             raise self.InvalidInputException('Invalid category: %s' % category)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to modify contributor\'s role.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to modify contributor\'s role.')
 
     return test_can_manage_contributors_role
 
@@ -1375,9 +1237,7 @@ def can_delete_any_user(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_primary_admin(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_primary_admin(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a primary admin e.g. user with
         email address equal to SYSTEM_EMAIL_ADDRESS.
 
@@ -1396,12 +1256,8 @@ def can_delete_any_user(
             raise self.NotLoggedInException
 
         email = user_services.get_email_from_user_id(self.user_id)
-        if email != platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
-        ):
-            raise self.UnauthorizedUserException(
-                '%s cannot delete any user.' % self.user_id
-            )
+        if email != platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value):
+            raise self.UnauthorizedUserException('%s cannot delete any user.' % self.user_id)
 
         return handler(self, **kwargs)
 
@@ -1424,9 +1280,7 @@ def can_upload_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_upload(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_upload(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can upload exploration.
 
         Args:
@@ -1444,9 +1298,7 @@ def can_upload_exploration(
             raise self.NotLoggedInException
 
         if not self.current_user_is_super_admin:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to upload explorations.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to upload explorations.')
         return handler(self, **kwargs)
 
     return test_can_upload
@@ -1468,9 +1320,7 @@ def can_create_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_create(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_create(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can create an exploration.
 
         Args:
@@ -1490,9 +1340,7 @@ def can_create_exploration(
         if role_services.ACTION_CREATE_EXPLORATION in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to create an exploration.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to create an exploration.')
 
     return test_can_create
 
@@ -1513,9 +1361,7 @@ def can_create_collection(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_create(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_create(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can create a collection.
 
         Args:
@@ -1535,9 +1381,7 @@ def can_create_collection(
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to create a collection.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to create a collection.')
 
     return test_can_create
 
@@ -1558,9 +1402,7 @@ def can_access_creator_dashboard(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the creator dashboard page.
 
         Args:
@@ -1580,9 +1422,7 @@ def can_access_creator_dashboard(
         if role_services.ACTION_ACCESS_CREATOR_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to access creator dashboard.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to access creator dashboard.')
 
     return test_can_access
 
@@ -1603,9 +1443,7 @@ def can_create_feedback_thread(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can create a feedback thread.
 
         Args:
@@ -1624,17 +1462,11 @@ def can_create_feedback_thread(
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.NotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
-        if rights_manager.check_can_access_activity(
-            self.user, exploration_rights
-        ):
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to create exploration feedback.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to create exploration feedback.')
 
     return test_can_access
 
@@ -1655,9 +1487,7 @@ def can_view_feedback_thread(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can view a feedback thread.
 
         Args:
@@ -1681,9 +1511,7 @@ def can_view_feedback_thread(
             raise self.InvalidInputException('Not a valid thread id.')
 
         entity_type = feedback_services.get_thread(thread_id).entity_type
-        entity_types_with_unrestricted_view_suggestion_access = (
-            feconf.ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS
-        )
+        entity_types_with_unrestricted_view_suggestion_access = feconf.ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS
         if entity_type in entity_types_with_unrestricted_view_suggestion_access:
             return handler(self, thread_id, **kwargs)
 
@@ -1692,17 +1520,11 @@ def can_view_feedback_thread(
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.NotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
-        if rights_manager.check_can_access_activity(
-            self.user, exploration_rights
-        ):
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(self.user, exploration_rights):
             return handler(self, thread_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to view exploration feedback.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to view exploration feedback.')
 
     return test_can_access
 
@@ -1723,9 +1545,7 @@ def can_comment_on_feedback_thread(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can comment on the feedback thread.
 
         Args:
@@ -1757,19 +1577,12 @@ def can_comment_on_feedback_thread(
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.NotFoundException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
-        if rights_manager.check_can_access_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_access_activity(self.user, exploration_rights):
             return handler(self, thread_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to comment on exploration'
-                ' feedback.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to comment on exploration feedback.')
 
     return test_can_access
 
@@ -1791,9 +1604,7 @@ def can_rate_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_rate(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_rate(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can rate the exploration.
 
         Args:
@@ -1807,15 +1618,10 @@ def can_rate_exploration(
             UnauthorizedUserException. The user does not have credentials to
                 rate an exploration.
         """
-        if (
-            role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION
-            in self.user.actions
-        ):
+        if role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION in self.user.actions:
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to give ratings to explorations.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to give ratings to explorations.')
 
     return test_can_rate
 
@@ -1836,9 +1642,7 @@ def can_flag_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_flag(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_flag(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can flag the exploration.
 
         Args:
@@ -1855,9 +1659,7 @@ def can_flag_exploration(
         if role_services.ACTION_FLAG_EXPLORATION in self.user.actions:
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to flag explorations.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to flag explorations.')
 
     return test_can_flag
 
@@ -1878,9 +1680,7 @@ def can_subscribe_to_users(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_subscribe(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_subscribe(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can subscribe/unsubscribe a creator.
 
         Args:
@@ -1896,9 +1696,7 @@ def can_subscribe_to_users(
         if role_services.ACTION_SUBSCRIBE_TO_USERS in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to manage subscriptions.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to manage subscriptions.')
 
     return test_can_subscribe
 
@@ -1944,21 +1742,15 @@ def can_edit_exploration(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
         if exploration_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_edit_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_edit_activity(self.user, exploration_rights):
             return handler(self, exploration_id, *args, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to edit this exploration.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to edit this exploration.')
 
     return test_can_edit
 
@@ -1979,9 +1771,7 @@ def can_voiceover_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_voiceover(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_voiceover(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can voiceover the exploration.
 
         Args:
@@ -2000,20 +1790,14 @@ def can_voiceover_exploration(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_voiceover_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_voiceover_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to voiceover this exploration.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to voiceover this exploration.')
 
     return test_can_voiceover
 
@@ -2063,28 +1847,18 @@ def can_add_voice_artist(
             raise base.UserFacingExceptions.NotLoggedInException
 
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
-            raise self.InvalidInputException(
-                'Unsupported entity_type: %s' % entity_type
-            )
+            raise self.InvalidInputException('Unsupported entity_type: %s' % entity_type)
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            entity_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(entity_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
         if exploration_rights.is_private():
-            raise base.UserFacingExceptions.InvalidInputException(
-                'Could not assign voice artist to private activity.'
-            )
-        if rights_manager.check_can_manage_voice_artist_in_activity(
-            self.user, exploration_rights
-        ):
+            raise base.UserFacingExceptions.InvalidInputException('Could not assign voice artist to private activity.')
+        if rights_manager.check_can_manage_voice_artist_in_activity(self.user, exploration_rights):
             return handler(self, entity_type, entity_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to manage voice artists.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to manage voice artists.')
 
     return test_can_add_voice_artist
 
@@ -2133,24 +1907,16 @@ def can_remove_voice_artist(
             raise base.UserFacingExceptions.NotLoggedInException
 
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
-            raise self.InvalidInputException(
-                'Unsupported entity_type: %s' % entity_type
-            )
+            raise self.InvalidInputException('Unsupported entity_type: %s' % entity_type)
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            entity_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(entity_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_manage_voice_artist_in_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_manage_voice_artist_in_activity(self.user, exploration_rights):
             return handler(self, entity_type, entity_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to manage voice artists.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to manage voice artists.')
 
     return test_can_remove_voice_artist
 
@@ -2171,9 +1937,7 @@ def can_save_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_save(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_save(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can save the exploration.
 
         Args:
@@ -2193,20 +1957,14 @@ def can_save_exploration(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_save_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_save_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have permissions to save this exploration.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have permissions to save this exploration.')
 
     return test_can_save
 
@@ -2227,9 +1985,7 @@ def can_delete_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_delete(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_delete(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can delete the exploration.
 
         Args:
@@ -2247,19 +2003,12 @@ def can_delete_exploration(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
-        if rights_manager.check_can_delete_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_delete_activity(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'User %s does not have permissions to delete exploration %s'
-                % (self.user_id, exploration_id)
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('User %s does not have permissions to delete exploration %s' % (self.user_id, exploration_id))
 
     return test_can_delete
 
@@ -2281,9 +2030,7 @@ def can_suggest_changes_to_exploration(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_suggest(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_suggest(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can make suggestions to an exploration.
 
         Args:
@@ -2300,10 +2047,7 @@ def can_suggest_changes_to_exploration(
         if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to give suggestions to this '
-                'exploration.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to give suggestions to this exploration.')
 
     return test_can_suggest
 
@@ -2324,9 +2068,7 @@ def can_suggest_changes(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_suggest(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_suggest(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can make suggestions to an exploration.
 
         Args:
@@ -2342,9 +2084,7 @@ def can_suggest_changes(
         if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to make suggestions.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to make suggestions.')
 
     return test_can_suggest
 
@@ -2357,9 +2097,7 @@ def can_resubmit_suggestion(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_resubmit_suggestion(
-        self: _SelfBaseHandlerType, suggestion_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_resubmit_suggestion(self: _SelfBaseHandlerType, suggestion_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can edit the given suggestion.
 
         Args:
@@ -2373,22 +2111,14 @@ def can_resubmit_suggestion(
             UnauthorizedUserException. The user does not have credentials to
                 edit this suggestion.
         """
-        suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion_id, strict=False
-        )
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id, strict=False)
         if suggestion is None:
-            raise self.InvalidInputException(
-                'No suggestion found with given suggestion id'
-            )
+            raise self.InvalidInputException('No suggestion found with given suggestion id')
 
-        if self.user_id and suggestion_services.check_can_resubmit_suggestion(
-            suggestion_id, self.user_id
-        ):
+        if self.user_id and suggestion_services.check_can_resubmit_suggestion(suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to resubmit this suggestion.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to resubmit this suggestion.')
 
     return test_can_resubmit_suggestion
 
@@ -2430,21 +2160,15 @@ def can_publish_exploration(
             UnauthorizedUserException. The user does not have credentials to
                 publish an exploration.
         """
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
         if exploration_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_publish_activity(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_publish_activity(self.user, exploration_rights):
             return handler(self, exploration_id, *args, **kwargs)
 
-        raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You do not have credentials to publish this exploration.'
-        )
+        raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to publish this exploration.')
 
     return test_can_publish
 
@@ -2465,9 +2189,7 @@ def can_publish_collection(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_publish_collection(
-        self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_publish_collection(self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can publish the collection.
 
         Args:
@@ -2482,20 +2204,14 @@ def can_publish_collection(
             UnauthorizedUserException. The user does not have credentials to
                 publish a collection.
         """
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False
-        )
+        collection_rights = rights_manager.get_collection_rights(collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_publish_activity(
-            self.user, collection_rights
-        ):
+        if rights_manager.check_can_publish_activity(self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to publish this collection.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to publish this collection.')
 
     return test_can_publish_collection
 
@@ -2517,9 +2233,7 @@ def can_unpublish_collection(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_unpublish_collection(
-        self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_unpublish_collection(self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can unpublish the collection.
 
         Args:
@@ -2534,20 +2248,14 @@ def can_unpublish_collection(
             UnauthorizedUserException. The user does not have credentials
                 to unpublish a collection.
         """
-        collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False
-        )
+        collection_rights = rights_manager.get_collection_rights(collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_unpublish_activity(
-            self.user, collection_rights
-        ):
+        if rights_manager.check_can_unpublish_activity(self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to unpublish this collection.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to unpublish this collection.')
 
     return test_can_unpublish_collection
 
@@ -2570,9 +2278,7 @@ def can_modify_exploration_roles(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_modify(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_modify(self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can modify the rights related to an exploration.
 
         Args:
@@ -2586,19 +2292,12 @@ def can_modify_exploration_roles(
             UnauthorizedUserException. The user does not have credentials to
                 change the rights for an exploration.
         """
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
 
-        if rights_manager.check_can_modify_core_activity_roles(
-            self.user, exploration_rights
-        ):
+        if rights_manager.check_can_modify_core_activity_roles(self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to change rights for this '
-                'exploration.'
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('You do not have credentials to change rights for this exploration.')
 
     return test_can_modify
 
@@ -2621,9 +2320,7 @@ def can_perform_tasks_in_taskqueue(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_perform(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_perform(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the handler is called by task scheduler or by a superadmin
         of the application.
 
@@ -2641,13 +2338,8 @@ def can_perform_tasks_in_taskqueue(
         # a request from outside comes with this header AppEngine will get
         # rid of it.
         # https://cloud.google.com/tasks/docs/creating-appengine-handlers#reading_app_engine_task_request_headers
-        if (
-            self.request.headers.get('X-AppEngine-QueueName') is None
-            and not self.current_user_is_super_admin
-        ):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.'
-            )
+        if self.request.headers.get('X-AppEngine-QueueName') is None and not self.current_user_is_super_admin:
+            raise self.UnauthorizedUserException('You do not have the credentials to access this page.')
 
         return handler(self, **kwargs)
 
@@ -2672,9 +2364,7 @@ def can_perform_cron_tasks(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_perform(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_perform(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the handler is called by cron or by a superadmin of the
         application.
 
@@ -2691,13 +2381,8 @@ def can_perform_cron_tasks(
         # The X-AppEngine-Cron header is set inside AppEngine and if a request
         # from outside comes with this header AppEngine will get rid of it.
         # https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#validating_cron_requests
-        if (
-            self.request.headers.get('X-AppEngine-Cron') is None
-            and not self.current_user_is_super_admin
-        ):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.'
-            )
+        if self.request.headers.get('X-AppEngine-Cron') is None and not self.current_user_is_super_admin:
+            raise self.UnauthorizedUserException('You do not have the credentials to access this page.')
 
         return handler(self, **kwargs)
 
@@ -2720,9 +2405,7 @@ def can_access_learner_dashboard(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the learner dashboard.
 
         Args:
@@ -2742,9 +2425,7 @@ def can_access_learner_dashboard(
         if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.'
-            )
+            raise self.UnauthorizedUserException('You do not have the credentials to access this page.')
 
     return test_can_access
 
@@ -2765,9 +2446,7 @@ def can_access_feedback_updates(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the feedback updates.
 
         Args:
@@ -2787,9 +2466,7 @@ def can_access_feedback_updates(
         if role_services.ACTION_ACCESS_FEEDBACK_UPDATES in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.'
-            )
+            raise self.UnauthorizedUserException('You do not have the credentials to access this page.')
 
     return test_can_access
 
@@ -2810,9 +2487,7 @@ def can_access_learner_groups(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can access the learner groups.
 
         Args:
@@ -2832,9 +2507,7 @@ def can_access_learner_groups(
         if role_services.ACTION_ACCESS_LEARNER_GROUPS in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.'
-            )
+            raise self.UnauthorizedUserException('You do not have the credentials to access this page.')
 
     return test_can_access
 
@@ -2857,9 +2530,7 @@ def can_manage_question_skill_status(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_manage_question_skill_status(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_manage_question_skill_status(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can publish a question directly.
 
         Args:
@@ -2876,15 +2547,10 @@ def can_manage_question_skill_status(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if (
-            role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS
-            in self.user.actions
-        ):
+        if role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to publish a question.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to publish a question.')
 
     return test_can_manage_question_skill_status
 
@@ -2908,9 +2574,7 @@ def require_user_id_else_redirect_to_homepage(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_login(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> Optional[_GenericHandlerFunctionReturnType]:
+    def test_login(self: _SelfBaseHandlerType, **kwargs: Any) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user for the current session is logged in.
         If not, redirects the user to the home page.
 
@@ -2936,9 +2600,7 @@ def can_edit_topic(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_edit(
-        self: _SelfBaseHandlerType, topic_id: str, *args: Any, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_edit(self: _SelfBaseHandlerType, topic_id: str, *args: Any, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can edit a given topic.
 
         Args:
@@ -2971,9 +2633,7 @@ def can_edit_topic(
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, topic_id, *args, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this topic.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to edit this topic.')
 
     return test_can_edit
 
@@ -2994,9 +2654,7 @@ def can_edit_question(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_edit(
-        self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_edit(self: _SelfBaseHandlerType, question_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can edit the given question.
 
         Args:
@@ -3015,17 +2673,13 @@ def can_edit_question(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        question = question_services.get_question_by_id(
-            question_id, strict=False
-        )
+        question = question_services.get_question_by_id(question_id, strict=False)
         if question is None:
             raise self.NotFoundException
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this question.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to edit this question.')
 
     return test_can_edit
 
@@ -3046,9 +2700,7 @@ def can_play_question(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_play_question(
-        self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_play_question(self: _SelfBaseHandlerType, question_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can play the given question.
 
         Args:
@@ -3061,9 +2713,7 @@ def can_play_question(
         Raises:
             NotFoundException. The page is not found.
         """
-        question = question_services.get_question_by_id(
-            question_id, strict=False
-        )
+        question = question_services.get_question_by_id(question_id, strict=False)
         if question is None:
             raise self.NotFoundException
         return handler(self, question_id, **kwargs)
@@ -3087,9 +2737,7 @@ def can_view_question_editor(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_view_question_editor(
-        self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_view_question_editor(self: _SelfBaseHandlerType, question_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can view the question editor.
 
         Args:
@@ -3108,20 +2756,13 @@ def can_view_question_editor(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        question = question_services.get_question_by_id(
-            question_id, strict=False
-        )
+        question = question_services.get_question_by_id(question_id, strict=False)
         if question is None:
             raise self.NotFoundException
-        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (
-            self.user.actions
-        ):
+        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (self.user.actions):
             return handler(self, question_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to access the questions editor'
-                % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to access the questions editor' % self.user_id)
 
     return test_can_view_question_editor
 
@@ -3142,9 +2783,7 @@ def can_delete_question(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_delete_question(
-        self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_delete_question(self: _SelfBaseHandlerType, question_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a given question.
 
         Args:
@@ -3164,16 +2803,10 @@ def can_delete_question(
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
-        if (
-            role_services.ACTION_DELETE_ANY_QUESTION
-            in user_actions_info.actions
-        ):
+        if role_services.ACTION_DELETE_ANY_QUESTION in user_actions_info.actions:
             return handler(self, question_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to delete the'
-                ' question.' % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to delete the question.' % self.user_id)
 
     return test_can_delete_question
 
@@ -3194,9 +2827,7 @@ def can_add_new_story_to_topic(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_add_story(
-        self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_add_story(self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can add a story to
         a given topic.
 
@@ -3229,9 +2860,7 @@ def can_add_new_story_to_topic(
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, topic_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to add a story to this topic.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to add a story to this topic.')
 
     return test_can_add_story
 
@@ -3253,9 +2882,7 @@ def can_edit_story(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_edit_story(
-        self: _SelfBaseHandlerType, story_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_edit_story(self: _SelfBaseHandlerType, story_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can edit a story belonging to
         a given topic.
 
@@ -3293,9 +2920,7 @@ def can_edit_story(
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, story_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this story.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to edit this story.')
 
     return test_can_edit_story
 
@@ -3317,9 +2942,7 @@ def can_edit_skill(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_edit_skill(
-        self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_edit_skill(self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
@@ -3342,9 +2965,7 @@ def can_edit_skill(
         if role_services.ACTION_EDIT_SKILL in self.user.actions:
             return handler(self, skill_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this skill.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to edit this skill.')
 
     return test_can_edit_skill
 
@@ -3365,9 +2986,7 @@ def can_submit_images_to_questions(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_submit_images_to_questions(
-        self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_submit_images_to_questions(self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Test to see if user can submit images to questions.
 
         Args:
@@ -3395,9 +3014,7 @@ def can_submit_images_to_questions(
         ):
             return handler(self, skill_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to submit images to questions.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to submit images to questions.')
 
     return test_can_submit_images_to_questions
 
@@ -3418,9 +3035,7 @@ def can_submit_images_to_explorations(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_submit_images_to_explorations(
-        self: _SelfBaseHandlerType, target_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_submit_images_to_explorations(self: _SelfBaseHandlerType, target_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Test to see if user can submit images to explorations.
 
         Args:
@@ -3442,9 +3057,7 @@ def can_submit_images_to_explorations(
         if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
             return handler(self, target_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to submit images to explorations.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to submit images to explorations.')
 
     return test_can_submit_images_to_explorations
 
@@ -3465,9 +3078,7 @@ def can_delete_skill(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_delete_skill(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_delete_skill(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a skill.
 
         Args:
@@ -3488,9 +3099,7 @@ def can_delete_skill(
         if role_services.ACTION_DELETE_ANY_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to delete the skill.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to delete the skill.')
 
     return test_can_delete_skill
 
@@ -3512,9 +3121,7 @@ def can_create_skill(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_create_skill(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_create_skill(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can create a skill, which can be
         independent or belong to a topic.
 
@@ -3536,9 +3143,7 @@ def can_create_skill(
         if role_services.ACTION_CREATE_NEW_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to create a skill.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to create a skill.')
 
     return test_can_create_skill
 
@@ -3561,9 +3166,7 @@ def can_delete_story(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_delete_story(
-        self: _SelfBaseHandlerType, story_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_delete_story(self: _SelfBaseHandlerType, story_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a story in
         a given topic.
 
@@ -3595,9 +3198,7 @@ def can_delete_story(
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, story_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to delete this story.'
-            )
+            raise self.UnauthorizedUserException('You do not have credentials to delete this story.')
 
     return test_can_delete_story
 
@@ -3618,9 +3219,7 @@ def can_delete_topic(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_delete_topic(
-        self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_delete_topic(self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can delete a given topic.
 
         Args:
@@ -3648,10 +3247,7 @@ def can_delete_topic(
         if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to delete the'
-                ' topic.' % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to delete the topic.' % self.user_id)
 
     return test_can_delete_topic
 
@@ -3672,9 +3268,7 @@ def can_create_topic(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_create_topic(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_create_topic(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can create a topic.
 
         Args:
@@ -3696,10 +3290,7 @@ def can_create_topic(
         if role_services.ACTION_CREATE_NEW_TOPIC in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to create a'
-                ' topic.' % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to create a topic.' % self.user_id)
 
     return test_can_create_topic
 
@@ -3721,9 +3312,7 @@ def can_access_topics_and_skills_dashboard(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_topics_and_skills_dashboard(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_topics_and_skills_dashboard(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can access the topics and skills
         dashboard.
 
@@ -3744,16 +3333,10 @@ def can_access_topics_and_skills_dashboard(
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
-        if (
-            role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD
-            in user_actions_info.actions
-        ):
+        if role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to access the topics and skills'
-                ' dashboard.' % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to access the topics and skills dashboard.' % self.user_id)
 
     return test_can_access_topics_and_skills_dashboard
 
@@ -3774,9 +3357,7 @@ def can_view_any_topic_editor(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_view_any_topic_editor(
-        self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_view_any_topic_editor(self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can view any topic editor.
 
         Args:
@@ -3800,16 +3381,10 @@ def can_view_any_topic_editor(
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
-        if (
-            role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE
-            in user_actions_info.actions
-        ):
+        if role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to view any topic editor.'
-                % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to view any topic editor.' % self.user_id)
 
     return test_can_view_any_topic_editor
 
@@ -3830,9 +3405,7 @@ def can_manage_rights_for_topic(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_manage_topic_rights(
-        self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_manage_topic_rights(self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can manage a topic's rights.
 
         Args:
@@ -3852,16 +3425,10 @@ def can_manage_rights_for_topic(
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
-        if (
-            role_services.ACTION_MANAGE_TOPIC_RIGHTS
-            in user_actions_info.actions
-        ):
+        if role_services.ACTION_MANAGE_TOPIC_RIGHTS in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to assign roles for the '
-                'topic.' % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to assign roles for the topic.' % self.user_id)
 
     return test_can_manage_topic_rights
 
@@ -3882,9 +3449,7 @@ def can_access_classroom_admin_page(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_classroom_admin_page(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_classroom_admin_page(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access classroom admin page.
 
         Args:
@@ -3901,15 +3466,10 @@ def can_access_classroom_admin_page(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if (
-            role_services.ACTION_ACCESS_CLASSROOM_ADMIN_PAGE
-            in self.user.actions
-        ):
+        if role_services.ACTION_ACCESS_CLASSROOM_ADMIN_PAGE in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access classroom admin page.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access classroom admin page.')
 
     return test_can_access_classroom_admin_page
 
@@ -3930,9 +3490,7 @@ def can_access_voiceover_admin_page(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_access_voiceover_admin_page(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_access_voiceover_admin_page(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and can access voiceover admin page.
 
         Args:
@@ -3949,15 +3507,10 @@ def can_access_voiceover_admin_page(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if (
-            role_services.ACTION_ACCESS_VOICEOVER_ADMIN_PAGE
-            in self.user.actions
-        ):
+        if role_services.ACTION_ACCESS_VOICEOVER_ADMIN_PAGE in self.user.actions:
             return handler(self, **kwargs)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access voiceover admin page.'
-        )
+        raise self.UnauthorizedUserException('You do not have credentials to access voiceover admin page.')
 
     return test_can_access_voiceover_admin_page
 
@@ -3978,9 +3531,7 @@ def can_change_topic_publication_status(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_change_topic_publication_status(
-        self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_change_topic_publication_status(self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can can publish or unpublish a topic.
 
         Args:
@@ -4005,16 +3556,10 @@ def can_change_topic_publication_status(
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
-        if (
-            role_services.ACTION_CHANGE_TOPIC_STATUS
-            in user_actions_info.actions
-        ):
+        if role_services.ACTION_CHANGE_TOPIC_STATUS in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
         else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to publish or unpublish the '
-                'topic.' % self.user_id
-            )
+            raise self.UnauthorizedUserException('%s does not have enough rights to publish or unpublish the topic.' % self.user_id)
 
     return test_can_change_topic_publication_status
 
@@ -4059,8 +3604,7 @@ def can_access_topic_viewer_page(
         if topic_url_fragment != topic_url_fragment.lower():
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s'
-                % (classroom_url_fragment, topic_url_fragment.lower()),
+                '/learn/%s/%s' % (classroom_url_fragment, topic_url_fragment.lower()),
                 self.GET_HANDLER_ERROR_RETURN_TYPE,
             )
             return None
@@ -4075,17 +3619,12 @@ def can_access_topic_viewer_page(
             )
             return None
 
-        verified_classroom_url_fragment = (
-            classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                topic.id
-            )
-        )
+        verified_classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(topic.id)
         if classroom_url_fragment != verified_classroom_url_fragment:
             url_substring = topic_url_fragment
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s'
-                % (verified_classroom_url_fragment, url_substring),
+                '/learn/%s/%s' % (verified_classroom_url_fragment, url_substring),
                 self.GET_HANDLER_ERROR_RETURN_TYPE,
             )
             return None
@@ -4094,11 +3633,7 @@ def can_access_topic_viewer_page(
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=True)
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
-        if (
-            topic_rights.topic_is_published
-            or role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE
-            in user_actions_info.actions
-        ):
+        if topic_rights.topic_is_published or role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in user_actions_info.actions:
             return handler(self, topic.name, **kwargs)
         else:
             raise self.NotFoundException
@@ -4164,8 +3699,7 @@ def can_access_story_viewer_page(
         if story is None:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/story'
-                % (classroom_url_fragment, topic_url_fragment),
+                '/learn/%s/%s/story' % (classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE,
             )
             return None
@@ -4190,9 +3724,7 @@ def can_access_story_viewer_page(
                 )
                 return None
 
-            verified_classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                topic.id
-            )
+            verified_classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(topic.id)
             if classroom_url_fragment != verified_classroom_url_fragment:
                 url_substring = '%s/story/%s' % (
                     topic_url_fragment,
@@ -4200,8 +3732,7 @@ def can_access_story_viewer_page(
                 )
                 _redirect_based_on_return_type(
                     self,
-                    '/learn/%s/%s'
-                    % (verified_classroom_url_fragment, url_substring),
+                    '/learn/%s/%s' % (verified_classroom_url_fragment, url_substring),
                     self.GET_HANDLER_ERROR_RETURN_TYPE,
                 )
                 return None
@@ -4212,11 +3743,7 @@ def can_access_story_viewer_page(
                 if reference.story_id == story_id:
                     story_is_published = reference.story_is_published
 
-        if (
-            (story_is_published and topic_is_published)
-            or role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE
-            in user_actions_info.actions
-        ):
+        if (story_is_published and topic_is_published) or role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in user_actions_info.actions:
             return handler(self, story_id, *args, **kwargs)
         else:
             raise self.NotFoundException
@@ -4288,8 +3815,7 @@ def can_access_story_viewer_page_as_logged_in_user(
         if story is None:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/story'
-                % (classroom_url_fragment, topic_url_fragment),
+                '/learn/%s/%s/story' % (classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE,
             )
             return None
@@ -4314,9 +3840,7 @@ def can_access_story_viewer_page_as_logged_in_user(
                 )
                 return None
 
-            verified_classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                topic.id
-            )
+            verified_classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(topic.id)
             if classroom_url_fragment != verified_classroom_url_fragment:
                 url_substring = '%s/story/%s' % (
                     topic_url_fragment,
@@ -4324,8 +3848,7 @@ def can_access_story_viewer_page_as_logged_in_user(
                 )
                 _redirect_based_on_return_type(
                     self,
-                    '/learn/%s/%s'
-                    % (verified_classroom_url_fragment, url_substring),
+                    '/learn/%s/%s' % (verified_classroom_url_fragment, url_substring),
                     self.GET_HANDLER_ERROR_RETURN_TYPE,
                 )
                 return None
@@ -4336,11 +3859,7 @@ def can_access_story_viewer_page_as_logged_in_user(
                 if reference.story_id == story_id:
                     story_is_published = reference.story_is_published
 
-        if (
-            (story_is_published and topic_is_published)
-            or role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE
-            in user_actions_info.actions
-        ):
+        if (story_is_published and topic_is_published) or role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in user_actions_info.actions:
             return handler(self, story_id, *args, **kwargs)
         else:
             raise self.NotFoundException
@@ -4413,11 +3932,7 @@ def can_access_subtopic_viewer_page(
         user_actions_info = user_services.get_user_actions_info(self.user_id)
         topic_rights = topic_fetchers.get_topic_rights(topic.id)
 
-        if (
-            (topic_rights is None or not topic_rights.topic_is_published)
-            and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE
-            not in user_actions_info.actions
-        ):
+        if (topic_rights is None or not topic_rights.topic_is_published) and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE not in user_actions_info.actions:
             _redirect_based_on_return_type(
                 self,
                 '/learn/%s' % classroom_url_fragment,
@@ -4432,17 +3947,12 @@ def can_access_subtopic_viewer_page(
         if not subtopic_id:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/studyguide'
-                % (classroom_url_fragment, topic_url_fragment),
+                '/learn/%s/%s/studyguide' % (classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE,
             )
             return None
 
-        verified_classroom_url_fragment = (
-            classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                topic.id
-            )
-        )
+        verified_classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(topic.id)
         if classroom_url_fragment != verified_classroom_url_fragment:
             url_substring = '%s/studyguide/%s' % (
                 topic_url_fragment,
@@ -4450,8 +3960,7 @@ def can_access_subtopic_viewer_page(
             )
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s'
-                % (verified_classroom_url_fragment, url_substring),
+                '/learn/%s/%s' % (verified_classroom_url_fragment, url_substring),
                 self.GET_HANDLER_ERROR_RETURN_TYPE,
             )
             return None
@@ -4460,28 +3969,22 @@ def can_access_subtopic_viewer_page(
             feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
             self.user_id,
         ):
-            study_guide = study_guide_services.get_study_guide_by_id(
-                topic.id, subtopic_id, strict=False
-            )
+            study_guide = study_guide_services.get_study_guide_by_id(topic.id, subtopic_id, strict=False)
             if study_guide is None:
                 _redirect_based_on_return_type(
                     self,
-                    '/learn/%s/%s/studyguide'
-                    % (classroom_url_fragment, topic_url_fragment),
+                    '/learn/%s/%s/studyguide' % (classroom_url_fragment, topic_url_fragment),
                     self.GET_HANDLER_ERROR_RETURN_TYPE,
                 )
                 return None
             else:
                 return handler(self, topic.name, subtopic_id, **kwargs)
         else:
-            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-                topic.id, subtopic_id, strict=False
-            )
+            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(topic.id, subtopic_id, strict=False)
             if subtopic_page is None:
                 _redirect_based_on_return_type(
                     self,
-                    '/learn/%s/%s/studyguide'
-                    % (classroom_url_fragment, topic_url_fragment),
+                    '/learn/%s/%s/studyguide' % (classroom_url_fragment, topic_url_fragment),
                     self.GET_HANDLER_ERROR_RETURN_TYPE,
                 )
                 return None
@@ -4554,21 +4057,14 @@ def get_decorator_for_accepting_suggestion(
             """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
-            user_actions = user_services.get_user_actions_info(
-                self.user_id
-            ).actions
+            user_actions = user_services.get_user_actions_info(self.user_id).actions
             if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
                 return handler(self, target_id, suggestion_id, **kwargs)
 
             if len(suggestion_id.split('.')) != 3:
-                raise self.InvalidInputException(
-                    'Invalid format for suggestion_id.'
-                    ' It must contain 3 parts separated by \'.\''
-                )
+                raise self.InvalidInputException('Invalid format for suggestion_id. It must contain 3 parts separated by \'.\'')
 
-            suggestion = suggestion_services.get_suggestion_by_id(
-                suggestion_id, strict=False
-            )
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id, strict=False)
 
             if suggestion is None:
                 raise self.NotFoundException
@@ -4576,22 +4072,16 @@ def get_decorator_for_accepting_suggestion(
             # TODO(#6671): Currently, the can_user_review_category is
             # not in use as the suggestion scoring system is not enabled.
             # Remove this check once the new scoring structure gets implemented.
-            if suggestion_services.can_user_review_category(
-                self.user_id, suggestion.score_category
-            ):
+            if suggestion_services.can_user_review_category(self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
-            if suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-            ):
+            if suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 if user_services.can_review_translation_suggestions(
                     self.user_id,
                     language_code=suggestion.change_cmd.language_code,
                 ):
                     return handler(self, target_id, suggestion_id, **kwargs)
-            elif suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_ADD_QUESTION
-            ):
+            elif suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_ADD_QUESTION):
                 if user_services.can_review_question_suggestions(self.user_id):
                     return handler(self, target_id, suggestion_id, **kwargs)
 
@@ -4646,18 +4136,12 @@ def can_view_reviewable_suggestions(
             if user_services.can_review_translation_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
             else:
-                raise Exception(
-                    'User with user_id: %s is not allowed to review '
-                    'translation suggestions.' % self.user_id
-                )
+                raise Exception('User with user_id: %s is not allowed to review translation suggestions.' % self.user_id)
         elif suggestion_type == (feconf.SUGGESTION_TYPE_ADD_QUESTION):
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
             else:
-                raise Exception(
-                    'User with user_id: %s is not allowed to review question '
-                    'suggestions.' % self.user_id
-                )
+                raise Exception('User with user_id: %s is not allowed to review question suggestions.' % self.user_id)
         else:
             raise self.NotFoundException
 
@@ -4699,43 +4183,24 @@ def can_edit_entity(
         Raises:
             NotFoundException. The given page cannot be found.
         """
-        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+
+        def arg_swapped_handler(x, y, z):
+            return handler(y, x, z)
+
         # This swaps the first two arguments (self and entity_type), so
         # that functools.partial can then be applied to the leftmost one to
         # create a modified handler function that has the correct signature
         # for the corresponding decorators.
         reduced_handler = functools.partial(arg_swapped_handler, entity_type)
-        functions: Dict[
-            str, Callable[[str], _GenericHandlerFunctionReturnType]
-        ] = {
-            feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
-                can_edit_exploration(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.ENTITY_TYPE_QUESTION: lambda entity_id: (
-                can_edit_question(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.ENTITY_TYPE_TOPIC: lambda entity_id: (
-                can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.ENTITY_TYPE_SKILL: lambda entity_id: (
-                can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (
-                can_submit_images_to_questions(reduced_handler)(
-                    self, entity_id, **kwargs
-                )
-            ),
-            feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS: lambda entity_id: (
-                can_submit_images_to_explorations(reduced_handler)(
-                    self, entity_id, **kwargs
-                )
-            ),
-            feconf.ENTITY_TYPE_STORY: lambda entity_id: (
-                can_edit_story(reduced_handler)(self, entity_id, **kwargs)
-            ),
-            feconf.ENTITY_TYPE_BLOG_POST: lambda entity_id: (
-                can_edit_blog_post(reduced_handler)(self, entity_id, **kwargs)
-            ),
+        functions: Dict[str, Callable[[str], _GenericHandlerFunctionReturnType]] = {
+            feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (can_edit_exploration(reduced_handler)(self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_QUESTION: lambda entity_id: (can_edit_question(reduced_handler)(self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_TOPIC: lambda entity_id: (can_edit_topic(reduced_handler)(self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_SKILL: lambda entity_id: (can_edit_skill(reduced_handler)(self, entity_id, **kwargs)),
+            feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (can_submit_images_to_questions(reduced_handler)(self, entity_id, **kwargs)),
+            feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS: lambda entity_id: (can_submit_images_to_explorations(reduced_handler)(self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_STORY: lambda entity_id: (can_edit_story(reduced_handler)(self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_BLOG_POST: lambda entity_id: (can_edit_blog_post(reduced_handler)(self, entity_id, **kwargs)),
         }
         if entity_type not in dict.keys(functions):
             raise self.NotFoundException
@@ -4779,23 +4244,20 @@ def can_play_entity(
         Raises:
             NotFoundException. The given page cannot be found.
         """
-        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+
+        def arg_swapped_handler(x, y, z):
+            return handler(y, x, z)
+
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             # This swaps the first two arguments (self and entity_type), so
             # that functools.partial can then be applied to the leftmost one to
             # create a modified handler function that has the correct signature
             # for can_edit_question().
-            reduced_handler = functools.partial(
-                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION
-            )
+            reduced_handler = functools.partial(arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
             # This raises an error if the question checks fail.
-            return can_play_exploration(reduced_handler)(
-                self, entity_id, **kwargs
-            )
+            return can_play_exploration(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            reduced_handler = functools.partial(
-                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION
-            )
+            reduced_handler = functools.partial(arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
             return can_play_question(reduced_handler)(self, entity_id, **kwargs)
         else:
             raise self.NotFoundException
@@ -4827,9 +4289,7 @@ def can_update_suggestion(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_update_suggestion(
-        self: _SelfBaseHandlerType, suggestion_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_update_suggestion(self: _SelfBaseHandlerType, suggestion_id: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Returns a handler to test whether a suggestion can be updated based
         on the user's roles.
 
@@ -4853,14 +4313,9 @@ def can_update_suggestion(
         user_actions = self.user.actions
 
         if len(suggestion_id.split('.')) != 3:
-            raise self.InvalidInputException(
-                'Invalid format for suggestion_id.'
-                ' It must contain 3 parts separated by \'.\''
-            )
+            raise self.InvalidInputException('Invalid format for suggestion_id. It must contain 3 parts separated by \'.\'')
 
-        suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion_id, strict=False
-        )
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id, strict=False)
 
         if suggestion is None:
             raise self.NotFoundException
@@ -4869,32 +4324,19 @@ def can_update_suggestion(
             return handler(self, suggestion_id, **kwargs)
 
         if suggestion.author_id == self.user_id:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'The user, %s is not allowed to update self-created'
-                'suggestions.' % (user_services.get_username(self.user_id))
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('The user, %s is not allowed to update self-createdsuggestions.' % (user_services.get_username(self.user_id)))
 
-        if suggestion.suggestion_type not in (
-            feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES
-        ):
+        if suggestion.suggestion_type not in (feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
             raise self.InvalidInputException('Invalid suggestion type.')
 
-        if suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        ):
-            if user_services.can_review_translation_suggestions(
-                self.user_id, language_code=suggestion.change_cmd.language_code
-            ):
+        if suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if user_services.can_review_translation_suggestions(self.user_id, language_code=suggestion.change_cmd.language_code):
                 return handler(self, suggestion_id, **kwargs)
-        elif suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_ADD_QUESTION
-        ):
+        elif suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_ADD_QUESTION):
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, suggestion_id, **kwargs)
 
-        raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You are not allowed to update the suggestion.'
-        )
+        raise base.UserFacingExceptions.UnauthorizedUserException('You are not allowed to update the suggestion.')
 
     return test_can_update_suggestion
 
@@ -4951,14 +4393,9 @@ def can_fetch_contributor_dashboard_stats(
             raise base.UserFacingExceptions.NotLoggedInException
 
         if user_services.get_username(self.user_id) != username:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'The user %s is not allowed to fetch the stats of other '
-                'users.' % (user_services.get_username(self.user_id))
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('The user %s is not allowed to fetch the stats of other users.' % (user_services.get_username(self.user_id)))
 
-        return handler(
-            self, contribution_type, contribution_subtype, username, **kwargs
-        )
+        return handler(self, contribution_type, contribution_subtype, username, **kwargs)
 
     return test_can_fetch_contributor_dashboard_stats
 
@@ -4985,9 +4422,7 @@ def can_fetch_all_contributor_dashboard_stats(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_can_fetch_all_contributor_dashboard_stats(
-        self: _SelfBaseHandlerType, username: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_can_fetch_all_contributor_dashboard_stats(self: _SelfBaseHandlerType, username: str, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Returns a handler to test whether stats can be fetched based
         on the logged in user.
 
@@ -5007,10 +4442,7 @@ def can_fetch_all_contributor_dashboard_stats(
             raise base.UserFacingExceptions.NotLoggedInException
 
         if user_services.get_username(self.user_id) != username:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'The user %s is not allowed to fetch the stats of other '
-                'users.' % (user_services.get_username(self.user_id))
-            )
+            raise base.UserFacingExceptions.UnauthorizedUserException('The user %s is not allowed to fetch the stats of other users.' % (user_services.get_username(self.user_id)))
 
         return handler(self, username, **kwargs)
 
@@ -5032,9 +4464,7 @@ def is_from_oppia_android(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_is_from_oppia_android(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_is_from_oppia_android(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was sent from Oppia Android.
 
         Args:
@@ -5053,24 +4483,10 @@ def is_from_oppia_android(
         app_version_name = headers['app_version_name']
         app_version_code = headers['app_version_code']
 
-        version_name_matches = (
-            android_validation_constants.APP_VERSION_WITH_HASH_REGEXP.match(
-                app_version_name
-            )
-        )
-        version_code_is_positive_int = app_version_code.isdigit() and (
-            int(app_version_code) > 0
-        )
-        if (
-            api_key != android_validation_constants.ANDROID_API_KEY
-            or app_package_name
-            != (android_validation_constants.ANDROID_APP_PACKAGE_NAME)
-            or not version_name_matches
-            or not version_code_is_positive_int
-        ):
-            raise self.UnauthorizedUserException(
-                'The incoming request is not a valid Oppia Android request.'
-            )
+        version_name_matches = android_validation_constants.APP_VERSION_WITH_HASH_REGEXP.match(app_version_name)
+        version_code_is_positive_int = app_version_code.isdigit() and (int(app_version_code) > 0)
+        if api_key != android_validation_constants.ANDROID_API_KEY or app_package_name != (android_validation_constants.ANDROID_APP_PACKAGE_NAME) or not version_name_matches or not version_code_is_positive_int:
+            raise self.UnauthorizedUserException('The incoming request is not a valid Oppia Android request.')
         return handler(self, **kwargs)
 
     return test_is_from_oppia_android
@@ -5092,9 +4508,7 @@ def is_from_oppia_android_build(
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
-    def test_is_from_oppia_android_build(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+    def test_is_from_oppia_android_build(self: _SelfBaseHandlerType, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was sent from Oppia Android build process.
 
         Args:
@@ -5108,15 +4522,8 @@ def is_from_oppia_android_build(
             UnauthorizedUserException. If incoming request is not from a valid
                 Oppia Android build request.
         """
-        if self.request.headers.get(
-            'X-ApiKey'
-        ) is None or not android_services.verify_android_build_secret(
-            self.request.headers['X-ApiKey']
-        ):
-            raise self.UnauthorizedUserException(
-                'The incoming request is not a valid '
-                'Oppia Android build request.'
-            )
+        if self.request.headers.get('X-ApiKey') is None or not android_services.verify_android_build_secret(self.request.headers['X-ApiKey']):
+            raise self.UnauthorizedUserException('The incoming request is not a valid Oppia Android build request.')
         return handler(self, **kwargs)
 
     return test_is_from_oppia_android_build

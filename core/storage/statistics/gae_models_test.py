@@ -20,20 +20,18 @@ from __future__ import annotations
 
 import types
 
+from typing import List
+
 from core import feconf
 from core.domain import exp_domain, stats_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, stats_models
 
-(base_models, stats_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.STATISTICS]
-)
+(base_models, stats_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.STATISTICS])
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
@@ -45,9 +43,7 @@ class StateCounterModelTests(test_utils.GenericTestBase):
 
     def test_state_counter_model_gets_created(self) -> None:
         # This tests whether get_or_create() can create the model.
-        model_instance = stats_models.StateCounterModel.get_or_create(
-            'exp_id1', 'state_name'
-        )
+        model_instance = stats_models.StateCounterModel.get_or_create('exp_id1', 'state_name')
 
         self.assertEqual(model_instance.id, 'exp_id1.state_name')
         self.assertEqual(model_instance.first_entry_count, 0)
@@ -60,9 +56,7 @@ class StateCounterModelTests(test_utils.GenericTestBase):
         # model is created by creating an instance.
         stats_models.StateCounterModel(id='exp_id1.state_name').put()
 
-        model_instance = stats_models.StateCounterModel.get_or_create(
-            'exp_id1', 'state_name'
-        )
+        model_instance = stats_models.StateCounterModel.get_or_create('exp_id1', 'state_name')
 
         self.assertEqual(model_instance.id, 'exp_id1.state_name')
         self.assertEqual(model_instance.first_entry_count, 0)
@@ -102,13 +96,9 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_event_models(self) -> None:
-        event_id = stats_models.AnswerSubmittedEventLogEntryModel.create(
-            'exp_id1', 1, 'state_name1', 'session_id1', 0.0, True
-        )
+        event_id = stats_models.AnswerSubmittedEventLogEntryModel.create('exp_id1', 1, 'state_name1', 'session_id1', 0.0, True)
 
-        event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(
-            event_id
-        )
+        event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(event_id)
 
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
@@ -142,9 +132,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class ExplorationActualStartEventLogEntryModelUnitTests(
-    test_utils.GenericTestBase
-):
+class ExplorationActualStartEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationActualStartEventLogEntryModel class."""
 
     def test_get_deletion_policy(self) -> None:
@@ -154,13 +142,9 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         )
 
     def test_create_and_get_event_models(self) -> None:
-        event_id = stats_models.ExplorationActualStartEventLogEntryModel.create(
-            'exp_id1', 1, 'state_name1', 'session_id1'
-        )
+        event_id = stats_models.ExplorationActualStartEventLogEntryModel.create('exp_id1', 1, 'state_name1', 'session_id1')
 
-        event_model = stats_models.ExplorationActualStartEventLogEntryModel.get(
-            event_id
-        )
+        event_model = stats_models.ExplorationActualStartEventLogEntryModel.get(event_id)
 
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
@@ -200,9 +184,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_event_models(self) -> None:
-        event_id = stats_models.SolutionHitEventLogEntryModel.create(
-            'exp_id1', 1, 'state_name1', 'session_id1', 0.0
-        )
+        event_id = stats_models.SolutionHitEventLogEntryModel.create('exp_id1', 1, 'state_name1', 'session_id1', 0.0)
 
         event_model = stats_models.SolutionHitEventLogEntryModel.get(event_id)
 
@@ -255,9 +237,7 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL,
         )
 
-        event_model = stats_models.StartExplorationEventLogEntryModel.get(
-            event_id
-        )
+        event_model = stats_models.StartExplorationEventLogEntryModel.get(event_id)
 
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
@@ -293,9 +273,7 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class MaybeLeaveExplorationEventLogEntryModelUnitTests(
-    test_utils.GenericTestBase
-):
+class MaybeLeaveExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the MaybeLeaveExplorationEventLogEntryModel class."""
 
     def test_get_deletion_policy(self) -> None:
@@ -314,9 +292,7 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             {},
             feconf.PLAY_TYPE_NORMAL,
         )
-        event_model = stats_models.MaybeLeaveExplorationEventLogEntryModel.get(
-            event_id
-        )
+        event_model = stats_models.MaybeLeaveExplorationEventLogEntryModel.get(event_id)
 
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
@@ -352,9 +328,7 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
         )
 
 
-class CompleteExplorationEventLogEntryModelUnitTests(
-    test_utils.GenericTestBase
-):
+class CompleteExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the CompleteExplorationEventLogEntryModel class."""
 
     def test_get_deletion_policy(self) -> None:
@@ -374,9 +348,7 @@ class CompleteExplorationEventLogEntryModelUnitTests(
             feconf.PLAY_TYPE_NORMAL,
         )
 
-        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
-            event_id
-        )
+        event_model = stats_models.CompleteExplorationEventLogEntryModel.get(event_id)
 
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
@@ -423,12 +395,8 @@ class RateExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_event_models(self) -> None:
-        event_id = stats_models.RateExplorationEventLogEntryModel.create(
-            'exp_id', 'user_id', 2, 1
-        )
-        event_model = stats_models.RateExplorationEventLogEntryModel.get(
-            event_id
-        )
+        event_id = stats_models.RateExplorationEventLogEntryModel.create('exp_id', 'user_id', 2, 1)
+        event_model = stats_models.RateExplorationEventLogEntryModel.get(event_id)
 
         self.assertEqual(event_model.exploration_id, 'exp_id')
         self.assertEqual(event_model.rating, 2)
@@ -520,9 +488,7 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_event_models(self) -> None:
-        event_id = stats_models.StateCompleteEventLogEntryModel.create(
-            'exp_id1', 1, 'state_name1', 'session_id1', 0.0
-        )
+        event_id = stats_models.StateCompleteEventLogEntryModel.create('exp_id1', 1, 'state_name1', 'session_id1', 0.0)
 
         event_model = stats_models.StateCompleteEventLogEntryModel.get(event_id)
 
@@ -556,9 +522,7 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
-    test_utils.GenericTestBase
-):
+class LeaveForRefresherExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the LeaveForRefresherExplorationEventLogEntryModel class."""
 
     def test_get_deletion_policy(self) -> None:
@@ -568,17 +532,9 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
         )
 
     def test_create_and_get_event_models(self) -> None:
-        event_id = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.create(
-                'exp_id1', 'exp_id2', 1, 'state_name1', 'session_id1', 0.0
-            )
-        )
+        event_id = stats_models.LeaveForRefresherExplorationEventLogEntryModel.create('exp_id1', 'exp_id2', 1, 'state_name1', 'session_id1', 0.0)
 
-        event_model = (
-            stats_models.LeaveForRefresherExplorationEventLogEntryModel.get(
-                event_id
-            )
-        )
+        event_model = stats_models.LeaveForRefresherExplorationEventLogEntryModel.get(event_id)
 
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.refresher_exp_id, 'exp_id2')
@@ -626,9 +582,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_analytics_model(self) -> None:
-        model_id = stats_models.ExplorationStatsModel.create(
-            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}
-        )
+        model_id = stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
 
         model = stats_models.ExplorationStatsModel.get_model('exp_id1', 1)
 
@@ -646,12 +600,8 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.state_stats_mapping, {})
 
     def test_create_analytics_model(self) -> None:
-        model_id = stats_models.ExplorationStatsModel.create(
-            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}
-        )
-        fetched_model = stats_models.ExplorationStatsModel.get_model(
-            'exp_id1', 1
-        )
+        model_id = stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
+        fetched_model = stats_models.ExplorationStatsModel.get_model('exp_id1', 1)
 
         # Ruling out the possibility of None for mypy type checking.
         assert fetched_model is not None
@@ -667,15 +617,9 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(fetched_model.state_stats_mapping, {})
 
     def test_get_multi_stats_models(self) -> None:
-        stats_models.ExplorationStatsModel.create(
-            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}
-        )
-        stats_models.ExplorationStatsModel.create(
-            'exp_id1', 2, 0, 0, 0, 0, 0, 0, {}
-        )
-        stats_models.ExplorationStatsModel.create(
-            'exp_id2', 1, 0, 0, 0, 0, 0, 0, {}
-        )
+        stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
+        stats_models.ExplorationStatsModel.create('exp_id1', 2, 0, 0, 0, 0, 0, 0, {})
+        stats_models.ExplorationStatsModel.create('exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
 
         exp_version_reference_dicts = [
             exp_domain.ExpVersionReference('exp_id1', 1),
@@ -683,9 +627,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             exp_domain.ExpVersionReference('exp_id2', 1),
         ]
 
-        stat_models = stats_models.ExplorationStatsModel.get_multi_stats_models(
-            exp_version_reference_dicts
-        )
+        stat_models = stats_models.ExplorationStatsModel.get_multi_stats_models(exp_version_reference_dicts)
 
         # Ruling out the possibility of None for mypy type checking.
         assert stat_models[0] is not None
@@ -700,16 +642,10 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stat_models[2].exp_version, 1)
 
     def test_get_multi_versions(self) -> None:
-        stats_models.ExplorationStatsModel.create(
-            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}
-        )
-        stats_models.ExplorationStatsModel.create(
-            'exp_id1', 2, 0, 0, 0, 0, 0, 0, {}
-        )
+        stats_models.ExplorationStatsModel.create('exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
+        stats_models.ExplorationStatsModel.create('exp_id1', 2, 0, 0, 0, 0, 0, 0, {})
 
-        stat_models = stats_models.ExplorationStatsModel.get_multi_versions(
-            'exp_id1', [1, 2]
-        )
+        stat_models = stats_models.ExplorationStatsModel.get_multi_versions('exp_id1', [1, 2])
 
         assert stat_models[0] is not None
         assert stat_models[1] is not None
@@ -807,9 +743,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_playthrough_model(self) -> None:
-        model_id = stats_models.PlaythroughModel.create(
-            'exp_id1', 1, 'EarlyQuit', {}, []
-        )
+        model_id = stats_models.PlaythroughModel.create('exp_id1', 1, 'EarlyQuit', {}, [])
 
         model = stats_models.PlaythroughModel.get(model_id)
 
@@ -830,14 +764,11 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
-            'The id generator for PlaythroughModel is producing too '
-            'many collisions.',
+            'The id generator for PlaythroughModel is producing too many collisions.',
         )
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
-            stats_models.PlaythroughModel.create(
-                'exp_id1', 1, 'EarlyQuit', {}, []
-            )
+            stats_models.PlaythroughModel.create('exp_id1', 1, 'EarlyQuit', {}, [])
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -853,9 +784,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'issue_customization_args': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
-            ),
+            'issue_customization_args': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'actions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
@@ -876,56 +805,38 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
     def test_get_state_reference_for_exploration(self) -> None:
         exp_id_1 = 'expid1'
         state_name_1 = 'intro'
-        state_reference_1 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
-            exp_id_1, state_name_1
-        )  # pylint: disable=line-too-long
+        state_reference_1 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_1, state_name_1)  # pylint: disable=line-too-long
         self.assertEqual(state_reference_1, 'expid1:intro')
         exp_id_2 = 'exp_id_2'
         state_name_2 = 'first state'
-        state_reference_2 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
-            exp_id_2, state_name_2
-        )  # pylint: disable=line-too-long
+        state_reference_2 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_2, state_name_2)  # pylint: disable=line-too-long
         self.assertEqual(state_reference_2, 'exp_id_2:first state')
         exp_id_3 = 'exp id 1.2.3'
         state_name_3 = 'this_is first_state version 1.1'
-        state_reference_3 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
-            exp_id_3, state_name_3
-        )  # pylint: disable=line-too-long
-        self.assertEqual(
-            state_reference_3, 'exp id 1.2.3:this_is first_state version 1.1'
-        )
+        state_reference_3 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_3, state_name_3)  # pylint: disable=line-too-long
+        self.assertEqual(state_reference_3, 'exp id 1.2.3:this_is first_state version 1.1')
         exp_id_4 = '123'
         state_name_4 = 'टेक्स्ट'
-        state_reference_4 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
-            exp_id_4, state_name_4
-        )  # pylint: disable=line-too-long
+        state_reference_4 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_4, state_name_4)  # pylint: disable=line-too-long
         self.assertEqual(state_reference_4, '123:%s' % (state_name_4))
         exp_id_5 = '1234'
         state_name_5 = 'Klüft'
-        state_reference_5 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
-            exp_id_5, state_name_5
-        )  # pylint: disable=line-too-long
+        state_reference_5 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_5, state_name_5)  # pylint: disable=line-too-long
         self.assertEqual(state_reference_5, '1234:%s' % (state_name_5))
 
     def test_get_state_reference_for_question(self) -> None:
         question_id_1 = 'first question'
-        state_reference_1 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(
-            question_id_1
-        )  # pylint: disable=line-too-long
+        state_reference_1 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_1)  # pylint: disable=line-too-long
         self.assertEqual(state_reference_1, 'first question')
         question_id_2 = 'first.question'
-        state_reference_2 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(
-            question_id_2
-        )  # pylint: disable=line-too-long
+        state_reference_2 = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_2)  # pylint: disable=line-too-long
         self.assertEqual(state_reference_2, 'first.question')
 
     def test_get_instance_id(self) -> None:
         state_reference = 'exp_id:state_name'
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         expected_instance_id = 'exploration:exp_id:state_name'
-        instance_id = stats_models.LearnerAnswerDetailsModel.get_instance_id(
-            entity_type, state_reference
-        )
+        instance_id = stats_models.LearnerAnswerDetailsModel.get_instance_id(entity_type, state_reference)
         self.assertEqual(instance_id, expected_instance_id)
 
     def test_create_model_instance(self) -> None:
@@ -934,9 +845,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
         learner_answer_info_list: List[stats_domain.LearnerAnswerInfo] = []
-        learner_answer_info_schema_version = (
-            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION
-        )
+        learner_answer_info_schema_version = feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type,
@@ -946,18 +855,12 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes,
         )
-        model_instance = (
-            stats_models.LearnerAnswerDetailsModel.get_model_instance(
-                feconf.ENTITY_TYPE_EXPLORATION, state_reference
-            )
-        )
+        model_instance = stats_models.LearnerAnswerDetailsModel.get_model_instance(feconf.ENTITY_TYPE_EXPLORATION, state_reference)
         # Ruling out the possibility of None for mypy type checking.
         assert model_instance is not None
         self.assertEqual(model_instance.id, 'exploration:exp_id:state_name')
         self.assertEqual(model_instance.state_reference, state_reference)
-        self.assertEqual(
-            model_instance.entity_type, feconf.ENTITY_TYPE_EXPLORATION
-        )
+        self.assertEqual(model_instance.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
         self.assertEqual(model_instance.learner_answer_info_list, [])
 
         # Test to create model instance for question state.
@@ -965,9 +868,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_QUESTION
         interaction_id = 'TextInput'
         learner_answer_info_list_2: List[stats_domain.LearnerAnswerInfo] = []
-        learner_answer_info_schema_version = (
-            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION
-        )
+        learner_answer_info_schema_version = feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type,
@@ -977,40 +878,26 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes,
         )
-        model_instance = (
-            stats_models.LearnerAnswerDetailsModel.get_model_instance(
-                feconf.ENTITY_TYPE_QUESTION, state_reference
-            )
-        )
+        model_instance = stats_models.LearnerAnswerDetailsModel.get_model_instance(feconf.ENTITY_TYPE_QUESTION, state_reference)
         # Ruling out the possibility of None for mypy type checking.
         assert model_instance is not None
         self.assertEqual(model_instance.state_reference, state_reference)
-        self.assertEqual(
-            model_instance.entity_type, feconf.ENTITY_TYPE_QUESTION
-        )
+        self.assertEqual(model_instance.entity_type, feconf.ENTITY_TYPE_QUESTION)
         self.assertEqual(model_instance.learner_answer_info_list, [])
 
     def test_get_model_instance_returns_none(self) -> None:
-        model_instance = (
-            stats_models.LearnerAnswerDetailsModel.get_model_instance(
-                feconf.ENTITY_TYPE_QUESTION, 'expID:stateName'
-            )
-        )
+        model_instance = stats_models.LearnerAnswerDetailsModel.get_model_instance(feconf.ENTITY_TYPE_QUESTION, 'expID:stateName')
         self.assertEqual(model_instance, None)
 
     def test_save_and_get_model_instance_for_unicode_state_names(self) -> None:
         exp_id = '123'
         state_name = 'टेक्स्ट'
-        state_reference = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
-            exp_id, state_name
-        )  # pylint: disable=line-too-long
+        state_reference = stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)  # pylint: disable=line-too-long
         self.assertEqual(state_reference, '123:%s' % (state_name))
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
         learner_answer_info_list: List[stats_domain.LearnerAnswerInfo] = []
-        learner_answer_info_schema_version = (
-            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION
-        )
+        learner_answer_info_schema_version = feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type,
@@ -1020,17 +907,11 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes,
         )
-        model_instance = (
-            stats_models.LearnerAnswerDetailsModel.get_model_instance(
-                feconf.ENTITY_TYPE_EXPLORATION, state_reference
-            )
-        )
+        model_instance = stats_models.LearnerAnswerDetailsModel.get_model_instance(feconf.ENTITY_TYPE_EXPLORATION, state_reference)
         # Ruling out the possibility of None for mypy type checking.
         assert model_instance is not None
         self.assertNotEqual(model_instance, None)
-        self.assertEqual(
-            model_instance.state_reference, '123:%s' % (state_name)
-        )
+        self.assertEqual(model_instance.state_reference, '123:%s' % (state_name))
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -1066,9 +947,7 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_models(self) -> None:
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '1', 5, 4, {}
-        )
+        stats_models.ExplorationAnnotationsModel.create('exp_id1', '1', 5, 4, {})
 
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
 
@@ -1079,23 +958,15 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model1.state_hit_counts, {})
 
     def test_get_versions(self) -> None:
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '1', 5, 4, {}
-        )
-        stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '2', 5, 4, {}
-        )
+        stats_models.ExplorationAnnotationsModel.create('exp_id1', '1', 5, 4, {})
+        stats_models.ExplorationAnnotationsModel.create('exp_id1', '2', 5, 4, {})
 
-        versions = stats_models.ExplorationAnnotationsModel.get_versions(
-            'exp_id1'
-        )
+        versions = stats_models.ExplorationAnnotationsModel.get_versions('exp_id1')
 
         self.assertEqual(sorted(versions), ['1', '2'])
 
     def test_get_version_for_invalid_exploration_id(self) -> None:
-        versions = stats_models.ExplorationAnnotationsModel.get_versions(
-            'invalid_exp_id'
-        )
+        versions = stats_models.ExplorationAnnotationsModel.get_versions('invalid_exp_id')
 
         self.assertEqual(versions, [])
 
@@ -1138,9 +1009,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
                 'rule_spec_index': 1,
-                'classification_categorization': (
-                    exp_domain.EXPLICIT_CLASSIFICATION
-                ),
+                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
                 'time_spent_in_sec': 10.5,
@@ -1149,13 +1018,9 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             }
         ]
 
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id', submitted_answer_list
-        )
+        stats_models.StateAnswersModel.insert_submitted_answers('exp_id', 1, 'state_name', 'interaction_id', submitted_answer_list)
 
-        model1 = stats_models.StateAnswersModel.get_master_model(
-            'exp_id', 1, 'state_name'
-        )
+        model1 = stats_models.StateAnswersModel.get_master_model('exp_id', 1, 'state_name')
 
         # Ruling out the possibility of None for mypy type checking.
         assert model1 is not None
@@ -1168,9 +1033,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
-            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1
-        ):
+        with self.swap(stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
             stats_models.StateAnswersModel.insert_submitted_answers(
                 'exp_id',
                 1,
@@ -1179,9 +1042,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 submitted_answer_list,
             )
 
-            model1 = stats_models.StateAnswersModel.get_master_model(
-                'exp_id', 1, 'state_name'
-            )
+            model1 = stats_models.StateAnswersModel.get_master_model('exp_id', 1, 'state_name')
 
             # Ruling out the possibility of None for mypy type checking.
             assert model1 is not None
@@ -1195,9 +1056,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 submitted_answer_list,
             )
 
-            model1 = stats_models.StateAnswersModel.get_master_model(
-                'exp_id', 1, 'state_name'
-            )
+            model1 = stats_models.StateAnswersModel.get_master_model('exp_id', 1, 'state_name')
 
             # Ruling out the possibility of None for mypy type checking.
             assert model1 is not None
@@ -1205,24 +1064,16 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
         # 'shard_count' will not increase as number of answers are less than
         # the max answer list size.
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id', submitted_answer_list
-        )
+        stats_models.StateAnswersModel.insert_submitted_answers('exp_id', 1, 'state_name', 'interaction_id', submitted_answer_list)
 
-        model1 = stats_models.StateAnswersModel.get_master_model(
-            'exp_id', 1, 'state_name'
-        )
+        model1 = stats_models.StateAnswersModel.get_master_model('exp_id', 1, 'state_name')
 
         # Ruling out the possibility of None for mypy type checking.
         assert model1 is not None
         self.assertEqual(model1.shard_count, 2)
 
     def test_get_all_state_answer_models_of_a_single_shard(self) -> None:
-        self.assertIsNone(
-            stats_models.StateAnswersModel.get_all_models(
-                'exp_id', 1, 'state_name'
-            )
-        )
+        self.assertIsNone(stats_models.StateAnswersModel.get_all_models('exp_id', 1, 'state_name'))
 
         # The 'shard_count' will be zero since the number of answer lists
         # is less than _MAX_ANSWER_LIST_BYTE_SIZE.
@@ -1232,9 +1083,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
                 'rule_spec_index': 1,
-                'classification_categorization': (
-                    exp_domain.EXPLICIT_CLASSIFICATION
-                ),
+                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
                 'time_spent_in_sec': 10.5,
@@ -1242,9 +1091,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 'answer_str': 'answer str',
             }
         ]
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id1', submitted_answer_list1
-        )
+        stats_models.StateAnswersModel.insert_submitted_answers('exp_id', 1, 'state_name', 'interaction_id1', submitted_answer_list1)
 
         submitted_answer_list2: List[stats_domain.SubmittedAnswerDict] = [
             {
@@ -1252,9 +1099,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
                 'rule_spec_index': 1,
-                'classification_categorization': (
-                    exp_domain.EXPLICIT_CLASSIFICATION
-                ),
+                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
                 'params': {},
                 'session_id': 'sess',
                 'time_spent_in_sec': 10.5,
@@ -1262,13 +1107,9 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 'answer_str': 'answer str',
             }
         ]
-        stats_models.StateAnswersModel.insert_submitted_answers(
-            'exp_id', 1, 'state_name', 'interaction_id2', submitted_answer_list2
-        )
+        stats_models.StateAnswersModel.insert_submitted_answers('exp_id', 1, 'state_name', 'interaction_id2', submitted_answer_list2)
 
-        stat_answer_models = stats_models.StateAnswersModel.get_all_models(
-            'exp_id', 1, 'state_name'
-        )
+        stat_answer_models = stats_models.StateAnswersModel.get_all_models('exp_id', 1, 'state_name')
 
         # Ruling out the possibility of None for mypy type checking.
         assert stat_answer_models is not None
@@ -1285,18 +1126,14 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
     def test_get_all_state_answer_models_of_all_shards(self) -> None:
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
-            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1
-        ):
+        with self.swap(stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
             submitted_answer_list1: List[stats_domain.SubmittedAnswerDict] = [
                 {
                     'answer': 'value1',
                     'interaction_id': 'TextInput',
                     'answer_group_index': 0,
                     'rule_spec_index': 1,
-                    'classification_categorization': (
-                        exp_domain.EXPLICIT_CLASSIFICATION
-                    ),
+                    'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
                     'params': {},
                     'session_id': 'sess',
                     'time_spent_in_sec': 10.5,
@@ -1318,9 +1155,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                     'interaction_id': 'TextInput',
                     'answer_group_index': 0,
                     'rule_spec_index': 1,
-                    'classification_categorization': (
-                        exp_domain.EXPLICIT_CLASSIFICATION
-                    ),
+                    'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
                     'params': {},
                     'session_id': 'sess',
                     'time_spent_in_sec': 10.5,
@@ -1336,9 +1171,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
                 submitted_answer_list2,
             )
 
-            stat_answer_models = stats_models.StateAnswersModel.get_all_models(
-                'exp_id', 1, 'state_name'
-            )
+            stat_answer_models = stats_models.StateAnswersModel.get_all_models('exp_id', 1, 'state_name')
 
             # Ruling out the possibility of None for mypy type checking.
             assert stat_answer_models is not None

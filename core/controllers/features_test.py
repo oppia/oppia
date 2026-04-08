@@ -16,11 +16,11 @@
 
 from __future__ import annotations
 
+from typing import Final
+
 from core import feconf
 from core.domain import opportunity_services, rights_manager, user_services
 from core.tests import test_utils
-
-from typing import Final
 
 
 def exploration_features_url(exp_id: str) -> str:
@@ -38,9 +38,7 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.save_new_valid_exploration(
-            self.EXP_ID, editor_id, title='Explore!', end_state_name='END'
-        )
+        self.save_new_valid_exploration(self.EXP_ID, editor_id, title='Explore!', end_state_name='END')
         editor_actions_info = user_services.get_user_actions_info(editor_id)
         rights_manager.publish_exploration(editor_actions_info, self.EXP_ID)
 

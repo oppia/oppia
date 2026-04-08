@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Callable, List, Optional, Union, cast
+
 from core import utils
 from core.domain import (
     exp_domain,
@@ -28,8 +30,6 @@ from core.domain import (
     state_domain,
 )
 from core.platform import models
-
-from typing import Callable, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -86,16 +86,12 @@ def try_upgrading_draft_to_exp_version(
             to_exp_version.
     """
     if current_draft_version > to_exp_version:
-        raise utils.InvalidInputException(
-            'Current draft version is greater than the exploration version.'
-        )
+        raise utils.InvalidInputException('Current draft version is greater than the exploration version.')
     if current_draft_version == to_exp_version:
         return None
 
     exp_versions = list(range(current_draft_version + 1, to_exp_version + 1))
-    commits_list = exp_models.ExplorationCommitLogEntryModel.get_multi(
-        exp_id, exp_versions
-    )
+    commits_list = exp_models.ExplorationCommitLogEntryModel.get_multi(exp_id, exp_versions)
     upgrade_times = 0
     while current_draft_version + upgrade_times < to_exp_version:
         commit = commits_list[upgrade_times]
@@ -104,11 +100,7 @@ def try_upgrading_draft_to_exp_version(
         # occurs an instance of ExplorationCommitLogEntryModel is saved. Even
         # if we create an exploration, a commit occurs.
         assert commit is not None
-        if (
-            len(commit.commit_cmds) != 1
-            or commit.commit_cmds[0]['cmd']
-            != exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION
-        ):
+        if len(commit.commit_cmds) != 1 or commit.commit_cmds[0]['cmd'] != exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
             return None
         conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
             commit.commit_cmds[0]['from_version'],
@@ -157,15 +149,10 @@ class DraftUpgradeUtil:
             if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 # Here we use cast because this 'if' condition forces
                 # change to have type EditExpStatePropertyContentCmd.
-                edit_content_property_cmd = cast(
-                    exp_domain.EditExpStatePropertyContentCmd, change
-                )
+                edit_content_property_cmd = cast(exp_domain.EditExpStatePropertyContentCmd, change)
                 new_value = edit_content_property_cmd.new_value
                 new_value['html'] = conversion_fn(new_value['html'])
-            elif (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
-            ):
+            elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS:
                 # Only customization args with the key 'choices' have HTML
                 # content in them.
                 # Here we use cast because this 'elif' condition forces change
@@ -186,17 +173,11 @@ class DraftUpgradeUtil:
                         List[state_domain.SubtitledHtmlDict],
                         new_value['choices']['value'],
                     )
-                    for value_index, value in enumerate(
-                        subtitled_html_new_value_dicts
-                    ):
+                    for value_index, value in enumerate(subtitled_html_new_value_dicts):
                         if isinstance(value, dict) and 'html' in value:
-                            subtitled_html_new_value_dicts[value_index][
-                                'html'
-                            ] = conversion_fn(value['html'])
+                            subtitled_html_new_value_dicts[value_index]['html'] = conversion_fn(value['html'])
                         elif isinstance(value, str):
-                            subtitled_html_new_value_dicts[value_index] = (
-                                conversion_fn(value)
-                            )
+                            subtitled_html_new_value_dicts[value_index] = conversion_fn(value)
             elif change.property_name == 'written_translations':
                 # Here we use MyPy ignore because the latest schema of state
                 # dict doesn't contains translations_mapping of
@@ -207,25 +188,11 @@ class DraftUpgradeUtil:
                     content_id,
                     language_code_to_written_translation,
                 ) in translations_mapping.items():
-                    for (
-                        language_code
-                    ) in language_code_to_written_translation.keys():
-                        translation_dict = translations_mapping[content_id][
-                            language_code
-                        ]
+                    for language_code in language_code_to_written_translation.keys():
+                        translation_dict = translations_mapping[content_id][language_code]
                         if 'html' in translation_dict:
-                            translations_mapping[content_id][language_code][
-                                'html'
-                            ] = conversion_fn(
-                                translations_mapping[content_id][language_code][
-                                    'html'
-                                ]
-                            )
-            elif (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                and new_value is not None
-            ):
+                            translations_mapping[content_id][language_code]['html'] = conversion_fn(translations_mapping[content_id][language_code]['html'])
+            elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and new_value is not None:
                 # Here we use cast because this 'elif' condition forces change
                 # to have type EditExpStatePropertyInteractionDefaultOutcomeCmd.
                 edit_interaction_default_outcome_cmd = cast(
@@ -236,29 +203,13 @@ class DraftUpgradeUtil:
                     edit_interaction_default_outcome_cmd.new_value,
                     conversion_fn,
                 )
-            elif (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_HINTS
-            ):
+            elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS:
                 # Here we use cast because this 'elif' condition forces change
                 # to have type EditExpStatePropertyInteractionHintsCmd.
-                edit_interaction_hints_cmd = cast(
-                    exp_domain.EditExpStatePropertyInteractionHintsCmd, change
-                )
+                edit_interaction_hints_cmd = cast(exp_domain.EditExpStatePropertyInteractionHintsCmd, change)
                 hint_dicts = edit_interaction_hints_cmd.new_value
-                new_value = [
-                    (
-                        state_domain.Hint.convert_html_in_hint(
-                            hint_dict, conversion_fn
-                        )
-                    )
-                    for hint_dict in hint_dicts
-                ]
-            elif (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION
-                and new_value is not None
-            ):
+                new_value = [(state_domain.Hint.convert_html_in_hint(hint_dict, conversion_fn)) for hint_dict in hint_dicts]
+            elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and new_value is not None:
                 # Here we use cast because this 'elif' condition forces change
                 # to have type EditExpStatePropertyInteractionSolutionCmd.
                 edit_interaction_solution_cmd = cast(
@@ -266,9 +217,7 @@ class DraftUpgradeUtil:
                     change,
                 )
                 new_value = edit_interaction_solution_cmd.new_value
-                new_value['explanation']['html'] = conversion_fn(
-                    new_value['explanation']['html']
-                )
+                new_value['explanation']['html'] = conversion_fn(new_value['explanation']['html'])
                 # TODO(#9413): Find a way to include a reference to the
                 # interaction type in the Draft change lists.
                 # See issue: https://github.com/oppia/oppia/issues/9413.
@@ -279,13 +228,9 @@ class DraftUpgradeUtil:
                 # The typecheckings below can be avoided once #9413 is fixed.
                 if new_value['correct_answer']:
                     if isinstance(new_value['correct_answer'], list):
-                        for list_index, html_list in enumerate(
-                            new_value['correct_answer']
-                        ):
+                        for list_index, html_list in enumerate(new_value['correct_answer']):
                             if isinstance(html_list, list):
-                                for answer_html_index, answer_html in enumerate(
-                                    html_list
-                                ):
+                                for answer_html_index, answer_html in enumerate(html_list):
                                     if isinstance(answer_html, str):
                                         # Here we use cast because all
                                         # of the above 'if' conditions
@@ -295,27 +240,16 @@ class DraftUpgradeUtil:
                                             List[List[str]],
                                             new_value['correct_answer'],
                                         )
-                                        correct_answer[list_index][
-                                            answer_html_index
-                                        ] = conversion_fn(answer_html)
-            elif (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
-                html_field_types_to_rule_specs = (
-                    rules_registry.Registry.get_html_field_types_to_rule_specs(
-                        state_schema_version=41
-                    )
-                )
+                                        correct_answer[list_index][answer_html_index] = conversion_fn(answer_html)
+            elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS:
+                html_field_types_to_rule_specs = rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41)
                 # Here we use cast because this 'elif' condition forces change
                 # to have type EditExpStatePropertyInteractionAnswerGroupsCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change,
                 )
-                answer_group_dicts = (
-                    edit_interaction_answer_groups_cmd.new_value
-                )
+                answer_group_dicts = edit_interaction_answer_groups_cmd.new_value
                 new_value = [
                     state_domain.AnswerGroup.convert_html_in_answer_group(
                         answer_group,
@@ -336,9 +270,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v56_dict_to_v57_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v56_dict_to_v57_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 56 to 57. Version 57
         removes recorded_voiceovers property form the state, converting draft to
         a new version won't be possible.
@@ -355,20 +287,12 @@ class DraftUpgradeUtil:
                 completed.
         """
         for exp_change in draft_change_list:
-            if (
-                exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
-                and exp_change.property_name
-                == exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED
-            ):
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and exp_change.property_name == exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED:
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v55_dict_to_v56_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v55_dict_to_v56_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 55 to 56. Version 56
         adds an inapplicable_skill_misconception_ids list property to the
         state.
@@ -387,9 +311,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v54_dict_to_v55_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v54_dict_to_v55_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 54 to 55. Version 55
         changes content ids for content and removes written_translation property
         form the state, converting draft to anew version won't be possible.
@@ -407,15 +329,11 @@ class DraftUpgradeUtil:
         """
         for exp_change in draft_change_list:
             if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v53_dict_to_v54_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v53_dict_to_v54_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 53 to 54. State
         version 54 adds catchMisspellings customization_arg to TextInput
         interaction. As this is a new property and therefore
@@ -432,9 +350,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v52_dict_to_v53_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v52_dict_to_v53_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts from version 52 to 53. Version 53 fixes general
         state, interaction and rte data. This will update the drafts
         for state and RTE part but won't be able to do for interaction.
@@ -467,9 +383,7 @@ class DraftUpgradeUtil:
                 continue
 
             if exp_change.property_name in drafts_to_remove:
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
 
             if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 # Ruling out the possibility of any other type for mypy
@@ -479,42 +393,26 @@ class DraftUpgradeUtil:
                 html = exp_domain.Exploration.fix_content(html)
                 exp_change.new_value['html'] = html
 
-            elif exp_change.property_name == (
-                exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS
-            ):
+            elif exp_change.property_name == (exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 # Ruling out the possibility of any other type for mypy
                 # type checking.
                 assert isinstance(exp_change.new_value, dict)
                 written_translations = exp_change.new_value
 
-                for translations in written_translations[
-                    'translations_mapping'
-                ].values():
+                for translations in written_translations['translations_mapping'].values():
                     for written_translation in translations.values():
                         if written_translation['data_format'] == 'html':
-                            if isinstance(
-                                written_translation['translation'], list
-                            ):
+                            if isinstance(written_translation['translation'], list):
                                 # Translation of type html should only be str,
                                 # cannot be of type list.
-                                raise InvalidDraftConversionException(
-                                    'Conversion cannot be completed.'
-                                )
+                                raise InvalidDraftConversionException('Conversion cannot be completed.')
 
-                            fixed_translation = (
-                                exp_domain.Exploration.fix_content(
-                                    written_translation['translation']
-                                )
-                            )
-                            written_translation['translation'] = (
-                                fixed_translation
-                            )
+                            fixed_translation = exp_domain.Exploration.fix_content(written_translation['translation'])
+                            written_translation['translation'] = fixed_translation
         return draft_change_list
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v51_dict_to_v52_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts from version 51 to 52. Version 52 fixes content IDs
         in translations and voiceovers (some content IDs are removed).
         We discard drafts that work with content IDs to make sure that they
@@ -533,38 +431,25 @@ class DraftUpgradeUtil:
         """
         for exp_change in draft_change_list:
             if exp_change.cmd in (
-                (
-                    exp_domain.DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
-                ),
-                (
-                    exp_domain.DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE
-                ),
+                (exp_domain.DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE),
+                (exp_domain.DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE),
                 exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
             ):
                 # All cmds above somehow work with content IDs and as in
                 # the 51 to 52 conversion we remove some content IDs we raise
                 # an exception so that these drafts are removed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
             if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                if (
-                    exp_change.property_name
-                    == exp_domain.DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX
-                ):
+                if exp_change.property_name == exp_domain.DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX:
                     # If we change the next content ID index in the draft
                     # we rather remove it as in the 51 to 52 conversion
                     # we remove some content IDs.
-                    raise InvalidDraftConversionException(
-                        'Conversion cannot be completed.'
-                    )
+                    raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v50_dict_to_v51_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v50_dict_to_v51_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 50 to 51. Adds
         a new field dest_if_really_stuck to Outcome class to direct the
         learner to a custom revision state.
@@ -577,42 +462,24 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
-                and change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS:
                 # Here we use cast because this 'if' condition forces change to
                 # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change,
                 )
-                new_answer_groups_dicts = (
-                    edit_interaction_answer_groups_cmd.new_value
-                )
+                new_answer_groups_dicts = edit_interaction_answer_groups_cmd.new_value
                 answer_group_dicts: List[state_domain.AnswerGroupDict] = []
                 for answer_group_dict in new_answer_groups_dicts:
                     outcome_dict: state_domain.OutcomeDict = {
                         'dest': answer_group_dict['outcome']['dest'],
                         'dest_if_really_stuck': None,
                         'feedback': (answer_group_dict['outcome']['feedback']),
-                        'labelled_as_correct': (
-                            answer_group_dict['outcome']['labelled_as_correct']
-                        ),
-                        'param_changes': (
-                            answer_group_dict['outcome']['param_changes']
-                        ),
-                        'refresher_exploration_id': (
-                            answer_group_dict['outcome'][
-                                'refresher_exploration_id'
-                            ]
-                        ),
-                        'missing_prerequisite_skill_id': (
-                            answer_group_dict['outcome'][
-                                'missing_prerequisite_skill_id'
-                            ]
-                        ),
+                        'labelled_as_correct': (answer_group_dict['outcome']['labelled_as_correct']),
+                        'param_changes': (answer_group_dict['outcome']['param_changes']),
+                        'refresher_exploration_id': (answer_group_dict['outcome']['refresher_exploration_id']),
+                        'missing_prerequisite_skill_id': (answer_group_dict['outcome']['missing_prerequisite_skill_id']),
                     }
                     answer_group_dicts.append(
                         {
@@ -625,52 +492,32 @@ class DraftUpgradeUtil:
                 draft_change_list[i] = exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                        ),
+                        'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
                         'state_name': change.state_name,
                         'new_value': answer_group_dicts,
                     }
                 )
-            elif (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                and change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
-            ):
+            elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 # Here we use cast because this 'elif' condition forces change
                 # to have type EditExpStatePropertyInteractionDefaultOutcomeCmd.
                 edit_interaction_default_outcome_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,
                     change,
                 )
-                new_default_outcome_dict = (
-                    edit_interaction_default_outcome_cmd.new_value
-                )
+                new_default_outcome_dict = edit_interaction_default_outcome_cmd.new_value
                 default_outcome_dict: state_domain.OutcomeDict = {
                     'dest': new_default_outcome_dict['dest'],
                     'dest_if_really_stuck': None,
                     'feedback': new_default_outcome_dict['feedback'],
-                    'labelled_as_correct': (
-                        new_default_outcome_dict['labelled_as_correct']
-                    ),
-                    'param_changes': (
-                        new_default_outcome_dict['param_changes']
-                    ),
-                    'refresher_exploration_id': (
-                        new_default_outcome_dict['refresher_exploration_id']
-                    ),
-                    'missing_prerequisite_skill_id': (
-                        new_default_outcome_dict[
-                            'missing_prerequisite_skill_id'
-                        ]
-                    ),
+                    'labelled_as_correct': (new_default_outcome_dict['labelled_as_correct']),
+                    'param_changes': (new_default_outcome_dict['param_changes']),
+                    'refresher_exploration_id': (new_default_outcome_dict['refresher_exploration_id']),
+                    'missing_prerequisite_skill_id': (new_default_outcome_dict['missing_prerequisite_skill_id']),
                 }
                 draft_change_list[i] = exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                        ),
+                        'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
                         'state_name': change.state_name,
                         'new_value': default_outcome_dict,
                     }
@@ -678,9 +525,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v49_dict_to_v50_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v49_dict_to_v50_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 49 to 50. State
         version 50 removes rules from explorations that use one of the following
         rules: [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also
@@ -697,9 +542,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v48_dict_to_v49_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v48_dict_to_v49_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 48 to 49. State
         version 49 adds requireNonnegativeInput customization_arg to
         NumericInput interaction.
@@ -714,9 +557,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v47_dict_to_v48_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v47_dict_to_v48_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 47 to 48. State
         version 48 fixes encoding issues in HTML fields.
 
@@ -728,14 +569,10 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         conversion_fn = html_validation_service.fix_incorrectly_encoded_chars
-        return cls._convert_html_in_draft_change_list(
-            draft_change_list, conversion_fn
-        )
+        return cls._convert_html_in_draft_change_list(draft_change_list, conversion_fn)
 
     @classmethod
-    def _convert_states_v46_dict_to_v47_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v46_dict_to_v47_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 46 to 47. State
         version 47 deprecates oppia-noninteractive-svgdiagram tag and converts
         existing occurences of it to oppia-noninteractive-image tag.
@@ -747,17 +584,11 @@ class DraftUpgradeUtil:
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        conversion_fn = (
-            html_validation_service.convert_svg_diagram_tags_to_image_tags
-        )
-        return cls._convert_html_in_draft_change_list(
-            draft_change_list, conversion_fn
-        )
+        conversion_fn = html_validation_service.convert_svg_diagram_tags_to_image_tags
+        return cls._convert_html_in_draft_change_list(draft_change_list, conversion_fn)
 
     @classmethod
-    def _convert_states_v45_dict_to_v46_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v45_dict_to_v46_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 45 to 46. State
         version 46 ensures that written translations corresponding to
         unicode text have data_format field set to 'unicode' and that they
@@ -773,9 +604,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v44_dict_to_v45_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v44_dict_to_v45_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 44 to 45. State
         version 45 adds a linked skill id property to the
         state. As this is a new property and therefore doesn't affect any
@@ -791,9 +620,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v43_dict_to_v44_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v43_dict_to_v44_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 43 to 44. State
         version 44 adds card_is_checkpoint boolean variable to the
         state, for which there should be no changes to drafts.
@@ -808,9 +635,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v42_dict_to_v43_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v42_dict_to_v43_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 42 to 43.
 
         Args:
@@ -825,10 +650,7 @@ class DraftUpgradeUtil:
                 completed.
         """
         for change in draft_change_list:
-            if (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
+            if change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS:
                 # Converting the answer groups depends on getting an
                 # exploration state of v42, because we need an interaction's
                 # customization arguments to properly convert ExplorationChanges
@@ -836,15 +658,11 @@ class DraftUpgradeUtil:
                 # Since we do not yet support passing an exploration state of a
                 # given version into draft conversion functions, we throw an
                 # Exception to indicate that the conversion cannot be completed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v41_dict_to_v42_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v41_dict_to_v42_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 41 to 42.
 
         Args:
@@ -859,10 +677,7 @@ class DraftUpgradeUtil:
                 completed.
         """
         for change in draft_change_list:
-            if (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
+            if change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS:
                 # Converting the answer groups depends on getting an
                 # exploration state of v41, because we need an interaction's
                 # customization arguments to properly convert ExplorationChanges
@@ -870,15 +685,11 @@ class DraftUpgradeUtil:
                 # Since we do not yet support passing an exploration state of a
                 # given version into draft conversion functions, we throw an
                 # Exception to indicate that the conversion cannot be completed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v40_dict_to_v41_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v40_dict_to_v41_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 40 to 41.
 
         Args:
@@ -893,25 +704,18 @@ class DraftUpgradeUtil:
                 completed.
         """
         for change in draft_change_list:
-            if (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
+            if change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS:
                 # Converting the answer groups depends on getting an
                 # exploration state of v40, because we need an interaction's id
                 # to properly convert ExplorationChanges that set answer groups.
                 # Since we do not yet support passing an exploration state of a
                 # given version into draft conversion functions, we throw an
                 # Exception to indicate that the conversion cannot be completed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v39_dict_to_v40_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v39_dict_to_v40_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 39 to 40.
 
         Args:
@@ -926,25 +730,18 @@ class DraftUpgradeUtil:
                 completed.
         """
         for change in draft_change_list:
-            if (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
-            ):
+            if change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS:
                 # Converting the answer groups depends on getting an
                 # exploration state of v38, because we need an interaction's id
                 # to properly convert ExplorationChanges that set answer groups.
                 # Since we do not yet support passing an exploration state of a
                 # given version into draft conversion functions, we throw an
                 # Exception to indicate that the conversion cannot be completed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v38_dict_to_v39_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v38_dict_to_v39_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 38 to 39. State
         version 39 adds a customization arg for the Numeric Expression Input
         interactions that allows creators to modify the placeholder text,
@@ -960,9 +757,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v37_dict_to_v38_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v37_dict_to_v38_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 37 to 38. State
         version 38 adds a customization arg for the Math interactions that
         allows creators to specify the letters that would be displayed to the
@@ -978,9 +773,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v36_dict_to_v37_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v36_dict_to_v37_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from version 36 to 37.
 
         Args:
@@ -991,19 +784,14 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for change in draft_change_list:
-            if (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
+            if change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS:
                 # Here we use cast because this 'if' condition forces change to
                 # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change,
                 )
-                answer_group_dicts = (
-                    edit_interaction_answer_groups_cmd.new_value
-                )
+                answer_group_dicts = edit_interaction_answer_groups_cmd.new_value
                 for answer_group_dict in answer_group_dicts:
                     for rule_spec_dict in answer_group_dict['rule_specs']:
                         if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
@@ -1012,9 +800,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v35_dict_to_v36_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v35_dict_to_v36_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from version 35 to 36.
 
         Args:
@@ -1028,10 +814,7 @@ class DraftUpgradeUtil:
             InvalidDraftConversionException. Conversion cannot be completed.
         """
         for change in draft_change_list:
-            if (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
-            ):
+            if change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS:
                 # Converting the customization arguments depends on getting an
                 # exploration state of v35, because we need an interaction's id
                 # to properly convert ExplorationChanges that set customization
@@ -1039,15 +822,11 @@ class DraftUpgradeUtil:
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
-    def _convert_states_v34_dict_to_v35_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v34_dict_to_v35_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 34 to 35. State
         version 35 upgrades all explorations that use the MathExpressionInput
         interaction to use one of AlgebraicExpressionInput,
@@ -1067,32 +846,15 @@ class DraftUpgradeUtil:
         for change in draft_change_list:
             # We don't want to migrate any changes that involve the
             # MathExpressionInput interaction.
-            interaction_id_change_condition = (
-                change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ID
-                and (change.new_value == 'MathExpressionInput')
-            )
-            answer_groups_change_condition = (
-                change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                and isinstance(change.new_value, list)
-                and (
-                    change.new_value[0]['rule_specs'][0]['rule_type']
-                    == ('IsMathematicallyEquivalentTo')
-                )
-            )
-            if interaction_id_change_condition or (
-                answer_groups_change_condition
-            ):
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.'
-                )
+            interaction_id_change_condition = change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ID and (change.new_value == 'MathExpressionInput')
+            answer_groups_change_condition = change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS and isinstance(change.new_value, list) and (change.new_value[0]['rule_specs'][0]['rule_type'] == ('IsMathematicallyEquivalentTo'))
+            if interaction_id_change_condition or (answer_groups_change_condition):
+                raise InvalidDraftConversionException('Conversion cannot be completed.')
 
         return draft_change_list
 
     @classmethod
-    def _convert_states_v33_dict_to_v34_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 33 to 34. State
         version 34 adds the new schema for Math components.
 
@@ -1103,17 +865,11 @@ class DraftUpgradeUtil:
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        conversion_fn = (
-            html_validation_service.add_math_content_to_math_rte_components
-        )
-        return cls._convert_html_in_draft_change_list(
-            draft_change_list, conversion_fn
-        )
+        conversion_fn = html_validation_service.add_math_content_to_math_rte_components
+        return cls._convert_html_in_draft_change_list(draft_change_list, conversion_fn)
 
     @classmethod
-    def _convert_states_v32_dict_to_v33_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v32_dict_to_v33_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 32 to 33. State
         version 33 adds showChoicesInShuffledOrder boolean variable to the
         MultipleChoiceInput interaction.
@@ -1126,24 +882,16 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
-                and change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
-            ):
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS:
                 # Ruling out the possibility of any other type for mypy
                 # type checking.
                 assert isinstance(change.new_value, dict)
                 if list(change.new_value.keys()) == ['choices']:
-                    change.new_value['showChoicesInShuffledOrder'] = {
-                        'value': False
-                    }
+                    change.new_value['showChoicesInShuffledOrder'] = {'value': False}
                     draft_change_list[i] = exp_domain.ExplorationChange(
                         {
                             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                            'property_name': (
-                                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
-                            ),
+                            'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                             'state_name': change.state_name,
                             'new_value': change.new_value,
                         }
@@ -1151,9 +899,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v31_dict_to_v32_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 31 to 32. State
         version 32 adds a customization arg for the "Add" button text
         in SetInput interaction, for which there should be no changes
@@ -1169,9 +915,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v30_dict_to_v31_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 30 to 31. State
         Version 31 adds the duration_secs float for the Voiceover
         section of state.
@@ -1184,47 +928,29 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
-                and change.property_name
-                == exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED
-            ):
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and change.property_name == exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED:
                 # Here we use cast because this 'if' condition forces change to
                 # have type EditExpStatePropertyRecordedVoiceoversCmd.
-                edit_recorded_voiceovers_cmd = cast(
-                    exp_domain.EditExpStatePropertyRecordedVoiceoversCmd, change
-                )
-                recorded_voiceovers_dict = (
-                    edit_recorded_voiceovers_cmd.new_value
-                )
-                new_voiceovers_mapping = recorded_voiceovers_dict[
-                    'voiceovers_mapping'
-                ]
+                edit_recorded_voiceovers_cmd = cast(exp_domain.EditExpStatePropertyRecordedVoiceoversCmd, change)
+                recorded_voiceovers_dict = edit_recorded_voiceovers_cmd.new_value
+                new_voiceovers_mapping = recorded_voiceovers_dict['voiceovers_mapping']
                 # Initialize the value to migrate draft state to v31.
-                language_codes_to_audio_metadata = (
-                    new_voiceovers_mapping.values()
-                )
+                language_codes_to_audio_metadata = new_voiceovers_mapping.values()
                 for language_codes in language_codes_to_audio_metadata:
                     for audio_metadata in language_codes.values():
                         audio_metadata['duration_secs'] = 0.0
                 draft_change_list[i] = exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED
-                        ),
+                        'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED),
                         'state_name': change.state_name,
-                        'new_value': {
-                            'voiceovers_mapping': new_voiceovers_mapping
-                        },
+                        'new_value': {'voiceovers_mapping': new_voiceovers_mapping},
                     }
                 )
         return draft_change_list
 
     @classmethod
-    def _convert_states_v29_dict_to_v30_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v29_dict_to_v30_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 29 to 30. State
         version 30 replaces tagged_misconception_id with
         tagged_skill_misconception_id.
@@ -1237,20 +963,14 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
-                and change.property_name
-                == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-            ):
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS:
                 # Here we use cast because this 'if' condition forces change to
                 # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change,
                 )
-                new_answer_groups_dicts = (
-                    edit_interaction_answer_groups_cmd.new_value
-                )
+                new_answer_groups_dicts = edit_interaction_answer_groups_cmd.new_value
                 answer_group_dicts: List[state_domain.AnswerGroupDict] = []
                 for answer_group_dict in new_answer_groups_dicts:
                     answer_group_dicts.append(
@@ -1264,9 +984,7 @@ class DraftUpgradeUtil:
                 draft_change_list[i] = exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                        ),
+                        'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
                         'state_name': change.state_name,
                         'new_value': answer_group_dicts,
                     }
@@ -1274,9 +992,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v28_dict_to_v29_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v28_dict_to_v29_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 28 to 29. State
         version 29 adds solicit_answer_details boolean variable to the
         state, for which there should be no changes to drafts.
@@ -1291,9 +1007,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v27_dict_to_v28_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
+    def _convert_states_v27_dict_to_v28_dict(cls, draft_change_list: List[exp_domain.ExplorationChange]) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 27 to 28. State
         version 28 replaces content_ids_to_audio_translations with
         recorded_voiceovers.
@@ -1306,11 +1020,7 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
-                and change.property_name
-                == exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
-            ):  # pylint: disable=line-too-long
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and change.property_name == exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED:  # pylint: disable=line-too-long
                 # Here we use cast because this 'if'
                 # condition forces change to have type
                 # EditExpStatePropertyContentIdToAudioTranslationsDeprecatedCmd.
@@ -1318,15 +1028,11 @@ class DraftUpgradeUtil:
                     exp_domain.EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd,  # pylint: disable=line-too-long
                     change,
                 )
-                voiceovers_dict = (
-                    content_ids_to_audio_translations_cmd.new_value
-                )
+                voiceovers_dict = content_ids_to_audio_translations_cmd.new_value
                 draft_change_list[i] = exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED
-                        ),
+                        'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED),
                         'state_name': change.state_name,
                         'new_value': {'voiceovers_mapping': voiceovers_dict},
                     }

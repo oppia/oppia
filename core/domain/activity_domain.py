@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from core.constants import constants
-
 from typing import Dict, List
+
+from core.constants import constants
 
 
 class ActivityReference:
@@ -81,9 +81,7 @@ class ActivityReference:
         }
 
     @classmethod
-    def from_dict(
-        cls, activity_reference_dict: Dict[str, str]
-    ) -> ActivityReference:
+    def from_dict(cls, activity_reference_dict: Dict[str, str]) -> ActivityReference:
         """Return the ActivityReference object from a dict.
 
         Args:
@@ -93,9 +91,7 @@ class ActivityReference:
         Returns:
             ActivityReference. The corresponding ActivityReference object.
         """
-        return cls(
-            activity_reference_dict['type'], activity_reference_dict['id']
-        )
+        return cls(activity_reference_dict['type'], activity_reference_dict['id'])
 
 
 class ActivityReferences:

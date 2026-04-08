@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
-from core.domain import caching_services
-
 import apache_beam as beam
 from typing import Any
+
+from core.domain import caching_services
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -42,8 +42,4 @@ class FlushCache(beam.PTransform):  # type: ignore[misc]
         Returns:
             PCollection. An empty PCollection.
         """
-        return (
-            items
-            | beam.CombineGlobally(lambda _: [])
-            | beam.Map(lambda _: caching_services.flush_memory_caches())
-        )
+        return items | beam.CombineGlobally(lambda _: []) | beam.Map(lambda _: caching_services.flush_memory_caches())

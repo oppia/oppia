@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+from typing import Optional
+
 from core.domain import beam_job_services
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
-from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -54,9 +54,7 @@ class PutResults(beam.PTransform):  # type: ignore[misc]
         super().__init__(label=label)
         self.job_id = job_id
 
-    def expand(
-        self, results: beam.PCollection[job_run_result.JobRunResult]
-    ) -> beam.pvalue.PDone:
+    def expand(self, results: beam.PCollection[job_run_result.JobRunResult]) -> beam.pvalue.PDone:
         """Writes the given job results to the NDB datastore.
 
         This overrides expand from parent class.
@@ -84,9 +82,7 @@ class PutResults(beam.PTransform):  # type: ignore[misc]
             | ndb_io.PutModels()
         )
 
-    def create_beam_job_run_result_model(
-        self, result: job_run_result.JobRunResult, namespace: Optional[str]
-    ) -> beam_job_models.BeamJobRunResultModel:
+    def create_beam_job_run_result_model(self, result: job_run_result.JobRunResult, namespace: Optional[str]) -> beam_job_models.BeamJobRunResultModel:
         """Returns an NDB model for storing the given JobRunResult.
 
         Args:
@@ -97,6 +93,4 @@ class PutResults(beam.PTransform):  # type: ignore[misc]
             BeamJobRunResultModel. The NDB model.
         """
         with datastore_services.get_ndb_context(namespace=namespace):
-            return beam_job_services.create_beam_job_run_result_model(
-                self.job_id, result.stdout, result.stderr
-            )
+            return beam_job_services.create_beam_job_run_result_model(self.job_id, result.stdout, result.stderr)

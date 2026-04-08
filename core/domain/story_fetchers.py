@@ -25,6 +25,8 @@ from __future__ import annotations
 import copy
 import itertools
 
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
+
 from core import feconf
 from core.constants import constants
 from core.domain import (
@@ -37,15 +39,11 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import story_models, user_models
 
-(story_models, user_models) = models.Registry.import_models(
-    [models.Names.STORY, models.Names.USER]
-)
+(story_models, user_models) = models.Registry.import_models([models.Names.STORY, models.Names.USER])
 
 
 def _migrate_story_contents_to_latest_schema(
@@ -70,23 +68,11 @@ def _migrate_story_contents_to_latest_schema(
             is supported at present.
     """
     story_contents_schema_version = versioned_story_contents['schema_version']
-    if not (
-        1
-        <= story_contents_schema_version
-        <= feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
-    ):
-        raise Exception(
-            'Sorry, we can only process v1-v%d story schemas at '
-            'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
-        )
+    if not (1 <= story_contents_schema_version <= feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+        raise Exception('Sorry, we can only process v1-v%d story schemas at present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
-    while (
-        story_contents_schema_version
-        < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
-    ):
-        story_domain.Story.update_story_contents_from_model(
-            versioned_story_contents, story_contents_schema_version, story_id
-        )
+    while story_contents_schema_version < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
+        story_domain.Story.update_story_contents_from_model(versioned_story_contents, story_contents_schema_version, story_id)
         story_contents_schema_version += 1
 
 
@@ -112,13 +98,8 @@ def get_story_from_model(
     }
 
     # Migrate the story contents if it is not using the latest schema version.
-    if (
-        story_model.story_contents_schema_version
-        != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
-    ):
-        _migrate_story_contents_to_latest_schema(
-            versioned_story_contents, story_model.id
-        )
+    if story_model.story_contents_schema_version != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
+        _migrate_story_contents_to_latest_schema(versioned_story_contents, story_model.id)
 
     return story_domain.Story(
         story_model.id,
@@ -128,9 +109,7 @@ def get_story_from_model(
         story_model.thumbnail_size_in_bytes,
         story_model.description,
         story_model.notes,
-        story_domain.StoryContents.from_dict(
-            versioned_story_contents['story_contents']
-        ),
+        story_domain.StoryContents.from_dict(versioned_story_contents['story_contents']),
         versioned_story_contents['schema_version'],
         story_model.language_code,
         story_model.corresponding_topic_id,
@@ -178,26 +157,18 @@ def get_story_by_id(
 
 
 @overload
-def get_story_by_id(
-    story_id: str, *, version: Optional[int] = None
-) -> story_domain.Story: ...
+def get_story_by_id(story_id: str, *, version: Optional[int] = None) -> story_domain.Story: ...
 
 
 @overload
-def get_story_by_id(
-    story_id: str, *, strict: Literal[True], version: Optional[int] = None
-) -> story_domain.Story: ...
+def get_story_by_id(story_id: str, *, strict: Literal[True], version: Optional[int] = None) -> story_domain.Story: ...
 
 
 @overload
-def get_story_by_id(
-    story_id: str, *, strict: Literal[False], version: Optional[int] = None
-) -> Optional[story_domain.Story]: ...
+def get_story_by_id(story_id: str, *, strict: Literal[False], version: Optional[int] = None) -> Optional[story_domain.Story]: ...
 
 
-def get_story_by_id(
-    story_id: str, strict: bool = True, version: Optional[int] = None
-) -> Optional[story_domain.Story]:
+def get_story_by_id(story_id: str, strict: bool = True, version: Optional[int] = None) -> Optional[story_domain.Story]:
     """Returns a domain object representing a story.
 
     Args:
@@ -212,16 +183,12 @@ def get_story_by_id(
         given id, or None if it does not exist.
     """
     sub_namespace = str(version) if version else None
-    cached_story = caching_services.get_multi(
-        caching_services.CACHE_NAMESPACE_STORY, sub_namespace, [story_id]
-    ).get(story_id)
+    cached_story = caching_services.get_multi(caching_services.CACHE_NAMESPACE_STORY, sub_namespace, [story_id]).get(story_id)
 
     if cached_story is not None:
         return cached_story
     else:
-        story_model = story_models.StoryModel.get(
-            story_id, strict=strict, version=version
-        )
+        story_model = story_models.StoryModel.get(story_id, strict=strict, version=version)
         if story_model:
             story = get_story_from_model(story_model)
             caching_services.set_multi(
@@ -249,13 +216,8 @@ def get_multiple_stories_by_ids_and_version(
         and versions. If a story does not exist, the corresponding entry will
         be None.
     """
-    story_model_list = story_models.StoryModel.get_version_multi(
-        story_ids_and_versions
-    )
-    return [
-        get_story_from_model(story_model) if story_model is not None else None
-        for story_model in story_model_list
-    ]
+    story_model_list = story_models.StoryModel.get_version_multi(story_ids_and_versions)
+    return [get_story_from_model(story_model) if story_model is not None else None for story_model in story_model_list]
 
 
 def get_story_by_url_fragment(
@@ -283,20 +245,14 @@ def get_story_summary_by_id(story_id: str) -> story_domain.StorySummary: ...
 
 
 @overload
-def get_story_summary_by_id(
-    story_id: str, *, strict: Literal[True]
-) -> story_domain.StorySummary: ...
+def get_story_summary_by_id(story_id: str, *, strict: Literal[True]) -> story_domain.StorySummary: ...
 
 
 @overload
-def get_story_summary_by_id(
-    story_id: str, *, strict: Literal[False]
-) -> Optional[story_domain.StorySummary]: ...
+def get_story_summary_by_id(story_id: str, *, strict: Literal[False]) -> Optional[story_domain.StorySummary]: ...
 
 
-def get_story_summary_by_id(
-    story_id: str, strict: bool = True
-) -> Optional[story_domain.StorySummary]:
+def get_story_summary_by_id(story_id: str, strict: bool = True) -> Optional[story_domain.StorySummary]:
     """Returns a domain object representing a story summary.
 
     Args:
@@ -308,9 +264,7 @@ def get_story_summary_by_id(
         StorySummary. The story summary domain object corresponding to
         a story with the given story_id.
     """
-    story_summary_model = story_models.StorySummaryModel.get(
-        story_id, strict=strict
-    )
+    story_summary_model = story_models.StorySummaryModel.get(story_id, strict=strict)
     if story_summary_model:
         story_summary = get_story_summary_from_model(story_summary_model)
         return story_summary
@@ -319,9 +273,7 @@ def get_story_summary_by_id(
 
 
 @overload
-def get_stories_by_ids(
-    story_ids: List[str], *, strict: Literal[True]
-) -> List[story_domain.Story]: ...
+def get_stories_by_ids(story_ids: List[str], *, strict: Literal[True]) -> List[story_domain.Story]: ...
 
 
 @overload
@@ -331,14 +283,10 @@ def get_stories_by_ids(
 
 
 @overload
-def get_stories_by_ids(
-    story_ids: List[str], *, strict: Literal[False]
-) -> List[Optional[story_domain.Story]]: ...
+def get_stories_by_ids(story_ids: List[str], *, strict: Literal[False]) -> List[Optional[story_domain.Story]]: ...
 
 
-def get_stories_by_ids(
-    story_ids: List[str], strict: bool = False
-) -> Sequence[Optional[story_domain.Story]]:
+def get_stories_by_ids(story_ids: List[str], strict: bool = False) -> Sequence[Optional[story_domain.Story]]:
     """Returns a list of stories matching the IDs provided.
 
     Args:
@@ -358,10 +306,7 @@ def get_stories_by_ids(
     for index, story_model in enumerate(all_story_models):
         if story_model is None:
             if strict:
-                raise Exception(
-                    'No story model exists for the story_id: %s'
-                    % story_ids[index]
-                )
+                raise Exception('No story model exists for the story_id: %s' % story_ids[index])
             stories.append(story_model)
         elif story_model is not None:
             stories.append(get_story_from_model(story_model))
@@ -382,11 +327,7 @@ def get_story_summaries_by_ids(
         ids.
     """
     story_summary_models = story_models.StorySummaryModel.get_multi(story_ids)
-    story_summaries = [
-        get_story_summary_from_model(story_summary_model)
-        for story_summary_model in story_summary_models
-        if story_summary_model is not None
-    ]
+    story_summaries = [get_story_summary_from_model(story_summary_model) for story_summary_model in story_summary_models if story_summary_model is not None]
     return story_summaries
 
 
@@ -420,10 +361,7 @@ def get_learner_group_syllabus_story_summaries(
         assert topic is not None
         topic_id_to_topic_map[topic.id] = topic
 
-    story_summaries_dicts = [
-        story_summary.to_dict()
-        for story_summary in get_story_summaries_by_ids(story_ids)
-    ]
+    story_summaries_dicts = [story_summary.to_dict() for story_summary in get_story_summaries_by_ids(story_ids)]
 
     return [
         {
@@ -437,20 +375,12 @@ def get_learner_group_syllabus_story_summaries(
             'thumbnail_bg_color': story.thumbnail_bg_color,
             'url_fragment': story.url_fragment,
             'story_model_created_on': summary_dict['story_model_created_on'],
-            'story_model_last_updated': summary_dict[
-                'story_model_last_updated'
-            ],
+            'story_model_last_updated': summary_dict['story_model_last_updated'],
             'story_is_published': True,
             'completed_node_titles': [],
-            'all_node_dicts': [
-                node.to_dict() for node in story.story_contents.nodes
-            ],
-            'topic_name': topic_id_to_topic_map[
-                story.corresponding_topic_id
-            ].name,
-            'topic_url_fragment': topic_id_to_topic_map[
-                story.corresponding_topic_id
-            ].url_fragment,
+            'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
+            'topic_name': topic_id_to_topic_map[story.corresponding_topic_id].name,
+            'topic_url_fragment': topic_id_to_topic_map[story.corresponding_topic_id].url_fragment,
             'classroom_url_fragment': None,
         }
         for (story, summary_dict) in zip(all_stories, story_summaries_dicts)
@@ -469,29 +399,19 @@ def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
         If length is larger than 3, return the last three of them. If length is
         smaller or equal to 3, return all of them.
     """
-    progress_model = user_models.StoryProgressModel.get(
-        user_id, story_id, strict=False
-    )
+    progress_model = user_models.StoryProgressModel.get(user_id, story_id, strict=False)
 
     if not progress_model:
         return []
 
     num_of_nodes = min(len(progress_model.completed_node_ids), 3)
     story = get_story_by_id(story_id, strict=True)
-    ordered_node_ids = [
-        node.id for node in story.story_contents.get_ordered_nodes()
-    ]
-    ordered_completed_node_ids = [
-        node_id
-        for node_id in ordered_node_ids
-        if node_id in progress_model.completed_node_ids
-    ]
+    ordered_node_ids = [node.id for node in story.story_contents.get_ordered_nodes()]
+    ordered_completed_node_ids = [node_id for node_id in ordered_node_ids if node_id in progress_model.completed_node_ids]
     return ordered_completed_node_ids[-num_of_nodes:]
 
 
-def get_completed_nodes_in_story(
-    user_id: str, story_id: str
-) -> List[story_domain.StoryNode]:
+def get_completed_nodes_in_story(user_id: str, story_id: str) -> List[story_domain.StoryNode]:
     """Returns nodes that are completed in a story
 
     Args:
@@ -513,9 +433,7 @@ def get_completed_nodes_in_story(
     return completed_nodes
 
 
-def get_user_progress_in_story_chapters(
-    user_id: str, story_ids: List[str]
-) -> List[story_domain.StoryChapterProgressSummaryDict]:
+def get_user_progress_in_story_chapters(user_id: str, story_ids: List[str]) -> List[story_domain.StoryChapterProgressSummaryDict]:
     """Returns the progress of multiple users in multiple chapters.
 
     Args:
@@ -526,49 +444,31 @@ def get_user_progress_in_story_chapters(
         list(StoryChapterProgressSummaryDict). The list of the progress
         summaries of the user corresponding to all stories chapters.
     """
-    all_valid_stories = [
-        story for story in get_stories_by_ids(story_ids) if story is not None
-    ]
+    all_valid_stories = [story for story in get_stories_by_ids(story_ids) if story is not None]
     all_valid_story_nodes: List[story_domain.StoryNode] = []
     for story in all_valid_stories:
         all_valid_story_nodes.extend(story.story_contents.nodes)
 
-    exp_ids = [
-        node.exploration_id
-        for node in all_valid_story_nodes
-        if node.exploration_id
-    ]
+    exp_ids = [node.exploration_id for node in all_valid_story_nodes if node.exploration_id]
     exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
     user_id_exp_id_combinations = list(itertools.product([user_id], exp_ids))
-    exp_user_data_models = user_models.ExplorationUserDataModel.get_multi(
-        user_id_exp_id_combinations
-    )
+    exp_user_data_models = user_models.ExplorationUserDataModel.get_multi(user_id_exp_id_combinations)
 
     completed_node_ids_by_story = {}
     for story_id in story_ids:
-        completed_node_ids_by_story[story_id] = get_completed_node_ids(
-            user_id, story_id
-        )
+        completed_node_ids_by_story[story_id] = get_completed_node_ids(user_id, story_id)
 
-    all_chapters_progress: List[
-        story_domain.StoryChapterProgressSummaryDict
-    ] = []
+    all_chapters_progress: List[story_domain.StoryChapterProgressSummaryDict] = []
     for i, user_id_exp_id_pair in enumerate(user_id_exp_id_combinations):
         exp_id = user_id_exp_id_pair[1]
         exploration = exp_id_to_exp_map[exp_id]
-        all_checkpoints = user_services.get_checkpoints_in_order(
-            exploration.init_state_name, exploration.states
-        )
+        all_checkpoints = user_services.get_checkpoints_in_order(exploration.init_state_name, exploration.states)
         model = exp_user_data_models[i]
         visited_checkpoints = 0
         if model is not None:
-            most_recently_visited_checkpoint = (
-                model.most_recently_reached_checkpoint_state_name
-            )
+            most_recently_visited_checkpoint = model.most_recently_reached_checkpoint_state_name
             if most_recently_visited_checkpoint is not None:
-                visited_checkpoints = (
-                    all_checkpoints.index(most_recently_visited_checkpoint) + 1
-                )
+                visited_checkpoints = all_checkpoints.index(most_recently_visited_checkpoint) + 1
         found_story_id: Optional[str] = None
         found_node_id: Optional[str] = None
         for story in all_valid_stories:
@@ -580,11 +480,7 @@ def get_user_progress_in_story_chapters(
             if found_story_id:
                 break
 
-        is_completed = (
-            found_story_id is not None
-            and found_node_id
-            in completed_node_ids_by_story.get(found_story_id, [])
-        )
+        is_completed = found_story_id is not None and found_node_id in completed_node_ids_by_story.get(found_story_id, [])
 
         all_chapters_progress.append(
             {
@@ -598,9 +494,7 @@ def get_user_progress_in_story_chapters(
     return all_chapters_progress
 
 
-def get_multi_users_progress_in_stories(
-    user_ids: List[str], story_ids: List[str]
-) -> Dict[str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]]:
+def get_multi_users_progress_in_stories(user_ids: List[str], story_ids: List[str]) -> Dict[str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]]:
     """Returns the progress of given users in all given stories.
 
     Args:
@@ -611,14 +505,10 @@ def get_multi_users_progress_in_stories(
         Dict(str, list(StoryProgressDict)). Dictionary of user id and their
         corresponding list of story progress dicts.
     """
-    all_valid_stories = [
-        story for story in get_stories_by_ids(story_ids) if story
-    ]
+    all_valid_stories = [story for story in get_stories_by_ids(story_ids) if story]
 
     # Filter unique topic ids from all valid stories.
-    topic_ids = list(
-        {story.corresponding_topic_id for story in all_valid_stories}
-    )
+    topic_ids = list({story.corresponding_topic_id for story in all_valid_stories})
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
     topic_id_to_topic_map = {}
     for topic in topics:
@@ -627,30 +517,20 @@ def get_multi_users_progress_in_stories(
     story_id_to_story_map = {story.id: story for story in all_valid_stories}
     valid_story_ids = [story.id for story in all_valid_stories]
     all_story_summaries = get_story_summaries_by_ids(valid_story_ids)
-    story_id_to_summary_map = {
-        summary.id: summary for summary in all_story_summaries
-    }
+    story_id_to_summary_map = {summary.id: summary for summary in all_story_summaries}
 
     # All poosible combinations of user_id and story_id for which progress
     # models are returned.
     all_posssible_combinations = itertools.product(user_ids, valid_story_ids)
-    progress_models = user_models.StoryProgressModel.get_multi(
-        user_ids, valid_story_ids
-    )
-    all_users_stories_progress: Dict[
-        str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]
-    ] = {user_id: [] for user_id in user_ids}
+    progress_models = user_models.StoryProgressModel.get_multi(user_ids, valid_story_ids)
+    all_users_stories_progress: Dict[str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]] = {user_id: [] for user_id in user_ids}
     for i, (user_id, story_id) in enumerate(all_posssible_combinations):
         progress_model = progress_models[i]
         completed_node_ids = []
         if progress_model is not None:
             completed_node_ids = progress_model.completed_node_ids
         story = story_id_to_story_map[story_id]
-        completed_node_titles = [
-            node.title
-            for node in story.story_contents.nodes
-            if node.id in completed_node_ids
-        ]
+        completed_node_titles = [node.title for node in story.story_contents.nodes if node.id in completed_node_ids]
         topic = topic_id_to_topic_map[story.corresponding_topic_id]
         summary_dict = story_id_to_summary_map[story_id].to_dict()
         all_users_stories_progress[user_id].append(
@@ -664,31 +544,21 @@ def get_multi_users_progress_in_stories(
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
                 'url_fragment': summary_dict['url_fragment'],
-                'story_model_created_on': summary_dict[
-                    'story_model_created_on'
-                ],
-                'story_model_last_updated': summary_dict[
-                    'story_model_last_updated'
-                ],
+                'story_model_created_on': summary_dict['story_model_created_on'],
+                'story_model_last_updated': summary_dict['story_model_last_updated'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
-                'all_node_dicts': [
-                    node.to_dict() for node in story.story_contents.nodes
-                ],
+                'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
                 'topic_name': topic.name,
                 'topic_url_fragment': topic.url_fragment,
-                'classroom_url_fragment': classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id
-                ),
+                'classroom_url_fragment': classroom_config_services.get_classroom_url_fragment_for_topic_id(topic.id),
             }
         )
 
     return all_users_stories_progress
 
 
-def get_pending_and_all_nodes_in_story(
-    user_id: Optional[str], story_id: str
-) -> Dict[str, List[story_domain.StoryNode]]:
+def get_pending_and_all_nodes_in_story(user_id: Optional[str], story_id: str) -> Dict[str, List[story_domain.StoryNode]]:
     """Returns the nodes that are pending in a story
 
     Args:
@@ -703,9 +573,7 @@ def get_pending_and_all_nodes_in_story(
     story = get_story_by_id(story_id, strict=True)
     pending_nodes = []
 
-    completed_node_ids = (
-        get_completed_node_ids(user_id, story_id) if user_id else []
-    )
+    completed_node_ids = get_completed_node_ids(user_id, story_id) if user_id else []
     for node in story.story_contents.nodes:
         if node.id not in completed_node_ids:
             pending_nodes.append(node)
@@ -730,9 +598,7 @@ def get_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     Returns:
         list(str). List of the node ids completed in story.
     """
-    progress_model = user_models.StoryProgressModel.get(
-        user_id, story_id, strict=False
-    )
+    progress_model = user_models.StoryProgressModel.get(user_id, story_id, strict=False)
 
     # TODO(#15621): The explicit declaration of type for ndb properties should
     # be removed. Currently, these ndb properties are annotated with Any return

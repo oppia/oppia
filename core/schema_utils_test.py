@@ -21,10 +21,10 @@ from __future__ import annotations
 import inspect
 import re
 
+from typing import Any, Dict, List, Tuple
+
 from core import schema_utils, utils
 from core.tests import test_utils
-
-from typing import Any, Dict, List, Tuple
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
@@ -66,9 +66,7 @@ SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
 # in the relevant extensions/objects/models/objects.py class.
 SCHEMA_TYPE_CUSTOM = schema_utils.SCHEMA_TYPE_CUSTOM
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
-SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS = (
-    schema_utils.SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS
-)
+SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS = schema_utils.SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS
 SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
@@ -232,9 +230,7 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
     },
     SCHEMA_TYPE_CUSTOM: {
         'has_subtitled_html_non_empty': {},
-        'has_expected_subtitled_content_length': {
-            'max_value': {'type': SCHEMA_TYPE_INT}
-        },
+        'has_expected_subtitled_content_length': {'max_value': {'type': SCHEMA_TYPE_INT}},
     },
 }
 
@@ -252,12 +248,9 @@ def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
         AssertionError. The object fails to validate against the schema.
     """
     reference_dict = UI_CONFIG_SPECS[obj_type]
-    assert set(ui_config.keys()) <= set(reference_dict.keys()), (
-        'Missing keys: %s, Extra keys: %s'
-        % (
-            list(set(reference_dict.keys()) - set(ui_config.keys())),
-            list(set(ui_config.keys()) - set(reference_dict.keys())),
-        )
+    assert set(ui_config.keys()) <= set(reference_dict.keys()), 'Missing keys: %s, Extra keys: %s' % (
+        list(set(reference_dict.keys()) - set(ui_config.keys())),
+        list(set(ui_config.keys()) - set(reference_dict.keys())),
     )
     for key, value in ui_config.items():
         schema_utils.normalize_against_schema(value, reference_dict[key])
@@ -277,23 +270,13 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
     """
     reference_dict = VALIDATOR_SPECS[obj_type]
     assert 'id' in validator, 'id is not present in validator'
-    assert validator['id'] in reference_dict, (
-        '%s is not present in reference_dict' % validator['id']
-    )
+    assert validator['id'] in reference_dict, '%s is not present in reference_dict' % validator['id']
 
     customization_keys = list(validator.keys())
     customization_keys.remove('id')
-    assert set(customization_keys) == set(
-        reference_dict[validator['id']].keys()
-    ), 'Missing keys: %s, Extra keys: %s' % (
-        list(
-            set(reference_dict[validator['id']].keys())
-            - set(customization_keys)
-        ),
-        list(
-            set(customization_keys)
-            - set(reference_dict[validator['id']].keys())
-        ),
+    assert set(customization_keys) == set(reference_dict[validator['id']].keys()), 'Missing keys: %s, Extra keys: %s' % (
+        list(set(reference_dict[validator['id']].keys()) - set(customization_keys)),
+        list(set(customization_keys) - set(reference_dict[validator['id']].keys())),
     )
     for key in customization_keys:
         value = validator[key]
@@ -305,17 +288,9 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
 
     # Check that the id corresponds to a valid normalizer function.
     validator_fn = schema_utils.get_validator(validator['id'])
-    assert set(inspect.getfullargspec(validator_fn).args) == set(
-        customization_keys + ['obj']
-    ), 'Missing keys: %s, Extra keys: %s' % (
-        list(
-            set(customization_keys + ['obj'])
-            - set(inspect.getfullargspec(validator_fn).args)
-        ),
-        list(
-            set(inspect.getfullargspec(validator_fn).args)
-            - set(customization_keys + ['obj'])
-        ),
+    assert set(inspect.getfullargspec(validator_fn).args) == set(customization_keys + ['obj']), 'Missing keys: %s, Extra keys: %s' % (
+        list(set(customization_keys + ['obj']) - set(inspect.getfullargspec(validator_fn).args)),
+        list(set(inspect.getfullargspec(validator_fn).args) - set(customization_keys + ['obj'])),
     )
 
 
@@ -339,12 +314,8 @@ def _validate_dict_keys(
         AssertionError. The dict is missing required keys.
         AssertionError. The dict contains extra keys.
     """
-    assert set(required_keys) <= set(dict_to_check.keys()), (
-        'Missing keys: %s' % dict_to_check
-    )
-    assert set(dict_to_check.keys()) <= set(required_keys + optional_keys), (
-        'Extra keys: %s' % dict_to_check
-    )
+    assert set(required_keys) <= set(dict_to_check.keys()), 'Missing keys: %s' % dict_to_check
+    assert set(dict_to_check.keys()) <= set(required_keys + optional_keys), 'Extra keys: %s' % dict_to_check
 
 
 # Here we use type Any because schema can have a recursive structure and
@@ -379,12 +350,8 @@ def validate_schema(schema: Dict[str, Any]) -> None:
         AssertionError. The schema is not valid.
     """
     assert isinstance(schema, dict), 'Expected dict, got %s' % schema
-    assert SCHEMA_KEY_TYPE in schema, (
-        '%s is not present in schema key types' % SCHEMA_KEY_TYPE
-    )
-    assert schema[SCHEMA_KEY_TYPE] in ALLOWED_SCHEMA_TYPES, (
-        '%s is not an allowed schema type' % schema[SCHEMA_KEY_TYPE]
-    )
+    assert SCHEMA_KEY_TYPE in schema, '%s is not present in schema key types' % SCHEMA_KEY_TYPE
+    assert schema[SCHEMA_KEY_TYPE] in ALLOWED_SCHEMA_TYPES, '%s is not an allowed schema type' % schema[SCHEMA_KEY_TYPE]
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
         _validate_dict_keys(
             schema,
@@ -405,13 +372,8 @@ def validate_schema(schema: Dict[str, Any]) -> None:
 
         validate_schema(schema[SCHEMA_KEY_ITEMS])
         if SCHEMA_KEY_LEN in schema:
-            assert isinstance(schema[SCHEMA_KEY_LEN], int), (
-                'Expected int, got %s' % schema[SCHEMA_KEY_LEN]
-            )
-            assert schema[SCHEMA_KEY_LEN] > 0, (
-                'Expected length greater than 0, got %s'
-                % (schema[SCHEMA_KEY_LEN])
-            )
+            assert isinstance(schema[SCHEMA_KEY_LEN], int), 'Expected int, got %s' % schema[SCHEMA_KEY_LEN]
+            assert schema[SCHEMA_KEY_LEN] > 0, 'Expected length greater than 0, got %s' % (schema[SCHEMA_KEY_LEN])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         _validate_dict_keys(
             schema,
@@ -419,23 +381,17 @@ def validate_schema(schema: Dict[str, Any]) -> None:
             OPTIONAL_SCHEMA_KEYS,
         )
 
-        assert isinstance(schema[SCHEMA_KEY_PROPERTIES], list), (
-            'Expected list, got %s' % schema[SCHEMA_KEY_LEN]
-        )
+        assert isinstance(schema[SCHEMA_KEY_PROPERTIES], list), 'Expected list, got %s' % schema[SCHEMA_KEY_LEN]
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
             _validate_dict_keys(
                 prop,
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION],
             )
-            assert isinstance(prop[SCHEMA_KEY_NAME], str), (
-                'Expected %s, got %s' % (str, prop[SCHEMA_KEY_NAME])
-            )
+            assert isinstance(prop[SCHEMA_KEY_NAME], str), 'Expected %s, got %s' % (str, prop[SCHEMA_KEY_NAME])
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
-                assert isinstance(prop[SCHEMA_KEY_DESCRIPTION], str), (
-                    'Expected %s, got %s' % (str, prop[SCHEMA_KEY_DESCRIPTION])
-                )
+                assert isinstance(prop[SCHEMA_KEY_DESCRIPTION], str), 'Expected %s, got %s' % (str, prop[SCHEMA_KEY_DESCRIPTION])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
         _validate_dict_keys(
             schema,
@@ -444,52 +400,35 @@ def validate_schema(schema: Dict[str, Any]) -> None:
         )
         items = [SCHEMA_KEY_VALUES, SCHEMA_KEY_KEYS]
         for item in items:
-            assert isinstance(schema[item], dict), (
-                'Expected dict, got %s' % (schema[item])
-            )
-            _validate_dict_keys(
-                schema[item], [SCHEMA_KEY_SCHEMA], OPTIONAL_SCHEMA_KEYS
-            )
+            assert isinstance(schema[item], dict), 'Expected dict, got %s' % (schema[item])
+            _validate_dict_keys(schema[item], [SCHEMA_KEY_SCHEMA], OPTIONAL_SCHEMA_KEYS)
             schema_item = schema[item]
             validate_schema(schema_item[SCHEMA_KEY_SCHEMA])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_VALIDATION_METHOD, SCHEMA_KEY_OBJECT_CLASS]
-            + OPTIONAL_SCHEMA_KEYS,
+            [SCHEMA_KEY_VALIDATION_METHOD, SCHEMA_KEY_OBJECT_CLASS] + OPTIONAL_SCHEMA_KEYS,
         )
     else:
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
     if SCHEMA_KEY_UI_CONFIG in schema:
-        _validate_ui_config(
-            schema[SCHEMA_KEY_TYPE], schema[SCHEMA_KEY_UI_CONFIG]
-        )
+        _validate_ui_config(schema[SCHEMA_KEY_TYPE], schema[SCHEMA_KEY_UI_CONFIG])
 
     if SCHEMA_KEY_POST_NORMALIZERS in schema:
-        assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list), (
-            'Expected list, got %s' % schema[SCHEMA_KEY_POST_NORMALIZERS]
-        )
+        assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list), 'Expected list, got %s' % schema[SCHEMA_KEY_POST_NORMALIZERS]
         for post_normalizer in schema[SCHEMA_KEY_POST_NORMALIZERS]:
-            assert isinstance(post_normalizer, dict), (
-                'Expected dict, got %s' % post_normalizer
-            )
-            assert 'id' in post_normalizer, (
-                'id is not present in %s' % post_normalizer
-            )
+            assert isinstance(post_normalizer, dict), 'Expected dict, got %s' % post_normalizer
+            assert 'id' in post_normalizer, 'id is not present in %s' % post_normalizer
             # Check that the id corresponds to a valid normalizer function.
             schema_utils.Normalizers.get(post_normalizer['id'])
             # TODO(sll): Check the arguments too.
 
     if SCHEMA_KEY_VALIDATORS in schema:
-        assert isinstance(schema[SCHEMA_KEY_VALIDATORS], list), (
-            'Expected list, got %s' % schema[SCHEMA_KEY_VALIDATORS]
-        )
+        assert isinstance(schema[SCHEMA_KEY_VALIDATORS], list), 'Expected list, got %s' % schema[SCHEMA_KEY_VALIDATORS]
         for validator in schema[SCHEMA_KEY_VALIDATORS]:
-            assert isinstance(validator, dict), (
-                'Expected dict, got %s' % schema[SCHEMA_KEY_VALIDATORS]
-            )
+            assert isinstance(validator, dict), 'Expected dict, got %s' % schema[SCHEMA_KEY_VALIDATORS]
             assert 'id' in validator, 'id is not present in %s' % validator
             _validate_validator(schema[SCHEMA_KEY_TYPE], validator)
 
@@ -550,21 +489,13 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                 {
                     'type': 'list',
                     'items': {'type': 'unicode'},
-                    'validators': [
-                        {'id': 'has_length_at_most', 'max_value': 0}
-                    ],
+                    'validators': [{'id': 'has_length_at_most', 'max_value': 0}],
                 },
-                re.escape(
-                    'Validation failed: is_at_least ({\'min_value\': 1}) for '
-                    'object 0'
-                ),
+                re.escape('Validation failed: is_at_least ({\'min_value\': 1}) for object 0'),
             ),
             (
                 {'type': 'dict', 'items': {'type': 'float'}},
-                re.escape(
-                    'Missing keys: {\'type\': \'dict\', '
-                    '\'items\': {\'type\': \'float\'}}'
-                ),
+                re.escape('Missing keys: {\'type\': \'dict\', \'items\': {\'type\': \'float\'}}'),
             ),
             (
                 {'type': 'dict', 'properties': {123: {'type': 'unicode'}}},
@@ -584,9 +515,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'fake_arg': 'value',
                     'values': {'schema': {'type': 'basestring'}},
                 },
-                'Missing keys: {\'type\': \'variable_keys_dict\', '
-                '\'fake_arg\': \'value\', \'values\': {\'schema\': '
-                '{\'type\': \'basestring\'}}}',
+                'Missing keys: {\'type\': \'variable_keys_dict\', \'fake_arg\': \'value\', \'values\': {\'schema\': {\'type\': \'basestring\'}}}',
             ),
             (
                 {
@@ -641,10 +570,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                         'rows': -1,
                     },
                 },
-                re.escape(
-                    'Validation failed: is_at_least ({\'min_value\': 1}) for '
-                    'object -1'
-                ),
+                re.escape('Validation failed: is_at_least ({\'min_value\': 1}) for object -1'),
             ),
             (
                 {
@@ -653,10 +579,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                         'coding_mode': 'invalid_mode',
                     },
                 },
-                re.escape(
-                    'Received invalid_mode which is not in the allowed range '
-                    'of choices: [\'none\', \'python\', \'coffeescript\']'
-                ),
+                re.escape('Received invalid_mode which is not in the allowed range of choices: [\'none\', \'python\', \'coffeescript\']'),
             ),
         ]
 
@@ -669,9 +592,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             {'type': 'bool'},
             {
                 'type': 'dict',
-                'properties': [
-                    {'name': 'str_property', 'schema': {'type': 'unicode'}}
-                ],
+                'properties': [{'name': 'str_property', 'schema': {'type': 'unicode'}}],
             },
             {
                 'type': 'variable_keys_dict',
@@ -782,9 +703,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Tests for the is_valid_algebraic_expression static method with
         algebraic type.
         """
-        is_valid_algebraic_expression = schema_utils.get_validator(
-            'is_valid_algebraic_expression'
-        )
+        is_valid_algebraic_expression = schema_utils.get_validator('is_valid_algebraic_expression')
 
         self.assertTrue(is_valid_algebraic_expression('a+b*2'))
         self.assertTrue(is_valid_algebraic_expression('3+4/2'))
@@ -810,18 +729,14 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Tests for the is_valid_numeric_expression static method with
         numeric type.
         """
-        is_valid_numeric_expression = schema_utils.get_validator(
-            'is_valid_numeric_expression'
-        )
+        is_valid_numeric_expression = schema_utils.get_validator('is_valid_numeric_expression')
 
         self.assertFalse(is_valid_numeric_expression('a+b*2'))
         self.assertTrue(is_valid_numeric_expression('3+4/2'))
 
     def test_is_valid_math_equation_validator(self) -> None:
         """Tests for the is_valid_math_equation static method."""
-        is_valid_math_equation = schema_utils.get_validator(
-            'is_valid_math_equation'
-        )
+        is_valid_math_equation = schema_utils.get_validator('is_valid_math_equation')
 
         self.assertTrue(is_valid_math_equation('a+b=c'))
         self.assertTrue(is_valid_math_equation('x^2+y^2=z^2'))
@@ -857,9 +772,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_math_equation('a+b=c:)'))
 
     def test_is_supported_audio_language_code(self) -> None:
-        is_supported_audio_language_code = schema_utils.get_validator(
-            'is_supported_audio_language_code'
-        )
+        is_supported_audio_language_code = schema_utils.get_validator('is_supported_audio_language_code')
 
         self.assertTrue(is_supported_audio_language_code('en'))
         self.assertTrue(is_supported_audio_language_code('fr'))
@@ -943,9 +856,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Checks whether a given string is contained within parenthesis and
         double quotes.
         """
-        is_search_query_string = schema_utils.get_validator(
-            'is_search_query_string'
-        )
+        is_search_query_string = schema_utils.get_validator('is_search_query_string')
 
         self.assertTrue(is_search_query_string('("A category")'))
 
@@ -954,9 +865,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
     def test_is_valid_username_string(self) -> None:
         """Checks whether given username string is valid."""
-        is_valid_username_string = schema_utils.get_validator(
-            'is_valid_username_string'
-        )
+        is_valid_username_string = schema_utils.get_validator('is_valid_username_string')
 
         self.assertTrue(is_valid_username_string('alphabetic'))
         self.assertTrue(is_valid_username_string('alpha1234'))
@@ -974,9 +883,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Checks whether the given subtitled content does not exceed the
         given length.
         """
-        has_expected_subtitled_content_length = schema_utils.get_validator(
-            'has_expected_subtitled_content_length'
-        )
+        has_expected_subtitled_content_length = schema_utils.get_validator('has_expected_subtitled_content_length')
 
         obj = {'content_id': 'id', 'unicode_str': 'Continueeeeeeeeeeeeeeee'}
         self.assertFalse(has_expected_subtitled_content_length(obj, 20))
@@ -986,9 +893,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
     def test_has_unique_subtitled_contents(self) -> None:
         """Checks whether the subtitled html content has unique value or not."""
-        has_unique_subtitled_contents = schema_utils.get_validator(
-            'has_unique_subtitled_contents'
-        )
+        has_unique_subtitled_contents = schema_utils.get_validator('has_unique_subtitled_contents')
 
         obj_list = [
             {'content_id': 'id_1', 'html': '<p>1</p>'},
@@ -1062,9 +967,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ('abc', 'Could not convert str to float: abc'),
             (None, 'Could not convert NoneType to float: None'),
         ]
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_int_schema(self) -> None:
         schema = {
@@ -1076,9 +979,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ('abc', 'Could not convert str to int: abc'),
             (None, 'Could not convert NoneType to int: None'),
         ]
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_unicode_or_none_schema(self) -> None:
         schema = {
@@ -1088,9 +989,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_values_with_error_messages: List[Tuple[List[str], str]] = [
             ([], r'Expected unicode string or None, received'),
         ]
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_list_schema_with_len(self) -> None:
         schema = {
@@ -1115,9 +1014,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (['c'], 'Expected length of 2 got 1'),
             ([], 'Expected length of 2 got 0'),
         ]
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_html_schema(self) -> None:
         """Tests for valid html schema, an html string. Note that
@@ -1130,23 +1027,17 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ('<script></script>', ''),
             (b'<script></script>', ''),
             (
-                '<a class="webLink" href="https://www.oppia.com/">'
-                '<img src="images/oppia.png"></a>',
+                '<a class="webLink" href="https://www.oppia.com/"><img src="images/oppia.png"></a>',
                 '<a href="https://www.oppia.com/"></a>',
             ),
         ]
         invalid_values_with_error_messages = [
             (
                 ['<script></script>', '<script></script>'],
-                re.escape(
-                    'Expected unicode HTML string, received ['
-                    '\'<script></script>\', \'<script></script>\']'
-                ),
+                re.escape('Expected unicode HTML string, received [\'<script></script>\', \'<script></script>\']'),
             )
         ]
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_schema_key_post_normalizers(self) -> None:
         """Test post normalizers in schema using basic html schema."""
@@ -1200,9 +1091,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (123, 'Expected list, received 123'),
             ('abc', 'Expected list, received abc'),
         ]
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_dict_schema(self) -> None:
         schema = {
@@ -1226,9 +1115,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                         'properties': [
                             {
                                 'name': 'floatProp',
-                                'schema': {
-                                    'type': schema_utils.SCHEMA_TYPE_FLOAT
-                                },
+                                'schema': {'type': schema_utils.SCHEMA_TYPE_FLOAT},
                             }
                         ],
                     },
@@ -1270,9 +1157,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                     'intPROP': 1,
                     'dictProp': {'floatProp': 3.0},
                 },
-                re.escape(
-                    'Missing keys: [\'intProp\'], Extra keys: [\'intPROP\']'
-                ),
+                re.escape('Missing keys: [\'intProp\'], Extra keys: [\'intPROP\']'),
             ),
             (
                 {
@@ -1291,19 +1176,14 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ),
             (
                 ['unicodeListProp', 'intProp', 'dictProp'],
-                re.escape(
-                    'Expected dict, received [\'unicodeListProp\', '
-                    '\'intProp\', \'dictProp\']'
-                ),
+                re.escape('Expected dict, received [\'unicodeListProp\', \'intProp\', \'dictProp\']'),
             ),
             (None, 'Expected dict, received None'),
             (123, 'Expected dict, received 123'),
             ('abc', 'Expected dict, received abc'),
         ]
 
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_dict_with_variable_key_schema(self) -> None:
         schema = {
@@ -1340,9 +1220,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ({'skill_id1': [45, 2, 34]}, 'Expected length of 2 got 3'),
         ]
 
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_string_schema(self) -> None:
         schema = {
@@ -1354,9 +1232,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (None, 'Expected string, received None'),
         ]
 
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_object_dict_schema_with_validation_method_key(self) -> None:
         schema = {
@@ -1377,13 +1253,9 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        invalid_values_with_error_messages = [
-            ({'arg_a': 'arbitary_argument_a'}, 'Missing arg_b in argument.')
-        ]
+        invalid_values_with_error_messages = [({'arg_a': 'arbitary_argument_a'}, 'Missing arg_b in argument.')]
 
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages
-        )
+        self.check_normalization(schema, mappings, invalid_values_with_error_messages)
 
     def test_normalize_spaces(self) -> None:
         """Test static method normalize_spaces; should collapse multiple
@@ -1412,9 +1284,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         ):
             schema_utils.Normalizers.get('some invalid normalizer method name')
 
-        with self.assertRaisesRegex(
-            Exception, 'Invalid normalizer id: normalize_space'
-        ):
+        with self.assertRaisesRegex(Exception, 'Invalid normalizer id: normalize_space'):
             # Test substring of an actual id.
             schema_utils.Normalizers.get('normalize_space')
 
@@ -1440,12 +1310,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            'https://www.web.com/%3Cscript%20type%3D%22text/javascript%22%'
-            '3Ealert%28%27rm%20-rf%27%29%3B%3C/script%3E',
-            sanitize_url(
-                'https://www.web.com/<script type="text/javascript">alert(\'rm'
-                ' -rf\');</script>'
-            ),
+            'https://www.web.com/%3Cscript%20type%3D%22text/javascript%22%3Ealert%28%27rm%20-rf%27%29%3B%3C/script%3E',
+            sanitize_url('https://www.web.com/<script type="text/javascript">alert(\'rm -rf\');</script>'),
         )
 
         self.assertEqual('', sanitize_url(''))
@@ -1454,15 +1320,13 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         # https://.
         with self.assertRaisesRegex(
             AssertionError,
-            'Invalid URL: Sanitized URL should start with \'http://\' or'
-            ' \'https://\'; received oppia.org',
+            'Invalid URL: Sanitized URL should start with \'http://\' or \'https://\'; received oppia.org',
         ):
             sanitize_url('oppia.org')
 
         with self.assertRaisesRegex(
             AssertionError,
-            'Invalid URL: Sanitized URL should start with \'http://\' or'
-            ' \'https://\'; received www.oppia.org',
+            'Invalid URL: Sanitized URL should start with \'http://\' or \'https://\'; received www.oppia.org',
         ):
             sanitize_url('www.oppia.org')
 

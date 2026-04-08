@@ -21,14 +21,14 @@ from __future__ import annotations
 import datetime
 import math
 
+from typing import Dict, Final, List, Tuple, Type, Union
+
 from core import utils
 from core.domain import search_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Dict, Final, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
@@ -43,9 +43,7 @@ StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
 class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[
-        blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
-    ] = blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
+    JOB_CLASS: Type[blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob] = blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
 
     USER_ID_1: Final = 'id_1'
     USERNAME: Final = 'someUsername'
@@ -81,11 +79,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'title': 'title',
                             'tags': ['tag1', 'tag2'],
                             'summary': 'blog_post_summary',
-                            'rank': math.floor(
-                                utils.get_time_in_millisecs(
-                                    blog_summary.published_on
-                                )
-                            ),
+                            'rank': math.floor(utils.get_time_in_millisecs(blog_summary.published_on)),
                         }
                     ],
                     search_services.SEARCH_INDEX_BLOG_POSTS,
@@ -94,9 +88,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is(
-                [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
-            )
+            self.assert_job_output_is([job_run_result.JobRunResult.as_stdout('SUCCESS: 1')])
 
     def test_indexes_non_deleted_models(self) -> None:
         date_time_now = datetime.datetime.utcnow()
@@ -128,11 +120,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'title': 'title',
                             'tags': ['tag1', 'tag2'],
                             'summary': 'blog_post_summary',
-                            'rank': math.floor(
-                                utils.get_time_in_millisecs(
-                                    blog_summary.published_on
-                                )
-                            ),
+                            'rank': math.floor(utils.get_time_in_millisecs(blog_summary.published_on)),
                         }
                     ],
                     search_services.SEARCH_INDEX_BLOG_POSTS,
@@ -148,9 +136,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap, max_batch_size_swap:
-            self.assert_job_output_is(
-                [job_run_result.JobRunResult.as_stdout('SUCCESS: 5')]
-            )
+            self.assert_job_output_is([job_run_result.JobRunResult.as_stdout('SUCCESS: 5')])
 
     def test_reports_failed_when_indexing_fails(self) -> None:
         blog_summary = self.create_model(
@@ -186,11 +172,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'title': 'title',
                             'tags': ['tag1', 'tag2'],
                             'summary': 'blog_post_summary',
-                            'rank': math.floor(
-                                utils.get_time_in_millisecs(
-                                    blog_summary.published_on
-                                )
-                            ),
+                            'rank': math.floor(utils.get_time_in_millisecs(blog_summary.published_on)),
                         }
                     ],
                     search_services.SEARCH_INDEX_BLOG_POSTS,
@@ -199,13 +181,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is(
-                [
-                    job_run_result.JobRunResult.as_stderr(
-                        'ERROR: "search exception": 1'
-                    )
-                ]
-            )
+            self.assert_job_output_is([job_run_result.JobRunResult.as_stderr('ERROR: "search exception": 1')])
 
     def test_skips_deleted_model(self) -> None:
         blog_summary = self.create_model(
@@ -257,6 +233,4 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is(
-                [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
-            )
+            self.assert_job_output_is([job_run_result.JobRunResult.as_stdout('SUCCESS: 1')])

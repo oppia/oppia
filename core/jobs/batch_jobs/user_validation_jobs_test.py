@@ -18,12 +18,13 @@
 
 from __future__ import annotations
 
+# ruff: noqa: E501
+from typing import Final, Type
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Final, Type
 
 MYPY = False
 if MYPY:
@@ -33,9 +34,7 @@ if MYPY:
 
 
 class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[user_validation_jobs.GetUsersWithInvalidBioJob] = (
-        user_validation_jobs.GetUsersWithInvalidBioJob
-    )
+    JOB_CLASS: Type[user_validation_jobs.GetUsersWithInvalidBioJob] = user_validation_jobs.GetUsersWithInvalidBioJob
 
     USER_USERNAME_1: Final = 'user_1'
     USER_USERNAME_2: Final = 'user_2'
@@ -55,16 +54,9 @@ class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stderr='The username of user is "user_1"'
-                    ' and their bio is "None"'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='CountInvalidUserBios SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='CountTotalUsers SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stderr='The username of user is "user_1" and their bio is "None"'),
+                job_run_result.JobRunResult(stdout='CountInvalidUserBios SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='CountTotalUsers SUCCESS: 1'),
             ]
         )
 
@@ -78,9 +70,7 @@ class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
         user.update_timestamps()
         self.put_multi([user])
 
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='CountTotalUsers SUCCESS: 1')]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='CountTotalUsers SUCCESS: 1')])
 
     def test_user_with_too_long_bio(self) -> None:
         user = self.create_model(
@@ -97,11 +87,7 @@ class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult(
                     stderr='The username of user is "user_3" and their bio is "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis convallis ut felis eget fringilla. Phasellus congue quam et odio venenatis viverra. Maecenas pharetra, dui a convallis vestibulum, augue sem posuere enim, ac hendrerit nisl diam eu dolor. Sed mattis risus in quam mollis pellentesque. Proin mi nisl, dignissim at euismod in, fermentum ut nisi. Donec vel mauris ipsum. Nulla quis egestas nisl. Phasellus urna nisi, iaculis tincidunt dui volutpat, sagittis congue urna. Suspendisse commodo mollis sem, porttitor molestie justo laoreet in. Nullam facilisis dui sapien, et viverra lorem elementum vel.Integer tincidunt feugiat orci, vitae molestie erat facilisis eget. Nullam venenatis, tellus gravida varius condimentum, orci nunc ornare purus, quis pretium diam nulla vitae ipsum. In vel lorem consectetur, mattis enim a, varius magna. Nunc consequat nisl vel mi feugiat, a consequat turpis dapibus. Cras lectus magna, ullamcorper id orci vel, malesuada hendrerit enim. Nunc in quam felis. Proin posuere justo sed consectetur molestie. Quisque non aliquet magna. Vivamus non vulputate augue, quis placerat est.Nullam vel ornare arcu. Integer ornare est lacinia ligula vehicula efficitur. Aliquam varius elit sit amet eros vestibulum, eu pharetra justo maximus. Proin a sagittis felis, ac tempus ipsum. Cras egestas lorem quis ante ullamcorper, vitae accumsan sapien luctus. Nulla sodales elit sit amet dignissim ornare. In non porttitor tellus, sit amet interdum nisl. Vivamus ut lobortis lacus. Duis feugiat tempor eros vitae aliquet. Integer varius elit quis erat cursus, faucibus bibendum sapien varius. In ut luctus elit, bibendum posuere felis. Donec pretium enim id eleifend venenatis. Cras aliquet magna nec ante sodales, vel imperdiet velit posuere.Nunc nulla sem, condimentum sit amet tempor eu, pharetra at nulla. Nulla auctor pellentesque condimentum. In vestibulum, lectus nec pulvinar dignissim, elit quam viverra metus, ut fermentum ipsum dui ac mauris. Aliquam imperdiet dictum nulla, eget dignissim risus vehicula sit amet. Nam et blandit turpis, ut varius nulla. Mauris dui."'
                 ),  # pylint: disable=line-too-long
-                job_run_result.JobRunResult(
-                    stdout='CountInvalidUserBios SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='CountTotalUsers SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='CountInvalidUserBios SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='CountTotalUsers SUCCESS: 1'),
             ]
         )

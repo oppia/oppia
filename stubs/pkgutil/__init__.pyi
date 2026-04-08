@@ -2,6 +2,7 @@
 # python-ce/helpers/typeshed/stdlib/pkgutil.pyi
 
 from importlib.abc import Loader, PathEntryFinder
+
 from typing import Iterable, Iterator, NamedTuple, Optional
 
 class ModuleInfo(NamedTuple):

@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from typing import Dict, List, Optional, TypedDict
+
 from core import android_validation_constants, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
@@ -29,12 +31,8 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict
 
-
-def _require_valid_version(
-    version_from_payload: int, skill_version: int
-) -> None:
+def _require_valid_version(version_from_payload: int, skill_version: int) -> None:
     """Check that the payload version matches the given skill
     version.
 
@@ -48,11 +46,7 @@ def _require_valid_version(
         Exception. The skill versions do not match.
     """
     if version_from_payload != skill_version:
-        raise base.BaseHandler.InvalidInputException(
-            'Trying to update version %s of skill from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (skill_version, version_from_payload)
-        )
+        raise base.BaseHandler.InvalidInputException('Trying to update version %s of skill from version %s, which is too old. Please reload the page and try again.' % (skill_version, version_from_payload))
 
 
 def check_can_edit_skill_description(user: user_domain.UserActionsInfo) -> bool:
@@ -100,9 +94,7 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
-        can_edit_skill_description = check_can_edit_skill_description(
-            user_actions_info
-        )
+        can_edit_skill_description = check_can_edit_skill_description(user_actions_info)
 
         self.values.update(
             {
@@ -124,11 +116,7 @@ class EditableSkillDataHandlerNormalizedPayloadDict(TypedDict):
     change_dicts: List[skill_domain.SkillChange]
 
 
-class EditableSkillDataHandler(
-    base.BaseHandler[
-        EditableSkillDataHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class EditableSkillDataHandler(base.BaseHandler[EditableSkillDataHandlerNormalizedPayloadDict, Dict[str, str]]):
     """A data handler for skills which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -184,9 +172,7 @@ class EditableSkillDataHandler(
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
-            raise self.NotFoundException(
-                Exception('The skill with the given id doesn\'t exist.')
-            )
+            raise self.NotFoundException(Exception('The skill with the given id doesn\'t exist.'))
 
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
@@ -208,12 +194,8 @@ class EditableSkillDataHandler(
                         break
                 assigned_skill_topic_data_dict[topic.name] = subtopic_name
 
-            skill_summaries = skill_services.get_multi_skill_summaries(
-                skill_ids_in_topic
-            )
-            skill_summary_dicts = [
-                summary.to_dict() for summary in skill_summaries
-            ]
+            skill_summaries = skill_services.get_multi_skill_summaries(skill_ids_in_topic)
+            skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
 
         self.values.update(
@@ -243,28 +225,18 @@ class EditableSkillDataHandler(
         assert self.normalized_payload is not None
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
-            raise self.NotFoundException(
-                Exception('The skill with the given id doesn\'t exist.')
-            )
+            raise self.NotFoundException(Exception('The skill with the given id doesn\'t exist.'))
 
         version = self.normalized_payload['version']
         _require_valid_version(version, skill.version)
 
         commit_message = self.normalized_payload.get('commit_message')
-        if (
-            commit_message is not None
-            and len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH
-        ):
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH
-            )
+        if commit_message is not None and len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH:
+            raise self.InvalidInputException('Commit messages must be at most %s characters long.' % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_list = self.normalized_payload['change_dicts']
         try:
-            skill_services.update_skill(
-                self.user_id, skill_id, change_list, commit_message
-            )
+            skill_services.update_skill(self.user_id, skill_id, change_list, commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -287,9 +259,7 @@ class EditableSkillDataHandler(
         assert self.user_id is not None
 
         if skill_services.skill_has_associated_questions(skill_id):
-            raise self.InvalidInputException(
-                'Please delete all questions associated with this skill first.'
-            )
+            raise self.InvalidInputException('Please delete all questions associated with this skill first.')
 
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
         skill_services.delete_skill(self.user_id, skill_id)
@@ -384,21 +354,11 @@ class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Args:
             skill_description: str. Skill description.
         """
-        self.values.update(
-            {
-                'skill_description_exists': (
-                    skill_services.does_skill_with_description_exist(
-                        skill_description
-                    )
-                )
-            }
-        )
+        self.values.update({'skill_description_exists': (skill_services.does_skill_with_description_exist(skill_description))})
         self.render_json(self.values)
 
 
-class DiagnosticTestSkillAssignmentHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class DiagnosticTestSkillAssignmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A handler that returns a list of topic names for which the given skill
     is assigned to that topic's diagnostic test.
     """
@@ -427,13 +387,5 @@ class DiagnosticTestSkillAssignmentHandler(
         Args:
             skill_id: str. The skill ID.
         """
-        self.values.update(
-            {
-                'topic_names': (
-                    skill_services.get_topic_names_with_given_skill_in_diagnostic_test(
-                        skill_id
-                    )
-                )
-            }
-        )
+        self.values.update({'topic_names': (skill_services.get_topic_names_with_given_skill_in_diagnostic_test(skill_id))})
         self.render_json(self.values)

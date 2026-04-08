@@ -20,10 +20,6 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.interactions.NumberWithUnits import (  # pylint: disable=unused-import # isort: skip
-    NumberWithUnits,
-)
-
 
 class NumberWithUnitsTests(test_utils.GenericTestBase):
     # At Oppia, we require all files to have an associated test file, since

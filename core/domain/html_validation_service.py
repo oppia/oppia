@@ -21,15 +21,15 @@ from __future__ import annotations
 import json
 import logging
 
+import bs4
+import defusedxml.ElementTree
+from typing import Callable, Dict, Iterator, List, Tuple, Union
+
 from core import feconf, utils
 from core.constants import constants
 from core.domain import fs_services, rte_component_registry
 from extensions.objects.models import objects
 from extensions.rich_text_components import components
-
-import bs4
-import defusedxml.ElementTree
-from typing import Callable, Dict, Iterator, List, Tuple, Union
 
 
 def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
@@ -74,14 +74,10 @@ def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
 
 
 # List of oppia noninteractive inline components.
-INLINE_COMPONENT_TAG_NAMES: List[str] = (
-    rte_component_registry.Registry.get_inline_component_tag_names()
-)
+INLINE_COMPONENT_TAG_NAMES: List[str] = rte_component_registry.Registry.get_inline_component_tag_names()
 
 # List of oppia noninteractive block components.
-BLOCK_COMPONENT_TAG_NAMES: List[str] = (
-    rte_component_registry.Registry.get_block_component_tag_names()
-)
+BLOCK_COMPONENT_TAG_NAMES: List[str] = rte_component_registry.Registry.get_block_component_tag_names()
 
 # See https://perso.crans.org/besson/_static/python/lib/python2.7/encodings/cp1252.py # pylint: disable=line-too-long
 # Useful reading: https://www.regular-expressions.info/unicode8bit.html
@@ -384,9 +380,7 @@ CHAR_MAPPINGS: List[Tuple[str, str]] = [
 ]
 
 
-def validate_rte_format(
-    html_list: List[str], rte_format: str
-) -> Dict[str, List[str]]:
+def validate_rte_format(html_list: List[str], rte_format: str) -> Dict[str, List[str]]:
     """This function checks if html strings in a given list are
     valid for given RTE format.
 
@@ -412,82 +406,46 @@ def validate_rte_format(
         # otherwise BeautifulSoup in some cases adds </br> closing tag
         # and br is reported as parent of other tags which
         # produces issues in validation.
-        soup = bs4.BeautifulSoup(
-            soup_data.replace('<br>', '<br/>'), 'html.parser'
-        )
+        soup = bs4.BeautifulSoup(soup_data.replace('<br>', '<br/>'), 'html.parser')
 
         is_invalid = validate_soup_for_rte(soup, rte_format, err_dict)
 
         if is_invalid:
             err_dict['strings'].append(html_data)
 
-        for collapsible in soup.findAll(
-            name='oppia-noninteractive-collapsible'
-        ):
-            if 'content-with-value' not in collapsible.attrs or (
-                collapsible['content-with-value'] == ''
-            ):
+        for collapsible in soup.findAll(name='oppia-noninteractive-collapsible'):
+            if 'content-with-value' not in collapsible.attrs or (collapsible['content-with-value'] == ''):
                 is_invalid = True
             else:
-                content_html = json.loads(
-                    utils.unescape_html(collapsible['content-with-value'])
-                )
-                soup_for_collapsible = bs4.BeautifulSoup(
-                    content_html.replace('<br>', '<br/>'), 'html.parser'
-                )
-                is_invalid = validate_soup_for_rte(
-                    soup_for_collapsible, rte_format, err_dict
-                )
+                content_html = json.loads(utils.unescape_html(collapsible['content-with-value']))
+                soup_for_collapsible = bs4.BeautifulSoup(content_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = validate_soup_for_rte(soup_for_collapsible, rte_format, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
 
         for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-            tab_content_json = utils.unescape_html(
-                tabs['tab_contents-with-value']
-            )
+            tab_content_json = utils.unescape_html(tabs['tab_contents-with-value'])
             tab_content_list = json.loads(tab_content_json)
             for tab_content in tab_content_list:
                 content_html = tab_content['content']
-                soup_for_tabs = bs4.BeautifulSoup(
-                    content_html.replace('<br>', '<br/>'), 'html.parser'
-                )
-                is_invalid = validate_soup_for_rte(
-                    soup_for_tabs, rte_format, err_dict
-                )
+                soup_for_tabs = bs4.BeautifulSoup(content_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = validate_soup_for_rte(soup_for_tabs, rte_format, err_dict)
                 if is_invalid:
                     err_dict['strings'].append(html_data)
 
-        for workedexample in soup.findAll(
-            name='oppia-noninteractive-workedexample'
-        ):
-            if 'question-with-value' not in workedexample.attrs or (
-                workedexample['question-with-value'] == ''
-            ):
+        for workedexample in soup.findAll(name='oppia-noninteractive-workedexample'):
+            if 'question-with-value' not in workedexample.attrs or (workedexample['question-with-value'] == ''):
                 is_invalid = True
             else:
-                question_html = json.loads(
-                    utils.unescape_html(workedexample['question-with-value'])
-                )
-                soup_for_workedexample = bs4.BeautifulSoup(
-                    question_html.replace('<br>', '<br/>'), 'html.parser'
-                )
-                is_invalid = validate_soup_for_rte(
-                    soup_for_workedexample, rte_format, err_dict
-                )
-            if 'answer-with-value' not in workedexample.attrs or (
-                workedexample['answer-with-value'] == ''
-            ):
+                question_html = json.loads(utils.unescape_html(workedexample['question-with-value']))
+                soup_for_workedexample = bs4.BeautifulSoup(question_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = validate_soup_for_rte(soup_for_workedexample, rte_format, err_dict)
+            if 'answer-with-value' not in workedexample.attrs or (workedexample['answer-with-value'] == ''):
                 is_invalid = True
             else:
-                answer_html = json.loads(
-                    utils.unescape_html(workedexample['answer-with-value'])
-                )
-                soup_for_workedexample = bs4.BeautifulSoup(
-                    answer_html.replace('<br>', '<br/>'), 'html.parser'
-                )
-                is_invalid = validate_soup_for_rte(
-                    soup_for_workedexample, rte_format, err_dict
-                )
+                answer_html = json.loads(utils.unescape_html(workedexample['answer-with-value']))
+                soup_for_workedexample = bs4.BeautifulSoup(answer_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = validate_soup_for_rte(soup_for_workedexample, rte_format, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
 
@@ -497,9 +455,7 @@ def validate_rte_format(
     return err_dict
 
 
-def validate_soup_for_rte(
-    soup: bs4.BeautifulSoup, rte_format: str, err_dict: Dict[str, List[str]]
-) -> bool:
+def validate_soup_for_rte(soup: bs4.BeautifulSoup, rte_format: str, err_dict: Dict[str, List[str]]) -> bool:
     """Validate content in given soup for given RTE format.
 
     Args:
@@ -515,9 +471,7 @@ def validate_soup_for_rte(
         rte_type = 'RTE_TYPE_TEXTANGULAR'
     else:
         rte_type = 'RTE_TYPE_CKEDITOR'
-    allowed_parent_list = feconf.RTE_CONTENT_SPEC[rte_type][
-        'ALLOWED_PARENT_LIST'
-    ]
+    allowed_parent_list = feconf.RTE_CONTENT_SPEC[rte_type]['ALLOWED_PARENT_LIST']
     allowed_tag_list = feconf.RTE_CONTENT_SPEC[rte_type]['ALLOWED_TAG_LIST']
 
     is_invalid = False
@@ -538,9 +492,7 @@ def validate_soup_for_rte(
         # Checking for parent-child relation that are not
         # allowed in RTE.
         parent = tag.parent.name
-        if (tag.name in allowed_tag_list) and (
-            parent not in allowed_parent_list[tag.name]
-        ):
+        if (tag.name in allowed_tag_list) and (parent not in allowed_parent_list[tag.name]):
             if tag.name in err_dict:
                 err_dict[tag.name].append(parent)
             else:
@@ -564,9 +516,7 @@ def validate_customization_args(html_list: List[str]) -> Dict[str, List[str]]:
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
     err_dict = {}
-    rich_text_component_tag_names = (
-        INLINE_COMPONENT_TAG_NAMES + BLOCK_COMPONENT_TAG_NAMES
-    )
+    rich_text_component_tag_names = INLINE_COMPONENT_TAG_NAMES + BLOCK_COMPONENT_TAG_NAMES
 
     tags_to_original_html_strings = {}
     for html_string in html_list:
@@ -599,9 +549,7 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
     """
 
     component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes()  # pylint: disable=line-too-long
-    simple_component_tag_names = (
-        rte_component_registry.Registry.get_simple_component_tag_names()
-    )
+    simple_component_tag_names = rte_component_registry.Registry.get_simple_component_tag_names()
     tag_name = tag.name
     value_dict = {}
     attrs = tag.attrs
@@ -613,16 +561,10 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
         component_types_to_component_classes[tag_name].validate(value_dict)
         if tag_name == 'oppia-noninteractive-collapsible':
             content_html = value_dict['content-with-value']
-            soup_for_collapsible = bs4.BeautifulSoup(
-                content_html, 'html.parser'
-            )
+            soup_for_collapsible = bs4.BeautifulSoup(content_html, 'html.parser')
             for component_name in simple_component_tag_names:
-                for component_tag in soup_for_collapsible.findAll(
-                    name=component_name
-                ):
-                    for err_msg in validate_customization_args_in_tag(
-                        component_tag
-                    ):
+                for component_tag in soup_for_collapsible.findAll(name=component_name):
+                    for err_msg in validate_customization_args_in_tag(component_tag):
                         yield err_msg
 
         elif tag_name == 'oppia-noninteractive-tabs':
@@ -631,46 +573,28 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
                 content_html = tab_content['content']
                 soup_for_tabs = bs4.BeautifulSoup(content_html, 'html.parser')
                 for component_name in simple_component_tag_names:
-                    for component_tag in soup_for_tabs.findAll(
-                        name=component_name
-                    ):
-                        for err_msg in validate_customization_args_in_tag(
-                            component_tag
-                        ):
+                    for component_tag in soup_for_tabs.findAll(name=component_name):
+                        for err_msg in validate_customization_args_in_tag(component_tag):
                             yield err_msg
 
         elif tag_name == 'oppia-noninteractive-workedexample':
             question_html = value_dict['question-with-value']
-            soup_for_workedexample = bs4.BeautifulSoup(
-                question_html, 'html.parser'
-            )
+            soup_for_workedexample = bs4.BeautifulSoup(question_html, 'html.parser')
             for component_name in simple_component_tag_names:
-                for component_tag in soup_for_workedexample.findAll(
-                    name=component_name
-                ):
-                    for err_msg in validate_customization_args_in_tag(
-                        component_tag
-                    ):
+                for component_tag in soup_for_workedexample.findAll(name=component_name):
+                    for err_msg in validate_customization_args_in_tag(component_tag):
                         yield err_msg
             answer_html = value_dict['answer-with-value']
-            soup_for_workedexample = bs4.BeautifulSoup(
-                answer_html, 'html.parser'
-            )
+            soup_for_workedexample = bs4.BeautifulSoup(answer_html, 'html.parser')
             for component_name in simple_component_tag_names:
-                for component_tag in soup_for_workedexample.findAll(
-                    name=component_name
-                ):
-                    for err_msg in validate_customization_args_in_tag(
-                        component_tag
-                    ):
+                for component_tag in soup_for_workedexample.findAll(name=component_name):
+                    for err_msg in validate_customization_args_in_tag(component_tag):
                         yield err_msg
     except Exception as e:
         yield str(e)
 
 
-def validate_svg_filenames_in_math_rich_text(
-    entity_type: str, entity_id: str, html_string: str
-) -> List[str]:
+def validate_svg_filenames_in_math_rich_text(entity_type: str, entity_id: str, html_string: str) -> List[str]:
     """Validates the SVG filenames for each math rich-text components and
     returns a list of all invalid math tags in the given HTML.
 
@@ -685,12 +609,8 @@ def validate_svg_filenames_in_math_rich_text(
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
-        math_content_dict = json.loads(
-            utils.unescape_html(math_tag['math_content-with-value'])
-        )
-        svg_filename = objects.UnicodeString.normalize(
-            math_content_dict['svg_filename']
-        )
+        math_content_dict = json.loads(utils.unescape_html(math_tag['math_content-with-value']))
+        svg_filename = objects.UnicodeString.normalize(math_content_dict['svg_filename'])
         if svg_filename == '':
             error_list.append(str(math_tag))
         else:
@@ -717,13 +637,9 @@ def validate_math_content_attribute_in_html(
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
-        math_content_dict = json.loads(
-            utils.unescape_html(math_tag['math_content-with-value'])
-        )
+        math_content_dict = json.loads(utils.unescape_html(math_tag['math_content-with-value']))
         try:
-            components.Math.validate(
-                {'math_content-with-value': math_content_dict}
-            )
+            components.Math.validate({'math_content-with-value': math_content_dict})
         except utils.ValidationError as e:
             error_list.append({'invalid_tag': str(math_tag), 'error': str(e)})
     return error_list
@@ -749,9 +665,7 @@ def does_svg_tag_contains_xmlns_attribute(
     # Also if we encode the svg_string here manually, then it fails to process
     # SVGs having non-ascii unicode characters and raises a UnicodeDecodeError.
     soup = bs4.BeautifulSoup(svg_string, 'html.parser')
-    return all(
-        svg_tag.get('xmlns') is not None for svg_tag in soup.findAll(name='svg')
-    )
+    return all(svg_tag.get('xmlns') is not None for svg_tag in soup.findAll(name='svg'))
 
 
 def get_invalid_svg_tags_and_attrs(
@@ -784,10 +698,7 @@ def get_invalid_svg_tags_and_attrs(
     for element in soup.find_all():
         if element.name.lower() in constants.SVG_ATTRS_ALLOWLIST:
             for attr in element.attrs:
-                if (
-                    attr.lower()
-                    not in (constants.SVG_ATTRS_ALLOWLIST[element.name.lower()])
-                ):
+                if attr.lower() not in (constants.SVG_ATTRS_ALLOWLIST[element.name.lower()]):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:
             invalid_elements.append(element.name)
@@ -822,14 +733,10 @@ def extract_svg_filenames_in_math_rte_components(html_string: str) -> List[str]:
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     filenames = []
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
-        math_content_dict = json.loads(
-            utils.unescape_html(math_tag['math_content-with-value'])
-        )
+        math_content_dict = json.loads(utils.unescape_html(math_tag['math_content-with-value']))
         svg_filename = math_content_dict['svg_filename']
         if svg_filename != '':
-            normalized_svg_filename = objects.UnicodeString.normalize(
-                svg_filename
-            )
+            normalized_svg_filename = objects.UnicodeString.normalize(svg_filename)
             filenames.append(normalized_svg_filename)
     return filenames
 
@@ -868,25 +775,14 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                 # The raw_latex attribute value should be enclosed in
                 # double quotes(&amp;quot;) and should be a valid unicode
                 # string.
-                raw_latex = json.loads(
-                    utils.unescape_html(math_tag['raw_latex-with-value'])
-                )
-                normalized_raw_latex = objects.UnicodeString.normalize(
-                    raw_latex
-                )
+                raw_latex = json.loads(utils.unescape_html(math_tag['raw_latex-with-value']))
+                normalized_raw_latex = objects.UnicodeString.normalize(raw_latex)
             except Exception as e:
-                logging.exception(
-                    'Invalid raw_latex string found in the math tag : %s'
-                    % (str(e))
-                )
+                logging.exception('Invalid raw_latex string found in the math tag : %s' % (str(e)))
                 raise e
             if math_tag.has_attr('svg_filename-with-value'):
-                svg_filename = json.loads(
-                    utils.unescape_html(math_tag['svg_filename-with-value'])
-                )
-                normalized_svg_filename = objects.UnicodeString.normalize(
-                    svg_filename
-                )
+                svg_filename = json.loads(utils.unescape_html(math_tag['svg_filename-with-value']))
+                normalized_svg_filename = objects.UnicodeString.normalize(svg_filename)
                 math_content_dict = {
                     'raw_latex': normalized_raw_latex,
                     'svg_filename': normalized_svg_filename,
@@ -899,13 +795,9 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                 }
             # Normalize and validate the value before adding to the math
             # tag.
-            normalized_math_content_dict = (
-                objects.MathExpressionContent.normalize(math_content_dict)
-            )
+            normalized_math_content_dict = objects.MathExpressionContent.normalize(math_content_dict)
             # Add the new attribute math_expression_contents-with-value.
-            math_tag['math_content-with-value'] = utils.escape_html(
-                json.dumps(normalized_math_content_dict, sort_keys=True)
-            )
+            math_tag['math_content-with-value'] = utils.escape_html(json.dumps(normalized_math_content_dict, sort_keys=True))
             # Delete the attribute raw_latex-with-value.
             del math_tag['raw_latex-with-value']
         elif math_tag.has_attr('math_content-with-value'):
@@ -937,9 +829,7 @@ def validate_math_tags_in_html(html_string: str) -> List[str]:
                 # The raw_latex attribute value should be enclosed in
                 # double quotes(&amp;quot;) and should be a valid unicode
                 # string.
-                raw_latex = json.loads(
-                    utils.unescape_html(math_tag['raw_latex-with-value'])
-                )
+                raw_latex = json.loads(utils.unescape_html(math_tag['raw_latex-with-value']))
                 objects.UnicodeString.normalize(raw_latex)
             except Exception:
                 error_list.append(math_tag)
@@ -968,9 +858,7 @@ def validate_math_tags_in_html_with_attribute_math_content(
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('math_content-with-value'):
             try:
-                math_content_dict = json.loads(
-                    utils.unescape_html(math_tag['math_content-with-value'])
-                )
+                math_content_dict = json.loads(utils.unescape_html(math_tag['math_content-with-value']))
                 raw_latex = math_content_dict['raw_latex']
                 svg_filename = math_content_dict['svg_filename']
                 objects.UnicodeString.normalize(svg_filename)
@@ -1013,9 +901,7 @@ def convert_svg_diagram_to_image_for_soup(
     Returns:
         str. The updated html string.
     """
-    for svg_image in soup_context.findAll(
-        name='oppia-noninteractive-svgdiagram'
-    ):
+    for svg_image in soup_context.findAll(name='oppia-noninteractive-svgdiagram'):
         svg_filepath = svg_image['svg_filename-with-value']
         del svg_image['svg_filename-with-value']
         svg_image['filepath-with-value'] = svg_filepath
@@ -1034,11 +920,7 @@ def convert_svg_diagram_tags_to_image_tags(html_string: str) -> str:
     Returns:
         str. The updated html string.
     """
-    return str(
-        _process_string_with_components(
-            html_string, convert_svg_diagram_to_image_for_soup
-        )
-    )
+    return str(_process_string_with_components(html_string, convert_svg_diagram_to_image_for_soup))
 
 
 def _replace_incorrectly_encoded_chars(soup_context: bs4.BeautifulSoup) -> str:
@@ -1072,16 +954,10 @@ def fix_incorrectly_encoded_chars(html_string: str) -> str:
     Returns:
         str. The updated html string.
     """
-    return str(
-        _process_string_with_components(
-            html_string, _replace_incorrectly_encoded_chars
-        )
-    )
+    return str(_process_string_with_components(html_string, _replace_incorrectly_encoded_chars))
 
 
-def _process_string_with_components(
-    html_string: str, conversion_fn: Callable[[bs4.BeautifulSoup], str]
-) -> str:
+def _process_string_with_components(html_string: str, conversion_fn: Callable[[bs4.BeautifulSoup], str]) -> str:
     """Executes the provided conversion function after parsing complex RTE
     components.
 
@@ -1093,69 +969,31 @@ def _process_string_with_components(
     Returns:
         str. The updated html string.
     """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser'
-    )
+    soup = bs4.BeautifulSoup(html_string.encode(encoding='utf-8'), 'html.parser')
 
     for collapsible in soup.findAll(name='oppia-noninteractive-collapsible'):
         if 'content-with-value' in collapsible.attrs:
-            content_html = json.loads(
-                utils.unescape_html(collapsible['content-with-value'])
-            )
-            soup_for_collapsible = bs4.BeautifulSoup(
-                content_html.replace('<br>', '<br/>'), 'html.parser'
-            )
-            collapsible['content-with-value'] = utils.escape_html(
-                json.dumps(
-                    conversion_fn(soup_for_collapsible).replace('<br/>', '<br>')
-                )
-            )
+            content_html = json.loads(utils.unescape_html(collapsible['content-with-value']))
+            soup_for_collapsible = bs4.BeautifulSoup(content_html.replace('<br>', '<br/>'), 'html.parser')
+            collapsible['content-with-value'] = utils.escape_html(json.dumps(conversion_fn(soup_for_collapsible).replace('<br/>', '<br>')))
 
     for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
         tab_content_json = utils.unescape_html(tabs['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
         for tab_content in tab_content_list:
             content_html = tab_content['content']
-            soup_for_tabs = bs4.BeautifulSoup(
-                content_html.replace('<br>', '<br/>'), 'html.parser'
-            )
-            tab_content['content'] = conversion_fn(soup_for_tabs).replace(
-                '<br/>', '<br>'
-            )
-        tabs['tab_contents-with-value'] = utils.escape_html(
-            json.dumps(tab_content_list)
-        )
+            soup_for_tabs = bs4.BeautifulSoup(content_html.replace('<br>', '<br/>'), 'html.parser')
+            tab_content['content'] = conversion_fn(soup_for_tabs).replace('<br/>', '<br>')
+        tabs['tab_contents-with-value'] = utils.escape_html(json.dumps(tab_content_list))
 
-    for workedexample in soup.findAll(
-        name='oppia-noninteractive-workedexample'
-    ):
+    for workedexample in soup.findAll(name='oppia-noninteractive-workedexample'):
         if 'question-with-value' in workedexample.attrs:
-            question_html = json.loads(
-                utils.unescape_html(workedexample['question-with-value'])
-            )
-            soup_for_workedexample = bs4.BeautifulSoup(
-                question_html.replace('<br>', '<br/>'), 'html.parser'
-            )
-            workedexample['question-with-value'] = utils.escape_html(
-                json.dumps(
-                    conversion_fn(soup_for_workedexample).replace(
-                        '<br/>', '<br>'
-                    )
-                )
-            )
+            question_html = json.loads(utils.unescape_html(workedexample['question-with-value']))
+            soup_for_workedexample = bs4.BeautifulSoup(question_html.replace('<br>', '<br/>'), 'html.parser')
+            workedexample['question-with-value'] = utils.escape_html(json.dumps(conversion_fn(soup_for_workedexample).replace('<br/>', '<br>')))
         if 'answer-with-value' in workedexample.attrs:
-            answer_html = json.loads(
-                utils.unescape_html(workedexample['answer-with-value'])
-            )
-            soup_for_workedexample = bs4.BeautifulSoup(
-                answer_html.replace('<br>', '<br/>'), 'html.parser'
-            )
-            workedexample['answer-with-value'] = utils.escape_html(
-                json.dumps(
-                    conversion_fn(soup_for_workedexample).replace(
-                        '<br/>', '<br>'
-                    )
-                )
-            )
+            answer_html = json.loads(utils.unescape_html(workedexample['answer-with-value']))
+            soup_for_workedexample = bs4.BeautifulSoup(answer_html.replace('<br>', '<br/>'), 'html.parser')
+            workedexample['answer-with-value'] = utils.escape_html(json.dumps(conversion_fn(soup_for_workedexample).replace('<br/>', '<br>')))
 
     return conversion_fn(soup)

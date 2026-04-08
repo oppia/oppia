@@ -24,10 +24,10 @@ import contextlib
 import os
 import time
 
-from core import feconf
-
 import psutil
 from typing import Callable, ContextManager, Iterator, List, Optional, Sequence
+
+from core import feconf
 
 from . import (
     build,
@@ -51,10 +51,7 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--disable_host_checking',
-    help='optional; if specified, disables host checking so that the dev '
-    'server can be accessed by any device on the same network using the '
-    'host device\'s IP address. DO NOT use this flag if you\'re running '
-    'on an untrusted network.',
+    help='optional; if specified, disables host checking so that the dev server can be accessed by any device on the same network using the host device\'s IP address. DO NOT use this flag if you\'re running on an untrusted network.',
     action='store_true',
 )
 _PARSER.add_argument(
@@ -74,8 +71,7 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--no_auto_restart',
-    help='optional; if specified, does not automatically restart when files '
-    'are changed.',
+    help='optional; if specified, does not automatically restart when files are changed.',
     action='store_true',
 )
 _PARSER.add_argument(
@@ -85,8 +81,7 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--skip_install',
-    help='optional; if specified, skips the installation of '
-    'third party libraries',
+    help='optional; if specified, skips the installation of third party libraries',
     action='store_true',
 )
 
@@ -94,9 +89,7 @@ BROWSER_LAUNCH_TIMEOUT_SECS = 10.0
 BROWSER_RETRY_INTERVAL_SECS = 0.5
 SERVER_READY_MESSAGE = [
     'INFORMATION',
-    'Local development server is ready! You can access it by '
-    'navigating to http://localhost:%s/ in a web '
-    'browser.' % feconf.GAE_DEVELOPMENT_SERVER_PORT,
+    'Local development server is ready! You can access it by navigating to http://localhost:%s/ in a web browser.' % feconf.GAE_DEVELOPMENT_SERVER_PORT,
 ]
 
 
@@ -161,22 +154,12 @@ def make_dev_appserver_env(
     return env, app_yaml_path
 
 
-def start_services(
-    parsed_args: argparse.Namespace, stack: contextlib.ExitStack
-) -> psutil.Process:
+def start_services(parsed_args: argparse.Namespace, stack: contextlib.ExitStack) -> psutil.Process:
     """Starts all the required services and returns the dev appserver."""
     stack.enter_context(servers.managed_redis_server())
     stack.enter_context(servers.managed_elasticsearch_dev_server())
-    stack.enter_context(
-        servers.managed_firebase_auth_emulator(
-            recover_users=parsed_args.save_datastore
-        )
-    )
-    stack.enter_context(
-        servers.managed_cloud_datastore_emulator(
-            clear_datastore=not parsed_args.save_datastore
-        )
-    )
+    stack.enter_context(servers.managed_firebase_auth_emulator(recover_users=parsed_args.save_datastore))
+    stack.enter_context(servers.managed_cloud_datastore_emulator(clear_datastore=not parsed_args.save_datastore))
 
     # NOTE: When prod_env=True the Webpack compiler is run by build.main().
     if not parsed_args.prod_env:
@@ -207,9 +190,7 @@ def start_services(
 
 
 def attempt_launch_browser(
-    enter_context_fn: Callable[
-        [ContextManager[psutil.Process]], psutil.Process
-    ],
+    enter_context_fn: Callable[[ContextManager[psutil.Process]], psutil.Process],
 ) -> None:
     """Attempts to launch the web browser."""
 
@@ -219,17 +200,11 @@ def attempt_launch_browser(
 
     while True:
         try:
-            enter_context_fn(
-                servers.create_managed_web_browser(
-                    feconf.GAE_DEVELOPMENT_SERVER_PORT
-                )
-            )
+            enter_context_fn(servers.create_managed_web_browser(feconf.GAE_DEVELOPMENT_SERVER_PORT))
             common.print_each_string_after_two_new_lines(
                 [
                     'INFORMATION',
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % feconf.GAE_DEVELOPMENT_SERVER_PORT,
+                    'Local development server is ready! Opening a default web browser window pointing to it: http://localhost:%s/' % feconf.GAE_DEVELOPMENT_SERVER_PORT,
                 ]
             )
             return
@@ -241,13 +216,10 @@ def attempt_launch_browser(
                 common.print_each_string_after_two_new_lines(
                     [
                         'ERROR',
-                        'Error occurred while attempting to automatically launch '
-                        'the web browser: %s' % last_error,
+                        'Error occurred while attempting to automatically launch the web browser: %s' % last_error,
                     ]
                 )
-                common.print_each_string_after_two_new_lines(
-                    SERVER_READY_MESSAGE
-                )
+                common.print_each_string_after_two_new_lines(SERVER_READY_MESSAGE)
                 return
             time.sleep(BROWSER_RETRY_INTERVAL_SECS)
 
@@ -292,8 +264,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         common.print_each_string_after_two_new_lines(
             [
                 'ERROR',
-                'Could not start new server. The following ports are already in '
-                'use and need to be available: %s' % port_msgs,
+                'Could not start new server. The following ports are already in use and need to be available: %s' % port_msgs,
             ]
         )
         raise SystemExit(1)
@@ -362,9 +333,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if not parsed_args.no_browser:
                 attempt_launch_browser(stack.enter_context)
             else:
-                common.print_each_string_after_two_new_lines(
-                    SERVER_READY_MESSAGE
-                )
+                common.print_each_string_after_two_new_lines(SERVER_READY_MESSAGE)
 
             dev_appserver.wait()
 
@@ -379,8 +348,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             common.print_each_string_after_two_new_lines(
                 [
                     'WARNING',
-                    'The following ports are still in use after exiting: %s'
-                    % port_msgs,
+                    'The following ports are still in use after exiting: %s' % port_msgs,
                 ]
             )
 

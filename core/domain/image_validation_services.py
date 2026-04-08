@@ -18,11 +18,11 @@ from __future__ import annotations
 
 import base64
 
-from core import feconf, utils
-from core.domain import html_validation_service
-
 import filetype
 from typing import Optional, Union
+
+from core import feconf, utils
+from core.domain import html_validation_service
 
 HUNDRED_KB_IN_BYTES = 100 * 1024
 ONE_MB_IN_BYTES = 1 * 1024 * 1024
@@ -62,45 +62,25 @@ def validate_image_and_filename(
         raw_image = base64.decodebytes(raw_image.encode('utf-8'))
 
     if len(raw_image) > max_file_size:
-        raise utils.ValidationError(
-            'Image exceeds file size limit of %i KB.' % (max_file_size / 1024)
-        )
-    allowed_formats = ', '.join(
-        list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
-    )
+        raise utils.ValidationError('Image exceeds file size limit of %i KB.' % (max_file_size / 1024))
+    allowed_formats = ', '.join(list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
     # Ruling out the possibility of str for mypy type checking.
     assert isinstance(raw_image, bytes)
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
-        invalid_tags, invalid_attrs = (
-            html_validation_service.get_invalid_svg_tags_and_attrs(raw_image)
-        )
+        invalid_tags, invalid_attrs = html_validation_service.get_invalid_svg_tags_and_attrs(raw_image)
         if invalid_tags or invalid_attrs:
-            invalid_tags_message = (
-                'tags: %s' % invalid_tags if invalid_tags else ''
-            )
-            invalid_attrs_message = (
-                'attributes: %s' % invalid_attrs if invalid_attrs else ''
-            )
-            raise utils.ValidationError(
-                'Unsupported tags/attributes found in the SVG:\n%s\n%s'
-                % (invalid_tags_message, invalid_attrs_message)
-            )
-        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(
-            raw_image
-        ):
-            raise utils.ValidationError(
-                'The svg tag does not contains the \'xmlns\' attribute.'
-            )
+            invalid_tags_message = 'tags: %s' % invalid_tags if invalid_tags else ''
+            invalid_attrs_message = 'attributes: %s' % invalid_attrs if invalid_attrs else ''
+            raise utils.ValidationError('Unsupported tags/attributes found in the SVG:\n%s\n%s' % (invalid_tags_message, invalid_attrs_message))
+        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(raw_image):
+            raise utils.ValidationError('The svg tag does not contains the \'xmlns\' attribute.')
     else:
         # Verify that the data is recognized as an image.
         file_details = filetype.guess(raw_image)
         if not file_details:
             raise utils.ValidationError('Image not recognized')
-        if (
-            file_details.extension
-            not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS
-        ):
+        if file_details.extension not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
             raise utils.ValidationError('Image uses unsupported format')
 
         file_format = file_details.extension
@@ -111,25 +91,13 @@ def validate_image_and_filename(
     if filename.rfind('.') == 0:
         raise utils.ValidationError('Invalid filename')
     if '/' in filename or '..' in filename:
-        raise utils.ValidationError(
-            'Filenames should not include slashes (/) or consecutive '
-            'dot characters.'
-        )
+        raise utils.ValidationError('Filenames should not include slashes (/) or consecutive dot characters.')
     if '.' not in filename:
-        raise utils.ValidationError(
-            'Image filename with no extension: it should have '
-            'one of the following extensions: %s.' % allowed_formats
-        )
+        raise utils.ValidationError('Image filename with no extension: it should have one of the following extensions: %s.' % allowed_formats)
 
     dot_index = filename.rfind('.')
     extension = filename[dot_index + 1 :].lower()
-    if (
-        extension
-        not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]
-    ):
-        raise utils.ValidationError(
-            'Expected a filename ending in .%s, received %s'
-            % (file_format, filename)
-        )
+    if extension not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]:
+        raise utils.ValidationError('Expected a filename ending in .%s, received %s' % (file_format, filename))
 
     return file_format

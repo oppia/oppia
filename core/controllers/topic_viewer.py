@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Dict
+
 from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -31,8 +33,6 @@ from core.domain import (
     topic_fetchers,
     topic_services,
 )
-
-from typing import Dict
 
 
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -56,39 +56,19 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        canonical_story_ids = topic.get_canonical_story_ids(
-            include_only_published=True
-        )
-        additional_story_ids = topic.get_additional_story_ids(
-            include_only_published=True
-        )
-        canonical_story_summaries = [
-            story_fetchers.get_story_summary_by_id(canonical_story_id)
-            for canonical_story_id in canonical_story_ids
-        ]
+        canonical_story_ids = topic.get_canonical_story_ids(include_only_published=True)
+        additional_story_ids = topic.get_additional_story_ids(include_only_published=True)
+        canonical_story_summaries = [story_fetchers.get_story_summary_by_id(canonical_story_id) for canonical_story_id in canonical_story_ids]
 
-        additional_story_summaries = [
-            story_fetchers.get_story_summary_by_id(additional_story_id)
-            for additional_story_id in additional_story_ids
-        ]
+        additional_story_summaries = [story_fetchers.get_story_summary_by_id(additional_story_id) for additional_story_id in additional_story_ids]
 
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
-            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id
-            )['all_nodes']
-            filtered_nodes = [
-                node
-                for node in all_nodes
-                if node.status != constants.STORY_NODE_STATUS_DRAFT
-            ]
-            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id
-            )['pending_nodes']
+            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(self.user_id, story_summary.id)['all_nodes']
+            filtered_nodes = [node for node in all_nodes if node.status != constants.STORY_NODE_STATUS_DRAFT]
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
-            completed_node_titles = utils.compute_list_difference(
-                story_summary.node_titles, pending_node_titles
-            )
+            completed_node_titles = utils.compute_list_difference(story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             canonical_story_dict = {
                 'id': story_summary_dict['id'],
@@ -106,16 +86,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
-            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id
-            )['all_nodes']
-            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id
-            )['pending_nodes']
+            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(self.user_id, story_summary.id)['all_nodes']
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
-            completed_node_titles = utils.compute_list_difference(
-                story_summary.node_titles, pending_node_titles
-            )
+            completed_node_titles = utils.compute_list_difference(story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             additional_story_dict = {
                 'id': story_summary_dict['id'],
@@ -135,38 +109,26 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         subtopics = topic.get_all_subtopics()
 
         all_skill_ids = topic.get_all_skill_ids()
-        skill_descriptions, deleted_skill_ids = (
-            skill_services.get_descriptions_of_skills(all_skill_ids)
-        )
+        skill_descriptions, deleted_skill_ids = skill_services.get_descriptions_of_skills(all_skill_ids)
 
         if deleted_skill_ids:
             deleted_skills_string = ', '.join(deleted_skill_ids)
-            logging.exception(
-                'The deleted skills: %s are still present in topic with id %s'
-                % (deleted_skills_string, topic.id)
-            )
-            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
+            logging.exception('The deleted skills: %s are still present in topic with id %s' % (deleted_skills_string, topic.id))
+            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
             if server_can_send_emails:
                 email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
-                    'The deleted skills: %s are still present in topic with '
-                    'id %s' % (deleted_skills_string, topic.id),
+                    'The deleted skills: %s are still present in topic with id %s' % (deleted_skills_string, topic.id),
                 )
 
         if self.user_id:
-            degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
-                self.user_id, all_skill_ids
-            )
+            degrees_of_mastery = skill_services.get_multi_user_skill_mastery(self.user_id, all_skill_ids)
         else:
             degrees_of_mastery = {}
             for skill_id in all_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
-        classroom_name = (
-            classroom_config_services.get_classroom_name_for_topic_id(topic.id)
-        )
+        classroom_name = classroom_config_services.get_classroom_name_for_topic_id(topic.id)
 
         self.values.update(
             {
@@ -182,14 +144,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'practice_tab_is_displayed': topic.practice_tab_is_displayed,
                 'meta_tag_content': topic.meta_tag_content,
                 'page_title_fragment_for_web': topic.page_title_fragment_for_web,
-                'classroom_name': (
-                    None
-                    if (
-                        classroom_name
-                        == str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
-                    )
-                    else classroom_name
-                ),
+                'classroom_name': (None if (classroom_name == str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)) else classroom_name),
             }
         )
         self.render_json(self.values)
@@ -222,11 +177,5 @@ class TopicNameHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Args:
             topic_name: str. The topic name.
         """
-        self.values.update(
-            {
-                'topic_name_exists': (
-                    topic_services.does_topic_with_name_exist(topic_name)
-                )
-            }
-        )
+        self.values.update({'topic_name_exists': (topic_services.does_topic_with_name_exist(topic_name))})
         self.render_json(self.values)

@@ -18,14 +18,14 @@ from __future__ import annotations
 
 import logging
 
+import requests
+from mailchimp3 import mailchimpclient
+from typing import Dict, List
+
 from core.domain import platform_parameter_list
 from core.platform import models
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
-
-import requests
-from mailchimp3 import mailchimpclient
-from typing import Dict, List
 
 secrets_services = models.Registry.import_secrets_services()
 
@@ -71,11 +71,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                             tag_data: dict. A dict with the 'tags' key
                                 containing the tags to be updated for the user.
                         """
-                        self.tag_names = [
-                            tag['name']
-                            for tag in tag_data['tags']
-                            if tag['status'] == 'active'
-                        ]
+                        self.tag_names = [tag['name'] for tag in tag_data['tags'] if tag['status'] == 'active']
 
                 def __init__(self) -> None:
                     self.users_data = [
@@ -97,9 +93,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     ]
                     self.tags = self.MailchimpTags()
 
-                def get(
-                    self, _list_id: str, subscriber_hash: str
-                ) -> Dict[str, str]:
+                def get(self, _list_id: str, subscriber_hash: str) -> Dict[str, str]:
                     """Mocks the get function of the mailchimp api.
 
                     Args:
@@ -130,9 +124,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
                     mock_response = requests.Response()
                     mock_response.status_code = 404
-                    raise mailchimpclient.MailChimpError(
-                        {'status': 404, 'response': mock_response}
-                    )
+                    raise mailchimpclient.MailChimpError({'status': 404, 'response': mock_response})
 
                 def update(
                     self,
@@ -193,9 +185,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                             }
                         )
 
-                def delete_permanent(
-                    self, _list_id: str, subscriber_hash: str
-                ) -> None:
+                def delete_permanent(self, _list_id: str, subscriber_hash: str) -> None:
                     """Mocks the delete function of the mailchimp api. This
                     function just sets the deleted user to a private variable
                     to test it.
@@ -205,11 +195,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         subscriber_hash: str. Subscriber hash, which is an MD5
                             hash of subscriber's email ID.
                     """
-                    self.users_data = [
-                        user
-                        for user in self.users_data
-                        if user['email_hash'] != subscriber_hash
-                    ]
+                    self.users_data = [user for user in self.users_data if user['email_hash'] != subscriber_hash]
 
             def __init__(self) -> None:
                 self.members = self.MailchimpMembers()
@@ -232,16 +218,17 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         # is used to test method _get_subscriber_hash() for invalid argument
         # type.
         sample_email_2 = 5
-        with self.assertRaisesRegex(
-            Exception, 'Invalid type for email. Expected string, received 5'
-        ):
+        with self.assertRaisesRegex(Exception, 'Invalid type for email. Expected string, received 5'):
             mailchimp_bulk_email_services._get_subscriber_hash(  # pylint: disable=protected-access
                 sample_email_2  # type: ignore[arg-type]
             )
 
     def test_function_input_validation(self) -> None:
         mailchimp = self.MockMailchimpClass()
-        swapped_mailchimp = lambda: mailchimp
+
+        def swapped_mailchimp():
+            return mailchimp
+
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
@@ -278,9 +265,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 self.assertIsNone(
                     mailchimp_bulk_email_services._get_mailchimp_class()  # pylint: disable=protected-access
                 )
-                self.assertItemsEqual(
-                    logs, ['Mailchimp API key is not available.']
-                )
+                self.assertItemsEqual(logs, ['Mailchimp API key is not available.'])
 
     def test_get_mailchimp_class_errors_when_username_is_not_available(
         self,
@@ -310,11 +295,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             ],
         )
         with swap_get_secret:
-            self.assertFalse(
-                mailchimp_bulk_email_services.add_or_update_user_status(
-                    'sample_email', {}, 'Web', can_receive_email_updates=True
-                )
-            )
+            self.assertFalse(mailchimp_bulk_email_services.add_or_update_user_status('sample_email', {}, 'Web', can_receive_email_updates=True))
 
     def test_permanently_delete_user_from_list_when_username_is_none(
         self,
@@ -328,9 +309,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             ],
         )
         with swap_get_secret:
-            mailchimp_bulk_email_services.permanently_delete_user_from_list(
-                'sample_email'
-            )
+            mailchimp_bulk_email_services.permanently_delete_user_from_list('sample_email')
 
     @test_utils.set_platform_parameters(
         [
@@ -340,7 +319,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     )
     def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()
-        swapped_mailchimp = lambda: mailchimp
+
+        def swapped_mailchimp():
+            return mailchimp
+
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
@@ -351,49 +333,29 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         with swap_mailchimp_context, swap_api:
             # Tests condition where user was initally unsubscribed in list and
             # becomes subscribed.
-            self.assertEqual(
-                mailchimp.lists.members.users_data[0]['status'], 'unsubscribed'
-            )
-            mailchimp_bulk_email_services.add_or_update_user_status(
-                self.user_email_1, {}, 'Web', can_receive_email_updates=True
-            )
-            self.assertEqual(
-                mailchimp.lists.members.users_data[0]['status'], 'subscribed'
-            )
+            self.assertEqual(mailchimp.lists.members.users_data[0]['status'], 'unsubscribed')
+            mailchimp_bulk_email_services.add_or_update_user_status(self.user_email_1, {}, 'Web', can_receive_email_updates=True)
+            self.assertEqual(mailchimp.lists.members.users_data[0]['status'], 'subscribed')
             self.assertEqual(mailchimp.lists.members.tags.tag_names, ['Web'])
 
             # Tests condition where user was initally subscribed in list and
             # becomes unsubscribed.
-            self.assertEqual(
-                mailchimp.lists.members.users_data[1]['status'], 'subscribed'
-            )
-            mailchimp_bulk_email_services.add_or_update_user_status(
-                self.user_email_2, {}, 'Web', can_receive_email_updates=False
-            )
-            self.assertEqual(
-                mailchimp.lists.members.users_data[1]['status'], 'unsubscribed'
-            )
+            self.assertEqual(mailchimp.lists.members.users_data[1]['status'], 'subscribed')
+            mailchimp_bulk_email_services.add_or_update_user_status(self.user_email_2, {}, 'Web', can_receive_email_updates=False)
+            self.assertEqual(mailchimp.lists.members.users_data[1]['status'], 'unsubscribed')
 
             # Creates a mailchimp entry for a new user.
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
-            return_status = (
-                mailchimp_bulk_email_services.add_or_update_user_status(
-                    self.user_email_3, {}, 'Web', can_receive_email_updates=True
-                )
-            )
+            return_status = mailchimp_bulk_email_services.add_or_update_user_status(self.user_email_3, {}, 'Web', can_receive_email_updates=True)
             self.assertTrue(return_status)
-            self.assertEqual(
-                mailchimp.lists.members.users_data[3]['status'], 'subscribed'
-            )
+            self.assertEqual(mailchimp.lists.members.users_data[3]['status'], 'subscribed')
 
             # Creates a mailchimp entry for a new user.
-            return_status = (
-                mailchimp_bulk_email_services.add_or_update_user_status(
-                    'test4@example.com',
-                    {},
-                    'Web',
-                    can_receive_email_updates=True,
-                )
+            return_status = mailchimp_bulk_email_services.add_or_update_user_status(
+                'test4@example.com',
+                {},
+                'Web',
+                can_receive_email_updates=True,
             )
             self.assertFalse(return_status)
 
@@ -403,9 +365,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             # used ignore here.
             mailchimp.lists.members.users_data = None  # type: ignore[assignment]
             with self.capture_logging(min_level=logging.ERROR) as logs:
-                mailchimp_bulk_email_services.add_or_update_user_status(
-                    self.user_email_1, {}, 'Web', can_receive_email_updates=True
-                )
+                mailchimp_bulk_email_services.add_or_update_user_status(self.user_email_1, {}, 'Web', can_receive_email_updates=True)
                 self.assertEqual(len(logs), 1)
                 self.assertRegex(
                     logs[0],
@@ -421,7 +381,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     )
     def test_android_merge_fields(self) -> None:
         mailchimp = self.MockMailchimpClass()
-        swapped_mailchimp = lambda: mailchimp
+
+        def swapped_mailchimp():
+            return mailchimp
+
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
@@ -432,21 +395,15 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         with swap_mailchimp_context, swap_api:
             # Tests condition where user was initally unsubscribed in list and
             # becomes subscribed.
-            self.assertEqual(
-                mailchimp.lists.members.users_data[0]['status'], 'unsubscribed'
-            )
+            self.assertEqual(mailchimp.lists.members.users_data[0]['status'], 'unsubscribed')
             mailchimp_bulk_email_services.add_or_update_user_status(
                 self.user_email_1,
                 {'NAME': 'name'},
                 'Android',
                 can_receive_email_updates=True,
             )
-            self.assertEqual(
-                mailchimp.lists.members.users_data[0]['status'], 'subscribed'
-            )
-            self.assertEqual(
-                mailchimp.lists.members.tags.tag_names, ['Android']
-            )
+            self.assertEqual(mailchimp.lists.members.users_data[0]['status'], 'subscribed')
+            self.assertEqual(mailchimp.lists.members.tags.tag_names, ['Android'])
 
     @test_utils.set_platform_parameters(
         [
@@ -456,7 +413,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     )
     def test_catch_or_raise_errors_when_creating_new_invalid_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
-        swapped_mailchimp = lambda: mailchimp
+
+        def swapped_mailchimp():
+            return mailchimp
+
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
@@ -467,13 +427,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         with swap_mailchimp_context, swap_api:
             # Creates a mailchimp entry for a deleted user.
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
-            return_status = (
-                mailchimp_bulk_email_services.add_or_update_user_status(
-                    'test4@example.com',
-                    {},
-                    'Web',
-                    can_receive_email_updates=True,
-                )
+            return_status = mailchimp_bulk_email_services.add_or_update_user_status(
+                'test4@example.com',
+                {},
+                'Web',
+                can_receive_email_updates=True,
             )
             self.assertFalse(return_status)
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
@@ -500,7 +458,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     )
     def test_permanently_delete_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
-        swapped_mailchimp = lambda: mailchimp
+
+        def swapped_mailchimp():
+            return mailchimp
+
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
@@ -510,9 +471,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
         with swap_mailchimp_context, swap_api:
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
-            mailchimp_bulk_email_services.permanently_delete_user_from_list(
-                self.user_email_1
-            )
+            mailchimp_bulk_email_services.permanently_delete_user_from_list(self.user_email_1)
             self.assertEqual(len(mailchimp.lists.members.users_data), 2)
 
             # Here we use MyPy ignore because attribute 'users_data' can only
@@ -521,6 +480,4 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             # used ignore here.
             mailchimp.lists.members.users_data = None  # type: ignore[assignment]
             with self.assertRaisesRegex(Exception, 'Server Error'):
-                mailchimp_bulk_email_services.permanently_delete_user_from_list(
-                    self.user_email_1
-                )
+                mailchimp_bulk_email_services.permanently_delete_user_from_list(self.user_email_1)

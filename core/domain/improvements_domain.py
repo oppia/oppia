@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Optional, TypedDict
+
 from core import feconf, utils
 from core.constants import constants
-
-from typing import Optional, TypedDict
 
 
 class TaskEntryDict(TypedDict):
@@ -184,9 +184,5 @@ class TaskEntry:
             'issue_description': self.issue_description,
             'status': self.status,
             'resolver_username': None,
-            'resolved_on_msecs': (
-                None
-                if not self.resolved_on
-                else utils.get_time_in_millisecs(self.resolved_on)
-            ),
+            'resolved_on_msecs': (None if not self.resolved_on else utils.get_time_in_millisecs(self.resolved_on)),
         }

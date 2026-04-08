@@ -19,15 +19,15 @@ from __future__ import annotations
 import contextlib
 import importlib
 
-import main
-from core.constants import constants
-from core.platform import models
-from core.tests import test_utils
-
 import google.cloud.logging
 import webapp2
 import webtest
 from typing import ContextManager, Dict, cast
+
+import main
+from core.constants import constants
+from core.platform import models
+from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -53,9 +53,7 @@ class CloudLoggingTests(test_utils.GenericTestBase):
                 function_calls['setup_logging'] = True
 
         emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
-        logging_client_swap = self.swap_with_checks(
-            google.cloud.logging, 'Client', MockClient
-        )
+        logging_client_swap = self.swap_with_checks(google.cloud.logging, 'Client', MockClient)
         with emulator_mode_swap, logging_client_swap:
             # This reloads the main module so that all the checks in
             # the module are reexecuted.
@@ -68,9 +66,7 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
     """Test the NdbWsgiMiddleware."""
 
     def test_ndb_wsgi_middleware_properly_wraps_given_function(self) -> None:
-        def wsgi_app_mock(
-            environ: Dict[str, str], response: webtest.TestResponse
-        ) -> webtest.TestResponse:
+        def wsgi_app_mock(environ: Dict[str, str], response: webtest.TestResponse) -> webtest.TestResponse:
             """Mock WSGI app.
 
             Args:
@@ -98,20 +94,14 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(type(global_cache), datastore_services.RedisCache)
             return contextlib.nullcontext()
 
-        get_ndb_context_swap = self.swap_with_checks(
-            datastore_services, 'get_ndb_context', get_ndb_context_mock
-        )
+        get_ndb_context_swap = self.swap_with_checks(datastore_services, 'get_ndb_context', get_ndb_context_mock)
 
         # Create middleware that wraps wsgi_app_mock.
         # The function 'wsgi_app_mock' is casted to be of type WSGIApplication
         # because we are passing it as a WSGIApplication not as a function.
-        middleware = main.NdbWsgiMiddleware(
-            cast(webapp2.WSGIApplication, wsgi_app_mock)
-        )
+        middleware = main.NdbWsgiMiddleware(cast(webapp2.WSGIApplication, wsgi_app_mock))
         test_response = webtest.TestResponse()
 
         # Verify that NdbWsgiMiddleware keeps the test_response the same.
         with get_ndb_context_swap:
-            self.assertEqual(
-                middleware({'key': 'value'}, test_response), test_response
-            )
+            self.assertEqual(middleware({'key': 'value'}, test_response), test_response)

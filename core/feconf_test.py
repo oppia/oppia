@@ -21,10 +21,10 @@ from __future__ import annotations
 import datetime
 import os
 
+import bs4
+
 from core import feconf
 from core.tests import test_utils
-
-import bs4
 
 
 class FeconfTests(test_utils.GenericTestBase):
@@ -39,9 +39,7 @@ class FeconfTests(test_utils.GenericTestBase):
         swap_getenv = self.swap(os, 'getenv', mock_getenv)
         with (
             swap_getenv,
-            self.assertRaisesRegex(
-                Exception, 'DEV_MODE can\'t be true on production.'
-            ),
+            self.assertRaisesRegex(Exception, 'DEV_MODE can\'t be true on production.'),
         ):
             feconf.check_dev_mode_is_true()
 
@@ -54,9 +52,7 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.check_dev_mode_is_true()
 
     def test_get_empty_ratings(self) -> None:
-        self.assertEqual(
-            feconf.get_empty_ratings(), {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
-        )
+        self.assertEqual(feconf.get_empty_ratings(), {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
     def test_callable_variables_return_correctly(self) -> None:
         recipient_username = 'Anshuman'
@@ -78,15 +74,11 @@ class FeconfTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            feconf.VALID_MODERATOR_ACTIONS['unpublish_exploration'][
-                'email_config'
-            ],
+            feconf.VALID_MODERATOR_ACTIONS['unpublish_exploration']['email_config'],
             'unpublish_exploration_email_html_body',
         )
         self.assertEqual(
-            feconf.VALID_MODERATOR_ACTIONS['unpublish_exploration'][
-                'email_intent'
-            ],
+            feconf.VALID_MODERATOR_ACTIONS['unpublish_exploration']['email_intent'],
             'unpublish_exploration',
         )
 
@@ -97,15 +89,6 @@ class FeconfTests(test_utils.GenericTestBase):
             encoding='utf-8',
         ) as f:
             terms_page_contents = f.read()
-            terms_page_parsed_html = bs4.BeautifulSoup(
-                terms_page_contents, 'html.parser'
-            )
-            max_date = max(
-                datetime.datetime.strptime(
-                    element.get_text().split(':')[0], '%d %b %Y'
-                )
-                for element in terms_page_parsed_html.find(
-                    'ul', class_='e2e-test-changelog'
-                ).find_all('li')
-            )
+            terms_page_parsed_html = bs4.BeautifulSoup(terms_page_contents, 'html.parser')
+            max_date = max(datetime.datetime.strptime(element.get_text().split(':')[0], '%d %b %Y') for element in terms_page_parsed_html.find('ul', class_='e2e-test-changelog').find_all('li'))
         self.assertEqual(feconf.TERMS_PAGE_LAST_UPDATED_UTC, max_date)

@@ -22,12 +22,12 @@ import re
 import sys
 from types import ModuleType  # pylint: disable=import-only-modules
 
+from typing import cast
+
 from core import feconf
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
-
-from typing import cast
 
 
 class RegistryUnitTest(test_utils.TestBase):
@@ -186,9 +186,7 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_recommendations_models = (gae_models,)
         self.assertEqual(
             expected_recommendations_models,
-            self.registry_instance.import_models(
-                [models.Names.RECOMMENDATIONS]
-            ),
+            self.registry_instance.import_models([models.Names.RECOMMENDATIONS]),
         )
 
     def test_import_models_skill(self) -> None:
@@ -263,9 +261,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests get_all_storage_model_classes."""
         from core.storage.user import gae_models as user_models
 
-        classes = self.registry_instance.get_storage_model_classes(
-            [models.Names.USER]
-        )
+        classes = self.registry_instance.get_storage_model_classes([models.Names.USER])
         self.assertIn(user_models.UserSettingsModel, classes)
         self.assertIn(user_models.CompletedActivitiesModel, classes)
         self.assertIn(user_models.IncompleteActivitiesModel, classes)
@@ -307,9 +303,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests datastore services functions errors."""
         from core.platform.datastore import cloud_datastore_services
 
-        with self.assertRaisesRegex(
-            Exception, 'Model names should not be duplicated in input list.'
-        ):
+        with self.assertRaisesRegex(Exception, 'Model names should not be duplicated in input list.'):
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [
                     ('SampleModel', ['id_1', 'id_2']),
@@ -391,9 +385,7 @@ class RegistryUnitTest(test_utils.TestBase):
         an invalid option.
         """
         with (
-            self.swap(
-                feconf, 'EMAIL_SERVICE_PROVIDER', 'invalid service provider'
-            ),
+            self.swap(feconf, 'EMAIL_SERVICE_PROVIDER', 'invalid service provider'),
             self.swap(constants, 'DEV_MODE', False),
         ):
             with self.assertRaisesRegex(
@@ -443,9 +435,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import cache services function."""
         from core.platform.cache import redis_cache_services
 
-        self.assertEqual(
-            self.registry_instance.import_cache_services(), redis_cache_services
-        )
+        self.assertEqual(self.registry_instance.import_cache_services(), redis_cache_services)
 
     def test_import_taskqueue_services(self) -> None:
         """Tests import taskqueue services function."""
@@ -458,9 +448,7 @@ class RegistryUnitTest(test_utils.TestBase):
             # but for testing purposes here we are providing MockCloudTaskqueue
             # which is of class type. So because of this MyPy throws an error.
             # Thus to avoid the error, we used cast here.
-            sys.modules['core.platform.taskqueue.cloud_taskqueue_services'] = (
-                cast(ModuleType, MockCloudTaskqueue)
-            )
+            sys.modules['core.platform.taskqueue.cloud_taskqueue_services'] = cast(ModuleType, MockCloudTaskqueue)
             self.assertEqual(
                 self.registry_instance.import_taskqueue_services(),
                 MockCloudTaskqueue,
@@ -510,9 +498,7 @@ class RegistryUnitTest(test_utils.TestBase):
             # which is of class type. So because of this MyPy throws an error.
             # Thus to avoid the error, we used cast here.
             # Mock Cloud Storage since importing it fails in emulator env.
-            sys.modules['core.platform.storage.cloud_storage_services'] = cast(
-                ModuleType, MockCloudStorage
-            )
+            sys.modules['core.platform.storage.cloud_storage_services'] = cast(ModuleType, MockCloudStorage)
             self.assertEqual(
                 self.registry_instance.import_storage_services(),
                 MockCloudStorage,
@@ -531,8 +517,6 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests NotImplementedError of Platform."""
         with self.assertRaisesRegex(
             NotImplementedError,
-            re.escape(
-                'import_models() method is not overwritten in derived classes'
-            ),
+            re.escape('import_models() method is not overwritten in derived classes'),
         ):
             models.Platform().import_models([models.Names.BASE_MODEL])

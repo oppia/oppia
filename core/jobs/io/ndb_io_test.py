@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+from typing import List
+
 from core.jobs import job_test_utils
 from core.jobs.io import ndb_io
 from core.platform import models
-
-import apache_beam as beam
-from typing import List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -49,9 +49,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         Args:
             model_list: list(Model). The models to put into the datastore.
         """
-        datastore_services.update_timestamps_multi(
-            model_list, update_last_updated_time=False
-        )
+        datastore_services.update_timestamps_multi(model_list, update_last_updated_time=False)
         datastore_services.put_multi(model_list)
 
     def test_read_from_datastore(self) -> None:
@@ -64,9 +62,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_base_models(), model_list)
 
-        model_pcoll = self.pipeline | ndb_io.GetModels(
-            base_models.BaseModel.get_all()
-        )
+        model_pcoll = self.pipeline | ndb_io.GetModels(base_models.BaseModel.get_all())
 
         self.assert_pcoll_equal(model_pcoll, model_list)
 
@@ -79,9 +75,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_base_models(), [])
 
-        self.assert_pcoll_empty(
-            self.pipeline | beam.Create(model_list) | ndb_io.PutModels()
-        )
+        self.assert_pcoll_empty(self.pipeline | beam.Create(model_list) | ndb_io.PutModels())
         self.assertItemsEqual(self.get_base_models(), model_list)
 
     def test_delete_from_datastore(self) -> None:
@@ -94,10 +88,6 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_base_models(), model_list)
 
-        self.assert_pcoll_empty(
-            self.pipeline
-            | beam.Create([model.key for model in model_list])
-            | ndb_io.DeleteModels()
-        )
+        self.assert_pcoll_empty(self.pipeline | beam.Create([model.key for model in model_list]) | ndb_io.DeleteModels())
 
         self.assertItemsEqual(self.get_base_models(), [])

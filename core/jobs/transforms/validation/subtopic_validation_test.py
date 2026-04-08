@@ -18,66 +18,46 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.jobs import job_test_utils
 from core.jobs.transforms.validation import subtopic_validation
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
-import apache_beam as beam
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, subtopic_models
 
-(base_models, subtopic_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.SUBTOPIC]
-)
+(base_models, subtopic_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.SUBTOPIC])
 
 
 class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
     def test_validate_change_domain_implemented(self) -> None:
-        valid_commit_cmd_model = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel(
-                id='123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='delete',
-                commit_cmds=[
-                    {'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}
-                ],
-            )
+        valid_commit_cmd_model = subtopic_models.SubtopicPageSnapshotMetadataModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='delete',
+            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([valid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel()
-            )
-        )
+        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
 
         self.assert_pcoll_equal(output, [])
 
     def test_subtopic_page_change_object_with_missing_cmd(self) -> None:
-        invalid_commit_cmd_model = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel(
-                id='123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='delete',
-                commit_cmds=[{'invalid': 'data'}],
-            )
+        invalid_commit_cmd_model = subtopic_models.SubtopicPageSnapshotMetadataModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='delete',
+            commit_cmds=[{'invalid': 'data'}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel()
-            )
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -91,24 +71,16 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_subtopic_page_change_object_with_invalid_cmd(self) -> None:
-        invalid_commit_cmd_model = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel(
-                id='123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='delete',
-                commit_cmds=[{'cmd': 'invalid'}],
-            )
+        invalid_commit_cmd_model = subtopic_models.SubtopicPageSnapshotMetadataModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='delete',
+            commit_cmds=[{'cmd': 'invalid'}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel()
-            )
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -124,30 +96,22 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(
         self,
     ) -> None:
-        invalid_commit_cmd_model = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel(
-                id='123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='edit',
-                commit_cmds=[
-                    {
-                        'cmd': 'update_subtopic_page_property',
-                        'property_name': '<p>page_contents_html</p>',
-                        'subtopic_id': 'subtopic_id',
-                    }
-                ],
-            )
+        invalid_commit_cmd_model = subtopic_models.SubtopicPageSnapshotMetadataModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': '<p>page_contents_html</p>',
+                    'subtopic_id': 'subtopic_id',
+                }
+            ],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel()
-            )
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -159,8 +123,7 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                         'property_name': '<p>page_contents_html</p>',
                         'subtopic_id': 'subtopic_id',
                     },
-                    'The following required attributes are missing: '
-                    'new_value, old_value',
+                    'The following required attributes are missing: new_value, old_value',
                 )
             ],
         )
@@ -168,31 +131,23 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(
         self,
     ) -> None:
-        invalid_commit_cmd_model = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel(
-                id='123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds=[
-                    {
-                        'cmd': 'create_new',
-                        'topic_id': 'topic_id',
-                        'subtopic_id': 'subtopic_id',
-                        'invalid': 'invalid',
-                    }
-                ],
-            )
+        invalid_commit_cmd_model = subtopic_models.SubtopicPageSnapshotMetadataModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[
+                {
+                    'cmd': 'create_new',
+                    'topic_id': 'topic_id',
+                    'subtopic_id': 'subtopic_id',
+                    'invalid': 'invalid',
+                }
+            ],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel()
-            )
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -213,32 +168,24 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
         self,
     ) -> None:
-        invalid_commit_cmd_model = (
-            subtopic_models.SubtopicPageSnapshotMetadataModel(
-                id='123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='edit',
-                commit_cmds=[
-                    {
-                        'cmd': 'update_subtopic_page_property',
-                        'subtopic_id': 'subtopic_id',
-                        'property_name': 'invalid',
-                        'old_value': 'old_value',
-                        'new_value': 'new_value',
-                    }
-                ],
-            )
+        invalid_commit_cmd_model = subtopic_models.SubtopicPageSnapshotMetadataModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='edit',
+            commit_cmds=[
+                {
+                    'cmd': 'update_subtopic_page_property',
+                    'subtopic_id': 'subtopic_id',
+                    'property_name': 'invalid',
+                    'old_value': 'old_value',
+                    'new_value': 'new_value',
+                }
+            ],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel()
-            )
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -252,71 +199,44 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                         'old_value': 'old_value',
                         'new_value': 'new_value',
                     },
-                    'Value for property_name in cmd '
-                    'update_subtopic_page_property: invalid is not allowed',
+                    'Value for property_name in cmd update_subtopic_page_property: invalid is not allowed',
                 )
             ],
         )
 
 
-class ValidateSubtopicPageCommitLogEntryModelTests(
-    job_test_utils.PipelinedTestBase
-):
+class ValidateSubtopicPageCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
     def test_validate_subtopic_page_model(self) -> None:
-        valid_commit_cmd_model = (
-            subtopic_models.SubtopicPageCommitLogEntryModel(
-                id='subtopicpage_id123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                subtopic_page_id='123',
-                post_commit_status='private',
-                commit_cmds=[
-                    {'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}
-                ],
-            )
+        valid_commit_cmd_model = subtopic_models.SubtopicPageCommitLogEntryModel(
+            id='subtopicpage_id123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test-type',
+            user_id='',
+            subtopic_page_id='123',
+            post_commit_status='private',
+            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([valid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageCommitLogEntryModel()
-            )
-        )
+        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageCommitLogEntryModel())
 
         self.assert_pcoll_equal(output, [])
 
     def test_raises_commit_cmd_none_error(self) -> None:
-        invalid_commit_cmd_model = (
-            subtopic_models.SubtopicPageCommitLogEntryModel(
-                id='model_id123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                subtopic_page_id='123',
-                post_commit_status='private',
-                commit_cmds=[
-                    {'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}
-                ],
-            )
+        invalid_commit_cmd_model = subtopic_models.SubtopicPageCommitLogEntryModel(
+            id='model_id123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test-type',
+            user_id='',
+            subtopic_page_id='123',
+            post_commit_status='private',
+            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                subtopic_validation.ValidateSubtopicPageCommitLogEntryModel()
-            )
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(subtopic_validation.ValidateSubtopicPageCommitLogEntryModel())
 
         self.assert_pcoll_equal(
             output,
-            [
-                base_validation_errors.CommitCmdsNoneError(
-                    invalid_commit_cmd_model
-                )
-            ],
+            [base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)],
         )

@@ -21,11 +21,11 @@ from __future__ import annotations
 import logging
 import textwrap
 
+from typing import Dict, Union
+
 from core.domain import platform_parameter_list
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
-
-from typing import Dict, Union
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -36,9 +36,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.admin_email_address = 'testadmin@example.com'
         self.system_email_address = 'system@example.com'
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)])
     def test_send_mail_logs_to_terminal(self) -> None:
         """In DEV Mode, platforms email_service API that sends a singular email
         logs the correct email info to terminal.
@@ -78,11 +76,7 @@ class EmailTests(test_utils.GenericTestBase):
             'html',
         )
         logging_info_email_body = textwrap.dedent(msg_body)
-        logging_info_notification = (
-            'You are not currently sending out real emails since this is a '
-            'dev environment. Emails are sent out in the production'
-            ' environment.'
-        )
+        logging_info_notification = 'You are not currently sending out real emails since this is a dev environment. Emails are sent out in the production environment.'
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
@@ -98,9 +92,7 @@ class EmailTests(test_utils.GenericTestBase):
             [logging_info_email_body, logging_info_notification],
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)])
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self) -> None:
         """In DEV Mode, platform email_services that sends mail to multiple
         recipients logs the correct info to terminal.
@@ -154,11 +146,7 @@ class EmailTests(test_utils.GenericTestBase):
             'attachment.txt',
         )
         logging_info_email_body = textwrap.dedent(msg_body)
-        logging_info_notification = (
-            'You are not currently sending out real emails since this is a '
-            'dev environment. Emails are sent out in the production'
-            ' environment.'
-        )
+        logging_info_notification = 'You are not currently sending out real emails since this is a dev environment. Emails are sent out in the production environment.'
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
@@ -171,9 +159,7 @@ class EmailTests(test_utils.GenericTestBase):
                 bcc=['e@e.com', 'f@f.com', 'g@g.com', 'h@h.com'],
                 reply_to='123',
                 recipient_variables=recipient_variables,
-                attachments=[
-                    {'filename': 'attachment.txt', 'path': '/dummypath'}
-                ],
+                attachments=[{'filename': 'attachment.txt', 'path': '/dummypath'}],
             )
         self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(

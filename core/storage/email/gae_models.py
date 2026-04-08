@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Dict, Optional, Sequence
+
 from core import feconf, utils
 from core.platform import models
-
-from typing import Dict, Optional, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -45,9 +45,7 @@ class SentEmailModel(base_models.BaseModel):
     # user with a given intent within a given time period.
 
     # The user ID of the email recipient.
-    recipient_id = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    recipient_id = datastore_services.StringProperty(required=True, indexed=True)
     # The email address of the recipient.
     recipient_email = datastore_services.StringProperty(required=True)
     # The user ID of the email sender. For site-generated emails this is equal
@@ -89,9 +87,7 @@ class SentEmailModel(base_models.BaseModel):
     # The HTML content of the email body.
     html_body = datastore_services.TextProperty(required=True)
     # The datetime the email was sent, in UTC.
-    sent_datetime = datastore_services.DateTimeProperty(
-        required=True, indexed=True
-    )
+    sent_datetime = datastore_services.DateTimeProperty(required=True, indexed=True)
     # The hash of the recipient id, email subject and message body.
     email_hash = datastore_services.StringProperty(indexed=True)
 
@@ -103,9 +99,7 @@ class SentEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since emails were sent
         to them.
         """
@@ -195,10 +189,7 @@ class SentEmailModel(base_models.BaseModel):
             if not cls.get_by_id(new_id):
                 return new_id
 
-        raise Exception(
-            'The id generator for SentEmailModel is producing too many '
-            'collisions.'
-        )
+        raise Exception('The id generator for SentEmailModel is producing too many collisions.')
 
     @classmethod
     def create(
@@ -244,9 +235,7 @@ class SentEmailModel(base_models.BaseModel):
     def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
         super()._pre_put_hook()
-        self.email_hash = self._generate_hash(
-            self.recipient_id, self.subject, self.html_body
-        )
+        self.email_hash = self._generate_hash(self.recipient_id, self.subject, self.html_body)
 
     @classmethod
     def get_by_hash(
@@ -293,9 +282,7 @@ class SentEmailModel(base_models.BaseModel):
         return query.fetch()
 
     @classmethod
-    def _generate_hash(
-        cls, recipient_id: str, email_subject: str, email_body: str
-    ) -> str:
+    def _generate_hash(cls, recipient_id: str, email_subject: str, email_body: str) -> str:
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
 
@@ -307,16 +294,12 @@ class SentEmailModel(base_models.BaseModel):
         Returns:
             str. The generated hash value of the given email.
         """
-        hash_value = utils.convert_to_hash(
-            recipient_id + email_subject + email_body, 100
-        )
+        hash_value = utils.convert_to_hash(recipient_id + email_subject + email_body, 100)
 
         return hash_value
 
     @classmethod
-    def check_duplicate_message(
-        cls, recipient_id: str, email_subject: str, email_body: str
-    ) -> bool:
+    def check_duplicate_message(cls, recipient_id: str, email_subject: str, email_body: str) -> bool:
         """Check for a given recipient_id, email_subject and cleaned
         email_body, whether a similar message has been sent in the last
         DUPLICATE_EMAIL_INTERVAL_MINS.
@@ -334,22 +317,14 @@ class SentEmailModel(base_models.BaseModel):
         email_hash = cls._generate_hash(recipient_id, email_subject, email_body)
 
         datetime_now = datetime.datetime.utcnow()
-        time_interval = datetime.timedelta(
-            minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS
-        )
+        time_interval = datetime.timedelta(minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
 
         sent_datetime_lower_bound = datetime_now - time_interval
 
-        messages = cls.get_by_hash(
-            email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound
-        )
+        messages = cls.get_by_hash(email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
 
         for message in messages:
-            if (
-                message.recipient_id == recipient_id
-                and message.subject == email_subject
-                and message.html_body == email_body
-            ):
+            if message.recipient_id == recipient_id and message.subject == email_subject and message.html_body == email_body:
                 return True
 
         return False
@@ -389,9 +364,7 @@ class BulkEmailModel(base_models.BaseModel):
     # The HTML content of the email body.
     html_body = datastore_services.TextProperty(required=True)
     # The datetime the email was sent, in UTC.
-    sent_datetime = datastore_services.DateTimeProperty(
-        required=True, indexed=True
-    )
+    sent_datetime = datastore_services.DateTimeProperty(required=True, indexed=True)
 
     # DEPRECATED in v3.2.1. Do not use.
     recipient_ids = datastore_services.JsonProperty(default=[], compressed=True)
@@ -404,9 +377,7 @@ class BulkEmailModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Users already have access to this data since the emails were sent
         to them.
         """
@@ -455,9 +426,7 @@ class BulkEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (
-            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None
-        )
+        return cls.query(cls.sender_id == user_id).get(keys_only=True) is not None
 
     @classmethod
     def create(

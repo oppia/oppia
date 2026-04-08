@@ -21,16 +21,16 @@ from __future__ import annotations
 import copy
 import json
 
+from typing import Any, Dict, List, Optional, Union
+
 from core import schema_utils
 from core.constants import constants
 
-from typing import Any, Dict, List, Optional, Union
-
 MYPY = False
 if MYPY:  # pragma: no cover
-    from extensions import domain
-
     from typing import TypedDict
+
+    from extensions import domain
 
     class CheckedProofDict(TypedDict):
         """Dictionary representing the CheckedProof object."""
@@ -197,10 +197,7 @@ class BaseObject:
             NotImplementedError. The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError(
-            'The get_schema() method is missing from the derived class. It '
-            'should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The get_schema() method is missing from the derived class. It should be implemented in the derived class.')
 
 
 class Boolean(BaseObject):
@@ -232,9 +229,7 @@ class Boolean(BaseObject):
         if raw is None or raw == '':
             raw = False
 
-        normalized_value: bool = schema_utils.normalize_against_schema(
-            raw, cls.get_schema()
-        )
+        normalized_value: bool = schema_utils.normalize_against_schema(raw, cls.get_schema())
         return normalized_value
 
 
@@ -440,12 +435,8 @@ class CodeString(BaseObject):
             TypeError. Unexpected tab characters in given python object 'raw'.
         """
         if '\t' in raw:
-            raise TypeError(
-                'Unexpected tab characters in code string: %s' % raw
-            )
-        normalized_value: str = schema_utils.normalize_against_schema(
-            raw, cls.get_schema()
-        )
+            raise TypeError('Unexpected tab characters in code string: %s' % raw)
+        normalized_value: str = schema_utils.normalize_against_schema(raw, cls.get_schema())
         return normalized_value
 
 
@@ -593,9 +584,7 @@ class NormalizedString(BaseObject):
 class SetOfNormalizedString(BaseObject):
     """Class for sets of NormalizedStrings."""
 
-    description = (
-        'A set (a list with unique elements) of whitespace-collapsed strings.'
-    )
+    description = 'A set (a list with unique elements) of whitespace-collapsed strings.'
     default_value: List[str] = []
 
     @classmethod
@@ -686,10 +675,7 @@ class SkillSelector(BaseObject):
 class MusicPhrase(BaseObject):
     """List of Objects that represent a musical phrase."""
 
-    description = (
-        'A musical phrase that contains zero or more notes, rests, '
-        'and time signature.'
-    )
+    description = 'A musical phrase that contains zero or more notes, rests, and time signature.'
     default_value: List[MusicPhraseDict] = []
 
     # The maximum number of notes allowed in a music phrase.
@@ -964,13 +950,9 @@ class Graph(BaseObject):
                     assert edge['weight'] == 1.0
 
             if raw['isDirected']:
-                edge_pairs = [
-                    (edge['src'], edge['dst']) for edge in raw['edges']
-                ]
+                edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
             else:
-                edge_pairs = [
-                    (edge['src'], edge['dst']) for edge in raw['edges']
-                ] + [(edge['dst'], edge['src']) for edge in raw['edges']]
+                edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']] + [(edge['dst'], edge['src']) for edge in raw['edges']]
             assert len(set(edge_pairs)) == len(edge_pairs)
 
         except Exception as e:
@@ -1022,10 +1004,7 @@ class ListOfGraph(BaseObject):
 class NormalizedRectangle2D(BaseObject):
     """Normalized Rectangle class."""
 
-    description = (
-        'A rectangle normalized so that the coordinates are within the range '
-        '[0,1].'
-    )
+    description = 'A rectangle normalized so that the coordinates are within the range [0,1].'
 
     @classmethod
     def get_schema(cls) -> SchemaDictType:
@@ -1076,9 +1055,7 @@ class NormalizedRectangle2D(BaseObject):
             raw[1][1] = clamp(raw[1][1])
 
         except Exception as e:
-            raise TypeError(
-                'Cannot convert to Normalized Rectangle %s' % raw
-            ) from e
+            raise TypeError('Cannot convert to Normalized Rectangle %s' % raw) from e
 
         return raw
 
@@ -1292,10 +1269,7 @@ class DragAndDropPositiveInt(BaseObject):
     drag and drop item.
     """
 
-    description = (
-        'The rank(position) of a drag and drop item in the given list of sets'
-        'of drag and drop items.'
-    )
+    description = 'The rank(position) of a drag and drop item in the given list of setsof drag and drop items.'
     default_value = 1
 
     @classmethod
@@ -1373,9 +1347,7 @@ class AlgebraicIdentifier(BaseObject):
 class SetOfAlgebraicIdentifier(BaseObject):
     """Class for sets of AlgebraicIdentifiers."""
 
-    description = (
-        'A set (a list with unique elements) of algebraic identifiers.'
-    )
+    description = 'A set (a list with unique elements) of algebraic identifiers.'
     default_value: List[str] = []
 
     @classmethod
@@ -1430,9 +1402,7 @@ class NumericExpression(BaseObject):
         """
         return {
             'type': 'unicode',
-            'validators': [
-                {'id': 'is_valid_math_expression', 'algebraic': False}
-            ],
+            'validators': [{'id': 'is_valid_math_expression', 'algebraic': False}],
         }
 
 
@@ -1441,9 +1411,7 @@ class PositionOfTerms(BaseObject):
     the equals sign in a math equation.
     """
 
-    description = (
-        'The position of terms relative to the equals sign in a math equation.'
-    )
+    description = 'The position of terms relative to the equals sign in a math equation.'
     default_value = 'both'
 
     @classmethod
@@ -1488,11 +1456,7 @@ class AllowedVariables(BaseObject):
     and Greek alphabets.
     """
 
-    description = (
-        'Shortcut variables that the learner can access in the '
-        'on-screen keyboard. (The order of these variables will be reflected '
-        'in the learner\'s keyboard)'
-    )
+    description = 'Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner\'s keyboard)'
     default_value: List[str] = []
 
     @classmethod
@@ -1581,9 +1545,7 @@ class BaseTranslatableObject(BaseObject):
     default_value: TranslatableObjectDefaultValueTypes = None
 
     @classmethod
-    def normalize_value(
-        cls, value: Union[str, List[str]]
-    ) -> Union[str, List[str]]:
+    def normalize_value(cls, value: Union[str, List[str]]) -> Union[str, List[str]]:
         """Normalizes the translatable value of the object.
 
         Args:
@@ -1598,13 +1560,8 @@ class BaseTranslatableObject(BaseObject):
                 is not set.
         """
         if cls._value_key_name is None or cls._value_schema is None:
-            raise NotImplementedError(
-                'The _value_key_name and _value_schema for this class must '
-                'both be set.'
-            )
-        normalized_value: Union[str, List[str]] = (
-            schema_utils.normalize_against_schema(value, cls._value_schema)
-        )
+            raise NotImplementedError('The _value_key_name and _value_schema for this class must both be set.')
+        normalized_value: Union[str, List[str]] = schema_utils.normalize_against_schema(value, cls._value_schema)
         return normalized_value
 
     @classmethod
@@ -1619,10 +1576,7 @@ class BaseTranslatableObject(BaseObject):
                 is not set.
         """
         if cls._value_key_name is None or cls._value_schema is None:
-            raise NotImplementedError(
-                'The _value_key_name and _value_schema for this class must '
-                'both be set.'
-            )
+            raise NotImplementedError('The _value_key_name and _value_schema for this class must both be set.')
         return {
             'type': 'dict',
             'properties': [
@@ -1705,8 +1659,6 @@ class JsonEncodedInString(BaseObject):
             Exception. Given arg is not of type str.
         """
         if not isinstance(raw, str):
-            raise Exception(
-                'Expected string received %s of type %s' % (raw, type(raw))
-            )
+            raise Exception('Expected string received %s of type %s' % (raw, type(raw)))
 
         return json.loads(raw)

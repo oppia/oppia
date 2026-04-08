@@ -1,6 +1,7 @@
-from . import Model, TYPE_MODEL
 from google.cloud import datastore
 from typing import Type
+
+from . import TYPE_MODEL, Model
 
 def _entity_to_ds_entity(entity: Model) -> datastore.Entity: ...
 def _entity_from_ds_entity(

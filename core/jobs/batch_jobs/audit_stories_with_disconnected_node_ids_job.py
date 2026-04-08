@@ -23,21 +23,19 @@ have them.
 
 from __future__ import annotations
 
+import apache_beam as beam
+from typing import Iterable, List, Optional, Tuple, TypedDict
+
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
-import apache_beam as beam
-from typing import Iterable, List, Optional, Tuple, TypedDict
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import story_models
 
-(topic_models, story_models) = models.Registry.import_models(
-    [models.Names.TOPIC, models.Names.STORY]
-)
+(topic_models, story_models) = models.Registry.import_models([models.Names.TOPIC, models.Names.STORY])
 
 
 class StoryNodeDict(TypedDict):
@@ -74,21 +72,9 @@ class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
     """Class to audit stories with disconnected node ids."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        all_stories_info_pcoll = (
-            self.pipeline
-            | 'Get all StoryModels'
-            >> ndb_io.GetModels(
-                story_models.StoryModel.get_all(include_deleted=False)
-            )
-            | 'Extract Id and Story contents'
-            >> beam.Map(lambda story: (story.id, story.story_contents))
-        )
+        all_stories_info_pcoll = self.pipeline | 'Get all StoryModels' >> ndb_io.GetModels(story_models.StoryModel.get_all(include_deleted=False)) | 'Extract Id and Story contents' >> beam.Map(lambda story: (story.id, story.story_contents))
 
-        stories_with_disconnected_node = (
-            all_stories_info_pcoll
-            | 'Find story ids with disconnected nodes'
-            >> beam.ParDo(CheckDisconnectedNodeIds())
-        )
+        stories_with_disconnected_node = all_stories_info_pcoll | 'Find story ids with disconnected nodes' >> beam.ParDo(CheckDisconnectedNodeIds())
 
         return stories_with_disconnected_node
 
@@ -100,17 +86,13 @@ class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
 class CheckDisconnectedNodeIds(beam.DoFn):  # type: ignore[misc]
     """DoFn to check for disconnected node_ids in stories."""
 
-    def process(
-        self, element: Tuple[str, StoryContentsDict]
-    ) -> Iterable[job_run_result.JobRunResult]:
+    def process(self, element: Tuple[str, StoryContentsDict]) -> Iterable[job_run_result.JobRunResult]:
         story_id, story_contents = element
 
         nodes = story_contents['nodes']
         num_nodes = len(nodes)
         if num_nodes == 0:
-            yield job_run_result.JobRunResult.as_stdout(
-                f'Story ID: {story_id} has no nodes.'
-            )
+            yield job_run_result.JobRunResult.as_stdout(f'Story ID: {story_id} has no nodes.')
             return
         all_destination_ids = set()
         for node in nodes:
@@ -119,10 +101,6 @@ class CheckDisconnectedNodeIds(beam.DoFn):  # type: ignore[misc]
                     all_destination_ids.add(dest_id)
 
         if (num_nodes - 1) > len(all_destination_ids):
-            yield job_run_result.JobRunResult.as_stdout(
-                f'Story ID: {story_id} has disconnected nodes.'
-            )
+            yield job_run_result.JobRunResult.as_stdout(f'Story ID: {story_id} has disconnected nodes.')
         else:
-            yield job_run_result.JobRunResult.as_stdout(
-                f'SUCCESS: {story_id} has no disconnected nodes.'
-            )
+            yield job_run_result.JobRunResult.as_stdout(f'SUCCESS: {story_id} has no disconnected nodes.')

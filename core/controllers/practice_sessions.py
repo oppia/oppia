@@ -16,12 +16,12 @@
 
 from __future__ import annotations
 
+from typing import Dict, List, TypedDict
+
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import skill_fetchers, topic_fetchers
-
-from typing import Dict, List, TypedDict
 
 
 class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
@@ -32,11 +32,7 @@ class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
     selected_subtopic_ids: List[int]
 
 
-class PracticeSessionsPageDataHandler(
-    base.BaseHandler[
-        Dict[str, str], PracticeSessionsPageDataHandlerNormalizedRequestDict
-    ]
-):
+class PracticeSessionsPageDataHandler(base.BaseHandler[Dict[str, str], PracticeSessionsPageDataHandlerNormalizedRequestDict]):
     """Fetches relevant data for the practice sessions page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -44,13 +40,7 @@ class PracticeSessionsPageDataHandler(
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'selected_subtopic_ids': {
-                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
-            }
-        }
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {'selected_subtopic_ids': {'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}}}}
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name: str) -> None:

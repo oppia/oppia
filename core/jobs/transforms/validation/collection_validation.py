@@ -18,14 +18,14 @@
 
 from __future__ import annotations
 
+from typing import Iterator, List, Optional, Tuple, Type, Union
+
 from core.domain import collection_domain, rights_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.jobs.types import model_property
 from core.platform import models
-
-from typing import Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -34,14 +34,8 @@ if MYPY:  # pragma: no cover
 (collection_models,) = models.Registry.import_models([models.Names.COLLECTION])
 
 
-@validation_decorators.AuditsExisting(
-    collection_models.CollectionSnapshotMetadataModel
-)
-class ValidateCollectionSnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        collection_models.CollectionSnapshotMetadataModel
-    ]
-):
+@validation_decorators.AuditsExisting(collection_models.CollectionSnapshotMetadataModel)
+class ValidateCollectionSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[collection_models.CollectionSnapshotMetadataModel]):
     """Overrides _get_change_domain_class for CollectionSnapshotMetadataModel."""
 
     def _get_change_domain_class(
@@ -82,14 +76,8 @@ def collection_summary_model_relationships(
     yield model.id, [collection_models.CollectionRightsModel]
 
 
-@validation_decorators.AuditsExisting(
-    collection_models.CollectionRightsSnapshotMetadataModel
-)
-class ValidateCollectionRightsSnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        collection_models.CollectionRightsSnapshotMetadataModel
-    ]
-):
+@validation_decorators.AuditsExisting(collection_models.CollectionRightsSnapshotMetadataModel)
+class ValidateCollectionRightsSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[collection_models.CollectionRightsSnapshotMetadataModel]):
     """Overrides _get_change_domain_class for
     CollectionRightsSnapshotMetadataModel.
     """
@@ -110,14 +98,8 @@ class ValidateCollectionRightsSnapshotMetadataModel(
         return rights_domain.CollectionRightsChange
 
 
-@validation_decorators.AuditsExisting(
-    collection_models.CollectionCommitLogEntryModel
-)
-class ValidateCollectionCommitLogEntryModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        collection_models.CollectionCommitLogEntryModel
-    ]
-):
+@validation_decorators.AuditsExisting(collection_models.CollectionCommitLogEntryModel)
+class ValidateCollectionCommitLogEntryModel(base_validation.BaseValidateCommitCmdsSchema[collection_models.CollectionCommitLogEntryModel]):
     """Overrides _get_change_domain_class for CollectionCommitLogEntryModel."""
 
     # Here we use MyPy ignore because the signature of this method doesn't

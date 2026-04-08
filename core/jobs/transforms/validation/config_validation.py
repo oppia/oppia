@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+from typing import Type
+
 from core.domain import platform_parameter_domain as parameter_domain
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
-
-from typing import Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -32,14 +32,8 @@ if MYPY:  # pragma: no cover
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 
-@validation_decorators.AuditsExisting(
-    config_models.PlatformParameterSnapshotMetadataModel
-)
-class ValidatePlatformParameterSnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        config_models.PlatformParameterSnapshotMetadataModel
-    ]
-):
+@validation_decorators.AuditsExisting(config_models.PlatformParameterSnapshotMetadataModel)
+class ValidatePlatformParameterSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[config_models.PlatformParameterSnapshotMetadataModel]):
     """Overrides _get_change_domain_class for
     PlatformParameterSnapshotMetadataModel.
     """

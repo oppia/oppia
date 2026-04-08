@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import signal
 
+import psutil
+
 from core.tests import test_utils
 from scripts import scripts_test_utils
-
-import psutil
 
 
 class PopenStubTests(test_utils.TestBase):

@@ -23,10 +23,10 @@ import shutil
 import subprocess
 import sys
 
-from scripts import common
-
 import yaml
 from typing import List, Optional, Sequence
+
+from scripts import common
 
 # Contains the name of all files that are not strictly typed.
 # This list must be kept up-to-date; the changes (only remove) should be done
@@ -298,15 +298,10 @@ def validate_compiled_js_dir() -> None:
         config_data = json.load(f)
         out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
     if out_dir != COMPILED_JS_DIR:
-        raise Exception(
-            'COMPILED_JS_DIR: %s does not match the output directory '
-            'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir)
-        )
+        raise Exception('COMPILED_JS_DIR: %s does not match the output directory in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
-def compile_temp_strict_tsconfig(
-    config_path: str, error_messages: List[str]
-) -> None:
+def compile_temp_strict_tsconfig(config_path: str, error_messages: List[str]) -> None:
     """Compiles temporary strict TS config with files those are neither
     strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If there are any
     errors, we restores the original config.
@@ -370,10 +365,7 @@ def compile_temp_strict_tsconfig(
 
     if error_messages:
         print('\n%s' % '\n'.join(error_messages))
-        print(
-            '%s Errors found during compilation.\n'
-            % (len([x for x in error_messages if x.startswith(PREFIXES)]))
-        )
+        print('%s Errors found during compilation.\n' % (len([x for x in error_messages if x.startswith(PREFIXES)])))
         sys.exit(1)
     else:
         print('Compilation successful!')
@@ -416,9 +408,7 @@ def compile_and_check_typescript(config_path: str) -> None:
     error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
-        compile_temp_strict_tsconfig(
-            TEMP_STRICT_TSCONFIG_FILEPATH, error_messages
-        )
+        compile_temp_strict_tsconfig(TEMP_STRICT_TSCONFIG_FILEPATH, error_messages)
     else:
         if error_messages:
             print('Errors found during compilation\n')
@@ -465,11 +455,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     run_typescript_type_tests()
 
     # Then run the main TypeScript compilation checks.
-    compile_and_check_typescript(
-        STRICT_TSCONFIG_FILEPATH
-        if parsed_args.strict_checks
-        else TSCONFIG_FILEPATH
-    )
+    compile_and_check_typescript(STRICT_TSCONFIG_FILEPATH if parsed_args.strict_checks else TSCONFIG_FILEPATH)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

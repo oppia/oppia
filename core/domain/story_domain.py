@@ -22,16 +22,16 @@ import functools
 import json
 import re
 
+from typing import Final, List, Literal, Optional, TypedDict, overload
+
 from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import fs_services  # pylint: disable=invalid-import-from
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
+    fs_services,  # pylint: disable=invalid-import-from
+    html_cleaner,  # pylint: disable=invalid-import-from
     html_validation_service,
 )
-
-from typing import Final, List, Literal, Optional, TypedDict, overload
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -57,13 +57,9 @@ STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR: Final = 'thumbnail_bg_color'
 STORY_NODE_PROPERTY_THUMBNAIL_FILENAME: Final = 'thumbnail_filename'
 STORY_NODE_PROPERTY_EXPLORATION_ID: Final = 'exploration_id'
 STORY_NODE_PROPERTY_STATUS: Final = 'status'
-STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE: Final = (
-    'planned_publication_date_msecs'
-)
+STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE: Final = 'planned_publication_date_msecs'
 STORY_NODE_PROPERTY_LAST_MODIFIED: Final = 'last_modified_msecs'
-STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE: Final = (
-    'first_publication_date_msecs'
-)
+STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE: Final = 'first_publication_date_msecs'
 STORY_NODE_PROPERTY_UNPUBLISHING_REASON: Final = 'unpublishing_reason'
 
 
@@ -621,9 +617,7 @@ class StoryNode:
             node_id: str. The node id to be validated.
         """
         if not isinstance(node_id, str):
-            raise utils.ValidationError(
-                'Expected node ID to be a string, received %s' % node_id
-            )
+            raise utils.ValidationError('Expected node ID to be a string, received %s' % node_id)
         pattern = re.compile('%s[0-9]+' % NODE_ID_PREFIX)
         if not pattern.match(node_id):
             raise utils.ValidationError('Invalid node_id: %s' % node_id)
@@ -650,10 +644,7 @@ class StoryNode:
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return (
-            thumbnail_bg_color
-            in constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter']
-        )
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter']
 
     @classmethod
     def require_valid_status(cls, status: str) -> bool:
@@ -668,9 +659,7 @@ class StoryNode:
         return status in constants.ALLOWED_STORY_NODE_STATUS
 
     @classmethod
-    def require_valid_unpublishing_reason(
-        cls, unpublishing_reason: str
-    ) -> bool:
+    def require_valid_unpublishing_reason(cls, unpublishing_reason: str) -> bool:
         """Checks whether the unpublishing reason of the story node is valid.
 
         Args:
@@ -679,9 +668,7 @@ class StoryNode:
         Returns:
             bool. Whether the unpublishing reason is valid or not.
         """
-        return unpublishing_reason in (
-            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS
-        )
+        return unpublishing_reason in (constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS)
 
     def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
@@ -703,21 +690,9 @@ class StoryNode:
             'outline_is_finalized': self.outline_is_finalized,
             'exploration_id': self.exploration_id,
             'status': self.status,
-            'planned_publication_date_msecs': (
-                utils.get_time_in_millisecs(self.planned_publication_date)
-                if self.planned_publication_date
-                else None
-            ),
-            'last_modified_msecs': (
-                utils.get_time_in_millisecs(self.last_modified)
-                if self.last_modified
-                else None
-            ),
-            'first_publication_date_msecs': (
-                utils.get_time_in_millisecs(self.first_publication_date)
-                if self.first_publication_date
-                else None
-            ),
+            'planned_publication_date_msecs': (utils.get_time_in_millisecs(self.planned_publication_date) if self.planned_publication_date else None),
+            'last_modified_msecs': (utils.get_time_in_millisecs(self.last_modified) if self.last_modified else None),
+            'first_publication_date_msecs': (utils.get_time_in_millisecs(self.first_publication_date) if self.first_publication_date else None),
             'unpublishing_reason': self.unpublishing_reason,
         }
 
@@ -731,24 +706,9 @@ class StoryNode:
         Returns:
             StoryNode. The corresponding StoryNode domain object.
         """
-        planned_publication_date_msecs = (
-            node_dict['planned_publication_date_msecs']
-            if 'planned_publication_date_msecs' in node_dict
-            and node_dict['planned_publication_date_msecs']
-            else None
-        )
-        last_modified_msecs = (
-            node_dict['last_modified_msecs']
-            if 'last_modified_msecs' in node_dict
-            and node_dict['last_modified_msecs']
-            else None
-        )
-        first_publication_date_msecs = (
-            node_dict['first_publication_date_msecs']
-            if 'first_publication_date_msecs' in node_dict
-            and node_dict['first_publication_date_msecs']
-            else None
-        )
+        planned_publication_date_msecs = node_dict['planned_publication_date_msecs'] if 'planned_publication_date_msecs' in node_dict and node_dict['planned_publication_date_msecs'] else None
+        last_modified_msecs = node_dict['last_modified_msecs'] if 'last_modified_msecs' in node_dict and node_dict['last_modified_msecs'] else None
+        first_publication_date_msecs = node_dict['first_publication_date_msecs'] if 'first_publication_date_msecs' in node_dict and node_dict['first_publication_date_msecs'] else None
         node = cls(
             node_dict['id'],
             node_dict['title'],
@@ -763,32 +723,10 @@ class StoryNode:
             node_dict['outline_is_finalized'],
             node_dict['exploration_id'],
             node_dict['status'] if 'status' in node_dict else None,
-            (
-                utils.convert_millisecs_time_to_datetime_object(
-                    planned_publication_date_msecs
-                )
-                if planned_publication_date_msecs
-                else None
-            ),
-            (
-                utils.convert_millisecs_time_to_datetime_object(
-                    last_modified_msecs
-                )
-                if last_modified_msecs
-                else None
-            ),
-            (
-                utils.convert_millisecs_time_to_datetime_object(
-                    first_publication_date_msecs
-                )
-                if first_publication_date_msecs
-                else None
-            ),
-            (
-                node_dict['unpublishing_reason']
-                if 'unpublishing_reason' in node_dict
-                else None
-            ),
+            (utils.convert_millisecs_time_to_datetime_object(planned_publication_date_msecs) if planned_publication_date_msecs else None),
+            (utils.convert_millisecs_time_to_datetime_object(last_modified_msecs) if last_modified_msecs else None),
+            (utils.convert_millisecs_time_to_datetime_object(first_publication_date_msecs) if first_publication_date_msecs else None),
+            (node_dict['unpublishing_reason'] if 'unpublishing_reason' in node_dict else None),
         )
         return node
 
@@ -832,188 +770,93 @@ class StoryNode:
                 invalid.
         """
         if self.exploration_id is None:
-            raise utils.ValidationError(
-                'Expected exploration ID to not be None'
-            )
+            raise utils.ValidationError('Expected exploration ID to not be None')
         if self.exploration_id and not isinstance(self.exploration_id, str):
-            raise utils.ValidationError(
-                'Expected exploration ID to be a string, received %s'
-                % self.exploration_id
-            )
+            raise utils.ValidationError('Expected exploration ID to be a string, received %s' % self.exploration_id)
         if self.exploration_id == '':
-            raise utils.ValidationError(
-                'Expected exploration ID to not be an empty string, '
-                'received %s' % self.exploration_id
-            )
+            raise utils.ValidationError('Expected exploration ID to not be an empty string, received %s' % self.exploration_id)
 
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
-        if self.thumbnail_bg_color is not None and not (
-            self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)
-        ):
-            raise utils.ValidationError(
-                'Chapter thumbnail background color %s is not supported.'
-                % (self.thumbnail_bg_color)
-            )
+        if self.thumbnail_bg_color is not None and not (self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            raise utils.ValidationError('Chapter thumbnail background color %s is not supported.' % (self.thumbnail_bg_color))
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
-            raise utils.ValidationError(
-                'Chapter thumbnail image is not provided.'
-            )
+            raise utils.ValidationError('Chapter thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
-            raise utils.ValidationError(
-                'Chapter thumbnail background color is not specified.'
-            )
-        if self.thumbnail_filename is not None and (
-            self.thumbnail_size_in_bytes == 0
-        ):
-            raise utils.ValidationError(
-                'Story node thumbnail size in bytes cannot be zero.'
-            )
+            raise utils.ValidationError('Chapter thumbnail background color is not specified.')
+        if self.thumbnail_filename is not None and (self.thumbnail_size_in_bytes == 0):
+            raise utils.ValidationError('Story node thumbnail size in bytes cannot be zero.')
 
         if not isinstance(self.outline, str):
-            raise utils.ValidationError(
-                'Expected outline to be a string, received %s' % self.outline
-            )
+            raise utils.ValidationError('Expected outline to be a string, received %s' % self.outline)
 
         if not isinstance(self.title, str):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title
-            )
+            raise utils.ValidationError('Expected title to be a string, received %s' % self.title)
 
         if not isinstance(self.description, str):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s'
-                % self.description
-            )
+            raise utils.ValidationError('Expected description to be a string, received %s' % self.description)
 
-        description_length_limit = (
-            android_validation_constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION
-        )
+        description_length_limit = android_validation_constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION
         if len(self.description) > description_length_limit:
-            raise utils.ValidationError(
-                'Chapter description should be less than %d chars, received %s'
-                % (description_length_limit, self.description)
-            )
+            raise utils.ValidationError('Chapter description should be less than %d chars, received %s' % (description_length_limit, self.description))
 
-        title_limit = (
-            android_validation_constants.MAX_CHARS_IN_EXPLORATION_TITLE
-        )
+        title_limit = android_validation_constants.MAX_CHARS_IN_EXPLORATION_TITLE
         if len(self.title) > title_limit:
-            raise utils.ValidationError(
-                'Chapter title should be less than %d chars, received %s'
-                % (title_limit, self.title)
-            )
+            raise utils.ValidationError('Chapter title should be less than %d chars, received %s' % (title_limit, self.title))
 
         if not isinstance(self.outline_is_finalized, bool):
-            raise utils.ValidationError(
-                'Expected outline_is_finalized to be a boolean, received %s'
-                % self.outline_is_finalized
-            )
+            raise utils.ValidationError('Expected outline_is_finalized to be a boolean, received %s' % self.outline_is_finalized)
 
         self.require_valid_node_id(self.id)
 
         if not isinstance(self.prerequisite_skill_ids, list):
-            raise utils.ValidationError(
-                'Expected prerequisite skill ids to be a list, received %s'
-                % self.prerequisite_skill_ids
-            )
+            raise utils.ValidationError('Expected prerequisite skill ids to be a list, received %s' % self.prerequisite_skill_ids)
         for skill_id in self.prerequisite_skill_ids:
             if not isinstance(skill_id, str):
-                raise utils.ValidationError(
-                    'Expected each prerequisite skill id to be a string, '
-                    'received %s' % skill_id
-                )
-        if len(self.prerequisite_skill_ids) > len(
-            set(self.prerequisite_skill_ids)
-        ):
-            raise utils.ValidationError(
-                'Expected all prerequisite skills to be distinct.'
-            )
+                raise utils.ValidationError('Expected each prerequisite skill id to be a string, received %s' % skill_id)
+        if len(self.prerequisite_skill_ids) > len(set(self.prerequisite_skill_ids)):
+            raise utils.ValidationError('Expected all prerequisite skills to be distinct.')
 
         if not isinstance(self.acquired_skill_ids, list):
-            raise utils.ValidationError(
-                'Expected acquired skill ids to be a list, received %s'
-                % self.acquired_skill_ids
-            )
+            raise utils.ValidationError('Expected acquired skill ids to be a list, received %s' % self.acquired_skill_ids)
         for skill_id in self.acquired_skill_ids:
             if not isinstance(skill_id, str):
-                raise utils.ValidationError(
-                    'Expected each acquired skill id to be a string, '
-                    'received %s' % skill_id
-                )
+                raise utils.ValidationError('Expected each acquired skill id to be a string, received %s' % skill_id)
         if len(self.acquired_skill_ids) > len(set(self.acquired_skill_ids)):
-            raise utils.ValidationError(
-                'Expected all acquired skills to be distinct.'
-            )
+            raise utils.ValidationError('Expected all acquired skills to be distinct.')
 
         for skill_id in self.prerequisite_skill_ids:
             if skill_id in self.acquired_skill_ids:
-                raise utils.ValidationError(
-                    'Expected prerequisite skill ids and acquired skill ids '
-                    'to be mutually exclusive. The skill_id %s intersects '
-                    % skill_id
-                )
+                raise utils.ValidationError('Expected prerequisite skill ids and acquired skill ids to be mutually exclusive. The skill_id %s intersects ' % skill_id)
 
         if not isinstance(self.destination_node_ids, list):
-            raise utils.ValidationError(
-                'Expected destination node ids to be a list, received %s'
-                % self.destination_node_ids
-            )
+            raise utils.ValidationError('Expected destination node ids to be a list, received %s' % self.destination_node_ids)
 
         for node_id in self.destination_node_ids:
             self.require_valid_node_id(node_id)
             if node_id == self.id:
-                raise utils.ValidationError(
-                    'The story node with ID %s points to itself.' % node_id
-                )
+                raise utils.ValidationError('The story node with ID %s points to itself.' % node_id)
 
         if self.status:
             if not isinstance(self.status, str):
-                raise utils.ValidationError(
-                    'Expected status to be a string, received %s' % self.status
-                )
+                raise utils.ValidationError('Expected status to be a string, received %s' % self.status)
             if not self.require_valid_status(self.status):
-                raise utils.ValidationError(
-                    'Chapter status cannot be %s ' % self.status
-                )
+                raise utils.ValidationError('Chapter status cannot be %s ' % self.status)
 
-        if self.planned_publication_date and (
-            not isinstance(self.planned_publication_date, datetime.datetime)
-        ):
-            raise utils.ValidationError(
-                'Expected planned publication date to be a datetime, '
-                'received %s' % self.planned_publication_date
-            )
+        if self.planned_publication_date and (not isinstance(self.planned_publication_date, datetime.datetime)):
+            raise utils.ValidationError('Expected planned publication date to be a datetime, received %s' % self.planned_publication_date)
 
-        if self.last_modified and (
-            not isinstance(self.last_modified, datetime.datetime)
-        ):
-            raise utils.ValidationError(
-                'Expected last modified to be a datetime, '
-                'received %s' % self.last_modified
-            )
+        if self.last_modified and (not isinstance(self.last_modified, datetime.datetime)):
+            raise utils.ValidationError('Expected last modified to be a datetime, received %s' % self.last_modified)
 
-        if self.first_publication_date and (
-            not isinstance(self.first_publication_date, datetime.datetime)
-        ):
-            raise utils.ValidationError(
-                'Expected first publication date to be a datetime, '
-                'received %s' % self.first_publication_date
-            )
+        if self.first_publication_date and (not isinstance(self.first_publication_date, datetime.datetime)):
+            raise utils.ValidationError('Expected first publication date to be a datetime, received %s' % self.first_publication_date)
 
         if self.unpublishing_reason:
             if not isinstance(self.unpublishing_reason, str):
-                raise utils.ValidationError(
-                    'Expected unpublishing reason to be string, received %s'
-                    % self.unpublishing_reason
-                )
-            if not self.require_valid_unpublishing_reason(
-                self.unpublishing_reason
-            ):
-                raise utils.ValidationError(
-                    'Chapter unpublishing reason cannot be %s '
-                    % self.unpublishing_reason
-                )
+                raise utils.ValidationError('Expected unpublishing reason to be string, received %s' % self.unpublishing_reason)
+            if not self.require_valid_unpublishing_reason(self.unpublishing_reason):
+                raise utils.ValidationError('Chapter unpublishing reason cannot be %s ' % self.unpublishing_reason)
 
     def is_node_upcoming(self) -> bool:
         """Return whether the StoryNode domain object is expected to be
@@ -1024,22 +867,8 @@ class StoryNode:
             bool. True if the chapter is upcoming else false.
         """
         current_time_msecs = utils.get_current_time_in_millisecs()
-        planned_publication_date_msecs = (
-            utils.get_time_in_millisecs(self.planned_publication_date)
-            if self.planned_publication_date
-            else None
-        )
-        if (
-            self.status != constants.STORY_NODE_STATUS_PUBLISHED
-            and planned_publication_date_msecs is not None
-            and current_time_msecs
-            < planned_publication_date_msecs
-            < current_time_msecs
-            + (constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)
-            * 24
-            * 3600
-            * 1000
-        ):
+        planned_publication_date_msecs = utils.get_time_in_millisecs(self.planned_publication_date) if self.planned_publication_date else None
+        if self.status != constants.STORY_NODE_STATUS_PUBLISHED and planned_publication_date_msecs is not None and current_time_msecs < planned_publication_date_msecs < current_time_msecs + (constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) * 24 * 3600 * 1000:
             return True
         return False
 
@@ -1051,16 +880,8 @@ class StoryNode:
             bool. True if the chapter is behind-schedule else false.
         """
         current_time_msecs = utils.get_current_time_in_millisecs()
-        planned_publication_date_msecs = (
-            utils.get_time_in_millisecs(self.planned_publication_date)
-            if self.planned_publication_date
-            else None
-        )
-        if (
-            self.status != constants.STORY_NODE_STATUS_PUBLISHED
-            and planned_publication_date_msecs is not None
-            and current_time_msecs > planned_publication_date_msecs
-        ):
+        planned_publication_date_msecs = utils.get_time_in_millisecs(self.planned_publication_date) if self.planned_publication_date else None
+        if self.status != constants.STORY_NODE_STATUS_PUBLISHED and planned_publication_date_msecs is not None and current_time_msecs > planned_publication_date_msecs:
             return True
         return False
 
@@ -1104,9 +925,7 @@ class StoryContents:
                 invalid.
         """
         if not isinstance(self.nodes, list):
-            raise utils.ValidationError(
-                'Expected nodes field to be a list, received %s' % self.nodes
-            )
+            raise utils.ValidationError('Expected nodes field to be a list, received %s' % self.nodes)
 
         if len(self.nodes) > 0:
             # Ruling out the possibility of None for mypy type checking.
@@ -1120,36 +939,23 @@ class StoryContents:
 
         for node in self.nodes:
             if not isinstance(node, StoryNode):
-                raise utils.ValidationError(
-                    'Expected each node to be a StoryNode object, received %s'
-                    % node
-                )
+                raise utils.ValidationError('Expected each node to be a StoryNode object, received %s' % node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
                 if (
                     next(
-                        (
-                            node
-                            for node in self.nodes
-                            if node.id == destination_node_id
-                        ),
+                        (node for node in self.nodes if node.id == destination_node_id),
                         None,
                     )
                     is None
                 ):
-                    raise utils.ValidationError(
-                        'Expected all destination nodes to exist'
-                    )
+                    raise utils.ValidationError('Expected all destination nodes to exist')
             if node.id == self.initial_node_id:
                 initial_node_is_present = True
             # Checks whether the number in the id of any node is greater than
             # the value of next_node_id.
-            if StoryNode.get_number_from_node_id(
-                node.id
-            ) >= StoryNode.get_number_from_node_id(self.next_node_id):
-                raise utils.ValidationError(
-                    'The node with id %s is out of bounds.' % node.id
-                )
+            if StoryNode.get_number_from_node_id(node.id) >= StoryNode.get_number_from_node_id(self.next_node_id):
+                raise utils.ValidationError('The node with id %s is out of bounds.' % node.id)
             node_id_list.append(node.id)
             node_title_list.append(node.title)
 
@@ -1158,14 +964,10 @@ class StoryContents:
                 raise utils.ValidationError('Expected starting node to exist.')
 
             if len(node_id_list) > len(set(node_id_list)):
-                raise utils.ValidationError(
-                    'Expected all node ids to be distinct.'
-                )
+                raise utils.ValidationError('Expected all node ids to be distinct.')
 
             if len(node_title_list) > len(set(node_title_list)):
-                raise utils.ValidationError(
-                    'Expected all chapter titles to be distinct.'
-                )
+                raise utils.ValidationError('Expected all chapter titles to be distinct.')
 
     @overload
     def get_node_index(
@@ -1177,18 +979,12 @@ class StoryContents:
     def get_node_index(self, node_id: str, *, strict: Literal[True]) -> int: ...
 
     @overload
-    def get_node_index(
-        self, node_id: str, *, strict: Literal[False]
-    ) -> Optional[int]: ...
+    def get_node_index(self, node_id: str, *, strict: Literal[False]) -> Optional[int]: ...
 
     @overload
-    def get_node_index(
-        self, node_id: str, *, strict: bool = ...
-    ) -> Optional[int]: ...
+    def get_node_index(self, node_id: str, *, strict: bool = ...) -> Optional[int]: ...
 
-    def get_node_index(
-        self, node_id: str, strict: bool = True
-    ) -> Optional[int]:
+    def get_node_index(self, node_id: str, strict: bool = True) -> Optional[int]:
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
 
@@ -1209,9 +1005,7 @@ class StoryContents:
             if node.id == node_id:
                 index = ind
         if strict and index is None:
-            raise ValueError(
-                'The node with id %s is not part of this story.' % node_id
-            )
+            raise ValueError('The node with id %s is not part of this story.' % node_id)
         return index
 
     def get_ordered_nodes(self) -> List[StoryNode]:
@@ -1287,9 +1081,7 @@ class StoryContents:
             if node.exploration_id == exp_id:
                 return node
 
-        raise Exception(
-            'Unable to find the exploration id in any node: %s' % (exp_id)
-        )
+        raise Exception('Unable to find the exploration id in any node: %s' % (exp_id))
 
     def to_dict(self) -> StoryContentsDict:
         """Returns a dict representing this StoryContents domain object.
@@ -1315,10 +1107,7 @@ class StoryContents:
             StoryContents. The corresponding StoryContents domain object.
         """
         story_contents = cls(
-            [
-                StoryNode.from_dict(story_node_dict)
-                for story_node_dict in story_contents_dict['nodes']
-            ],
+            [StoryNode.from_dict(story_node_dict) for story_node_dict in story_contents_dict['nodes']],
             story_contents_dict['initial_node_id'],
             story_contents_dict['next_node_id'],
         )
@@ -1439,22 +1228,13 @@ class Story:
             ValidationError. The description is not a valid string.
         """
         if not isinstance(description, str):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s' % description
-            )
+            raise utils.ValidationError('Expected description to be a string, received %s' % description)
         if description == '':
-            raise utils.ValidationError(
-                'Expected description field not to be empty'
-            )
+            raise utils.ValidationError('Expected description field not to be empty')
 
-        description_length_limit = (
-            android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION
-        )
+        description_length_limit = android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION
         if len(description) > description_length_limit:
-            raise utils.ValidationError(
-                'Expected description to be less than %d chars, received %s'
-                % (description_length_limit, len(description))
-            )
+            raise utils.ValidationError('Expected description to be less than %d chars, received %s' % (description_length_limit, len(description)))
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename: str) -> None:
@@ -1478,9 +1258,7 @@ class Story:
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return (
-            thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS['story']
-        )
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS['story']
 
     def validate(self) -> None:
         """Validates various properties of the story object.
@@ -1499,36 +1277,19 @@ class Story:
         utils.require_valid_meta_tag_content(self.meta_tag_content)
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
-        if self.thumbnail_bg_color is not None and not (
-            self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)
-        ):
-            raise utils.ValidationError(
-                'Story thumbnail background color %s is not supported.'
-                % (self.thumbnail_bg_color)
-            )
+        if self.thumbnail_bg_color is not None and not (self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            raise utils.ValidationError('Story thumbnail background color %s is not supported.' % (self.thumbnail_bg_color))
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
-            raise utils.ValidationError(
-                'Story thumbnail image is not provided.'
-            )
+            raise utils.ValidationError('Story thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
-            raise utils.ValidationError(
-                'Story thumbnail background color is not specified.'
-            )
+            raise utils.ValidationError('Story thumbnail background color is not specified.')
         if not isinstance(self.notes, str):
-            raise utils.ValidationError(
-                'Expected notes to be a string, received %s' % self.notes
-            )
+            raise utils.ValidationError('Expected notes to be a string, received %s' % self.notes)
 
         if not isinstance(self.story_contents_schema_version, int):
-            raise utils.ValidationError(
-                'Expected story contents schema version to be an integer, '
-                'received %s' % self.story_contents_schema_version
-            )
+            raise utils.ValidationError('Expected story contents schema version to be an integer, received %s' % self.story_contents_schema_version)
 
-        if (
-            self.story_contents_schema_version
-            != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
-        ):
+        if self.story_contents_schema_version != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
             raise utils.ValidationError(
                 'Expected story contents schema version to be %s, '
                 'received %s'
@@ -1539,21 +1300,13 @@ class Story:
             )
 
         if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language code to be a string, received %s'
-                % self.language_code
-            )
+            raise utils.ValidationError('Expected language code to be a string, received %s' % self.language_code)
 
         if not utils.is_valid_language_code(self.language_code):
-            raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code
-            )
+            raise utils.ValidationError('Invalid language code: %s' % self.language_code)
 
         if not isinstance(self.corresponding_topic_id, str):
-            raise utils.ValidationError(
-                'Expected corresponding_topic_id should be a string, received: '
-                '%s' % self.corresponding_topic_id
-            )
+            raise utils.ValidationError('Expected corresponding_topic_id should be a string, received: %s' % self.corresponding_topic_id)
 
         self.story_contents.validate()
 
@@ -1565,9 +1318,7 @@ class Story:
             story_id: str. The story id to validate.
         """
         if not isinstance(story_id, str):
-            raise utils.ValidationError(
-                'Story id should be a string, received: %s' % story_id
-            )
+            raise utils.ValidationError('Story id should be a string, received: %s' % story_id)
 
         if len(story_id) != constants.STORY_ID_LENGTH:
             raise utils.ValidationError('Invalid story id.')
@@ -1587,14 +1338,9 @@ class Story:
 
         title_limit = android_validation_constants.MAX_CHARS_IN_STORY_TITLE
         if len(title) > title_limit:
-            raise utils.ValidationError(
-                'Story title should be less than %d chars, received %s'
-                % (title_limit, title)
-            )
+            raise utils.ValidationError('Story title should be less than %d chars, received %s' % (title_limit, title))
 
-    def get_acquired_skill_ids_for_node_ids(
-        self, node_ids: List[str]
-    ) -> List[str]:
+    def get_acquired_skill_ids_for_node_ids(self, node_ids: List[str]) -> List[str]:
         """Returns the acquired skill ids of the nodes having the given
         node ids.
 
@@ -1614,9 +1360,7 @@ class Story:
                         acquired_skill_ids.append(skill_id)
         return acquired_skill_ids
 
-    def get_prerequisite_skill_ids_for_exp_id(
-        self, exp_id: str
-    ) -> Optional[List[str]]:
+    def get_prerequisite_skill_ids_for_exp_id(self, exp_id: str) -> Optional[List[str]]:
         """Returns the prerequisite skill ids of the node having the given
         exploration id.
 
@@ -1682,20 +1426,8 @@ class Story:
             Story. The corresponding Story domain object.
         """
         story_dict = json.loads(json_string)
-        created_on = (
-            utils.convert_string_to_naive_datetime_object(
-                story_dict['created_on']
-            )
-            if 'created_on' in story_dict
-            else None
-        )
-        last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                story_dict['last_updated']
-            )
-            if 'last_updated' in story_dict
-            else None
-        )
+        created_on = utils.convert_string_to_naive_datetime_object(story_dict['created_on']) if 'created_on' in story_dict else None
+        last_updated = utils.convert_string_to_naive_datetime_object(story_dict['last_updated']) if 'last_updated' in story_dict else None
 
         story = cls.from_dict(
             story_dict,
@@ -1732,14 +1464,10 @@ class Story:
         story_dict['version'] = self.version
 
         if self.created_on:
-            story_dict['created_on'] = utils.convert_naive_datetime_to_string(
-                self.created_on
-            )
+            story_dict['created_on'] = utils.convert_naive_datetime_to_string(self.created_on)
 
         if self.last_updated:
-            story_dict['last_updated'] = utils.convert_naive_datetime_to_string(
-                self.last_updated
-            )
+            story_dict['last_updated'] = utils.convert_naive_datetime_to_string(self.last_updated)
 
         return json.dumps(story_dict)
 
@@ -1823,9 +1551,7 @@ class Story:
         story_contents = StoryContents([], None, initial_node_id)
         if thumbnail_filename is not None:
             raw_image = b''
-            with open(
-                f'core/tests/data/{thumbnail_filename}', 'rt', encoding='utf-8'
-            ) as svg_file:
+            with open(f'core/tests/data/{thumbnail_filename}', 'rt', encoding='utf-8') as svg_file:
                 svg_file_content = svg_file.read()
                 raw_image = svg_file_content.encode('ascii')
             fs_services.save_original_and_compressed_versions_of_image(
@@ -1854,9 +1580,7 @@ class Story:
         )
 
     @classmethod
-    def _convert_story_contents_v1_dict_to_v2_dict(
-        cls, story_contents_dict: StoryContentsDict
-    ) -> StoryContentsDict:
+    def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents_dict: StoryContentsDict) -> StoryContentsDict:
         """Converts old Story Contents schema to the modern v2 schema.
         v2 schema introduces the thumbnail_filename and thumbnail_bg_color
         fields for Story Nodes.
@@ -1874,9 +1598,7 @@ class Story:
         return story_contents_dict
 
     @classmethod
-    def _convert_story_contents_v2_dict_to_v3_dict(
-        cls, story_contents_dict: StoryContentsDict
-    ) -> StoryContentsDict:
+    def _convert_story_contents_v2_dict_to_v3_dict(cls, story_contents_dict: StoryContentsDict) -> StoryContentsDict:
         """Converts v2 Story Contents schema to the v3 schema.
         v3 schema introduces the description field for Story Nodes.
 
@@ -1892,9 +1614,7 @@ class Story:
         return story_contents_dict
 
     @classmethod
-    def _convert_story_contents_v3_dict_to_v4_dict(
-        cls, story_contents_dict: StoryContentsDict
-    ) -> StoryContentsDict:
+    def _convert_story_contents_v3_dict_to_v4_dict(cls, story_contents_dict: StoryContentsDict) -> StoryContentsDict:
         """Converts v3 Story Contents schema to the v4 schema.
         v4 schema introduces the new schema for Math components.
 
@@ -1906,17 +1626,11 @@ class Story:
             dict. The converted story_contents_dict.
         """
         for node in story_contents_dict['nodes']:
-            node['outline'] = (
-                html_validation_service.add_math_content_to_math_rte_components(
-                    node['outline']
-                )
-            )
+            node['outline'] = html_validation_service.add_math_content_to_math_rte_components(node['outline'])
         return story_contents_dict
 
     @classmethod
-    def _convert_story_contents_v4_dict_to_v5_dict(
-        cls, story_id: str, story_contents_dict: StoryContentsDict
-    ) -> StoryContentsDict:
+    def _convert_story_contents_v4_dict_to_v5_dict(cls, story_id: str, story_contents_dict: StoryContentsDict) -> StoryContentsDict:
         """Converts v4 Story Contents schema to the modern v5 schema.
         v5 schema introduces the thumbnail_size_in_bytes for Story Nodes.
 
@@ -1934,15 +1648,11 @@ class Story:
                 constants.ASSET_TYPE_THUMBNAIL,
                 story_contents_dict['nodes'][index]['thumbnail_filename'],
             )
-            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = (
-                len(fs.get(filepath)) if fs.isfile(filepath) else None
-            )
+            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = len(fs.get(filepath)) if fs.isfile(filepath) else None
         return story_contents_dict
 
     @classmethod
-    def _convert_story_contents_v5_dict_to_v6_dict(
-        cls, story_contents_dict: StoryContentsDict
-    ) -> StoryContentsDict:
+    def _convert_story_contents_v5_dict_to_v6_dict(cls, story_contents_dict: StoryContentsDict) -> StoryContentsDict:
         """Converts v5 Story Contents schema to the modern v6 schema.
         v6 schema fixes story node's destination_node_ids and relinks disconnected nodes.
 
@@ -1986,16 +1696,13 @@ class Story:
 
         conversion_fn = getattr(
             cls,
-            '_convert_story_contents_v%s_dict_to_v%s_dict'
-            % (current_version, current_version + 1),
+            '_convert_story_contents_v%s_dict_to_v%s_dict' % (current_version, current_version + 1),
         )
 
         if current_version == 4:
             conversion_fn = functools.partial(conversion_fn, story_id)
 
-        versioned_story_contents['story_contents'] = conversion_fn(
-            versioned_story_contents['story_contents']
-        )
+        versioned_story_contents['story_contents'] = conversion_fn(versioned_story_contents['story_contents'])
 
     def update_title(self, title: str) -> None:
         """Updates the title of the story.
@@ -2005,9 +1712,7 @@ class Story:
         """
         self.title = title
 
-    def update_thumbnail_filename(
-        self, new_thumbnail_filename: Optional[str]
-    ) -> None:
+    def update_thumbnail_filename(self, new_thumbnail_filename: Optional[str]) -> None:
         """Updates the thumbnail filename and file size of the story.
 
         Args:
@@ -2027,14 +1732,9 @@ class Story:
             self.thumbnail_filename = new_thumbnail_filename
             self.thumbnail_size_in_bytes = len(fs.get(filepath))
         else:
-            raise Exception(
-                'The thumbnail %s for story with id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id)
-            )
+            raise Exception('The thumbnail %s for story with id %s does not exist in the filesystem.' % (new_thumbnail_filename, self.id))
 
-    def update_thumbnail_bg_color(
-        self, thumbnail_bg_color: Optional[str]
-    ) -> None:
+    def update_thumbnail_bg_color(self, thumbnail_bg_color: Optional[str]) -> None:
         """Updates the thumbnail background color of the story.
 
         Args:
@@ -2097,22 +1797,13 @@ class Story:
                 story_contents.next_node_id.
         """
         if self.story_contents.next_node_id != desired_node_id:
-            raise Exception(
-                'The node id %s does not match the expected '
-                'next node id for the story.' % desired_node_id
-            )
-        self.story_contents.nodes.append(
-            StoryNode.create_default_story_node(desired_node_id, node_title)
-        )
-        self.story_contents.next_node_id = StoryNode.get_incremented_node_id(
-            self.story_contents.next_node_id
-        )
+            raise Exception('The node id %s does not match the expected next node id for the story.' % desired_node_id)
+        self.story_contents.nodes.append(StoryNode.create_default_story_node(desired_node_id, node_title))
+        self.story_contents.next_node_id = StoryNode.get_incremented_node_id(self.story_contents.next_node_id)
         if self.story_contents.initial_node_id is None:
             self.story_contents.initial_node_id = desired_node_id
 
-    def _check_exploration_id_already_present(
-        self, exploration_id: str
-    ) -> bool:
+    def _check_exploration_id_already_present(self, exploration_id: str) -> bool:
         """Returns whether a node with the given exploration id is already
         present in story_contents.
 
@@ -2143,10 +1834,7 @@ class Story:
             if len(self.story_contents.nodes) == 1:
                 self.story_contents.initial_node_id = None
             else:
-                raise ValueError(
-                    'The node with id %s is the starting node for the story, '
-                    'change the starting node before deleting it.' % node_id
-                )
+                raise ValueError('The node with id %s is the starting node for the story, change the starting node before deleting it.' % node_id)
         delete_node = self.story_contents.nodes[node_index]
         delete_node_destination_ids = delete_node.destination_node_ids
         for node in self.story_contents.nodes:
@@ -2177,9 +1865,7 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].title = new_title
 
-    def update_node_description(
-        self, node_id: str, new_description: str
-    ) -> None:
+    def update_node_description(self, node_id: str, new_description: str) -> None:
         """Updates the description field of a given node.
 
         Args:
@@ -2189,9 +1875,7 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].description = new_description
 
-    def update_node_thumbnail_filename(
-        self, node_id: str, new_thumbnail_filename: Optional[str]
-    ) -> None:
+    def update_node_thumbnail_filename(self, node_id: str, new_thumbnail_filename: Optional[str]) -> None:
         """Updates the thumbnail filename and file size field of a given node.
 
         Args:
@@ -2210,21 +1894,12 @@ class Story:
             new_thumbnail_filename,
         )
         if fs.isfile(filepath):
-            self.story_contents.nodes[
-                node_index
-            ].thumbnail_filename = new_thumbnail_filename
-            self.story_contents.nodes[node_index].thumbnail_size_in_bytes = len(
-                fs.get(filepath)
-            )
+            self.story_contents.nodes[node_index].thumbnail_filename = new_thumbnail_filename
+            self.story_contents.nodes[node_index].thumbnail_size_in_bytes = len(fs.get(filepath))
         else:
-            raise Exception(
-                'The thumbnail %s for story node with id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id)
-            )
+            raise Exception('The thumbnail %s for story node with id %s does not exist in the filesystem.' % (new_thumbnail_filename, self.id))
 
-    def update_node_thumbnail_bg_color(
-        self, node_id: str, new_thumbnail_bg_color: Optional[str]
-    ) -> None:
+    def update_node_thumbnail_bg_color(self, node_id: str, new_thumbnail_bg_color: Optional[str]) -> None:
         """Updates the thumbnail background color field of a given node.
 
         Args:
@@ -2233,9 +1908,7 @@ class Story:
                 color of the given node.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[
-            node_index
-        ].thumbnail_bg_color = new_thumbnail_bg_color
+        self.story_contents.nodes[node_index].thumbnail_bg_color = new_thumbnail_bg_color
 
     def mark_node_outline_as_finalized(self, node_id: str) -> None:
         """Updates the outline_is_finalized field of the node with the given
@@ -2257,9 +1930,7 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].outline_is_finalized = False
 
-    def update_node_acquired_skill_ids(
-        self, node_id: str, new_acquired_skill_ids: List[str]
-    ) -> None:
+    def update_node_acquired_skill_ids(self, node_id: str, new_acquired_skill_ids: List[str]) -> None:
         """Updates the acquired skill ids field of a given node.
 
         Args:
@@ -2268,13 +1939,9 @@ class Story:
                 list.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[
-            node_index
-        ].acquired_skill_ids = new_acquired_skill_ids
+        self.story_contents.nodes[node_index].acquired_skill_ids = new_acquired_skill_ids
 
-    def update_node_prerequisite_skill_ids(
-        self, node_id: str, new_prerequisite_skill_ids: List[str]
-    ) -> None:
+    def update_node_prerequisite_skill_ids(self, node_id: str, new_prerequisite_skill_ids: List[str]) -> None:
         """Updates the prerequisite skill ids field of a given node.
 
         Args:
@@ -2283,9 +1950,7 @@ class Story:
                 skill id list.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[
-            node_index
-        ].prerequisite_skill_ids = new_prerequisite_skill_ids
+        self.story_contents.nodes[node_index].prerequisite_skill_ids = new_prerequisite_skill_ids
 
     def update_node_status(self, node_id: str, new_status: str) -> None:
         """Updates the status of a given node
@@ -2297,9 +1962,7 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].status = new_status
 
-    def update_node_planned_publication_date(
-        self, node_id: str, new_planned_publication_date_msecs: float
-    ) -> None:
+    def update_node_planned_publication_date(self, node_id: str, new_planned_publication_date_msecs: float) -> None:
         """Updates the planned publication date of a given node
 
         Args:
@@ -2308,17 +1971,9 @@ class Story:
                 date of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].planned_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_planned_publication_date_msecs
-            )
-            if new_planned_publication_date_msecs
-            else None
-        )
+        self.story_contents.nodes[node_index].planned_publication_date = utils.convert_millisecs_time_to_datetime_object(new_planned_publication_date_msecs) if new_planned_publication_date_msecs else None
 
-    def update_node_last_modified(
-        self, node_id: str, new_last_modified_msecs: float
-    ) -> None:
+    def update_node_last_modified(self, node_id: str, new_last_modified_msecs: float) -> None:
         """Updates the last modified of a given node
 
         Args:
@@ -2327,19 +1982,9 @@ class Story:
                 of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].last_modified = (
-            (
-                utils.convert_millisecs_time_to_datetime_object(
-                    new_last_modified_msecs
-                )
-            )
-            if new_last_modified_msecs
-            else None
-        )
+        self.story_contents.nodes[node_index].last_modified = (utils.convert_millisecs_time_to_datetime_object(new_last_modified_msecs)) if new_last_modified_msecs else None
 
-    def update_node_first_publication_date(
-        self, node_id: str, new_publication_date_msecs: float
-    ) -> None:
+    def update_node_first_publication_date(self, node_id: str, new_publication_date_msecs: float) -> None:
         """Updates the first publication date of a given node.
 
         Args:
@@ -2348,17 +1993,9 @@ class Story:
                 of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].first_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_publication_date_msecs
-            )
-            if new_publication_date_msecs
-            else None
-        )
+        self.story_contents.nodes[node_index].first_publication_date = utils.convert_millisecs_time_to_datetime_object(new_publication_date_msecs) if new_publication_date_msecs else None
 
-    def update_node_unpublishing_reason(
-        self, node_id: str, new_unpublishing_reason: str
-    ) -> None:
+    def update_node_unpublishing_reason(self, node_id: str, new_unpublishing_reason: str) -> None:
         """Updates the unpublishing reason of a given node.
 
         Args:
@@ -2367,13 +2004,9 @@ class Story:
                 this node.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[
-            node_index
-        ].unpublishing_reason = new_unpublishing_reason
+        self.story_contents.nodes[node_index].unpublishing_reason = new_unpublishing_reason
 
-    def update_node_destination_node_ids(
-        self, node_id: str, new_destination_node_ids: List[str]
-    ) -> None:
+    def update_node_destination_node_ids(self, node_id: str, new_destination_node_ids: List[str]) -> None:
         """Updates the destination_node_ids field of a given node.
 
         Args:
@@ -2382,9 +2015,7 @@ class Story:
                 node id list.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[
-            node_index
-        ].destination_node_ids = new_destination_node_ids
+        self.story_contents.nodes[node_index].destination_node_ids = new_destination_node_ids
 
     def rearrange_node_in_story(self, from_index: int, to_index: int) -> None:
         """Rearranges or moves a node in the story content.
@@ -2397,20 +2028,13 @@ class Story:
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception(
-                'Expected from_index value to be a number, '
-                'received %s' % from_index
-            )
+            raise Exception('Expected from_index value to be a number, received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception(
-                'Expected to_index value to be a number, received %s' % to_index
-            )
+            raise Exception('Expected to_index value to be a number, received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception(
-                'Expected from_index and to_index values to be different.'
-            )
+            raise Exception('Expected from_index and to_index values to be different.')
 
         story_content_nodes = self.story_contents.nodes
         if from_index >= len(story_content_nodes) or from_index < 0:
@@ -2432,22 +2056,16 @@ class Story:
             self.update_initial_node(story_node_to_move.id)
         else:
             left_neighbour = story_content_nodes[to_index - 1]
-            self.update_node_destination_node_ids(
-                left_neighbour.id, [story_node_to_move.id]
-            )
+            self.update_node_destination_node_ids(left_neighbour.id, [story_node_to_move.id])
 
         if to_index == len(story_content_nodes) - 1:
             # Node is moved to the end of the storyline.
             self.update_node_destination_node_ids(story_node_to_move.id, [])
         else:
             right_neighbour = story_content_nodes[to_index + 1]
-            self.update_node_destination_node_ids(
-                story_node_to_move.id, [right_neighbour.id]
-            )
+            self.update_node_destination_node_ids(story_node_to_move.id, [right_neighbour.id])
 
-    def update_node_exploration_id(
-        self, node_id: str, new_exploration_id: str
-    ) -> None:
+    def update_node_exploration_id(self, node_id: str, new_exploration_id: str) -> None:
         """Updates the exploration id field of a given node.
 
         Args:
@@ -2459,23 +2077,12 @@ class Story:
         """
         node_index = self.story_contents.get_node_index(node_id)
 
-        if (
-            self.story_contents.nodes[node_index].exploration_id
-            == new_exploration_id
-        ):
+        if self.story_contents.nodes[node_index].exploration_id == new_exploration_id:
             return
 
-        if (
-            new_exploration_id is not None
-            and self._check_exploration_id_already_present(new_exploration_id)
-        ):
-            raise ValueError(
-                'A node with exploration id %s already exists.'
-                % new_exploration_id
-            )
-        self.story_contents.nodes[
-            node_index
-        ].exploration_id = new_exploration_id
+        if new_exploration_id is not None and self._check_exploration_id_already_present(new_exploration_id):
+            raise ValueError('A node with exploration id %s already exists.' % new_exploration_id)
+        self.story_contents.nodes[node_index].exploration_id = new_exploration_id
 
     def update_initial_node(self, new_initial_node_id: str) -> None:
         """Updates the starting node of the story.
@@ -2570,60 +2177,35 @@ class StorySummary:
         )
 
         if not isinstance(self.title, str):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title
-            )
+            raise utils.ValidationError('Expected title to be a string, received %s' % self.title)
 
         if self.title == '':
             raise utils.ValidationError('Title field should not be empty')
 
         if not isinstance(self.description, str):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s'
-                % self.description
-            )
+            raise utils.ValidationError('Expected description to be a string, received %s' % self.description)
 
         if not isinstance(self.node_titles, list):
-            raise utils.ValidationError(
-                'Expected node_titles to be a list, received \'%s\''
-                % (self.node_titles)
-            )
+            raise utils.ValidationError('Expected node_titles to be a list, received \'%s\'' % (self.node_titles))
 
         for title in self.node_titles:
             if not isinstance(title, str):
-                raise utils.ValidationError(
-                    'Expected each chapter title to be a string, received %s'
-                    % title
-                )
+                raise utils.ValidationError('Expected each chapter title to be a string, received %s' % title)
 
         if self.thumbnail_filename is not None:
             utils.require_valid_thumbnail_filename(self.thumbnail_filename)
-        if self.thumbnail_bg_color is not None and not (
-            Story.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)
-        ):
-            raise utils.ValidationError(
-                'Story thumbnail background color %s is not supported.'
-                % (self.thumbnail_bg_color)
-            )
+        if self.thumbnail_bg_color is not None and not (Story.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            raise utils.ValidationError('Story thumbnail background color %s is not supported.' % (self.thumbnail_bg_color))
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
-            raise utils.ValidationError(
-                'Story thumbnail image is not provided.'
-            )
+            raise utils.ValidationError('Story thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
-            raise utils.ValidationError(
-                'Story thumbnail background color is not specified.'
-            )
+            raise utils.ValidationError('Story thumbnail background color is not specified.')
 
         if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language code to be a string, received %s'
-                % self.language_code
-            )
+            raise utils.ValidationError('Expected language code to be a string, received %s' % self.language_code)
 
         if not utils.is_valid_language_code(self.language_code):
-            raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code
-            )
+            raise utils.ValidationError('Invalid language code: %s' % self.language_code)
 
     def to_dict(self) -> StorySummaryDict:
         """Returns a dictionary representation of this domain object.
@@ -2641,12 +2223,8 @@ class StorySummary:
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'url_fragment': self.url_fragment,
-            'story_model_created_on': utils.get_time_in_millisecs(
-                self.story_model_created_on
-            ),
-            'story_model_last_updated': utils.get_time_in_millisecs(
-                self.story_model_last_updated
-            ),
+            'story_model_created_on': utils.get_time_in_millisecs(self.story_model_created_on),
+            'story_model_last_updated': utils.get_time_in_millisecs(self.story_model_last_updated),
         }
 
     def to_human_readable_dict(self) -> HumanReadableStorySummaryDict:

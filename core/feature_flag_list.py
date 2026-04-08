@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import enum
 
-from core.domain import feature_flag_domain
-
 from typing import List
+
+from core.domain import feature_flag_domain
 
 
 class FeatureNames(enum.Enum):
@@ -31,21 +31,15 @@ class FeatureNames(enum.Enum):
     DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
-    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
-        'contributor_dashboard_accomplishments'
-    )
+    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = 'contributor_dashboard_accomplishments'
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
-    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
-        'serial_chapter_launch_curriculum_admin_view'
-    )
+    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = 'serial_chapter_launch_curriculum_admin_view'
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
     SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
-    SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
-        'show_feedback_updates_in_profile_pic_dropdown'
-    )
+    SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = 'show_feedback_updates_in_profile_pic_dropdown'
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
@@ -54,38 +48,20 @@ class FeatureNames(enum.Enum):
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
     ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
     AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
-    EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS = (
-        'exploration_editor_can_modify_translations'
-    )
-    EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = (
-        'exploration_editor_can_tag_misconceptions'
-    )
+    EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS = 'exploration_editor_can_modify_translations'
+    EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = 'exploration_editor_can_tag_misconceptions'
     ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
     REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
-    AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP = (
-        'automatic_voiceover_regeneration_from_exp'
-    )
+    AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP = 'automatic_voiceover_regeneration_from_exp'
     LABEL_ACCENT_TO_VOICE_ARTIST = 'label_accent_to_voice_artist'
-    SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS = (
-        'show_voiceover_tab_for_non_curated_explorations'
-    )
+    SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS = 'show_voiceover_tab_for_non_curated_explorations'
     SHOW_RESTRUCTURED_STUDY_GUIDES = 'show_restructured_study_guides'
-    ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
-        'enable_translation_opps_with_new_opp_models'
-    )
-    ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
-        'enable_worked_examples_rte_component'
-    )
-    SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS = (
-        'show_regenerated_voiceovers_to_learners'
-    )
-    ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
-        'enable_background_voiceover_synthesis'
-    )
+    ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = 'enable_translation_opps_with_new_opp_models'
+    ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = 'enable_worked_examples_rte_component'
+    SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS = 'show_regenerated_voiceovers_to_learners'
+    ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = 'enable_background_voiceover_synthesis'
     ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
-    ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER = (
-        'enable_financial_literacy_campaign_banner'
-    )
+    ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER = 'enable_financial_literacy_campaign_banner'
     # A separate flag is used for testing the financial literacy campaign banner with early dates.
     # This allows testing the feature before the actual campaign dates that will
     # be used in production. Without a separate test flag, we would need to change
@@ -93,9 +69,7 @@ class FeatureNames(enum.Enum):
     # releasing to production. That process would require additional PRs,
     # cherry-picks, or hotfixes. Using a dedicated test-mode flag avoids that
     # overhead and keeps testing and production configurations separate.
-    ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE = (
-        'enable_financial_literacy_campaign_banner_test_mode'
-    )
+    ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE = 'enable_financial_literacy_campaign_banner_test_mode'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -180,15 +154,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
         (
-            'This flag is for serial chapter launch feature and making changes '
-            'only in the curriculum admin view.',
+            'This flag is for serial chapter launch feature and making changes only in the curriculum admin view.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW.value: (
         (
-            'This flag is for serial chapter launch feature and making changes '
-            'only in the learner view.',
+            'This flag is for serial chapter launch feature and making changes only in the learner view.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
@@ -200,15 +172,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (
         (
-            'This flag is to show translation size on translation cards in '
-            'contributor dashboard.',
+            'This flag is to show translation size on translation cards in contributor dashboard.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN.value: (
         (
-            'This flag is to show feedback updates in the '
-            'profile pic drop-down menu.',
+            'This flag is to show feedback updates in the profile pic drop-down menu.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
@@ -220,14 +190,11 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value: (
         (
-            'Exposes the Improvements Tab for creators in the exploration '
-            'editor.',
+            'Exposes the Improvements Tab for creators in the exploration editor.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
-    FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value: (
-        ('Enable learner groups feature', feature_flag_domain.ServerMode.PROD)
-    ),
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value: (('Enable learner groups feature', feature_flag_domain.ServerMode.PROD)),
     FeatureNames.NEW_LESSON_PLAYER.value: (
         (
             'This flag is to enable the exploration player redesign.',
@@ -236,45 +203,37 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
-            'This flag allows translation reviewers to undo translation '
-            'suggestion review on the contributor dashboard.',
+            'This flag allows translation reviewers to undo translation suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
         (
-            'This flag allows exploration editors to promptly update '
-            'translations of content they are editing in the exploration '
-            'editor page.',
+            'This flag allows exploration editors to promptly update translations of content they are editing in the exploration editor page.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
         (
-            'This flag allows exploration editors to view a list of '
-            'misconceptions and tag answer groups with misconceptions '
-            'for a curated exploration.',
+            'This flag allows exploration editors to view a list of misconceptions and tag answer groups with misconceptions for a curated exploration.',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
         (
-            'The flag enables flow for multiple classrooms '
-            'and makes the classrooms page available to learners.',
+            'The flag enables flow for multiple classrooms and makes the classrooms page available to learners.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
         (
-            'This flag activates the redesigned topic viewer page'
-            'and makes it accessible to learners.',
+            'This flag activates the redesigned topic viewer pageand makes it accessible to learners.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
         (
-            'The flag enables the automatic regeneration of voiceovers '
-            'directly from the exploration editor page.',
+            'The flag enables the automatic regeneration of voiceovers directly from the exploration editor page.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
@@ -286,31 +245,25 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value: (
         (
-            'Allows the creators to access the updated study guide editor page '
-            'and learners to access the updated study guide user interface '
-            '(the actual content displayed by the study guides will be the '
-            'same, just the user interface will be different).',
+            'Allows the creators to access the updated study guide editor page and learners to access the updated study guide user interface (the actual content displayed by the study guides will be the same, just the user interface will be different).',
             feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
         (
-            'This flag enables the new translation opportunity structure to '
-            'the contributor dashboard.',
+            'This flag enables the new translation opportunity structure to the contributor dashboard.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
         (
-            'This flag allows learners to see the regenerated voiceovers '
-            'in the exploration player.',
+            'This flag allows learners to see the regenerated voiceovers in the exploration player.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
         (
-            'The flag enables the asynchronous voiceover synthesis for the '
-            'curated exploration contents.',
+            'The flag enables the asynchronous voiceover synthesis for the curated exploration contents.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),

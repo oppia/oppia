@@ -24,10 +24,10 @@ import logging
 import os
 import sys
 
+from typing import Dict
+
 from core.tests import test_utils
 from scripts import check_unused_i18n_keys
-
-from typing import Dict
 
 
 class MockFile:
@@ -75,9 +75,7 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
             if path == './node_modules/file2.ts':
                 return MockFile('This has I18N_NODE_KEY')
             if path == './valid_dir/file3.html':
-                return MockFile(
-                    'This has I18N_KEY_3 and I18N_KEY_4-with&symbol'
-                )
+                return MockFile('This has I18N_KEY_3 and I18N_KEY_4-with&symbol')
             return MockFile('')
 
         walk_swap = self.swap(os, 'walk', mock_walk)
@@ -132,17 +130,18 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
             expected_args=[(self.en_json_path,)],
         )
 
-        with exists_swap, self.assertRaisesRegex(
-            Exception,
-            'File %s does not exist.' % self.en_json_path.replace('\\', '\\\\'),
+        with (
+            exists_swap,
+            self.assertRaisesRegex(
+                Exception,
+                'File %s does not exist.' % self.en_json_path.replace('\\', '\\\\'),
+            ),
         ):
             check_unused_i18n_keys.check_unused_keys()
 
     def test_check_unused_keys_returns_false_if_all_used(self) -> None:
         en_json_data = {'I18N_KEY_1': 'value1', 'I18N_KEY_2': 'value2'}
-        allowlist_data: dict[str, list[Dict[str, str]]] = {
-            'patterns': [{'pattern': 'I18N_KEY_2', 'reason': 'test'}]
-        }
+        allowlist_data: dict[str, list[Dict[str, str]]] = {'patterns': [{'pattern': 'I18N_KEY_2', 'reason': 'test'}]}
 
         def mock_exists(path: str) -> bool:
             return path == self.en_json_path
@@ -206,20 +205,14 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
         self.assertTrue(has_errors)
 
     def test_main_exits_with_error_code_if_errors_found(self) -> None:
-        check_swap = self.swap(
-            check_unused_i18n_keys, 'check_unused_keys', lambda: True
-        )
-        exit_swap = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]
-        )
+        check_swap = self.swap(check_unused_i18n_keys, 'check_unused_keys', lambda: True)
+        exit_swap = self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,)])
 
         with check_swap, exit_swap:
             check_unused_i18n_keys.main()
 
     def test_main_does_not_exit_if_no_errors_found(self) -> None:
-        check_swap = self.swap(
-            check_unused_i18n_keys, 'check_unused_keys', lambda: False
-        )
+        check_swap = self.swap(check_unused_i18n_keys, 'check_unused_keys', lambda: False)
 
         def mock_exit(val: int) -> None:
             raise Exception('sys.exit unexpectedly called')

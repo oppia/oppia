@@ -16,17 +16,15 @@
 
 from __future__ import annotations
 
+from typing import Dict
+
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import skill_fetchers, story_fetchers
 
-from typing import Dict
 
-
-class ReviewTestsPageDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class ReviewTestsPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Fetches relevant data for the review tests page. This handler should
     be called only if the user has completed at least one exploration in
     the story.
@@ -44,25 +42,13 @@ class ReviewTestsPageDataHandler(
     def get(self, story_id: str) -> None:
         """Handles GET requests."""
         story = story_fetchers.get_story_by_id(story_id)
-        latest_completed_node_ids = (
-            (
-                story_fetchers.get_latest_completed_node_ids(
-                    self.user_id, story_id
-                )
-            )
-            if self.user_id
-            else []
-        )
+        latest_completed_node_ids = (story_fetchers.get_latest_completed_node_ids(self.user_id, story_id)) if self.user_id else []
 
         if len(latest_completed_node_ids) == 0:
             raise self.NotFoundException
 
         try:
-            skills = skill_fetchers.get_multi_skills(
-                story.get_acquired_skill_ids_for_node_ids(
-                    latest_completed_node_ids
-                )
-            )
+            skills = skill_fetchers.get_multi_skills(story.get_acquired_skill_ids_for_node_ids(latest_completed_node_ids))
         except Exception as e:
             raise self.NotFoundException(e)
         skill_descriptions = {}

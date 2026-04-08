@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Dict, List, Optional, Tuple, cast
+
 from core import constants, feconf
 from core.domain import (
     email_manager,
@@ -38,8 +40,6 @@ from core.domain import (
 from core.platform import models
 from core.storage.voiceover import gae_models
 
-from typing import Dict, List, Optional, Tuple, cast
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models, voiceover_models
@@ -47,9 +47,7 @@ if MYPY:  # pragma: no cover
 (
     exp_models,
     voiceover_models,
-) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.VOICEOVER]
-)
+) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.VOICEOVER])
 
 
 MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST = 5
@@ -76,9 +74,7 @@ def get_entity_voiceovers_from_model(
             'entity_version': entity_voiceovers_model.entity_version,
             'language_accent_code': entity_voiceovers_model.language_accent_code,
             'voiceovers_mapping': entity_voiceovers_model.voiceovers_mapping,
-            'automated_voiceovers_audio_offsets_msecs': (
-                entity_voiceovers_model.automated_voiceovers_audio_offsets_msecs
-            ),
+            'automated_voiceovers_audio_offsets_msecs': (entity_voiceovers_model.automated_voiceovers_audio_offsets_msecs),
         }
     )
     return entity_voiceovers
@@ -101,9 +97,7 @@ def get_voiceovers_for_given_language_accent_code(
     Returns:
         EntityVoiceovers. An instance of entity voiceover.
     """
-    entity_voiceovers_model = voiceover_models.EntityVoiceoversModel.get_model(
-        entity_type, entity_id, entity_version, language_accent_code
-    )
+    entity_voiceovers_model = voiceover_models.EntityVoiceoversModel.get_model(entity_type, entity_id, entity_version, language_accent_code)
 
     if entity_voiceovers_model:
         return get_entity_voiceovers_from_model(entity_voiceovers_model)
@@ -115,9 +109,7 @@ def get_voiceovers_for_given_language_accent_code(
     )
 
 
-def get_entity_voiceovers_for_given_exploration(
-    entity_id: str, entity_type: str, entity_version: int
-) -> List[voiceover_domain.EntityVoiceovers]:
+def get_entity_voiceovers_for_given_exploration(entity_id: str, entity_type: str, entity_version: int) -> List[voiceover_domain.EntityVoiceovers]:
     """Retrieves entity voiceovers models for the specified exploration version.
 
     Args:
@@ -133,20 +125,14 @@ def get_entity_voiceovers_for_given_exploration(
         the specified exploration and version.
     """
     entity_voiceovers_objects: List[voiceover_domain.EntityVoiceovers] = []
-    entity_voiceovers_models = voiceover_models.EntityVoiceoversModel.get_entity_voiceovers_for_given_exploration(
-        entity_id, entity_type, entity_version
-    )
+    entity_voiceovers_models = voiceover_models.EntityVoiceoversModel.get_entity_voiceovers_for_given_exploration(entity_id, entity_type, entity_version)
 
     for model_instance in entity_voiceovers_models:
-        entity_voiceovers_objects.append(
-            get_entity_voiceovers_from_model(model_instance)
-        )
+        entity_voiceovers_objects.append(get_entity_voiceovers_from_model(model_instance))
     return entity_voiceovers_objects
 
 
-def fetch_entity_voiceovers_by_language_code(
-    entity_id: str, entity_type: str, entity_version: int, language_code: str
-) -> List[voiceover_domain.EntityVoiceovers]:
+def fetch_entity_voiceovers_by_language_code(entity_id: str, entity_type: str, entity_version: int, language_code: str) -> List[voiceover_domain.EntityVoiceovers]:
     """Retrieves entity voiceovers models for the specified exploration and
     version for a given language code.
 
@@ -164,23 +150,16 @@ def fetch_entity_voiceovers_by_language_code(
         list(EntityVoiceovers). Returns a list of entity voiceovers domain
         instances for the specified exploration data.
     """
-    entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(
-        entity_id, entity_type, entity_version
-    )
+    entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(entity_id, entity_type, entity_version)
 
     language_codes_mapping = get_all_language_accent_codes_for_voiceovers()
 
-    supported_language_accent_codes = language_codes_mapping.get(
-        language_code, {}
-    )
+    supported_language_accent_codes = language_codes_mapping.get(language_code, {})
 
     entity_voiceovers_list = []
 
     for entity_voiceovers in entity_voiceovers_for_exp:
-        if (
-            entity_voiceovers.language_accent_code
-            not in supported_language_accent_codes
-        ):
+        if entity_voiceovers.language_accent_code not in supported_language_accent_codes:
             continue
         if not bool(entity_voiceovers.voiceovers_mapping):
             continue
@@ -214,9 +193,7 @@ def compute_voiceover_related_change(
     entity_version = updated_exploration.version - 1
     entity_type = 'exploration'
 
-    entity_voiceovers_objects = get_entity_voiceovers_for_given_exploration(
-        entity_id, entity_type, entity_version
-    )
+    entity_voiceovers_objects = get_entity_voiceovers_for_given_exploration(entity_id, entity_type, entity_version)
 
     for entity_voiceovers in entity_voiceovers_objects:
         entity_voiceovers_id = generate_id_method(
@@ -225,13 +202,9 @@ def compute_voiceover_related_change(
             entity_voiceovers.entity_version,
             entity_voiceovers.language_accent_code,
         )
-        entity_voiceover_id_to_entity_voiceovers[entity_voiceovers_id] = (
-            entity_voiceovers
-        )
+        entity_voiceover_id_to_entity_voiceovers[entity_voiceovers_id] = entity_voiceovers
 
-    language_code_to_language_accent_mapping = (
-        get_all_language_accent_codes_for_voiceovers()
-    )
+    language_code_to_language_accent_mapping = get_all_language_accent_codes_for_voiceovers()
     for change in voiceover_changes:
         if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
             # Here we use cast because this forces change to have type
@@ -240,108 +213,58 @@ def compute_voiceover_related_change(
             content_id = voiceover_change.content_id
             language_accent_code = voiceover_change.language_accent_code
 
-            entity_voiceover_id = generate_id_method(
-                entity_type, entity_id, entity_version, language_accent_code
-            )
+            entity_voiceover_id = generate_id_method(entity_type, entity_id, entity_version, language_accent_code)
 
-            empty_entity_voiceovers = (
-                voiceover_domain.EntityVoiceovers.create_empty(
-                    entity_id, entity_type, entity_version, language_accent_code
-                )
-            )
+            empty_entity_voiceovers = voiceover_domain.EntityVoiceovers.create_empty(entity_id, entity_type, entity_version, language_accent_code)
 
-            entity_voiceovers = entity_voiceover_id_to_entity_voiceovers.get(
-                entity_voiceover_id, empty_entity_voiceovers
-            )
+            entity_voiceovers = entity_voiceover_id_to_entity_voiceovers.get(entity_voiceover_id, empty_entity_voiceovers)
 
             if content_id not in entity_voiceovers.voiceovers_mapping:
-                manual_voiceover_dict: state_domain.VoiceoverDict = (
-                    voiceover_change.voiceovers['manual']
-                )
-                manual_voiceover = state_domain.Voiceover.from_dict(
-                    manual_voiceover_dict
-                )
+                manual_voiceover_dict: state_domain.VoiceoverDict = voiceover_change.voiceovers['manual']
+                manual_voiceover = state_domain.Voiceover.from_dict(manual_voiceover_dict)
 
-                entity_voiceovers.add_new_content_id_without_voiceovers(
-                    content_id
-                )
-                entity_voiceovers.add_voiceover(
-                    content_id, feconf.VoiceoverType.MANUAL, manual_voiceover
-                )
+                entity_voiceovers.add_new_content_id_without_voiceovers(content_id)
+                entity_voiceovers.add_voiceover(content_id, feconf.VoiceoverType.MANUAL, manual_voiceover)
             else:
                 if 'manual' not in voiceover_change.voiceovers:
-                    entity_voiceovers.remove_voiceover(
-                        content_id, feconf.VoiceoverType.MANUAL
-                    )
+                    entity_voiceovers.remove_voiceover(content_id, feconf.VoiceoverType.MANUAL)
                 else:
-                    manual_voiceover_dict = voiceover_change.voiceovers[
-                        'manual'
-                    ]
-                    manual_voiceover = state_domain.Voiceover.from_dict(
-                        manual_voiceover_dict
-                    )
+                    manual_voiceover_dict = voiceover_change.voiceovers['manual']
+                    manual_voiceover = state_domain.Voiceover.from_dict(manual_voiceover_dict)
 
-                    entity_voiceovers.voiceovers_mapping[content_id][
-                        'manual'
-                    ] = manual_voiceover
+                    entity_voiceovers.voiceovers_mapping[content_id]['manual'] = manual_voiceover
 
             entity_voiceovers.validate()
-            entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
-                entity_voiceovers
-            )
+            entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = entity_voiceovers
         elif change.cmd == exp_domain.CMD_MARK_VOICEOVER_AS_NEEDING_UPDATE:
             language_code = change.language_code
-            language_accent_codes = language_code_to_language_accent_mapping[
-                language_code
-            ].keys()
-            all_entity_voiceovers = (
-                entity_voiceover_id_to_entity_voiceovers.values()
-            )
+            language_accent_codes = language_code_to_language_accent_mapping[language_code].keys()
+            all_entity_voiceovers = entity_voiceover_id_to_entity_voiceovers.values()
 
             for entity_voiceovers in all_entity_voiceovers:
                 # If the language code is English, it indicates that the
                 # English content was modified, so all associated
                 # voiceovers must be marked as needing update.
-                if (
-                    language_code != constants.constants.DEFAULT_LANGUAGE_CODE
-                    and entity_voiceovers.language_accent_code
-                    not in language_accent_codes
-                ):
+                if language_code != constants.constants.DEFAULT_LANGUAGE_CODE and entity_voiceovers.language_accent_code not in language_accent_codes:
                     continue
 
-                entity_voiceovers.mark_voiceovers_as_needing_update(
-                    change.content_id, feconf.VoiceoverType.MANUAL
-                )
-                entity_voiceovers.mark_voiceovers_as_needing_update(
-                    change.content_id, feconf.VoiceoverType.AUTO
-                )
+                entity_voiceovers.mark_voiceovers_as_needing_update(change.content_id, feconf.VoiceoverType.MANUAL)
+                entity_voiceovers.mark_voiceovers_as_needing_update(change.content_id, feconf.VoiceoverType.AUTO)
 
         elif change.cmd == exp_domain.CMD_REMOVE_VOICEOVERS:
             language_code = change.language_code
-            language_accent_codes = language_code_to_language_accent_mapping[
-                language_code
-            ].keys()
-            all_entity_voiceovers = (
-                entity_voiceover_id_to_entity_voiceovers.values()
-            )
+            language_accent_codes = language_code_to_language_accent_mapping[language_code].keys()
+            all_entity_voiceovers = entity_voiceover_id_to_entity_voiceovers.values()
 
             for entity_voiceovers in all_entity_voiceovers:
                 # If the language code is English, it indicates that the
                 # English content was modified, so all associated
                 # voiceovers must be removed.
-                if (
-                    language_code != constants.constants.DEFAULT_LANGUAGE_CODE
-                    and entity_voiceovers.language_accent_code
-                    not in language_accent_codes
-                ):
+                if language_code != constants.constants.DEFAULT_LANGUAGE_CODE and entity_voiceovers.language_accent_code not in language_accent_codes:
                     continue
 
-                entity_voiceovers.remove_voiceover(
-                    change.content_id, feconf.VoiceoverType.MANUAL
-                )
-                entity_voiceovers.remove_voiceover(
-                    change.content_id, feconf.VoiceoverType.AUTO
-                )
+                entity_voiceovers.remove_voiceover(change.content_id, feconf.VoiceoverType.MANUAL)
+                entity_voiceovers.remove_voiceover(change.content_id, feconf.VoiceoverType.AUTO)
 
     for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():
         entity_voiceovers_dict = entity_voiceovers.to_dict()
@@ -366,18 +289,14 @@ def compute_voiceover_related_change(
                     ],
                     entity_voiceovers_dict['voiceovers_mapping'],
                 ),
-                entity_voiceovers_dict[
-                    'automated_voiceovers_audio_offsets_msecs'
-                ],
+                entity_voiceovers_dict['automated_voiceovers_audio_offsets_msecs'],
             )
         )
 
     return new_voiceovers_models
 
 
-def get_all_language_accent_codes_for_voiceovers() -> Dict[
-    str, Dict[str, bool]
-]:
+def get_all_language_accent_codes_for_voiceovers() -> Dict[str, Dict[str, bool]]:
     """Returns all language-accent codes which are supported by
     Oppia's voiceovers.
 
@@ -389,18 +308,12 @@ def get_all_language_accent_codes_for_voiceovers() -> Dict[
         as values.
     """
 
-    voiceover_autogeneration_policy_model = (
-        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
-        )
-    )
+    voiceover_autogeneration_policy_model = voiceover_models.VoiceoverAutogenerationPolicyModel.get(voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
     language_codes_mapping: Dict[str, Dict[str, bool]] = {}
     if voiceover_autogeneration_policy_model is None:
         return language_codes_mapping
 
-    language_codes_mapping = (
-        voiceover_autogeneration_policy_model.language_codes_mapping
-    )
+    language_codes_mapping = voiceover_autogeneration_policy_model.language_codes_mapping
     return language_codes_mapping
 
 
@@ -412,11 +325,7 @@ def is_voiceover_autogeneration_using_cloud_service_enabled() -> bool:
         bool. True if cloud based voiceover autogeneration is enabled,
         False otherwise.
     """
-    voiceover_autogeneration_policy_model = (
-        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
-        )
-    )
+    voiceover_autogeneration_policy_model = voiceover_models.VoiceoverAutogenerationPolicyModel.get(voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
 
     autogenerated_voiceovers_are_enabled: bool = False
 
@@ -436,17 +345,11 @@ def update_admin_config_for_voiceover_autogeneration(
             indicating whether cloud based voiceover autogeneration is enabled
             by admins or not.
     """
-    voiceover_autogeneration_policy_model = (
-        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
-        )
-    )
+    voiceover_autogeneration_policy_model = voiceover_models.VoiceoverAutogenerationPolicyModel.get(voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
 
     assert voiceover_autogeneration_policy_model is not None
 
-    (
-        voiceover_autogeneration_policy_model.autogenerated_voiceovers_are_enabled
-    ) = autogenerated_voiceovers_are_enabled
+    (voiceover_autogeneration_policy_model.autogenerated_voiceovers_are_enabled) = autogenerated_voiceovers_are_enabled
 
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
@@ -487,9 +390,7 @@ def create_entity_voiceovers_model(
         ],
         entity_voiceovers_dict['voiceovers_mapping'],
     )
-    automated_voiceovers_audio_offsets_msecs_dict = entity_voiceovers_dict[
-        'automated_voiceovers_audio_offsets_msecs'
-    ]
+    automated_voiceovers_audio_offsets_msecs_dict = entity_voiceovers_dict['automated_voiceovers_audio_offsets_msecs']
 
     entity_voiceovers_model = voiceover_models.EntityVoiceoversModel.create_new(
         entity_type,
@@ -530,22 +431,10 @@ def save_language_accent_support(
             whether it's possible to generate automatic voiceovers for this
             language-accent code as values.
     """
-    retrieved_voiceover_autogeneration_policy_model = (
-        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
-        )
-    )
-    voiceover_autogeneration_policy_model = (
-        retrieved_voiceover_autogeneration_policy_model
-        if retrieved_voiceover_autogeneration_policy_model is not None
-        else voiceover_models.VoiceoverAutogenerationPolicyModel(
-            id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID
-        )
-    )
+    retrieved_voiceover_autogeneration_policy_model = voiceover_models.VoiceoverAutogenerationPolicyModel.get(voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+    voiceover_autogeneration_policy_model = retrieved_voiceover_autogeneration_policy_model if retrieved_voiceover_autogeneration_policy_model is not None else voiceover_models.VoiceoverAutogenerationPolicyModel(id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
 
-    voiceover_autogeneration_policy_model.language_codes_mapping = (
-        language_codes_mapping
-    )
+    voiceover_autogeneration_policy_model.language_codes_mapping = language_codes_mapping
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
 
@@ -561,9 +450,7 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
         language-accent pairs that Oppia may support for
         voiceovers (manual and auto).
     """
-    language_accent_master_list: Dict[str, Dict[str, str]] = (
-        constants.language_accent_master_list_constants
-    )
+    language_accent_master_list: Dict[str, Dict[str, str]] = constants.language_accent_master_list_constants
     return language_accent_master_list
 
 
@@ -576,12 +463,8 @@ def get_language_accent_codes_to_descriptions() -> Dict[str, str]:
         descriptions.
     """
     language_accent_codes_to_descriptions = {}
-    for (
-        language_accent_code_to_description
-    ) in get_language_accent_master_list().values():
-        language_accent_codes_to_descriptions.update(
-            language_accent_code_to_description
-        )
+    for language_accent_code_to_description in get_language_accent_master_list().values():
+        language_accent_codes_to_descriptions.update(language_accent_code_to_description)
     return language_accent_codes_to_descriptions
 
 
@@ -604,9 +487,7 @@ def get_language_code_from_language_accent_code(
         language_code,
         language_accent_code_to_description,
     ) in language_accent_master_dict.items():
-        if language_accent_code in list(
-            language_accent_code_to_description.keys()
-        ):
+        if language_accent_code in list(language_accent_code_to_description.keys()):
             language_code_for_given_accent = language_code
             break
 
@@ -625,9 +506,7 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         for voiceover generation, while 'voice_code' signifies the desired
         voice type.
     """
-    autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
-        constants.autogeneratable_language_accent_constants
-    )
+    autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = constants.autogeneratable_language_accent_constants
     return autogeneratable_language_accent_list
 
 
@@ -639,15 +518,11 @@ def get_autogeneratable_language_accent_codes() -> List[str]:
         List[str]. A list of language accent codes that are supported by the
         cloud service for autogeneration.
     """
-    language_accent_codes = list(
-        get_autogeneratable_language_accent_list().keys()
-    )
+    language_accent_codes = list(get_autogeneratable_language_accent_list().keys())
     return language_accent_codes
 
 
-def compute_voiceover_related_changes_upon_revert(
-    reverted_exploration: exp_domain.Exploration, revert_to_version: int
-) -> List[voiceover_models.EntityVoiceoversModel]:
+def compute_voiceover_related_changes_upon_revert(reverted_exploration: exp_domain.Exploration, revert_to_version: int) -> List[voiceover_models.EntityVoiceoversModel]:
     """Creates new EntityVoiceovers models corresponding to voiceover related
     changes upon reverting an exploration.
 
@@ -660,11 +535,7 @@ def compute_voiceover_related_changes_upon_revert(
         list(EntityVoiceoversModel). A list of EntityVoiceoversModel's with
         respect to reverted exploration version.
     """
-    entity_voiceovers_domain_objects = (
-        get_entity_voiceovers_for_given_exploration(
-            reverted_exploration.id, 'exploration', revert_to_version
-        )
-    )
+    entity_voiceovers_domain_objects = get_entity_voiceovers_for_given_exploration(reverted_exploration.id, 'exploration', revert_to_version)
     new_entity_voiceovers_models = []
 
     for entity_voiceovers in entity_voiceovers_domain_objects:
@@ -690,9 +561,7 @@ def compute_voiceover_related_changes_upon_revert(
                     ],
                     entity_voiceovers_dict['voiceovers_mapping'],
                 ),
-                entity_voiceovers_dict[
-                    'automated_voiceovers_audio_offsets_msecs'
-                ],
+                entity_voiceovers_dict['automated_voiceovers_audio_offsets_msecs'],
             )
         )
     return new_entity_voiceovers_models
@@ -714,11 +583,7 @@ def get_supported_autogeneratable_accents_by_language(
     """
     language_codes_mapping = get_all_language_accent_codes_for_voiceovers()
     accent_codes_mapping = language_codes_mapping.get(language_code, {})
-    return [
-        accent_code
-        for accent_code, autogeneration_enabled in accent_codes_mapping.items()
-        if autogeneration_enabled
-    ]
+    return [accent_code for accent_code, autogeneration_enabled in accent_codes_mapping.items() if autogeneration_enabled]
 
 
 def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
@@ -726,9 +591,7 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     exploration_title: str,
     date_time: str,
     language_accents_used_for_voiceover_regeneration: List[str],
-    error_collections_during_voiceover_regeneration: List[
-        Dict[str, List[Tuple[str, str]] | str]
-    ],
+    error_collections_during_voiceover_regeneration: List[Dict[str, List[Tuple[str, str]] | str]],
     number_of_contents_for_voiceover_regeneration: int,
     number_of_contents_failed_to_regenerate: int,
     author_id: str,
@@ -763,10 +626,7 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     author_username = user_settings.username
     assert author_username is not None
 
-    number_of_successful_regenerations = (
-        number_of_contents_for_voiceover_regeneration
-        - number_of_contents_failed_to_regenerate
-    )
+    number_of_successful_regenerations = number_of_contents_for_voiceover_regeneration - number_of_contents_failed_to_regenerate
 
     # Email to voiceover tech leads should be sent only if there are voiceover
     # regeneration errors.
@@ -807,11 +667,7 @@ def _remove_empty_contents_for_voiceover_regeneration(
         _,
         content_ids_to_content_values,
     ) in language_code_to_contents_mapping.items():
-        content_ids_to_remove = [
-            content_id
-            for content_id, html in (content_ids_to_content_values.items())
-            if not html.strip()
-        ]
+        content_ids_to_remove = [content_id for content_id, html in (content_ids_to_content_values.items()) if not html.strip()]
         for content_id in content_ids_to_remove:
             del content_ids_to_content_values[content_id]
 
@@ -832,9 +688,7 @@ def extract_english_voiceover_texts_from_exploration(
     language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
 
     for state in exploration.states.values():
-        content_id_to_translatable_content = (
-            state.get_translatable_contents_collection()
-        ).content_id_to_translatable_content
+        content_id_to_translatable_content = (state.get_translatable_contents_collection()).content_id_to_translatable_content
 
         for translatable_content in content_id_to_translatable_content.values():
             content_id = translatable_content.content_id
@@ -846,9 +700,7 @@ def extract_english_voiceover_texts_from_exploration(
             content_value = translatable_content.content_value
             assert isinstance(content_value, str)
 
-            language_code_to_contents_mapping.setdefault('en', {})[
-                content_id
-            ] = content_value
+            language_code_to_contents_mapping.setdefault('en', {})[content_id] = content_value
 
     return language_code_to_contents_mapping
 
@@ -886,9 +738,7 @@ def extract_translated_voiceover_texts_from_entity_translations(
             content_value = translated_content.content_value
             assert isinstance(content_value, str)
 
-            language_code_to_contents_mapping.setdefault(language_code, {})[
-                content_id
-            ] = content_value
+            language_code_to_contents_mapping.setdefault(language_code, {})[content_id] = content_value
 
     return language_code_to_contents_mapping
 
@@ -931,22 +781,16 @@ def _regenerate_voiceovers_for_given_contents(
     language_code_to_autogeneratable_accent_codes = {}
 
     # Remove empty contents from the voiceover regeneration mapping.
-    _remove_empty_contents_for_voiceover_regeneration(
-        language_code_to_contents_mapping
-    )
+    _remove_empty_contents_for_voiceover_regeneration(language_code_to_contents_mapping)
 
     # A list of error collections that occurred during the
     # voiceover regeneration.
-    error_collections_during_voiceover_regeneration: List[
-        Dict[str, List[Tuple[str, str]] | str]
-    ] = []
+    error_collections_during_voiceover_regeneration: List[Dict[str, List[Tuple[str, str]] | str]] = []
 
     # Get all language codes that need voiceover regeneration in this request.
     language_codes = list(language_code_to_contents_mapping.keys())
 
-    language_accent_codes_to_descriptions = (
-        get_language_accent_codes_to_descriptions()
-    )
+    language_accent_codes_to_descriptions = get_language_accent_codes_to_descriptions()
 
     # Counter to track the number of contents for which voiceover regeneration
     # is triggered.
@@ -959,14 +803,10 @@ def _regenerate_voiceovers_for_given_contents(
     # Retrieve all Oppia-supported language accents, grouped by language code,
     # for which voiceovers need to be regenerated for the given contents.
     for language_code in language_codes:
-        language_accent_codes = (
-            get_supported_autogeneratable_accents_by_language(language_code)
-        )
+        language_accent_codes = get_supported_autogeneratable_accents_by_language(language_code)
         if not language_accent_codes:
             continue
-        language_code_to_autogeneratable_accent_codes[language_code] = (
-            language_accent_codes
-        )
+        language_code_to_autogeneratable_accent_codes[language_code] = language_accent_codes
 
     # A list of language accents for which voiceovers are regenerated.
     language_accents_used_for_voiceover_regeneration = []
@@ -976,11 +816,7 @@ def _regenerate_voiceovers_for_given_contents(
     if requested_task_is_async:
         # Ruling out the possibility of None for mypy type checking.
         assert task_run_id is not None
-        voiceover_regeneration_task = (
-            voiceover_cloud_task_services.get_voiceover_regeneration_task(
-                exploration_id, task_run_id
-            )
-        )
+        voiceover_regeneration_task = voiceover_cloud_task_services.get_voiceover_regeneration_task(exploration_id, task_run_id)
 
     if requested_task_is_async and voiceover_regeneration_task is None:
         # Ruling out the possibility of None for mypy type checking.
@@ -995,37 +831,22 @@ def _regenerate_voiceovers_for_given_contents(
         # Ruling out the possibility of None for mypy type checking.
         assert voiceover_regeneration_task is not None
 
-        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
-            voiceover_regeneration_task
-        )
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(voiceover_regeneration_task)
 
     errors_while_voiceover_regeneration = []
 
     for language_code in language_codes:
-        language_accent_codes = (
-            language_code_to_autogeneratable_accent_codes.get(language_code, [])
-        )
+        language_accent_codes = language_code_to_autogeneratable_accent_codes.get(language_code, [])
 
-        content_ids_to_content_values = language_code_to_contents_mapping.get(
-            language_code, {}
-        )
+        content_ids_to_content_values = language_code_to_contents_mapping.get(language_code, {})
 
         for language_accent_code in language_accent_codes:
-            if (
-                specific_language_accent_code is not None
-                and language_accent_code != specific_language_accent_code
-            ):
+            if specific_language_accent_code is not None and language_accent_code != specific_language_accent_code:
                 continue
 
-            language_accents_used_for_voiceover_regeneration.append(
-                language_accent_codes_to_descriptions.get(
-                    language_accent_code, ''
-                )
-            )
+            language_accents_used_for_voiceover_regeneration.append(language_accent_codes_to_descriptions.get(language_accent_code, ''))
 
-            number_of_contents_for_voiceover_regeneration += len(
-                content_ids_to_content_values
-            )
+            number_of_contents_for_voiceover_regeneration += len(content_ids_to_content_values)
 
             errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
                 exploration_id,
@@ -1034,16 +855,12 @@ def _regenerate_voiceovers_for_given_contents(
                 language_accent_code,
             )
 
-            failed_content_ids = [
-                error[0] for error in errors_while_voiceover_regeneration
-            ]
+            failed_content_ids = [error[0] for error in errors_while_voiceover_regeneration]
 
             if requested_task_is_async:
                 # Ruling out the possibility of None for mypy type checking.
                 assert voiceover_regeneration_task is not None
-                voiceover_regeneration_task.update_final_content_status_for_cloud_task_run(
-                    language_accent_code, failed_content_ids
-                )
+                voiceover_regeneration_task.update_final_content_status_for_cloud_task_run(language_accent_code, failed_content_ids)
 
             if errors_while_voiceover_regeneration:
                 error_collections_during_voiceover_regeneration.append(
@@ -1053,16 +870,12 @@ def _regenerate_voiceovers_for_given_contents(
                         'error_messages': errors_while_voiceover_regeneration,
                     }
                 )
-                number_of_contents_failed_to_regenerate += len(
-                    errors_while_voiceover_regeneration
-                )
+                number_of_contents_failed_to_regenerate += len(errors_while_voiceover_regeneration)
 
     if requested_task_is_async:
         # Ruling out the possibility of None for mypy type checking.
         assert voiceover_regeneration_task is not None
-        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
-            voiceover_regeneration_task
-        )
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(voiceover_regeneration_task)
 
     send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
         exploration_id,
@@ -1078,33 +891,22 @@ def _regenerate_voiceovers_for_given_contents(
     if requested_task_is_async:
         error_string = ''
         for error_collection in error_collections_during_voiceover_regeneration:
-            error_string += (
-                'Exploration ID: %s\nLanguage Accent Code: %s\nErrors: %s \n'
-                % (
-                    error_collection['exploration_id'],
-                    error_collection['language_accent_code'],
-                    error_collection['error_messages'],
-                )
+            error_string += 'Exploration ID: %s\nLanguage Accent Code: %s\nErrors: %s \n' % (
+                error_collection['exploration_id'],
+                error_collection['language_accent_code'],
+                error_collection['error_messages'],
             )
 
         # Ruling out the possibility of None for mypy type checking.
         assert task_run_id is not None
-        cloud_task_run_domain_instance = (
-            taskqueue_services.get_cloud_task_run_by_model_id(task_run_id)
-        )
+        cloud_task_run_domain_instance = taskqueue_services.get_cloud_task_run_by_model_id(task_run_id)
         # Ruling out the possibility of None for mypy type checking.
         assert cloud_task_run_domain_instance is not None
 
         if errors_while_voiceover_regeneration:
-            cloud_task_run_domain_instance.latest_job_state = (
-                'PERMANENTLY_FAILED'
-            )
-            cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(
-                error_string
-            )
-            taskqueue_services.update_cloud_task_run_model(
-                cloud_task_run_domain_instance
-            )
+            cloud_task_run_domain_instance.latest_job_state = 'PERMANENTLY_FAILED'
+            cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(error_string)
+            taskqueue_services.update_cloud_task_run_model(cloud_task_run_domain_instance)
 
 
 def regenerate_voiceovers_on_exploration_update(
@@ -1147,17 +949,9 @@ def regenerate_voiceovers_on_exploration_update(
     )
     exploration_change_diff = []
     try:
-        exploration_change_diff = (
-            exp_models.ExplorationCommitLogEntryModel.get(
-                exploration_commit_log_entry_model_id
-            )
-        ).commit_cmds
+        exploration_change_diff = (exp_models.ExplorationCommitLogEntryModel.get(exploration_commit_log_entry_model_id)).commit_cmds
     except Exception as e:
-        raise Exception(
-            'Could not fetch change diff for exploration %s, version %s during '
-            'voiceover regeneration.'
-            % (exploration_id, str(exploration_version))
-        ) from e
+        raise Exception('Could not fetch change diff for exploration %s, version %s during voiceover regeneration.' % (exploration_id, str(exploration_version))) from e
 
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
@@ -1177,26 +971,20 @@ def regenerate_voiceovers_on_exploration_update(
                 exp_domain.ExplorationChange,
                 exp_domain.ExplorationChange.from_dict(change),
             )
-            content_id_to_content_values = exp_services.get_content_updates_from_cmd_edit_state_property_change(
-                change_object
-            )
+            content_id_to_content_values = exp_services.get_content_updates_from_cmd_edit_state_property_change(change_object)
 
             for (
                 content_id,
                 content_value,
             ) in content_id_to_content_values.items():
-                language_code_to_contents_mapping.setdefault('en', {})[
-                    content_id
-                ] = content_value
+                language_code_to_contents_mapping.setdefault('en', {})[content_id] = content_value
         elif cmd == exp_domain.CMD_EDIT_TRANSLATION:
             # CMD_EDIT_TRANSLATION is used to fetch the updated content for
             # the translations in other languages.
             language_code = change['language_code']
             updated_content = change['translation']['content_value']
             content_id = change['content_id']
-            language_code_to_contents_mapping.setdefault(language_code, {})[
-                content_id
-            ] = updated_content
+            language_code_to_contents_mapping.setdefault(language_code, {})[content_id] = updated_content
 
     _regenerate_voiceovers_for_given_contents(
         exploration_id,
@@ -1242,23 +1030,15 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
     exploration_title = exploration.title
 
     # Retrieve all English-language contents from the exploration.
-    language_code_to_contents_mapping.update(
-        extract_english_voiceover_texts_from_exploration(exploration)
-    )
+    language_code_to_contents_mapping.update(extract_english_voiceover_texts_from_exploration(exploration))
 
     # Retrieve all translated contents of the exploration.
-    entity_translations = (
-        translation_fetchers.get_all_entity_translations_for_entity(
-            feconf.TranslatableEntityType.EXPLORATION,
-            exploration_id,
-            exploration_version,
-        )
+    entity_translations = translation_fetchers.get_all_entity_translations_for_entity(
+        feconf.TranslatableEntityType.EXPLORATION,
+        exploration_id,
+        exploration_version,
     )
-    language_code_to_contents_mapping.update(
-        extract_translated_voiceover_texts_from_entity_translations(
-            entity_translations
-        )
-    )
+    language_code_to_contents_mapping.update(extract_translated_voiceover_texts_from_entity_translations(entity_translations))
 
     _regenerate_voiceovers_for_given_contents(
         exploration_id,
@@ -1301,14 +1081,10 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     # content IDs as keys and their corresponding HTML content as values.
     language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
 
-    language_code = get_language_code_from_language_accent_code(
-        language_accent_code
-    )
+    language_code = get_language_code_from_language_accent_code(language_accent_code)
 
     if language_code is None:
-        raise Exception(
-            'Invalid language accent code: %s' % language_accent_code
-        )
+        raise Exception('Invalid language accent code: %s' % language_accent_code)
 
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     assert exploration is not None
@@ -1318,9 +1094,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
 
     if language_code == constants.constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
-        language_code_to_contents_mapping.update(
-            extract_english_voiceover_texts_from_exploration(exploration)
-        )
+        language_code_to_contents_mapping.update(extract_english_voiceover_texts_from_exploration(exploration))
     else:
         # Retrieve all translated contents of the exploration in the given
         # language code.
@@ -1330,11 +1104,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
             exploration_version,
             language_code,
         )
-        language_code_to_contents_mapping.update(
-            extract_translated_voiceover_texts_from_entity_translations(
-                [entity_translation]
-            )
-        )
+        language_code_to_contents_mapping.update(extract_translated_voiceover_texts_from_entity_translations([entity_translation]))
 
     _regenerate_voiceovers_for_given_contents(
         exploration_id,
@@ -1366,9 +1136,7 @@ def generate_voiceover_from_translated_content(
             generated.
         language_code: str. The language code for the voiceover.
     """
-    language_code_to_contents_mapping = {
-        language_code: {content_id: translation_content}
-    }
+    language_code_to_contents_mapping = {language_code: {content_id: translation_content}}
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     assert exploration is not None
     exploration_title = exploration.title

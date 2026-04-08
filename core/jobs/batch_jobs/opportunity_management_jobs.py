@@ -21,6 +21,10 @@ from __future__ import annotations
 import itertools
 import logging
 
+import apache_beam as beam
+import result
+from typing import Dict, List
+
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -37,10 +41,6 @@ from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
-import result
-from typing import Dict, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -86,25 +86,11 @@ class DeleteSkillOpportunityModelJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             deleting SkillOpportunityModel.
         """
-        skill_opportunity_model = (
-            self.pipeline
-            | 'Get all non-deleted skill models'
-            >> ndb_io.GetModels(
-                opportunity_models.SkillOpportunityModel.get_all(
-                    include_deleted=False
-                )
-            )
-        )
+        skill_opportunity_model = self.pipeline | 'Get all non-deleted skill models' >> ndb_io.GetModels(opportunity_models.SkillOpportunityModel.get_all(include_deleted=False))
 
-        unused_delete_result = (
-            skill_opportunity_model
-            | beam.Map(lambda model: model.key)
-            | 'Delete all models' >> ndb_io.DeleteModels()
-        )
+        (skill_opportunity_model | beam.Map(lambda model: model.key) | 'Delete all models' >> ndb_io.DeleteModels())
 
-        return skill_opportunity_model | 'Create job run result' >> (
-            job_result_transforms.CountObjectsToJobRunResult()
-        )
+        return skill_opportunity_model | 'Create job run result' >> (job_result_transforms.CountObjectsToJobRunResult())
 
 
 class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
@@ -116,9 +102,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
 
     @staticmethod
     def _count_unique_question_ids(
-        question_skill_link_models: List[
-            question_models.QuestionSkillLinkModel
-        ],
+        question_skill_link_models: List[question_models.QuestionSkillLinkModel],
     ) -> int:
         """Counts the number of unique question ids.
 
@@ -155,11 +139,7 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             skill_opportunity = opportunity_domain.SkillOpportunity(
                 skill_id=skill.id,
                 skill_description=skill.description,
-                question_count=(
-                    GenerateSkillOpportunityModelJob._count_unique_question_ids(
-                        question_skill_links
-                    )
-                ),
+                question_count=(GenerateSkillOpportunityModelJob._count_unique_question_ids(question_skill_links)),
             )
             skill_opportunity.validate()
             with datastore_services.get_ndb_context():
@@ -181,32 +161,9 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             generating SkillOpportunityModel.
         """
-        question_skill_link_models = (
-            self.pipeline
-            | 'Get all non-deleted QuestionSkillLinkModels'
-            >> (
-                ndb_io.GetModels(
-                    question_models.QuestionSkillLinkModel.get_all(
-                        include_deleted=False
-                    )
-                )
-            )
-            | 'Group QuestionSkillLinkModels by skill ID'
-            >> beam.GroupBy(lambda n: n.skill_id)
-        )
+        question_skill_link_models = self.pipeline | 'Get all non-deleted QuestionSkillLinkModels' >> (ndb_io.GetModels(question_models.QuestionSkillLinkModel.get_all(include_deleted=False))) | 'Group QuestionSkillLinkModels by skill ID' >> beam.GroupBy(lambda n: n.skill_id)
 
-        skills = (
-            self.pipeline
-            | 'Get all non-deleted SkillModels'
-            >> (
-                ndb_io.GetModels(
-                    skill_models.SkillModel.get_all(include_deleted=False)
-                )
-            )
-            | 'Get skill object from model'
-            >> beam.Map(skill_fetchers.get_skill_from_model)
-            | 'Group skill objects by skill ID' >> beam.GroupBy(lambda m: m.id)
-        )
+        skills = self.pipeline | 'Get all non-deleted SkillModels' >> (ndb_io.GetModels(skill_models.SkillModel.get_all(include_deleted=False))) | 'Get skill object from model' >> beam.Map(skill_fetchers.get_skill_from_model) | 'Group skill objects by skill ID' >> beam.GroupBy(lambda m: m.id)
 
         skills_with_question_counts = (
             {
@@ -222,16 +179,8 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             | 'Flatten skill and question_skill_links'
             >> beam.Map(
                 lambda skill_and_question_skill_links_object: {
-                    'skill': list(
-                        skill_and_question_skill_links_object['skill'][0]
-                    )[0],
-                    'question_skill_links': list(
-                        itertools.chain.from_iterable(
-                            skill_and_question_skill_links_object[
-                                'question_skill_links'
-                            ]
-                        )
-                    ),
+                    'skill': list(skill_and_question_skill_links_object['skill'][0])[0],
+                    'question_skill_links': list(itertools.chain.from_iterable(skill_and_question_skill_links_object['question_skill_links'])),
                 }
             )
         )
@@ -243,18 +192,9 @@ class GenerateSkillOpportunityModelJob(base_jobs.JobBase):
             )
         )
 
-        unused_put_result = (
-            opportunities_results
-            | 'Filter the results with OK status'
-            >> beam.Filter(lambda result: result.is_ok())
-            | 'Fetch the models to be put'
-            >> beam.Map(lambda result: result.unwrap())
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
+        (opportunities_results | 'Filter the results with OK status' >> beam.Filter(lambda result: result.is_ok()) | 'Fetch the models to be put' >> beam.Map(lambda result: result.unwrap()) | 'Put models into the datastore' >> ndb_io.PutModels())
 
-        return opportunities_results | 'Transform Results to JobRunResults' >> (
-            job_result_transforms.ResultsToJobRunResults()
-        )
+        return opportunities_results | 'Transform Results to JobRunResults' >> (job_result_transforms.ResultsToJobRunResults())
 
 
 class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
@@ -268,25 +208,11 @@ class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             deleting ExplorationOpportunitySummaryModel.
         """
-        exp_opportunity_summary_model = (
-            self.pipeline
-            | 'Get all non-deleted opportunity models'
-            >> ndb_io.GetModels(
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
-                    include_deleted=False
-                )
-            )
-        )
+        exp_opportunity_summary_model = self.pipeline | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(opportunity_models.ExplorationOpportunitySummaryModel.get_all(include_deleted=False))
 
-        unused_delete_result = (
-            exp_opportunity_summary_model
-            | beam.Map(lambda model: model.key)
-            | 'Delete all models' >> ndb_io.DeleteModels()
-        )
+        (exp_opportunity_summary_model | beam.Map(lambda model: model.key) | 'Delete all models' >> ndb_io.DeleteModels())
 
-        return exp_opportunity_summary_model | 'Create job run result' >> (
-            job_result_transforms.CountObjectsToJobRunResult()
-        )
+        return exp_opportunity_summary_model | 'Create job run result' >> (job_result_transforms.CountObjectsToJobRunResult())
 
 
 class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
@@ -301,9 +227,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
         topic: topic_domain.Topic,
         stories_dict: Dict[str, story_domain.Story],
         exps_dict: Dict[str, exp_domain.Exploration],
-    ) -> result.Result[
-        List[opportunity_models.ExplorationOpportunitySummaryModel], Exception
-    ]:
+    ) -> result.Result[List[opportunity_models.ExplorationOpportunitySummaryModel], Exception]:
         """Generate opportunities related to a topic.
 
         Args:
@@ -323,22 +247,13 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
         """
         story_ids = topic.get_canonical_story_ids()
         existing_story_ids = set(stories_dict.keys()).intersection(story_ids)
-        exp_ids: List[str] = list(
-            itertools.chain.from_iterable(
-                stories_dict[story_id].story_contents.get_all_linked_exp_ids()
-                for story_id in existing_story_ids
-            )
-        )
+        exp_ids: List[str] = list(itertools.chain.from_iterable(stories_dict[story_id].story_contents.get_all_linked_exp_ids() for story_id in existing_story_ids))
         existing_exp_ids = set(exps_dict.keys()).intersection(exp_ids)
 
         missing_story_ids = set(story_ids).difference(existing_story_ids)
         missing_exp_ids = set(exp_ids).difference(existing_exp_ids)
         if len(missing_exp_ids) > 0 or len(missing_story_ids) > 0:
-            return result.Err(
-                'Failed to regenerate opportunities for topic id: %s, '
-                'missing_exp_with_ids: %s, missing_story_with_ids: %s'
-                % (topic.id, list(missing_exp_ids), list(missing_story_ids))
-            )
+            return result.Err('Failed to regenerate opportunities for topic id: %s, missing_exp_with_ids: %s, missing_story_with_ids: %s' % (topic.id, list(missing_exp_ids), list(missing_story_ids)))
 
         exploration_opportunity_summary_list = []
         stories = [stories_dict[story_id] for story_id in existing_story_ids]
@@ -348,11 +263,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             for story in stories:
                 for exp_id in story.story_contents.get_all_linked_exp_ids():
                     try:
-                        exploration_opportunity_summary_list.append(
-                            opportunity_services.create_exp_opportunity_summary(
-                                topic, story, exps_dict[exp_id]
-                            )
-                        )
+                        exploration_opportunity_summary_list.append(opportunity_services.create_exp_opportunity_summary(topic, story, exps_dict[exp_id]))
                     except Exception as e:
                         logging.exception(e)
                         return result.Err((exp_id, e))
@@ -366,19 +277,11 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                     story_title=opportunity.story_title,
                     chapter_title=opportunity.chapter_title,
                     content_count=opportunity.content_count,
-                    incomplete_translation_language_codes=(
-                        opportunity.incomplete_translation_language_codes
-                    ),
+                    incomplete_translation_language_codes=(opportunity.incomplete_translation_language_codes),
                     translation_counts=opportunity.translation_counts,
-                    language_codes_needing_voice_artists=(
-                        opportunity.language_codes_needing_voice_artists
-                    ),
-                    language_codes_with_assigned_voice_artists=(
-                        opportunity.language_codes_with_assigned_voice_artists
-                    ),
-                    reviewer_only_content_count=(
-                        opportunity.reviewer_only_content_count
-                    ),
+                    language_codes_needing_voice_artists=(opportunity.language_codes_needing_voice_artists),
+                    language_codes_with_assigned_voice_artists=(opportunity.language_codes_with_assigned_voice_artists),
+                    reviewer_only_content_count=(opportunity.reviewer_only_content_count),
                 )
                 model.update_timestamps()
                 exploration_opportunity_summary_model_list.append(model)
@@ -394,41 +297,11 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             generating ExplorationOpportunitySummaryModel.
         """
 
-        topics = (
-            self.pipeline
-            | 'Get all non-deleted topic models'
-            >> (
-                ndb_io.GetModels(
-                    topic_models.TopicModel.get_all(include_deleted=False)
-                )
-            )
-            | 'Get topic from model'
-            >> beam.Map(topic_fetchers.get_topic_from_model)
-        )
+        topics = self.pipeline | 'Get all non-deleted topic models' >> (ndb_io.GetModels(topic_models.TopicModel.get_all(include_deleted=False))) | 'Get topic from model' >> beam.Map(topic_fetchers.get_topic_from_model)
 
-        story_ids_to_story = (
-            self.pipeline
-            | 'Get all non-deleted story models'
-            >> ndb_io.GetModels(
-                story_models.StoryModel.get_all(include_deleted=False)
-            )
-            | 'Get story from model'
-            >> beam.Map(story_fetchers.get_story_from_model)
-            | 'Combine stories and ids'
-            >> beam.Map(lambda story: (story.id, story))
-        )
+        story_ids_to_story = self.pipeline | 'Get all non-deleted story models' >> ndb_io.GetModels(story_models.StoryModel.get_all(include_deleted=False)) | 'Get story from model' >> beam.Map(story_fetchers.get_story_from_model) | 'Combine stories and ids' >> beam.Map(lambda story: (story.id, story))
 
-        exp_ids_to_exp = (
-            self.pipeline
-            | 'Get all non-deleted exp models'
-            >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False)
-            )
-            | 'Get exploration from model'
-            >> beam.Map(exp_fetchers.get_exploration_from_model)
-            | 'Combine exploration and ids'
-            >> beam.Map(lambda exp: (exp.id, exp))
-        )
+        exp_ids_to_exp = self.pipeline | 'Get all non-deleted exp models' >> ndb_io.GetModels(exp_models.ExplorationModel.get_all(include_deleted=False)) | 'Get exploration from model' >> beam.Map(exp_fetchers.get_exploration_from_model) | 'Combine exploration and ids' >> beam.Map(lambda exp: (exp.id, exp))
 
         stories_dict = beam.pvalue.AsDict(story_ids_to_story)
         exps_dict = beam.pvalue.AsDict(exp_ids_to_exp)
@@ -439,23 +312,18 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             exps_dict=exps_dict,
         )
 
-        unused_put_result = (
+        (
             opportunities_results
-            | 'Filter the results with SUCCESS status'
-            >> beam.Filter(lambda result: result.is_ok())
-            | 'Fetch the models to be put'
-            >> beam.FlatMap(lambda result: result.unwrap())
+            | 'Filter the results with SUCCESS status' >> beam.Filter(lambda result: result.is_ok())
+            | 'Fetch the models to be put' >> beam.FlatMap(lambda result: result.unwrap())
             | 'Add ID as a key'
             >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda model: model.id
             )
-            | 'Allow only one item per key'
-            >> (beam.combiners.Sample.FixedSizePerKey(1))
+            | 'Allow only one item per key' >> (beam.combiners.Sample.FixedSizePerKey(1))
             | 'Remove the IDs' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Flatten the list of lists of models' >> beam.FlatMap(lambda x: x)
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return opportunities_results | 'Count the output' >> (
-            job_result_transforms.ResultsToJobRunResults()
-        )
+        return opportunities_results | 'Count the output' >> (job_result_transforms.ResultsToJobRunResults())

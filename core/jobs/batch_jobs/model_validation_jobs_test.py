@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from typing import Final, Type
+
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import model_validation_jobs
@@ -25,21 +27,15 @@ from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 
-from typing import Final, Type
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import auth_models, base_models, user_models
 
-(auth_models, base_models, user_models) = models.Registry.import_models(
-    [models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER]
-)
+(auth_models, base_models, user_models) = models.Registry.import_models([models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER])
 
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[model_validation_jobs.AuditAllStorageModelsJob] = (
-        model_validation_jobs.AuditAllStorageModelsJob
-    )
+    JOB_CLASS: Type[model_validation_jobs.AuditAllStorageModelsJob] = model_validation_jobs.AuditAllStorageModelsJob
 
     VALID_USER_ID: Final = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
 
@@ -47,9 +43,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_base_validation(self) -> None:
-        base_model_with_invalid_id = self.create_model(
-            base_models.BaseModel, id='123@?!*', deleted=False
-        )
+        base_model_with_invalid_id = self.create_model(base_models.BaseModel, id='123@?!*', deleted=False)
         base_model_with_invalid_timestamps = self.create_model(
             base_models.BaseModel,
             id='124',
@@ -64,12 +58,8 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
             created_on=self.YEAR_LATER,
             last_updated=self.YEAR_AGO,
         )
-        expired_base_model = self.create_model(
-            base_models.BaseModel, id='126', deleted=True
-        )
-        valid_base_model = self.create_model(
-            base_models.BaseModel, id='127', deleted=False
-        )
+        expired_base_model = self.create_model(base_models.BaseModel, id='126', deleted=True)
+        valid_base_model = self.create_model(base_models.BaseModel, id='127', deleted=False)
 
         self.put_multi(
             [
@@ -87,20 +77,14 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
                     base_model_with_invalid_id,
                     base_validation.BASE_MODEL_ID_PATTERN,
                 ),
-                base_validation_errors.ModelMutatedDuringJobError(
-                    base_model_with_invalid_timestamps
-                ),
-                base_validation_errors.InconsistentTimestampsError(
-                    base_model_with_inconsistent_timestamps
-                ),
+                base_validation_errors.ModelMutatedDuringJobError(base_model_with_invalid_timestamps),
+                base_validation_errors.InconsistentTimestampsError(base_model_with_inconsistent_timestamps),
                 base_validation_errors.ModelExpiredError(expired_base_model),
             ]
         )
 
     def test_user_audits(self) -> None:
-        user_settings_model_with_invalid_id = self.create_model(
-            user_models.UserSettingsModel, id='128', email='a@a.com'
-        )
+        user_settings_model_with_invalid_id = self.create_model(user_models.UserSettingsModel, id='128', email='a@a.com')
         user_settings_model_with_valid_id = self.create_model(
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID,
@@ -116,16 +100,12 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                base_validation_errors.ModelIdRegexError(
-                    user_settings_model_with_invalid_id, feconf.USER_ID_REGEX
-                ),
+                base_validation_errors.ModelIdRegexError(user_settings_model_with_invalid_id, feconf.USER_ID_REGEX),
             ]
         )
 
     def test_reports_error_when_id_property_target_does_not_exist(self) -> None:
-        model = self.create_model(
-            user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID
-        )
+        model = self.create_model(user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID)
         # UserEmailPreferencesModel.id -> UserSettingsModel.id.
         # UserSettingsModel missing.
         self.put_multi([model])
@@ -147,9 +127,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
     def test_empty_when_id_property_target_exists(self) -> None:
         self.put_multi(
             [
-                self.create_model(
-                    user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID
-                ),
+                self.create_model(user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
                 self.create_model(
                     user_models.UserSettingsModel,
                     id=self.VALID_USER_ID,

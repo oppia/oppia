@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+from typing import Type
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import dummy_jobs
 from core.jobs.types import job_run_result
-
-from typing import Type
 
 
 class DummyPassJobTests(job_test_utils.JobTestBase):
@@ -30,13 +30,7 @@ class DummyPassJobTests(job_test_utils.JobTestBase):
 
     def test_dummy_pass_job_outputs_success(self) -> None:
         """Test that DummyPassJob outputs a success result."""
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'SUCCESS: Dummy job completed successfully'
-                )
-            ]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult.as_stdout('SUCCESS: Dummy job completed successfully')])
 
 
 class DummyFailJobTests(job_test_utils.JobTestBase):
@@ -44,7 +38,5 @@ class DummyFailJobTests(job_test_utils.JobTestBase):
 
     def test_dummy_fail_job_outputs_failure(self) -> None:
         """Test that DummyFailJob outputs a failure result."""
-        with self.assertRaisesRegex(
-            Exception, 'DummyFailJob intentionally failed.'
-        ):
+        with self.assertRaisesRegex(Exception, 'DummyFailJob intentionally failed.'):
             self.run_job()

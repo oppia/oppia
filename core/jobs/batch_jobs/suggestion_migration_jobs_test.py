@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from typing import Dict, Final, Union
+
 from core import feconf
 from core.domain import (
     question_domain,
@@ -32,15 +34,11 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union
-
 MYPY = False
 if MYPY:
     from mypy_imports import exp_models, suggestion_models
 
-(exp_models, suggestion_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.SUGGESTION]
-)
+(exp_models, suggestion_models) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.SUGGESTION])
 
 
 class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
@@ -147,9 +145,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
         )
         suggestion_1_model.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([suggestion_1_model])
-        unmigrated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
-        )
+        unmigrated_suggestion_model = suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
         self.assertEqual(
             unmigrated_suggestion_model.change_cmd['content_id'],
             'default_outcome',
@@ -157,18 +153,12 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION MIGRATED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='SUGGESTION MIGRATED SUCCESS: 1'),
             ]
         )
 
-        migrated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
-        )
+        migrated_suggestion_model = suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
         self.assertEqual(
             migrated_suggestion_model.change_cmd['content_id'],
             'default_outcome_1',
@@ -246,12 +236,8 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
         )
         suggestion_3_model.update_timestamps()
 
-        suggestion_models.GeneralSuggestionModel.put_multi(
-            [suggestion_1_model, suggestion_2_model, suggestion_3_model]
-        )
-        unmigrated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
-        )
+        suggestion_models.GeneralSuggestionModel.put_multi([suggestion_1_model, suggestion_2_model, suggestion_3_model])
+        unmigrated_suggestion_model = suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
         self.assertEqual(
             unmigrated_suggestion_model.change_cmd['content_id'],
             'default_outcome',
@@ -259,26 +245,10 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION MIGRATED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'SUGGESTION TARGET PROCESSED ERROR: "(16, '
-                        '\'State name invalid_state_name does not exist in the '
-                        'exploration\')": 1'
-                    )
-                ),
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'SUGGESTION TARGET PROCESSED ERROR: '
-                        '"(17, \'Content ID invalid does not exist in the '
-                        'exploration\')": 1'
-                    )
-                ),
+                job_run_result.JobRunResult(stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='SUGGESTION MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(stderr=('SUGGESTION TARGET PROCESSED ERROR: "(16, \'State name invalid_state_name does not exist in the exploration\')": 1')),
+                job_run_result.JobRunResult(stderr=('SUGGESTION TARGET PROCESSED ERROR: "(17, \'Content ID invalid does not exist in the exploration\')": 1')),
             ]
         )
 
@@ -310,22 +280,12 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'SUGGESTION TARGET PROCESSED ERROR: "(\'111\', '
-                        '\'Content ID invalid_id does not exist in the exploration'
-                        '\')": 1'
-                    )
-                ),
+                job_run_result.JobRunResult(stderr=('SUGGESTION TARGET PROCESSED ERROR: "(\'111\', \'Content ID invalid_id does not exist in the exploration\')": 1')),
             ]
         )
 
-        unmigrated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
-        )
-        self.assertEqual(
-            unmigrated_suggestion_model.change_cmd['content_id'], 'invalid_id'
-        )
+        unmigrated_suggestion_model = suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
+        self.assertEqual(unmigrated_suggestion_model.change_cmd['content_id'], 'invalid_id')
 
 
 class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
@@ -432,9 +392,7 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
         )
         suggestion_1_model.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([suggestion_1_model])
-        unmigrated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
-        )
+        unmigrated_suggestion_model = suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
         self.assertEqual(
             unmigrated_suggestion_model.change_cmd['content_id'],
             'default_outcome',
@@ -442,18 +400,12 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION MIGRATED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='SUGGESTION MIGRATED SUCCESS: 1'),
             ]
         )
 
-        migrated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
-        )
+        migrated_suggestion_model = suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
         self.assertEqual(
             migrated_suggestion_model.change_cmd['content_id'],
             'default_outcome',
@@ -487,27 +439,15 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'SUGGESTION TARGET PROCESSED ERROR: "(15, '
-                        '\'Content ID invalid_id does not exist in the exploration'
-                        '\')": 1'
-                    )
-                ),
+                job_run_result.JobRunResult(stderr=('SUGGESTION TARGET PROCESSED ERROR: "(15, \'Content ID invalid_id does not exist in the exploration\')": 1')),
             ]
         )
 
-        unmigrated_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
-        )
-        self.assertEqual(
-            unmigrated_suggestion_model.change_cmd['content_id'], 'invalid_id'
-        )
+        unmigrated_suggestion_model = suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
+        self.assertEqual(unmigrated_suggestion_model.change_cmd['content_id'], 'invalid_id')
 
 
-class MigrateQuestionSuggestionsJobTests(
-    job_test_utils.JobTestBase, test_utils.GenericTestBase
-):
+class MigrateQuestionSuggestionsJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
     JOB_CLASS = suggestion_migration_jobs.MigrateQuestionSuggestionsJob
 
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -524,26 +464,18 @@ class MigrateQuestionSuggestionsJobTests(
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        state = self._create_valid_question_data(
-            'default-state', content_id_generator
-        )
-        suggestion_change: Dict[
-            str, Union[str, float, question_domain.QuestionDict]
-        ] = {
+        state = self._create_valid_question_data('default-state', content_id_generator)
+        suggestion_change: Dict[str, Union[str, float, question_domain.QuestionDict]] = {
             'cmd': (question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
                 'question_state_data': state.to_dict(),
                 'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data_schema_version': (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'next_content_id_index': (
-                    content_id_generator.next_content_id_index
-                ),
+                'next_content_id_index': (content_id_generator.next_content_id_index),
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3,
@@ -558,86 +490,49 @@ class MigrateQuestionSuggestionsJobTests(
             'test description',
         )
 
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stdout='QUESTION MODELS COUNT SUCCESS: 1'
-                )
-            ]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='QUESTION MODELS COUNT SUCCESS: 1')])
 
     def test_unmigrated_question_suggestion_is_migrated(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        suggestion_id = (
-            self.save_new_question_suggestion_with_state_data_schema_v27(
-                self.author_id, skill_id
-            )
-        )
+        suggestion_id = self.save_new_question_suggestion_with_state_data_schema_v27(self.author_id, skill_id)
 
-        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
-            suggestion_id
-        )
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
         self.assertEqual(
-            suggestion.change_cmd['question_dict'][
-                'question_state_data_schema_version'
-            ],
+            suggestion.change_cmd['question_dict']['question_state_data_schema_version'],
             27,
         )
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='QUESTION MODELS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION MIGRATED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='QUESTION MODELS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='SUGGESTION MIGRATED SUCCESS: 1'),
             ]
         )
 
-        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
-            suggestion_id
-        )
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
         self.assertEqual(
-            suggestion.change_cmd['question_dict'][
-                'question_state_data_schema_version'
-            ],
+            suggestion.change_cmd['question_dict']['question_state_data_schema_version'],
             feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
 
     def test_migration_errors_are_reported_in_job_result(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        suggestion_id = (
-            self.save_new_question_suggestion_with_state_data_schema_v27(
-                self.author_id, skill_id
-            )
-        )
-        migrate_state_schema_raise = self.swap_to_always_raise(
-            question_fetchers, 'migrate_state_schema'
-        )
+        suggestion_id = self.save_new_question_suggestion_with_state_data_schema_v27(self.author_id, skill_id)
+        migrate_state_schema_raise = self.swap_to_always_raise(question_fetchers, 'migrate_state_schema')
         with migrate_state_schema_raise:
             self.assert_job_output_is(
                 [
-                    job_run_result.JobRunResult(
-                        stderr=(
-                            'SUGGESTION MIGRATED ERROR: "(\'%s\', '
-                            'Exception())": 1' % suggestion_id
-                        )
-                    ),
-                    job_run_result.JobRunResult(
-                        stdout='QUESTION MODELS COUNT SUCCESS: 1'
-                    ),
+                    job_run_result.JobRunResult(stderr=('SUGGESTION MIGRATED ERROR: "(\'%s\', Exception())": 1' % suggestion_id)),
+                    job_run_result.JobRunResult(stdout='QUESTION MODELS COUNT SUCCESS: 1'),
                 ]
             )
 
 
-class AuditMigrateQuestionSuggestionsJobTests(
-    job_test_utils.JobTestBase, test_utils.GenericTestBase
-):
+class AuditMigrateQuestionSuggestionsJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
     JOB_CLASS = suggestion_migration_jobs.AuditMigrateQuestionSuggestionsJob
 
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -653,66 +548,37 @@ class AuditMigrateQuestionSuggestionsJobTests(
     def test_unmigrated_question_suggestion_is_not_migrated(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        suggestion_id = (
-            self.save_new_question_suggestion_with_state_data_schema_v27(
-                self.author_id, skill_id
-            )
-        )
-        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
-            suggestion_id
-        )
+        suggestion_id = self.save_new_question_suggestion_with_state_data_schema_v27(self.author_id, skill_id)
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
         self.assertEqual(
-            suggestion.change_cmd['question_dict'][
-                'question_state_data_schema_version'
-            ],
+            suggestion.change_cmd['question_dict']['question_state_data_schema_version'],
             27,
         )
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='QUESTION MODELS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='SUGGESTION MIGRATED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='QUESTION MODELS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='SUGGESTION MIGRATED SUCCESS: 1'),
             ]
         )
 
-        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
-            suggestion_id
-        )
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
         self.assertEqual(
-            suggestion.change_cmd['question_dict'][
-                'question_state_data_schema_version'
-            ],
+            suggestion.change_cmd['question_dict']['question_state_data_schema_version'],
             27,
         )
 
     def test_audit_errors_are_reported_in_job_result(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        suggestion_id = (
-            self.save_new_question_suggestion_with_state_data_schema_v27(
-                self.author_id, skill_id
-            )
-        )
-        migrate_state_schema_raise = self.swap_to_always_raise(
-            question_fetchers, 'migrate_state_schema'
-        )
+        suggestion_id = self.save_new_question_suggestion_with_state_data_schema_v27(self.author_id, skill_id)
+        migrate_state_schema_raise = self.swap_to_always_raise(question_fetchers, 'migrate_state_schema')
         with migrate_state_schema_raise:
             self.assert_job_output_is(
                 [
-                    job_run_result.JobRunResult(
-                        stderr=(
-                            'SUGGESTION MIGRATED ERROR: "(\'%s\', '
-                            'Exception())": 1' % suggestion_id
-                        )
-                    ),
-                    job_run_result.JobRunResult(
-                        stdout='QUESTION MODELS COUNT SUCCESS: 1'
-                    ),
+                    job_run_result.JobRunResult(stderr=('SUGGESTION MIGRATED ERROR: "(\'%s\', Exception())": 1' % suggestion_id)),
+                    job_run_result.JobRunResult(stdout='QUESTION MODELS COUNT SUCCESS: 1'),
                 ]
             )

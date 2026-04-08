@@ -21,13 +21,13 @@ from __future__ import annotations
 import hashlib
 import logging
 
-from core import feconf
-from core.domain import platform_parameter_list, platform_parameter_services
-from core.platform import models
-
 import mailchimp3
 from mailchimp3 import mailchimpclient
 from typing import Any, Dict, Optional
+
+from core import feconf
+from core.domain import platform_parameter_list, platform_parameter_services
+from core.platform import models
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -49,9 +49,7 @@ def _get_subscriber_hash(email: str) -> str:
         Exception. Invalid type for email, expected string.
     """
     if not isinstance(email, str):
-        raise Exception(
-            'Invalid type for email. Expected string, received %s' % email
-        )
+        raise Exception('Invalid type for email. Expected string, received %s' % email)
     md5_hash = hashlib.md5()
     # The md5 accepts only bytes, so we first need to encode the email to bytes.
     md5_hash.update(email.encode('utf-8'))
@@ -68,18 +66,12 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         Mailchimp|None. A mailchimp class instance with the API key and username
         initialized.
     """
-    mailchimp_api_key: Optional[str] = secrets_services.get_secret(
-        'MAILCHIMP_API_KEY'
-    )
+    mailchimp_api_key: Optional[str] = secrets_services.get_secret('MAILCHIMP_API_KEY')
     if not mailchimp_api_key:
         logging.error('Mailchimp API key is not available.')
         return None
 
-    mailchimp_username = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.MAILCHIMP_USERNAME.value
-        )
-    )
+    mailchimp_username = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.MAILCHIMP_USERNAME.value)
     assert isinstance(mailchimp_username, str)
     if not mailchimp_username:
         logging.error('Mailchimp username is not set.')
@@ -119,15 +111,9 @@ def _create_user_in_mailchimp_db(
             mailchimp API.
     """
     try:
-        mailchimp_audience_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
-            )
-        )
+        mailchimp_audience_id = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value)
         assert isinstance(mailchimp_audience_id, str)
-        client.lists.members.create(
-            mailchimp_audience_id, subscribed_mailchimp_data
-        )
+        client.lists.members.create(mailchimp_audience_id, subscribed_mailchimp_data)
     except mailchimpclient.MailChimpError as error:
         error_message = error.args[0]
         # This is the specific error message returned for the case where the
@@ -165,16 +151,10 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
     subscriber_hash = _get_subscriber_hash(user_email)
     try:
-        mailchimp_audience_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
-            )
-        )
+        mailchimp_audience_id = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value)
         assert isinstance(mailchimp_audience_id, str)
         client.lists.members.get(mailchimp_audience_id, subscriber_hash)
-        client.lists.members.delete_permanent(
-            mailchimp_audience_id, subscriber_hash
-        )
+        client.lists.members.delete_permanent(mailchimp_audience_id, subscriber_hash)
     except mailchimpclient.MailChimpError as error:
         error_message = error.args[0]
         # Ignore if the error corresponds to "User does not exist".
@@ -227,11 +207,7 @@ def add_or_update_user_status(
     if tag not in feconf.VALID_MAILCHIMP_TAGS:
         raise Exception('Invalid tag: %s' % tag)
 
-    invalid_keys = [
-        key
-        for key in merge_fields
-        if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS
-    ]
+    invalid_keys = [key for key in merge_fields if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS]
     if invalid_keys:
         raise Exception('Invalid Merge Fields: %s' % invalid_keys)
 
@@ -273,18 +249,12 @@ def add_or_update_user_status(
         }
 
         if 'NAME' in merge_fields and merge_fields['NAME'] is not None:
-            new_user_mailchimp_data['merge_fields']['NAME'] = merge_fields[
-                'NAME'
-            ]
-            subscribed_mailchimp_data['merge_fields']['NAME'] = merge_fields[
-                'NAME'
-            ]
+            new_user_mailchimp_data['merge_fields']['NAME'] = merge_fields['NAME']
+            subscribed_mailchimp_data['merge_fields']['NAME'] = merge_fields['NAME']
 
     try:
         try:
-            mailchimp_audience_id = platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
-            )
+            mailchimp_audience_id = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value)
             assert isinstance(mailchimp_audience_id, str)
             client.lists.members.get(mailchimp_audience_id, subscriber_hash)
 
@@ -293,9 +263,7 @@ def add_or_update_user_status(
             # programmatically added back, so we change their status based on
             # preference.
             if can_receive_email_updates:
-                client.lists.members.tags.update(
-                    mailchimp_audience_id, subscriber_hash, tag_data
-                )
+                client.lists.members.tags.update(mailchimp_audience_id, subscriber_hash, tag_data)
                 client.lists.members.update(
                     mailchimp_audience_id,
                     subscriber_hash,
@@ -312,9 +280,7 @@ def add_or_update_user_status(
             # Error 404 corresponds to 'User does not exist'.
             if error_message['status'] == 404:
                 if can_receive_email_updates:
-                    user_creation_successful = _create_user_in_mailchimp_db(
-                        client, new_user_mailchimp_data
-                    )
+                    user_creation_successful = _create_user_in_mailchimp_db(client, new_user_mailchimp_data)
                     if not user_creation_successful:
                         return False
             else:

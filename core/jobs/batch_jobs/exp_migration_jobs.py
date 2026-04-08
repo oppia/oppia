@@ -20,6 +20,10 @@ from __future__ import annotations
 
 import logging
 
+import apache_beam as beam
+import result
+from typing import Iterable, Sequence, Tuple
+
 from core import feconf
 from core.constants import constants
 from core.domain import exp_domain, exp_fetchers, exp_services
@@ -29,17 +33,11 @@ from core.jobs.transforms import job_result_transforms, results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
-import apache_beam as beam
-import result
-from typing import Iterable, Sequence, Tuple
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services, exp_models
 
-(base_models, exp_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.EXPLORATION]
-)
+(base_models, exp_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -54,11 +52,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
     """
 
     @staticmethod
-    def _migrate_exploration(
-        exp_model: exp_models.ExplorationModel, exp_is_published: bool
-    ) -> result.Result[
-        Tuple[str, exp_domain.Exploration], Tuple[str, Exception]
-    ]:
+    def _migrate_exploration(exp_model: exp_models.ExplorationModel, exp_is_published: bool) -> result.Result[Tuple[str, exp_domain.Exploration], Tuple[str, Exception]]:
         """Migrates exploration and transform exploration model into
         exploration object.
 
@@ -80,15 +74,8 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
                 # because feature flags need to be fetched from the
                 # datastore as part of validation.
                 exploration.validate(strict=exp_is_published)
-                if (
-                    exp_services.get_story_id_linked_to_exploration(
-                        exp_model.id
-                    )
-                    is not None
-                ):
-                    exp_services.validate_exploration_for_story(
-                        exploration, True
-                    )
+                if exp_services.get_story_id_linked_to_exploration(exp_model.id) is not None:
+                    exp_services.validate_exploration_for_story(exploration, True)
 
         except Exception as e:
             logging.exception(e)
@@ -97,9 +84,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         return result.Ok((exp_model.id, exploration))
 
     @staticmethod
-    def _generate_exploration_changes(
-        exp_id: str, exp_model: exp_models.ExplorationModel
-    ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
+    def _generate_exploration_changes(exp_id: str, exp_model: exp_models.ExplorationModel) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. The ExplorationChange object
         is only generated when the exploration's states schema version is lower
         than the latest schema version.
@@ -117,9 +102,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         if exp_states_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
             exp_change = exp_domain.ExplorationChange(
                 {
-                    'cmd': (
-                        exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION
-                    ),
+                    'cmd': (exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
                     'from_version': str(exp_states_version),
                     'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION),
                 }
@@ -145,12 +128,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         """
         unmigrated_exploration_models = (
             pipeline
-            | 'Get all non-deleted exploration models'
-            >> (
-                ndb_io.GetModels(
-                    exp_models.ExplorationModel.get_all(include_deleted=False)
-                )
-            )
+            | 'Get all non-deleted exploration models' >> (ndb_io.GetModels(exp_models.ExplorationModel.get_all(include_deleted=False)))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration keys'
@@ -161,8 +139,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
 
         exp_publication_status = (
             pipeline
-            | 'Get all non-deleted exploration rights models'
-            >> (ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
+            | 'Get all non-deleted exploration rights models' >> (ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
             | 'Extract publication status'
             >> beam.Map(
                 lambda exp_rights: (
@@ -178,32 +155,16 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             | 'Get rid of exp ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
             | 'Transform and migrate model'
             >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
-                lambda exploration_models, status: self._migrate_exploration(
-                    exploration_models[0], status[0]
-                )
+                lambda exploration_models, status: self._migrate_exploration(exploration_models[0], status[0])
             )
         )
 
-        migrated_exp_job_run_results = (
-            all_migrated_exp_results
-            | 'Generate results for migration'
-            >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
-        )
+        migrated_exp_job_run_results = all_migrated_exp_results | 'Generate results for migration' >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
 
-        filtered_migrated_exp = (
-            all_migrated_exp_results
-            | 'Filter migration results'
-            >> (results_transforms.DrainResultsOnError())
-        )
-        migrated_exp = filtered_migrated_exp | 'Unwrap ok' >> beam.Map(
-            lambda result_item: result_item.unwrap()
-        )
+        filtered_migrated_exp = all_migrated_exp_results | 'Filter migration results' >> (results_transforms.DrainResultsOnError())
+        migrated_exp = filtered_migrated_exp | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
 
-        exp_changes = (
-            unmigrated_exploration_models
-            | 'Generate exploration changes'
-            >> beam.FlatMapTuple(self._generate_exploration_changes)
-        )
+        exp_changes = unmigrated_exploration_models | 'Generate exploration changes' >> beam.FlatMapTuple(self._generate_exploration_changes)
 
         exp_objects_list = (
             {
@@ -217,12 +178,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
 
         transformed_exp_objects_list = (
             exp_objects_list
-            | 'Remove unmigrated explorations'
-            >> beam.Filter(
-                lambda x: (
-                    len(x['exp_changes']) > 0 and len(x['exploration']) > 0
-                )
-            )
+            | 'Remove unmigrated explorations' >> beam.Filter(lambda x: (len(x['exp_changes']) > 0 and len(x['exploration']) > 0))
             | 'Reorganize the exploration objects'
             >> beam.Map(
                 lambda objects: {
@@ -233,29 +189,9 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             )
         )
 
-        exp_objects_list_job_run_results = (
-            transformed_exp_objects_list
-            | 'Transform exp objects into job run results'
-            >> (
-                job_result_transforms.CountObjectsToJobRunResult('EXP MIGRATED')
-            )
-        )
+        exp_objects_list_job_run_results = transformed_exp_objects_list | 'Transform exp objects into job run results' >> (job_result_transforms.CountObjectsToJobRunResult('EXP MIGRATED'))
 
-        already_migrated_job_run_results = (
-            exp_objects_list
-            | 'Remove migrated explorations'
-            >> beam.Filter(
-                lambda x: (
-                    len(x['exp_changes']) == 0 and len(x['exploration']) > 0
-                )
-            )
-            | 'Transform previously migrated exps into job run results'
-            >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXP PREVIOUSLY MIGRATED'
-                )
-            )
-        )
+        already_migrated_job_run_results = exp_objects_list | 'Remove migrated explorations' >> beam.Filter(lambda x: (len(x['exp_changes']) == 0 and len(x['exploration']) > 0)) | 'Transform previously migrated exps into job run results' >> (job_result_transforms.CountObjectsToJobRunResult('EXP PREVIOUSLY MIGRATED'))
 
         job_run_results = (
             migrated_exp_job_run_results,
@@ -290,13 +226,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
             the datastore.
         """
         try:
-            updated_exp_model = exp_services.populate_exp_model_fields(
-                exp_model, migrated_exp
-            )
+            updated_exp_model = exp_services.populate_exp_model_fields(exp_model, migrated_exp)
 
-            commit_message = (
-                'Update exploration states schema version to %d.'
-            ) % (feconf.CURRENT_STATE_SCHEMA_VERSION)
+            commit_message = ('Update exploration states schema version to %d.') % (feconf.CURRENT_STATE_SCHEMA_VERSION)
             models_to_put_values = []
             with datastore_services.get_ndb_context():
                 models_to_put_values = exp_services.compute_models_to_put_when_saving_new_exp_version(
@@ -305,9 +237,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     exp_changes,
                     commit_message,
                 )
-            datastore_services.update_timestamps_multi(
-                list(models_to_put_values)
-            )
+            datastore_services.update_timestamps_multi(list(models_to_put_values))
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_model.id, e))
@@ -322,46 +252,20 @@ class MigrateExplorationJob(base_jobs.JobBase):
             migration.
         """
 
-        transformed_exp_objects_list, job_run_results = (
-            self.pipeline
-            | 'Perform migration and filter migration results'
-            >> (MigrateExplorationModels())
-        )
+        transformed_exp_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateExplorationModels())
 
-        exp_related_models_results = (
-            transformed_exp_objects_list
-            | 'Generate exploration models to put'
-            >> beam.Map(
-                lambda exp_objects: self._update_exploration(
-                    exp_objects['exp_model'],
-                    exp_objects['exploration'],
-                    exp_objects['exp_changes'],
-                )
+        exp_related_models_results = transformed_exp_objects_list | 'Generate exploration models to put' >> beam.Map(
+            lambda exp_objects: self._update_exploration(
+                exp_objects['exp_model'],
+                exp_objects['exploration'],
+                exp_objects['exp_changes'],
             )
         )
 
-        exp_related_models_to_put = (
-            exp_related_models_results
-            | 'Filter results with oks'
-            >> beam.Filter(lambda result_item: result_item.is_ok())
-            | 'Unwrap models'
-            >> beam.FlatMap(lambda result_item: result_item.unwrap())
-        )
+        exp_related_models_to_put = exp_related_models_results | 'Filter results with oks' >> beam.Filter(lambda result_item: result_item.is_ok()) | 'Unwrap models' >> beam.FlatMap(lambda result_item: result_item.unwrap())
 
-        exp_related_models_job_results = (
-            exp_related_models_results
-            | 'Generate results for exp related models'
-            >> (
-                job_result_transforms.ResultsToJobRunResults(
-                    'EXP RELATED MODELS GENERATED'
-                )
-            )
-        )
-        unused_put_results = (
-            exp_related_models_to_put
-            | 'Filter None models' >> beam.Filter(lambda x: x is not None)
-            | 'Put models into datastore' >> ndb_io.PutModels()
-        )
+        exp_related_models_job_results = exp_related_models_results | 'Generate results for exp related models' >> (job_result_transforms.ResultsToJobRunResults('EXP RELATED MODELS GENERATED'))
+        (exp_related_models_to_put | 'Filter None models' >> beam.Filter(lambda x: x is not None) | 'Put models into datastore' >> ndb_io.PutModels())
 
         return (
             job_run_results,
@@ -381,11 +285,7 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
             migration.
         """
 
-        unused_transformed_exp_objects_list, job_run_results = (
-            self.pipeline
-            | 'Perform migration and filter migration results'
-            >> (MigrateExplorationModels())
-        )
+        unused_transformed_exp_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateExplorationModels())
 
         return job_run_results
 
@@ -394,11 +294,7 @@ class RegenerateMissingExplorationStatsModelsJob(base_jobs.JobBase):
     """Job that regenerates missing exploration stats models."""
 
     @staticmethod
-    def _regenerate_stats_models(
-        exp_id: str, unused_exp_model: exp_models.ExplorationModel
-    ) -> result.Result[
-        Tuple[str, exp_domain.Exploration], Tuple[str, Exception]
-    ]:
+    def _regenerate_stats_models(exp_id: str, unused_exp_model: exp_models.ExplorationModel) -> result.Result[Tuple[str, exp_domain.Exploration], Tuple[str, Exception]]:
         """Regenerates missing exploration stats models.
 
         Args:
@@ -414,9 +310,7 @@ class RegenerateMissingExplorationStatsModelsJob(base_jobs.JobBase):
         results = None
         try:
             with datastore_services.get_ndb_context():
-                results = exp_services.regenerate_missing_stats_for_exploration(
-                    exp_id
-                )
+                results = exp_services.regenerate_missing_stats_for_exploration(exp_id)
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_id, e))
@@ -432,12 +326,7 @@ class RegenerateMissingExplorationStatsModelsJob(base_jobs.JobBase):
 
         unmigrated_exploration_models = (
             self.pipeline
-            | 'Get all non-deleted exploration models'
-            >> (
-                ndb_io.GetModels(
-                    exp_models.ExplorationModel.get_all(include_deleted=False)
-                )
-            )
+            | 'Get all non-deleted exploration models' >> (ndb_io.GetModels(exp_models.ExplorationModel.get_all(include_deleted=False)))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration keys'
@@ -446,26 +335,14 @@ class RegenerateMissingExplorationStatsModelsJob(base_jobs.JobBase):
             )
             # TODO(#15871): This filter should be removed after the explorations
             # are fixed and it is possible to migrate them.
-            | 'Remove broken exploration'
-            >> beam.Filter(
-                lambda id_and_exp: id_and_exp[0]
-                not in ('umPkwp0L1M0-', '670bU6d9JGBh')
-            )
+            | 'Remove broken exploration' >> beam.Filter(lambda id_and_exp: id_and_exp[0] not in ('umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
-        regenerated_stats_results = (
-            unmigrated_exploration_models
-            | 'Transform and migrate model'
-            >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
-                self._regenerate_stats_models
-            )
+        regenerated_stats_results = unmigrated_exploration_models | 'Transform and migrate model' >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+            self._regenerate_stats_models
         )
 
-        regenerated_stats_job_run_results = (
-            regenerated_stats_results
-            | 'Generate results for migration'
-            >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
-        )
+        regenerated_stats_job_run_results = regenerated_stats_results | 'Generate results for migration' >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
 
         return regenerated_stats_job_run_results
 
@@ -494,19 +371,12 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
             tuple that consists of exploration ID and Exception if any.
         """
         with datastore_services.get_ndb_context():
-            latest_exploration = exp_fetchers.get_exploration_by_id(
-                exp_id, strict=False
-            )
+            latest_exploration = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
             if latest_exploration is None:
-                return result.Err(
-                    (exp_id, Exception('Exploration does not exist.'))
-                )
+                return result.Err((exp_id, Exception('Exploration does not exist.')))
 
             exploration_model = exp_models.ExplorationModel.get(exp_id)
-        if (
-            exploration_model.states_schema_version
-            != feconf.CURRENT_STATE_SCHEMA_VERSION
-        ):
+        if exploration_model.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
             return result.Err(
                 (
                     exp_id,
@@ -520,9 +390,7 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
             return result.Err(
                 (
                     exp_id,
-                    Exception(
-                        'Exploration %s failed non-strict validation' % exp_id
-                    ),
+                    Exception('Exploration %s failed non-strict validation' % exp_id),
                 )
             )
 
@@ -535,9 +403,7 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
             exp_snapshot_model.content['states_schema_version'] = 0
 
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        current_state_schema_version = exp_snapshot_model.content[
-            'states_schema_version'
-        ]
+        current_state_schema_version = exp_snapshot_model.content['states_schema_version']
         if current_state_schema_version == target_state_schema_version:
             return result.Err(
                 (
@@ -546,11 +412,9 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                 )
             )
 
-        versioned_exploration_states = (
-            exp_domain.VersionedExplorationStatesDict(
-                states_schema_version=current_state_schema_version,
-                states=exp_snapshot_model.content['states'],
-            )
+        versioned_exploration_states = exp_domain.VersionedExplorationStatesDict(
+            states_schema_version=current_state_schema_version,
+            states=exp_snapshot_model.content['states'],
         )
         while (  # pragma: no branch
             current_state_schema_version < target_state_schema_version
@@ -565,10 +429,7 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                     )
                 current_state_schema_version += 1
             except Exception as e:
-                error_message = (
-                    'Exploration snapshot %s failed migration to states '
-                    'v%s: %s' % (exp_id, current_state_schema_version + 1, e)
-                )
+                error_message = 'Exploration snapshot %s failed migration to states v%s: %s' % (exp_id, current_state_schema_version + 1, e)
                 logging.exception(error_message)
                 return result.Err((exp_id, Exception(error_message)))
 
@@ -587,14 +448,7 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
         """
         unmigrated_exploration_models = (
             self.pipeline
-            | 'Get all exploration snapshot content models'
-            >> (
-                ndb_io.GetModels(
-                    exp_models.ExplorationSnapshotContentModel.get_all(
-                        include_deleted=False
-                    )
-                )
-            )
+            | 'Get all exploration snapshot content models' >> (ndb_io.GetModels(exp_models.ExplorationSnapshotContentModel.get_all(include_deleted=False)))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration keys'
@@ -603,19 +457,11 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
             )
         )
 
-        migrated_exp_results = (
-            unmigrated_exploration_models
-            | 'Transform and migrate model'
-            >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
-                self._migrate_exploration_snapshot_model
-            )
+        migrated_exp_results = unmigrated_exploration_models | 'Transform and migrate model' >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+            self._migrate_exploration_snapshot_model
         )
 
-        migrated_exp_job_run_results = (
-            migrated_exp_results
-            | 'Generate results for migration'
-            >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
-        )
+        migrated_exp_job_run_results = migrated_exp_results | 'Generate results for migration' >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
 
         return migrated_exp_job_run_results
 
@@ -649,25 +495,16 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
             tuple that consists of exploration ID and Exception if any.
         """
         with datastore_services.get_ndb_context():
-            latest_exploration = exp_fetchers.get_exploration_by_id(
-                exp_id, strict=False
-            )
+            latest_exploration = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
             if latest_exploration is None:
-                return result.Err(
-                    (exp_id, Exception('Exploration does not exist.'))
-                )
+                return result.Err((exp_id, Exception('Exploration does not exist.')))
 
             exploration_model = exp_models.ExplorationModel.get(exp_id)
-            if (
-                exploration_model.states_schema_version
-                != feconf.CURRENT_STATE_SCHEMA_VERSION
-            ):
+            if exploration_model.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
                 return result.Err(
                     (
                         exp_id,
-                        Exception(
-                            'Exploration is not at latest schema version'
-                        ),
+                        Exception('Exploration is not at latest schema version'),
                     )
                 )
 
@@ -677,9 +514,7 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
             return result.Err(
                 (
                     exp_id,
-                    Exception(
-                        'Exploration %s failed non-strict validation' % exp_id
-                    ),
+                    Exception('Exploration %s failed non-strict validation' % exp_id),
                 )
             )
 
@@ -692,9 +527,7 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
             exp_snapshot_model.content['states_schema_version'] = 0
 
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        current_state_schema_version = exp_snapshot_model.content[
-            'states_schema_version'
-        ]
+        current_state_schema_version = exp_snapshot_model.content['states_schema_version']
         if current_state_schema_version == target_state_schema_version:
             return result.Err(
                 (
@@ -703,11 +536,9 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                 )
             )
 
-        versioned_exploration_states = (
-            exp_domain.VersionedExplorationStatesDict(
-                states_schema_version=current_state_schema_version,
-                states=exp_snapshot_model.content['states'],
-            )
+        versioned_exploration_states = exp_domain.VersionedExplorationStatesDict(
+            states_schema_version=current_state_schema_version,
+            states=exp_snapshot_model.content['states'],
         )
         while current_state_schema_version < target_state_schema_version:
             try:
@@ -720,19 +551,12 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                     )
                 current_state_schema_version += 1
             except Exception as e:
-                error_message = (
-                    'Exploration snapshot %s failed migration to states '
-                    'v%s: %s' % (exp_id, current_state_schema_version + 1, e)
-                )
+                error_message = 'Exploration snapshot %s failed migration to states v%s: %s' % (exp_id, current_state_schema_version + 1, e)
                 logging.exception(error_message)
                 return result.Err((exp_id, Exception(error_message)))
 
-        exp_snapshot_model.content['states'] = versioned_exploration_states[
-            'states'
-        ]
-        exp_snapshot_model.content['states_schema_version'] = (
-            current_state_schema_version
-        )
+        exp_snapshot_model.content['states'] = versioned_exploration_states['states']
+        exp_snapshot_model.content['states_schema_version'] = current_state_schema_version
         with datastore_services.get_ndb_context():
             exp_snapshot_model.update_timestamps(update_last_updated_time=False)
             exp_snapshot_model.put()
@@ -749,14 +573,7 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
         """
         unmigrated_exploration_models = (
             self.pipeline
-            | 'Get all exploration snapshot content models'
-            >> (
-                ndb_io.GetModels(
-                    exp_models.ExplorationSnapshotContentModel.get_all(
-                        include_deleted=False
-                    )
-                )
-            )
+            | 'Get all exploration snapshot content models' >> (ndb_io.GetModels(exp_models.ExplorationSnapshotContentModel.get_all(include_deleted=False)))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add exploration keys'
@@ -765,18 +582,10 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
             )
         )
 
-        migrated_exp_results = (
-            unmigrated_exploration_models
-            | 'Transform and migrate model'
-            >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
-                self._migrate_exploration_snapshot_model
-            )
+        migrated_exp_results = unmigrated_exploration_models | 'Transform and migrate model' >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+            self._migrate_exploration_snapshot_model
         )
 
-        migrated_exp_job_run_results = (
-            migrated_exp_results
-            | 'Generate results for migration'
-            >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
-        )
+        migrated_exp_job_run_results = migrated_exp_results | 'Generate results for migration' >> (job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
 
         return migrated_exp_job_run_results

@@ -16,10 +16,10 @@
 
 from __future__ import annotations
 
+from typing import Dict, TypedDict
+
 from core.controllers import acl_decorators, base
 from core.domain import app_feedback_report_domain, app_feedback_report_services
-
-from typing import Dict, TypedDict
 
 USER_SUPPLIED_FEEDBACK_DICT_SCHEMA = {
     'type': 'dict',
@@ -191,9 +191,7 @@ class IncomingAndroidFeedbackReportHandler(
         report_obj = app_feedback_report_domain.AppFeedbackReport.from_submitted_feedback_dict(  # pylint: disable=line-too-long
             report_dict
         )
-        app_feedback_report_services.save_feedback_report_to_storage(
-            report_obj, new_incoming_report=True
-        )
+        app_feedback_report_services.save_feedback_report_to_storage(report_obj, new_incoming_report=True)
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
         return self.render_json({})

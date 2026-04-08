@@ -21,10 +21,10 @@ from __future__ import annotations
 import enum
 import uuid
 
+from typing import Dict, Final, List, Type
+
 from core import feconf, utils
 from core.platform import models
-
-from typing import Dict, Final, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -54,10 +54,7 @@ def _get_new_model_id(model_class: Type[base_models.BaseModel]) -> str:
         new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
         if model_class.get(new_id, strict=False) is None:
             return new_id
-    raise RuntimeError(
-        'Failed to generate a unique ID after %d attempts'
-        % (_MAX_ID_GENERATION_ATTEMPTS)
-    )
+    raise RuntimeError('Failed to generate a unique ID after %d attempts' % (_MAX_ID_GENERATION_ATTEMPTS))
 
 
 class CloudTaskState(enum.Enum):
@@ -88,22 +85,16 @@ class CloudTaskRunModel(base_models.BaseModel):
     # The pattern of the cloud task name is:
     # projects/{project_id}/locations/{location_id}/queues/{queue_id}/tasks/
     # {task_id}
-    cloud_task_name = datastore_services.StringProperty(
-        required=False, indexed=True
-    )
+    cloud_task_name = datastore_services.StringProperty(required=False, indexed=True)
 
     # The task_id is the ID of the cloud task run. Added as a seperate
     # property to allow for easier querying of tasks by their ID.
-    task_id = datastore_services.StringProperty(
-        required=True, indexed=True, default=None
-    )
+    task_id = datastore_services.StringProperty(required=True, indexed=True, default=None)
 
     # The queue_id is the ID of the queue that the cloud task belongs to. Added
     # as a separate property to allow for easier querying of tasks by their
     # queue ID.
-    queue_id = datastore_services.StringProperty(
-        required=True, indexed=True, default=None
-    )
+    queue_id = datastore_services.StringProperty(required=True, indexed=True, default=None)
 
     # The state of the job at the time the model was last updated.
     latest_job_state = datastore_services.StringProperty(
@@ -125,20 +116,14 @@ class CloudTaskRunModel(base_models.BaseModel):
     function_id = datastore_services.StringProperty(
         required=True,
         indexed=True,
-        choices=list(
-            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS.values()
-        ),
+        choices=list(feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS.values()),
     )
 
     # The property stores exception messages for failed runs of the cloud task.
-    exception_messages_for_failed_runs = datastore_services.JsonProperty(
-        required=False, indexed=False, default=[]
-    )
+    exception_messages_for_failed_runs = datastore_services.JsonProperty(required=False, indexed=False, default=[])
 
     # The property tracks the number of retry attempts for the cloud task run.
-    current_retry_attempt = datastore_services.IntegerProperty(
-        required=True, indexed=True, default=0
-    )
+    current_retry_attempt = datastore_services.IntegerProperty(required=True, indexed=True, default=0)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -155,9 +140,7 @@ class CloudTaskRunModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -172,9 +155,7 @@ class CloudTaskRunModel(base_models.BaseModel):
                 'queue_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'function_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'exception_messages_for_failed_runs': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                ),
+                'exception_messages_for_failed_runs': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
                 'current_retry_attempt': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
@@ -213,9 +194,7 @@ class CloudTaskRunModel(base_models.BaseModel):
             CloudTaskRunModel. The newly created CloudTaskRunModel instance.
         """
 
-        queue_id = CloudTaskRunModel.get_queue_id_from_task_name(
-            cloud_task_name
-        )
+        queue_id = CloudTaskRunModel.get_queue_id_from_task_name(cloud_task_name)
         task_id = CloudTaskRunModel.get_task_id_from_task_name(cloud_task_name)
 
         cloud_task_run_model = cls(
@@ -286,8 +265,7 @@ class CloudTaskRunModel(base_models.BaseModel):
             CloudTaskRunModel.query(
                 datastore_services.all_of(
                     cls.queue_id == queue_id,
-                    cls.deleted  # pylint: disable=singleton-comparison
-                    == False,
+                    not cls.deleted,
                 )
             ).fetch()
         )
@@ -303,20 +281,14 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
     """
 
     # The exploration ID for which the voiceover regeneration is requested.
-    exploration_id = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    exploration_id = datastore_services.StringProperty(required=True, indexed=True)
 
     # ID of the corresponding CloudTaskRunModel.
-    cloud_task_run_id = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    cloud_task_run_id = datastore_services.StringProperty(required=True, indexed=True)
 
     # A dictionary mapping language-accent codes to nested dicts, each nested
     # dict containing content IDs as keys and regeneration status as values.
-    language_accent_to_content_status_map = datastore_services.JsonProperty(
-        required=True, indexed=False
-    )
+    language_accent_to_content_status_map = datastore_services.JsonProperty(required=True, indexed=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -324,9 +296,7 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -338,16 +308,12 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
             **{
                 'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'cloud_task_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'language_accent_to_content_status_map': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                ),
+                'language_accent_to_content_status_map': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             },
         )
 
     @classmethod
-    def get_voiceover_regeneration_tasks_by_exploration_id(
-        cls, exploration_id: str
-    ) -> List[VoiceoverRegenerationTaskMappingModel]:
+    def get_voiceover_regeneration_tasks_by_exploration_id(cls, exploration_id: str) -> List[VoiceoverRegenerationTaskMappingModel]:
         """The method fetches all voiceover regeneration task requests for the
         given exploration ID.
 
@@ -363,8 +329,7 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
             VoiceoverRegenerationTaskMappingModel.query(
                 datastore_services.all_of(
                     cls.exploration_id == exploration_id,
-                    cls.deleted  # pylint: disable=singleton-comparison
-                    == False,
+                    not cls.deleted,
                 )
             ).fetch()
         )

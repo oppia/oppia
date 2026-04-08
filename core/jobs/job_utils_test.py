@@ -20,11 +20,11 @@ from __future__ import annotations
 
 import datetime
 
+from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
+
 from core.jobs import job_utils
 from core.platform import models
 from core.tests import test_utils
-
-from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -106,9 +106,7 @@ class CloneTests(test_utils.TestBase):
 
 class GetModelClassTests(test_utils.TestBase):
     def test_get_from_existing_model(self) -> None:
-        self.assertIs(
-            job_utils.get_model_class('BaseModel'), base_models.BaseModel
-        )
+        self.assertIs(job_utils.get_model_class('BaseModel'), base_models.BaseModel)
 
     def test_get_from_non_existing_model(self) -> None:
         with self.assertRaisesRegex(Exception, 'No model class found'):
@@ -122,9 +120,7 @@ class GetModelKindTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_model_kind(model), 'BaseModel')
 
     def test_get_from_datastore_model_class(self) -> None:
-        self.assertEqual(
-            job_utils.get_model_kind(base_models.BaseModel), 'BaseModel'
-        )
+        self.assertEqual(job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
@@ -250,17 +246,11 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
         self.assertEqual(
             model,
-            job_utils.get_ndb_model_from_beam_entity(
-                job_utils.get_beam_entity_from_ndb_model(model)
-            ),
+            job_utils.get_ndb_model_from_beam_entity(job_utils.get_beam_entity_from_ndb_model(model)),
         )
 
     def test_from_and_then_to_beam_entity(self) -> None:
-        beam_entity = beam_datastore_types.Entity(
-            beam_datastore_types.Key(
-                ('CoreModel', 'abc'), project=self.oppia_project_id
-            )
-        )
+        beam_entity = beam_datastore_types.Entity(beam_datastore_types.Key(('CoreModel', 'abc'), project=self.oppia_project_id))
         beam_entity.set_properties(
             {
                 'prop': 123,
@@ -272,9 +262,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
         self.assertEqual(
             beam_entity,
-            job_utils.get_beam_entity_from_ndb_model(
-                job_utils.get_ndb_model_from_beam_entity(beam_entity)
-            ),
+            job_utils.get_beam_entity_from_ndb_model(job_utils.get_ndb_model_from_beam_entity(beam_entity)),
         )
 
 
@@ -309,24 +297,14 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
         self.assertEqual(beam_query.filters, (('prop', '>=', 3),))
 
     def test_query_with_range_like_filter(self) -> None:
-        query = datastore_services.Query(
-            filters=datastore_services.all_of(
-                BarModel.prop >= 3, BarModel.prop < 6
-            )
-        )
+        query = datastore_services.Query(filters=datastore_services.all_of(BarModel.prop >= 3, BarModel.prop < 6))
 
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
-        self.assertEqual(
-            beam_query.filters, (('prop', '>=', 3), ('prop', '<', 6))
-        )
+        self.assertEqual(beam_query.filters, (('prop', '>=', 3), ('prop', '<', 6)))
 
     def test_query_with_or_filter_raises_type_error(self) -> None:
-        query = datastore_services.Query(
-            filters=datastore_services.any_of(
-                BarModel.prop == 1, BarModel.prop == 2
-            )
-        )
+        query = datastore_services.Query(filters=datastore_services.any_of(BarModel.prop == 1, BarModel.prop == 2))
 
         with self.assertRaisesRegex(TypeError, 'forbidden filter'):
             job_utils.get_beam_query_from_ndb_query(query)
@@ -338,9 +316,7 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_not_equal_filter_raises_type_error(self) -> None:
-        query = datastore_services.Query(
-            filters=datastore_services.not_equal(BarModel.prop, 1)
-        )
+        query = datastore_services.Query(filters=datastore_services.not_equal(BarModel.prop, 1))
 
         with self.assertRaisesRegex(TypeError, 'forbidden filter'):
             job_utils.get_beam_query_from_ndb_query(query)

@@ -20,14 +20,14 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Final, Type
+
 from core import feconf
 from core.domain import topic_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import topic_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Final, Type
 
 MYPY = True
 if MYPY:
@@ -37,9 +37,7 @@ if MYPY:
 
 
 class MigrateTopicJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[topic_migration_jobs.MigrateTopicJob] = (
-        topic_migration_jobs.MigrateTopicJob
-    )
+    JOB_CLASS: Type[topic_migration_jobs.MigrateTopicJob] = topic_migration_jobs.MigrateTopicJob
 
     TOPIC_1_ID: Final = 'topic_1_id'
     TOPIC_2_ID: Final = 'topic_2_id'
@@ -165,12 +163,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
             self.assert_job_output_is(
                 [
-                    job_run_result.JobRunResult(
-                        stdout='TOPIC PROCESSED SUCCESS: 1'
-                    ),
-                    job_run_result.JobRunResult(
-                        stdout='TOPIC MIGRATED SUCCESS: 1'
-                    ),
+                    job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+                    job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
                 ]
             )
 
@@ -208,15 +202,11 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
                 job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
             ]
         )
-        migrated_topic_summary_model = topic_models.TopicSummaryModel.get(
-            self.TOPIC_1_ID
-        )
+        migrated_topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_1_ID)
         self.assertEqual(migrated_topic_summary_model.version, 2)
 
     def test_broken_topic_leads_to_no_migration(self) -> None:
@@ -262,26 +252,14 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
-                        '\'Invalid language code: abc\''
-                        '))": 1'
-                    )
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stderr=('TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError(\'Invalid language code: abc\'))": 1')),
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
             ]
         )
-        first_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_1_ID
-        )
+        first_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(first_migrated_topic_model.version, 1)
 
-        second_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_2_ID
-        )
+        second_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_2_ID)
         self.assertEqual(second_migrated_topic_model.version, 1)
 
     def test_migrated_topic_is_not_migrated(self) -> None:
@@ -307,12 +285,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'),
             ]
         )
 
@@ -321,9 +295,7 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
 
 class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[topic_migration_jobs.AuditTopicMigrateJob] = (
-        topic_migration_jobs.AuditTopicMigrateJob
-    )
+    JOB_CLASS: Type[topic_migration_jobs.AuditTopicMigrateJob] = topic_migration_jobs.AuditTopicMigrateJob
 
     TOPIC_1_ID: Final = 'topic_1_id'
     TOPIC_2_ID: Final = 'topic_2_id'
@@ -465,26 +437,14 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
-                        '\'Invalid language code: abc\''
-                        '))": 1'
-                    )
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stderr=('TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError(\'Invalid language code: abc\'))": 1')),
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
             ]
         )
-        first_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_1_ID
-        )
+        first_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(first_migrated_topic_model.version, 1)
 
-        second_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_2_ID
-        )
+        second_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_2_ID)
         self.assertEqual(second_migrated_topic_model.version, 1)
 
     def test_migrated_topic_is_not_migrated(self) -> None:
@@ -510,12 +470,8 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'),
             ]
         )
 

@@ -21,12 +21,12 @@ from __future__ import annotations
 import copy
 import datetime
 
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+
 import core.storage.base_model.gae_models as base_models
 from core import feconf, utils
 from core.constants import constants
 from core.platform import models
-
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,23 +60,17 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the collection being edited.
-    collection_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    collection_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: user_id field.
         """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
+        return base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -142,21 +136,12 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                     this batch.
         """
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError(
-                'max_age must be a datetime.timedelta instance or None.'
-            )
+            raise ValueError('max_age must be a datetime.timedelta instance or None.')
 
-        query = cls.query(
-            cls.post_commit_is_private  # pylint: disable=singleton-comparison
-            == False
-        )
+        query = cls.query(not cls.post_commit_is_private)
         if max_age:
-            query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age
-            )
-        return cls._fetch_page_sorted_by_last_updated(
-            query, page_size, urlsafe_start_cursor
-        )
+            query = query.filter(cls.last_updated >= datetime.datetime.utcnow() - max_age)
+        return cls._fetch_page_sorted_by_last_updated(query, page_size, urlsafe_start_cursor)
 
 
 class CollectionModel(base_models.VersionedModel):
@@ -178,23 +163,17 @@ class CollectionModel(base_models.VersionedModel):
     # The objective of this collection.
     objective = datastore_services.TextProperty(default='', indexed=False)
     # The language code of this collection.
-    language_code = datastore_services.StringProperty(
-        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True
-    )
+    language_code = datastore_services.StringProperty(default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Tags associated with this collection.
     tags = datastore_services.StringProperty(repeated=True, indexed=True)
 
     # The version of all property blob schemas.
-    schema_version = datastore_services.IntegerProperty(
-        required=True, default=1, indexed=True
-    )
+    schema_version = datastore_services.IntegerProperty(required=True, default=1, indexed=True)
 
     # A dict representing the contents of a collection. Currently, this
     # contains the list of nodes. This dict should contain collection data
     # whose structure might need to be changed in the future.
-    collection_contents = datastore_services.JsonProperty(
-        default={}, indexed=False
-    )
+    collection_contents = datastore_services.JsonProperty(default={}, indexed=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -202,9 +181,7 @@ class CollectionModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -256,9 +233,7 @@ class CollectionModel(base_models.VersionedModel):
         # need to move the values from nodes field to collection_contents dict
         # and delete nodes.
         if 'nodes' in model_dict and model_dict['nodes']:
-            model_dict['collection_contents']['nodes'] = copy.deepcopy(
-                model_dict['nodes']
-            )
+            model_dict['collection_contents']['nodes'] = copy.deepcopy(model_dict['nodes'])
             del model_dict['nodes']
 
         return model_dict
@@ -394,13 +369,9 @@ class CollectionModel(base_models.VersionedModel):
 
         if not force_deletion:
             commit_log_models = []
-            collection_rights_models = CollectionRightsModel.get_multi(
-                entity_ids, include_deleted=True
-            )
+            collection_rights_models = CollectionRightsModel.get_multi(entity_ids, include_deleted=True)
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
-            for model, rights_model in zip(
-                versioned_models, collection_rights_models
-            ):
+            for model, rights_model in zip(versioned_models, collection_rights_models):
                 # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
                 assert rights_model is not None
@@ -416,23 +387,17 @@ class CollectionModel(base_models.VersionedModel):
                 )
                 collection_commit_log.collection_id = model.id
                 commit_log_models.append(collection_commit_log)
-            CollectionCommitLogEntryModel.update_timestamps_multi(
-                commit_log_models
-            )
+            CollectionCommitLogEntryModel.update_timestamps_multi(commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
 
-class CollectionRightsSnapshotMetadataModel(
-    base_models.BaseSnapshotMetadataModel
-):
+class CollectionRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
 
     pass
 
 
-class CollectionRightsSnapshotContentModel(
-    base_models.BaseSnapshotContentModel
-):
+class CollectionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
 
     @staticmethod
@@ -461,13 +426,7 @@ class CollectionRightsSnapshotContentModel(
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (
-            CollectionRightsSnapshotMetadataModel.query(
-                CollectionRightsSnapshotMetadataModel.content_user_ids
-                == user_id
-            ).get(keys_only=True)
-            is not None
-        )
+        return CollectionRightsSnapshotMetadataModel.query(CollectionRightsSnapshotMetadataModel.content_user_ids == user_id).get(keys_only=True) is not None
 
 
 class CollectionRightsModel(base_models.VersionedModel):
@@ -485,26 +444,18 @@ class CollectionRightsModel(base_models.VersionedModel):
     # The user_ids of users who are allowed to edit this collection.
     editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this collection.
-    voice_artist_ids = datastore_services.StringProperty(
-        indexed=True, repeated=True
-    )
+    voice_artist_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this collection.
     viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     # Whether this collection is owned by the community.
-    community_owned = datastore_services.BooleanProperty(
-        indexed=True, default=False
-    )
+    community_owned = datastore_services.BooleanProperty(indexed=True, default=False)
     # For private collections, whether this collection can be viewed
     # by anyone who has the URL. If the collection is not private, this
     # setting is ignored.
-    viewable_if_private = datastore_services.BooleanProperty(
-        indexed=True, default=False
-    )
+    viewable_if_private = datastore_services.BooleanProperty(indexed=True, default=False)
     # Time, in milliseconds, when the collection was first published.
-    first_published_msec = datastore_services.FloatProperty(
-        indexed=True, default=None
-    )
+    first_published_msec = datastore_services.FloatProperty(indexed=True, default=None)
 
     # The publication status of this collection.
     status = datastore_services.StringProperty(
@@ -522,14 +473,10 @@ class CollectionRightsModel(base_models.VersionedModel):
         to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
         """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
+        return base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users contribute to collections and have varying rights.
         """
@@ -649,11 +596,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             'voice_artist_ids',
             'viewer_ids',
         ):
-            model_dict[field_name] = [
-                user_id
-                for user_id in model_dict[field_name]
-                if not utils.is_pseudonymous_id(user_id)
-            ]
+            model_dict[field_name] = [user_id for user_id in model_dict[field_name] if not utils.is_pseudonymous_id(user_id)]
 
         return model_dict
 
@@ -661,9 +604,7 @@ class CollectionRightsModel(base_models.VersionedModel):
     # accepts content NDB JSON properties and those NDB JSON properties have
     # loose typing. So, once we explicitly type those NDB JSON properties, we
     # can remove Any type from the argument of '_reconstitute' method.
-    def _reconstitute(
-        self, snapshot_dict: Dict[str, Any]
-    ) -> CollectionRightsModel:
+    def _reconstitute(self, snapshot_dict: Dict[str, Any]) -> CollectionRightsModel:
         """Populates the model instance with the snapshot.
 
         Some old CollectionRightsSnapshotContentModels can contain fields
@@ -679,9 +620,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             VersionedModel. The instance of the VersionedModel class populated
             with the the snapshot.
         """
-        self.populate(
-            **CollectionRightsModel.convert_to_valid_dict(snapshot_dict)
-        )
+        self.populate(**CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
     def compute_models_to_commit(
@@ -727,31 +666,18 @@ class CollectionRightsModel(base_models.VersionedModel):
         )
 
         snapshot_metadata_model = models_to_put['snapshot_metadata_model']
-        snapshot_metadata_model.content_user_ids = list(
-            sorted(
-                set(self.owner_ids)
-                | set(self.editor_ids)
-                | set(self.voice_artist_ids)
-                | set(self.viewer_ids)
-            )
-        )
+        snapshot_metadata_model.content_user_ids = list(sorted(set(self.owner_ids) | set(self.editor_ids) | set(self.voice_artist_ids) | set(self.viewer_ids)))
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            user_id_attribute_names = next(
-                cmd['user_id_attribute_names']
-                for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
-                if cmd['name'] == commit_cmd['cmd']
-            )
+            user_id_attribute_names = next(cmd['user_id_attribute_names'] for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS if cmd['name'] == commit_cmd['cmd'])
             for user_id_attribute_name in user_id_attribute_names:
                 user_id_name_value = commit_cmd[user_id_attribute_name]
                 # # Ruling out the possibility of any other type for mypy type
                 # checking.
                 assert isinstance(user_id_name_value, str)
                 commit_cmds_user_ids.add(user_id_name_value)
-        snapshot_metadata_model.commit_cmds_user_ids = list(
-            sorted(commit_cmds_user_ids)
-        )
+        snapshot_metadata_model.commit_cmds_user_ids = list(sorted(commit_cmds_user_ids))
 
         # Create and delete events will already be recorded in the
         # CollectionModel.
@@ -766,17 +692,11 @@ class CollectionRightsModel(base_models.VersionedModel):
                 version=None,
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
-                post_commit_is_private=(
-                    self.status == constants.ACTIVITY_STATUS_PRIVATE
-                ),
+                post_commit_is_private=(self.status == constants.ACTIVITY_STATUS_PRIVATE),
             )
             return {
-                'snapshot_metadata_model': (
-                    models_to_put['snapshot_metadata_model']
-                ),
-                'snapshot_content_model': (
-                    models_to_put['snapshot_content_model']
-                ),
+                'snapshot_metadata_model': (models_to_put['snapshot_metadata_model']),
+                'snapshot_content_model': (models_to_put['snapshot_content_model']),
                 'commit_log_model': collection_commit_log,
                 'versioned_model': models_to_put['versioned_model'],
             }
@@ -798,9 +718,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         owned_collections = cls.get_all().filter(cls.owner_ids == user_id)
         editable_collections = cls.get_all().filter(cls.editor_ids == user_id)
-        voiced_collections = cls.get_all().filter(
-            cls.voice_artist_ids == user_id
-        )
+        voiced_collections = cls.get_all().filter(cls.voice_artist_ids == user_id)
         viewable_collections = cls.get_all().filter(cls.viewer_ids == user_id)
 
         owned_collection_ids = [col.key.id() for col in owned_collections]
@@ -839,9 +757,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     # The objective of this collection.
     objective = datastore_services.TextProperty(required=True, indexed=False)
     # The ISO 639-1 code for the language this collection is written in.
-    language_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
     # Tags associated with this collection.
     tags = datastore_services.StringProperty(repeated=True, indexed=True)
 
@@ -851,15 +767,11 @@ class CollectionSummaryModel(base_models.BaseModel):
     # Time when the collection model was last updated (not to be
     # confused with last_updated, which is the time when the
     # collection *summary* model was last updated).
-    collection_model_last_updated = datastore_services.DateTimeProperty(
-        indexed=True
-    )
+    collection_model_last_updated = datastore_services.DateTimeProperty(indexed=True)
     # Time when the collection model was created (not to be confused
     # with created_on, which is the time when the collection *summary*
     # model was created).
-    collection_model_created_on = datastore_services.DateTimeProperty(
-        indexed=True
-    )
+    collection_model_created_on = datastore_services.DateTimeProperty(indexed=True)
 
     # The publication status of this collection.
     status = datastore_services.StringProperty(
@@ -872,9 +784,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     )
 
     # Whether this collection is owned by the community.
-    community_owned = datastore_services.BooleanProperty(
-        required=True, indexed=True
-    )
+    community_owned = datastore_services.BooleanProperty(required=True, indexed=True)
 
     # The user_ids of owners of this collection.
     owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
@@ -887,15 +797,11 @@ class CollectionSummaryModel(base_models.BaseModel):
     # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
     # synchronized, meaning that the keys in contributors_summary need be
     # equal to the contributor_ids list.
-    contributor_ids = datastore_services.StringProperty(
-        indexed=True, repeated=True
-    )
+    contributor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # collection. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
-    contributors_summary = datastore_services.JsonProperty(
-        default={}, indexed=False
-    )
+    contributors_summary = datastore_services.JsonProperty(default={}, indexed=False)
     # The version number of the collection after this commit. Only populated
     # for commits to an collection (as opposed to its rights, etc.).
     version = datastore_services.IntegerProperty()
@@ -908,14 +814,10 @@ class CollectionSummaryModel(base_models.BaseModel):
         to a user: viewer_ids, editor_ids, owner_ids, contributor_ids,
         and contributors_summary fields.
         """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
+        return base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been exported as a part of the
         CollectionRightsModel, and thus does not need an export_data
         function.
@@ -974,9 +876,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_private_at_least_viewable(
-        cls, user_id: str
-    ) -> Sequence[CollectionSummaryModel]:
+    def get_private_at_least_viewable(cls, user_id: str) -> Sequence[CollectionSummaryModel]:
         """Returns an iterable with private collection summary models that are
         at least viewable by the given user.
 
@@ -1001,9 +901,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_at_least_editable(
-        cls, user_id: str
-    ) -> Sequence[CollectionSummaryModel]:
+    def get_at_least_editable(cls, user_id: str) -> Sequence[CollectionSummaryModel]:
         """Returns an iterable with collection summary models that are at least
         editable by the given user.
 

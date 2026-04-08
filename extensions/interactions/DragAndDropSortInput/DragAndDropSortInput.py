@@ -15,9 +15,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -57,9 +57,7 @@ class DragAndDropSortInput(base.BaseInteraction):
                         'rte_component_config_id': 'ALL_COMPONENTS',
                         'html': {
                             'hide_complex_extensions': True,
-                            'placeholder': (
-                                'Enter an option for the learner to drag and drop.'
-                            ),
+                            'placeholder': ('Enter an option for the learner to drag and drop.'),
                         },
                     },
                 },

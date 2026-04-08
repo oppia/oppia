@@ -20,15 +20,15 @@ from __future__ import annotations
 
 import logging
 
+import requests
+from typing import Dict, List, Optional, Union
+
 from core.domain import (
     email_services,
     platform_parameter_list,
     platform_parameter_services,
 )
 from core.platform import models
-
-import requests
-from typing import Dict, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -49,9 +49,7 @@ def send_email_to_recipients(
     cc: Optional[List[str]] = None,
     bcc: Optional[List[str]] = None,
     reply_to: Optional[str] = None,
-    recipient_variables: Optional[
-        Dict[str, Dict[str, Union[str, float]]]
-    ] = None,
+    recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None,
     attachments: Optional[List[Dict[str, str]]] = None,
 ) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
@@ -97,9 +95,7 @@ def send_email_to_recipients(
     Returns:
         bool. Whether the emails are sent successfully.
     """
-    mailgun_api_key: Optional[str] = secrets_services.get_secret(
-        'MAILGUN_API_KEY'
-    )
+    mailgun_api_key: Optional[str] = secrets_services.get_secret('MAILGUN_API_KEY')
     if mailgun_api_key is None:
         email_msg = email_services.convert_email_to_loggable_string(
             sender_email,
@@ -112,16 +108,9 @@ def send_email_to_recipients(
             reply_to,
             recipient_variables,
         )
-        raise Exception(
-            'Mailgun API key is not available. '
-            'Here is the email that failed sending: %s' % email_msg
-        )
+        raise Exception('Mailgun API key is not available. Here is the email that failed sending: %s' % email_msg)
 
-    mailgun_domain_name = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value
-        )
-    )
+    mailgun_domain_name = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value)
     if not mailgun_domain_name:
         email_msg = email_services.convert_email_to_loggable_string(
             sender_email,
@@ -134,10 +123,7 @@ def send_email_to_recipients(
             reply_to,
             recipient_variables,
         )
-        raise Exception(
-            'Mailgun domain name is not set. '
-            'Here is the email that failed sending: %s' % email_msg
-        )
+        raise Exception('Mailgun domain name is not set. Here is the email that failed sending: %s' % email_msg)
     assert isinstance(mailgun_domain_name, str)
 
     # To send bulk emails we pass list of recipients in 'to' paarameter of
@@ -145,14 +131,9 @@ def send_email_to_recipients(
     # For more detail check following link:
     # https://documentation.mailgun.com/docs/mailgun/user-manual/
     # sending-messages/#batch-sending.
-    recipient_email_lists = [
-        recipient_emails[i : i + 1000]
-        for i in range(0, len(recipient_emails), 1000)
-    ]
+    recipient_email_lists = [recipient_emails[i : i + 1000] for i in range(0, len(recipient_emails), 1000)]
     for email_list in recipient_email_lists:
-        data: Dict[
-            str, Union[str, List[str], Dict[str, Dict[str, Union[str, float]]]]
-        ] = {
+        data: Dict[str, Union[str, List[str], Dict[str, Dict[str, Union[str, float]]]]] = {
             'from': sender_email,
             'subject': subject,
             'text': plaintext_body,
@@ -173,9 +154,7 @@ def send_email_to_recipients(
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
         data['recipient_variables'] = recipient_variables or {}
-        server = 'https://api.mailgun.net/v3/%s/messages' % (
-            mailgun_domain_name
-        )
+        server = 'https://api.mailgun.net/v3/%s/messages' % (mailgun_domain_name)
 
         # Adding attachments to the email.
         files = (
@@ -205,10 +184,7 @@ def send_email_to_recipients(
             file_obj.close()
 
         if response.status_code != 200:
-            logging.error(
-                'Failed to send email: %s - %s.'
-                % (response.status_code, response.text)
-            )
+            logging.error('Failed to send email: %s - %s.' % (response.status_code, response.text))
             return False
 
     return True

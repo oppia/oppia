@@ -20,10 +20,6 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.issues.CyclicStateTransitions import (  # pylint: disable=unused-import, line-too-long # isort: skip
-    CyclicStateTransitions,
-)
-
 
 class CyclicStateTransitionsTests(test_utils.GenericTestBase):
     # At Oppia, we require all files to have an associated test file, since

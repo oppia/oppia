@@ -20,22 +20,22 @@ from __future__ import annotations
 
 import hashlib
 
+from typing import Dict, Final, List, Literal, Optional, Sequence, Union
+
 from core import feconf
 from core.platform import models
-
-from typing import Dict, Final, List, Literal, Optional, Sequence, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
     # Here, 'state_domain' is imported only for type checking.
     # Here, 'voiceover_domain' is imported only for type checking.
-    from core.domain import state_domain  # pylint: disable=invalid-import
-    from core.domain import voiceover_domain  # pylint: disable=invalid-import
+    from core.domain import (
+        state_domain,  # pylint: disable=invalid-import
+        voiceover_domain,  # pylint: disable=invalid-import
+    )
     from mypy_imports import base_models, datastore_services
 
-    ContentIdToVoiceoverMappingType = (
-        voiceover_domain.ContentIdToVoiceoverMappingType
-    )
+    ContentIdToVoiceoverMappingType = voiceover_domain.ContentIdToVoiceoverMappingType
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
@@ -56,17 +56,11 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # The id of the corresponding entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
     # The type of the corresponding entity.
-    entity_type = datastore_services.StringProperty(
-        required=True, indexed=True, choices=[feconf.ENTITY_TYPE_EXPLORATION]
-    )
+    entity_type = datastore_services.StringProperty(required=True, indexed=True, choices=[feconf.ENTITY_TYPE_EXPLORATION])
     # The version of the corresponding entity.
-    entity_version = datastore_services.IntegerProperty(
-        required=True, indexed=True
-    )
+    entity_version = datastore_services.IntegerProperty(required=True, indexed=True)
     # A language-accent code, e.g., en-US.
-    language_accent_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    language_accent_code = datastore_services.StringProperty(required=True, indexed=True)
     # A dict representing content IDs as keys and nested dicts as values.
     # Each nested dict contains 'manual' and 'auto' as keys and VoiceoverDict
     # as values.
@@ -80,9 +74,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # Note: This field only contains the audio offset for automated voiceovers
     # that are synthesized from Azure. These audio offsets are not provided or
     # stored for manual voiceovers.
-    automated_voiceovers_audio_offsets_msecs = datastore_services.JsonProperty(
-        required=True, default={}
-    )
+    automated_voiceovers_audio_offsets_msecs = datastore_services.JsonProperty(required=True, default={})
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -90,9 +82,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -107,9 +97,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
                 'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'voiceovers_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'automated_voiceovers_audio_offsets_msecs': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                ),
+                'automated_voiceovers_audio_offsets_msecs': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             },
         )
 
@@ -166,9 +154,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             corresponding to the given inputs, if such a voiceover
             exists, or None if no voiceover is found.
         """
-        model_id = cls.generate_id(
-            entity_type, entity_id, entity_version, language_accent_code
-        )
+        model_id = cls.generate_id(entity_type, entity_id, entity_version, language_accent_code)
         return cls.get_by_id(model_id)
 
     @classmethod
@@ -178,12 +164,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers_mapping: Dict[
-            str, Dict[VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]]
-        ],
-        automated_voiceovers_audio_offsets_msecs: Dict[
-            str, List[Dict[str, Union[str, float]]]
-        ],
+        voiceovers_mapping: Dict[str, Dict[VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]]],
+        automated_voiceovers_audio_offsets_msecs: Dict[str, List[Dict[str, Union[str, float]]]],
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 
@@ -211,23 +193,17 @@ class EntityVoiceoversModel(base_models.BaseModel):
             EntityVoiceoversModel. Returns a new EntityVoiceoversModel.
         """
         return cls(
-            id=cls.generate_id(
-                entity_type, entity_id, entity_version, language_accent_code
-            ),
+            id=cls.generate_id(entity_type, entity_id, entity_version, language_accent_code),
             entity_type=entity_type,
             entity_id=entity_id,
             entity_version=entity_version,
             language_accent_code=language_accent_code,
             voiceovers_mapping=voiceovers_mapping,
-            automated_voiceovers_audio_offsets_msecs=(
-                automated_voiceovers_audio_offsets_msecs
-            ),
+            automated_voiceovers_audio_offsets_msecs=(automated_voiceovers_audio_offsets_msecs),
         )
 
     @classmethod
-    def get_entity_voiceovers_for_given_exploration(
-        cls, entity_id: str, entity_type: str, entity_version: int
-    ) -> Sequence[EntityVoiceoversModel]:
+    def get_entity_voiceovers_for_given_exploration(cls, entity_id: str, entity_type: str, entity_version: int) -> Sequence[EntityVoiceoversModel]:
         """Retrieves voiceovers models for the specified exploration data.
 
         Args:
@@ -265,9 +241,7 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
 
     # Boolean flag indicating whether cloud based voiceover autogeneration is
     # enabled.
-    autogenerated_voiceovers_are_enabled = datastore_services.BooleanProperty(
-        required=True, default=False
-    )
+    autogenerated_voiceovers_are_enabled = datastore_services.BooleanProperty(required=True, default=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -275,9 +249,7 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -288,9 +260,7 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
             super(cls, cls).get_export_policy(),
             **{
                 'language_codes_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'autogenerated_voiceovers_are_enabled': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                ),
+                'autogenerated_voiceovers_are_enabled': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             },
         )
 
@@ -301,9 +271,7 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
     """
 
     # The language accent code associated with the stored voiceovers.
-    language_accent_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    language_accent_code = datastore_services.StringProperty(required=True, indexed=True)
     # The cloud service provider used for generating the synthesized voiceover.
     provider = datastore_services.StringProperty(required=True, indexed=True)
     # A SHA-256 hash code generated from the text associated with the stored
@@ -329,9 +297,7 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -365,9 +331,7 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
         return hashlib.sha256(plaintext.encode()).hexdigest()
 
     @classmethod
-    def get_cached_automatic_voiceover_model(
-        cls, hash_code: str, language_accent_code: str, provider: str
-    ) -> CachedAutomaticVoiceoversModel:
+    def get_cached_automatic_voiceover_model(cls, hash_code: str, language_accent_code: str, provider: str) -> CachedAutomaticVoiceoversModel:
         """The method returns an instance of `CachedAutomaticVoiceoversModel`
         based on the specified parameters.
 

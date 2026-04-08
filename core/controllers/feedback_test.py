@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from typing import Dict, Final, List, Union
+
 from core import feconf
 from core.domain import (
     exp_domain,
@@ -31,8 +33,6 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Callable, Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -104,9 +104,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
     def test_non_logged_in_users_can_view_threads_and_messages(self) -> None:
         # Non-logged-in users can see the thread list.
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         self.assertEqual(len(response_dict['feedback_thread_dicts']), 1)
         self.assertDictContainsSubset(
             {
@@ -187,9 +185,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         )
         self.logout()
 
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         threadlist = response_dict['feedback_thread_dicts']
         self.assertEqual(len(threadlist), 1)
         self.assertEqual(set(threadlist[0].keys()), set(EXPECTED_THREAD_KEYS))
@@ -230,9 +226,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/threadlisthandler/0\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: subject.',
+            'At \'http://localhost/threadlisthandler/0\' these errors are happening:\nMissing key in handler args: subject.',
         )
         self.logout()
 
@@ -249,9 +243,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/threadlisthandler/0\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: text.',
+            'At \'http://localhost/threadlisthandler/0\' these errors are happening:\nMissing key in handler args: text.',
         )
         self.logout()
 
@@ -270,9 +262,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         )
 
         # Then, get the thread id.
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         threadlist = response_dict['feedback_thread_dicts']
         self.assertEqual(len(threadlist), 1)
         thread_id = threadlist[0]['thread_id']
@@ -290,9 +280,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(len(response_dict['messages']), 2)
-        self.assertEqual(
-            set(response_dict['messages'][0].keys()), set(EXPECTED_MESSAGE_KEYS)
-        )
+        self.assertEqual(set(response_dict['messages'][0].keys()), set(EXPECTED_MESSAGE_KEYS))
         self.assertDictContainsSubset(
             {
                 'author_username': self.EDITOR_USERNAME,
@@ -320,9 +308,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def test_no_username_shown_for_logged_out_learners(self) -> None:
         new_exp_id = 'new_eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            new_exp_id, title='A title', category='A category'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration(new_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.editor_id, exploration)
         rights_manager.publish_exploration(self.editor, new_exp_id)
 
@@ -338,16 +324,11 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, new_exp_id)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, new_exp_id))
         threadlist = response_dict['feedback_thread_dicts']
         self.assertIsNone(threadlist[0]['original_author_username'])
 
-        response_dict = self.get_json(
-            '%s/%s'
-            % (feconf.FEEDBACK_THREAD_URL_PREFIX, threadlist[0]['thread_id'])
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, threadlist[0]['thread_id']))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
 
     def test_message_id_assignment_for_multiple_posts_to_same_thread(
@@ -367,9 +348,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
         # Get the thread id.
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
         thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
 
@@ -416,12 +395,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         # Get the message list.
         response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), num_users + 1)
+
         # The resulting message list is not sorted. It needs to be sorted
         # by message id.
-        sort_func: Callable[[Dict[str, str]], str] = lambda x: x['message_id']
-        response_dict['messages'] = sorted(
-            response_dict['messages'], key=sort_func
-        )
+        def sort_func(x: Dict[str, str]) -> str:
+            return x['message_id']
+
+        response_dict['messages'] = sorted(response_dict['messages'], key=sort_func)
 
         self.assertEqual(
             response_dict['messages'][0]['author_username'],
@@ -434,9 +414,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 response_dict['messages'][num + 1]['author_username'],
                 _get_username(num),
             )
-            self.assertEqual(
-                response_dict['messages'][num + 1]['message_id'], num + 1
-            )
+            self.assertEqual(response_dict['messages'][num + 1]['message_id'], num + 1)
             self.assertEqual(
                 response_dict['messages'][num + 1]['text'],
                 'New Message %s' % num,
@@ -476,27 +454,17 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             language_code='en',
         )
 
-        rights_manager.create_new_exploration_rights(
-            self.EXP_ID, self.owner_id_2
-        )
+        rights_manager.create_new_exploration_rights(self.EXP_ID, self.owner_id_2)
         rights_manager.publish_exploration(self.owner_2, self.EXP_ID)
 
-    def _get_messages_read_by_user(
-        self, user_id: str, thread_id: str
-    ) -> List[int]:
+    def _get_messages_read_by_user(self, user_id: str, thread_id: str) -> List[int]:
         """Gets the ids of messages in the thread read by the user corresponding
         to the given user id.
         """
-        feedback_thread_user_model = (
-            feedback_models.GeneralFeedbackThreadUserModel.get(
-                user_id, thread_id
-            )
-        )
+        feedback_thread_user_model = feedback_models.GeneralFeedbackThreadUserModel.get(user_id, thread_id)
 
         if feedback_thread_user_model:
-            user_ids: List[int] = (
-                feedback_thread_user_model.message_ids_read_by_user
-            )
+            user_ids: List[int] = feedback_thread_user_model.message_ids_read_by_user
             return user_ids
         else:
             return []
@@ -522,9 +490,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
 
         # Get the id of the thread.
         thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
@@ -655,9 +621,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL_1)
         csrf_token = self.get_new_csrf_token()
 
-        new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>'
-        ).to_dict()
+        new_content = state_domain.SubtitledHtml('content', '<p>new content html</p>').to_dict()
         change: Dict[str, Union[str, state_domain.SubtitledHtmlDict]] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -674,9 +638,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'sample description',
         )
 
-        thread_id = suggestion_services.query_suggestions(
-            [('author_id', self.owner_id_1), ('target_id', self.EXP_ID)]
-        )[0].suggestion_id
+        thread_id = suggestion_services.query_suggestions([('author_id', self.owner_id_1), ('target_id', self.EXP_ID)])[0].suggestion_id
 
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
         response = self.post_json(
@@ -721,10 +683,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
     def test_get_feedback_threads_linked_to_topics(self) -> None:
         self.login(self.OWNER_EMAIL)
 
-        response_dict = self.get_json(
-            '%s/%s'
-            % (feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS, self.topic_id)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS, self.topic_id))
         suggestion_thread_dicts = response_dict['suggestion_thread_dicts']
 
         self.assertEqual(suggestion_thread_dicts, [])
@@ -738,14 +697,9 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
             has_suggestion=True,
         )
 
-        response_dict = self.get_json(
-            '%s/%s'
-            % (feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS, self.topic_id)
-        )
+        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS, self.topic_id))
         suggestion_thread_dicts = response_dict['suggestion_thread_dicts'][0]
-        topic_thread = feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_TOPIC, self.topic_id, True
-        )[0]
+        topic_thread = feedback_services.get_all_threads(feconf.ENTITY_TYPE_TOPIC, self.topic_id, True)[0]
 
         self.assertEqual(suggestion_thread_dicts['subject'], 'a subject')
         self.assertEqual(suggestion_thread_dicts['thread_id'], topic_thread.id)
@@ -780,19 +734,13 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
             language_code='en',
         )
 
-        response = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id)
-        )
+        response = self.get_json('%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
         self.assertEqual(response['num_total_threads'], 0)
         self.assertEqual(response['num_open_threads'], 0)
 
-        feedback_services.create_thread(
-            'exploration', self.exp_id, self.owner_id, 'subject', 'text'
-        )
+        feedback_services.create_thread('exploration', self.exp_id, self.owner_id, 'subject', 'text')
 
-        response = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id)
-        )
+        response = self.get_json('%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
         self.assertEqual(response['num_total_threads'], 1)
         self.assertEqual(response['num_open_threads'], 1)
 

@@ -27,9 +27,9 @@ import argparse
 import os
 import re
 
-from scripts import common
-
 from typing import Final, List, Optional
+
+from scripts import common
 
 FECONF_REGEX: Final = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX: Final = '^(  "[A-Z_]+": ).*$'
@@ -55,9 +55,7 @@ _PARSER.add_argument(
 )
 
 
-def apply_changes_based_on_config(
-    local_filepath: str, config_filepath: str, expected_config_line_regex: str
-) -> None:
+def apply_changes_based_on_config(local_filepath: str, config_filepath: str, expected_config_line_regex: str) -> None:
     """Updates the local file based on the deployment configuration specified
     in the config file.
 
@@ -87,23 +85,13 @@ def apply_changes_based_on_config(
     for config_line in config_lines:
         match_result = re.match(expected_config_line_regex, config_line)
         if match_result is None:
-            raise Exception(
-                'Invalid line in %s config file: %s'
-                % (config_filename, config_line)
-            )
+            raise Exception('Invalid line in %s config file: %s' % (config_filename, config_line))
 
-        matching_local_line_numbers = [
-            line_number
-            for (line_number, line) in enumerate(local_lines)
-            if line.startswith(match_result.group(1))
-        ]
-        assert len(matching_local_line_numbers) == 1, (
-            'Could not find correct number of lines in %s matching: %s, %s'
-            % (
-                local_filename,
-                config_line,
-                matching_local_line_numbers,
-            )
+        matching_local_line_numbers = [line_number for (line_number, line) in enumerate(local_lines) if line.startswith(match_result.group(1))]
+        assert len(matching_local_line_numbers) == 1, 'Could not find correct number of lines in %s matching: %s, %s' % (
+            local_filename,
+            config_line,
+            matching_local_line_numbers,
         )
         local_line_numbers.append(matching_local_line_numbers[0])
 
@@ -115,9 +103,7 @@ def apply_changes_based_on_config(
         writable_local_file.write('%s\n' % '\n'.join(local_lines))
 
 
-def update_app_yaml(
-    release_app_dev_yaml_path: str, feconf_config_path: str
-) -> None:
+def update_app_yaml(release_app_dev_yaml_path: str, feconf_config_path: str) -> None:
     """Updates app.yaml file with more strict CORS HTTP header.
 
     Args:
@@ -130,20 +116,14 @@ def update_app_yaml(
     with open(feconf_config_path, 'r', encoding='utf-8') as feconf_config_file:
         feconf_config_contents = feconf_config_file.read()
 
-    with open(
-        release_app_dev_yaml_path, 'r', encoding='utf-8'
-    ) as app_yaml_file:
+    with open(release_app_dev_yaml_path, 'r', encoding='utf-8') as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
-    oppia_site_url_searched_key = re.search(
-        r'OPPIA_SITE_URL = \'(.*)\'', feconf_config_contents
-    )
+    oppia_site_url_searched_key = re.search(r'OPPIA_SITE_URL = \'(.*)\'', feconf_config_contents)
     if oppia_site_url_searched_key is None:
         raise Exception('Error: No OPPIA_SITE_URL key found.')
     project_origin = oppia_site_url_searched_key.group(1)
-    access_control_allow_origin_header = (
-        'Access-Control-Allow-Origin: %s' % project_origin
-    )
+    access_control_allow_origin_header = 'Access-Control-Allow-Origin: %s' % project_origin
 
     edited_app_yaml_contents, _ = re.subn(
         r'Access-Control-Allow-Origin: \"\*\"',
@@ -151,15 +131,11 @@ def update_app_yaml(
         app_yaml_contents,
     )
 
-    with open(
-        release_app_dev_yaml_path, 'w', encoding='utf-8'
-    ) as app_yaml_file:
+    with open(release_app_dev_yaml_path, 'w', encoding='utf-8') as app_yaml_file:
         app_yaml_file.write(edited_app_yaml_contents)
 
 
-def verify_config_files(
-    release_feconf_path: str, release_app_dev_yaml_path: str
-) -> None:
+def verify_config_files(release_feconf_path: str, release_app_dev_yaml_path: str) -> None:
     """Verifies that feconf is updated correctly to include
     redishost and app.yaml to include correct headers.
 
@@ -175,27 +151,17 @@ def verify_config_files(
             before deployment.
     """
     feconf_contents = open(release_feconf_path, 'r', encoding='utf-8').read()
-    if (
-        'REDISHOST' not in feconf_contents
-        or 'REDISHOST = \'localhost\'' in feconf_contents
-    ):
+    if 'REDISHOST' not in feconf_contents or 'REDISHOST = \'localhost\'' in feconf_contents:
         raise Exception('REDISHOST must be updated before deployment.')
 
-    with open(
-        release_app_dev_yaml_path, 'r', encoding='utf-8'
-    ) as app_yaml_file:
+    with open(release_app_dev_yaml_path, 'r', encoding='utf-8') as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
     if 'Access-Control-Allow-Origin: "*"' in app_yaml_contents:
-        raise Exception(
-            '\'Access-Control-Allow-Origin: "*"\' must be updated to '
-            'a specific origin before deployment.'
-        )
+        raise Exception('\'Access-Control-Allow-Origin: "*"\' must be updated to a specific origin before deployment.')
 
 
-def update_analytics_constants_based_on_config(
-    release_analytics_constants_path: str, analytics_constants_config_path: str
-) -> None:
+def update_analytics_constants_based_on_config(release_analytics_constants_path: str, analytics_constants_config_path: str) -> None:
     """Updates the GA4 and UA IDs in the analytics constants JSON file.
 
     Args:
@@ -208,34 +174,24 @@ def update_analytics_constants_based_on_config(
         Exception. No SITE_NAME_FOR_ANALYTICS key found.
         Exception. No CAN_SEND_ANALYTICS_EVENTS key found.
     """
-    with open(
-        analytics_constants_config_path, 'r', encoding='utf-8'
-    ) as config_file:
+    with open(analytics_constants_config_path, 'r', encoding='utf-8') as config_file:
         config_file_contents = config_file.read()
-    ga_analytics_searched_key = re.search(
-        r'"GA_ANALYTICS_ID": "(.*)"', config_file_contents
-    )
+    ga_analytics_searched_key = re.search(r'"GA_ANALYTICS_ID": "(.*)"', config_file_contents)
     if ga_analytics_searched_key is None:
         raise Exception('Error: No GA_ANALYTICS_ID key found.')
     ga_analytics_id = ga_analytics_searched_key.group(1)
 
-    gtm_analytics_searched_key = re.search(
-        r'"GTM_ANALYTICS_ID": "(.*)"', config_file_contents
-    )
+    gtm_analytics_searched_key = re.search(r'"GTM_ANALYTICS_ID": "(.*)"', config_file_contents)
     if gtm_analytics_searched_key is None:
         raise Exception('Error: No GTM_ANALYTICS_ID key found.')
     gtm_analytics_id = gtm_analytics_searched_key.group(1)
 
-    site_name_for_analytics_searched_key = re.search(
-        r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', config_file_contents
-    )
+    site_name_for_analytics_searched_key = re.search(r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', config_file_contents)
     if site_name_for_analytics_searched_key is None:
         raise Exception('Error: No SITE_NAME_FOR_ANALYTICS key found.')
     site_name_for_analytics = site_name_for_analytics_searched_key.group(1)
 
-    can_send_analytics_events_searched_key = re.search(
-        r'"CAN_SEND_ANALYTICS_EVENTS": (true|false)', config_file_contents
-    )
+    can_send_analytics_events_searched_key = re.search(r'"CAN_SEND_ANALYTICS_EVENTS": (true|false)', config_file_contents)
     if can_send_analytics_events_searched_key is None:
         raise Exception('Error: No CAN_SEND_ANALYTICS_EVENTS key found.')
     can_send_analytics_events = can_send_analytics_events_searched_key.group(1)
@@ -269,39 +225,19 @@ def main(args: Optional[List[str]] = None) -> None:
     options = _PARSER.parse_args(args=args)
 
     # Do prerequisite checks.
-    feconf_config_path = os.path.join(
-        options.deploy_data_path, 'feconf_updates.config'
-    )
-    constants_config_path = os.path.join(
-        options.deploy_data_path, 'constants_updates.config'
-    )
-    analytics_constants_config_path = os.path.join(
-        options.deploy_data_path, 'analytics_constants_updates.config'
-    )
+    feconf_config_path = os.path.join(options.deploy_data_path, 'feconf_updates.config')
+    constants_config_path = os.path.join(options.deploy_data_path, 'constants_updates.config')
+    analytics_constants_config_path = os.path.join(options.deploy_data_path, 'analytics_constants_updates.config')
 
-    release_feconf_path = os.path.join(
-        options.release_dir_path, common.FECONF_PATH
-    )
-    release_constants_path = os.path.join(
-        options.release_dir_path, common.CONSTANTS_FILE_PATH
-    )
-    release_app_dev_yaml_path = os.path.join(
-        options.release_dir_path, common.APP_DEV_YAML_PATH
-    )
-    release_analytics_constants_path = os.path.join(
-        options.release_dir_path, common.ANALYTICS_CONSTANTS_FILE_PATH
-    )
+    release_feconf_path = os.path.join(options.release_dir_path, common.FECONF_PATH)
+    release_constants_path = os.path.join(options.release_dir_path, common.CONSTANTS_FILE_PATH)
+    release_app_dev_yaml_path = os.path.join(options.release_dir_path, common.APP_DEV_YAML_PATH)
+    release_analytics_constants_path = os.path.join(options.release_dir_path, common.ANALYTICS_CONSTANTS_FILE_PATH)
 
-    apply_changes_based_on_config(
-        release_feconf_path, feconf_config_path, FECONF_REGEX
-    )
-    apply_changes_based_on_config(
-        release_constants_path, constants_config_path, CONSTANTS_REGEX
-    )
+    apply_changes_based_on_config(release_feconf_path, feconf_config_path, FECONF_REGEX)
+    apply_changes_based_on_config(release_constants_path, constants_config_path, CONSTANTS_REGEX)
     update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
-    update_analytics_constants_based_on_config(
-        release_analytics_constants_path, analytics_constants_config_path
-    )
+    update_analytics_constants_based_on_config(release_analytics_constants_path, analytics_constants_config_path)
     verify_config_files(release_feconf_path, release_app_dev_yaml_path)
 
 

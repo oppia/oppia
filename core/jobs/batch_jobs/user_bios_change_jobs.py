@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -39,29 +39,14 @@ class ChangeUserNullBiosToEmptyStringJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         user_settings_query = user_models.UserSettingsModel.get_all()
-        user_settings_models = (
-            self.pipeline
-            | 'Get all UserSettingsModels'
-            >> ndb_io.GetModels(user_settings_query)
-        )
-        users_with_invalid_bios = (
-            user_settings_models
-            | 'Filter users with invalid bios'
-            >> beam.Filter(lambda user: not isinstance(user.user_bio, str))
-        )
+        user_settings_models = self.pipeline | 'Get all UserSettingsModels' >> ndb_io.GetModels(user_settings_query)
+        users_with_invalid_bios = user_settings_models | 'Filter users with invalid bios' >> beam.Filter(lambda user: not isinstance(user.user_bio, str))
         # Here we use MyPy ignore because "setattr" does not return a value.
-        updated_users = (
-            users_with_invalid_bios
-            | 'Set invalid bios to empty string'
-            >> beam.Map(
-                lambda user: (setattr(user, 'user_bio', ''), user)[1]  # type: ignore[func-returns-value]
-            )
+        updated_users = users_with_invalid_bios | 'Set invalid bios to empty string' >> beam.Map(
+            lambda user: (setattr(user, 'user_bio', ''), user)[1]  # type: ignore[func-returns-value]
         )
         if self.DATASTORE_UPDATES_ALLOWED:
-            unused_saved_users = (
-                updated_users
-                | 'Save updated user models to Datastore' >> ndb_io.PutModels()
-            )
+            (updated_users | 'Save updated user models to Datastore' >> ndb_io.PutModels())
         test_output = updated_users | 'Generate test output' >> beam.Map(
             lambda user: job_run_result.JobRunResult.as_stdout(
                 f"""Test Output - Username: {user.username}, New Bio: {user.user_bio}"""  # pylint: disable=line-too-long
@@ -70,9 +55,7 @@ class ChangeUserNullBiosToEmptyStringJob(base_jobs.JobBase):
         return test_output
 
 
-class AuditChangeUserNullBiosToEmptyStringJob(
-    ChangeUserNullBiosToEmptyStringJob
-):
+class AuditChangeUserNullBiosToEmptyStringJob(ChangeUserNullBiosToEmptyStringJob):
     """Job that audits ChangeUserNullBiosToEmptyStringJob."""
 
     DATASTORE_UPDATES_ALLOWED = False

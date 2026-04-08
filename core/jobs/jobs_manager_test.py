@@ -22,6 +22,10 @@ import contextlib
 import datetime
 from unittest import mock
 
+import apache_beam as beam
+from apache_beam import runners
+from google.cloud import dataflow
+
 from core import feconf
 from core.domain import beam_job_services
 from core.jobs import base_jobs, job_options, jobs_manager
@@ -29,27 +33,19 @@ from core.jobs.types import job_run_result
 from core.storage.beam_job import gae_models as beam_job_models
 from core.tests import test_utils
 
-import apache_beam as beam
-from apache_beam import runners
-from google.cloud import dataflow
-
 
 class WorkingJob(base_jobs.JobBase):
     """Simple job that outputs string literals."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        return self.pipeline | beam.Create(
-            [job_run_result.JobRunResult(stdout='o', stderr='e')]
-        )
+        return self.pipeline | beam.Create([job_run_result.JobRunResult(stdout='o', stderr='e')])
 
 
 class VoiceoverSynthesisForTestingJob(base_jobs.JobBase):
     """Simple job for voiceover synthesis to test resource limiting."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        return self.pipeline | beam.Create(
-            [job_run_result.JobRunResult(stdout='o', stderr='e')]
-        )
+        return self.pipeline | beam.Create([job_run_result.JobRunResult(stdout='o', stderr='e')])
 
 
 class FailingJob(base_jobs.JobBase):
@@ -81,9 +77,7 @@ class RunJobTests(test_utils.GenericTestBase):
         run_model = beam_job_models.BeamJobRunModel.get(run.id)
         self.assertEqual(run, run_model)
 
-        self.assertIn(
-            'uh-oh', beam_job_services.get_beam_job_run_result(run.id).stderr
-        )
+        self.assertIn('uh-oh', beam_job_services.get_beam_job_run_result(run.id).stderr)
 
     def test_async_job(self) -> None:
         mock_run_result = mock.Mock()
@@ -126,9 +120,7 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.run_model = beam_job_services.create_beam_job_run_model(
-            'WorkingJob', dataflow_job_id='123'
-        )
+        self.run_model = beam_job_services.create_beam_job_run_model('WorkingJob', dataflow_job_id='123')
 
         self.dataflow_job = dataflow.Job(
             id='123',
@@ -142,11 +134,7 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
         self.dataflow_client_mock.get_job.return_value = self.dataflow_job
 
         self.exit_stack = contextlib.ExitStack()
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock
-            )
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock))
 
     def tearDown(self) -> None:
         try:
@@ -210,9 +198,7 @@ class CancelJobTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.run_model = beam_job_services.create_beam_job_run_model(
-            'WorkingJob', dataflow_job_id='123'
-        )
+        self.run_model = beam_job_services.create_beam_job_run_model('WorkingJob', dataflow_job_id='123')
 
         self.dataflow_job = dataflow.Job(
             id='123',
@@ -226,11 +212,7 @@ class CancelJobTests(test_utils.GenericTestBase):
         self.dataflow_client_mock.update_job.return_value = self.dataflow_job
 
         self.exit_stack = contextlib.ExitStack()
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock
-            )
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock))
 
     def tearDown(self) -> None:
         try:
@@ -262,23 +244,16 @@ class CancelJobTests(test_utils.GenericTestBase):
 
 
 class LimitJobResourcesTests(test_utils.GenericTestBase):
-
     def test_does_job_requires_limiting_workers_true(self) -> None:
         job_name = 'VoiceoverSynthesisJob'
-        self.assertTrue(
-            jobs_manager.does_job_requires_limiting_workers(job_name)
-        )
+        self.assertTrue(jobs_manager.does_job_requires_limiting_workers(job_name))
 
     def test_does_job_requires_limiting_workers_false(self) -> None:
         job_name = 'SomeOtherJob'
-        self.assertFalse(
-            jobs_manager.does_job_requires_limiting_workers(job_name)
-        )
+        self.assertFalse(jobs_manager.does_job_requires_limiting_workers(job_name))
 
     def test_working_voiceover_sync_job(self) -> None:
-        run = jobs_manager.run_job(
-            VoiceoverSynthesisForTestingJob, True, namespace=self.namespace
-        )
+        run = jobs_manager.run_job(VoiceoverSynthesisForTestingJob, True, namespace=self.namespace)
 
         self.assertEqual(run.latest_job_state, 'DONE')
 

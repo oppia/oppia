@@ -1,8 +1,9 @@
 import logging
-from typing import Any, MutableMapping, Optional, Type, Union, Collection
 
-from .indices import IndicesClient
+from typing import Any, Collection, MutableMapping, Optional, Type, Union
+
 from ..transport import Transport
+from .indices import IndicesClient
 
 logger: logging.Logger
 

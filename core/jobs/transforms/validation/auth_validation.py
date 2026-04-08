@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+from typing import Iterator, List, Tuple, Type, Union
+
 from core import feconf
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
-
-from typing import Iterator, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -44,9 +44,7 @@ class ValidateFirebaseSeedModelId(base_validation.ValidateBaseModelId):
 
 
 @validation_decorators.AuditsExisting(auth_models.UserIdByFirebaseAuthIdModel)
-class ValidateUserIdByFirebaseAuthIdModelId(
-    base_validation.ValidateBaseModelId
-):
+class ValidateUserIdByFirebaseAuthIdModelId(base_validation.ValidateBaseModelId):
     """Overrides regex to match the Firebase account ID pattern."""
 
     def __init__(self) -> None:

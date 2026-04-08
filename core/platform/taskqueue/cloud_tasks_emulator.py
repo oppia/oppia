@@ -211,11 +211,7 @@ class Emulator:
         Returns:
             Task. The task that was created and added to the queue.
         """
-        scheduled_for_time = (
-            time.mktime(scheduled_for.timetuple())
-            if scheduled_for
-            else time.time()
-        )
+        scheduled_for_time = time.mktime(scheduled_for.timetuple()) if scheduled_for else time.time()
         with self._lock:
             if queue_name not in self._queues:
                 self._queues[queue_name] = []
@@ -245,11 +241,14 @@ class Emulator:
                 task_name=task_name,
             )
             queue.append(task)
+
             # The key for sorting is defined separately because of a mypy bug.
             # A [no-any-return] is thrown if key is defined in the sort()
             # method instead.
             # https://github.com/python/mypy/issues/9590
-            k = lambda t: t.scheduled_for
+            def k(t):
+                return t.scheduled_for
+
             queue.sort(key=k)
             return task
 

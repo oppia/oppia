@@ -20,11 +20,11 @@ from __future__ import annotations
 
 import os
 
-from core import feconf
-from core.platform.taskqueue import cloud_tasks_emulator
-
 import requests
 from typing import TYPE_CHECKING, Any, Dict, Optional
+
+from core import feconf
+from core.platform.taskqueue import cloud_tasks_emulator
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime

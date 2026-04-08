@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -37,9 +37,7 @@ class GraphInput(base.BaseInteraction):
     _dependency_ids: List[str] = []
     answer_type: str = 'Graph'
     instructions: str = 'I18N_INTERACTIONS_GRAPH_INPUT_INSTRUCTION'
-    narrow_instructions: str = (
-        'I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION'
-    )
+    narrow_instructions: str = 'I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION'
     needs_summary: bool = True
     can_have_solution: bool = True
     show_generic_submit_button: bool = True

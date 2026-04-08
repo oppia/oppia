@@ -1,6 +1,5 @@
 from google.cloud.storage.blob import Blob
 from google.cloud.storage.bucket import Bucket
-
 from typing import Any, Iterator, Optional, Union
 
 class Client(type):

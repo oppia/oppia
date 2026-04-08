@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Dict, Final
+
 from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
@@ -44,8 +46,6 @@ from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
 
-from typing import Dict, Final
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models, skill_models
@@ -53,9 +53,7 @@ if MYPY:  # pragma: no cover
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
-ACCESS_VALIDATION_HANDLER_PREFIX: Final = (
-    feconf.ACCESS_VALIDATION_HANDLER_PREFIX
-)
+ACCESS_VALIDATION_HANDLER_PREFIX: Final = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
 
 
 class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
@@ -72,22 +70,17 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
-        self.get_html_response(
-            '%s/can_access_classroom_page?classroom_url_fragment=%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math')
-        )
+        self.get_html_response('%s/can_access_classroom_page?classroom_url_fragment=%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math'))
 
     def test_validation_returns_false_if_classroom_doesnot_exists(self) -> None:
         self.get_json(
-            '%s/can_access_classroom_page?classroom_url_fragment=%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
             expected_status_int=404,
         )
 
     def test_validation_returns_false_if_classroom_is_private(self) -> None:
         self.get_json(
-            '%s/can_access_classroom_page?classroom_url_fragment=%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'),
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'),
             expected_status_int=404,
         )
 
@@ -95,10 +88,7 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/can_access_classroom_page?classroom_url_fragment=%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'history')
-        )
+        self.get_html_response('%s/can_access_classroom_page?classroom_url_fragment=%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'))
 
 
 class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
@@ -115,12 +105,8 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         self.skill_id1 = 'skill_id_1'
         self.skill_id2 = 'skill_id_2'
 
-        self.save_new_skill(
-            self.skill_id1, self.admin_id, description='Skill 1'
-        )
-        self.save_new_skill(
-            self.skill_id2, self.admin_id, description='Skill 2'
-        )
+        self.save_new_skill(self.skill_id1, self.admin_id, description='Skill 1')
+        self.save_new_skill(self.skill_id2, self.admin_id, description='Skill 2')
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id,
@@ -154,9 +140,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         self.topic.next_subtopic_id = 3
         self.topic.skill_ids_for_diagnostic_test = [self.skill_id1]
         self.topic.thumbnail_filename = 'Topic.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
@@ -167,9 +151,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             'fragm',
         )
         self.topic.thumbnail_filename = 'Topic.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -181,9 +163,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         }
 
         thumbnail_image = b''
-        with open(
-            'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
-        ) as svg_file:
+        with open('core/tests/data/thumbnail.svg', 'rt', encoding='utf-8') as svg_file:
             svg_file_content = svg_file.read()
             thumbnail_image = svg_file_content.encode('ascii')
         fs_services.save_original_and_compressed_versions_of_image(
@@ -196,9 +176,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         )
 
         banner_image = b''
-        with open(
-            'core/tests/data/classroom-banner.png', 'rb', encoding=None
-        ) as png_file:
+        with open('core/tests/data/classroom-banner.png', 'rb', encoding=None) as png_file:
             banner_image = png_file.read()
         fs_services.save_original_and_compressed_versions_of_image(
             'banner.png',
@@ -216,17 +194,11 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             course_details='Math course details',
             teaser_text='Math teaser text',
             topic_list_intro='Start with our first topic.',
-            topic_id_to_prerequisite_topic_ids=(
-                topic_dependency_for_classroom_1
-            ),
+            topic_id_to_prerequisite_topic_ids=(topic_dependency_for_classroom_1),
             is_published=True,
             diagnostic_test_is_enabled=False,
-            thumbnail_data=classroom_config_domain.ImageData(
-                'thumbnail.svg', 'transparent', 1000
-            ),
-            banner_data=classroom_config_domain.ImageData(
-                'banner.png', 'transparent', 1000
-            ),
+            thumbnail_data=classroom_config_domain.ImageData('thumbnail.svg', 'transparent', 1000),
+            banner_data=classroom_config_domain.ImageData('banner.png', 'transparent', 1000),
             index=0,
         )
 
@@ -234,31 +206,27 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
 
     def test_any_user_can_access_practice_sessions_page(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
             params={'selected_subtopic_ids': '[1,2]'},
             expected_status_int=200,
         )
 
     def test_get_fails_when_subtopics_not_provided(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
             expected_status_int=400,
         )
 
     def test_get_fails_when_subtopic_id_is_invalid(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
             params={'selected_subtopic_ids': '[999]'},
             expected_status_int=404,
         )
 
     def test_get_fails_when_selected_subtopic_ids_is_none(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
             expected_status_int=400,
         )
 
@@ -266,16 +234,14 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         self,
     ) -> None:  # pylint: disable=line-too-long
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
             params={'selected_subtopic_ids': '["invalid"]'},
             expected_status_int=400,
         )
 
     def test_get_succeeds_with_valid_subtopic_ids(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
             params={'selected_subtopic_ids': '[1,2]'},
             expected_status_int=200,
         )
@@ -295,16 +261,14 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
 
     def test_invalid_topic_url_fragment_raises_exception(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 12345),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 12345),
             params={'selected_subtopic_ids': '[1,2]'},
             expected_status_int=400,
         )
 
     def test_get_fails_when_topic_doesnt_exist(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/session'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'invalid-topic'),
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'invalid-topic'),
             params={'selected_subtopic_ids': '[1,2]'},
             expected_status_int=302,
         )
@@ -316,8 +280,7 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         with self.swap(constants, 'DEV_MODE', False):
             self.get_json(
-                '%s/can_access_classrooms_page'
-                % (ACCESS_VALIDATION_HANDLER_PREFIX),
+                '%s/can_access_classrooms_page' % (ACCESS_VALIDATION_HANDLER_PREFIX),
                 expected_status_int=404,
             )
 
@@ -325,16 +288,11 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         with self.swap(constants, 'DEV_MODE', True):
-            self.get_html_response(
-                '%s/can_access_classrooms_page'
-                % ACCESS_VALIDATION_HANDLER_PREFIX
-            )
+            self.get_html_response('%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
     def test_validation_returns_true_if_we_have_public_classrooms(self) -> None:
         self.save_new_valid_classroom()
-        self.get_html_response(
-            '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX
-        )
+        self.get_html_response('%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
 class TopicViewerPageRevisionRedirectHandlerTests(test_utils.GenericTestBase):
@@ -362,9 +320,7 @@ class TopicViewerPageRevisionRedirectHandlerTests(test_utils.GenericTestBase):
         # Login as regular user and test redirect.
         self.login(self.NEW_USER_EMAIL)
 
-        response = self.get_html_response(
-            '/learn/math/fraction/revision', expected_status_int=301
-        )
+        response = self.get_html_response('/learn/math/fraction/revision', expected_status_int=301)
 
         redirect_url = 'http://localhost/learn/math/fraction/studyguide'
         self.assertEqual(response.headers['Location'], redirect_url)
@@ -392,8 +348,7 @@ class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.logout()
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
-            '%s/can_access_topic_viewer_page/%s/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'fraction'),
+            '%s/can_access_topic_viewer_page/%s/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'fraction'),
             expected_status_int=200,
         )
 
@@ -407,23 +362,18 @@ class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             'fragm',
         )
         topic.thumbnail_filename = 'Image.svg'
-        topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         topic.url_fragment = 'private'
         topic_services.save_new_topic(self.admin_id, topic)
 
         self.get_json(
-            '%s/can_access_topic_viewer_page/staging/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'private'),
+            '%s/can_access_topic_viewer_page/staging/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'private'),
             expected_status_int=404,
         )
         self.logout()
 
 
-class CollectionViewerPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class CollectionViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Test for collection page access validation."""
 
     COLLECTION_ID: Final = 'cid'
@@ -443,8 +393,7 @@ class CollectionViewerPageAccessValidationHandlerTests(
         self,
     ) -> None:
         self.get_json(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+            '%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
             expected_status_int=404,
         )
 
@@ -453,8 +402,7 @@ class CollectionViewerPageAccessValidationHandlerTests(
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+            '%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
             expected_status_int=404,
         )
         self.logout()
@@ -466,28 +414,21 @@ class CollectionViewerPageAccessValidationHandlerTests(
         self.save_new_valid_collection('cid2', self.OTHER_EDITOR_EMAIL)
         self.login(self.OTHER_EDITOR_EMAIL)
         self.get_json(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+            '%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
             expected_status_int=404,
         )
         self.logout()
 
     def test_unpublished_collections_are_visible_to_their_editors(self) -> None:
         self.login(self.EDITOR_EMAIL)
-        self.get_html_response(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID)
-        )
+        self.get_html_response('%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
         self.logout()
 
     def test_unpublished_collections_are_visible_to_admins(self) -> None:
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
-        self.get_html_response(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID)
-        )
+        self.get_html_response('%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
         self.logout()
 
     def test_published_collections_are_visible_to_logged_out_users(
@@ -495,32 +436,23 @@ class CollectionViewerPageAccessValidationHandlerTests(
     ) -> None:
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
-        self.get_html_response(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID)
-        )
+        self.get_html_response('%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
 
     def test_published_collections_are_visible_to_logged_in_users(self) -> None:
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
         self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID)
-        )
+        self.get_html_response('%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
 
     def test_invalid_collection_error(self) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_json(
-            '%s/can_access_collection_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'none'),
+            '%s/can_access_collection_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'none'),
             expected_status_int=404,
         )
         self.logout()
 
 
-class SubtopicViewerPageRevisionRedirectHandlerTests(
-    test_utils.GenericTestBase
-):
+class SubtopicViewerPageRevisionRedirectHandlerTests(test_utils.GenericTestBase):
     """Test for subtopic viewer page revision redirect handler."""
 
     def setUp(self) -> None:
@@ -532,16 +464,8 @@ class SubtopicViewerPageRevisionRedirectHandlerTests(
         self.topic_id = 'topic_id'
         self.subtopic_id_1 = 1
         self.subtopic_id_2 = 2
-        self.subtopic_page_1 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_1, self.topic_id
-            )
-        )
-        self.subtopic_page_2 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_2, self.topic_id
-            )
-        )
+        self.subtopic_page_1 = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(self.subtopic_id_1, self.topic_id)
+        self.subtopic_page_2 = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(self.subtopic_id_2, self.topic_id)
         subtopic_page_services.save_subtopic_page(
             self.admin_id,
             self.subtopic_page_1,
@@ -573,14 +497,10 @@ class SubtopicViewerPageRevisionRedirectHandlerTests(
             ],
         )
 
-        subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title', 'url-frag'
-        )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = ['skill_id_1']
         subtopic.url_fragment = 'sub-url-frag-one'
-        subtopic2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2', 'url-frag-two'
-        )
+        subtopic2 = topic_domain.Subtopic.create_default_subtopic(2, 'Subtopic Title 2', 'url-frag-two')
         subtopic2.skill_ids = ['skill_id_2']
         subtopic2.url_fragment = 'sub-url-frag-two'
 
@@ -612,9 +532,7 @@ class SubtopicViewerPageRevisionRedirectHandlerTests(
         )
 
 
-class SubtopicViewerPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class SubtopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Test for subtopic viewer page access validation."""
 
     def setUp(self) -> None:
@@ -626,16 +544,8 @@ class SubtopicViewerPageAccessValidationHandlerTests(
         self.topic_id = 'topic_id'
         self.subtopic_id_1 = 1
         self.subtopic_id_2 = 2
-        self.subtopic_page_1 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_1, self.topic_id
-            )
-        )
-        self.subtopic_page_2 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_2, self.topic_id
-            )
-        )
+        self.subtopic_page_1 = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(self.subtopic_id_1, self.topic_id)
+        self.subtopic_page_2 = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(self.subtopic_id_2, self.topic_id)
         subtopic_page_services.save_subtopic_page(
             self.admin_id,
             self.subtopic_page_1,
@@ -666,11 +576,7 @@ class SubtopicViewerPageAccessValidationHandlerTests(
                 )
             ],
         )
-        subtopic_page_private_topic = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_1, 'topic_id_2'
-            )
-        )
+        subtopic_page_private_topic = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(self.subtopic_id_1, 'topic_id_2')
         subtopic_page_services.save_subtopic_page(
             self.admin_id,
             subtopic_page_private_topic,
@@ -686,14 +592,10 @@ class SubtopicViewerPageAccessValidationHandlerTests(
                 )
             ],
         )
-        subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title', 'url-frag'
-        )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = ['skill_id_1']
         subtopic.url_fragment = 'sub-url-frag-one'
-        subtopic2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2', 'url-frag-two'
-        )
+        subtopic2 = topic_domain.Subtopic.create_default_subtopic(2, 'Subtopic Title 2', 'url-frag-two')
         subtopic2.skill_ids = ['skill_id_2']
         subtopic2.url_fragment = 'sub-url-frag-two'
 
@@ -733,17 +635,13 @@ class SubtopicViewerPageAccessValidationHandlerTests(
         )
 
 
-class ReleaseCoordinatorAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class ReleaseCoordinatorAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Test for release coordinator access validation."""
 
     def setUp(self) -> None:
         """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
         super().setUp()
-        self.signup(
-            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME
-        )
+        self.signup(self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.add_user_role(
@@ -753,26 +651,21 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
 
     def test_guest_user_does_not_pass_validation(self) -> None:
         self.get_json(
-            '%s/can_access_release_coordinator_page'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_release_coordinator_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=401,
         )
 
     def test_exploration_editor_does_not_pass_validation(self) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_json(
-            '%s/can_access_release_coordinator_page'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_release_coordinator_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=401,
         )
 
     def test_release_coordinator_passes_validation(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
-        self.get_html_response(
-            '%s/can_access_release_coordinator_page'
-            % ACCESS_VALIDATION_HANDLER_PREFIX
-        )
+        self.get_html_response('%s/can_access_release_coordinator_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
 class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
@@ -798,15 +691,13 @@ class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
 
     def test_exploration_player_page_with_invalid_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_exploration_player_page/invalid'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX),
+            '%s/can_access_exploration_player_page/invalid' % (ACCESS_VALIDATION_HANDLER_PREFIX),
             expected_status_int=404,
         )
 
     def test_exploration_player_page_with_valid_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_exploration_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
+            '%s/can_access_exploration_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
             expected_status_int=200,
         )
 
@@ -814,8 +705,7 @@ class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.get_html_response(
-            '%s/can_access_exploration_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
+            '%s/can_access_exploration_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
             params={
                 'v': 10,
             },
@@ -826,8 +716,7 @@ class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.get_html_response(
-            '%s/can_access_exploration_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
+            '%s/can_access_exploration_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
             params={
                 'v': self.exploration.version,
                 'parent': True,
@@ -839,8 +728,7 @@ class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         self.get_html_response(
-            '%s/can_access_exploration_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
+            '%s/can_access_exploration_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
             params={
                 'v': self.exploration.version,
                 'collection_id': 'aZ9_______12',
@@ -855,23 +743,19 @@ class ExplorationPlayerAccessValidationPageTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(col_id, self.owner_id)
 
         self.get_html_response(
-            '%s/can_access_exploration_player_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
+            '%s/can_access_exploration_player_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration.id),
             params={'v': self.exploration.version, 'collection_id': col_id},
             expected_status_int=200,
         )
         self.logout()
 
 
-class DiagnosticTestPlayerPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class DiagnosticTestPlayerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Test for diagnostic test player access validation."""
 
     def test_should_access_diagnostic_test(self) -> None:
         self.get_html_response(
-            '%s/can_access_diagnostic_test_player_page'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX),
+            '%s/can_access_diagnostic_test_player_page' % (ACCESS_VALIDATION_HANDLER_PREFIX),
             expected_status_int=200,
         )
 
@@ -887,10 +771,7 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         # Viewer looks at editor's profile page.
         self.login(self.VIEWER_EMAIL)
-        self.get_html_response(
-            '%s/does_profile_exist/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME)
-        )
+        self.get_html_response('%s/does_profile_exist/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME))
         self.logout()
 
     def test_profile_validation_returns_true_if_user_views_own_profile(
@@ -898,10 +779,7 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         # Editor looks at their own profile page.
         self.login(self.EDITOR_EMAIL)
-        self.get_html_response(
-            '%s/does_profile_exist/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME)
-        )
+        self.get_html_response('%s/does_profile_exist/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.EDITOR_USERNAME))
         self.logout()
 
     def test_profile_validation_returns_false_if_profile_doesnot_exist(
@@ -910,8 +788,7 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
         # Editor looks at non-existing profile page.
         self.login(self.EDITOR_EMAIL)
         self.get_json(
-            '%s/does_profile_exist/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
+            '%s/does_profile_exist/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
             expected_status_int=404,
         )
         self.logout()
@@ -938,28 +815,20 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_normal_user_can_manage_account(self) -> None:
         self.login(self.user_email)
-        self.get_html_response(
-            '%s/can_manage_own_account' % ACCESS_VALIDATION_HANDLER_PREFIX
-        )
+        self.get_html_response('%s/can_manage_own_account' % ACCESS_VALIDATION_HANDLER_PREFIX)
         self.logout()
 
 
-class ViewLearnerGroupPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class ViewLearnerGroupPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.facilitator_id = self.get_user_id_from_email(
-            self.CURRICULUM_ADMIN_EMAIL
-        )
+        self.facilitator_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.learner_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.LEARNER_GROUP_ID = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.LEARNER_GROUP_ID = learner_group_fetchers.get_new_learner_group_id()
         learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID,
             'Learner Group Title',
@@ -976,53 +845,36 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
         self,
     ) -> None:
         self.get_json(
-            '%s/does_learner_group_exist/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+            '%s/does_learner_group_exist/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
             expected_status_int=404,
         )
         self.logout()
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_false_with_user_not_being_a_learner(
         self,
     ) -> None:
         self.get_json(
-            '%s/does_learner_group_exist/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+            '%s/does_learner_group_exist/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
             expected_status_int=404,
         )
         self.logout()
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_true_for_valid_learner(self) -> None:
-        learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.learner_id, False
-        )
-        self.get_html_response(
-            '%s/does_learner_group_exist/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID)
-        )
+        learner_group_services.add_learner_to_learner_group(self.LEARNER_GROUP_ID, self.learner_id, False)
+        self.get_html_response('%s/does_learner_group_exist/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
 
 
-class EditLearnerGroupPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class EditLearnerGroupPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.facilitator_id = self.get_user_id_from_email(
-            self.CURRICULUM_ADMIN_EMAIL
-        )
+        self.facilitator_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        self.LEARNER_GROUP_ID = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.LEARNER_GROUP_ID = learner_group_fetchers.get_new_learner_group_id()
         learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID,
             'Learner Group Title',
@@ -1038,38 +890,27 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
-            '%s/can_access_edit_learner_group_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+            '%s/can_access_edit_learner_group_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
             expected_status_int=404,
         )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_false_with_user_not_being_a_facilitator(
         self,
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/can_access_edit_learner_group_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+            '%s/can_access_edit_learner_group_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
             expected_status_int=404,
         )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_true_for_valid_facilitator(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/can_access_edit_learner_group_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID)
-        )
+        self.get_html_response('%s/can_access_edit_learner_group_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
 
 
-class FacilitatorDashboardPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class FacilitatorDashboardPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Test for facilitator dashboard access validation."""
 
     def setUp(self) -> None:
@@ -1081,21 +922,17 @@ class FacilitatorDashboardPageAccessValidationHandlerTests(
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/can_access_facilitator_dashboard_page'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX),
+            '%s/can_access_facilitator_dashboard_page' % (ACCESS_VALIDATION_HANDLER_PREFIX),
             expected_status_int=404,
         )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_should_access_facilitator_dashboard_page_when_feature_is_enabled(
         self,
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
-            '%s/can_access_facilitator_dashboard_page'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX),
+            '%s/can_access_facilitator_dashboard_page' % (ACCESS_VALIDATION_HANDLER_PREFIX),
             expected_status_int=200,
         )
 
@@ -1111,18 +948,14 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.skill_id = 'skill_1'
-        self.save_new_skill(
-            self.skill_id, self.admin_id, description='Skill Description'
-        )
+        self.save_new_skill(self.skill_id, self.admin_id, description='Skill Description')
         self.save_new_story(
             self.story_id,
             self.admin_id,
             self.topic_id,
             url_fragment='story-one',
         )
-        subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title', 'url-frag'
-        )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = [self.skill_id]
         self.save_new_topic(
             self.topic_id,
@@ -1138,28 +971,22 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             next_subtopic_id=2,
         )
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        topic_services.publish_story(
-            self.topic_id, self.story_id, self.admin_id
-        )
+        topic_services.publish_story(self.topic_id, self.story_id, self.admin_id)
 
     def test_validation_returns_true_if_story_exists(self) -> None:
         self.get_html_response(
-            '%s/can_access_story_viewer_page/staging/topic-name/story/story-one'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_story_viewer_page/staging/topic-name/story/story-one' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=200,
         )
 
     def test_validation_returns_false_if_story_does_not_exist(self) -> None:
         self.get_json(
-            '%s/can_access_story_viewer_page/staging/topic-name/story/invalid-story'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_story_viewer_page/staging/topic-name/story/invalid-story' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=404,
         )
 
 
-class CreateLearnerGroupPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class CreateLearnerGroupPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -1169,19 +996,15 @@ class CreateLearnerGroupPageAccessValidationHandlerTests(
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/can_access_create_learner_group_page'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX),
+            '%s/can_access_create_learner_group_page' % (ACCESS_VALIDATION_HANDLER_PREFIX),
             expected_status_int=404,
         )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_true_for_valid_user(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
-            '%s/can_access_create_learner_group_page'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_create_learner_group_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=200,
         )
 
@@ -1216,9 +1039,7 @@ class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_blog_home_page_access_as_blog_post_editor(self) -> None:
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(
-            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR
-        )
+        self.add_user_role(self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.login(self.BLOG_EDITOR_EMAIL)
         self.get_html_response(
             '%s/can_access_blog_home_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
@@ -1247,8 +1068,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_blog_post_page_access_without_logging_in(self) -> None:
         self.get_html_response(
-            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=200,
         )
 
@@ -1256,8 +1076,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(
-            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=200,
         )
         self.logout()
@@ -1267,21 +1086,17 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.add_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.login(self.BLOG_ADMIN_EMAIL)
         self.get_html_response(
-            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=200,
         )
         self.logout()
 
     def test_blog_post_page_access_as_blog_post_editor(self) -> None:
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(
-            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR
-        )
+        self.add_user_role(self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.login(self.BLOG_EDITOR_EMAIL)
         self.get_html_response(
-            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=200,
         )
         self.logout()
@@ -1290,22 +1105,17 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(
-            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR
-        )
+        self.add_user_role(self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.login(self.BLOG_EDITOR_EMAIL)
 
         self.get_json(
-            '%s/can_access_blog_post_page?blog_post_url_fragment=invalid-url'
-            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            '%s/can_access_blog_post_page?blog_post_url_fragment=invalid-url' % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=404,
         )
         self.logout()
 
 
-class BlogAuthorProfilePageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class BlogAuthorProfilePageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the blog author profile page and its rendering."""
 
     def setUp(self) -> None:
@@ -1315,8 +1125,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
 
     def test_blog_author_profile_page_access_without_logging_in(self) -> None:
         self.get_html_response(
-            '%s/can_access_blog_author_profile_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
+            '%s/can_access_blog_author_profile_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
             expected_status_int=200,
         )
 
@@ -1324,8 +1133,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(
-            '%s/can_access_blog_author_profile_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
+            '%s/can_access_blog_author_profile_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
             expected_status_int=200,
         )
         self.logout()
@@ -1333,8 +1141,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
     def test_blog_author_profile_page_access_as_blog_admin(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         self.get_html_response(
-            '%s/can_access_blog_author_profile_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
+            '%s/can_access_blog_author_profile_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME),
             expected_status_int=200,
         )
         self.logout()
@@ -1345,8 +1152,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_json(
-            '%s/can_access_blog_author_profile_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.VIEWER_USERNAME),
+            '%s/can_access_blog_author_profile_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.VIEWER_USERNAME),
             expected_status_int=404,
         )
         self.logout()
@@ -1357,8 +1163,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_json(
-            '%s/can_access_blog_author_profile_page/invalid_username'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX),
+            '%s/can_access_blog_author_profile_page/invalid_username' % (ACCESS_VALIDATION_HANDLER_PREFIX),
             expected_status_int=404,
         )
         self.logout()
@@ -1391,8 +1196,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
     def test_access_topic_editor_page_with_curriculum_admin_right(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
-            '%s/can_access_topic_editor/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+            '%s/can_access_topic_editor/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
             expected_status_int=200,
         )
         self.logout()
@@ -1405,8 +1209,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
         invalid_topic_id = 'p3MBT4ndlCTX'
 
         self.get_html_response(
-            '%s/can_access_topic_editor/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, invalid_topic_id),
+            '%s/can_access_topic_editor/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, invalid_topic_id),
             expected_status_int=404,
         )
         self.logout()
@@ -1416,8 +1219,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
-            '%s/can_access_topic_editor/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+            '%s/can_access_topic_editor/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
             expected_status_int=401,
         )
 
@@ -1428,33 +1230,25 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.add_user_role(
-            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
-        )
+        self.add_user_role(self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id, self.admin_id, description='Skill Description'
-        )
+        self.save_new_skill(self.skill_id, self.admin_id, description='Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id_2, self.admin_id, description='Skill Description 2'
-        )
+        self.save_new_skill(self.skill_id_2, self.admin_id, description='Skill Description 2')
 
     def test_access_skill_editor_page_without_logging_in(self) -> None:
         self.get_json(
-            '%s/can_access_skill_editor/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
+            '%s/can_access_skill_editor/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
             expected_status_int=401,
         )
 
     def test_access_skill_editor_page_with_guest_user(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/can_access_skill_editor/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
+            '%s/can_access_skill_editor/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
             expected_status_int=401,
         )
         self.logout()
@@ -1462,8 +1256,7 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
     def test_access_skill_editor_page_with_curriculum_admin(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
-            '%s/can_access_skill_editor/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
+            '%s/can_access_skill_editor/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
             expected_status_int=200,
         )
         self.logout()
@@ -1472,12 +1265,9 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_model = skill_models.SkillModel.get(self.skill_id)
         skill_model.delete(self.admin_id, 'Delete skill model.')
-        caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_SKILL, None, [self.skill_id]
-        )
+        caching_services.delete_multi(caching_services.CACHE_NAMESPACE_SKILL, None, [self.skill_id])
         self.get_json(
-            '%s/can_access_skill_editor/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
+            '%s/can_access_skill_editor/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id),
             expected_status_int=404,
         )
         self.logout()
@@ -1497,9 +1287,7 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
 
         self.signup(self.user_email, self.collection_editor_username)
         self.signup(self.guest_email, self.guest_username)
-        self.add_user_role(
-            self.collection_editor_username, feconf.ROLE_ID_COLLECTION_EDITOR
-        )
+        self.add_user_role(self.collection_editor_username, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.user = user_services.get_user_actions_info(self.user_id)
         self.save_new_valid_collection(self.COLLECTION_ID, self.user_id)
@@ -1507,8 +1295,7 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
     def test_for_logged_in_user_without_rights(self) -> None:
         self.login(self.guest_email)
         self.get_html_response(
-            '%s/can_access_collection_editor_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+            '%s/can_access_collection_editor_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
             expected_status_int=401,
         )
         self.logout()
@@ -1517,8 +1304,7 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.user, self.COLLECTION_ID)
         self.login(self.user_email)
         self.get_html_response(
-            '%s/can_access_collection_editor_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+            '%s/can_access_collection_editor_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
             expected_status_int=200,
         )
         self.logout()
@@ -1528,23 +1314,19 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.guest_email)
         self.get_html_response(
-            '%s/can_access_collection_editor_page/invalid_collectionId'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX,),
+            '%s/can_access_collection_editor_page/invalid_collectionId' % (ACCESS_VALIDATION_HANDLER_PREFIX,),
             expected_status_int=404,
         )
         self.logout()
 
     def test_should_not_access_for_logged_out_user(self) -> None:
         self.get_html_response(
-            '%s/can_access_collection_editor_page/'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX,),
+            '%s/can_access_collection_editor_page/' % (ACCESS_VALIDATION_HANDLER_PREFIX,),
             expected_status_int=404,
         )
 
 
-class ExplorationEditorPageAccessValidationHandlerTests(
-    test_utils.GenericTestBase
-):
+class ExplorationEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the exploration editor page and its rendering."""
 
     def setUp(self) -> None:
@@ -1554,23 +1336,19 @@ class ExplorationEditorPageAccessValidationHandlerTests(
         self.signup(self.guest_email, self.guest_username)
         self.owner_id = self.get_user_id_from_email(self.guest_email)
         self.exp_id = 'unpub_eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.exp_id
-        )
+        exploration = exp_domain.Exploration.create_default_exploration(self.exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
     def test_access_exploration_editor_page_without_logging_in(self) -> None:
         self.get_html_response(
-            '%s/can_access_exploration_editor_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id),
+            '%s/can_access_exploration_editor_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id),
             expected_status_int=404,
         )
 
     def test_access_exploration_editor_page_after_logging_in(self) -> None:
         self.login(self.guest_email)
         self.get_html_response(
-            '%s/can_access_exploration_editor_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id),
+            '%s/can_access_exploration_editor_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id),
             expected_status_int=200,
         )
         self.logout()
@@ -1604,9 +1382,7 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.add_user_role(
-            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
-        )
+        self.add_user_role(self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
@@ -1629,16 +1405,14 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_access_story_editor_page_without_logging_in(self) -> None:
         self.get_html_response(
-            '%s/can_access_story_editor_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id),
+            '%s/can_access_story_editor_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id),
             expected_status_int=302,
         )
 
     def test_access_story_editor_page_with_curriculum_admin(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
-            '%s/can_access_story_editor_page/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id),
+            '%s/can_access_story_editor_page/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id),
             expected_status_int=200,
         )
         self.logout()
@@ -1677,9 +1451,7 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
@@ -1704,9 +1476,7 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             self.topic_id,
             self.story_url_fragment_1,
         )
-        self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(self.node_1)
-        ]
+        self.story.story_contents.nodes = [story_domain.StoryNode.from_dict(self.node_1)]
         self.story.story_contents.initial_node_id = self.node_id
         self.story.story_contents.next_node_id = self.node_id_2
         story_services.save_new_story(self.admin_id, self.story)
@@ -1719,9 +1489,7 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             self.story_url_fragment_2,
         )
         story_services.save_new_story(self.admin_id, self.story_2)
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one'
-        )
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
@@ -1736,16 +1504,13 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             next_subtopic_id=2,
         )
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        topic_services.publish_story(
-            self.topic_id, self.story_id_1, self.admin_id
-        )
+        topic_services.publish_story(self.topic_id, self.story_id_1, self.admin_id)
 
         self.login(self.VIEWER_EMAIL)
 
     def test_any_user_can_access_review_tests_page(self) -> None:
         self.get_html_response(
-            '%s/can_access_review_tests_page/staging/topic/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_url_fragment_1),
+            '%s/can_access_review_tests_page/staging/topic/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_url_fragment_1),
             expected_status_int=200,
         )
 
@@ -1753,14 +1518,12 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.get_json(
-            '%s/can_access_review_tests_page/staging/topic/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_url_fragment_2),
+            '%s/can_access_review_tests_page/staging/topic/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_url_fragment_2),
             expected_status_int=404,
         )
 
     def test_get_fails_when_story_doesnt_exist(self) -> None:
         self.get_json(
-            '%s/can_access_review_tests_page/staging/topic/%s'
-            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'non-existent-story'),
+            '%s/can_access_review_tests_page/staging/topic/%s' % (ACCESS_VALIDATION_HANDLER_PREFIX, 'non-existent-story'),
             expected_status_int=404,
         )

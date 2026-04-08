@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import copy
 
-from core import feconf, utils
-
 from typing import Any, Dict, List, Mapping, Union, cast
+
+from core import feconf, utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -99,40 +99,20 @@ def validate_cmd(
         DeprecatedCommandError. The value of any attribute is deprecated.
     """
 
-    required_attribute_names = valid_cmd_attribute_specs[
-        'required_attribute_names'
-    ]
-    optional_attribute_names = valid_cmd_attribute_specs[
-        'optional_attribute_names'
-    ]
-    actual_attribute_names = [
-        key for key in actual_cmd_attributes.keys() if key != 'cmd'
-    ]
+    required_attribute_names = valid_cmd_attribute_specs['required_attribute_names']
+    optional_attribute_names = valid_cmd_attribute_specs['optional_attribute_names']
+    actual_attribute_names = [key for key in actual_cmd_attributes.keys() if key != 'cmd']
 
-    missing_attribute_names = [
-        key
-        for key in required_attribute_names
-        if key not in (actual_attribute_names)
-    ]
+    missing_attribute_names = [key for key in required_attribute_names if key not in (actual_attribute_names)]
 
-    extra_attribute_names = [
-        key
-        for key in actual_attribute_names
-        if key not in (required_attribute_names + optional_attribute_names)
-    ]
+    extra_attribute_names = [key for key in actual_attribute_names if key not in (required_attribute_names + optional_attribute_names)]
 
     error_msg_list = []
     if missing_attribute_names:
-        error_msg_list.append(
-            'The following required attributes are missing: %s'
-            % ((', ').join(sorted(missing_attribute_names)))
-        )
+        error_msg_list.append('The following required attributes are missing: %s' % ((', ').join(sorted(missing_attribute_names))))
 
     if extra_attribute_names:
-        error_msg_list.append(
-            'The following extra attributes are present: %s'
-            % ((', ').join(sorted(extra_attribute_names)))
-        )
+        error_msg_list.append('The following extra attributes are present: %s' % ((', ').join(sorted(extra_attribute_names))))
 
     if error_msg_list:
         raise utils.ValidationError((', ').join(error_msg_list))
@@ -141,10 +121,7 @@ def validate_cmd(
     for attribute_name, attribute_values in deprecated_values.items():
         actual_value = actual_cmd_attributes.get(attribute_name)
         if actual_value in attribute_values:
-            raise utils.DeprecatedCommandError(
-                'Value for %s in cmd %s: %s is deprecated'
-                % (attribute_name, cmd_name, actual_value)
-            )
+            raise utils.DeprecatedCommandError('Value for %s in cmd %s: %s is deprecated' % (attribute_name, cmd_name, actual_value))
 
     allowed_values = valid_cmd_attribute_specs.get('allowed_values')
     if not allowed_values:
@@ -153,10 +130,7 @@ def validate_cmd(
     for attribute_name, attribute_values in allowed_values.items():
         actual_value = actual_cmd_attributes[attribute_name]
         if actual_value not in attribute_values:
-            raise utils.ValidationError(
-                'Value for %s in cmd %s: %s is not allowed'
-                % (attribute_name, cmd_name, actual_value)
-            )
+            raise utils.ValidationError('Value for %s in cmd %s: %s is not allowed' % (attribute_name, cmd_name, actual_value))
 
 
 class BaseChange:
@@ -195,9 +169,7 @@ class BaseChange:
         }
     ]
 
-    def __init__(
-        self, change_dict: Mapping[str, AcceptableChangeDictTypes]
-    ) -> None:
+    def __init__(self, change_dict: Mapping[str, AcceptableChangeDictTypes]) -> None:
         """Initializes a BaseChange object from a dict.
 
         Args:
@@ -211,25 +183,18 @@ class BaseChange:
         cmd_name = change_dict['cmd']
         self.cmd = cmd_name
 
-        all_allowed_commands = (
-            self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS
-        )
+        all_allowed_commands = self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS
 
         cmd_attribute_names = []
         for cmd in all_allowed_commands:
             if cmd['name'] == cmd_name:
-                cmd_attribute_names = (
-                    cmd['required_attribute_names']
-                    + cmd['optional_attribute_names']
-                )
+                cmd_attribute_names = cmd['required_attribute_names'] + cmd['optional_attribute_names']
                 break
 
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
 
-    def validate_dict(
-        self, change_dict: Mapping[str, AcceptableChangeDictTypes]
-    ) -> None:
+    def validate_dict(self, change_dict: Mapping[str, AcceptableChangeDictTypes]) -> None:
         """Checks that the command in change dict is valid for the domain
         object.
 
@@ -253,18 +218,14 @@ class BaseChange:
 
         valid_cmd_attribute_specs = None
 
-        all_allowed_commands = (
-            self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS
-        )
+        all_allowed_commands = self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS
         for cmd in all_allowed_commands:
             if cmd['name'] == cmd_name:
                 valid_cmd_attribute_specs = copy.deepcopy(cmd)
                 break
 
         if cmd_name in self.DEPRECATED_COMMANDS:
-            raise utils.DeprecatedCommandError(
-                'Command %s is deprecated' % cmd_name
-            )
+            raise utils.DeprecatedCommandError('Command %s is deprecated' % cmd_name)
 
         if not valid_cmd_attribute_specs:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
@@ -282,16 +243,11 @@ class BaseChange:
         base_change_dict = {}
         base_change_dict['cmd'] = self.cmd
 
-        all_allowed_commands = (
-            self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS
-        )
+        all_allowed_commands = self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS
         valid_cmd_attribute_names = []
         for cmd in all_allowed_commands:
             if cmd['name'] == self.cmd:
-                valid_cmd_attribute_names = (
-                    cmd['required_attribute_names']
-                    + cmd['optional_attribute_names']
-                )
+                valid_cmd_attribute_names = cmd['required_attribute_names'] + cmd['optional_attribute_names']
                 break
 
         for attribute_name in valid_cmd_attribute_names:
@@ -301,9 +257,7 @@ class BaseChange:
         return base_change_dict
 
     @classmethod
-    def from_dict(
-        cls, base_change_dict: Mapping[str, AcceptableChangeDictTypes]
-    ) -> BaseChange:
+    def from_dict(cls, base_change_dict: Mapping[str, AcceptableChangeDictTypes]) -> BaseChange:
         """Returns a BaseChange domain object from a dict.
 
         Args:

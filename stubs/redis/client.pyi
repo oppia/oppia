@@ -1,6 +1,7 @@
-from .core import CoreCommands as CoreCommands, _Key, _StrType
-
 from typing import Any, Generic, List
+
+from .core import CoreCommands as CoreCommands
+from .core import _Key, _StrType
 
 class Redis(CoreCommands[_StrType]):
     def __init__(

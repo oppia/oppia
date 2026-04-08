@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import re
 
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
+
 from core import feconf, utils
 from core.domain import state_domain
-
-from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 
 class EntityVoiceoversDict(TypedDict):
@@ -33,17 +33,11 @@ class EntityVoiceoversDict(TypedDict):
     entity_type: str
     entity_version: int
     language_accent_code: str
-    voiceovers_mapping: Dict[
-        str, Dict[str, Optional[state_domain.VoiceoverDict]]
-    ]
-    automated_voiceovers_audio_offsets_msecs: Dict[
-        str, List[Dict[str, Union[str, float]]]
-    ]
+    voiceovers_mapping: Dict[str, Dict[str, Optional[state_domain.VoiceoverDict]]]
+    automated_voiceovers_audio_offsets_msecs: Dict[str, List[Dict[str, Union[str, float]]]]
 
 
-ContentIdToVoiceoverMappingType = Dict[
-    str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
-]
+ContentIdToVoiceoverMappingType = Dict[str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]]
 
 
 class EntityVoiceovers:
@@ -60,12 +54,8 @@ class EntityVoiceovers:
         entity_type: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers_mapping: Dict[
-            str, Dict[str, Optional[state_domain.Voiceover]]
-        ],
-        automated_voiceovers_audio_offsets_msecs: Dict[
-            str, List[Dict[str, Union[str, float]]]
-        ],
+        voiceovers_mapping: Dict[str, Dict[str, Optional[state_domain.Voiceover]]],
+        automated_voiceovers_audio_offsets_msecs: Dict[str, List[Dict[str, Union[str, float]]]],
     ) -> None:
         """Constructs an EntityVoiceovers domain object.
 
@@ -92,9 +82,7 @@ class EntityVoiceovers:
         self.entity_version = entity_version
         self.language_accent_code = language_accent_code
         self.voiceovers_mapping = voiceovers_mapping
-        self.automated_voiceovers_audio_offsets_msecs = (
-            automated_voiceovers_audio_offsets_msecs
-        )
+        self.automated_voiceovers_audio_offsets_msecs = automated_voiceovers_audio_offsets_msecs
 
     def to_dict(self) -> EntityVoiceoversDict:
         """Returns the dict representation of the EntityVoiceovers object.
@@ -103,9 +91,7 @@ class EntityVoiceovers:
             EntityVoiceoversDict. The dict representation of the
             EntityVoiceovers object.
         """
-        content_id_to_voiceovers_dict: Dict[
-            str, Dict[str, Optional[state_domain.VoiceoverDict]]
-        ] = {}
+        content_id_to_voiceovers_dict: Dict[str, Dict[str, Optional[state_domain.VoiceoverDict]]] = {}
 
         for (
             content_id,
@@ -114,28 +100,20 @@ class EntityVoiceovers:
             content_id_to_voiceovers_dict[content_id] = {}
             for voiceover_type in feconf.VoiceoverType:
                 voiceover = voiceover_type_to_voiceover[voiceover_type.value]
-                voiceover_dict = (
-                    None if voiceover is None else voiceover.to_dict()
-                )
+                voiceover_dict = None if voiceover is None else voiceover.to_dict()
 
-                content_id_to_voiceovers_dict[content_id][
-                    voiceover_type.value
-                ] = voiceover_dict
+                content_id_to_voiceovers_dict[content_id][voiceover_type.value] = voiceover_dict
         return {
             'entity_id': self.entity_id,
             'entity_type': self.entity_type,
             'entity_version': self.entity_version,
             'language_accent_code': self.language_accent_code,
             'voiceovers_mapping': content_id_to_voiceovers_dict,
-            'automated_voiceovers_audio_offsets_msecs': (
-                self.automated_voiceovers_audio_offsets_msecs
-            ),
+            'automated_voiceovers_audio_offsets_msecs': (self.automated_voiceovers_audio_offsets_msecs),
         }
 
     @classmethod
-    def from_dict(
-        cls, entity_voiceovers_dict: EntityVoiceoversDict
-    ) -> EntityVoiceovers:
+    def from_dict(cls, entity_voiceovers_dict: EntityVoiceoversDict) -> EntityVoiceovers:
         """Creates the EntityVoiceovers instance from the given dict.
 
         Args:
@@ -146,27 +124,17 @@ class EntityVoiceovers:
             EntityVoiceovers. The EntityVoiceovers instance created using the
             given dict.
         """
-        content_id_to_voiceovers: Dict[
-            str, Dict[str, Optional[state_domain.Voiceover]]
-        ] = {}
+        content_id_to_voiceovers: Dict[str, Dict[str, Optional[state_domain.Voiceover]]] = {}
         for (
             content_id,
             voiceover_type_to_voiceover_dict,
         ) in entity_voiceovers_dict['voiceovers_mapping'].items():
             content_id_to_voiceovers[content_id] = {}
             for voiceover_type in feconf.VoiceoverType:
-                voiceover_dict = voiceover_type_to_voiceover_dict[
-                    voiceover_type.value
-                ]
-                voiceover = (
-                    None
-                    if voiceover_dict is None
-                    else state_domain.Voiceover.from_dict(voiceover_dict)
-                )
+                voiceover_dict = voiceover_type_to_voiceover_dict[voiceover_type.value]
+                voiceover = None if voiceover_dict is None else state_domain.Voiceover.from_dict(voiceover_dict)
 
-                content_id_to_voiceovers[content_id][voiceover_type.value] = (
-                    voiceover
-                )
+                content_id_to_voiceovers[content_id][voiceover_type.value] = voiceover
 
         return cls(
             entity_voiceovers_dict['entity_id'],
@@ -180,41 +148,21 @@ class EntityVoiceovers:
     def validate(self) -> None:
         """Validates the EntityVoiceovers object."""
         if not isinstance(self.entity_type, str):
-            raise utils.ValidationError(
-                'entity_type must be a string, received %s' % self.entity_type
-            )
+            raise utils.ValidationError('entity_type must be a string, received %s' % self.entity_type)
         if not isinstance(self.entity_id, str):
-            raise utils.ValidationError(
-                'entity_id must be a string, received %s' % self.entity_id
-            )
+            raise utils.ValidationError('entity_id must be a string, received %s' % self.entity_id)
         if not isinstance(self.entity_version, int):
-            raise utils.ValidationError(
-                'entity_version must be an int, received %s'
-                % self.entity_version
-            )
+            raise utils.ValidationError('entity_version must be an int, received %s' % self.entity_version)
         if not isinstance(self.language_accent_code, str):
-            raise utils.ValidationError(
-                'language_accent_code must be a string, received %s'
-                % self.language_accent_code
-            )
-        if not bool(
-            re.match(
-                feconf.LANGUAGE_ACCENT_CODE_REGEX, self.language_accent_code
-            )
-        ):
-            raise utils.ValidationError(
-                'language_accent_code must be formatted as '
-                '{{language}}-{{accent}}, received %s'
-                % self.language_accent_code
-            )
+            raise utils.ValidationError('language_accent_code must be a string, received %s' % self.language_accent_code)
+        if not bool(re.match(feconf.LANGUAGE_ACCENT_CODE_REGEX, self.language_accent_code)):
+            raise utils.ValidationError('language_accent_code must be formatted as {{language}}-{{accent}}, received %s' % self.language_accent_code)
         for (
             content_id,
             voiceover_type_to_voiceover,
         ) in self.voiceovers_mapping.items():
             if not isinstance(content_id, str):
-                raise utils.ValidationError(
-                    'content_id must be a string, received %s' % content_id
-                )
+                raise utils.ValidationError('content_id must be a string, received %s' % content_id)
             for (
                 voiceover_type,
                 voiceover,
@@ -223,10 +171,7 @@ class EntityVoiceovers:
                     feconf.VoiceoverType.MANUAL.value,
                     feconf.VoiceoverType.AUTO.value,
                 ]:
-                    raise utils.ValidationError(
-                        'voiceover type must be VoiceoverType, received %s'
-                        % voiceover_type
-                    )
+                    raise utils.ValidationError('voiceover type must be VoiceoverType, received %s' % voiceover_type)
                 if voiceover is not None:
                     voiceover.validate()
 
@@ -235,37 +180,23 @@ class EntityVoiceovers:
             audio_offset_list,
         ) in self.automated_voiceovers_audio_offsets_msecs.items():
             if not isinstance(content_id, str):
-                raise utils.ValidationError(
-                    'content_id must be a string, received %s' % content_id
-                )
+                raise utils.ValidationError('content_id must be a string, received %s' % content_id)
 
             for token_audio_offset_dict in audio_offset_list:
                 if 'token' not in token_audio_offset_dict:
-                    raise utils.ValidationError(
-                        'Missing key `token` in word audio offset data.'
-                    )
+                    raise utils.ValidationError('Missing key `token` in word audio offset data.')
 
                 if 'audio_offset_msecs' not in token_audio_offset_dict:
-                    raise utils.ValidationError(
-                        'Missing key `audio_offset_msecs` in word audio offset '
-                        'data.'
-                    )
+                    raise utils.ValidationError('Missing key `audio_offset_msecs` in word audio offset data.')
 
                 token = token_audio_offset_dict['token']
-                audio_offset_msecs = token_audio_offset_dict[
-                    'audio_offset_msecs'
-                ]
+                audio_offset_msecs = token_audio_offset_dict['audio_offset_msecs']
 
                 if not isinstance(token, str):
-                    raise utils.ValidationError(
-                        'Token must be a string, received %s' % token
-                    )
+                    raise utils.ValidationError('Token must be a string, received %s' % token)
 
                 if not isinstance(audio_offset_msecs, float):
-                    raise utils.ValidationError(
-                        'audio_offset_msecs must be a floating value, '
-                        'received %s' % audio_offset_msecs
-                    )
+                    raise utils.ValidationError('audio_offset_msecs must be a floating value, received %s' % audio_offset_msecs)
 
     def add_new_content_id_without_voiceovers(self, content_id: str) -> None:
         """Adds a new content ID for which manual and automatic voiceovers
@@ -302,13 +233,9 @@ class EntityVoiceovers:
         if content_id not in self.voiceovers_mapping:
             self.add_new_content_id_without_voiceovers(content_id)
 
-        self.voiceovers_mapping[content_id][voiceover_type.value] = (
-            voiceovers_mapping
-        )
+        self.voiceovers_mapping[content_id][voiceover_type.value] = voiceovers_mapping
 
-    def remove_voiceover(
-        self, content_id: str, voiceover_type: feconf.VoiceoverType
-    ) -> None:
+    def remove_voiceover(self, content_id: str, voiceover_type: feconf.VoiceoverType) -> None:
         """Removes voiceover from the entity voiceover instance.
 
         Args:
@@ -337,16 +264,7 @@ class EntityVoiceovers:
             bool. A boolean value specifying whether both the manual and
             automatic voiceovers are empty or not.
         """
-        return (
-            self.voiceovers_mapping[content_id][
-                feconf.VoiceoverType.MANUAL.value
-            ]
-            is None
-            and self.voiceovers_mapping[content_id][
-                feconf.VoiceoverType.AUTO.value
-            ]
-            is None
-        )
+        return self.voiceovers_mapping[content_id][feconf.VoiceoverType.MANUAL.value] is None and self.voiceovers_mapping[content_id][feconf.VoiceoverType.AUTO.value] is None
 
     def add_automated_voiceovers_audio_offsets(
         self,
@@ -366,13 +284,9 @@ class EntityVoiceovers:
                 synthesized from Cloud and does not include offsets for manual
                 voiceovers.
         """
-        self.automated_voiceovers_audio_offsets_msecs[content_id] = (
-            sentence_tokens_with_durations
-        )
+        self.automated_voiceovers_audio_offsets_msecs[content_id] = sentence_tokens_with_durations
 
-    def mark_voiceovers_as_needing_update(
-        self, content_id: str, voiceover_type: feconf.VoiceoverType
-    ) -> None:
+    def mark_voiceovers_as_needing_update(self, content_id: str, voiceover_type: feconf.VoiceoverType) -> None:
         """Marks the manual voiceover for the given content ID as needing
         update.
 

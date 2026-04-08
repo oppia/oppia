@@ -18,11 +18,11 @@ from __future__ import annotations
 
 import re
 
+from typing import Iterator, Type
+
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Iterator, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -43,17 +43,12 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """
 
         for clazz in test_utils.get_storage_model_classes():
-            if (
-                clazz.__name__
-                in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES
-            ):
+            if clazz.__name__ in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES:
                 continue
             yield clazz
 
     def test_all_model_module_names_unique(self) -> None:
-        names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in test_utils.get_storage_model_classes()
-        ]
+        names_of_ndb_model_subclasses = [clazz.__name__ for clazz in test_utils.get_storage_model_classes()]
 
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),
@@ -65,80 +60,43 @@ class StorageModelsTest(test_utils.GenericTestBase):
     ) -> None:
         for clazz in self._get_base_or_versioned_model_child_classes():
             try:
-                self.assertIn(
-                    clazz.get_deletion_policy(), base_models.DELETION_POLICY
-                )
+                self.assertIn(clazz.get_deletion_policy(), base_models.DELETION_POLICY)
             except NotImplementedError:
-                self.fail(
-                    msg='get_deletion_policy is not defined for %s'
-                    % (clazz.__name__)
-                )
+                self.fail(msg='get_deletion_policy is not defined for %s' % (clazz.__name__))
 
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
         self,
     ) -> None:
         for clazz in self._get_base_or_versioned_model_child_classes():
-            if (
-                clazz.get_deletion_policy()
-                == base_models.DELETION_POLICY.NOT_APPLICABLE
-            ):
+            if clazz.get_deletion_policy() == base_models.DELETION_POLICY.NOT_APPLICABLE:
                 with self.assertRaisesRegex(
                     NotImplementedError,
-                    re.escape(
-                        'The has_reference_to_user_id() method is missing from '
-                        'the derived class. It should be implemented in the '
-                        'derived class.'
-                    ),
+                    re.escape('The has_reference_to_user_id() method is missing from the derived class. It should be implemented in the derived class.'),
                 ):
                     clazz.has_reference_to_user_id('any_id')
             else:
                 try:
-                    self.assertIsNotNone(
-                        clazz.has_reference_to_user_id('any_id')
-                    )
+                    self.assertIsNotNone(clazz.has_reference_to_user_id('any_id'))
                 except NotImplementedError:
-                    self.fail(
-                        msg='has_reference_to_user_id is not defined for %s'
-                        % (clazz.__name__)
-                    )
+                    self.fail(msg='has_reference_to_user_id is not defined for %s' % (clazz.__name__))
 
     def test_get_models_which_should_be_exported(self) -> None:
         """Ensure that the set of models to export is the set of models with
         export policy CONTAINS_USER_DATA, and that all other models have
         export policy NOT_APPLICABLE.
         """
-        all_models = [
-            clazz
-            for clazz in test_utils.get_storage_model_classes()
-            if (
-                not clazz.__name__
-                in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES
-            )
-        ]
-        models_with_export = (
-            takeout_service.get_models_which_should_be_exported()
-        )
+        all_models = [clazz for clazz in test_utils.get_storage_model_classes() if (clazz.__name__ not in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)]
+        models_with_export = takeout_service.get_models_which_should_be_exported()
         for model in all_models:
             export_policy = model.get_export_policy()
             if model in models_with_export:
-                self.assertIn(
-                    base_models.EXPORT_POLICY.EXPORTED, export_policy.values()
-                )
+                self.assertIn(base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
             else:
-                self.assertNotIn(
-                    base_models.EXPORT_POLICY.EXPORTED, export_policy.values()
-                )
+                self.assertNotIn(base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
 
     def test_all_fields_have_export_policy(self) -> None:
         """Ensure every field in every model has an export policy defined."""
-        all_models = [
-            clazz
-            for clazz in test_utils.get_storage_model_classes()
-            if (
-                not clazz.__name__
-                in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES
-            )
-        ]
+        all_models = [clazz for clazz in test_utils.get_storage_model_classes() if (clazz.__name__ not in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)]
         for model in all_models:
             export_policy = model.get_export_policy()
             self.assertEqual(
@@ -154,9 +112,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 set(export_policy.values()).issubset(
                     {
                         base_models.EXPORT_POLICY.EXPORTED,
-                        (
-                            base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT
-                        ),
+                        (base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT),
                         base_models.EXPORT_POLICY.NOT_APPLICABLE,
                     }
                 )
@@ -240,27 +196,12 @@ class StorageModelsTest(test_utils.GenericTestBase):
             'AppFeedbackReportModel',
         }
 
-        locally_pseudonymize_models = [
-            clazz.__name__
-            for clazz in test_utils.get_storage_model_classes()
-            if (
-                clazz.__name__
-                not in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES
-                and clazz.get_deletion_policy()
-                == base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-            )
-        ]
+        locally_pseudonymize_models = [clazz.__name__ for clazz in test_utils.get_storage_model_classes() if (clazz.__name__ not in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES and clazz.get_deletion_policy() == base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)]
 
-        models_missing_wipeout_handling = set(locally_pseudonymize_models) - (
-            models_with_wipeout_handling
-        )
+        models_missing_wipeout_handling = set(locally_pseudonymize_models) - (models_with_wipeout_handling)
 
         self.assertEqual(
             models_missing_wipeout_handling,
             set(),
-            'The following models have LOCALLY_PSEUDONYMIZE deletion policy '
-            'but are not listed as having wipeout handling. Please add wipeout '
-            'logic in core/domain/wipeout_service.py and then add the model '
-            'name to the models_with_wipeout_handling set in this test: %s'
-            % sorted(models_missing_wipeout_handling),
+            'The following models have LOCALLY_PSEUDONYMIZE deletion policy but are not listed as having wipeout handling. Please add wipeout logic in core/domain/wipeout_service.py and then add the model name to the models_with_wipeout_handling set in this test: %s' % sorted(models_missing_wipeout_handling),
         )

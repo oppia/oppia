@@ -18,21 +18,19 @@
 
 from __future__ import annotations
 
+from typing import Dict, Final, List, Type, Union
+
 from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import number_with_units_audit_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, Final, List, Type, Union
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services, exp_models, question_models
 
-exp_models, question_models = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.QUESTION]
-)
+exp_models, question_models = models.Registry.import_models([models.Names.EXPLORATION, models.Names.QUESTION])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -44,10 +42,7 @@ MalformedStateDict = Dict[str, object]
 
 
 class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
-
-    JOB_CLASS: Type[
-        number_with_units_audit_jobs.FindNumberWithUnitsRuleUnitsJob
-    ] = number_with_units_audit_jobs.FindNumberWithUnitsRuleUnitsJob
+    JOB_CLASS: Type[number_with_units_audit_jobs.FindNumberWithUnitsRuleUnitsJob] = number_with_units_audit_jobs.FindNumberWithUnitsRuleUnitsJob
 
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
@@ -68,9 +63,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
                 {'unit': 'm', 'exponent': 1},
             ]
         )
-        exp_state_3 = state_domain.State.create_default_state(
-            'state', 'content_4', 'default_outcome_5', is_initial_state=True
-        )
+        exp_state_3 = state_domain.State.create_default_state('state', 'content_4', 'default_outcome_5', is_initial_state=True)
         exp_state_3.update_interaction_id('TextInput')
 
         exp_model_1 = self.create_model(
@@ -91,9 +84,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         )
         exp_model_1.update_timestamps()
 
-        exp_state_4 = state_domain.State.create_default_state(
-            'state', 'content_0', 'default_outcome_1', is_initial_state=True
-        )
+        exp_state_4 = state_domain.State.create_default_state('state', 'content_0', 'default_outcome_1', is_initial_state=True)
         exp_state_4.update_interaction_id('TextInput')
 
         exp_model_2 = self.create_model(
@@ -131,9 +122,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
 
         datastore_services.put_multi([exp_model_1, exp_model_2, question_model])
 
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout=str(['hr', 'km', 'm', 's']))]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout=str(['hr', 'km', 'm', 's']))])
 
     def test_job_deduplicates_units_across_models_with_variations(self) -> None:
         exp_state_1 = self._create_state_with_units(
@@ -143,9 +132,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        exp_state_2 = state_domain.State.create_default_state(
-            'state', 'content_6', 'default_outcome_7', is_initial_state=True
-        )
+        exp_state_2 = state_domain.State.create_default_state('state', 'content_6', 'default_outcome_7', is_initial_state=True)
         exp_state_2.update_interaction_id('NumberWithUnits')
         default_outcome = exp_state_2.interaction.default_outcome
         assert default_outcome is not None
@@ -281,39 +268,29 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
 
         datastore_services.put_multi([exp_model, question_model])
 
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout=str(['N', 'kg', 'm', 's']))]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout=str(['N', 'kg', 'm', 's']))])
 
     def test_job_handles_malformed_state_data(self) -> None:
         # State with interaction that is not a dict.
-        malformed_state_1 = self._create_base_malformed_state_dict(
-            'content_0', 'default_outcome_1'
-        )
+        malformed_state_1 = self._create_base_malformed_state_dict('content_0', 'default_outcome_1')
         malformed_state_1['interaction'] = 'not_a_dict'
 
         # State with answer_groups that is not a list.
-        malformed_state_2 = self._create_base_malformed_state_dict(
-            'content_2', 'default_outcome_3'
-        )
+        malformed_state_2 = self._create_base_malformed_state_dict('content_2', 'default_outcome_3')
         interaction_2 = malformed_state_2['interaction']
         assert isinstance(interaction_2, dict)
         interaction_2['id'] = 'NumberWithUnits'
         interaction_2['answer_groups'] = 'not_a_list'
 
         # State with answer_group that is not a dict.
-        malformed_state_3 = self._create_base_malformed_state_dict(
-            'content_4', 'default_outcome_5'
-        )
+        malformed_state_3 = self._create_base_malformed_state_dict('content_4', 'default_outcome_5')
         interaction_3 = malformed_state_3['interaction']
         assert isinstance(interaction_3, dict)
         interaction_3['id'] = 'NumberWithUnits'
         interaction_3['answer_groups'] = ['not_a_dict']
 
         # State with rule_spec that is not a dict.
-        malformed_state_4 = self._create_base_malformed_state_dict(
-            'content_6', 'default_outcome_7'
-        )
+        malformed_state_4 = self._create_base_malformed_state_dict('content_6', 'default_outcome_7')
         interaction_4 = malformed_state_4['interaction']
         assert isinstance(interaction_4, dict)
         default_outcome_4 = interaction_4['default_outcome']
@@ -328,9 +305,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         ]
 
         # State with inputs that is not a dict.
-        malformed_state_5 = self._create_base_malformed_state_dict(
-            'content_8', 'default_outcome_9'
-        )
+        malformed_state_5 = self._create_base_malformed_state_dict('content_8', 'default_outcome_9')
         interaction_5 = malformed_state_5['interaction']
         assert isinstance(interaction_5, dict)
         default_outcome_5 = interaction_5['default_outcome']
@@ -350,9 +325,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         ]
 
         # State with number_with_units (f) that is not a dict.
-        malformed_state_6 = self._create_base_malformed_state_dict(
-            'content_10', 'default_outcome_11'
-        )
+        malformed_state_6 = self._create_base_malformed_state_dict('content_10', 'default_outcome_11')
         interaction_6 = malformed_state_6['interaction']
         assert isinstance(interaction_6, dict)
         default_outcome_6 = interaction_6['default_outcome']
@@ -374,9 +347,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         ]
 
         # State with unit_dict that is not a dict followed by a valid one.
-        malformed_state_7 = self._create_base_malformed_state_dict(
-            'content_12', 'default_outcome_13'
-        )
+        malformed_state_7 = self._create_base_malformed_state_dict('content_12', 'default_outcome_13')
         interaction_7 = malformed_state_7['interaction']
         assert isinstance(interaction_7, dict)
         default_outcome_7 = interaction_7['default_outcome']
@@ -411,9 +382,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         ]
 
         # State with unit_dict where 'unit' is not a string followed by a valid unit.
-        malformed_state_8 = self._create_base_malformed_state_dict(
-            'content_14', 'default_outcome_15'
-        )
+        malformed_state_8 = self._create_base_malformed_state_dict('content_14', 'default_outcome_15')
         interaction_8 = malformed_state_8['interaction']
         assert isinstance(interaction_8, dict)
         default_outcome_8 = interaction_8['default_outcome']
@@ -448,9 +417,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         ]
 
         # Valid state with actual units to ensure job runs and produces output.
-        valid_state = self._create_state_with_units(
-            [{'unit': 'cm', 'exponent': 1}]
-        )
+        valid_state = self._create_state_with_units([{'unit': 'cm', 'exponent': 1}])
 
         exp_model = self.create_model(
             exp_models.ExplorationModel,
@@ -481,17 +448,11 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         # Valid state produces 'cm', malformed_state_7 produces 'g', and
         # malformed_state_8 produces 'mg' (both have valid units after invalid
         # ones that get skipped).
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout=str(['cm', 'g', 'mg']))]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout=str(['cm', 'g', 'mg']))])
 
-    def _create_state_with_units(
-        self, units: List[Dict[str, Union[str, int]]]
-    ) -> state_domain.StateDict:
+    def _create_state_with_units(self, units: List[Dict[str, Union[str, int]]]) -> state_domain.StateDict:
         """Creates a NumberWithUnits state dict with the provided units."""
-        state = state_domain.State.create_default_state(
-            'state', 'content_0', 'default_outcome_1', is_initial_state=True
-        )
+        state = state_domain.State.create_default_state('state', 'content_0', 'default_outcome_1', is_initial_state=True)
         state.update_interaction_id('NumberWithUnits')
         default_outcome = state.interaction.default_outcome
         assert default_outcome is not None
@@ -532,9 +493,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         )
         return state.to_dict()
 
-    def _create_base_malformed_state_dict(
-        self, content_id: str, default_outcome_id: str
-    ) -> MalformedStateDict:
+    def _create_base_malformed_state_dict(self, content_id: str, default_outcome_id: str) -> MalformedStateDict:
         """Creates a base state dict that can be modified for malformed tests.
 
         This function returns a plain Dict[str, object] rather than a TypedDict
@@ -547,7 +506,5 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         Returns:
             MalformedStateDict. A base state dict as a plain dictionary.
         """
-        state_dict = state_domain.State.create_default_state(
-            'state', content_id, default_outcome_id, is_initial_state=True
-        ).to_dict()
+        state_dict = state_domain.State.create_default_state('state', content_id, default_outcome_id, is_initial_state=True).to_dict()
         return dict(state_dict)

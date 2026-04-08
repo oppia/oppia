@@ -20,30 +20,24 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Final, Type
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import blog_author_details_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Final, Type
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models, user_models
 
-(blog_models, user_models) = models.Registry.import_models(
-    [models.Names.BLOG, models.Names.USER]
-)
+(blog_models, user_models) = models.Registry.import_models([models.Names.BLOG, models.Names.USER])
 
 
 class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
     """Tests for AuditBlogAuthorDetailsForDeletedUsersJob."""
 
-    JOB_CLASS: Type[
-        blog_author_details_migration_jobs.AuditBlogAuthorDetailsForDeletedUsersJob
-    ] = (
-        blog_author_details_migration_jobs.AuditBlogAuthorDetailsForDeletedUsersJob
-    )
+    JOB_CLASS: Type[blog_author_details_migration_jobs.AuditBlogAuthorDetailsForDeletedUsersJob] = blog_author_details_migration_jobs.AuditBlogAuthorDetailsForDeletedUsersJob
 
     # Active user with a UserSettingsModel.
     AUTHOR_ID_1: Final = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -89,9 +83,7 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    'TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult.as_stdout('TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'),
             ]
         )
 
@@ -116,15 +108,9 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    f'ORPHANED AUTHOR ID: {self.AUTHOR_ID_2}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'ORPHANED AUTHOR IDS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult.as_stdout(f'ORPHANED AUTHOR ID: {self.AUTHOR_ID_2}'),
+                job_run_result.JobRunResult.as_stdout('ORPHANED AUTHOR IDS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult.as_stdout('TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'),
             ]
         )
 
@@ -156,9 +142,7 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    'TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult.as_stdout('TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'),
             ]
         )
 
@@ -236,15 +220,9 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    f'ORPHANED AUTHOR ID: {self.AUTHOR_ID_2}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'ORPHANED AUTHOR IDS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 2'
-                ),
+                job_run_result.JobRunResult.as_stdout(f'ORPHANED AUTHOR ID: {self.AUTHOR_ID_2}'),
+                job_run_result.JobRunResult.as_stdout('ORPHANED AUTHOR IDS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult.as_stdout('TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 2'),
             ]
         )
 
@@ -280,29 +258,17 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    f'ORPHANED AUTHOR ID: {self.AUTHOR_ID_2}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'ORPHANED AUTHOR IDS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult.as_stdout(f'ORPHANED AUTHOR ID: {self.AUTHOR_ID_2}'),
+                job_run_result.JobRunResult.as_stdout('ORPHANED AUTHOR IDS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult.as_stdout('TOTAL BLOG POST AUTHOR IDS COUNT SUCCESS: 1'),
             ]
         )
 
 
-class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
-    job_test_utils.JobTestBase
-):
+class MigrateBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
     """Tests for MigrateBlogAuthorDetailsForDeletedUsersJob."""
 
-    JOB_CLASS: Type[
-        blog_author_details_migration_jobs.MigrateBlogAuthorDetailsForDeletedUsersJob
-    ] = (
-        blog_author_details_migration_jobs.MigrateBlogAuthorDetailsForDeletedUsersJob
-    )
+    JOB_CLASS: Type[blog_author_details_migration_jobs.MigrateBlogAuthorDetailsForDeletedUsersJob] = blog_author_details_migration_jobs.MigrateBlogAuthorDetailsForDeletedUsersJob
 
     # Active user with a UserSettingsModel.
     AUTHOR_ID_1: Final = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -367,18 +333,12 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED AUTHOR DETAILS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult.as_stdout(f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'),
+                job_run_result.JobRunResult.as_stdout('MIGRATED AUTHOR DETAILS COUNT SUCCESS: 1'),
             ]
         )
 
-        created_model = blog_models.BlogAuthorDetailsModel.get_by_author(
-            self.AUTHOR_ID_2
-        )
+        created_model = blog_models.BlogAuthorDetailsModel.get_by_author(self.AUTHOR_ID_2)
         self.assertIsNotNone(created_model)
         assert created_model is not None
         self.assertEqual(
@@ -439,19 +399,13 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED AUTHOR DETAILS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult.as_stdout(f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'),
+                job_run_result.JobRunResult.as_stdout('MIGRATED AUTHOR DETAILS COUNT SUCCESS: 1'),
             ]
         )
 
         # Verify that the model was persisted with correct values.
-        created_model = blog_models.BlogAuthorDetailsModel.get_by_author(
-            self.AUTHOR_ID_2
-        )
+        created_model = blog_models.BlogAuthorDetailsModel.get_by_author(self.AUTHOR_ID_2)
         self.assertIsNotNone(created_model)
         assert created_model is not None
         self.assertEqual(
@@ -517,18 +471,12 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED AUTHOR DETAILS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult.as_stdout(f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'),
+                job_run_result.JobRunResult.as_stdout('MIGRATED AUTHOR DETAILS COUNT SUCCESS: 1'),
             ]
         )
 
-        migrated_model = blog_models.BlogAuthorDetailsModel.get_by_author(
-            self.AUTHOR_ID_2
-        )
+        migrated_model = blog_models.BlogAuthorDetailsModel.get_by_author(self.AUTHOR_ID_2)
         self.assertIsNotNone(migrated_model)
         assert migrated_model is not None
         self.assertEqual(
@@ -540,9 +488,7 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
             blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_BIO,
         )
 
-        existing_model = blog_models.BlogAuthorDetailsModel.get_by_author(
-            self.AUTHOR_ID_1
-        )
+        existing_model = blog_models.BlogAuthorDetailsModel.get_by_author(self.AUTHOR_ID_1)
         self.assertIsNotNone(existing_model)
         assert existing_model is not None
         self.assertEqual(existing_model.displayed_author_name, 'Valid Author')
@@ -578,21 +524,13 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(
-                    f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_3}'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'MIGRATED AUTHOR DETAILS COUNT SUCCESS: 2'
-                ),
+                job_run_result.JobRunResult.as_stdout(f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_2}'),
+                job_run_result.JobRunResult.as_stdout(f'MIGRATED AUTHOR ID: {self.AUTHOR_ID_3}'),
+                job_run_result.JobRunResult.as_stdout('MIGRATED AUTHOR DETAILS COUNT SUCCESS: 2'),
             ]
         )
 
-        model_2 = blog_models.BlogAuthorDetailsModel.get_by_author(
-            self.AUTHOR_ID_2
-        )
+        model_2 = blog_models.BlogAuthorDetailsModel.get_by_author(self.AUTHOR_ID_2)
         self.assertIsNotNone(model_2)
         assert model_2 is not None
         self.assertEqual(
@@ -603,9 +541,7 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
             model_2.author_bio,
             blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_BIO,
         )
-        model_3 = blog_models.BlogAuthorDetailsModel.get_by_author(
-            self.AUTHOR_ID_3
-        )
+        model_3 = blog_models.BlogAuthorDetailsModel.get_by_author(self.AUTHOR_ID_3)
         self.assertIsNotNone(model_3)
         assert model_3 is not None
         self.assertEqual(

@@ -22,10 +22,10 @@ import builtins
 import threading
 import time
 
+from typing import Callable, List
+
 from core.tests import test_utils
 from scripts import concurrent_task_utils
-
-from typing import Callable, List
 
 
 def test_function(unused_arg: str) -> Callable[[], None]:
@@ -62,18 +62,14 @@ class TaskResultTests(ConcurrentTaskUtilsTests):
     def test_all_messages_with_success_message(self) -> None:
         output_object = concurrent_task_utils.TaskResult('Test', False, [], [])
         self.assertEqual(output_object.trimmed_messages, [])
-        self.assertEqual(
-            output_object.get_report(), ['SUCCESS  Test check passed']
-        )
+        self.assertEqual(output_object.get_report(), ['SUCCESS  Test check passed'])
         self.assertFalse(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
     def test_all_messages_with_failed_message(self) -> None:
         output_object = concurrent_task_utils.TaskResult('Test', True, [], [])
         self.assertEqual(output_object.trimmed_messages, [])
-        self.assertEqual(
-            output_object.get_report(), ['FAILED  Test check failed']
-        )
+        self.assertEqual(output_object.get_report(), ['FAILED  Test check failed'])
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
@@ -82,9 +78,7 @@ class CreateTaskTests(ConcurrentTaskUtilsTests):
     """Tests for create_task method."""
 
     def test_create_task_with_success(self) -> None:
-        task = concurrent_task_utils.create_task(
-            test_function, True, self.semaphore, errors_to_retry_on=[]
-        )
+        task = concurrent_task_utils.create_task(test_function, True, self.semaphore, errors_to_retry_on=[])
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))
 
 
@@ -123,8 +117,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             task.start()
             task.join()
         self.assertIn(
-            'test_function() missing 1 required '
-            'positional argument: \'unused_arg\'',
+            'test_function() missing 1 required positional argument: \'unused_arg\'',
             self.task_stdout,
         )
 
@@ -224,15 +217,12 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
     def test_execute_task_with_exception(self) -> None:
         task_list = []
         for _ in range(6):
-            task = concurrent_task_utils.create_task(
-                test_function, True, self.semaphore, errors_to_retry_on=[]
-            )
+            task = concurrent_task_utils.create_task(test_function, True, self.semaphore, errors_to_retry_on=[])
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         self.assertIn(
-            'test_function() missing 1 required '
-            'positional argument: \'unused_arg\'',
+            'test_function() missing 1 required positional argument: \'unused_arg\'',
             self.task_stdout,
         )
 

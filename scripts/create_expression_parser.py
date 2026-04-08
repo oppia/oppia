@@ -35,14 +35,10 @@ The root folder MUST be named 'oppia'.
 
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Produces the expression parser."""
-    unused_parsed_args = _PARSER.parse_args(args=args)
+    _PARSER.parse_args(args=args)
 
-    expression_parser_definition = os.path.join(
-        'core', 'templates', 'expressions', 'parser.pegjs'
-    )
-    expression_parser_js = os.path.join(
-        'core', 'templates', 'expressions', 'parser.js'
-    )
+    expression_parser_definition = os.path.join('core', 'templates', 'expressions', 'parser.pegjs')
+    expression_parser_js = os.path.join('core', 'templates', 'expressions', 'parser.js')
 
     common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 

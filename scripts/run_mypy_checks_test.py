@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import subprocess
 
+from typing import Final, List, Optional, Tuple
+
 from core.tests import test_utils
 from scripts import run_mypy_checks
-
-from typing import Final, List, Optional, Tuple
 
 PYTHON_CMD: Final = 'python3'
 MYPY_SCRIPT_MODULE: Final = 'scripts.run_mypy_checks'
@@ -48,9 +48,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        process_success = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        process_success = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         def mock_popen_success(
             unused_cmd: str,
@@ -61,9 +59,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_success
 
-        process_failure = subprocess.Popen(
-            ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        process_failure = subprocess.Popen(['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         def mock_popen_failure(
             unused_cmd: str,
@@ -74,16 +70,10 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_failure
 
-        self.popen_swap_success = self.swap(
-            subprocess, 'Popen', mock_popen_success
-        )
-        self.popen_swap_failure = self.swap(
-            subprocess, 'Popen', mock_popen_failure
-        )
+        self.popen_swap_success = self.swap(subprocess, 'Popen', mock_popen_success)
+        self.popen_swap_failure = self.swap(subprocess, 'Popen', mock_popen_failure)
 
-        self.directories_swap = self.swap(
-            run_mypy_checks, 'EXCLUDED_DIRECTORIES', ['dir1/', 'dir2/']
-        )
+        self.directories_swap = self.swap(run_mypy_checks, 'EXCLUDED_DIRECTORIES', ['dir1/', 'dir2/'])
 
     def test_get_mypy_cmd_without_files(self) -> None:
         expected_cmd = [
@@ -112,17 +102,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_running_script_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
-            process = subprocess.Popen(
-                [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE
-            )
+            process = subprocess.Popen([PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
             output = process.communicate()
             self.assertEqual(output[0], b'test\n')
 
     def test_running_script_with_mypy_errors(self) -> None:
         with self.popen_swap_failure:
-            process = subprocess.Popen(
-                [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE
-            )
+            process = subprocess.Popen([PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
             output = process.communicate()
             self.assertEqual(output[0], b'')
 

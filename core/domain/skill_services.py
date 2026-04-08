@@ -20,6 +20,17 @@ import collections
 import itertools
 import logging
 
+from typing import (
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Set,
+    Tuple,
+    cast,
+    overload,
+)
+
 from core import feconf
 from core.constants import constants
 from core.domain import (
@@ -40,18 +51,6 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import (
-    Callable,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Set,
-    Tuple,
-    cast,
-    overload,
-)
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
@@ -61,15 +60,13 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(skill_models, user_models, question_models, topic_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.SKILL,
-            models.Names.USER,
-            models.Names.QUESTION,
-            models.Names.TOPIC,
-        ]
-    )
+(skill_models, user_models, question_models, topic_models) = models.Registry.import_models(
+    [
+        models.Names.SKILL,
+        models.Names.USER,
+        models.Names.QUESTION,
+        models.Names.TOPIC,
+    ]
 )
 
 
@@ -91,10 +88,7 @@ def get_all_skill_summaries() -> List[skill_domain.SkillSummary]:
         datastore.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_all()
-    skill_summaries = [
-        get_skill_summary_from_model(summary)
-        for summary in skill_summaries_models
-    ]
+    skill_summaries = [get_skill_summary_from_model(summary) for summary in skill_summaries_models]
     return skill_summaries
 
 
@@ -128,16 +122,9 @@ def _get_skill_summaries_in_batches(
     # in having less number of skills than requested. Hence, fetching twice
     # the number of requested skills will help reduce the number of datastore
     # calls.
-    skill_summaries_models, new_urlsafe_start_cursor, more = (
-        skill_models.SkillSummaryModel.fetch_page(
-            2 * num_skills_to_fetch, urlsafe_start_cursor, sort_by
-        )
-    )
+    skill_summaries_models, new_urlsafe_start_cursor, more = skill_models.SkillSummaryModel.fetch_page(2 * num_skills_to_fetch, urlsafe_start_cursor, sort_by)
 
-    skill_summaries = [
-        get_skill_summary_from_model(summary)
-        for summary in skill_summaries_models
-    ]
+    skill_summaries = [get_skill_summary_from_model(summary) for summary in skill_summaries_models]
     return skill_summaries, new_urlsafe_start_cursor, more
 
 
@@ -182,21 +169,11 @@ def get_filtered_skill_summaries(
     more = True
 
     while len(augmented_skill_summaries) < num_skills_to_fetch and more:
-        augmented_skill_summaries_batch, new_urlsafe_start_cursor, more = (
-            _get_augmented_skill_summaries_in_batches(
-                num_skills_to_fetch, new_urlsafe_start_cursor, sort_by
-            )
-        )
+        augmented_skill_summaries_batch, new_urlsafe_start_cursor, more = _get_augmented_skill_summaries_in_batches(num_skills_to_fetch, new_urlsafe_start_cursor, sort_by)
 
-        filtered_augmented_skill_summaries = _filter_skills_by_status(
-            augmented_skill_summaries_batch, status
-        )
-        filtered_augmented_skill_summaries = _filter_skills_by_classroom(
-            filtered_augmented_skill_summaries, classroom_name
-        )
-        filtered_augmented_skill_summaries = _filter_skills_by_keywords(
-            filtered_augmented_skill_summaries, keywords
-        )
+        filtered_augmented_skill_summaries = _filter_skills_by_status(augmented_skill_summaries_batch, status)
+        filtered_augmented_skill_summaries = _filter_skills_by_classroom(filtered_augmented_skill_summaries, classroom_name)
+        filtered_augmented_skill_summaries = _filter_skills_by_keywords(filtered_augmented_skill_summaries, keywords)
         augmented_skill_summaries.extend(filtered_augmented_skill_summaries)
 
     return augmented_skill_summaries, new_urlsafe_start_cursor, more
@@ -220,24 +197,12 @@ def _get_augmented_skill_summaries_in_batches(
             more: bool. If True, there are (probably) more results after this
                 batch. If False, there are no further results after this batch.
     """
-    skill_summaries, new_urlsafe_start_cursor, more = (
-        _get_skill_summaries_in_batches(
-            num_skills_to_fetch, urlsafe_start_cursor, sort_by
-        )
-    )
+    skill_summaries, new_urlsafe_start_cursor, more = _get_skill_summaries_in_batches(num_skills_to_fetch, urlsafe_start_cursor, sort_by)
 
-    assigned_skill_ids: Dict[str, Dict[str, List[str]]] = (
-        collections.defaultdict(
-            lambda: {'topic_names': [], 'classroom_names': []}
-        )
-    )
+    assigned_skill_ids: Dict[str, Dict[str, List[str]]] = collections.defaultdict(lambda: {'topic_names': [], 'classroom_names': []})
 
     all_topic_models = topic_models.TopicModel.get_all()
-    all_topics = [
-        topic_fetchers.get_topic_from_model(topic_model)
-        for topic_model in all_topic_models
-        if topic_model is not None
-    ]
+    all_topics = [topic_fetchers.get_topic_from_model(topic_model) for topic_model in all_topic_models if topic_model is not None]
 
     topic_classroom_dict = {}
     classrooms = classroom_config_services.get_all_classrooms()
@@ -249,9 +214,7 @@ def _get_augmented_skill_summaries_in_batches(
     for topic in all_topics:
         for skill_id in topic.get_all_skill_ids():
             assigned_skill_ids[skill_id]['topic_names'].append(topic.name)
-            assigned_skill_ids[skill_id]['classroom_names'].append(
-                topic_classroom_dict.get(topic.id, '')
-            )
+            assigned_skill_ids[skill_id]['classroom_names'].append(topic_classroom_dict.get(topic.id, ''))
 
     augmented_skill_summaries = []
     for skill_summary in skill_summaries:
@@ -259,9 +222,7 @@ def _get_augmented_skill_summaries_in_batches(
         classroom_names = []
         if skill_summary.id in assigned_skill_ids:
             topic_names = assigned_skill_ids[skill_summary.id]['topic_names']
-            classroom_names = assigned_skill_ids[skill_summary.id][
-                'classroom_names'
-            ]
+            classroom_names = assigned_skill_ids[skill_summary.id]['classroom_names']
 
         augmented_skill_summary = skill_domain.AugmentedSkillSummary(
             skill_summary.id,
@@ -303,9 +264,7 @@ def _filter_skills_by_status(
         unassigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
             if not augmented_skill_summary.topic_names:
-                unassigned_augmented_skill_summaries.append(
-                    augmented_skill_summary
-                )
+                unassigned_augmented_skill_summaries.append(augmented_skill_summary)
 
         return unassigned_augmented_skill_summaries
 
@@ -313,9 +272,7 @@ def _filter_skills_by_status(
         assigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
             if augmented_skill_summary.topic_names:
-                assigned_augmented_skill_summaries.append(
-                    augmented_skill_summary
-                )
+                assigned_augmented_skill_summaries.append(augmented_skill_summary)
         return assigned_augmented_skill_summaries
 
     return []
@@ -344,9 +301,7 @@ def _filter_skills_by_classroom(
     augmented_skill_summaries_with_classroom_name = []
     for augmented_skill_summary in augmented_skill_summaries:
         if classroom_name in augmented_skill_summary.classroom_names:
-            augmented_skill_summaries_with_classroom_name.append(
-                augmented_skill_summary
-            )
+            augmented_skill_summaries_with_classroom_name.append(augmented_skill_summary)
 
     return augmented_skill_summaries_with_classroom_name
 
@@ -372,15 +327,7 @@ def _filter_skills_by_keywords(
     filtered_augmented_skill_summaries = []
 
     for augmented_skill_summary in augmented_skill_summaries:
-        if any(
-            (
-                augmented_skill_summary.description.lower().find(
-                    keyword.lower()
-                )
-                != -1
-            )
-            for keyword in keywords
-        ):
+        if any((augmented_skill_summary.description.lower().find(keyword.lower()) != -1) for keyword in keywords):
             filtered_augmented_skill_summaries.append(augmented_skill_summary)
 
     return filtered_augmented_skill_summaries
@@ -399,11 +346,7 @@ def get_multi_skill_summaries(
         provided IDs.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
-    skill_summaries = [
-        get_skill_summary_from_model(skill_summary_model)
-        for skill_summary_model in skill_summaries_models
-        if skill_summary_model is not None
-    ]
+    skill_summaries = [get_skill_summary_from_model(skill_summary_model) for skill_summary_model in skill_summaries_models if skill_summary_model is not None]
     return skill_summaries
 
 
@@ -420,9 +363,7 @@ def get_rubrics_of_skills(
         corresponding ids and the list of deleted skill ids, if any.
     """
     skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
-    skill_id_to_rubrics_dict: Dict[
-        str, Optional[List[skill_domain.RubricDict]]
-    ] = {}
+    skill_id_to_rubrics_dict: Dict[str, Optional[List[skill_domain.RubricDict]]] = {}
 
     for skill in skills:
         if skill is not None:
@@ -455,9 +396,7 @@ def get_descriptions_of_skills(
 
     for skill_summary in skill_summaries:
         if skill_summary is not None:
-            skill_id_to_description_dict[skill_summary.id] = (
-                skill_summary.description
-            )
+            skill_id_to_description_dict[skill_summary.id] = skill_summary.description
 
     deleted_skill_ids = []
     for skill_id in skill_ids:
@@ -527,11 +466,7 @@ def get_all_topic_assignments_for_skill(
                     subtopic_id = subtopic.id
                     break
 
-            topic_assignments.append(
-                skill_domain.TopicAssignment(
-                    topic.id, topic.name, topic.version, subtopic_id
-                )
-            )
+            topic_assignments.append(skill_domain.TopicAssignment(topic.id, topic.name, topic.version, subtopic_id))
 
     return topic_assignments
 
@@ -557,9 +492,7 @@ def get_topic_names_with_given_skill_in_diagnostic_test(
     return topic_names
 
 
-def replace_skill_id_in_all_topics(
-    user_id: str, old_skill_id: str, new_skill_id: str
-) -> None:
+def replace_skill_id_in_all_topics(user_id: str, old_skill_id: str, new_skill_id: str) -> None:
     """Replaces the old skill id with the new one in all the associated topics.
 
     Args:
@@ -575,11 +508,7 @@ def replace_skill_id_in_all_topics(
         change_list = []
         if old_skill_id in topic.get_all_skill_ids():
             if new_skill_id in topic.get_all_skill_ids():
-                raise Exception(
-                    'Found topic \'%s\' contains the two skills to be merged. '
-                    'Please unassign one of these skills from topic '
-                    'and retry this operation.' % topic.name
-                )
+                raise Exception('Found topic \'%s\' contains the two skills to be merged. Please unassign one of these skills from topic and retry this operation.' % topic.name)
             if old_skill_id in topic.uncategorized_skill_ids:
                 change_list.extend(
                     [
@@ -635,8 +564,7 @@ def replace_skill_id_in_all_topics(
                 user_id,
                 topic.id,
                 change_list,
-                'Replace skill id %s with skill id %s in the topic'
-                % (old_skill_id, new_skill_id),
+                'Replace skill id %s with skill id %s in the topic' % (old_skill_id, new_skill_id),
             )
 
 
@@ -677,8 +605,7 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
                 user_id,
                 topic.id,
                 change_list,
-                'Removed skill with id %s and name %s from the topic'
-                % (skill_id, skill_name),
+                'Removed skill with id %s and name %s from the topic' % (skill_id, skill_name),
             )
 
 
@@ -687,20 +614,14 @@ def get_skill_summary_by_id(skill_id: str) -> skill_domain.SkillSummary: ...
 
 
 @overload
-def get_skill_summary_by_id(
-    skill_id: str, *, strict: Literal[True]
-) -> skill_domain.SkillSummary: ...
+def get_skill_summary_by_id(skill_id: str, *, strict: Literal[True]) -> skill_domain.SkillSummary: ...
 
 
 @overload
-def get_skill_summary_by_id(
-    skill_id: str, *, strict: Literal[False]
-) -> Optional[skill_domain.SkillSummary]: ...
+def get_skill_summary_by_id(skill_id: str, *, strict: Literal[False]) -> Optional[skill_domain.SkillSummary]: ...
 
 
-def get_skill_summary_by_id(
-    skill_id: str, strict: bool = True
-) -> Optional[skill_domain.SkillSummary]:
+def get_skill_summary_by_id(skill_id: str, strict: bool = True) -> Optional[skill_domain.SkillSummary]:
     """Returns a domain object representing a skill summary.
 
     Args:
@@ -712,9 +633,7 @@ def get_skill_summary_by_id(
         SkillSummary. The skill summary domain object corresponding to a skill
         with the given skill_id.
     """
-    skill_summary_model = skill_models.SkillSummaryModel.get(
-        skill_id, strict=strict
-    )
+    skill_summary_model = skill_models.SkillSummaryModel.get(skill_id, strict=strict)
     if skill_summary_model:
         skill_summary = get_skill_summary_from_model(skill_summary_model)
         return skill_summary
@@ -751,9 +670,7 @@ def _create_skill(
         id=skill.id,
         description=skill.description,
         language_code=skill.language_code,
-        misconceptions=[
-            misconception.to_dict() for misconception in skill.misconceptions
-        ],
+        misconceptions=[misconception.to_dict() for misconception in skill.misconceptions],
         rubrics=[rubric.to_dict() for rubric in skill.rubrics],
         skill_contents=skill.skill_contents.to_dict(),
         next_misconception_id=skill.next_misconception_id,
@@ -826,44 +743,20 @@ def apply_change_list(
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
-                if (
-                    change.property_name
-                    == skill_domain.SKILL_PROPERTY_DESCRIPTION
-                ):
-                    if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (
-                        user.actions
-                    ):
-                        raise Exception(
-                            'The user does not have enough rights to edit the '
-                            'skill description.'
-                        )
+                if change.property_name == skill_domain.SKILL_PROPERTY_DESCRIPTION:
+                    if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (user.actions):
+                        raise Exception('The user does not have enough rights to edit the skill description.')
                     # Here we use cast because this 'if' condition forces
                     # change to have type UpdateSkillPropertyDescriptionCmd.
-                    update_description_cmd = cast(
-                        skill_domain.UpdateSkillPropertyDescriptionCmd, change
-                    )
+                    update_description_cmd = cast(skill_domain.UpdateSkillPropertyDescriptionCmd, change)
                     skill.update_description(update_description_cmd.new_value)
-                    (
-                        opportunity_services.update_skill_opportunity_skill_description(
-                            skill.id, update_description_cmd.new_value
-                        )
-                    )
-                elif (
-                    change.property_name
-                    == skill_domain.SKILL_PROPERTY_LANGUAGE_CODE
-                ):
+                    (opportunity_services.update_skill_opportunity_skill_description(skill.id, update_description_cmd.new_value))
+                elif change.property_name == skill_domain.SKILL_PROPERTY_LANGUAGE_CODE:
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateSkillPropertyLanguageCodeCmd.
-                    update_language_code_cmd = cast(
-                        skill_domain.UpdateSkillPropertyLanguageCodeCmd, change
-                    )
-                    skill.update_language_code(
-                        update_language_code_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
-                ):
+                    update_language_code_cmd = cast(skill_domain.UpdateSkillPropertyLanguageCodeCmd, change)
+                    skill.update_language_code(update_language_code_cmd.new_value)
+                elif change.property_name == skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID:
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillPropertySupersedingSkillIdCmd.
@@ -871,13 +764,8 @@ def apply_change_list(
                         skill_domain.UpdateSkillPropertySupersedingSkillIdCmd,
                         change,
                     )
-                    skill.update_superseding_skill_id(
-                        update_superseding_skill_id_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED
-                ):
+                    skill.update_superseding_skill_id(update_superseding_skill_id_cmd.new_value)
+                elif change.property_name == skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED:
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillPropertyAllQuestionsMergedCmd.
@@ -885,14 +773,9 @@ def apply_change_list(
                         skill_domain.UpdateSkillPropertyAllQuestionsMergedCmd,
                         change,
                     )
-                    skill.record_that_all_questions_are_merged(
-                        update_all_questions_merged_cmd.new_value
-                    )
+                    skill.record_that_all_questions_are_merged(update_all_questions_merged_cmd.new_value)
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
-                if (
-                    change.property_name
-                    == skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
-                ):
+                if change.property_name == skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION:
                     # Here we use cast because this 'if'
                     # condition forces change to have type
                     # UpdateSkillContentsPropertyExplanationCmd.
@@ -900,63 +783,37 @@ def apply_change_list(
                         skill_domain.UpdateSkillContentsPropertyExplanationCmd,
                         change,
                     )
-                    explanation = state_domain.SubtitledHtml.from_dict(
-                        update_explanation_cmd.new_value
-                    )
+                    explanation = state_domain.SubtitledHtml.from_dict(update_explanation_cmd.new_value)
                     explanation.validate()
                     skill.update_explanation(explanation)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
-                add_skill_misconception_cmd = cast(
-                    skill_domain.AddSkillMisconceptionCmd, change
-                )
-                misconception = skill_domain.Misconception.from_dict(
-                    add_skill_misconception_cmd.new_misconception_dict
-                )
+                add_skill_misconception_cmd = cast(skill_domain.AddSkillMisconceptionCmd, change)
+                misconception = skill_domain.Misconception.from_dict(add_skill_misconception_cmd.new_misconception_dict)
                 skill.add_misconception(misconception)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
-                delete_misconception_cmd = cast(
-                    skill_domain.DeleteSkillMisconceptionCmd, change
-                )
-                skill.delete_misconception(
-                    delete_misconception_cmd.misconception_id
-                )
+                delete_misconception_cmd = cast(skill_domain.DeleteSkillMisconceptionCmd, change)
+                skill.delete_misconception(delete_misconception_cmd.misconception_id)
             elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
-                add_prerequisite_skill_cmd = cast(
-                    skill_domain.AddPrerequisiteSkillCmd, change
-                )
-                skill.add_prerequisite_skill(
-                    add_prerequisite_skill_cmd.skill_id
-                )
+                add_prerequisite_skill_cmd = cast(skill_domain.AddPrerequisiteSkillCmd, change)
+                skill.add_prerequisite_skill(add_prerequisite_skill_cmd.skill_id)
             elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
-                delete_prerequisite_skill_cmd = cast(
-                    skill_domain.DeletePrerequisiteSkillCmd, change
-                )
-                skill.delete_prerequisite_skill(
-                    delete_prerequisite_skill_cmd.skill_id
-                )
+                delete_prerequisite_skill_cmd = cast(skill_domain.DeletePrerequisiteSkillCmd, change)
+                skill.delete_prerequisite_skill(delete_prerequisite_skill_cmd.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
                 update_rubric_cmd = cast(skill_domain.UpdateRubricsCmd, change)
-                skill.update_rubric(
-                    update_rubric_cmd.difficulty, update_rubric_cmd.explanations
-                )
-            elif (
-                change.cmd
-                == skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY
-            ):
-                if (
-                    change.property_name
-                    == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME
-                ):
+                skill.update_rubric(update_rubric_cmd.difficulty, update_rubric_cmd.explanations)
+            elif change.cmd == skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY:
+                if change.property_name == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME:
                     # Here we use cast because this 'if'
                     # condition forces change to have type
                     # UpdateSkillMisconceptionPropertyNameCmd.
@@ -968,10 +825,7 @@ def apply_change_list(
                         update_property_name_cmd.misconception_id,
                         update_property_name_cmd.new_value,
                     )
-                elif (
-                    change.property_name
-                    == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES
-                ):
+                elif change.property_name == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES:
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillMisconceptionPropertyNotesCmd.
@@ -983,10 +837,7 @@ def apply_change_list(
                         update_property_notes_cmd.misconception_id,
                         update_property_notes_cmd.new_value,
                     )
-                elif (
-                    change.property_name
-                    == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
-                ):
+                elif change.property_name == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK:
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillMisconceptionPropertyFeedbackCmd.
@@ -998,10 +849,7 @@ def apply_change_list(
                         update_property_feedback_cmd.misconception_id,
                         update_property_feedback_cmd.new_value,
                     )
-                elif (
-                    change.property_name
-                    == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED
-                ):  # pylint: disable=line-too-long
+                elif change.property_name == skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED:  # pylint: disable=line-too-long
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillMisconceptionPropertyMustBeAddressedCmd.
@@ -1029,15 +877,11 @@ def apply_change_list(
         return skill
 
     except Exception as e:
-        logging.error(
-            '%s %s %s %s' % (e.__class__.__name__, e, skill_id, change_list)
-        )
+        logging.error('%s %s %s %s' % (e.__class__.__name__, e, skill_id, change_list))
         raise e
 
 
-def populate_skill_model_fields(
-    skill_model: skill_models.SkillModel, skill: skill_domain.Skill
-) -> skill_models.SkillModel:
+def populate_skill_model_fields(skill_model: skill_models.SkillModel, skill: skill_domain.Skill) -> skill_models.SkillModel:
     """Populate skill model with the data from skill object.
 
     Args:
@@ -1053,17 +897,11 @@ def populate_skill_model_fields(
     skill_model.superseding_skill_id = skill.superseding_skill_id
     skill_model.all_questions_merged = skill.all_questions_merged
     skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
-    skill_model.misconceptions_schema_version = (
-        skill.misconceptions_schema_version
-    )
+    skill_model.misconceptions_schema_version = skill.misconceptions_schema_version
     skill_model.rubric_schema_version = skill.rubric_schema_version
-    skill_model.skill_contents_schema_version = (
-        skill.skill_contents_schema_version
-    )
+    skill_model.skill_contents_schema_version = skill.skill_contents_schema_version
     skill_model.skill_contents = skill.skill_contents.to_dict()
-    skill_model.misconceptions = [
-        misconception.to_dict() for misconception in skill.misconceptions
-    ]
+    skill_model.misconceptions = [misconception.to_dict() for misconception in skill.misconceptions]
     skill_model.rubrics = [rubric.to_dict() for rubric in skill.rubrics]
     skill_model.next_misconception_id = skill.next_misconception_id
     return skill_model
@@ -1091,10 +929,7 @@ def _save_skill(
         Exception. Received invalid change list.
     """
     if not change_list:
-        raise Exception(
-            'Unexpected error: received an invalid change list when trying to '
-            'save skill %s: %s' % (skill.id, change_list)
-        )
+        raise Exception('Unexpected error: received an invalid change list when trying to save skill %s: %s' % (skill.id, change_list))
     skill.validate()
 
     # Skill model cannot be None as skill is passed as parameter here and that
@@ -1102,25 +937,15 @@ def _save_skill(
     skill_model = skill_models.SkillModel.get(skill.id, strict=True)
 
     if skill.version > skill_model.version:
-        raise Exception(
-            'Unexpected error: trying to update version %s of skill '
-            'from version %s. Please reload the page and try again.'
-            % (skill_model.version, skill.version)
-        )
+        raise Exception('Unexpected error: trying to update version %s of skill from version %s. Please reload the page and try again.' % (skill_model.version, skill.version))
 
     if skill.version < skill_model.version:
-        raise Exception(
-            'Trying to update version %s of skill from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (skill_model.version, skill.version)
-        )
+        raise Exception('Trying to update version %s of skill from version %s, which is too old. Please reload the page and try again.' % (skill_model.version, skill.version))
 
     skill_model = populate_skill_model_fields(skill_model, skill)
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
-    caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id]
-    )
+    caching_services.delete_multi(caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id])
     skill.version += 1
 
 
@@ -1151,10 +976,7 @@ def update_skill(
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
-    misconception_is_deleted = any(
-        change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
-        for change in change_list
-    )
+    misconception_is_deleted = any(change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION for change in change_list)
     if misconception_is_deleted:
         deleted_skill_misconception_ids: List[str] = []
         for change in change_list:
@@ -1162,18 +984,10 @@ def update_skill(
                 # Here we use cast because we are narrowing down the type of
                 # 'change' from SkillChange to a specific change command
                 # DeleteSkillMisconceptionCmd.
-                delete_skill_misconception_cmd = cast(
-                    skill_domain.DeleteSkillMisconceptionCmd, change
-                )
-                deleted_skill_misconception_ids.append(
-                    skill.generate_skill_misconception_id(
-                        delete_skill_misconception_cmd.misconception_id
-                    )
-                )
+                delete_skill_misconception_cmd = cast(skill_domain.DeleteSkillMisconceptionCmd, change)
+                deleted_skill_misconception_ids.append(skill.generate_skill_misconception_id(delete_skill_misconception_cmd.misconception_id))
         taskqueue_services.defer(
-            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS'
-            ],
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS'],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             committer_id,
             skill_id,
@@ -1182,9 +996,7 @@ def update_skill(
         )
 
 
-def delete_skill(
-    committer_id: str, skill_id: str, force_deletion: bool = False
-) -> None:
+def delete_skill(committer_id: str, skill_id: str, force_deletion: bool = False) -> None:
     """Deletes the skill with the given skill_id.
 
     Args:
@@ -1196,15 +1008,11 @@ def delete_skill(
             still retained in the datastore. This last option is the preferred
             one.
     """
-    skill_models.SkillModel.delete_multi(
-        [skill_id], committer_id, '', force_deletion=force_deletion
-    )
+    skill_models.SkillModel.delete_multi([skill_id], committer_id, '', force_deletion=force_deletion)
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.
-    caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_SKILL, None, [skill_id]
-    )
+    caching_services.delete_multi(caching_services.CACHE_NAMESPACE_SKILL, None, [skill_id])
 
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).
@@ -1221,9 +1029,7 @@ def delete_skill_summary(skill_id: str) -> None:
             be deleted.
     """
 
-    skill_summary_model = skill_models.SkillSummaryModel.get(
-        skill_id, strict=False
-    )
+    skill_summary_model = skill_models.SkillSummaryModel.get(skill_id, strict=False)
     if skill_summary_model is not None:
         skill_summary_model.delete()
 
@@ -1250,9 +1056,7 @@ def compute_summary_of_skill(
         raise Exception('No data available for when the skill was created.')
 
     if skill.last_updated is None:
-        raise Exception(
-            'No data available for when the skill was last_updated.'
-        )
+        raise Exception('No data available for when the skill was last_updated.')
     skill_summary = skill_domain.SkillSummary(
         skill.id,
         skill.description,
@@ -1303,9 +1107,7 @@ def populate_skill_summary_model_fields(
         skill_summary_model.populate(**skill_summary_dict)
     else:
         skill_summary_dict['id'] = skill_summary.id
-        skill_summary_model = skill_models.SkillSummaryModel(
-            **skill_summary_dict
-        )
+        skill_summary_model = skill_models.SkillSummaryModel(**skill_summary_dict)
 
     return skill_summary_model
 
@@ -1318,19 +1120,13 @@ def save_skill_summary(skill_summary: skill_domain.SkillSummary) -> None:
         skill_summary: SkillSummaryModel. The skill summary object to be saved
             in the datastore.
     """
-    existing_skill_summary_model = skill_models.SkillSummaryModel.get_by_id(
-        skill_summary.id
-    )
-    skill_summary_model = populate_skill_summary_model_fields(
-        existing_skill_summary_model, skill_summary
-    )
+    existing_skill_summary_model = skill_models.SkillSummaryModel.get_by_id(skill_summary.id)
+    skill_summary_model = populate_skill_summary_model_fields(existing_skill_summary_model, skill_summary)
     skill_summary_model.update_timestamps()
     skill_summary_model.put()
 
 
-def create_user_skill_mastery(
-    user_id: str, skill_id: str, degree_of_mastery: float
-) -> None:
+def create_user_skill_mastery(user_id: str, skill_id: str, degree_of_mastery: float) -> None:
     """Creates skill mastery of a user.
 
     Args:
@@ -1339,9 +1135,7 @@ def create_user_skill_mastery(
         degree_of_mastery: float. The degree of mastery of user in the skill.
     """
 
-    user_skill_mastery = skill_domain.UserSkillMastery(
-        user_id, skill_id, degree_of_mastery
-    )
+    user_skill_mastery = skill_domain.UserSkillMastery(user_id, skill_id, degree_of_mastery)
     save_user_skill_mastery(user_skill_mastery)
 
 
@@ -1354,9 +1148,7 @@ def save_user_skill_mastery(
         user_skill_mastery: dict. The user skill mastery model of a user.
     """
     user_skill_mastery_model = user_models.UserSkillMasteryModel(
-        id=user_models.UserSkillMasteryModel.construct_model_id(
-            user_skill_mastery.user_id, user_skill_mastery.skill_id
-        ),
+        id=user_models.UserSkillMasteryModel.construct_model_id(user_skill_mastery.user_id, user_skill_mastery.skill_id),
         user_id=user_skill_mastery.user_id,
         skill_id=user_skill_mastery.skill_id,
         degree_of_mastery=user_skill_mastery.degree_of_mastery,
@@ -1366,9 +1158,7 @@ def save_user_skill_mastery(
     user_skill_mastery_model.put()
 
 
-def create_multi_user_skill_mastery(
-    user_id: str, degrees_of_mastery: Dict[str, float]
-) -> None:
+def create_multi_user_skill_mastery(user_id: str, degrees_of_mastery: Dict[str, float]) -> None:
     """Creates the mastery of a user in multiple skills.
 
     Args:
@@ -1382,17 +1172,13 @@ def create_multi_user_skill_mastery(
     for skill_id, degree_of_mastery in degrees_of_mastery.items():
         user_skill_mastery_models.append(
             user_models.UserSkillMasteryModel(
-                id=user_models.UserSkillMasteryModel.construct_model_id(
-                    user_id, skill_id
-                ),
+                id=user_models.UserSkillMasteryModel.construct_model_id(user_id, skill_id),
                 user_id=user_id,
                 skill_id=skill_id,
                 degree_of_mastery=degree_of_mastery,
             )
         )
-    user_models.UserSkillMasteryModel.update_timestamps_multi(
-        user_skill_mastery_models
-    )
+    user_models.UserSkillMasteryModel.update_timestamps_multi(user_skill_mastery_models)
     user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
 
 
@@ -1408,12 +1194,8 @@ def get_user_skill_mastery(user_id: str, skill_id: str) -> Optional[float]:
         float or None. Mastery degree of the user for the requested skill, or
         None if UserSkillMasteryModel does not exist for the skill.
     """
-    model_id = user_models.UserSkillMasteryModel.construct_model_id(
-        user_id, skill_id
-    )
-    user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
-        model_id, strict=False
-    )
+    model_id = user_models.UserSkillMasteryModel.construct_model_id(user_id, skill_id)
+    user_skill_mastery_model = user_models.UserSkillMasteryModel.get(model_id, strict=False)
 
     if not user_skill_mastery_model:
         return None
@@ -1425,9 +1207,7 @@ def get_user_skill_mastery(user_id: str, skill_id: str) -> Optional[float]:
     return degree_of_mastery
 
 
-def get_multi_user_skill_mastery(
-    user_id: str, skill_ids: List[str]
-) -> Dict[str, Optional[float]]:
+def get_multi_user_skill_mastery(user_id: str, skill_ids: List[str]) -> Dict[str, Optional[float]]:
     """Fetches the mastery of user in multiple skills.
 
     Args:
@@ -1444,15 +1224,9 @@ def get_multi_user_skill_mastery(
     model_ids = []
 
     for skill_id in skill_ids:
-        model_ids.append(
-            user_models.UserSkillMasteryModel.construct_model_id(
-                user_id, skill_id
-            )
-        )
+        model_ids.append(user_models.UserSkillMasteryModel.construct_model_id(user_id, skill_id))
 
-    skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
-        model_ids
-    )
+    skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(model_ids)
 
     for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
         if skill_mastery_model is None:
@@ -1463,9 +1237,7 @@ def get_multi_user_skill_mastery(
     return degrees_of_mastery
 
 
-def get_multi_users_skills_mastery(
-    user_ids: List[str], skill_ids: List[str]
-) -> Dict[str, Dict[str, Optional[float]]]:
+def get_multi_users_skills_mastery(user_ids: List[str], skill_ids: List[str]) -> Dict[str, Dict[str, Optional[float]]]:
     """Fetches the mastery of user in multiple skills.
 
     Args:
@@ -1485,26 +1257,16 @@ def get_multi_users_skills_mastery(
     all_combinations = list(itertools.product(user_ids, skill_ids))
     model_ids = []
     for user_id, skill_id in all_combinations:
-        model_ids.append(
-            user_models.UserSkillMasteryModel.construct_model_id(
-                user_id, skill_id
-            )
-        )
+        model_ids.append(user_models.UserSkillMasteryModel.construct_model_id(user_id, skill_id))
 
-    skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
-        model_ids
-    )
-    degrees_of_masteries: Dict[str, Dict[str, Optional[float]]] = {
-        user_id: {} for user_id in user_ids
-    }
+    skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(model_ids)
+    degrees_of_masteries: Dict[str, Dict[str, Optional[float]]] = {user_id: {} for user_id in user_ids}
     for i, (user_id, skill_id) in enumerate(all_combinations):
         skill_mastery_model = skill_mastery_models[i]
         if skill_mastery_model is None:
             degrees_of_masteries[user_id][skill_id] = None
         else:
-            degrees_of_masteries[user_id][skill_id] = (
-                skill_mastery_model.degree_of_mastery
-            )
+            degrees_of_masteries[user_id][skill_id] = skill_mastery_model.degree_of_mastery
 
     return degrees_of_masteries
 
@@ -1537,29 +1299,15 @@ def get_sorted_skill_ids(
     Returns:
         list. List of the initial skill id's based on the mastery level.
     """
-    skill_dict_with_float_value = {
-        skill_id: degree
-        for skill_id, degree in degrees_of_mastery.items()
-        if degree is not None
-    }
+    skill_dict_with_float_value = {skill_id: degree for skill_id, degree in degrees_of_mastery.items() if degree is not None}
 
-    sort_fn: Callable[[str], float] = lambda skill_id: (
-        skill_dict_with_float_value[skill_id]
-        if skill_dict_with_float_value.get(skill_id)
-        else 0
-    )
-    sorted_skill_ids_with_float_value = sorted(
-        skill_dict_with_float_value, key=sort_fn
-    )
-    skill_ids_with_none_value = [
-        skill_id
-        for skill_id, degree in degrees_of_mastery.items()
-        if degree is None
-    ]
+    def sort_fn(skill_id: str) -> float:
+        return skill_dict_with_float_value[skill_id] if skill_dict_with_float_value.get(skill_id) else 0
 
-    sorted_skill_ids = (
-        skill_ids_with_none_value + sorted_skill_ids_with_float_value
-    )
+    sorted_skill_ids_with_float_value = sorted(skill_dict_with_float_value, key=sort_fn)
+    skill_ids_with_none_value = [skill_id for skill_id, degree in degrees_of_mastery.items() if degree is None]
+
+    sorted_skill_ids = skill_ids_with_none_value + sorted_skill_ids_with_float_value
     return sorted_skill_ids[: feconf.MAX_NUMBER_OF_SKILL_IDS]
 
 
@@ -1609,17 +1357,13 @@ def get_untriaged_skill_summaries(
 
     for skill_summary in skill_summaries:
         skill_id = skill_summary.id
-        if (skill_id not in skill_ids_assigned_to_some_topic) and (
-            skill_id not in merged_skill_ids
-        ):
+        if (skill_id not in skill_ids_assigned_to_some_topic) and (skill_id not in merged_skill_ids):
             untriaged_skill_summaries.append(skill_summary)
 
     return untriaged_skill_summaries
 
 
-def get_categorized_skill_ids_and_descriptions() -> (
-    skill_domain.CategorizedSkills
-):
+def get_categorized_skill_ids_and_descriptions() -> skill_domain.CategorizedSkills:
     """Returns a CategorizedSkills domain object for all the skills that are
     categorized.
 
@@ -1649,14 +1393,10 @@ def get_categorized_skill_ids_and_descriptions() -> (
         subtopics = topic.subtopics
         for skill_id in topic.uncategorized_skill_ids:
             description = skill_descriptions[skill_id]
-            categorized_skills.add_uncategorized_skill(
-                topic.name, skill_id, description
-            )
+            categorized_skills.add_uncategorized_skill(topic.name, skill_id, description)
         for subtopic in subtopics:
             for skill_id in subtopic.skill_ids:
                 description = skill_descriptions[skill_id]
-                categorized_skills.add_subtopic_skill(
-                    topic.name, subtopic.title, skill_id, description
-                )
+                categorized_skills.add_subtopic_skill(topic.name, subtopic.title, skill_id, description)
 
     return categorized_skills

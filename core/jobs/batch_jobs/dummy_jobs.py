@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.jobs import base_jobs
 from core.jobs.types import job_run_result
-
-import apache_beam as beam
 
 
 class DummyPassJob(base_jobs.JobBase):
@@ -34,13 +34,7 @@ class DummyPassJob(base_jobs.JobBase):
             PCollection. A PCollection containing a single JobRunResult with
             stdout indicating success.
         """
-        return self.pipeline | 'Create success result' >> beam.Create(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'SUCCESS: Dummy job completed successfully'
-                )
-            ]
-        )
+        return self.pipeline | 'Create success result' >> beam.Create([job_run_result.JobRunResult.as_stdout('SUCCESS: Dummy job completed successfully')])
 
 
 class DummyFailJob(base_jobs.JobBase):

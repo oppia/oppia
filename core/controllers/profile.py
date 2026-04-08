@@ -22,6 +22,8 @@ import logging
 import re
 import zipfile
 
+from typing import Any, Callable, Dict, Optional, TypedDict
+
 from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -36,8 +38,6 @@ from core.domain import (
     user_services,
     wipeout_service,
 )
-
-from typing import Any, Callable, Dict, Optional, TypedDict
 
 
 class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -65,26 +65,14 @@ class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         created_exp_summary_dicts = []
         edited_exp_summary_dicts = []
 
-        subscriber_ids = subscription_services.get_all_subscribers_of_creator(
-            user_settings.user_id
-        )
+        subscriber_ids = subscription_services.get_all_subscribers_of_creator(user_settings.user_id)
         is_already_subscribed = self.user_id in subscriber_ids
         is_user_visiting_own_profile = self.user_id == user_settings.user_id
 
-        user_contributions = user_services.get_user_contributions(
-            user_settings.user_id
-        )
+        user_contributions = user_services.get_user_contributions(user_settings.user_id)
         if user_contributions:
-            created_exp_summary_dicts = (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    user_contributions.created_exploration_ids
-                )
-            )
-            edited_exp_summary_dicts = (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    user_contributions.edited_exploration_ids
-                )
-            )
+            created_exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts_matching_ids(user_contributions.created_exploration_ids)
+            edited_exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts_matching_ids(user_contributions.edited_exploration_ids)
         profile_is_of_current_user = self.username == username
 
         self.values.update(
@@ -93,14 +81,8 @@ class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'username_of_viewed_profile': user_settings.username,
                 'user_bio': user_settings.user_bio,
                 'subject_interests': user_settings.subject_interests,
-                'first_contribution_msec': (
-                    user_settings.first_contribution_msec
-                    if user_settings.first_contribution_msec
-                    else None
-                ),
-                'user_impact_score': user_services.get_user_impact_score(
-                    user_settings.user_id
-                ),
+                'first_contribution_msec': (user_settings.first_contribution_msec if user_settings.first_contribution_msec else None),
+                'user_impact_score': user_services.get_user_impact_score(user_settings.user_id),
                 'created_exp_summary_dicts': created_exp_summary_dicts,
                 'edited_exp_summary_dicts': edited_exp_summary_dicts,
                 'is_already_subscribed': is_already_subscribed,
@@ -110,9 +92,7 @@ class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json(self.values)
 
 
-class BulkEmailWebhookEndpoint(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class BulkEmailWebhookEndpoint(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The endpoint for the webhook that is triggered when a user
     subscribes/unsubscribes to the bulk email service provider externally.
     """
@@ -163,11 +143,7 @@ class BulkEmailWebhookEndpoint(
     def post(self, unused_secret: str) -> None:
         """Handles POST requests."""
         assert self.normalized_request is not None
-        mailchimp_audience_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
-            )
-        )
+        mailchimp_audience_id = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value)
         if self.normalized_request['data[list_id]'] != mailchimp_audience_id:
             self.render_json({})
             return
@@ -213,11 +189,7 @@ class MailingListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
     tag: str
 
 
-class MailingListSubscriptionHandler(
-    base.BaseHandler[
-        MailingListSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class MailingListSubscriptionHandler(base.BaseHandler[MailingListSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Adds user to the mailing list."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -267,9 +239,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     # Here we use type Any because we don't know the data type of input.
-    def __validate_data_type(
-        self, update_type: str, required_type: type, data: Any
-    ) -> None:
+    def __validate_data_type(self, update_type: str, required_type: type, data: Any) -> None:
         """Validates the type of the input data.This method checks if the
         provided input data is of the required type.
 
@@ -283,38 +253,25 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 required type.
         """
         if not isinstance(data, required_type):
-            raise self.InvalidInputException(
-                'Expected %s to be a %s, received %s'
-                % (update_type, required_type.__name__, type(data).__name__)
-            )
+            raise self.InvalidInputException('Expected %s to be a %s, received %s' % (update_type, required_type.__name__, type(data).__name__))
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
-        user_email_preferences = user_services.get_email_preferences(
+        user_email_preferences = user_services.get_email_preferences(self.user_id)
+
+        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to(  # pylint: disable=line-too-long
             self.user_id
         )
-
-        creators_subscribed_to = (
-            subscription_services.get_all_creators_subscribed_to(  # pylint: disable=line-too-long
-                self.user_id
-            )
-        )
-        creators_settings = user_services.get_users_settings(
-            creators_subscribed_to, strict=True
-        )
+        creators_settings = user_services.get_users_settings(creators_subscribed_to, strict=True)
         subscription_list = []
 
         for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {
                 'creator_username': creator_settings.username,
-                'creator_impact': (
-                    user_services.get_user_impact_score(
-                        creators_subscribed_to[index]
-                    )
-                ),
+                'creator_impact': (user_services.get_user_impact_score(creators_subscribed_to[index])),
             }
 
             subscription_list.append(subscription_summary)
@@ -322,30 +279,16 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.values.update(
             {
                 'preferred_language_codes': user_settings.preferred_language_codes,
-                'preferred_site_language_code': (
-                    user_settings.preferred_site_language_code
-                ),
-                'preferred_audio_language_code': (
-                    user_settings.preferred_audio_language_code
-                ),
-                'preferred_translation_language_code': (
-                    user_settings.preferred_translation_language_code
-                ),
+                'preferred_site_language_code': (user_settings.preferred_site_language_code),
+                'preferred_audio_language_code': (user_settings.preferred_audio_language_code),
+                'preferred_translation_language_code': (user_settings.preferred_translation_language_code),
                 'default_dashboard': user_settings.default_dashboard,
                 'user_bio': user_settings.user_bio,
                 'subject_interests': user_settings.subject_interests,
-                'can_receive_email_updates': (
-                    user_email_preferences.can_receive_email_updates
-                ),
-                'can_receive_editor_role_email': (
-                    user_email_preferences.can_receive_editor_role_email
-                ),
-                'can_receive_feedback_message_email': (
-                    user_email_preferences.can_receive_feedback_message_email
-                ),
-                'can_receive_subscription_email': (
-                    user_email_preferences.can_receive_subscription_email
-                ),
+                'can_receive_email_updates': (user_email_preferences.can_receive_email_updates),
+                'can_receive_editor_role_email': (user_email_preferences.can_receive_editor_role_email),
+                'can_receive_feedback_message_email': (user_email_preferences.can_receive_feedback_message_email),
+                'can_receive_subscription_email': (user_email_preferences.can_receive_subscription_email),
                 'subscription_list': subscription_list,
             }
         )
@@ -378,39 +321,23 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 ]
                 missing_keys = [key for key in required_keys if key not in data]
                 if missing_keys:
-                    raise self.InvalidInputException(
-                        'Expected data dict to have all the required keys. '
-                        'Missing keys: %s .' % ', '.join(missing_keys)
-                    )
+                    raise self.InvalidInputException('Expected data dict to have all the required keys. Missing keys: %s .' % ', '.join(missing_keys))
 
-                non_boolean_keys = [
-                    key
-                    for key, value in data.items()
-                    if not isinstance(value, bool)
-                ]
+                non_boolean_keys = [key for key, value in data.items() if not isinstance(value, bool)]
                 if non_boolean_keys:
-                    raise self.InvalidInputException(
-                        'Expected all values of data to be booleans. '
-                        'Non-boolean values found for keys: %s .'
-                        % ', '.join(non_boolean_keys)
-                    )
+                    raise self.InvalidInputException('Expected all values of data to be booleans. Non-boolean values found for keys: %s .' % ', '.join(non_boolean_keys))
 
-                bulk_email_signup_message_should_be_shown = (
-                    user_services.update_email_preferences(
-                        self.user_id,
-                        data['can_receive_email_updates'],
-                        data['can_receive_editor_role_email'],
-                        data['can_receive_feedback_message_email'],
-                        data['can_receive_subscription_email'],
-                    )
+                bulk_email_signup_message_should_be_shown = user_services.update_email_preferences(
+                    self.user_id,
+                    data['can_receive_email_updates'],
+                    data['can_receive_editor_role_email'],
+                    data['can_receive_feedback_message_email'],
+                    data['can_receive_subscription_email'],
                 )
             elif update_type == 'user_bio':
                 self.__validate_data_type(update_type, str, data)
                 if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
-                    raise self.InvalidInputException(
-                        'User bio exceeds maximum character limit: %s'
-                        % feconf.MAX_BIO_LENGTH_IN_CHARS
-                    )
+                    raise self.InvalidInputException('User bio exceeds maximum character limit: %s' % feconf.MAX_BIO_LENGTH_IN_CHARS)
                 user_settings.user_bio = data
             elif update_type == 'preferred_site_language_code':
                 self.__validate_data_type(update_type, str, data)
@@ -427,22 +354,12 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             elif update_type == 'profile_picture_data_url':
                 self.__validate_data_type(update_type, str, data)
                 assert user_settings.username is not None
-                user_services.update_profile_picture_data_url(
-                    user_settings.username, data
-                )
+                user_services.update_profile_picture_data_url(user_settings.username, data)
             else:
-                raise self.InvalidInputException(
-                    'Invalid update type: %s' % update_type
-                )
+                raise self.InvalidInputException('Invalid update type: %s' % update_type)
 
         user_services.save_user_settings(user_settings)
-        self.render_json(
-            {
-                'bulk_email_signup_message_should_be_shown': (
-                    bulk_email_signup_message_should_be_shown
-                )
-            }
-        )
+        self.render_json({'bulk_email_signup_message_should_be_shown': (bulk_email_signup_message_should_be_shown)})
 
 
 class SignupPageNormalizedRequestDict(TypedDict):
@@ -453,9 +370,7 @@ class SignupPageNormalizedRequestDict(TypedDict):
     return_url: Optional[str]
 
 
-class SignupPage(
-    base.BaseHandler[Dict[str, str], SignupPageNormalizedRequestDict]
-):
+class SignupPage(base.BaseHandler[Dict[str, str], SignupPageNormalizedRequestDict]):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
@@ -497,9 +412,7 @@ class SignupHandlerNormalizedPayloadDict(TypedDict):
     can_receive_email_updates: bool
 
 
-class SignupHandler(
-    base.BaseHandler[SignupHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class SignupHandler(base.BaseHandler[SignupHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Provides data for the editor prerequisites page."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
@@ -537,23 +450,12 @@ class SignupHandler(
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
+        server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
         self.render_json(
             {
                 'server_can_send_emails': server_can_send_emails,
-                'has_agreed_to_latest_terms': bool(
-                    user_settings.last_agreed_to_terms
-                    and user_settings.last_agreed_to_terms
-                    >= feconf.TERMS_PAGE_LAST_UPDATED_UTC
-                ),
-                'has_ever_registered': bool(
-                    user_settings.username
-                    and user_settings.last_agreed_to_terms
-                ),
+                'has_agreed_to_latest_terms': bool(user_settings.last_agreed_to_terms and user_settings.last_agreed_to_terms >= feconf.TERMS_PAGE_LAST_UPDATED_UTC),
+                'has_ever_registered': bool(user_settings.username and user_settings.last_agreed_to_terms),
                 'username': user_settings.username,
             }
         )
@@ -566,9 +468,7 @@ class SignupHandler(
         username = self.normalized_payload['username']
         agreed_to_terms = self.normalized_payload['agreed_to_terms']
         default_dashboard = self.normalized_payload['default_dashboard']
-        can_receive_email_updates = self.normalized_payload[
-            'can_receive_email_updates'
-        ]
+        can_receive_email_updates = self.normalized_payload['can_receive_email_updates']
         bulk_email_signup_message_should_be_shown = False
 
         config_bulk_email_failed = user_services.update_email_preferences(
@@ -580,34 +480,21 @@ class SignupHandler(
         )
         # Only block registration if bulk email configuration failed and the
         # user requested bulk emails.
-        bulk_email_signup_message_should_be_shown = (
-            can_receive_email_updates and config_bulk_email_failed
-        )
+        bulk_email_signup_message_should_be_shown = can_receive_email_updates and config_bulk_email_failed
         if bulk_email_signup_message_should_be_shown:
-            self.render_json(
-                {
-                    'bulk_email_signup_message_should_be_shown': (
-                        bulk_email_signup_message_should_be_shown
-                    )
-                }
-            )
+            self.render_json({'bulk_email_signup_message_should_be_shown': (bulk_email_signup_message_should_be_shown)})
             return
         # Ruling out the possibility of None for mypy type checking.
         assert self.user_id is not None
         has_ever_registered = user_services.has_ever_registered(self.user_id)
-        has_fully_registered_account = (
-            user_services.has_fully_registered_account(self.user_id)
-        )
+        has_fully_registered_account = user_services.has_fully_registered_account(self.user_id)
 
         if has_fully_registered_account:
             self.render_json({})
             return
 
         if not agreed_to_terms:
-            raise self.InvalidInputException(
-                'In order to edit explorations on this site, you will '
-                'need to accept the license terms.'
-            )
+            raise self.InvalidInputException('In order to edit explorations on this site, you will need to accept the license terms.')
 
         user_services.record_agreement_to_terms(self.user_id)
 
@@ -616,22 +503,14 @@ class SignupHandler(
 
         # Note that an email is only sent when the user registers for the first
         # time.
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
+        server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
         if server_can_send_emails and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
         user_settings = user_services.get_user_settings(self.user_id)
-        initial_profile_picture = user_services.fetch_gravatar(
-            user_settings.email
-        )
+        initial_profile_picture = user_services.fetch_gravatar(user_settings.email)
         assert user_settings.username is not None
-        user_services.update_profile_picture_data_url(
-            user_settings.username, initial_profile_picture
-        )
+        user_services.update_profile_picture_data_url(user_settings.username, initial_profile_picture)
 
         if not has_ever_registered:
             # Set the default dashboard for new users.
@@ -639,13 +518,7 @@ class SignupHandler(
 
         user_services.save_user_settings(user_settings)
 
-        self.render_json(
-            {
-                'bulk_email_signup_message_should_be_shown': (
-                    bulk_email_signup_message_should_be_shown
-                )
-            }
-        )
+        self.render_json({'bulk_email_signup_message_should_be_shown': (bulk_email_signup_message_should_be_shown)})
 
 
 class DeleteAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -681,47 +554,24 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
         if re.search(feconf.USER_ID_REGEX, user_data_json_string):
-            logging.error(
-                '[TAKEOUT] User ID found in the JSON generated for user %s'
-                % self.user_id
-            )
-            user_data_json_string = (
-                'There was an error while exporting '
-                'data. Please contact %s to export your data.'
-                % platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
-                )
-            )
+            logging.error('[TAKEOUT] User ID found in the JSON generated for user %s' % self.user_id)
+            user_data_json_string = 'There was an error while exporting data. Please contact %s to export your data.' % platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
             user_images = []
 
         # Create zip file.
         temp_file = io.BytesIO()
-        with zipfile.ZipFile(
-            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED
-        ) as zfile:
+        with zipfile.ZipFile(temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
                 if image.b64_image_data.startswith(utils.PNG_DATA_URL_PREFIX):
-                    decoded_png = utils.convert_data_url_to_binary(
-                        image.b64_image_data, 'png'
-                    )
-                    zfile.writestr(
-                        'images/' + image.image_export_path, decoded_png
-                    )
-                elif image.b64_image_data.startswith(
-                    utils.DATA_URL_FORMAT_PREFIX % 'webp'
-                ):
-                    decoded_webp = utils.convert_data_url_to_binary(
-                        image.b64_image_data, 'webp'
-                    )
-                    zfile.writestr(
-                        'images/' + image.image_export_path, decoded_webp
-                    )
+                    decoded_png = utils.convert_data_url_to_binary(image.b64_image_data, 'png')
+                    zfile.writestr('images/' + image.image_export_path, decoded_png)
+                elif image.b64_image_data.startswith(utils.DATA_URL_FORMAT_PREFIX % 'webp'):
+                    decoded_webp = utils.convert_data_url_to_binary(image.b64_image_data, 'webp')
+                    zfile.writestr('images/' + image.image_export_path, decoded_webp)
 
         # Render file for download.
-        self.render_downloadable_file(
-            temp_file, 'oppia_takeout_data.zip', 'text/plain'
-        )
+        self.render_downloadable_file(temp_file, 'oppia_takeout_data.zip', 'text/plain')
 
 
 class UsernameCheckHandlerNormalizedPayloadDict(TypedDict):
@@ -732,9 +582,7 @@ class UsernameCheckHandlerNormalizedPayloadDict(TypedDict):
     username: str
 
 
-class UsernameCheckHandler(
-    base.BaseHandler[UsernameCheckHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class UsernameCheckHandler(base.BaseHandler[UsernameCheckHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Checks whether a username has already been taken."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
@@ -772,14 +620,10 @@ class SiteLanguageHandlerNormalizedPayloadDict(TypedDict):
     site_language_code: str
 
 
-class SiteLanguageHandler(
-    base.BaseHandler[SiteLanguageHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class SiteLanguageHandler(base.BaseHandler[SiteLanguageHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Changes the preferred system language in the user's preferences."""
 
-    LANGUAGE_ID_PROVIDER_FUNC: Callable[[Dict[str, str]], str] = (
-        lambda language_dict: language_dict['id']
-    )
+    LANGUAGE_ID_PROVIDER_FUNC: Callable[[Dict[str, str]], str] = lambda language_dict: language_dict['id']
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -817,9 +661,7 @@ class UserInfoHandlerNormalizedPayloadDict(TypedDict):
     user_has_viewed_lesson_info_modal_once: bool
 
 
-class UserInfoHandler(
-    base.BaseHandler[UserInfoHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class UserInfoHandler(base.BaseHandler[UserInfoHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Provides info about user. If user is not logged in,
     return dict containing false as logged in status."""
 
@@ -841,29 +683,17 @@ class UserInfoHandler(
         self.response.cache_control.no_store = True
         if self.username:
             assert self.user_id is not None
-            user_actions = user_services.get_user_actions_info(
-                self.user_id
-            ).actions
-            user_settings = user_services.get_user_settings(
-                self.user_id, strict=True
-            )
+            user_actions = user_services.get_user_actions_info(self.user_id).actions
+            user_settings = user_services.get_user_settings(self.user_id, strict=True)
             self.render_json(
                 {
                     'roles': self.roles,
                     'is_moderator': (user_services.is_moderator(self.user_id)),
-                    'is_curriculum_admin': user_services.is_curriculum_admin(
-                        self.user_id
-                    ),
+                    'is_curriculum_admin': user_services.is_curriculum_admin(self.user_id),
                     'is_super_admin': self.current_user_is_super_admin,
-                    'is_topic_manager': (
-                        user_services.is_topic_manager(self.user_id)
-                    ),
-                    'can_create_collections': bool(
-                        role_services.ACTION_CREATE_COLLECTION in user_actions
-                    ),
-                    'preferred_site_language_code': (
-                        user_settings.preferred_site_language_code
-                    ),
+                    'is_topic_manager': (user_services.is_topic_manager(self.user_id)),
+                    'can_create_collections': bool(role_services.ACTION_CREATE_COLLECTION in user_actions),
+                    'preferred_site_language_code': (user_settings.preferred_site_language_code),
                     'username': user_settings.username,
                     'email': user_settings.email,
                     'user_is_logged_in': True,
@@ -884,13 +714,9 @@ class UserInfoHandler(
             return
 
         assert self.normalized_payload is not None
-        user_has_viewed_lesson_info_modal_once = self.normalized_payload[
-            'user_has_viewed_lesson_info_modal_once'
-        ]
+        user_has_viewed_lesson_info_modal_once = self.normalized_payload['user_has_viewed_lesson_info_modal_once']
         if user_has_viewed_lesson_info_modal_once:
-            user_services.set_user_has_viewed_lesson_info_modal_once(
-                self.user_id
-            )
+            user_services.set_user_has_viewed_lesson_info_modal_once(self.user_id)
         self.render_json({'success': True})
 
 
@@ -902,16 +728,12 @@ class UrlHandlerNormalizedRequestDict(TypedDict):
     current_url: str
 
 
-class UrlHandler(
-    base.BaseHandler[Dict[str, str], UrlHandlerNormalizedRequestDict]
-):
+class UrlHandler(base.BaseHandler[Dict[str, str], UrlHandlerNormalizedRequestDict]):
     """The handler for generating login URL."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {'current_url': {'schema': {'type': 'basestring'}}}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {'current_url': {'schema': {'type': 'basestring'}}}}
 
     @acl_decorators.open_access
     def get(self) -> None:

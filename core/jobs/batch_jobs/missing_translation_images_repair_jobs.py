@@ -20,15 +20,15 @@ from __future__ import annotations
 
 import html
 
+import apache_beam as beam
+import bs4
+from typing import Dict, List, Tuple, Union
+
 from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import gcs_io, ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
-import bs4
-from typing import Dict, List, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -49,9 +49,7 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
         self, pipeline: beam.Pipeline
     ) -> Tuple[
         beam.PCollection[Tuple[str, beam.PCollection[str]]],
-        beam.PCollection[
-            Tuple[str, Dict[str, beam.PCollection[Union[str, bool]]]]
-        ],
+        beam.PCollection[Tuple[str, Dict[str, beam.PCollection[Union[str, bool]]]]],
     ]:
         """Compute the copy operations to perform.
 
@@ -62,94 +60,42 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             (PCollection, PCollection). Tuple of the copy operations to perform
             and debugging information for the audit job.
         """
-        translation_suggestion_model_pcoll = (
-            pipeline
-            | 'Get all GeneralSuggestionModels'
-            >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all()
-            )
-            | 'Keep only translation suggestions'
-            >> beam.Filter(
-                lambda model: model.suggestion_type
-                == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-            )
-        )
+        translation_suggestion_model_pcoll = pipeline | 'Get all GeneralSuggestionModels' >> ndb_io.GetModels(suggestion_models.GeneralSuggestionModel.get_all()) | 'Keep only translation suggestions' >> beam.Filter(lambda model: model.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
 
-        translation_suggestion_models_by_suggestion_id = (
-            translation_suggestion_model_pcoll
-            | 'Group by suggestion id' >> beam.GroupBy(lambda model: model.id)
-        )
+        translation_suggestion_models_by_suggestion_id = translation_suggestion_model_pcoll | 'Group by suggestion id' >> beam.GroupBy(lambda model: model.id)
 
-        translation_suggestion_target_id_by_suggestion_id = (
-            translation_suggestion_models_by_suggestion_id
-            | 'Map each model to its target id'
-            >> beam.Map(self._get_target_id_from_model)
-        )
+        translation_suggestion_target_id_by_suggestion_id = translation_suggestion_models_by_suggestion_id | 'Map each model to its target id' >> beam.Map(self._get_target_id_from_model)
 
-        translation_suggestion_image_names_by_suggestion_id = (
-            translation_suggestion_models_by_suggestion_id
-            | 'Map each model to image paths in its translation content'
-            >> beam.Map(self._get_image_names_from_model)
-        )
+        translation_suggestion_image_names_by_suggestion_id = translation_suggestion_models_by_suggestion_id | 'Map each model to image paths in its translation content' >> beam.Map(self._get_image_names_from_model)
 
-        translation_suggestion_info_by_suggestion_id = (
-            {
-                'target_id': translation_suggestion_target_id_by_suggestion_id,
-                'image_names': translation_suggestion_image_names_by_suggestion_id,
-            }
-            | 'Group as (model_id: {target_id: [[str]], image_names: [[str]]})'
-            >> beam.CoGroupByKey()
-        )
+        translation_suggestion_info_by_suggestion_id = {
+            'target_id': translation_suggestion_target_id_by_suggestion_id,
+            'image_names': translation_suggestion_image_names_by_suggestion_id,
+        } | 'Group as (model_id: {target_id: [[str]], image_names: [[str]]})' >> beam.CoGroupByKey()
 
-        dst_path_by_src_path = (
-            translation_suggestion_info_by_suggestion_id
-            | 'Compute tentative destination paths keyed by source paths'
-            >> beam.FlatMap(self._make_path_pairs)
-        )
+        dst_path_by_src_path = translation_suggestion_info_by_suggestion_id | 'Compute tentative destination paths keyed by source paths' >> beam.FlatMap(self._make_path_pairs)
 
-        src_path_by_src_path = (
-            dst_path_by_src_path
-            | 'Get source paths keyed by source paths'
-            >> beam.Map(lambda group: (group[0], group[0]))
-        )
+        src_path_by_src_path = dst_path_by_src_path | 'Get source paths keyed by source paths' >> beam.Map(lambda group: (group[0], group[0]))
 
-        src_path_exist_by_src_path = (
-            src_path_by_src_path
-            | 'Check if source paths exist' >> gcs_io.IsFile()
-        )
+        src_path_exist_by_src_path = src_path_by_src_path | 'Check if source paths exist' >> gcs_io.IsFile()
 
-        dst_path_exist_by_src_path = (
-            dst_path_by_src_path
-            | 'Check if destination paths exist' >> gcs_io.IsFile()
-        )
+        dst_path_exist_by_src_path = dst_path_by_src_path | 'Check if destination paths exist' >> gcs_io.IsFile()
 
         copy_info_by_src_path = {
             'dst': dst_path_by_src_path,
             'src_exist': src_path_exist_by_src_path,
             'dst_exist': dst_path_exist_by_src_path,
-        } | (
-            'Group as {src: {dst: [str], src_exist: [bool], dst_exist: [bool]}}'
-        ) >> beam.CoGroupByKey()
+        } | ('Group as {src: {dst: [str], src_exist: [bool], dst_exist: [bool]}}') >> beam.CoGroupByKey()
 
-        copy_info_to_copy_by_src_path = (
-            copy_info_by_src_path
-            | 'Filter out copy operations that should not happen'
-            >> beam.Filter(self._filter_copy_ops)
-        )
+        copy_info_to_copy_by_src_path = copy_info_by_src_path | 'Filter out copy operations that should not happen' >> beam.Filter(self._filter_copy_ops)
 
-        dst_to_copy_by_src = (
-            copy_info_to_copy_by_src_path
-            | 'Extract only src and dst paths from copy operations info'
-            >> beam.MapTuple(lambda src, info: (src, info['dst'][0]))
-        )
+        dst_to_copy_by_src = copy_info_to_copy_by_src_path | 'Extract only src and dst paths from copy operations info' >> beam.MapTuple(lambda src, info: (src, info['dst'][0]))
 
         return dst_to_copy_by_src, copy_info_by_src_path
 
     def _get_target_id_from_model(
         self,
-        group: Tuple[
-            str, beam.PCollection[suggestion_models.GeneralSuggestionModel]
-        ],
+        group: Tuple[str, beam.PCollection[suggestion_models.GeneralSuggestionModel]],
     ) -> Tuple[str, List[str]]:
         """Extract the target ID from a GeneralSuggestionModel object.
 
@@ -168,9 +114,7 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
 
     def _get_image_names_from_model(
         self,
-        group: Tuple[
-            str, beam.PCollection[suggestion_models.GeneralSuggestionModel]
-        ],
+        group: Tuple[str, beam.PCollection[suggestion_models.GeneralSuggestionModel]],
     ) -> Tuple[str, List[str]]:
         """Extract image filenames from a GeneralSuggestionModel object.
 
@@ -203,16 +147,9 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
                     type(translation_html_str),
                     translation_html_str,
                 )
-                translation_tree = bs4.BeautifulSoup(
-                    translation_html_str, 'html.parser'
-                )
-                image_nodes = translation_tree.findAll(
-                    name='oppia-noninteractive-image'
-                )
-                image_filenames += [
-                    html.unescape(node.get('filepath-with-value')).strip('"')
-                    for node in image_nodes
-                ]
+                translation_tree = bs4.BeautifulSoup(translation_html_str, 'html.parser')
+                image_nodes = translation_tree.findAll(name='oppia-noninteractive-image')
+                image_filenames += [html.unescape(node.get('filepath-with-value')).strip('"') for node in image_nodes]
 
         return (model_id, image_filenames)
 
@@ -243,11 +180,7 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             destination.
         """
         _, suggestion_info = group
-        target_ids = [
-            target_id
-            for targets in suggestion_info['target_id']
-            for target_id in targets
-        ]
+        target_ids = [target_id for targets in suggestion_info['target_id'] for target_id in targets]
         assert len(target_ids) == 1
         target_id = target_ids[0]
 
@@ -312,16 +245,11 @@ class CopyMissingTranslationImagesJob(base_jobs.JobBase):
             Each element contains an ordered triple of the source path,
             destination path, and status string.
         """
-        dst_to_copy_by_src, _ = (
-            self.pipeline
-            | 'Plan copy operations' >> CopyMissingTranslationImages()
-        )
+        dst_to_copy_by_src, _ = self.pipeline | 'Plan copy operations' >> CopyMissingTranslationImages()
 
         results = dst_to_copy_by_src | 'Copy src to dst' >> gcs_io.CopyFile()
 
-        return results | 'Map as stdout' >> beam.Map(
-            job_run_result.JobRunResult.as_stdout
-        )
+        return results | 'Map as stdout' >> beam.Map(job_run_result.JobRunResult.as_stdout)
 
 
 class DebugMissingTranslationImagesJob(base_jobs.JobBase):
@@ -358,10 +286,7 @@ class DebugMissingTranslationImagesJob(base_jobs.JobBase):
             PCollection. Job run results describing an ordered pair of the copy
             operations to be performed and debugging information.
         """
-        dst_to_copy_by_src, copy_info_by_src_path = (
-            self.pipeline
-            | 'Plan copy operations' >> CopyMissingTranslationImages()
-        )
+        dst_to_copy_by_src, copy_info_by_src_path = self.pipeline | 'Plan copy operations' >> CopyMissingTranslationImages()
 
         return (
             {
@@ -383,11 +308,6 @@ class AuditMissingTranslationImagesJob(base_jobs.JobBase):
             PCollection. Job run results describing an ordered pair of the
             source and destination files for each copy to be performed.
         """
-        dst_to_copy_by_src, _ = (
-            self.pipeline
-            | 'Plan copy operations' >> CopyMissingTranslationImages()
-        )
+        dst_to_copy_by_src, _ = self.pipeline | 'Plan copy operations' >> CopyMissingTranslationImages()
 
-        return dst_to_copy_by_src | 'Map as stdout' >> beam.Map(
-            job_run_result.JobRunResult.as_stdout
-        )
+        return dst_to_copy_by_src | 'Map as stdout' >> beam.Map(job_run_result.JobRunResult.as_stdout)

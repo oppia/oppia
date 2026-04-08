@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Dict, List, Optional, Tuple
+
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -32,8 +34,6 @@ from core.domain import (
     summary_services,
     topic_fetchers,
 )
-
-from typing import Dict, List, Optional, Tuple
 
 
 class FrontendStoryNodeDict(story_domain.StoryNodeDict):
@@ -67,14 +67,8 @@ class StoryPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         topic_id = story.corresponding_topic_id
         topic_name = topic_fetchers.get_topic_by_id(topic_id).name
 
-        completed_nodes = (
-            story_fetchers.get_completed_nodes_in_story(self.user_id, story_id)
-            if self.user_id
-            else []
-        )
-        completed_node_ids = [
-            completed_node.id for completed_node in completed_nodes
-        ]
+        completed_nodes = story_fetchers.get_completed_nodes_in_story(self.user_id, story_id) if self.user_id else []
+        completed_node_ids = [completed_node.id for completed_node in completed_nodes]
         # Here we use MyPy ignore because we are explicitly changing
         # the type from the list of 'StoryNodeDict' to the list of
         # 'FrontendStoryNodeDict', and this is done because below we
@@ -89,16 +83,8 @@ class StoryPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             if node['id'] in completed_node_ids:
                 node['completed'] = True
 
-        exp_ids = [
-            node['exploration_id']
-            for node in ordered_node_dicts
-            if node['exploration_id'] is not None
-        ]
-        exp_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                exp_ids, user=self.user
-            )
-        )
+        exp_ids = [node['exploration_id'] for node in ordered_node_dicts if node['exploration_id'] is not None]
+        exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts_matching_ids(exp_ids, user=self.user)
 
         for ind, node in enumerate(ordered_node_dicts):
             node['exp_summary_dict'] = exp_summary_dicts[ind]
@@ -132,9 +118,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': (
-                            '%s[0-9]+' % story_domain.NODE_ID_PREFIX
-                        ),
+                        'regex_pattern': ('%s[0-9]+' % story_domain.NODE_ID_PREFIX),
                     }
                 ],
             }
@@ -173,35 +157,21 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         assert self.user_id is not None
 
         try:
-            story_fetchers.get_node_index_by_story_id_and_node_id(
-                story_id, node_id
-            )
+            story_fetchers.get_node_index_by_story_id_and_node_id(story_id, node_id)
         except Exception as e:
             raise self.NotFoundException(e)
 
         next_exp_ids = []
         next_node_id = None
         if node_id not in completed_node_ids:
-            story_services.record_completed_node_in_story_context(
-                self.user_id, story_id, node_id
-            )
+            story_services.record_completed_node_in_story_context(self.user_id, story_id, node_id)
 
-            completed_nodes = (
-                story_fetchers.get_completed_nodes_in_story(
-                    self.user_id, story_id
-                )
-                if self.user_id
-                else []
-            )
-            completed_node_ids = [
-                completed_node.id for completed_node in completed_nodes
-            ]
+            completed_nodes = story_fetchers.get_completed_nodes_in_story(self.user_id, story_id) if self.user_id else []
+            completed_node_ids = [completed_node.id for completed_node in completed_nodes]
 
             for node in ordered_nodes:
                 if node.id not in completed_node_ids:
-                    next_exp_ids = (
-                        [node.exploration_id] if node.exploration_id else []
-                    )
+                    next_exp_ids = [node.exploration_id] if node.exploration_id else []
                     next_node_id = node.id
                     break
         return (next_exp_ids, next_node_id, completed_node_ids)
@@ -223,11 +193,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             node_id,
         ) = self.request.path.split('/')
         story = story_fetchers.get_story_by_id(story_id)
-        completed_nodes = (
-            story_fetchers.get_completed_nodes_in_story(self.user_id, story_id)
-            if self.user_id
-            else []
-        )
+        completed_nodes = story_fetchers.get_completed_nodes_in_story(self.user_id, story_id) if self.user_id else []
         ordered_nodes = story.story_contents.get_ordered_nodes()
 
         # In case the user is a returning user and has completed nodes in the
@@ -246,9 +212,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             return
 
-        (next_exp_ids, next_node_id, _) = self._record_node_completion(
-            story_id, node_id, [], ordered_nodes
-        )
+        (next_exp_ids, next_node_id, _) = self._record_node_completion(story_id, node_id, [], ordered_nodes)
         if next_node_id is None:
             self.redirect(
                 '/learn/%s/%s/story/%s'
@@ -264,18 +228,10 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             feconf.EXPLORATION_URL_PREFIX,
             next_exp_ids[0],
         )
-        redirect_url = utils.set_url_query_parameter(
-            redirect_url, 'classroom_url_fragment', classroom_url_fragment
-        )
-        redirect_url = utils.set_url_query_parameter(
-            redirect_url, 'topic_url_fragment', topic_url_fragment
-        )
-        redirect_url = utils.set_url_query_parameter(
-            redirect_url, 'story_url_fragment', story_url_fragment
-        )
-        redirect_url = utils.set_url_query_parameter(
-            redirect_url, 'node_id', next_node_id
-        )
+        redirect_url = utils.set_url_query_parameter(redirect_url, 'classroom_url_fragment', classroom_url_fragment)
+        redirect_url = utils.set_url_query_parameter(redirect_url, 'topic_url_fragment', topic_url_fragment)
+        redirect_url = utils.set_url_query_parameter(redirect_url, 'story_url_fragment', story_url_fragment)
+        redirect_url = utils.set_url_query_parameter(redirect_url, 'node_id', next_node_id)
 
         self.redirect(redirect_url)
 
@@ -290,97 +246,56 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         assert self.user_id is not None
         story = story_fetchers.get_story_by_id(story_id)
         if story is None:
-            logging.error(
-                'Could not find a story corresponding to %s id.' % story_id
-            )
+            logging.error('Could not find a story corresponding to %s id.' % story_id)
             self.render_json({})
             return
         topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
-        completed_nodes = story_fetchers.get_completed_nodes_in_story(
-            self.user_id, story_id
-        )
-        completed_node_ids = [
-            completed_node.id for completed_node in completed_nodes
-        ]
+        completed_nodes = story_fetchers.get_completed_nodes_in_story(self.user_id, story_id)
+        completed_node_ids = [completed_node.id for completed_node in completed_nodes]
         ordered_nodes = story.story_contents.get_ordered_nodes()
 
-        (next_exp_ids, next_node_id, completed_node_ids) = (
-            self._record_node_completion(
-                story_id, node_id, completed_node_ids, ordered_nodes
-            )
-        )
+        (next_exp_ids, next_node_id, completed_node_ids) = self._record_node_completion(story_id, node_id, completed_node_ids, ordered_nodes)
 
         ready_for_review_test = False
-        exp_summaries = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                next_exp_ids
-            )
-        )
+        exp_summaries = summary_services.get_displayable_exp_summary_dicts_matching_ids(next_exp_ids)
 
         # If there are no questions for any of the acquired skills that the
         # learner has completed, do not show review tests.
-        acquired_skills = skill_fetchers.get_multi_skills(
-            story.get_acquired_skill_ids_for_node_ids(completed_node_ids)
-        )
+        acquired_skills = skill_fetchers.get_multi_skills(story.get_acquired_skill_ids_for_node_ids(completed_node_ids))
 
         acquired_skill_ids = [skill.id for skill in acquired_skills]
-        questions_available = (
-            len(
-                question_services.get_questions_by_skill_ids(
-                    1, acquired_skill_ids, False
-                )
-            )
-            > 0
-        )
+        questions_available = len(question_services.get_questions_by_skill_ids(1, acquired_skill_ids, False)) > 0
 
         learner_completed_story = len(completed_node_ids) == len(ordered_nodes)
-        learner_at_review_point_in_story = len(exp_summaries) != 0 and (
-            len(completed_node_ids) & constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
-            == 0
-        )
+        learner_at_review_point_in_story = len(exp_summaries) != 0 and (len(completed_node_ids) & constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0)
 
         # Gated Review Test redirection.
         if feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value,
             self.user_id,
-        ) and (
-            questions_available
-            and (learner_at_review_point_in_story or learner_completed_story)
-        ):
+        ) and (questions_available and (learner_at_review_point_in_story or learner_completed_story)):
             ready_for_review_test = True
 
         # If there is no next_node_id, the story is marked as completed else
         # mark the story as incomplete.
         if next_node_id is None:
-            learner_progress_services.mark_story_as_completed(
-                self.user_id, story_id
-            )
+            learner_progress_services.mark_story_as_completed(self.user_id, story_id)
         else:
-            learner_progress_services.record_story_started(
-                self.user_id, story.id
-            )
+            learner_progress_services.record_story_started(self.user_id, story.id)
 
-        completed_story_ids = (
-            learner_progress_services.get_all_completed_story_ids(self.user_id)
-        )
+        completed_story_ids = learner_progress_services.get_all_completed_story_ids(self.user_id)
         story_ids_in_topic = []
         for story_reference in topic.canonical_story_references:
             story_ids_in_topic.append(story_reference.story_id)
 
-        is_topic_completed = set(story_ids_in_topic).intersection(
-            set(completed_story_ids)
-        )
+        is_topic_completed = set(story_ids_in_topic).intersection(set(completed_story_ids))
 
         # If at least one story in the topic is completed,
         # mark the topic as learnt else mark it as partially learnt.
         if not is_topic_completed:
-            learner_progress_services.record_topic_started(
-                self.user_id, topic.id
-            )
+            learner_progress_services.record_topic_started(self.user_id, topic.id)
         else:
-            learner_progress_services.mark_topic_as_learnt(
-                self.user_id, topic.id
-            )
+            learner_progress_services.mark_topic_as_learnt(self.user_id, topic.id)
 
         self.render_json(
             {

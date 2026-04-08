@@ -20,6 +20,9 @@ from __future__ import annotations
 
 import re
 
+import apache_beam as beam
+from typing import Type
+
 from core import feconf
 from core.domain import change_domain, exp_domain, exp_fetchers, state_domain
 from core.jobs import job_test_utils
@@ -27,16 +30,11 @@ from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
-import apache_beam as beam
-from typing import Type
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, exp_models
 
-(base_models, exp_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.EXPLORATION]
-)
+(base_models, exp_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.EXPLORATION])
 
 
 class MockDomainObject(base_models.BaseModel):
@@ -54,11 +52,7 @@ class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
             last_updated=self.YEAR_AGO,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([expired_model])
-            | beam.ParDo(base_validation.ValidateDeletedModel())
-        )
+        output = self.pipeline | beam.Create([expired_model]) | beam.ParDo(base_validation.ValidateDeletedModel())
 
         self.assert_pcoll_equal(
             output,
@@ -70,64 +64,40 @@ class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
 
 class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
     def test_process_reports_model_timestamp_relationship_error(self) -> None:
-        invalid_timestamp = base_models.BaseModel(
-            id='123', created_on=self.NOW, last_updated=self.YEAR_AGO
-        )
+        invalid_timestamp = base_models.BaseModel(id='123', created_on=self.NOW, last_updated=self.YEAR_AGO)
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_validation.ValidateModelTimestamps())
-        )
+        output = self.pipeline | beam.Create([invalid_timestamp]) | beam.ParDo(base_validation.ValidateModelTimestamps())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.InconsistentTimestampsError(
-                    invalid_timestamp
-                ),
+                base_validation_errors.InconsistentTimestampsError(invalid_timestamp),
             ],
         )
 
     def test_process_reports_model_mutated_during_job_error(self) -> None:
-        invalid_timestamp = base_models.BaseModel(
-            id='124', created_on=self.NOW, last_updated=self.YEAR_LATER
-        )
+        invalid_timestamp = base_models.BaseModel(id='124', created_on=self.NOW, last_updated=self.YEAR_LATER)
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_validation.ValidateModelTimestamps())
-        )
+        output = self.pipeline | beam.Create([invalid_timestamp]) | beam.ParDo(base_validation.ValidateModelTimestamps())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.ModelMutatedDuringJobError(
-                    invalid_timestamp
-                ),
+                base_validation_errors.ModelMutatedDuringJobError(invalid_timestamp),
             ],
         )
 
 
 class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
     def test_validate_model_id(self) -> None:
-        invalid_id_model = base_models.BaseModel(
-            id='123@?!*', created_on=self.YEAR_AGO, last_updated=self.NOW
-        )
+        invalid_id_model = base_models.BaseModel(id='123@?!*', created_on=self.YEAR_AGO, last_updated=self.NOW)
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_id_model])
-            | beam.ParDo(base_validation.ValidateBaseModelId())
-        )
+        output = self.pipeline | beam.Create([invalid_id_model]) | beam.ParDo(base_validation.ValidateBaseModelId())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.ModelIdRegexError(
-                    invalid_id_model, base_validation.BASE_MODEL_ID_PATTERN
-                ),
+                base_validation_errors.ModelIdRegexError(invalid_id_model, base_validation.BASE_MODEL_ID_PATTERN),
             ],
         )
 
@@ -145,18 +115,12 @@ class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_validation.ValidatePostCommitStatus())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_status]) | beam.ParDo(base_validation.ValidatePostCommitStatus())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.InvalidCommitStatusError(
-                    invalid_commit_status
-                ),
+                base_validation_errors.InvalidCommitStatusError(invalid_commit_status),
             ],
         )
 
@@ -176,18 +140,12 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_validation.ValidatePostCommitIsPrivate())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_status]) | beam.ParDo(base_validation.ValidatePostCommitIsPrivate())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.InvalidPrivateCommitStatusError(
-                    invalid_commit_status
-                ),
+                base_validation_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
             ],
         )
 
@@ -205,18 +163,12 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_validation.ValidatePostCommitIsPrivate())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_status]) | beam.ParDo(base_validation.ValidatePostCommitIsPrivate())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.InvalidPrivateCommitStatusError(
-                    invalid_commit_status
-                ),
+                base_validation_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
             ],
         )
 
@@ -234,11 +186,7 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_status]) | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
 
         self.assert_pcoll_empty(output)
 
@@ -256,18 +204,12 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_status]) | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.InvalidPublicCommitStatusError(
-                    invalid_commit_status
-                ),
+                base_validation_errors.InvalidPublicCommitStatusError(invalid_commit_status),
             ],
         )
 
@@ -283,88 +225,60 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_status]) | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.InvalidPublicCommitStatusError(
-                    invalid_commit_status
-                ),
+                base_validation_errors.InvalidPublicCommitStatusError(invalid_commit_status),
             ],
         )
 
 
-class MockValidateModelDomainObjectInstancesWithNeutral(
-    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
-):
-    def _get_model_domain_object_instance(
-        self, _: base_models.BaseModel
-    ) -> MockDomainObject:
+class MockValidateModelDomainObjectInstancesWithNeutral(base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]):
+    def _get_model_domain_object_instance(self, _: base_models.BaseModel) -> MockDomainObject:
         """Method redefined for testing purpose returning instance of
         MockDomainObject.
         """
         return MockDomainObject()
 
-    def _get_domain_object_validation_type(
-        self, _: base_models.BaseModel
-    ) -> base_validation.ValidationModes:
+    def _get_domain_object_validation_type(self, _: base_models.BaseModel) -> base_validation.ValidationModes:
         """Method redefined for testing purpose returning neutral mode
         of validation.
         """
         return base_validation.ValidationModes.NEUTRAL
 
 
-class MockValidateModelDomainObjectInstancesWithStrict(
-    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
-):
-    def _get_model_domain_object_instance(
-        self, _: base_models.BaseModel
-    ) -> MockDomainObject:
+class MockValidateModelDomainObjectInstancesWithStrict(base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]):
+    def _get_model_domain_object_instance(self, _: base_models.BaseModel) -> MockDomainObject:
         """Method redefined for testing purpose returning instance of
         MockDomainObject.
         """
         return MockDomainObject()
 
-    def _get_domain_object_validation_type(
-        self, _: base_models.BaseModel
-    ) -> base_validation.ValidationModes:
+    def _get_domain_object_validation_type(self, _: base_models.BaseModel) -> base_validation.ValidationModes:
         """Method redefined for testing purpose returning strict mode
         of validation.
         """
         return base_validation.ValidationModes.STRICT
 
 
-class MockValidateModelDomainObjectInstancesWithNonStrict(
-    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
-):
-    def _get_model_domain_object_instance(
-        self, _: base_models.BaseModel
-    ) -> MockDomainObject:
+class MockValidateModelDomainObjectInstancesWithNonStrict(base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]):
+    def _get_model_domain_object_instance(self, _: base_models.BaseModel) -> MockDomainObject:
         """Method redefined for testing purpose returning instance of
         MockDomainObject.
         """
         return MockDomainObject()
 
-    def _get_domain_object_validation_type(
-        self, _: base_models.BaseModel
-    ) -> base_validation.ValidationModes:
+    def _get_domain_object_validation_type(self, _: base_models.BaseModel) -> base_validation.ValidationModes:
         """Method redefined for testing purpose returning non-strict mode
         of validation.
         """
         return base_validation.ValidationModes.NON_STRICT
 
 
-class MockValidateModelDomainObjectInstancesWithInvalid(
-    base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]
-):
-    def _get_model_domain_object_instance(
-        self, _: base_models.BaseModel
-    ) -> MockDomainObject:
+class MockValidateModelDomainObjectInstancesWithInvalid(base_validation.ValidateModelDomainObjectInstances[base_models.BaseModel]):
+    def _get_model_domain_object_instance(self, _: base_models.BaseModel) -> MockDomainObject:
         """Method redefined for testing purpose returning instance of
         MockDomainObject.
         """
@@ -386,14 +300,8 @@ class MockValidateModelDomainObjectInstancesWithInvalid(
         return 'invalid'
 
 
-class MockValidateExplorationModelDomainObjectInstances(
-    base_validation.ValidateModelDomainObjectInstances[
-        exp_models.ExplorationModel
-    ]
-):
-    def _get_model_domain_object_instance(
-        self, item: exp_models.ExplorationModel
-    ) -> exp_domain.Exploration:
+class MockValidateExplorationModelDomainObjectInstances(base_validation.ValidateModelDomainObjectInstances[exp_models.ExplorationModel]):
+    def _get_model_domain_object_instance(self, item: exp_models.ExplorationModel) -> exp_domain.Exploration:
         """Returns an Exploration domain object given an exploration
         model loaded from the datastore.
         """
@@ -409,11 +317,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(base_validation.ValidateModelDomainObjectInstances())
-        )
+        output = self.pipeline | beam.Create([model]) | beam.ParDo(base_validation.ValidateModelDomainObjectInstances())
 
         self.assert_pcoll_equal(output, [])
 
@@ -425,11 +329,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(MockValidateModelDomainObjectInstancesWithNeutral())
-        )
+        output = self.pipeline | beam.Create([model]) | beam.ParDo(MockValidateModelDomainObjectInstancesWithNeutral())
 
         self.assert_pcoll_equal(output, [])
 
@@ -441,11 +341,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(MockValidateModelDomainObjectInstancesWithStrict())
-        )
+        output = self.pipeline | beam.Create([model]) | beam.ParDo(MockValidateModelDomainObjectInstancesWithStrict())
 
         self.assert_pcoll_equal(output, [])
 
@@ -459,11 +355,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(MockValidateModelDomainObjectInstancesWithNonStrict())
-        )
+        output = self.pipeline | beam.Create([model]) | beam.ParDo(MockValidateModelDomainObjectInstancesWithNonStrict())
 
         self.assert_pcoll_equal(output, [])
 
@@ -477,18 +369,10 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(MockValidateModelDomainObjectInstancesWithInvalid())
-        )
+        output = self.pipeline | beam.Create([model]) | beam.ParDo(MockValidateModelDomainObjectInstancesWithInvalid())
         self.assert_pcoll_equal(
             output,
-            [
-                base_validation_errors.ModelDomainObjectValidateError(
-                    model, 'Invalid validation type for domain object: invalid'
-                )
-            ],
+            [base_validation_errors.ModelDomainObjectValidateError(model, 'Invalid validation type for domain object: invalid')],
         )
 
     def test_validation_type_for_exploration_domain_object(self) -> None:
@@ -536,19 +420,11 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([model_instance1, model_instance2])
-            | beam.ParDo(MockValidateExplorationModelDomainObjectInstances())
-        )
+        output = self.pipeline | beam.Create([model_instance1, model_instance2]) | beam.ParDo(MockValidateExplorationModelDomainObjectInstances())
 
         self.assert_pcoll_equal(
             output,
-            [
-                base_validation_errors.ModelDomainObjectValidateError(
-                    model_instance2, 'The destination end is not a valid state.'
-                )
-            ],
+            [base_validation_errors.ModelDomainObjectValidateError(model_instance2, 'The destination end is not a valid state.')],
         )
 
 
@@ -564,25 +440,17 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_type_model])
-            | beam.ParDo(base_validation.ValidateCommitType())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_type_model]) | beam.ParDo(base_validation.ValidateCommitType())
 
         self.assert_pcoll_equal(
             output,
             [
-                base_validation_errors.InvalidCommitTypeError(
-                    invalid_commit_type_model
-                ),
+                base_validation_errors.InvalidCommitTypeError(invalid_commit_type_model),
             ],
         )
 
 
-class MockValidateCommitCmdsSchema(
-    base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
-):
+class MockValidateCommitCmdsSchema(base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]):
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with super class's process() method, because in
     # in super class's process() method we are returning CommitCmdsValidateError
@@ -600,9 +468,7 @@ class MockValidateCommitCmdsSchema(
         self._get_change_domain_class(input_model)
 
 
-class MockValidateCommitCmdsSchemaChangeDomain(
-    base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
-):
+class MockValidateCommitCmdsSchemaChangeDomain(base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]):
     # Here we use MyPy ignore because the signature of this method doesn't
     # match with super class's `_get_change_domain_class()` method, because
     # in super class's method we are returning Type[BaseChange] and here for
@@ -614,12 +480,8 @@ class MockValidateCommitCmdsSchemaChangeDomain(
         pass
 
 
-class MockValidateWrongSchema(
-    base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
-):
-    def _get_change_domain_class(
-        self, _: base_models.BaseModel
-    ) -> Type[change_domain.BaseChange]:
+class MockValidateWrongSchema(base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]):
+    def _get_change_domain_class(self, _: base_models.BaseModel) -> Type[change_domain.BaseChange]:
         """Method defined for testing purpose returning BaseChange class."""
         return change_domain.BaseChange
 
@@ -636,19 +498,11 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(MockValidateCommitCmdsSchemaChangeDomain())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(MockValidateCommitCmdsSchemaChangeDomain())
 
         self.assert_pcoll_equal(
             output,
-            [
-                base_validation_errors.CommitCmdsNoneError(
-                    invalid_commit_cmd_model
-                )
-            ],
+            [base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)],
         )
 
     def test_validate_wrong_commit_cmd_missing(self) -> None:
@@ -662,11 +516,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd-invalid': 'invalid_test_command'}, {}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(MockValidateWrongSchema())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(MockValidateWrongSchema())
 
         self.assert_pcoll_equal(
             output,
@@ -690,11 +540,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': 'invalid_test_command'}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(MockValidateWrongSchema())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(MockValidateWrongSchema())
 
         self.assert_pcoll_equal(
             output,
@@ -720,10 +566,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
         with self.assertRaisesRegex(
             NotImplementedError,
-            re.escape(
-                'The _get_change_domain_class() method is missing from the '
-                'derived class. It should be implemented in the derived class.'
-            ),
+            re.escape('The _get_change_domain_class() method is missing from the derived class. It should be implemented in the derived class.'),
         ):
             MockValidateCommitCmdsSchema().process(invalid_commit_cmd_model)
 
@@ -738,10 +581,6 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(MockValidateWrongSchema())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(MockValidateWrongSchema())
 
         self.assert_pcoll_equal(output, [])

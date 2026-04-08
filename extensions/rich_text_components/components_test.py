@@ -22,10 +22,10 @@ import inspect
 import os
 import re
 
+from typing import Any, Dict, List, Sequence, Tuple, Type, Union
+
 from core.tests import test_utils
 from extensions.rich_text_components import components
-
-from typing import Any, Dict, List, Sequence, Tuple, Type, Union
 
 ValidItemTypes = Union[
     Dict[str, str],
@@ -76,12 +76,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         invalid_items_with_error_messages = [
             (
                 {
-                    'content-with-value': (
-                        '<oppia-noninteractive-collapsible content-with-value='
-                        '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
-                        'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
-                        'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
-                    ),
+                    'content-with-value': ('<oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;SubCollapsible&amp;quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'),
                     'heading-with-value': 'Collaspible',
                 },
                 'Nested tabs and collapsible',
@@ -91,8 +86,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                     'content-with-value': '<p>Hello</p>',
                     'heading-collap-with-value': 'Collapsible',
                 },
-                'Missing attributes: heading-with-value, Extra attributes: '
-                'heading-collap-with-value',
+                'Missing attributes: heading-with-value, Extra attributes: heading-collap-with-value',
             ),
         ]
 
@@ -134,9 +128,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             ),
         ]
 
-        self.check_validation(
-            components.Image, valid_items, invalid_items_with_error_messages
-        )
+        self.check_validation(components.Image, valid_items, invalid_items_with_error_messages)
 
     def test_link_validation(self) -> None:
         """Tests collapsible component validation."""
@@ -162,9 +154,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             ),
         ]
 
-        self.check_validation(
-            components.Link, valid_items, invalid_items_with_error_messages
-        )
+        self.check_validation(components.Link, valid_items, invalid_items_with_error_messages)
 
     def test_math_validation(self) -> None:
         """Tests collapsible component validation."""
@@ -172,19 +162,13 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             {
                 'math_content-with-value': {
                     'raw_latex': '123456',
-                    'svg_filename': (
-                        'mathImg_20201216_331234_r3ir43lmfd_height_2d456_width_6d1'
-                        '24_vertical_0d231.svg'
-                    ),
+                    'svg_filename': ('mathImg_20201216_331234_r3ir43lmfd_height_2d456_width_6d124_vertical_0d231.svg'),
                 }
             },
             {
                 'math_content-with-value': {
                     'raw_latex': '\\frac{x}{y}',
-                    'svg_filename': (
-                        'mathImg_20200216_133832_imzlvnf23a_height_4d123_width_23d'
-                        '122_vertical_2d123.svg'
-                    ),
+                    'svg_filename': ('mathImg_20200216_133832_imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg'),
                 }
             },
         ]
@@ -195,8 +179,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             ),
             (
                 {'url-with-value': 'http://link.com'},
-                'Missing attributes: math_content-with-value, Extra attributes: '
-                'url-with-value',
+                'Missing attributes: math_content-with-value, Extra attributes: url-with-value',
             ),
             (
                 {
@@ -229,39 +212,23 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 {
                     'math_content-with-value': {
                         'raw_latex': 'x^3',
-                        'svg_filename': (
-                            'invalid_2020761338_imzlvnf23a_height_4d123_width_23d'
-                            '122_vertical_2d123.svg'
-                        ),
+                        'svg_filename': ('invalid_2020761338_imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg'),
                     }
                 },
-                (
-                    'Invalid svg_filename attribute in math component: invalid_202'
-                    '0761338_imzlvnf23a_height_4d123_width_23d122_vertical_2d123'
-                    '.svg'
-                ),
+                ('Invalid svg_filename attribute in math component: invalid_2020761338_imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg'),
             ),
             (
                 {
                     'math_content-with-value': {
                         'raw_latex': 'x^3',
-                        'svg_filename': (
-                            'mathImg_20207361338_imzlvnf23a_invalid_4d123_width_2'
-                            '3d122_vertical_2d123.svg'
-                        ),
+                        'svg_filename': ('mathImg_20207361338_imzlvnf23a_invalid_4d123_width_23d122_vertical_2d123.svg'),
                     }
                 },
-                (
-                    'Invalid svg_filename attribute in math component: mathImg_202'
-                    '07361338_imzlvnf23a_invalid_4d123_width_23d122_vertical_2d123'
-                    '.svg'
-                ),
+                ('Invalid svg_filename attribute in math component: mathImg_20207361338_imzlvnf23a_invalid_4d123_width_23d122_vertical_2d123.svg'),
             ),
         ]
 
-        self.check_validation(
-            components.Math, valid_items, invalid_items_with_error_messages
-        )
+        self.check_validation(components.Math, valid_items, invalid_items_with_error_messages)
 
     def test_skillreview_validation(self) -> None:
         """Tests skillreview component validation."""
@@ -274,8 +241,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         invalid_items_with_error_messages = [
             (
                 {'skill_id-with-value': 20, 'url-with-value': 'Hello'},
-                'Missing attributes: text-with-value, Extra attributes: '
-                'url-with-value',
+                'Missing attributes: text-with-value, Extra attributes: url-with-value',
             )
         ]
 
@@ -288,21 +254,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_tabs_validation(self) -> None:
         """Tests collapsible component validation."""
         valid_items = [
-            {
-                'tab_contents-with-value': [
-                    {'content': '<p>hello</p>', 'title': 'Tabs'}
-                ]
-            },
+            {'tab_contents-with-value': [{'content': '<p>hello</p>', 'title': 'Tabs'}]},
             {
                 'tab_contents-with-value': [
                     {'content': '<p>hello</p>', 'title': 'Tabs'},
                     {
-                        'content': (
-                            '<p><oppia-noninteractive-link text-with-value="&amp;'
-                            'quot;What is a link?&amp;quot;" url-with-value="'
-                            '&amp;quot;https://link.com&amp;quot;">'
-                            '</oppia-noninteractive-link></p>'
-                        ),
+                        'content': ('<p><oppia-noninteractive-link text-with-value="&amp;quot;What is a link?&amp;quot;" url-with-value="&amp;quot;https://link.com&amp;quot;"></oppia-noninteractive-link></p>'),
                         'title': 'Tabs',
                     },
                 ]
@@ -319,23 +276,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 'Expected unicode HTML string, received 1234',
             ),
             (
-                {
-                    'tab_content-with-value': [
-                        {'content': '<p>hello</p>', 'title': 'hello'}
-                    ]
-                },
-                'Missing attributes: tab_contents-with-value, '
-                'Extra attributes: tab_content-with-value',
+                {'tab_content-with-value': [{'content': '<p>hello</p>', 'title': 'hello'}]},
+                'Missing attributes: tab_contents-with-value, Extra attributes: tab_content-with-value',
             ),
             (
-                {
-                    'tab_contents-with-value': [
-                        {'content': '<p>hello</p>', 'tab-title': 'hello'}
-                    ]
-                },
-                re.escape(
-                    'Missing keys: [\'title\'], Extra keys: [\'tab-title\']'
-                ),
+                {'tab_contents-with-value': [{'content': '<p>hello</p>', 'tab-title': 'hello'}]},
+                re.escape('Missing keys: [\'title\'], Extra keys: [\'tab-title\']'),
             ),
             (
                 {
@@ -355,9 +301,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             ),
         ]
 
-        self.check_validation(
-            components.Tabs, valid_items, invalid_items_with_error_messages
-        )
+        self.check_validation(components.Tabs, valid_items, invalid_items_with_error_messages)
 
     def test_video_validation(self) -> None:
         """Tests collapsible component validation."""
@@ -405,9 +349,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             ),
         ]
 
-        self.check_validation(
-            components.Video, valid_items, invalid_items_with_error_messages
-        )
+        self.check_validation(components.Video, valid_items, invalid_items_with_error_messages)
 
 
 class ComponentDefinitionTests(test_utils.GenericTestBase):
@@ -415,15 +357,8 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
 
     def test_component_definition(self) -> None:
         """Test that all components are defined."""
-        rich_text_components_dir = os.path.join(
-            os.curdir, 'extensions', 'rich_text_components'
-        )
-        actual_components = [
-            name
-            for name in os.listdir(rich_text_components_dir)
-            if name != '__pycache__'
-            and os.path.isdir(os.path.join(rich_text_components_dir, name))
-        ]
+        rich_text_components_dir = os.path.join(os.curdir, 'extensions', 'rich_text_components')
+        actual_components = [name for name in os.listdir(rich_text_components_dir) if name != '__pycache__' and os.path.isdir(os.path.join(rich_text_components_dir, name))]
         defined_components = []
         for name, obj in inspect.getmembers(components):
             if inspect.isclass(obj):
@@ -437,18 +372,9 @@ class ComponentE2eTests(test_utils.GenericTestBase):
 
     def test_component_e2e_tests(self) -> None:
         """Tests that an e2e test is defined for all rich text components."""
-        test_file = os.path.join(
-            'extensions', 'rich_text_components', 'webdriverio.js'
-        )
-        rich_text_components_dir = os.path.join(
-            os.curdir, 'extensions', 'rich_text_components'
-        )
-        actual_components = [
-            name
-            for name in os.listdir(rich_text_components_dir)
-            if name != '__pycache__'
-            and os.path.isdir(os.path.join(rich_text_components_dir, name))
-        ]
+        test_file = os.path.join('extensions', 'rich_text_components', 'webdriverio.js')
+        rich_text_components_dir = os.path.join(os.curdir, 'extensions', 'rich_text_components')
+        actual_components = [name for name in os.listdir(rich_text_components_dir) if name != '__pycache__' and os.path.isdir(os.path.join(rich_text_components_dir, name))]
         with open(test_file, 'r', encoding='utf-8') as f:
             text = f.read()
             # Replace all spaces and new lines with empty space.
@@ -459,21 +385,11 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             beginning_sequence = 'varRICH_TEXT_COMPONENTS={'
             first_bracket_index = text.find(beginning_sequence)
             last_bracket_index = text.find('};')
-            text_inside_constant = (
-                text[
-                    first_bracket_index
-                    + len(beginning_sequence) : last_bracket_index
-                ]
-                + ','
-            )
+            text_inside_constant = text[first_bracket_index + len(beginning_sequence) : last_bracket_index] + ','
 
             rte_components_with_test = []
             while text_inside_constant.find(',') != -1:
-                rte_components_with_test.append(
-                    text_inside_constant[0 : text_inside_constant.find(':')]
-                )
-                text_inside_constant = text_inside_constant[
-                    text_inside_constant.find(',') + 1 :
-                ]
+                rte_components_with_test.append(text_inside_constant[0 : text_inside_constant.find(':')])
+                text_inside_constant = text_inside_constant[text_inside_constant.find(',') + 1 :]
 
         self.assertEqual(set(actual_components), set(rte_components_with_test))

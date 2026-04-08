@@ -1,6 +1,4 @@
-from typing import Any
 
-from . import timestamp_pb2
 
 class Message:
     def SerializeToString(self) -> bytes: ...

@@ -24,6 +24,8 @@ import logging
 import os
 import re
 
+from typing import Dict, List, Optional, Tuple, Type, Union
+
 from core import feconf, schema_utils, utils
 from core.domain import (
     exp_domain,
@@ -37,8 +39,6 @@ from core.domain import (
 )
 from core.tests import test_utils
 from extensions.interactions import base
-
-from typing import Dict, List, Optional, Tuple, Type, Union
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -67,9 +67,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for extracting all the HTML from a state having
         DragAndDropSortInput interaction.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_content_dict: state_domain.SubtitledHtmlDict = {
@@ -102,9 +100,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.Outcome(
                 'Introduction',
                 None,
-                state_domain.SubtitledHtml(
-                    'feedback_1', '<p>State Feedback</p>'
-                ),
+                state_domain.SubtitledHtml('feedback_1', '<p>State Feedback</p>'),
                 False,
                 [],
                 None,
@@ -125,24 +121,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.RuleSpec(
                     'HasElementXBeforeElementY',
                     {
-                        'x': '<p>x input for HasElementXAtPositionY '
-                        'rule_spec </p>',
-                        'y': '<p>y input for HasElementXAtPositionY '
-                        'rule_spec </p>',
+                        'x': '<p>x input for HasElementXAtPositionY rule_spec </p>',
+                        'y': '<p>y input for HasElementXAtPositionY rule_spec </p>',
                     },
                 ),
                 state_domain.RuleSpec(
                     'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                    {
-                        'x': [
-                            [
-                                (
-                                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPos'
-                                    'ition rule_spec htmls</p>'
-                                )
-                            ]
-                        ]
-                    },
+                    {'x': [[('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_spec htmls</p>')]]},
                 ),
             ],
             [],
@@ -161,13 +146,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>',
             },
         }
-        state_hint_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
-                )
-            )
-        ]
+        state_hint_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>Hello, this is html1 for hint 1</p>'))]
 
         state_solution_dict = {
             'answer_is_exclusive': True,
@@ -183,39 +162,27 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        state.update_content(
-            state_domain.SubtitledHtml.from_dict(state_content_dict)
-        )
+        state.update_content(state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('DragAndDropSortInput')
-        state.update_interaction_customization_args(
-            state_customization_args_dict
-        )
+        state.update_interaction_customization_args(state_customization_args_dict)
         state.update_interaction_hints(state_hint_list)
 
         # Ruling out the possibility of None for mypy type checking.
         assert state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, state_solution_dict
-        )
+        solution = state_domain.Solution.from_dict(state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_answer_groups([state_answer_group])
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41))
 
         def mock_get_html_field_types_to_rule_specs(
             unused_cls: Type[state_domain.State],
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        def mock_get_interaction_by_id(
-            cls: Type[interaction_registry.Registry], interaction_id: str
-        ) -> base.BaseInteraction:
+        def mock_get_interaction_by_id(cls: Type[interaction_registry.Registry], interaction_id: str) -> base.BaseInteraction:
             interaction = copy.deepcopy(
                 cls._interactions[  # pylint: disable=protected-access
                     interaction_id
@@ -243,9 +210,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return html_str
 
         with rules_registry_swap, interaction_registry_swap:
-            state_domain.State.convert_html_fields_in_state(
-                state.to_dict(), _append_to_list
-            )
+            state_domain.State.convert_html_fields_in_state(state.to_dict(), _append_to_list)
 
         self.assertItemsEqual(
             html_list,
@@ -255,10 +220,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>HasElementXAtPositionY rule_spec html</p>',
                 '<p>y input for HasElementXAtPositionY rule_spec </p>',
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                (
-                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
-                    'pec htmls</p>'
-                ),
+                ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_spec htmls</p>'),
                 '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
@@ -277,9 +239,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         TextInput interaction.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
 
@@ -292,9 +252,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.Outcome(
                     exploration.init_state_name,
                     None,
-                    state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'
-                    ),
+                    state_domain.SubtitledHtml('feedback_1', '<p>state outcome html</p>'),
                     False,
                     [],
                     None,
@@ -318,25 +276,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_default_outcome = state_domain.Outcome(
             'State1',
             None,
-            state_domain.SubtitledHtml(
-                'default_outcome', '<p>Default outcome for State1</p>'
-            ),
+            state_domain.SubtitledHtml('default_outcome', '<p>Default outcome for State1</p>'),
             False,
             [],
             None,
             None,
         )
         state_hint_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state1</p>'
-                )
-            ),
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state1</p>'
-                )
-            ),
+            state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>Hello, this is html1 for state1</p>')),
+            state_domain.Hint(state_domain.SubtitledHtml('hint_2', '<p>Hello, this is html2 for state1</p>')),
         ]
         state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
@@ -347,16 +295,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
         state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
-            'placeholder': {
-                'value': {'content_id': 'ca_placeholder_0', 'unicode_str': ''}
-            },
+            'placeholder': {'value': {'content_id': 'ca_placeholder_0', 'unicode_str': ''}},
             'rows': {'value': 1},
             'catchMisspellings': {'value': False},
         }
 
-        state.update_content(
-            state_domain.SubtitledHtml.from_dict(state_content_dict)
-        )
+        state.update_content(state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
         state.update_interaction_answer_groups(state_answer_group)
@@ -364,9 +308,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_hints(state_hint_list)
         # Ruling out the possibility of None for mypy type checking.
         assert state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, state_solution_dict
-        )
+        solution = state_domain.Solution.from_dict(state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
 
         exp_services.save_new_exploration('owner_id', exploration)
@@ -376,9 +318,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             html_list.append(html_str)
             return html_str
 
-        state_domain.State.convert_html_fields_in_state(
-            state.to_dict(), _append_to_list
-        )
+        state_domain.State.convert_html_fields_in_state(state.to_dict(), _append_to_list)
 
         self.assertItemsEqual(
             html_list,
@@ -399,9 +339,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ItemSelectionInput interaction.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
 
@@ -427,9 +365,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>init_state customization arg html 4</p>',
             },
         ]
-        state_customization_args_dict: Dict[
-            str, Dict[str, Union[int, List[state_domain.SubtitledHtmlDict]]]
-        ] = {
+        state_customization_args_dict: Dict[str, Dict[str, Union[int, List[state_domain.SubtitledHtmlDict]]]] = {
             'maxAllowableSelectionCount': {'value': 1},
             'minAllowableSelectionCount': {'value': 1},
             'choices': {'value': choices_subtitled_dicts},
@@ -438,18 +374,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.Outcome(
                 exploration.init_state_name,
                 None,
-                state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'
-                ),
+                state_domain.SubtitledHtml('feedback', '<p>state outcome html</p>'),
                 False,
                 [],
                 None,
                 None,
             ),
             [
-                state_domain.RuleSpec(
-                    'Equals', {'x': ['<p>Equals rule_spec html</p>']}
-                ),
+                state_domain.RuleSpec('Equals', {'x': ['<p>Equals rule_spec html</p>']}),
                 state_domain.RuleSpec(
                     'ContainsAtLeastOneOf',
                     {'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']},
@@ -479,46 +411,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>',
             },
         }
-        state_hint_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
-                )
-            )
-        ]
+        state_hint_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>Hello, this is html1 for hint 1</p>'))]
 
-        state.update_content(
-            state_domain.SubtitledHtml.from_dict(state_content_dict)
-        )
+        state.update_content(state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_answer_groups([state_answer_group])
-        state.update_interaction_customization_args(
-            state_customization_args_dict
-        )
+        state.update_interaction_customization_args(state_customization_args_dict)
         state.update_interaction_hints(state_hint_list)
 
         # Ruling out the possibility of None for mypy type checking.
         assert state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, state_solution_dict
-        )
+        solution = state_domain.Solution.from_dict(state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
         exp_services.save_new_exploration('owner_id', exploration)
 
-        mock_html_field_types_to_rule_specs_dict = (
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
+        mock_html_field_types_to_rule_specs_dict = rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41)
 
         def mock_get_html_field_types_to_rule_specs(
             unused_cls: Type[state_domain.State],
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        def mock_get_interaction_by_id(
-            cls: Type[interaction_registry.Registry], interaction_id: str
-        ) -> base.BaseInteraction:
+        def mock_get_interaction_by_id(cls: Type[interaction_registry.Registry], interaction_id: str) -> base.BaseInteraction:
             interaction = copy.deepcopy(
                 cls._interactions[  # pylint: disable=protected-access
                     interaction_id
@@ -547,9 +461,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return html_str
 
         with rules_registry_swap, interaction_registry_swap:
-            state_domain.State.convert_html_fields_in_state(
-                state.to_dict(), _append_to_list
-            )
+            state_domain.State.convert_html_fields_in_state(state.to_dict(), _append_to_list)
 
         self.assertItemsEqual(
             html_list,
@@ -575,27 +487,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         when the rule_spec has invalid html format.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name,
                 None,
-                state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'
-                ),
+                state_domain.SubtitledHtml('feedback', '<p>state outcome html</p>'),
                 False,
                 [],
                 None,
                 None,
             ),
             [
-                state_domain.RuleSpec(
-                    'Equals', {'x': ['<p>Equals rule_spec html</p>']}
-                ),
+                state_domain.RuleSpec('Equals', {'x': ['<p>Equals rule_spec html</p>']}),
                 state_domain.RuleSpec(
                     'ContainsAtLeastOneOf',
                     {'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']},
@@ -616,11 +522,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_answer_groups([state_answer_group])
 
-        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41))
         for html_type_dict in mock_html_field_types_to_rule_specs_dict.values():
             html_type_dict['format'] = 'invalid format'
 
@@ -634,26 +536,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
         ):
-            with self.assertRaisesRegex(
-                Exception, 'The rule spec does not belong to a valid format.'
-            ):
-                state_domain.State.convert_html_fields_in_state(
-                    state.to_dict(), lambda x: x
-                )
+            with self.assertRaisesRegex(Exception, 'The rule spec does not belong to a valid format.'):
+                state_domain.State.convert_html_fields_in_state(state.to_dict(), lambda x: x)
 
     def test_update_customization_args_with_invalid_content_id(self) -> None:
         """Test the method for updating interaction customization arguments
         when a content_id is invalid (set to None).
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, Optional[str]]], int]]
-        ] = {
+        state_customization_args_dict: Dict[str, Dict[str, Union[List[Dict[str, Optional[str]]], int]]] = {
             'maxAllowableSelectionCount': {'value': 1},
             'minAllowableSelectionCount': {'value': 1},
             'choices': {
@@ -687,18 +581,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         when the rule_spec has html but the input variable is invalid.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name,
                 None,
-                state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'
-                ),
+                state_domain.SubtitledHtml('feedback', '<p>state outcome html</p>'),
                 False,
                 [],
                 None,
@@ -733,30 +623,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         ]
 
-        state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]
-        ] = {
+        state_customization_args_dict: Dict[str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]] = {
             'maxAllowableSelectionCount': {'value': 1},
             'minAllowableSelectionCount': {'value': 1},
             'choices': {'value': choices_subtitled_dicts},
         }
 
         state.update_interaction_id('ItemSelectionInput')
-        state.update_interaction_customization_args(
-            state_customization_args_dict
-        )
+        state.update_interaction_customization_args(state_customization_args_dict)
         state.update_interaction_answer_groups([state_answer_group])
 
-        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41))
         for html_type_dict in mock_html_field_types_to_rule_specs_dict.values():
             if html_type_dict['interactionId'] == 'ItemSelectionInput':
-                html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = [
-                    'y'
-                ]
+                html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = ['y']
 
         def mock_get_html_field_types_to_rule_specs(
             unused_cls: Type[state_domain.State],
@@ -770,21 +650,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             with self.assertRaisesRegex(
                 Exception,
-                'Rule spec should have at least one valid input variable with '
-                'Html in it.',
+                'Rule spec should have at least one valid input variable with Html in it.',
             ):
-                state_domain.State.convert_html_fields_in_state(
-                    state.to_dict(), lambda x: x
-                )
+                state_domain.State.convert_html_fields_in_state(state.to_dict(), lambda x: x)
 
     def test_get_all_html_when_solution_has_invalid_answer_type(self) -> None:
         """Test the method for extracting all the HTML from a state
         when the interaction has a solution but the answer_type for the
         corrent_answer is invalid.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_content_dict: state_domain.SubtitledHtmlDict = {
@@ -809,20 +684,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>state customization arg html 4</p>',
             },
         ]
-        state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
-        ] = {
+        state_customization_args_dict: Dict[str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]] = {
             'choices': {'value': choices_subtitled_dicts},
             'allowMultipleItemsInSamePosition': {'value': False},
         }
 
-        state_hint_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
-                )
-            )
-        ]
+        state_hint_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>Hello, this is html1 for hint 1</p>'))]
 
         state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
@@ -838,32 +705,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        state.update_content(
-            state_domain.SubtitledHtml.from_dict(state_content_dict)
-        )
+        state.update_content(state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('DragAndDropSortInput')
-        state.update_interaction_customization_args(
-            state_customization_args_dict
-        )
+        state.update_interaction_customization_args(state_customization_args_dict)
         state.update_interaction_hints(state_hint_list)
         # Ruling out the possibility of None for mypy type checking.
         assert state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, state_solution_dict
-        )
+        solution = state_domain.Solution.from_dict(state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
         exp_services.save_new_exploration('owner_id', exploration)
 
-        interaction = interaction_registry.Registry.get_interaction_by_id(
-            'DragAndDropSortInput'
-        )
+        interaction = interaction_registry.Registry.get_interaction_by_id('DragAndDropSortInput')
         interaction.answer_type = 'DragAndDropHtmlString'
 
-        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41))
 
         def mock_get_html_field_types_to_rule_specs(
             unused_cls: Type[state_domain.State],
@@ -879,17 +734,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 Exception,
                 'The solution does not have a valid correct_answer type.',
             ):
-                state_domain.State.convert_html_fields_in_state(
-                    state.to_dict(), lambda x: x
-                )
+                state_domain.State.convert_html_fields_in_state(state.to_dict(), lambda x: x)
 
     def test_get_all_html_when_interaction_is_none(self) -> None:
         """Test the method for extracting all the HTML from a state
         when the state has no interaction.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_content_dict: state_domain.SubtitledHtmlDict = {
@@ -897,9 +748,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'html': '<p>state content html</p>',
         }
 
-        state.update_content(
-            state_domain.SubtitledHtml.from_dict(state_content_dict)
-        )
+        state.update_content(state_domain.SubtitledHtml.from_dict(state_content_dict))
 
         exp_services.save_new_exploration('owner_id', exploration)
         html_list = state.get_all_html_content_strings()
@@ -907,9 +756,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_export_state_to_dict(self) -> None:
         """Test exporting a state to a dict."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['New state'])
 
         state_dict = exploration.states['New state'].to_dict()
@@ -944,9 +791,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_training_data(self) -> None:
         """Test retrieval of training data."""
         exploration_id = 'eid'
-        test_exp_filepath = os.path.join(
-            feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml'
-        )
+        test_exp_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, 'classifier_demo_exploration.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list: List[Tuple[str, bytes]] = []
         exp_services.save_new_exploration_from_yaml_and_assets(
@@ -986,23 +831,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
-            )
-        ]
+        hints_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
         init_state.update_interaction_hints(hints_list)
 
-        self.assertEqual(
-            init_state.get_content_html('hint_1'), '<p>hint one</p>'
-        )
+        self.assertEqual(init_state.get_content_html('hint_1'), '<p>hint one</p>')
 
         hints_list[0].hint_content.html = '<p>Changed hint one</p>'
         init_state.update_interaction_hints(hints_list)
 
-        self.assertEqual(
-            init_state.get_content_html('hint_1'), '<p>Changed hint one</p>'
-        )
+        self.assertEqual(init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
 
     def test_rte_content_validation_for_android(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1014,30 +851,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': (
-                    '<oppia-noninteractive-collapsible content-with-value='
-                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
-                    'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
-                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
-                ),
+                'html': ('<oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;SubCollapsible&amp;quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'),
             },
         }
 
         # Ruling out the possibility of None for mypy type checking.
         assert init_state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict
-        )
+        solution = state_domain.Solution.from_dict(init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
         # Ruling out the possibility of None for mypy type checking.
         assert init_state.interaction.id is not None
-        init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution_dict
-            )
-        )
+        init_state.update_interaction_solution(state_domain.Solution.from_dict(init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
@@ -1045,10 +871,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.Hint(
                 state_domain.SubtitledHtml(
                     'hint_1',
-                    '<oppia-noninteractive-collapsible content-with-value='
-                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
-                    'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
-                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>',
+                    '<oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;SubCollapsible&amp;quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>',
                 )
             )
         )
@@ -1063,12 +886,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             None,
             state_domain.SubtitledHtml(
                 'default_outcome',
-                (
-                    '<oppia-noninteractive-collapsible content-with-value='
-                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
-                    'quot;" heading-with-value="&amp;quot;Sub&amp;quot;">'
-                    '</oppia-noninteractive-collapsible><p>&nbsp;</p>'
-                ),
+                ('<oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sub&amp;quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'),
             ),
             False,
             [],
@@ -1088,14 +906,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 None,
                 state_domain.SubtitledHtml(
                     'feedback_1',
-                    (
-                        '<oppia-noninteractive-tabs tab_contents-with-value'
-                        '="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
-                        '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
-                        'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
-                        'quot;:&amp;quot;hello&amp;quot;}]">'
-                        '</oppia-noninteractive-tabs>'
-                    ),
+                    ('<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;hello&amp;quot;}]"></oppia-noninteractive-tabs>'),
                 ),
                 False,
                 [],
@@ -1119,12 +930,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_interaction_answer_groups([state_answer_group])
         self.assertFalse(init_state.is_rte_content_supported_on_android())
-        state_answer_group.outcome.feedback.html = (
-            '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
-            '&amp;quot;" filepath-with-value="&amp;quot;startBlue.png&amp;'
-            'quot;" alt-with-value="&amp;quot;&amp;quot;">'
-            '</oppia-noninteractive-image></p>'
-        )
+        state_answer_group.outcome.feedback.html = '<p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue.png&amp;quot;" alt-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
         init_state.update_interaction_answer_groups([state_answer_group])
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
@@ -1132,14 +938,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(
                 {
                     'content_id': 'content_0',
-                    'html': (
-                        '<oppia-noninteractive-tabs tab_contents-with-value'
-                        '="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
-                        '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
-                        'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
-                        'quot;:&amp;quot;hello&amp;quot;}]">'
-                        '</oppia-noninteractive-tabs>'
-                    ),
+                    'html': ('<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;hello&amp;quot;}]"></oppia-noninteractive-tabs>'),
                 }
             )
         )
@@ -1148,12 +947,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(
                 {
                     'content_id': 'content_0',
-                    'html': (
-                        '<p><oppia-noninteractive-link text-with-value="'
-                        '&amp;quot;What is a link?&amp;quot;" url-with-'
-                        'value="&amp;quot;htt://link.com&amp'
-                        ';quot;"></oppia-noninteractive-link></p>'
-                    ),
+                    'html': ('<p><oppia-noninteractive-link text-with-value="&amp;quot;What is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com&amp;quot;"></oppia-noninteractive-link></p>'),
                 }
             )
         )
@@ -1162,11 +956,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(
                 {
                     'content_id': 'content_0',
-                    'html': (
-                        '<p><oppia-noninteractive-skillreview text-with-value="'
-                        '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
-                        '&amp;quot;"></oppia-noninteractive-skillreview></p>'
-                    ),
+                    'html': ('<p><oppia-noninteractive-skillreview text-with-value="&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-skillreview></p>'),
                 }
             )
         )
@@ -1175,50 +965,34 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_interaction_validation_for_android(self) -> None:
         _checked_interaction_ids = set()
 
-        def _create_init_state_for_interaction_verification() -> (
-            state_domain.State
-        ):
+        def _create_init_state_for_interaction_verification() -> state_domain.State:
             """Creates an init state for interaction verification."""
             exploration = exp_domain.Exploration.create_default_exploration('0')
-            state: state_domain.State = exploration.states[
-                exploration.init_state_name
-            ]
+            state: state_domain.State = exploration.states[exploration.init_state_name]
             return state
 
-        def _verify_interaction_supports_android(
-            self: StateDomainUnitTests, interaction_id: Optional[str]
-        ) -> None:
+        def _verify_interaction_supports_android(self: StateDomainUnitTests, interaction_id: Optional[str]) -> None:
             """Checks that the provided interaction is supported on Android."""
             init_state = _create_init_state_for_interaction_verification()
             init_state.update_interaction_id(interaction_id)
-            self.assertTrue(
-                init_state.interaction.is_supported_on_android_app()
-            )
+            self.assertTrue(init_state.interaction.is_supported_on_android_app())
             _checked_interaction_ids.add(interaction_id)
 
-        def _verify_interaction_does_not_support_android(
-            self: StateDomainUnitTests, interaction_id: str
-        ) -> None:
+        def _verify_interaction_does_not_support_android(self: StateDomainUnitTests, interaction_id: str) -> None:
             """Checks that the provided interaction is not supported on
             Android.
             """
             init_state = _create_init_state_for_interaction_verification()
             init_state.update_interaction_id(interaction_id)
-            self.assertFalse(
-                init_state.interaction.is_supported_on_android_app()
-            )
+            self.assertFalse(init_state.interaction.is_supported_on_android_app())
             _checked_interaction_ids.add(interaction_id)
 
         def _verify_all_interaction_ids_checked(
             self: StateDomainUnitTests,
         ) -> None:
             """Verifies that all the interaction ids are checked."""
-            all_interaction_ids = set(
-                interaction_registry.Registry.get_all_interaction_ids()
-            )
-            missing_interaction_ids = (
-                all_interaction_ids - _checked_interaction_ids
-            )
+            all_interaction_ids = set(interaction_registry.Registry.get_all_interaction_ids())
+            missing_interaction_ids = all_interaction_ids - _checked_interaction_ids
             self.assertFalse(missing_interaction_ids)
 
         _verify_interaction_supports_android(self, 'AlgebraicExpressionInput')
@@ -1250,28 +1024,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
-            )
-        ]
+        hints_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
         init_state.update_interaction_hints(hints_list)
 
-        self.assertEqual(
-            init_state.get_content_html('hint_1'), '<p>hint one</p>'
-        )
+        self.assertEqual(init_state.get_content_html('hint_1'), '<p>hint one</p>')
 
-        with self.assertRaisesRegex(
-            ValueError, 'Content ID Invalid id does not exist'
-        ):
+        with self.assertRaisesRegex(ValueError, 'Content ID Invalid id does not exist'):
             init_state.get_content_html('Invalid id')
 
     def test_state_operations(self) -> None:
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
+        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
         self.assertNotIn('invalid_state_name', exploration.states)
 
         self.assertEqual(len(exploration.states), 1)
@@ -1316,16 +1080,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(ValueError, 'Duplicate state name'):
             exploration.rename_state('State 2', 'END')
 
-        default_outcome = exploration.states[
-            'Renamed state'
-        ].interaction.default_outcome
+        default_outcome = exploration.states['Renamed state'].interaction.default_outcome
         assert default_outcome is not None
         # Ensure the other states are connected to END.
         default_outcome.dest = 'State 2'
 
-        default_outcome = exploration.states[
-            'State 2'
-        ].interaction.default_outcome
+        default_outcome = exploration.states['State 2'].interaction.default_outcome
         assert default_outcome is not None
         default_outcome.dest = 'END'
 
@@ -1335,9 +1095,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'TextInput',
             content_id_generator,
         )
-        self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput', content_id_generator
-        )
+        self.set_interaction_for_state(exploration.states['State 2'], 'TextInput', content_id_generator)
 
         # Other miscellaneous requirements for validation.
         exploration.title = 'Title'
@@ -1346,9 +1104,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         # The exploration should NOT be terminable even though it has a state
         # called 'END' and everything else is connected to it.
-        with self.assertRaisesRegex(
-            Exception, 'This state does not have any interaction specified.'
-        ):
+        with self.assertRaisesRegex(Exception, 'This state does not have any interaction specified.'):
             exploration.validate(strict=True)
 
         # Renaming the node to something other than 'END' and giving it an
@@ -1356,9 +1112,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # default outcome or answer groups.
         exploration.rename_state('END', 'AnotherEnd')
         another_end_state = exploration.states['AnotherEnd']
-        self.set_interaction_for_state(
-            another_end_state, 'EndExploration', content_id_generator
-        )
+        self.set_interaction_for_state(another_end_state, 'EndExploration', content_id_generator)
         another_end_state.update_interaction_default_outcome(None)
         exploration.validate(strict=True)
 
@@ -1381,11 +1135,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.interaction.id = 'TextInput'
 
         rg = state_domain.AnswerGroup(
-            rule_specs=[
-                state_domain.RuleSpec(
-                    rule_type='Equals', inputs={'x': 'not_a_dict'}
-                )
-            ],
+            rule_specs=[state_domain.RuleSpec(rule_type='Equals', inputs={'x': 'not_a_dict'})],
             outcome=state_domain.Outcome(
                 dest='Intro',
                 feedback=state_domain.SubtitledHtml('f', 'fc'),
@@ -1407,9 +1157,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_solicit_answer_details(self) -> None:
         """Test updating solicit_answer_details."""
-        state = state_domain.State.create_default_state(
-            'state_1', 'content_0', 'default_outcome_1'
-        )
+        state = state_domain.State.create_default_state('state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.solicit_answer_details, False)
         state.update_solicit_answer_details(True)
         self.assertEqual(state.solicit_answer_details, True)
@@ -1432,29 +1180,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_linked_skill_id(self) -> None:
         """Test updating linked_skill_id."""
-        state = state_domain.State.create_default_state(
-            'state_1', 'content_0', 'default_outcome_1'
-        )
+        state = state_domain.State.create_default_state('state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.linked_skill_id, None)
         state.update_linked_skill_id('string_2')
         self.assertEqual(state.linked_skill_id, 'string_2')
 
     def test_update_inapplicable_misconception_skill_ids(self) -> None:
         """Test updating inapplicable_skill_misconception_ids."""
-        state = state_domain.State.create_default_state(
-            'state_1', 'content_0', 'default_outcome_1'
-        )
+        state = state_domain.State.create_default_state('state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.inapplicable_skill_misconception_ids, [])
         state.update_inapplicable_skill_misconception_ids(['string_1'])
-        self.assertEqual(
-            state.inapplicable_skill_misconception_ids, ['string_1']
-        )
+        self.assertEqual(state.inapplicable_skill_misconception_ids, ['string_1'])
 
     def test_update_card_is_checkpoint(self) -> None:
         """Test update card_is_checkpoint."""
-        state = state_domain.State.create_default_state(
-            'state_1', 'content_0', 'default_outcome_1'
-        )
+        state = state_domain.State.create_default_state('state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.card_is_checkpoint, False)
         state.update_card_is_checkpoint(True)
         self.assertEqual(state.card_is_checkpoint, True)
@@ -1467,9 +1207,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
-        with self.assertRaisesRegex(
-            Exception, ('Expected card_is_checkpoint to be a boolean, received')
-        ):
+        with self.assertRaisesRegex(Exception, ('Expected card_is_checkpoint to be a boolean, received')):
             init_state.update_card_is_checkpoint('abc')  # type: ignore[arg-type]
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
@@ -1480,16 +1218,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for converting all the HTML in a state having
         DragAndDropSortInput interaction.
         """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        )
-        html_with_new_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
+        html_with_old_math_schema = '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        html_with_new_math_schema = '<p>Value</p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
 
         answer_group_dict_with_old_math_schema: state_domain.AnswerGroupDict = {
             'outcome': {
@@ -1593,13 +1323,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        ),
+                        'html': ('<p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this is test case to check image tag inside p tag</p>'),
                     },
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
@@ -1657,13 +1381,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        ),
+                        'html': ('<p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this is test case to check image tag inside p tag</p>'),
                     },
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
@@ -1732,19 +1450,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for converting all the HTML in a state having
         ItemSelection interaction.
         """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        )
-        html_with_new_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        answer_group_with_old_math_schema: List[
-            state_domain.AnswerGroupDict
-        ] = [
+        html_with_old_math_schema = '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        html_with_new_math_schema = '<p>Value</p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [
             {
                 'rule_specs': [
                     {
@@ -1860,13 +1568,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        ),
+                        'html': ('<p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this is test case to check image tag inside p tag</p>'),
                     },
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
@@ -1912,13 +1614,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        ),
+                        'html': ('<p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this is test case to check image tag inside p tag</p>'),
                     },
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
@@ -1955,9 +1651,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hints': [],
             },
         }
-        interaction_registry.Registry.get_all_specs_for_state_schema_version(
-            41
-        )['ItemSelectionInput']['can_have_solution'] = True
+        interaction_registry.Registry.get_all_specs_for_state_schema_version(41)['ItemSelectionInput']['can_have_solution'] = True
 
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -1974,16 +1668,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for converting all the HTML in a state having
         TextInput interaction.
         """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        )
-        html_with_new_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
+        html_with_old_math_schema = '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        html_with_new_math_schema = '<p>Value</p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
         answer_group_with_old_math_schema: state_domain.AnswerGroupDict = {
             'outcome': {
                 'dest': 'Introduction',
@@ -2156,13 +1842,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for converting the HTML in a state
         when the rule_spec has invalid html format.
         """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        )
-        answer_group_with_old_math_schema: List[
-            state_domain.AnswerGroupDict
-        ] = [
+        html_with_old_math_schema = '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [
             {
                 'rule_specs': [
                     {
@@ -2206,13 +1887,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        ),
+                        'html': ('<p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this is test case to check image tag inside p tag</p>'),
                     },
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
@@ -2238,11 +1913,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41))
         for html_type_dict in mock_html_field_types_to_rule_specs_dict.values():
             html_type_dict['format'] = 'invalid format'
 
@@ -2261,9 +1932,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
         ):
-            with self.assertRaisesRegex(
-                Exception, 'The rule spec does not belong to a valid format.'
-            ):
+            with self.assertRaisesRegex(Exception, 'The rule spec does not belong to a valid format.'):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.add_math_content_to_math_rte_components,
@@ -2276,13 +1945,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for converting the HTML in a state
         when the rule_spec has invalid input variable.
         """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        )
-        answer_group_with_old_math_schema: List[
-            state_domain.AnswerGroupDict
-        ] = [
+        html_with_old_math_schema = '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [
             {
                 'rule_specs': [
                     {
@@ -2326,13 +1990,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        ),
+                        'html': ('<p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this is test case to check image tag inside p tag</p>'),
                     },
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
@@ -2358,16 +2016,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41))
         for html_type_dict in mock_html_field_types_to_rule_specs_dict.values():
             if html_type_dict['interactionId'] == 'ItemSelectionInput':
-                html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = [
-                    'y'
-                ]
+                html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = ['y']
 
         def mock_get_html_field_types_to_rule_specs(
             unused_cls: Type[state_domain.State],
@@ -2381,8 +2033,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             with self.assertRaisesRegex(
                 Exception,
-                'Rule spec should have at least one valid input variable with '
-                'Html in it.',
+                'Rule spec should have at least one valid input variable with Html in it.',
             ):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
@@ -2395,10 +2046,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for converting the HTML in a state when the
         interaction solution has invalid answer type.
         """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        )
+        html_with_old_math_schema = '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
 
         old_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
@@ -2458,14 +2106,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
-            rules_registry.Registry.get_html_field_types_to_rule_specs(
-                state_schema_version=41
-            )
-        )
-        mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
-            mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString')
-        )
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(rules_registry.Registry.get_html_field_types_to_rule_specs(state_schema_version=41))
+        mock_html_field_types_to_rule_specs_dict['NormalizedString'] = mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString')
 
         def mock_get_html_field_types_to_rule_specs(
             unused_cls: Type[state_domain.State],
@@ -2492,16 +2134,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for converting all the HTML in a state having
         no interaction.
         """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
-        )
-        html_with_new_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
+        html_with_old_math_schema = '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        html_with_new_math_schema = '<p>Value</p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
 
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
@@ -2626,22 +2260,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_subtitled_html_validation_with_invalid_html_type(self) -> None:
         """Test validation of subtitled HTML with invalid html type."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>'
-        )
+        subtitled_html = state_domain.SubtitledHtml('content_id', '<p>some html</p>')
         subtitled_html.validate()
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid content HTML'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid content HTML'):
             with self.swap(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
     def test_subtitled_html_validation_with_invalid_content(self) -> None:
         """Test validation of subtitled HTML with invalid content."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>'
-        )
+        subtitled_html = state_domain.SubtitledHtml('content_id', '<p>some html</p>')
         subtitled_html.validate()
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -2652,22 +2280,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_subtitled_unicode_validation_with_invalid_html_type(self) -> None:
         """Test validation of subtitled unicode with invalid unicode type."""
-        subtitled_unicode = state_domain.SubtitledUnicode(
-            'content_id', 'some string'
-        )
+        subtitled_unicode = state_domain.SubtitledUnicode('content_id', 'some string')
         subtitled_unicode.validate()
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid content unicode'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid content unicode'):
             with self.swap(subtitled_unicode, 'unicode_str', 20):
                 subtitled_unicode.validate()
 
     def test_subtitled_unicode_validation_with_invalid_content(self) -> None:
         """Test validation of subtitled unicode with invalid content."""
-        subtitled_unicode = state_domain.SubtitledUnicode(
-            'content_id', 'some html string'
-        )
+        subtitled_unicode = state_domain.SubtitledUnicode('content_id', 'some html string')
         subtitled_unicode.validate()
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -2681,55 +2303,38 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         audio_voiceover = state_domain.Voiceover('a.mp3', 20, True, 24.5)
         audio_voiceover.validate()
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected audio filename to be a string'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Expected audio filename to be a string'):
             with self.swap(audio_voiceover, 'filename', 20):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid audio filename'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid audio filename'):
             with self.swap(audio_voiceover, 'filename', '.invalidext'):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid audio filename'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid audio filename'):
             with self.swap(audio_voiceover, 'filename', 'justanextension'):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid audio filename'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid audio filename'):
             with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
                 audio_voiceover.validate()
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected file size to be an int'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Expected file size to be an int'):
             with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid file size'):
             with self.swap(audio_voiceover, 'file_size_bytes', -3):
                 audio_voiceover.validate()
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected needs_update to be a bool'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Expected needs_update to be a bool'):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected duration_secs to be a float'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Expected duration_secs to be a float'):
             with self.swap(audio_voiceover, 'duration_secs', 'test'):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected duration_secs to be a float'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Expected duration_secs to be a float'):
             with self.swap(audio_voiceover, 'duration_secs', '10'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected duration_secs to be positive number, '
-            'or zero if not yet specified',
+            'Expected duration_secs to be positive number, or zero if not yet specified',
         ):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
@@ -2737,24 +2342,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_hints_validation(self) -> None:
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
+        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator
-        )
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
+        self.set_interaction_for_state(init_state, 'TextInput', content_id_generator)
+        exploration.next_content_id_index = content_id_generator.next_content_id_index
         exploration.validate()
 
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
-            )
-        ]
+        hints_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
         init_state.update_interaction_hints(hints_list)
 
         solution_dict: state_domain.SolutionDict = {
@@ -2768,28 +2363,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert init_state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict
-        )
+        solution = state_domain.Solution.from_dict(init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
         exploration.validate()
 
-        hints_list.append(
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_2', '<p>new hint</p>')
-            )
-        )
+        hints_list.append(state_domain.Hint(state_domain.SubtitledHtml('hint_2', '<p>new hint</p>')))
         init_state.update_interaction_hints(hints_list)
 
-        self.assertEqual(
-            init_state.interaction.hints[1].hint_content.html, '<p>new hint</p>'
-        )
+        self.assertEqual(init_state.interaction.hints[1].hint_content.html, '<p>new hint</p>')
 
-        hints_list.append(
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_3', '<p>hint three</p>')
-            )
-        )
+        hints_list.append(state_domain.Hint(state_domain.SubtitledHtml('hint_3', '<p>hint three</p>')))
         init_state.update_interaction_hints(hints_list)
 
         del hints_list[1]
@@ -2805,13 +2388,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         customization args with non-unique content ids.
         """
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
+        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(
-            init_state, 'MultipleChoiceInput', content_id_generator
-        )
+        self.set_interaction_for_state(init_state, 'MultipleChoiceInput', content_id_generator)
         choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
             {'content_id': 'non-unique-content-id', 'html': '1'},
             {'content_id': 'non-unique-content-id', 'html': '2'},
@@ -2830,22 +2409,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_solution_validation(self) -> None:
         """Test validation of state solution."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
+        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator
-        )
+        self.set_interaction_for_state(init_state, 'TextInput', content_id_generator)
         exploration.validate()
 
         # Solution should be set to None as default.
         self.assertEqual(init_state.interaction.solution, None)
 
-        hints_list = [
-            state_domain.Hint(state_domain.SubtitledHtml('hint_1', ''))
-        ]
+        hints_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', ''))]
         init_state.update_interaction_hints(hints_list)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2867,9 +2440,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             AssertionError,
             re.escape('Expected unicode string, received [0, 0]'),
         ):
-            init_state.interaction.solution = state_domain.Solution.from_dict(
-                init_state.interaction.id, solution_dict
-            )
+            init_state.interaction.solution = state_domain.Solution.from_dict(init_state.interaction.id, solution_dict)
 
         solution_dict = {
             'answer_is_exclusive': False,
@@ -2879,19 +2450,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>',
             },
         }
-        init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution_dict
-            )
-        )
+        init_state.update_interaction_solution(state_domain.Solution.from_dict(init_state.interaction.id, solution_dict))
         exploration.validate()
 
     def test_validate_state_solicit_answer_details(self) -> None:
         """Test validation of solicit_answer_details."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
+        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(
@@ -2901,24 +2466,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
-        self.set_interaction_for_state(
-            init_state, 'Continue', content_id_generator
-        )
+        self.set_interaction_for_state(init_state, 'Continue', content_id_generator)
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The Continue interaction does not '
-            'support soliciting answer details from learners.',
+            'The Continue interaction does not support soliciting answer details from learners.',
         ):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
-        self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator
-        )
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
+        self.set_interaction_for_state(init_state, 'TextInput', content_id_generator)
+        exploration.next_content_id_index = content_id_generator.next_content_id_index
         self.assertEqual(init_state.interaction.id, 'TextInput')
         self.assertEqual(init_state.solicit_answer_details, False)
         exploration.validate()
@@ -2948,12 +2506,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected '
-            'inapplicable_skill_misconception_ids to be a list, received 12.',
+            'Expected inapplicable_skill_misconception_ids to be a list, received 12.',
         ):
-            with self.swap(
-                init_state, 'inapplicable_skill_misconception_ids', 12
-            ):
+            with self.swap(init_state, 'inapplicable_skill_misconception_ids', 12):
                 exploration.validate()
         self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
 
@@ -2984,14 +2539,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>',
             },
         }
-        hints_list = [
-            state_domain.Hint(state_domain.SubtitledHtml('hint_1', ''))
-        ]
+        hints_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', ''))]
         # Ruling out the possibility of None for mypy type checking.
         assert exploration.init_state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            exploration.init_state.interaction.id, solution_dict
-        )
+        solution = state_domain.Solution.from_dict(exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
@@ -3007,13 +2558,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>',
             },
         }
-        solution = state_domain.Solution.from_dict(
-            exploration.init_state.interaction.id, solution_dict
-        )
+        solution = state_domain.Solution.from_dict(exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_solution(solution)
-        with self.assertRaisesRegex(
-            Exception, 'Expected answer_is_exclusive to be bool, received 1'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3023,9 +2570,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         exploration.init_state.param_changes = 0  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(
-            Exception, 'Expected state param_changes to be a list, received 0'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected state param_changes to be a list, received 0'):
             exploration.init_state.validate({}, True)
 
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(
@@ -3037,14 +2582,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
         with contextlib.ExitStack() as stack:
-            captured_logs = stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR)
-            )
-            stack.enter_context(
-                self.assertRaisesRegex(
-                    Exception, 'string indices must be integers'
-                )
-            )
+            captured_logs = stack.enter_context(self.capture_logging(min_level=logging.ERROR))
+            stack.enter_context(self.assertRaisesRegex(Exception, 'string indices must be integers'))
 
             exploration.init_state.convert_state_dict_to_yaml(
                 'invalid_state_dict',
@@ -3058,13 +2597,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>'
-                )
-            )
-        ]
+        hints_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>Hello, this is html1 for state2</p>'))]
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
@@ -3075,17 +2608,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         # Ruling out the possibility of None for mypy type checking.
         assert exploration.init_state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            exploration.init_state.interaction.id, solution_dict
-        )
+        solution = state_domain.Solution.from_dict(exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
 
         # Ruling out the possibility of None for mypy type checking.
         assert exploration.init_state.interaction.solution is not None
-        self.assertEqual(
-            exploration.init_state.interaction.solution.to_dict(), solution_dict
-        )
+        self.assertEqual(exploration.init_state.interaction.solution.to_dict(), solution_dict)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
@@ -3098,13 +2627,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_interaction_solution_with_no_solution(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>'
-                )
-            )
-        ]
+        hints_list = [state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>Hello, this is html1 for state2</p>'))]
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(None)
@@ -3117,9 +2640,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_interaction_hints_with_non_list_hints(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with self.assertRaisesRegex(
-            Exception, 'Expected hints_list to be a list'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected hints_list to be a list'):
             exploration.init_state.update_interaction_hints({})  # type: ignore[arg-type]
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -3130,9 +2651,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with self.assertRaisesRegex(
-            Exception, 'Expected confirmed_unclassified_answers to be a list'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected confirmed_unclassified_answers to be a list'):
             (
                 exploration.init_state.update_interaction_confirmed_unclassified_answers(
                     {}  # type: ignore[arg-type]
@@ -3161,11 +2680,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
         )
 
-        (
-            exploration.init_state.update_interaction_confirmed_unclassified_answers(
-                [state_answer_group]
-            )
-        )
+        (exploration.init_state.update_interaction_confirmed_unclassified_answers([state_answer_group]))
 
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
@@ -3178,9 +2693,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_non_list_interaction_answer_groups(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with self.assertRaisesRegex(
-            Exception, 'Expected interaction_answer_groups to be a list'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected interaction_answer_groups to be a list'):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups'  # type: ignore[arg-type]
             )
@@ -3212,9 +2725,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception,
             re.escape('Expected rule_inputs to be a dict, received []'),
         ):
-            exploration.init_state.update_interaction_answer_groups(
-                [state_answer_group]
-            )
+            exploration.init_state.update_interaction_answer_groups([state_answer_group])
 
     def test_cannot_update_answer_groups_with_non_list_rule_specs(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -3237,12 +2748,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         state_answer_group.rule_specs = {}  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(
-            Exception, 'Expected answer group rule specs to be a list'
-        ):
-            exploration.init_state.update_interaction_answer_groups(
-                [state_answer_group]
-            )
+        with self.assertRaisesRegex(Exception, 'Expected answer group rule specs to be a list'):
+            exploration.init_state.update_interaction_answer_groups([state_answer_group])
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -3274,14 +2781,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            re.escape(
-                'Value has the wrong type. It should be a TranslatableSetOf'
-                'NormalizedString. The value is'
-            ),
+            re.escape('Value has the wrong type. It should be a TranslatableSetOfNormalizedString. The value is'),
         ):
-            exploration.init_state.update_interaction_answer_groups(
-                [state_answer_group]
-            )
+            exploration.init_state.update_interaction_answer_groups([state_answer_group])
 
     def test_validate_rule_spec(self) -> None:
         observed_log_messages: List[str] = []
@@ -3317,23 +2819,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None,
         )
-        exploration.init_state.update_interaction_answer_groups(
-            [state_answer_group]
-        )
+        exploration.init_state.update_interaction_answer_groups([state_answer_group])
 
         with logging_swap, self.assertRaisesRegex(KeyError, '\'x\''):
-            (
-                exploration.init_state.interaction.answer_groups[0]
-                .rule_specs[0]
-                .validate([], {})
-            )
+            (exploration.init_state.interaction.answer_groups[0].rule_specs[0].validate([], {}))
 
         self.assertEqual(
             observed_log_messages,
-            [
-                'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: {\'x\'}'
-            ],
+            ['RuleSpec \'Contains\' has inputs which are not recognized parameter names: {\'x\'}'],
         )
 
 
@@ -3343,9 +2836,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
     def test_traverse_by_schema_and_convert(self) -> None:
         html: List[str] = []
 
-        def extract_html(
-            value: state_domain.SubtitledHtml, unused_schema_obj_type: str
-        ) -> List[str]:
+        def extract_html(value: state_domain.SubtitledHtml, unused_schema_obj_type: str) -> List[str]:
             """Extracts html from SubtitledHtml values.
 
             Args:
@@ -3377,9 +2868,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
         }
         value = {'content': state_domain.SubtitledHtml('id', '<p>testing</p>')}
 
-        state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(
-            schema, value, extract_html
-        )
+        state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(schema, value, extract_html)
 
         self.assertEqual(html, ['<p>testing</p>'])
 
@@ -3400,13 +2889,11 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
         }
         value = {'content': state_domain.SubtitledHtml('id', '<p>testing</p>')}
 
-        html = (
-            state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
-                schema,
-                value,
-                [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-                lambda x: x.html,
-            )
+        html = state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
+            schema,
+            value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            lambda x: x.html,
         )
 
         self.assertEqual(html, ['<p>testing</p>'])
@@ -3420,18 +2907,12 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'id',
             'unicode_str': '',
         }
-        subtitled_unicode = state_domain.SubtitledUnicode.from_dict(
-            subtitled_unicode_dict
-        )
+        subtitled_unicode = state_domain.SubtitledUnicode.from_dict(subtitled_unicode_dict)
         self.assertEqual(subtitled_unicode.to_dict(), subtitled_unicode_dict)
 
     def test_create_default(self) -> None:
-        subtitled_unicode = (
-            state_domain.SubtitledUnicode.create_default_subtitled_unicode('id')
-        )
-        self.assertEqual(
-            subtitled_unicode.to_dict(), {'content_id': 'id', 'unicode_str': ''}
-        )
+        subtitled_unicode = state_domain.SubtitledUnicode.create_default_subtitled_unicode('id')
+        self.assertEqual(subtitled_unicode.to_dict(), {'content_id': 'id', 'unicode_str': ''})
 
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
@@ -3471,22 +2952,14 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
-        self.assertEqual(
-            recorded_voiceovers.to_dict(), recorded_voiceovers_dict
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
+        self.assertEqual(recorded_voiceovers.to_dict(), recorded_voiceovers_dict)
 
     def test_get_content_ids_for_voiceovers_return_correct_list_of_content_id(
         self,
     ) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
-        self.assertEqual(
-            recorded_voiceovers.get_content_ids_for_voiceovers(), []
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({'voiceovers_mapping': {}})
+        self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), [])
 
         recorded_voiceovers.add_content_id_for_voiceover('feedback_1')
         recorded_voiceovers.add_content_id_for_voiceover('feedback_2')
@@ -3496,23 +2969,15 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_add_content_id_for_voiceovers_adds_content_id(self) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({'voiceovers_mapping': {}})
 
-        self.assertEqual(
-            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0
-        )
+        self.assertEqual(len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0)
 
         new_content_id = 'content_id'
         recorded_voiceovers.add_content_id_for_voiceover(new_content_id)
 
-        self.assertEqual(
-            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 1
-        )
-        self.assertEqual(
-            recorded_voiceovers.get_content_ids_for_voiceovers(), ['content_id']
-        )
+        self.assertEqual(len(recorded_voiceovers.get_content_ids_for_voiceovers()), 1)
+        self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), ['content_id'])
 
     def test_should_be_able_to_strip_voiceovers(self) -> None:
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
@@ -3528,9 +2993,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
 
         recorded_voiceovers.strip_all_existing_voiceovers()
         self.assertEqual(recorded_voiceovers.voiceovers_mapping['content'], {})
@@ -3541,13 +3004,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     def test_add_content_id_for_voiceover_with_invalid_content_id_raise_error(
         self,
     ) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({'voiceovers_mapping': {}})
         invalid_content_id = 123
-        with self.assertRaisesRegex(
-            Exception, 'Expected content_id to be a string, received 123'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected content_id to be a string, received 123'):
             recorded_voiceovers.add_content_id_for_voiceover(
                 invalid_content_id  # type: ignore[arg-type]
             )
@@ -3568,16 +3027,10 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
         existing_content_id = 'feedback_1'
-        with self.assertRaisesRegex(
-            Exception, 'The content_id feedback_1 already exist.'
-        ):
-            recorded_voiceovers.add_content_id_for_voiceover(
-                existing_content_id
-            )
+        with self.assertRaisesRegex(Exception, 'The content_id feedback_1 already exist.'):
+            recorded_voiceovers.add_content_id_for_voiceover(existing_content_id)
 
     def test_delete_content_id_for_voiceovers_deletes_content_id(self) -> None:
         old_recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
@@ -3593,35 +3046,21 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            old_recorded_voiceovers_dict
-        )
-        self.assertEqual(
-            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 1
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(old_recorded_voiceovers_dict)
+        self.assertEqual(len(recorded_voiceovers.get_content_ids_for_voiceovers()), 1)
 
         recorded_voiceovers.delete_content_id_for_voiceover('content')
 
-        self.assertEqual(
-            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0
-        )
+        self.assertEqual(len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0)
 
     def test_delete_content_id_for_voiceover_with_nonexisting_content_id_raise_error(  # pylint: disable=line-too-long
         self,
     ) -> None:
-        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
-            'voiceovers_mapping': {'content': {}}
-        }
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {'voiceovers_mapping': {'content': {}}}
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
         nonexisting_content_id_to_delete = 'feedback_1'
-        with self.assertRaisesRegex(
-            Exception, 'The content_id feedback_1 does not exist.'
-        ):
-            recorded_voiceovers.delete_content_id_for_voiceover(
-                nonexisting_content_id_to_delete
-            )
+        with self.assertRaisesRegex(Exception, 'The content_id feedback_1 does not exist.'):
+            recorded_voiceovers.delete_content_id_for_voiceover(nonexisting_content_id_to_delete)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -3629,13 +3068,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_content_id_for_voiceover_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
         self,
     ) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({'voiceovers_mapping': {}})
         invalid_content_id_to_delete = 123
-        with self.assertRaisesRegex(
-            Exception, 'Expected content_id to be a string, '
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected content_id to be a string, '):
             recorded_voiceovers.delete_content_id_for_voiceover(
                 invalid_content_id_to_delete  # type: ignore[arg-type]
             )
@@ -3648,16 +3083,12 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             'voiceovers_mapping': {123: {}}  # type: ignore[dict-item]
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(
-            Exception, 'Expected content_id to be a string, '
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected content_id to be a string, '):
             recorded_voiceovers.validate([123])  # type: ignore[list-item]
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3693,13 +3124,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
 
-        with self.assertRaisesRegex(
-            Exception, 'Expected language_code to be a string, '
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected language_code to be a string, '):
             recorded_voiceovers.validate(['content'])
 
     def test_validation_with_unknown_language_code_raise_error(self) -> None:
@@ -3716,9 +3143,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
 
         with self.assertRaisesRegex(Exception, 'Invalid language_code: ed'):
             recorded_voiceovers.validate(['content'])
@@ -3737,16 +3162,11 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            recorded_voiceovers_dict
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict)
 
         with self.assertRaisesRegex(
             Exception,
-            re.escape(
-                'Expected state recorded_voiceovers to match the listed '
-                'content ids [\'invalid_content\']'
-            ),
+            re.escape('Expected state recorded_voiceovers to match the listed content ids [\'invalid_content\']'),
         ):
             recorded_voiceovers.validate(['invalid_content'])
 
@@ -3762,9 +3182,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_non_str_filename(self) -> None:
         self.voiceover.validate()
         self.voiceover.filename = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            Exception, 'Expected audio filename to be a string'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected audio filename to be a string'):
             self.voiceover.validate()
 
     def test_validate_filename(self) -> None:
@@ -3778,10 +3196,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         self.voiceover.filename = 'filename.png'
         with self.assertRaisesRegex(
             Exception,
-            re.escape(
-                'Invalid audio filename: it should have one of the following '
-                'extensions: %s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
-            ),
+            re.escape('Invalid audio filename: it should have one of the following extensions: %s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())),
         ):
             self.voiceover.validate()
 
@@ -3791,9 +3206,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_non_int_file_size_bytes(self) -> None:
         self.voiceover.validate()
         self.voiceover.file_size_bytes = 'file_size_bytes'  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            Exception, 'Expected file size to be an int'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected file size to be an int'):
             self.voiceover.validate()
 
     def test_validate_negative_file_size_bytes(self) -> None:
@@ -3808,9 +3221,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_non_bool_needs_update(self) -> None:
         self.voiceover.validate()
         self.voiceover.needs_update = 'needs_update'  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            Exception, 'Expected needs_update to be a bool'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected needs_update to be a bool'):
             self.voiceover.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3819,9 +3230,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_str_duration_secs(self) -> None:
         self.voiceover.validate()
         self.voiceover.duration_secs = 'duration_secs'  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            Exception, 'Expected duration_secs to be a float'
-        ):
+        with self.assertRaisesRegex(Exception, 'Expected duration_secs to be a float'):
             self.voiceover.validate()
 
     def test_validate_int_duration_secs(self) -> None:
@@ -3841,8 +3250,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         self.voiceover.duration_secs = -1.45
         with self.assertRaisesRegex(
             Exception,
-            'Expected duration_secs to be positive number, '
-            'or zero if not yet specified',
+            'Expected duration_secs to be positive number, or zero if not yet specified',
         ):
             self.voiceover.validate()
 
@@ -3854,9 +3262,7 @@ class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
             'state_name_in_previous_version': 'state 1',
             'committer_id': 'user_1',
         }
-        actual_dict = state_domain.StateVersionHistory(
-            1, 'state 1', 'user_1'
-        ).to_dict()
+        actual_dict = state_domain.StateVersionHistory(1, 'state 1', 'user_1').to_dict()
 
         self.assertEqual(expected_dict, actual_dict)
 
@@ -3866,9 +3272,7 @@ class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
             'state_name_in_previous_version': 'state 1',
             'committer_id': 'user_1',
         }
-        state_version_history = state_domain.StateVersionHistory.from_dict(
-            state_version_history_dict
-        )
+        state_version_history = state_domain.StateVersionHistory.from_dict(state_version_history_dict)
 
         self.assertEqual(
             state_version_history.previously_edited_in_version,
@@ -3878,6 +3282,4 @@ class StateVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
             state_version_history.state_name_in_previous_version,
             state_version_history_dict['state_name_in_previous_version'],
         )
-        self.assertEqual(
-            state_version_history.to_dict(), state_version_history_dict
-        )
+        self.assertEqual(state_version_history.to_dict(), state_version_history_dict)

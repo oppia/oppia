@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import inspect
 
-from extensions.visualizations import models
-
 from typing import Dict, List, Type
+
+from extensions.visualizations import models
 
 
 class Registry:
@@ -37,22 +37,16 @@ class Registry:
         cls.visualizations_dict.clear()
 
         # Add new visualization instances to the registry.
-        for name, clazz in inspect.getmembers(
-            models, predicate=inspect.isclass
-        ):
+        for name, clazz in inspect.getmembers(models, predicate=inspect.isclass):
             if name.endswith('_test') or name == 'BaseVisualization':
                 continue
 
-            ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)
-            ]
+            ancestor_names = [base_class.__name__ for base_class in inspect.getmro(clazz)]
             if 'BaseVisualization' in ancestor_names:
                 cls.visualizations_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_visualization_class(
-        cls, visualization_id: str
-    ) -> Type[models.BaseVisualization]:
+    def get_visualization_class(cls, visualization_id: str) -> Type[models.BaseVisualization]:
         """Gets a visualization class by its id (which is also its class name).
 
         The registry will refresh if the desired class is not found. If it's
@@ -61,9 +55,7 @@ class Registry:
         if visualization_id not in cls.visualizations_dict:
             cls._refresh_registry()
         if visualization_id not in cls.visualizations_dict:
-            raise TypeError(
-                '\'%s\' is not a valid visualization id.' % visualization_id
-            )
+            raise TypeError('\'%s\' is not a valid visualization id.' % visualization_id)
         return cls.visualizations_dict[visualization_id]
 
     @classmethod

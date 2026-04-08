@@ -20,11 +20,11 @@ import builtins
 import os
 import sys
 
+import setuptools
+
 from core import feconf
 from core.tests import test_utils
 from scripts import common
-
-import setuptools
 
 
 class SetupTests(test_utils.GenericTestBase):
@@ -78,11 +78,7 @@ class SetupTests(test_utils.GenericTestBase):
             ],
         )
 
-        dummy_path = [
-            path
-            for path in sys.path
-            if common.GOOGLE_CLOUD_SDK_HOME not in path
-        ]
+        dummy_path = [path for path in sys.path if common.GOOGLE_CLOUD_SDK_HOME not in path]
 
         swap_path = self.swap(sys, 'path', dummy_path)
 

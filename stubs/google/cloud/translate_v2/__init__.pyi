@@ -1,5 +1,5 @@
-from typing import Dict, List, Optional, Union
 from google import auth
+from typing import Dict, List, Optional, Union
 
 class Client(object):
     def __init__(

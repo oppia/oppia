@@ -23,12 +23,12 @@ should therefore be independent of the specific storage models used.
 
 from __future__ import annotations
 
+from typing import List, Optional
+
 from core import feconf, utils
 from core.constants import constants
 from core.domain import rights_domain
 from core.platform import models  # pylint: disable=invalid-import-from
-
-from typing import List, Optional
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -112,78 +112,42 @@ class ExplorationRights(rights_domain.ActivityRights):
                 has owners, editors, voice artists or viewers specified.
         """
         if not isinstance(self.community_owned, bool):
-            raise utils.ValidationError(
-                'Expected community_owned to be bool, received %s'
-                % (self.community_owned)
-            )
+            raise utils.ValidationError('Expected community_owned to be bool, received %s' % (self.community_owned))
 
         if not isinstance(self.owner_ids, list):
-            raise utils.ValidationError(
-                'Expected owner_ids to be list, received %s' % self.owner_ids
-            )
+            raise utils.ValidationError('Expected owner_ids to be list, received %s' % self.owner_ids)
         for owner_id in self.owner_ids:
             if not isinstance(owner_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in owner_ids to '
-                    'be string, received %s' % owner_id
-                )
+                raise utils.ValidationError('Expected each id in owner_ids to be string, received %s' % owner_id)
 
         if not isinstance(self.editor_ids, list):
-            raise utils.ValidationError(
-                'Expected editor_ids to be list, received %s' % self.editor_ids
-            )
+            raise utils.ValidationError('Expected editor_ids to be list, received %s' % self.editor_ids)
         for editor_id in self.editor_ids:
             if not isinstance(editor_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in editor_ids to '
-                    'be string, received %s' % editor_id
-                )
+                raise utils.ValidationError('Expected each id in editor_ids to be string, received %s' % editor_id)
 
         if not isinstance(self.voice_artist_ids, list):
-            raise utils.ValidationError(
-                'Expected voice_artist_ids to be list, received %s'
-                % (self.voice_artist_ids)
-            )
+            raise utils.ValidationError('Expected voice_artist_ids to be list, received %s' % (self.voice_artist_ids))
         for voice_artist_id in self.voice_artist_ids:
             if not isinstance(voice_artist_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in voice_artist_ids to '
-                    'be string, received %s' % voice_artist_id
-                )
+                raise utils.ValidationError('Expected each id in voice_artist_ids to be string, received %s' % voice_artist_id)
 
         if not isinstance(self.viewer_ids, list):
-            raise utils.ValidationError(
-                'Expected viewer_ids to be list, received %s' % self.viewer_ids
-            )
+            raise utils.ValidationError('Expected viewer_ids to be list, received %s' % self.viewer_ids)
         for viewer_id in self.viewer_ids:
             if not isinstance(viewer_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in viewer_ids to '
-                    'be string, received %s' % viewer_id
-                )
+                raise utils.ValidationError('Expected each id in viewer_ids to be string, received %s' % viewer_id)
 
         if not isinstance(self.viewable_if_private, bool):
-            raise utils.ValidationError(
-                'Expected viewable_if_private to '
-                'be boolean, received %s' % self.viewable_if_private
-            )
+            raise utils.ValidationError('Expected viewable_if_private to be boolean, received %s' % self.viewable_if_private)
 
         if self.status not in (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC):
-            raise utils.ValidationError(
-                'Expected status to be either "%s" or "%s", received "%s"'
-                % (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, self.status)
-            )
+            raise utils.ValidationError('Expected status to be either "%s" or "%s", received "%s"' % (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, self.status))
 
         if self.first_published_msec is not None:
             if not isinstance(self.first_published_msec, float):
-                raise utils.ValidationError(
-                    f'Expected first_published_msec to be a float, '
-                    f'received {self.first_published_msec}'
-                )
+                raise utils.ValidationError(f'Expected first_published_msec to be a float, received {self.first_published_msec}')
             if self.first_published_msec < 0:
-                raise utils.ValidationError(
-                    f'Expected first_published_msec to be non-negative, '
-                    f'received {self.first_published_msec}'
-                )
+                raise utils.ValidationError(f'Expected first_published_msec to be non-negative, received {self.first_published_msec}')
 
         super().validate()

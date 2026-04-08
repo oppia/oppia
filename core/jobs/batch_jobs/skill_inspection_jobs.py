@@ -22,13 +22,13 @@ called a hanging prerequisite.
 
 from __future__ import annotations
 
+import apache_beam as beam
+from typing import Dict, Iterable, List, Optional, Tuple
+
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
-from typing import Dict, Iterable, List, Optional, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -48,56 +48,20 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             PCollection. A PCollection of hanging prerequisite
             skills discovered during the validation.
         """
-        skill_models_pcoll = (
-            self.pipeline
-            | 'Get all SkillModels'
-            >> ndb_io.GetModels(
-                skill_models.SkillModel.get_all(include_deleted=False)
+        skill_models_pcoll = self.pipeline | 'Get all SkillModels' >> ndb_io.GetModels(skill_models.SkillModel.get_all(include_deleted=False))
+
+        all_skill_ids = skill_models_pcoll | 'Extract skill model ids' >> beam.Map(lambda skill_model: skill_model.id)
+
+        skills_description_map = skill_models_pcoll | 'Create skill ID to description mapping' >> beam.Map(lambda skill_model: (skill_model.id, skill_model.description))
+
+        skills_with_superseding_skills = skill_models_pcoll | 'Extract skill models with superseding IDs' >> beam.Map(
+            lambda skill_model: (
+                skill_model.id,
+                (skill_model.superseding_skill_id if hasattr(skill_model, 'superseding_skill_id') else None),
             )
         )
 
-        all_skill_ids = (
-            skill_models_pcoll
-            | 'Extract skill model ids'
-            >> beam.Map(lambda skill_model: skill_model.id)
-        )
-
-        skills_description_map = (
-            skill_models_pcoll
-            | 'Create skill ID to description mapping'
-            >> beam.Map(
-                lambda skill_model: (skill_model.id, skill_model.description)
-            )
-        )
-
-        skills_with_superseding_skills = (
-            skill_models_pcoll
-            | 'Extract skill models with superseding IDs'
-            >> beam.Map(
-                lambda skill_model: (
-                    skill_model.id,
-                    (
-                        skill_model.superseding_skill_id
-                        if hasattr(skill_model, 'superseding_skill_id')
-                        else None
-                    ),
-                )
-            )
-        )
-
-        prerequisite_skill_ids = (
-            skill_models_pcoll
-            | 'Extract prerequisite skill ids'
-            >> beam.FlatMap(
-                lambda skill_model: (
-                    skill_model.prerequisite_skill_ids
-                    if skill_model.prerequisite_skill_ids
-                    else []
-                )
-            )
-            | 'Remove duplicate prerequisites'
-            >> beam.Filter(lambda x, seen=set(): not (x in seen or seen.add(x)))
-        )
+        prerequisite_skill_ids = skill_models_pcoll | 'Extract prerequisite skill ids' >> beam.FlatMap(lambda skill_model: (skill_model.prerequisite_skill_ids if skill_model.prerequisite_skill_ids else [])) | 'Remove duplicate prerequisites' >> beam.Filter(lambda x, seen=set(): not (x in seen or seen.add(x)))
 
         hanging_prerequisites = (
             prerequisite_skill_ids

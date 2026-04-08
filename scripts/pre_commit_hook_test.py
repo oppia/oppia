@@ -23,9 +23,9 @@ import os
 import shutil
 import subprocess
 
-from core.tests import test_utils
-
 from typing import List, Tuple
+
+from core.tests import test_utils
 
 from . import pre_commit_hook
 
@@ -93,9 +93,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(ValueError, 'Error'):
                 pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertFalse(
-            'pre-commit hook file is now executable!' in self.print_arr
-        )
+        self.assertFalse('pre-commit hook file is now executable!' in self.print_arr)
 
     def test_install_hook_with_creation_of_symlink(self) -> None:
         check_function_calls = {'symlink_is_called': False}
@@ -132,12 +130,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         ):
             pre_commit_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
-        self.assertTrue(
-            'Created symlink in .git/hooks directory' in self.print_arr
-        )
-        self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr
-        )
+        self.assertTrue('Created symlink in .git/hooks directory' in self.print_arr)
+        self.assertTrue('pre-commit hook file is now executable!' in self.print_arr)
 
     def test_install_hook_with_error_in_creation_of_symlink(self) -> None:
         check_function_calls = {
@@ -182,9 +176,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 pre_commit_hook.install_hook()
         self.assertEqual(check_function_calls, expected_check_function_calls)
         self.assertTrue('Copied file to .git/hooks directory' in self.print_arr)
-        self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr
-        )
+        self.assertTrue('pre-commit hook file is now executable!' in self.print_arr)
 
     def test_install_hook_with_broken_symlink(self) -> None:
         check_function_calls = {
@@ -225,14 +217,10 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         self.assertTrue(check_function_calls['unlink_is_called'])
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue('Removing broken symlink' in self.print_arr)
-        self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr
-        )
+        self.assertTrue('pre-commit hook file is now executable!' in self.print_arr)
 
     def test_start_subprocess_for_result(self) -> None:
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         def mock_popen(  # pylint: disable=unused-argument
             unused_cmd_tokens: List[str],
@@ -258,9 +246,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             'start_subprocess_for_result',
             mock_start_subprocess_for_result,
         ):
-            self.assertTrue(
-                pre_commit_hook.does_diff_include_package_lock_file()
-            )
+            self.assertTrue(pre_commit_hook.does_diff_include_package_lock_file())
 
     def test_does_diff_include_package_lock_file_with_no_package_lock_in_diff(
         self,
@@ -275,9 +261,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             'start_subprocess_for_result',
             mock_start_subprocess_for_result,
         ):
-            self.assertFalse(
-                pre_commit_hook.does_diff_include_package_lock_file()
-            )
+            self.assertFalse(pre_commit_hook.does_diff_include_package_lock_file())
 
     def test_does_diff_include_package_lock_file_with_error(self) -> None:
         def mock_start_subprocess_for_result(
@@ -298,21 +282,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return True
 
         with self.swap(os.path, 'isfile', mock_isfile):
-            self.assertTrue(
-                pre_commit_hook.does_current_folder_contain_have_package_lock_file()
-            )
+            self.assertTrue(pre_commit_hook.does_current_folder_contain_have_package_lock_file())
 
     def test_check_changes_in_config_with_no_invalid_changes(self) -> None:
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
-                return (
-                    b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n'
-                )
-            return (
-                b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
-                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n'
-            )
+                return b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n'
+            return b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n'
 
         with self.swap(subprocess, 'check_output', mock_check_output):
             pre_commit_hook.check_changes_in_config()
@@ -323,24 +299,15 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_check_changes_in_config_with_invalid_feconf_changes(self) -> None:
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
-                return (
-                    b'-SYSTEM_EMAIL_NAME = \'sys@email.com\'\n+'
-                    b'+SYSTEM_EMAIL_NAME = \'sys-change@email.com\'\n'
-                )
-            return (
-                b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
-                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n'
-            )
+                return b'-SYSTEM_EMAIL_NAME = \'sys@email.com\'\n++SYSTEM_EMAIL_NAME = \'sys-change@email.com\'\n'
+            return b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n'
 
-        check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output
-        )
+        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
         with (
             check_output_swap,
             self.assertRaisesRegex(
                 Exception,
-                'Changes to %s made for deployment cannot be committed.'
-                % (pre_commit_hook.FECONF_FILEPATH),
+                'Changes to %s made for deployment cannot be committed.' % (pre_commit_hook.FECONF_FILEPATH),
             ),
         ):
             pre_commit_hook.check_changes_in_config()
@@ -350,24 +317,15 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     ) -> None:
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
-                return (
-                    b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n'
-                )
-            return (
-                b'-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",\n'
-                b'+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n'
-            )
+                return b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n'
+            return b'-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",\n+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n'
 
-        check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output
-        )
+        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
         with (
             check_output_swap,
             self.assertRaisesRegex(
                 Exception,
-                'Changes to %s made for deployment cannot be committed.'
-                % (pre_commit_hook.CONSTANTS_FILEPATH),
+                'Changes to %s made for deployment cannot be committed.' % (pre_commit_hook.CONSTANTS_FILEPATH),
             ),
         ):
             pre_commit_hook.check_changes_in_config()
@@ -381,9 +339,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
 
-        package_lock_swap = self.swap(
-            pre_commit_hook, 'does_diff_include_package_lock_file', mock_func
-        )
+        package_lock_swap = self.swap(pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
         package_lock_in_current_folder_swap = self.swap(
             pre_commit_hook,
             'does_current_folder_contain_have_package_lock_file',
@@ -401,12 +357,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 self.assertRaisesRegex(SystemExit, '1'),
             ):
                 pre_commit_hook.main(args=[])
-        self.assertTrue(
-            '-----------COMMIT ABORTED-----------' in self.print_arr
-        )
-        self.assertTrue(
-            check_function_calls['check_changes_in_config_is_called']
-        )
+        self.assertTrue('-----------COMMIT ABORTED-----------' in self.print_arr)
+        self.assertTrue(check_function_calls['check_changes_in_config_is_called'])
 
     def test_main_with_install_arg(self) -> None:
         check_function_calls = {'install_hook_is_called': False}
@@ -436,9 +388,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             self.assertEqual(cmds[1], 'lint-staged')
             check_function_calls['check_npx_subprocess_is_called'] = True
 
-        package_lock_swap = self.swap(
-            pre_commit_hook, 'does_diff_include_package_lock_file', mock_func
-        )
+        package_lock_swap = self.swap(pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
         package_lock_in_current_folder_swap = self.swap(
             pre_commit_hook,
             'does_current_folder_contain_have_package_lock_file',
@@ -453,7 +403,5 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         with package_lock_swap, package_lock_in_current_folder_swap:
             with check_config_swap, npx_subprocess_swap:
                 pre_commit_hook.main(args=[])
-        self.assertTrue(
-            check_function_calls['check_changes_in_config_is_called']
-        )
+        self.assertTrue(check_function_calls['check_changes_in_config_is_called'])
         self.assertTrue(check_function_calls['check_npx_subprocess_is_called'])

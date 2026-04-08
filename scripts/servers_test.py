@@ -32,11 +32,11 @@ import threading
 import time
 from urllib import request as urlrequest
 
+import psutil
+from typing import Iterator, List, Optional, Sequence, Tuple
+
 from core.tests import test_utils
 from scripts import common, scripts_test_utils, servers
-
-import psutil
-from typing import Callable, Iterator, List, Optional, Sequence, Tuple
 
 
 class MockCompiler:
@@ -61,9 +61,7 @@ def mock_context_manager() -> MockCompilerContextManager:
 
 class ManagedProcessTests(test_utils.TestBase):
     # Helper class for improving the readability of tests.
-    POPEN_CALL = collections.namedtuple(
-        'POPEN_CALL', ['program_args', 'kwargs']
-    )
+    POPEN_CALL = collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs'])
 
     def setUp(self) -> None:
         super().setUp()
@@ -102,9 +100,7 @@ class ManagedProcessTests(test_utils.TestBase):
         """
         popen_calls = []
 
-        def mock_popen(
-            program_args: List[str], **kwargs: str
-        ) -> scripts_test_utils.PopenStub:
+        def mock_popen(program_args: List[str], **kwargs: str) -> scripts_test_utils.PopenStub:
             """Mock of psutil.Popen that creates processes using os.fork().
 
             The processes created will always terminate within ~1 minute.
@@ -121,10 +117,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
             pid = 1
             stdout = b''.join(b'%b\n' % o for o in outputs)
-            child_procs = [
-                scripts_test_utils.PopenStub(pid=i, unresponsive=unresponsive)
-                for i in range(pid + 1, pid + 1 + num_children)
-            ]
+            child_procs = [scripts_test_utils.PopenStub(pid=i, unresponsive=unresponsive) for i in range(pid + 1, pid + 1 + num_children)]
             return scripts_test_utils.PopenStub(
                 pid=pid,
                 stdout=stdout,
@@ -136,9 +129,7 @@ class ManagedProcessTests(test_utils.TestBase):
             yield popen_calls
 
     @contextlib.contextmanager
-    def swap_managed_cloud_datastore_emulator_io_operations(
-        self, data_dir_exists: bool
-    ) -> Iterator[Tuple[test_utils.CallCounter, test_utils.CallCounter]]:
+    def swap_managed_cloud_datastore_emulator_io_operations(self, data_dir_exists: bool) -> Iterator[Tuple[test_utils.CallCounter, test_utils.CallCounter]]:
         """Safely swaps IO operations used by managed_cloud_datastore_emulator.
 
         Args:
@@ -152,19 +143,14 @@ class ManagedProcessTests(test_utils.TestBase):
         old_rmtree = shutil.rmtree
         old_makedirs = os.makedirs
 
-        is_data_dir: Callable[[str], bool] = (
-            lambda p: p == common.CLOUD_DATASTORE_EMULATOR_DATA_DIR
-        )
+        def is_data_dir(p: str) -> bool:
+            return p == common.CLOUD_DATASTORE_EMULATOR_DATA_DIR
 
-        new_exists = lambda p: (
-            data_dir_exists if is_data_dir(p) else old_exists(p)
-        )
-        new_rmtree = test_utils.CallCounter(
-            lambda p, **kw: None if is_data_dir(p) else old_rmtree(p, **kw)
-        )
-        new_makedirs = test_utils.CallCounter(
-            lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw)
-        )
+        def new_exists(p):
+            return data_dir_exists if is_data_dir(p) else old_exists(p)
+
+        new_rmtree = test_utils.CallCounter(lambda p, **kw: None if is_data_dir(p) else old_rmtree(p, **kw))
+        new_makedirs = test_utils.CallCounter(lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw))
 
         with contextlib.ExitStack() as exit_stack:
             exit_stack.enter_context(self.swap(os.path, 'exists', new_exists))
@@ -210,17 +196,13 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap(sys, 'path', []))
 
         # Entering the context should not raise.
-        self.exit_stack.enter_context(
-            servers.managed_process(['a'], timeout_secs=10)
-        )
+        self.exit_stack.enter_context(servers.managed_process(['a'], timeout_secs=10))
 
     def test_concats_command_args_when_shell_is_true(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(['a', 1], timeout_secs=10, shell=True)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['a', 1], timeout_secs=10, shell=True))
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
@@ -232,15 +214,11 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(['a', 1], shell=False, timeout_secs=10)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['a', 1], shell=False, timeout_secs=10))
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(
-            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})]
-        )
+        self.assertEqual(popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_true(
         self,
@@ -248,11 +226,7 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(
-                ['', 'a', '', 1], timeout_secs=10, shell=True
-            )
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['', 'a', '', 1], timeout_secs=10, shell=True))
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
@@ -264,28 +238,18 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(
-                ['', 'a', '', 1], shell=False, timeout_secs=10
-            )
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['', 'a', '', 1], shell=False, timeout_secs=10))
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(
-            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})]
-        )
+        self.assertEqual(popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
     def test_killing_process_raises_exception(self) -> None:
         self.exit_stack.enter_context(self.swap_popen(unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(['a'], timeout_secs=10)
-        )
-        with self.assertRaisesRegex(
-            Exception, 'Process .* exited unexpectedly with exit code 1'
-        ):
+        proc = self.exit_stack.enter_context(servers.managed_process(['a'], timeout_secs=10))
+        with self.assertRaisesRegex(Exception, 'Process .* exited unexpectedly with exit code 1'):
             self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
@@ -299,11 +263,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_popen(unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(
-                ['a'], timeout_secs=10, raise_on_nonzero_exit=False
-            )
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['a'], timeout_secs=10, raise_on_nonzero_exit=False))
         # Should not raise an exception.
         self.exit_stack.close()
 
@@ -318,9 +278,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_popen(num_children=3))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(['a'], timeout_secs=10)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['a'], timeout_secs=10))
         pids = [c.pid for c in proc.children()] + [proc.pid]
         self.exit_stack.close()
 
@@ -329,18 +287,12 @@ class ManagedProcessTests(test_utils.TestBase):
             self.assert_proc_was_managed_as_expected(logs, pid)
 
     def test_kills_child_processes(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_popen(num_children=3, unresponsive=True)
-        )
+        self.exit_stack.enter_context(self.swap_popen(num_children=3, unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(['a'], timeout_secs=10)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['a'], timeout_secs=10))
         pids = [c.pid for c in proc.children()] + [proc.pid]
-        with self.assertRaisesRegex(
-            Exception, 'Process .* exited unexpectedly with exit code 1'
-        ):
+        with self.assertRaisesRegex(Exception, 'Process .* exited unexpectedly with exit code 1'):
             self.exit_stack.close()
 
         self.assertEqual(len(set(pids)), 4)
@@ -356,28 +308,20 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_popen())
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(['a'], timeout_secs=10)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['a'], timeout_secs=10))
         time.sleep(1)
         proc.kill()
         proc.wait()
-        with self.assertRaisesRegex(
-            Exception, 'Process .* exited unexpectedly with exit code 1'
-        ):
+        with self.assertRaisesRegex(Exception, 'Process .* exited unexpectedly with exit code 1'):
             self.exit_stack.close()
 
-        self.assert_proc_was_managed_as_expected(
-            logs, proc.pid, manager_should_have_sent_terminate_signal=False
-        )
+        self.assert_proc_was_managed_as_expected(logs, proc.pid, manager_should_have_sent_terminate_signal=False)
 
     def test_respects_processes_that_are_killed_after_delay(self) -> None:
         self.exit_stack.enter_context(self.swap_popen(unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_process(['a'], timeout_secs=10)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_process(['a'], timeout_secs=10))
 
         def _kill_after_delay() -> None:
             """Kills the targeted process after a short delay."""
@@ -400,19 +344,11 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_raise_when_process_errors(self) -> None:
         self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_raise(
-                psutil, 'wait_procs', error=Exception('uh-oh')
-            )
-        )
-        logs = self.exit_stack.enter_context(
-            self.capture_logging(min_level=logging.ERROR)
-        )
+        self.exit_stack.enter_context(self.swap_to_always_raise(psutil, 'wait_procs', error=Exception('uh-oh')))
+        logs = self.exit_stack.enter_context(self.capture_logging(min_level=logging.ERROR))
 
         self.exit_stack.enter_context(servers.managed_process(['a', 'bc']))
-        with self.assertRaisesRegex(
-            Exception, 'Process .* exited unexpectedly with exit code 1'
-        ):
+        with self.assertRaisesRegex(Exception, 'Process .* exited unexpectedly with exit code 1'):
             self.exit_stack.close()
 
         self.assert_matches_regexps(
@@ -427,11 +363,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_firebase_emulator(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                common, 'wait_for_firebase_emulator_to_be_ready'
-            )
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_firebase_emulator_to_be_ready'))
 
         self.exit_stack.enter_context(servers.managed_firebase_auth_emulator())
         self.exit_stack.close()
@@ -443,22 +375,14 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_cloud_datastore_emulator(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(
-            self.swap_managed_cloud_datastore_emulator_io_operations(True)
-        )
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
+        self.exit_stack.enter_context(self.swap_managed_cloud_datastore_emulator_io_operations(True))
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
 
-        self.exit_stack.enter_context(
-            servers.managed_cloud_datastore_emulator()
-        )
+        self.exit_stack.enter_context(servers.managed_cloud_datastore_emulator())
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertIn(
-            'beta emulators datastore start', popen_calls[0].program_args
-        )
+        self.assertIn('beta emulators datastore start', popen_calls[0].program_args)
         self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 
@@ -467,16 +391,10 @@ class ManagedProcessTests(test_utils.TestBase):
     ) -> None:
         self.exit_stack.enter_context(self.swap_popen())
 
-        rmtree_counter, makedirs_counter = self.exit_stack.enter_context(
-            self.swap_managed_cloud_datastore_emulator_io_operations(False)
-        )
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
+        rmtree_counter, makedirs_counter = self.exit_stack.enter_context(self.swap_managed_cloud_datastore_emulator_io_operations(False))
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
 
-        self.exit_stack.enter_context(
-            servers.managed_cloud_datastore_emulator()
-        )
+        self.exit_stack.enter_context(servers.managed_cloud_datastore_emulator())
         self.exit_stack.close()
 
         self.assertEqual(rmtree_counter.times_called, 0)
@@ -485,16 +403,10 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_cloud_datastore_emulator_clears_data_dir(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        rmtree_counter, makedirs_counter = self.exit_stack.enter_context(
-            self.swap_managed_cloud_datastore_emulator_io_operations(True)
-        )
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
+        rmtree_counter, makedirs_counter = self.exit_stack.enter_context(self.swap_managed_cloud_datastore_emulator_io_operations(True))
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
 
-        self.exit_stack.enter_context(
-            servers.managed_cloud_datastore_emulator(clear_datastore=True)
-        )
+        self.exit_stack.enter_context(servers.managed_cloud_datastore_emulator(clear_datastore=True))
         self.exit_stack.close()
 
         self.assertIn('--no-store-on-disk', popen_calls[0].program_args)
@@ -507,16 +419,10 @@ class ManagedProcessTests(test_utils.TestBase):
     ) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        rmtree_counter, makedirs_counter = self.exit_stack.enter_context(
-            self.swap_managed_cloud_datastore_emulator_io_operations(True)
-        )
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
+        rmtree_counter, makedirs_counter = self.exit_stack.enter_context(self.swap_managed_cloud_datastore_emulator_io_operations(True))
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
 
-        self.exit_stack.enter_context(
-            servers.managed_cloud_datastore_emulator(clear_datastore=False)
-        )
+        self.exit_stack.enter_context(servers.managed_cloud_datastore_emulator(clear_datastore=False))
         self.exit_stack.close()
 
         self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
@@ -526,13 +432,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_dev_appserver(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
 
-        self.exit_stack.enter_context(
-            servers.managed_dev_appserver('app.yaml', env=None)
-        )
+        self.exit_stack.enter_context(servers.managed_dev_appserver('app.yaml', env=None))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -541,13 +443,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_elasticsearch_dev_server(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
 
-        self.exit_stack.enter_context(
-            servers.managed_elasticsearch_dev_server()
-        )
+        self.exit_stack.enter_context(servers.managed_elasticsearch_dev_server())
         self.exit_stack.close()
 
         self.assertEqual(
@@ -583,24 +481,12 @@ class ManagedProcessTests(test_utils.TestBase):
             return old_os_path_exists(file_path)
 
         self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                subprocess, 'call', value=scripts_test_utils.PopenStub()
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap(shutil, 'rmtree', mock_os_remove_files)
-        )
-        self.exit_stack.enter_context(
-            self.swap(os.path, 'exists', mock_os_path_exists)
-        )
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(subprocess, 'call', value=scripts_test_utils.PopenStub()))
+        self.exit_stack.enter_context(self.swap(shutil, 'rmtree', mock_os_remove_files))
+        self.exit_stack.enter_context(self.swap(os.path, 'exists', mock_os_path_exists))
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
 
-        self.exit_stack.enter_context(
-            servers.managed_elasticsearch_dev_server()
-        )
+        self.exit_stack.enter_context(servers.managed_elasticsearch_dev_server())
         self.exit_stack.close()
 
         self.assertTrue(check_function_calls['shutil_rmtree_is_called'])
@@ -621,25 +507,17 @@ class ManagedProcessTests(test_utils.TestBase):
             original_os_path_exists(path)
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
+        self.exit_stack.enter_context(self.swap_with_checks(os.path, 'exists', mock_os_path_exists))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 subprocess,
                 'check_call',
                 lambda _: 0,
-                expected_args=[
-                    ([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)
-                ],
+                expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os, 'remove', mock_os_remove, called=False)
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(os, 'remove', mock_os_remove, called=False))
 
         self.exit_stack.enter_context(servers.managed_redis_server())
 
@@ -671,23 +549,15 @@ class ManagedProcessTests(test_utils.TestBase):
             return None
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os, 'remove', mock_os_remove)
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(common, 'wait_for_port_to_be_in_use'))
+        self.exit_stack.enter_context(self.swap_with_checks(os.path, 'exists', mock_os_path_exists))
+        self.exit_stack.enter_context(self.swap_with_checks(os, 'remove', mock_os_remove))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 subprocess,
                 'check_call',
                 lambda _: 0,
-                expected_args=[
-                    ([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)
-                ],
+                expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)],
             )
         )
 
@@ -705,9 +575,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_web_browser_on_linux_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(os, 'listdir', value=[])
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(os, 'listdir', value=[]))
 
         managed_web_browser = servers.create_managed_web_browser(123)
         self.assertIsNotNone(managed_web_browser)
@@ -716,16 +584,12 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(managed_web_browser)
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args, ['xdg-open', 'http://localhost:123/']
-        )
+        self.assertEqual(popen_calls[0].program_args, ['xdg-open', 'http://localhost:123/'])
 
     def test_managed_web_browser_on_mac_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Darwin'))
-        self.exit_stack.enter_context(
-            self.swap_to_always_return(os, 'listdir', value=[])
-        )
+        self.exit_stack.enter_context(self.swap_to_always_return(os, 'listdir', value=[]))
 
         managed_web_browser = servers.create_managed_web_browser(123)
         self.assertIsNotNone(managed_web_browser)
@@ -733,9 +597,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(managed_web_browser)
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args, ['open', 'http://localhost:123/']
-        )
+        self.assertEqual(popen_calls[0].program_args, ['open', 'http://localhost:123/'])
 
     def test_managed_web_browser_on_windows_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -743,12 +605,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Unable to identify the Operating System and therefore, unable to '
-            'launch the web browser.',
+            'Unable to identify the Operating System and therefore, unable to launch the web browser.',
         ):
-            self.exit_stack.enter_context(
-                servers.create_managed_web_browser(123)
-            )
+            self.exit_stack.enter_context(servers.create_managed_web_browser(123))
 
         self.assertEqual(len(popen_calls), 0)
 
@@ -756,15 +615,11 @@ class ManagedProcessTests(test_utils.TestBase):
         web_browser_error = 'Mock Exception while launching web browser.'
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
-        mock_create_managed_web_browser = self.swap_to_always_raise(
-            servers, 'create_managed_web_browser', Exception(web_browser_error)
-        )
+        mock_create_managed_web_browser = self.swap_to_always_raise(servers, 'create_managed_web_browser', Exception(web_browser_error))
 
         with mock_create_managed_web_browser:
             with self.assertRaisesRegex(Exception, web_browser_error):
-                self.exit_stack.enter_context(
-                    servers.create_managed_web_browser(123)
-                )
+                self.exit_stack.enter_context(servers.create_managed_web_browser(123))
 
         self.assertEqual(len(popen_calls), 0)
 
@@ -781,9 +636,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s'
-            % (common.PORTSERVER_SOCKET_FILEPATH),
+            'python -m scripts.run_portserver --portserver_unix_socket_address %s' % (common.PORTSERVER_SOCKET_FILEPATH),
         )
         self.assertEqual(proc.signals_received, [signal.SIGINT])
         self.assertEqual(proc.terminate_count, 0)
@@ -806,12 +659,8 @@ class ManagedProcessTests(test_utils.TestBase):
             return None
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os, 'remove', mock_os_remove)
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(os.path, 'exists', mock_os_path_exists))
+        self.exit_stack.enter_context(self.swap_with_checks(os, 'remove', mock_os_remove))
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
         with self.assertRaisesRegex(
@@ -823,9 +672,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s'
-            % (common.PORTSERVER_SOCKET_FILEPATH),
+            'python -m scripts.run_portserver --portserver_unix_socket_address %s' % (common.PORTSERVER_SOCKET_FILEPATH),
         )
         self.assertEqual(proc.signals_received, [signal.SIGINT])
         self.assertEqual(mock_os_remove.times_called, 1)
@@ -840,9 +687,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s'
-            % (common.PORTSERVER_SOCKET_FILEPATH),
+            'python -m scripts.run_portserver --portserver_unix_socket_address %s' % (common.PORTSERVER_SOCKET_FILEPATH),
         )
         self.assertEqual(proc.signals_received, [signal.SIGINT])
         self.assertEqual(proc.terminate_count, 1)
@@ -862,25 +707,19 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s'
-            % (common.PORTSERVER_SOCKET_FILEPATH),
+            'python -m scripts.run_portserver --portserver_unix_socket_address %s' % (common.PORTSERVER_SOCKET_FILEPATH),
         )
         self.assertEqual(proc.signals_received, [signal.SIGINT])
         self.assertEqual(proc.terminate_count, 1)
         self.assertEqual(proc.kill_count, 1)
 
     def test_managed_ng_build_in_watch_mode_when_build_succeeds(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'abc', b'Build at: 123', b'def'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'Build at: 123', b'def']))
         str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_ng_build(watch_mode=True)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_ng_build(watch_mode=True))
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
@@ -904,9 +743,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
         with self.assertRaisesRegex(IOError, 'First build never completed'):
-            self.exit_stack.enter_context(
-                servers.managed_ng_build(watch_mode=True)
-            )
+            self.exit_stack.enter_context(servers.managed_ng_build(watch_mode=True))
         self.assert_matches_regexps(
             str_io.getvalue().strip().split('\n'),
             [
@@ -918,33 +755,23 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
     def test_managed_ng_build_uses_prod_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Build at: 123'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'Build at: 123']))
 
-        self.exit_stack.enter_context(
-            servers.managed_ng_build(use_prod_env=True)
-        )
+        self.exit_stack.enter_context(servers.managed_ng_build(use_prod_env=True))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH
-        )
+        self.assertEqual(popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH)
 
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(
         self,
     ) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'abc', b'Built at: 123', b'def'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'Built at: 123', b'def']))
         str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(watch_mode=True)
-        )
+        proc = self.exit_stack.enter_context(servers.managed_webpack_compiler(watch_mode=True))
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
@@ -972,9 +799,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
         with self.assertRaisesRegex(IOError, 'First build never completed'):
-            self.exit_stack.enter_context(
-                servers.managed_webpack_compiler(watch_mode=True)
-            )
+            self.exit_stack.enter_context(servers.managed_webpack_compiler(watch_mode=True))
         self.assert_matches_regexps(
             str_io.getvalue().strip().split('\n'),
             [
@@ -986,34 +811,23 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
     def test_managed_webpack_compiler_uses_explicit_config_path(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'Built at: 123']))
 
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(config_path='config.json')
-        )
+        self.exit_stack.enter_context(servers.managed_webpack_compiler(config_path='config.json'))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s --config config.json'
-            % (common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH),
+            '%s %s --config config.json' % (common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH),
         )
 
     def test_managed_webpack_compiler_uses_prod_source_maps_config(
         self,
     ) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'Built at: 123']))
 
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=True, use_source_maps=True
-            )
-        )
+        self.exit_stack.enter_context(servers.managed_webpack_compiler(use_prod_env=True, use_source_maps=True))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -1028,15 +842,9 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
     def test_managed_webpack_compiler_uses_prod_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'Built at: 123']))
 
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=True, use_source_maps=False
-            )
-        )
+        self.exit_stack.enter_context(servers.managed_webpack_compiler(use_prod_env=True, use_source_maps=False))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -1051,15 +859,9 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
     def test_managed_webpack_compiler_uses_dev_source_maps_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'Built at: 123']))
 
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=False, use_source_maps=True
-            )
-        )
+        self.exit_stack.enter_context(servers.managed_webpack_compiler(use_prod_env=False, use_source_maps=True))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -1074,15 +876,9 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
     def test_managed_webpack_compiler_uses_dev_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'Built at: 123']))
 
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=False, use_source_maps=False
-            )
-        )
+        self.exit_stack.enter_context(servers.managed_webpack_compiler(use_prod_env=False, use_source_maps=False))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -1097,13 +893,9 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
     def test_managed_webpack_compiler_with_max_old_space_size(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(outputs=[b'Built at: 123']))
 
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(max_old_space_size=2056)
-        )
+        self.exit_stack.enter_context(servers.managed_webpack_compiler(max_old_space_size=2056))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -1114,9 +906,7 @@ class ManagedProcessTests(test_utils.TestBase):
     ) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
-        self.exit_stack.enter_context(
-            self.swap_to_always_raise(subprocess, 'check_output', error=OSError)
-        )
+        self.exit_stack.enter_context(self.swap_to_always_raise(subprocess, 'check_output', error=OSError))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common,
@@ -1136,14 +926,10 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
         with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_webdriverio_server(sharding_instances=0)
-            )
+            self.exit_stack.enter_context(servers.managed_webdriverio_server(sharding_instances=0))
 
         with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
-            self.exit_stack.enter_context(
-                servers.managed_webdriverio_server(sharding_instances=-1)
-            )
+            self.exit_stack.enter_context(servers.managed_webdriverio_server(sharding_instances=-1))
 
         self.exit_stack.close()
 
@@ -1152,15 +938,11 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webdriverio(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(
-            servers.managed_webdriverio_server(chrome_version='104.0.5112.79')
-        )
+        self.exit_stack.enter_context(servers.managed_webdriverio_server(chrome_version='104.0.5112.79'))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
-        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
         self.assertIn(
             '%s --unhandled-rejections=strict %s %s --suite full %s'
@@ -1179,16 +961,10 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webdriverio_mobile(self) -> None:
         attempts = []
 
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> io.BufferedIOBase:
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
             attempts.append(url)
             self.assertLessEqual(len(attempts), 1)
-            self.assertTrue(
-                url.startswith(
-                    'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
-                )
-            )
+            self.assertTrue(url.startswith('https://chromedriver.storage.googleapis.com/LATEST_RELEASE'))
             self.assertIsNotNone(context)
             return io.BytesIO(b'content')
 
@@ -1200,16 +976,10 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webdriverio_with_explicit_args(self) -> None:
         attempts = []
 
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> io.BufferedIOBase:
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
             attempts.append(url)
             self.assertLessEqual(len(attempts), 1)
-            self.assertTrue(
-                url.startswith(
-                    'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
-                )
-            )
+            self.assertTrue(url.startswith('https://chromedriver.storage.googleapis.com/LATEST_RELEASE'))
             self.assertIsNotNone(context)
             return io.BytesIO(b'content')
 
@@ -1230,9 +1000,7 @@ class ManagedProcessTests(test_utils.TestBase):
             self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
-        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
         # From debug_mode=True.
         self.assertIn('DEBUG=true', program_args)
@@ -1245,21 +1013,13 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        test_file_path = (
-            'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
-        )
+        test_file_path = 'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=test_file_path, stdout=subprocess.PIPE
-            )
-        )
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(suite_name=test_file_path, stdout=subprocess.PIPE))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
-        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
         self.assertIn(test_file_path, program_args)
         self.assertEqual(os.getenv('SPEC_NAME'), test_file_path)
@@ -1269,51 +1029,31 @@ class ManagedProcessTests(test_utils.TestBase):
 
         expected_regexp = 'Invalid suite name: %s' % suite_name
         with self.assertRaisesRegex(Exception, expected_regexp):
-            self.exit_stack.enter_context(
-                servers.managed_acceptance_tests_server(
-                    suite_name=suite_name, stdout=subprocess.PIPE
-                )
-            )
+            self.exit_stack.enter_context(servers.managed_acceptance_tests_server(suite_name=suite_name, stdout=subprocess.PIPE))
 
     def test_managed_acceptance_test_server_headless(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        suite_name = (
-            'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
-        )
+        suite_name = 'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name, headless=True, stdout=subprocess.PIPE
-            )
-        )
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(suite_name=suite_name, headless=True, stdout=subprocess.PIPE))
         self.exit_stack.close()
 
         self.assertEqual(os.getenv('HEADLESS'), 'true')
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
-        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
         self.assertIn(suite_name, program_args)
         self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
 
     def test_managed_acceptance_test_server_mobile(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        suite_name = (
-            'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
-        )
+        suite_name = 'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name, mobile=True, stdout=subprocess.PIPE
-            )
-        )
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(suite_name=suite_name, mobile=True, stdout=subprocess.PIPE))
 
         self.assertEqual(os.getenv('MOBILE'), 'true')
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE}
-        )
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
         self.assertIn(suite_name, program_args)
         self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
@@ -1338,17 +1078,10 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         def mock_url_open(_: str) -> io.BytesIO:
             return io.BytesIO(b'72.0.3626.69')
 
-        expected_url = (
-            'https://chromedriver.storage.googleapis.com/'
-            'LATEST_RELEASE_72.0.3626'
-        )
+        expected_url = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_72.0.3626'
 
-        check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output
-        )
-        url_open_swap = self.swap_with_checks(
-            common, 'url_open', mock_url_open, expected_args=[(expected_url,)]
-        )
+        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
+        url_open_swap = self.swap_with_checks(common, 'url_open', mock_url_open, expected_args=[(expected_url,)])
 
         with check_output_swap, url_open_swap:
             self.assertEqual(
@@ -1363,9 +1096,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         def mock_url_open(_: str) -> None:
             raise AssertionError('url_open should not be called.')
 
-        check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output
-        )
+        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
         url_open_swap = self.swap(common, 'url_open', mock_url_open)
 
         with check_output_swap, url_open_swap:
@@ -1375,12 +1106,8 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             )
 
     def test_run_ng_compilation_successfully(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: True, expected_kwargs=[]
-        )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
-        )
+        swap_isdir = self.swap_with_checks(os.path, 'isdir', lambda _: True, expected_kwargs=[])
+        swap_ng_build = self.swap_with_checks(servers, 'managed_ng_build', mock_context_manager, expected_args=[])
         with self.print_swap, swap_ng_build, swap_isdir:
             servers.run_ng_compilation()
 
@@ -1390,15 +1117,9 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         )
 
     def test_run_ng_compilation_failed(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: False, expected_kwargs=[]
-        )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]
-        )
+        swap_isdir = self.swap_with_checks(os.path, 'isdir', lambda _: False, expected_kwargs=[])
+        swap_ng_build = self.swap_with_checks(servers, 'managed_ng_build', mock_context_manager, expected_args=[])
+        swap_sys_exit = self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,)])
         with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
             servers.run_ng_compilation()
 
@@ -1410,9 +1131,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
     def test_subprocess_error_results_in_failed_ng_build(self) -> None:
         class MockFailedCompiler:
             def wait(self) -> None:  # pylint: disable=missing-docstring
-                raise subprocess.CalledProcessError(
-                    returncode=1, cmd='', output='Subprocess execution failed.'
-                )
+                raise subprocess.CalledProcessError(returncode=1, cmd='', output='Subprocess execution failed.')
 
         class MockFailedCompilerContextManager:
             def __init__(self) -> None:
@@ -1443,8 +1162,6 @@ class GetChromedriverVersionTests(test_utils.TestBase):
                 ('dist/oppia-angular',),
             ],
         )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)]
-        )
+        swap_sys_exit = self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)])
         with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
             servers.run_ng_compilation()

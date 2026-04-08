@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+from typing import Dict, TypedDict
+
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import beam_job_services
-
-from typing import Dict, TypedDict
 
 
 class BeamJobHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -35,9 +35,7 @@ class BeamJobHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_run_any_job
     def get(self) -> None:
         """Retrieves a list of Beam jobs."""
-        sorted_beam_jobs = sorted(
-            beam_job_services.get_beam_jobs(), key=lambda j: j.name
-        )
+        sorted_beam_jobs = sorted(beam_job_services.get_beam_jobs(), key=lambda j: j.name)
         self.render_json({'jobs': [j.to_dict() for j in sorted_beam_jobs]})
 
 
@@ -123,11 +121,7 @@ class BeamJobRunResultHandlerNormalizedRequestDict(TypedDict):
     job_id: str
 
 
-class BeamJobRunResultHandler(
-    base.BaseHandler[
-        Dict[str, str], BeamJobRunResultHandlerNormalizedRequestDict
-    ]
-):
+class BeamJobRunResultHandler(base.BaseHandler[Dict[str, str], BeamJobRunResultHandlerNormalizedRequestDict]):
     """Handler for getting the result of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

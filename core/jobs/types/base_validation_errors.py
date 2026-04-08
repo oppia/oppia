@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
+from typing import Mapping, Union
+
 from core import feconf, utils
 from core.domain import change_domain
 from core.jobs import job_utils
 from core.jobs.types import job_run_result, model_property
 from core.platform import models
-
-from typing import Mapping, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -111,10 +111,7 @@ class ModelMutatedDuringJobError(BaseValidationError):
     """Error class for models mutated during a job."""
 
     def __init__(self, model: base_models.BaseModel) -> None:
-        message = (
-            'last_updated=%s is later than the audit job\'s start time'
-            % (model.last_updated.strftime('%Y-%m-%d %H:%M:%S'))
-        )
+        message = 'last_updated=%s is later than the audit job\'s start time' % (model.last_updated.strftime('%Y-%m-%d %H:%M:%S'))
         super().__init__(message, model)
 
 
@@ -122,21 +119,15 @@ class ModelIdRegexError(BaseValidationError):
     """Error class for models with ids that fail to match a regex pattern."""
 
     def __init__(self, model: base_models.BaseModel, regex_string: str) -> None:
-        message = 'id does not match the expected regex=%s' % (
-            utils.quoted(regex_string)
-        )
+        message = 'id does not match the expected regex=%s' % (utils.quoted(regex_string))
         super().__init__(message, model)
 
 
 class ModelDomainObjectValidateError(BaseValidationError):
     """Error class for domain object validation errors."""
 
-    def __init__(
-        self, model: base_models.BaseModel, error_message: str
-    ) -> None:
-        message = 'Entity fails domain validation with the error: %s' % (
-            error_message
-        )
+    def __init__(self, model: base_models.BaseModel, error_message: str) -> None:
+        message = 'Entity fails domain validation with the error: %s' % (error_message)
         super().__init__(message, model)
 
 
@@ -144,9 +135,7 @@ class ModelExpiredError(BaseValidationError):
     """Error class for expired models."""
 
     def __init__(self, model: base_models.BaseModel) -> None:
-        message = 'deleted=True when older than %s days' % (
-            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days
-        )
+        message = 'deleted=True when older than %s days' % (feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
         super().__init__(message, model)
 
 
@@ -187,10 +176,7 @@ class ModelRelationshipError(BaseValidationError):
         """
         # NOTE: IDs are converted to bytes because that's how they're read from
         # and written to the datastore.
-        message = (
-            '%s=%s should correspond to the ID of an existing %s, but no such '
-            'model exists' % (id_property, utils.quoted(target_id), target_kind)
-        )
+        message = '%s=%s should correspond to the ID of an existing %s, but no such model exists' % (id_property, utils.quoted(target_id), target_kind)
         super().__init__(message, model)
 
 
@@ -204,10 +190,7 @@ class CommitCmdsNoneError(BaseValidationError):
             base_models.BaseSnapshotMetadataModel,
         ],
     ) -> None:
-        message = (
-            'No commit command domain object defined for entity with commands: '
-            '%s' % model.commit_cmds
-        )
+        message = 'No commit command domain object defined for entity with commands: %s' % model.commit_cmds
         super().__init__(message, model)
 
 
@@ -223,8 +206,5 @@ class CommitCmdsValidateError(BaseValidationError):
         commit_cmd_dict: Mapping[str, change_domain.AcceptableChangeDictTypes],
         e: str,
     ) -> None:
-        message = (
-            'Commit command domain validation for command: %s failed with '
-            'error: %s' % (commit_cmd_dict, e)
-        )
+        message = 'Commit command domain validation for command: %s failed with error: %s' % (commit_cmd_dict, e)
         super().__init__(message, model)

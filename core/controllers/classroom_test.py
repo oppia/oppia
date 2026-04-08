@@ -19,6 +19,9 @@ from __future__ import annotations
 import json
 import os
 
+import webtest
+from typing import Dict, Union
+
 import main
 from core import feconf
 from core.constants import constants
@@ -32,15 +35,8 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-import webtest
-from typing import Callable, Dict, Union
-
-dummy_thumbnail_data = classroom_config_domain.ImageData(
-    'thumbnail.svg', 'transparent', 1000
-)
-dummy_banner_data = classroom_config_domain.ImageData(
-    'banner.png', 'transparent', 1000
-)
+dummy_thumbnail_data = classroom_config_domain.ImageData('thumbnail.svg', 'transparent', 1000)
+dummy_banner_data = classroom_config_domain.ImageData('banner.png', 'transparent', 1000)
 
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
@@ -78,9 +74,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
             'fragm',
         )
         self.public_topic_1.thumbnail_filename = 'Topic.svg'
-        self.public_topic_1.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
-        )
+        self.public_topic_1.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         self.public_topic_1.subtopics = [
             topic_domain.Subtopic(
                 1,
@@ -105,9 +99,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
             'fragm',
         )
         self.public_topic_2.thumbnail_filename = 'Topic.svg'
-        self.public_topic_2.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
-        )
+        self.public_topic_2.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         self.public_topic_2.subtopics = [
             topic_domain.Subtopic(
                 2,
@@ -132,9 +124,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
             'fragm',
         )
         self.public_topic_3.thumbnail_filename = 'Topic.svg'
-        self.public_topic_3.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
-        )
+        self.public_topic_3.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         self.public_topic_3.subtopics = [
             topic_domain.Subtopic(
                 1,
@@ -174,12 +164,8 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         )
         self.logout()
 
-        json_response = self.get_json(
-            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math')
-        )
-        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(
-            self.public_topic_id_1
-        ).to_dict()
+        json_response = self.get_json('%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(self.public_topic_id_1).to_dict()
         public_topic_1_summary_dict = {
             'id': topic_summary_dict['id'],
             'name': topic_summary_dict['name'],
@@ -187,36 +173,20 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'language_code': topic_summary_dict['language_code'],
             'description': topic_summary_dict['description'],
             'version': topic_summary_dict['version'],
-            'canonical_story_count': (
-                topic_summary_dict['canonical_story_count']
-            ),
-            'additional_story_count': (
-                topic_summary_dict['additional_story_count']
-            ),
-            'uncategorized_skill_count': (
-                topic_summary_dict['uncategorized_skill_count']
-            ),
+            'canonical_story_count': (topic_summary_dict['canonical_story_count']),
+            'additional_story_count': (topic_summary_dict['additional_story_count']),
+            'uncategorized_skill_count': (topic_summary_dict['uncategorized_skill_count']),
             'subtopic_count': topic_summary_dict['subtopic_count'],
             'total_skill_count': (topic_summary_dict['total_skill_count']),
-            'total_published_node_count': (
-                topic_summary_dict['total_published_node_count']
-            ),
+            'total_published_node_count': (topic_summary_dict['total_published_node_count']),
             'thumbnail_filename': (topic_summary_dict['thumbnail_filename']),
             'thumbnail_bg_color': (topic_summary_dict['thumbnail_bg_color']),
-            'published_story_exploration_mapping': (
-                topic_summary_dict['published_story_exploration_mapping']
-            ),
-            'topic_model_created_on': (
-                topic_summary_dict['topic_model_created_on']
-            ),
-            'topic_model_last_updated': (
-                topic_summary_dict['topic_model_last_updated']
-            ),
+            'published_story_exploration_mapping': (topic_summary_dict['published_story_exploration_mapping']),
+            'topic_model_created_on': (topic_summary_dict['topic_model_created_on']),
+            'topic_model_last_updated': (topic_summary_dict['topic_model_last_updated']),
             'is_published': True,
         }
-        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(
-            self.private_topic_id
-        ).to_dict()
+        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(self.private_topic_id).to_dict()
         private_topic_summary_dict = {
             'id': topic_summary_dict['id'],
             'name': topic_summary_dict['name'],
@@ -224,31 +194,17 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'language_code': topic_summary_dict['language_code'],
             'description': topic_summary_dict['description'],
             'version': topic_summary_dict['version'],
-            'canonical_story_count': (
-                topic_summary_dict['canonical_story_count']
-            ),
-            'additional_story_count': (
-                topic_summary_dict['additional_story_count']
-            ),
-            'uncategorized_skill_count': (
-                topic_summary_dict['uncategorized_skill_count']
-            ),
+            'canonical_story_count': (topic_summary_dict['canonical_story_count']),
+            'additional_story_count': (topic_summary_dict['additional_story_count']),
+            'uncategorized_skill_count': (topic_summary_dict['uncategorized_skill_count']),
             'subtopic_count': topic_summary_dict['subtopic_count'],
             'total_skill_count': (topic_summary_dict['total_skill_count']),
-            'total_published_node_count': (
-                topic_summary_dict['total_published_node_count']
-            ),
+            'total_published_node_count': (topic_summary_dict['total_published_node_count']),
             'thumbnail_filename': (topic_summary_dict['thumbnail_filename']),
             'thumbnail_bg_color': (topic_summary_dict['thumbnail_bg_color']),
-            'published_story_exploration_mapping': (
-                topic_summary_dict['published_story_exploration_mapping']
-            ),
-            'topic_model_created_on': (
-                topic_summary_dict['topic_model_created_on']
-            ),
-            'topic_model_last_updated': (
-                topic_summary_dict['topic_model_last_updated']
-            ),
+            'published_story_exploration_mapping': (topic_summary_dict['published_story_exploration_mapping']),
+            'topic_model_created_on': (topic_summary_dict['topic_model_created_on']),
+            'topic_model_last_updated': (topic_summary_dict['topic_model_last_updated']),
             'is_published': False,
         }
         expected_dict = {
@@ -299,22 +255,12 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         )
         self.logout()
 
-        json_response = self.get_json(
-            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math')
-        )
-        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(
-            self.public_topic_id_1
-        ).to_dict()
-        public_topic_1_summary_dict = dict(
-            topic_summary_dict, **{'is_published': True}
-        )
+        json_response = self.get_json('%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(self.public_topic_id_1).to_dict()
+        public_topic_1_summary_dict = dict(topic_summary_dict, **{'is_published': True})
 
-        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(
-            self.private_topic_id
-        ).to_dict()
-        private_topic_summary_dict = dict(
-            topic_summary_dict, **{'is_published': False}
-        )
+        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(self.private_topic_id).to_dict()
+        private_topic_summary_dict = dict(topic_summary_dict, **{'is_published': False})
         # Skips 'no_summary_topic'.
         expected_dict = {
             'classroom_id': 'test_id',
@@ -369,22 +315,12 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         )
         self.logout()
 
-        json_response = self.get_json(
-            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math')
-        )
-        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(
-            self.public_topic_id_1
-        ).to_dict()
-        public_topic_1_summary_dict = dict(
-            topic_summary_dict, **{'is_published': True}
-        )
+        json_response = self.get_json('%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(self.public_topic_id_1).to_dict()
+        public_topic_1_summary_dict = dict(topic_summary_dict, **{'is_published': True})
 
-        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(
-            self.private_topic_id
-        ).to_dict()
-        private_topic_summary_dict = dict(
-            topic_summary_dict, **{'is_published': False}
-        )
+        topic_summary_dict = topic_fetchers.get_topic_summary_by_id(self.private_topic_id).to_dict()
+        private_topic_summary_dict = dict(topic_summary_dict, **{'is_published': False})
 
         # Should return classroom with 'test_id', but count all
         # public_classrooms ('science' and 'test_id').
@@ -418,9 +354,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         super().setUp()
         self.testapp = webtest.TestApp(main.app_without_context)
 
-        self.physics_classroom_id = (
-            classroom_config_services.get_new_classroom_id()
-        )
+        self.physics_classroom_id = classroom_config_services.get_new_classroom_id()
         self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': self.physics_classroom_id,
             'name': 'physics',
@@ -435,14 +369,10 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             'banner_data': dummy_banner_data.to_dict(),
             'index': 0,
         }
-        self.physics_classroom = classroom_config_domain.Classroom.from_dict(
-            self.physics_classroom_dict
-        )
+        self.physics_classroom = classroom_config_domain.Classroom.from_dict(self.physics_classroom_dict)
         classroom_config_services.create_new_classroom(self.physics_classroom)
 
-        self.math_classroom_id = (
-            classroom_config_services.get_new_classroom_id()
-        )
+        self.math_classroom_id = classroom_config_services.get_new_classroom_id()
         self.math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': self.math_classroom_id,
             'name': 'math',
@@ -457,9 +387,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             'banner_data': dummy_banner_data.to_dict(),
             'index': 1,
         }
-        self.math_classroom = classroom_config_domain.Classroom.from_dict(
-            self.math_classroom_dict
-        )
+        self.math_classroom = classroom_config_domain.Classroom.from_dict(self.math_classroom_dict)
         classroom_config_services.create_new_classroom(self.math_classroom)
 
     def test_get_classroom_id_to_classroom_name(self) -> None:
@@ -494,12 +422,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         json_response = self.get_json(feconf.NEW_CLASSROOM_ID_HANDLER_URL)
 
-        self.assertFalse(
-            json_response['classroom_id'] == self.math_classroom_id
-        )
-        self.assertFalse(
-            json_response['classroom_id'] == self.physics_classroom_id
-        )
+        self.assertFalse(json_response['classroom_id'] == self.math_classroom_id)
+        self.assertFalse(json_response['classroom_id'] == self.physics_classroom_id)
 
         self.logout()
 
@@ -512,9 +436,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         json_response = self.get_json(classroom_handler_url)
 
-        self.assertEqual(
-            json_response['classroom_dict'], self.math_classroom_dict
-        )
+        self.assertEqual(json_response['classroom_dict'], self.math_classroom_dict)
         self.logout()
 
     def test_update_classroom_data(self) -> None:
@@ -535,15 +457,9 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_banner_image = f.read()
-        params = {
-            'payload': json.dumps(
-                {'classroom_dict': self.physics_classroom_dict}
-            )
-        }
+        params = {'payload': json.dumps({'classroom_dict': self.physics_classroom_dict})}
         params['csrf_token'] = csrf_token
         thumbnail = (
             'thumbnail_image',
@@ -576,16 +492,10 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_banner_image = f.read()
 
-        params = {
-            'payload': json.dumps(
-                {'classroom_dict': self.physics_classroom_dict}
-            )
-        }
+        params = {'payload': json.dumps({'classroom_dict': self.physics_classroom_dict})}
         params['csrf_token'] = csrf_token
 
         thumbnail = (
@@ -602,17 +512,11 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         )
 
         # Check physics classroom data updated correctly.
-        physics_classroom = classroom_config_services.get_classroom_by_id(
-            self.physics_classroom_id
-        )
-        self.assertEqual(
-            physics_classroom.to_dict(), self.physics_classroom_dict
-        )
+        physics_classroom = classroom_config_services.get_classroom_by_id(self.physics_classroom_id)
+        self.assertEqual(physics_classroom.to_dict(), self.physics_classroom_dict)
 
         # Check new thumbnail image uploaded correctly.
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_CLASSROOM, self.physics_classroom_id
-        )
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_CLASSROOM, self.physics_classroom_id)
         self.assertTrue(fs.isfile('thumbnail/update.svg'))
         self.assertTrue(fs.isfile('thumbnail/update_compressed.svg'))
         self.assertTrue(fs.isfile('thumbnail/update_micro.svg'))
@@ -641,15 +545,9 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_banner_image = f.read()
-        params = {
-            'payload': json.dumps(
-                {'classroom_dict': self.physics_classroom_dict}
-            )
-        }
+        params = {'payload': json.dumps({'classroom_dict': self.physics_classroom_dict})}
         params['csrf_token'] = csrf_token
         thumbnail = (
             'thumbnail_image',
@@ -665,17 +563,11 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         )
 
         # Check physics classroom data updated correctly.
-        physics_classroom = classroom_config_services.get_classroom_by_id(
-            self.physics_classroom_id
-        )
-        self.assertEqual(
-            physics_classroom.to_dict(), self.physics_classroom_dict
-        )
+        physics_classroom = classroom_config_services.get_classroom_by_id(self.physics_classroom_id)
+        self.assertEqual(physics_classroom.to_dict(), self.physics_classroom_dict)
 
         # Check new banner image uploaded correctly.
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_CLASSROOM, self.physics_classroom_id
-        )
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_CLASSROOM, self.physics_classroom_id)
         self.assertTrue(fs.isfile('image/update.png'))
         self.assertTrue(fs.isfile('image/update_compressed.png'))
         self.assertTrue(fs.isfile('image/update_micro.png'))
@@ -717,15 +609,9 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_banner_image = f.read()
-        params = {
-            'payload': json.dumps(
-                {'classroom_dict': self.physics_classroom_dict}
-            )
-        }
+        params = {'payload': json.dumps({'classroom_dict': self.physics_classroom_dict})}
         params['csrf_token'] = csrf_token
         thumbnail = (
             'thumbnail_image',
@@ -745,8 +631,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.assertEqual(
             response['error'],
-            'Classroom ID of the URL path argument must match with the ID '
-            'given in the classroom payload dict.',
+            'Classroom ID of the URL path argument must match with the ID given in the classroom payload dict.',
         )
         self.logout()
 
@@ -785,18 +670,14 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         json_response = self.get_json(url)
 
-        self.assertEqual(
-            json_response['classroom_id'], self.physics_classroom_id
-        )
+        self.assertEqual(json_response['classroom_id'], self.physics_classroom_id)
 
         non_existent_classroom_url = '%s/%s' % (
             feconf.CLASSROOM_ID_HANDLER_URL,
             'incorrect',
         )
 
-        json_response = self.get_json(
-            non_existent_classroom_url, expected_status_int=404
-        )
+        json_response = self.get_json(non_existent_classroom_url, expected_status_int=404)
 
     def test_assigning_topic_to_multiple_classrooms_should_raise_an_exception(
         self,
@@ -808,9 +689,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         )
         csrf_token = self.get_new_csrf_token()
 
-        self.physics_classroom_dict['topic_id_to_prerequisite_topic_ids'] = {
-            self.public_topic_id_2: []
-        }
+        self.physics_classroom_dict['topic_id_to_prerequisite_topic_ids'] = {self.public_topic_id_2: []}
 
         with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
@@ -818,15 +697,9 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_banner_image = f.read()
-        params = {
-            'payload': json.dumps(
-                {'classroom_dict': self.physics_classroom_dict}
-            )
-        }
+        params = {'payload': json.dumps({'classroom_dict': self.physics_classroom_dict})}
         params['csrf_token'] = csrf_token
         thumbnail = (
             'thumbnail_image',
@@ -846,8 +719,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.assertEqual(
             response['error'],
-            'Topic public_topic_2_name is already assigned to a classroom. '
-            'A topic can only be assigned to one classroom.',
+            'Topic public_topic_2_name is already assigned to a classroom. A topic can only be assigned to one classroom.',
         )
         self.logout()
 
@@ -868,9 +740,7 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
         )
         topic_services.save_new_topic(self.owner_id, self.used_topic1)
 
-        self.physics_classroom_id = (
-            classroom_config_services.get_new_classroom_id()
-        )
+        self.physics_classroom_id = classroom_config_services.get_new_classroom_id()
         self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': self.physics_classroom_id,
             'name': 'physics',
@@ -890,9 +760,7 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
             'banner_data': dummy_banner_data.to_dict(),
             'index': 0,
         }
-        self.physics_classroom = classroom_config_domain.Classroom.from_dict(
-            self.physics_classroom_dict
-        )
+        self.physics_classroom = classroom_config_domain.Classroom.from_dict(self.physics_classroom_dict)
         classroom_config_services.create_new_classroom(self.physics_classroom)
 
     def test_returns_newly_added_unused_topics(self) -> None:
@@ -961,14 +829,10 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
         self.assertEqual(json_response['unused_topics'], [])
 
-        self.physics_classroom.topic_id_to_prerequisite_topic_ids.pop(
-            self.used_topic1.id
-        )
+        self.physics_classroom.topic_id_to_prerequisite_topic_ids.pop(self.used_topic1.id)
         classroom_config_services.update_classroom(self.physics_classroom)
         json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
-        self.assertEqual(
-            json_response['unused_topics'], [self.used_topic1.to_dict()]
-        )
+        self.assertEqual(json_response['unused_topics'], [self.used_topic1.to_dict()])
 
         self.logout()
 
@@ -1023,9 +887,8 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
             },
         ]
 
-        sort_key: Callable[[Dict[str, str | bool]], str | bool] = (
-            lambda item: item['name']
-        )
+        def sort_key(item: Dict[str, str | bool]) -> str | bool:
+            return item['name']
 
         self.assertListEqual(
             sorted(json_response['all_classrooms_summary'], key=sort_key),
@@ -1036,9 +899,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
 class TopicsToClassroomsRelationHandlerTests(BaseClassroomControllerTests):
     def setUp(self) -> None:
         super().setUp()
-        self.save_new_valid_classroom(
-            topic_id_to_prerequisite_topic_ids={self.public_topic_id_1: []}
-        )
+        self.save_new_valid_classroom(topic_id_to_prerequisite_topic_ids={self.public_topic_id_1: []})
         self.save_new_valid_classroom(
             classroom_id='history',
             name='history',
@@ -1048,9 +909,7 @@ class TopicsToClassroomsRelationHandlerTests(BaseClassroomControllerTests):
 
     def test_get_all_topics_classroom_info(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        json_response = self.get_json(
-            feconf.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL
-        )
+        json_response = self.get_json(feconf.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL)
         expected_response = [
             {
                 'topic_id': self.public_topic_id_1,
@@ -1078,13 +937,11 @@ class TopicsToClassroomsRelationHandlerTests(BaseClassroomControllerTests):
             },
         ]
 
-        sort_key: Callable[[Dict[str, Union[str, None]]], str] = (
-            lambda item: item['topic_name'] or ''
-        )
+        def sort_key(item: Dict[str, Union[str, None]]) -> str:
+            return item['topic_name'] or ''
+
         self.assertListEqual(
-            sorted(
-                json_response['topics_to_classrooms_relation'], key=sort_key
-            ),
+            sorted(json_response['topics_to_classrooms_relation'], key=sort_key),
             sorted(expected_response, key=sort_key),
         )
 
@@ -1101,9 +958,7 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
             csrf_token=csrf_token,
         )
 
-        new_classroom = classroom_config_services.get_classroom_by_url_fragment(
-            'geography'
-        )
+        new_classroom = classroom_config_services.get_classroom_by_url_fragment('geography')
         if new_classroom:
             self.assertEqual(new_classroom.name, 'geography')
             self.assertEqual(new_classroom.url_fragment, 'geography')
@@ -1123,10 +978,7 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
 
         self.assertEqual(
             response['error'],
-            'At \'http://localhost/classroom_admin/create_new\' '
-            'these errors are happening:\n'
-            'Schema validation for \'name\' failed: '
-            'Validation failed: is_nonempty ({}) for object ',
+            'At \'http://localhost/classroom_admin/create_new\' these errors are happening:\nSchema validation for \'name\' failed: Validation failed: is_nonempty ({}) for object ',
         )
 
 
@@ -1136,12 +988,8 @@ class TestUpdateClassroomIndexMappingHandler(BaseClassroomControllerTests):
     def setUp(self) -> None:
         """Set up test data and environment."""
         super().setUp()
-        self.classroom_1 = self.save_new_valid_classroom(
-            'classroomone', 'Trigonometry', 'classroomone'
-        )
-        self.classroom_2 = self.save_new_valid_classroom(
-            'classroomtwo', 'Math', 'classroomtwo'
-        )
+        self.classroom_1 = self.save_new_valid_classroom('classroomone', 'Trigonometry', 'classroomone')
+        self.classroom_2 = self.save_new_valid_classroom('classroomtwo', 'Math', 'classroomtwo')
 
     def test_successful_update_classroom_index(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1160,16 +1008,10 @@ class TestUpdateClassroomIndexMappingHandler(BaseClassroomControllerTests):
             ]
         }
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            feconf.UPDATE_CLASSROOMS_ORDER_HANDLER_URL, payload, csrf_token
-        )
+        self.put_json(feconf.UPDATE_CLASSROOMS_ORDER_HANDLER_URL, payload, csrf_token)
 
-        updated_classroom_1 = classroom_config_services.get_classroom_by_id(
-            'classroomone'
-        )
-        updated_classroom_2 = classroom_config_services.get_classroom_by_id(
-            'classroomtwo'
-        )
+        updated_classroom_1 = classroom_config_services.get_classroom_by_id('classroomone')
+        updated_classroom_2 = classroom_config_services.get_classroom_by_id('classroomtwo')
 
         self.assertEqual(updated_classroom_1.index, 1)
         self.assertEqual(updated_classroom_2.index, 0)

@@ -1,5 +1,4 @@
 from google.cloud.storage.blob import Blob
-
 from typing import Any, Optional
 
 class Bucket(type):

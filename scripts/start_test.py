@@ -20,46 +20,34 @@ import argparse
 import unittest
 from unittest import mock
 
-from scripts import start
-
 from typing import List
+
+from scripts import start
 
 
 class GetBuildArgsTests(unittest.TestCase):
     """Tests for get_build_args function."""
 
     def test_get_build_args_no_flags_returns_empty_list(self) -> None:
-        parsed_args = argparse.Namespace(
-            prod_env=False, maintenance_mode=False, source_maps=False
-        )
+        parsed_args = argparse.Namespace(prod_env=False, maintenance_mode=False, source_maps=False)
         self.assertEqual(start.get_build_args(parsed_args), [])
 
     def test_get_build_args_prod_env_flag_returns_prod_env(self) -> None:
-        parsed_args = argparse.Namespace(
-            prod_env=True, maintenance_mode=False, source_maps=False
-        )
+        parsed_args = argparse.Namespace(prod_env=True, maintenance_mode=False, source_maps=False)
         self.assertEqual(start.get_build_args(parsed_args), ['--prod_env'])
 
     def test_get_build_args_maintenance_mode_flag_returns_maintenance_mode(
         self,
     ) -> None:
-        parsed_args = argparse.Namespace(
-            prod_env=False, maintenance_mode=True, source_maps=False
-        )
-        self.assertEqual(
-            start.get_build_args(parsed_args), ['--maintenance_mode']
-        )
+        parsed_args = argparse.Namespace(prod_env=False, maintenance_mode=True, source_maps=False)
+        self.assertEqual(start.get_build_args(parsed_args), ['--maintenance_mode'])
 
     def test_get_build_args_source_maps_flag_returns_source_maps(self) -> None:
-        parsed_args = argparse.Namespace(
-            prod_env=False, maintenance_mode=False, source_maps=True
-        )
+        parsed_args = argparse.Namespace(prod_env=False, maintenance_mode=False, source_maps=True)
         self.assertEqual(start.get_build_args(parsed_args), ['--source_maps'])
 
     def test_get_build_args_all_flags_returns_all(self) -> None:
-        parsed_args = argparse.Namespace(
-            prod_env=True, maintenance_mode=True, source_maps=True
-        )
+        parsed_args = argparse.Namespace(prod_env=True, maintenance_mode=True, source_maps=True)
         self.assertEqual(
             start.get_build_args(parsed_args),
             ['--prod_env', '--maintenance_mode', '--source_maps'],
@@ -100,18 +88,13 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
-    def test_browser_launch_success_prints_opening_message(
-        self, mock_create_browser: mock.Mock, mock_print: mock.Mock
-    ) -> None:
+    def test_browser_launch_success_prints_opening_message(self, mock_create_browser: mock.Mock, mock_print: mock.Mock) -> None:
         start.attempt_launch_browser(self.enter_context_fn)
-        self.enter_context_fn.assert_called_once_with(
-            mock_create_browser.return_value
-        )
+        self.enter_context_fn.assert_called_once_with(mock_create_browser.return_value)
         mock_print.assert_called_with(
             [
                 'INFORMATION',
-                'Local development server is ready! Opening a default web '
-                'browser window pointing to it: http://localhost:8181/',
+                'Local development server is ready! Opening a default web browser window pointing to it: http://localhost:8181/',
             ]
         )
 
@@ -145,15 +128,11 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
         self.assertEqual(mock_sleep.call_count, 1)
         # Called twice: fails, then succeeds.
         self.assertEqual(mock_create_browser.call_count, 2)
-        self.enter_context_fn.assert_called_once_with(
-            mock_create_browser.return_value
-        )
+        self.enter_context_fn.assert_called_once_with(mock_create_browser.return_value)
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
-    def test_attempt_launch_browser_success_when_devserver_is_running(
-        self, mock_create_browser: mock.Mock, mock_print: mock.Mock
-    ) -> None:
+    def test_attempt_launch_browser_success_when_devserver_is_running(self, mock_create_browser: mock.Mock, mock_print: mock.Mock) -> None:
         # This test verifies that attempt_launch_browser successfully launches
         # the browser when the dev server is running.
         dev_appserver = mock.Mock()
@@ -167,14 +146,11 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
             self.enter_context_fn,
         )
 
-        self.enter_context_fn.assert_called_once_with(
-            mock_create_browser.return_value
-        )
+        self.enter_context_fn.assert_called_once_with(mock_create_browser.return_value)
         mock_print.assert_called_with(
             [
                 'INFORMATION',
-                'Local development server is ready! Opening a default web '
-                'browser window pointing to it: http://localhost:8181/',
+                'Local development server is ready! Opening a default web browser window pointing to it: http://localhost:8181/',
             ]
         )
 
@@ -194,8 +170,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
         mock_time.side_effect = [
             0,
             start.BROWSER_RETRY_INTERVAL_SECS,
-            start.BROWSER_LAUNCH_TIMEOUT_SECS
-            + start.BROWSER_RETRY_INTERVAL_SECS,
+            start.BROWSER_LAUNCH_TIMEOUT_SECS + start.BROWSER_RETRY_INTERVAL_SECS,
         ]
         self.dev_appserver.is_running.return_value = True
         mock_create_browser.side_effect = Exception('BROWSER FAIL')
@@ -207,8 +182,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
         mock_print.assert_any_call(
             [
                 'ERROR',
-                'Error occurred while attempting to automatically launch '
-                'the web browser: BROWSER FAIL',
+                'Error occurred while attempting to automatically launch the web browser: BROWSER FAIL',
             ]
         )
         mock_print.assert_any_call(start.SERVER_READY_MESSAGE)
@@ -221,93 +195,61 @@ class MainTests(unittest.TestCase):
     def setUp(self) -> None:
         # Set up patches for all external dependencies to isolate the main()
         # function for unit testing.
-        self.patcher_common_is_port_in_use = mock.patch(
-            'scripts.start.common.is_port_in_use'
-        )
+        self.patcher_common_is_port_in_use = mock.patch('scripts.start.common.is_port_in_use')
         self.mock_is_port_in_use = self.patcher_common_is_port_in_use.start()
         self.mock_is_port_in_use.return_value = False
 
-        self.patcher_install = mock.patch(
-            'scripts.start.install_third_party_libs.main'
-        )
+        self.patcher_install = mock.patch('scripts.start.install_third_party_libs.main')
         self.mock_install = self.patcher_install.start()
 
         self.patcher_build = mock.patch('scripts.start.build.main')
         self.mock_build = self.patcher_build.start()
 
-        self.patcher_servers_managed_redis = mock.patch(
-            'scripts.start.servers.managed_redis_server'
-        )
+        self.patcher_servers_managed_redis = mock.patch('scripts.start.servers.managed_redis_server')
         self.mock_redis = self.patcher_servers_managed_redis.start()
 
-        self.patcher_servers_managed_es = mock.patch(
-            'scripts.start.servers.managed_elasticsearch_dev_server'
-        )
+        self.patcher_servers_managed_es = mock.patch('scripts.start.servers.managed_elasticsearch_dev_server')
         self.mock_es = self.patcher_servers_managed_es.start()
 
-        self.patcher_servers_managed_dev_appserver = mock.patch(
-            'scripts.start.servers.managed_dev_appserver'
-        )
-        self.mock_dev_appserver = (
-            self.patcher_servers_managed_dev_appserver.start()
-        )
+        self.patcher_servers_managed_dev_appserver = mock.patch('scripts.start.servers.managed_dev_appserver')
+        self.mock_dev_appserver = self.patcher_servers_managed_dev_appserver.start()
 
-        self.patcher_common_write_hashes = mock.patch(
-            'scripts.start.common.write_hashes_json_file'
-        )
+        self.patcher_common_write_hashes = mock.patch('scripts.start.common.write_hashes_json_file')
         self.mock_write_hashes = self.patcher_common_write_hashes.start()
 
-        self.patcher_servers_managed_ng_build = mock.patch(
-            'scripts.start.servers.managed_ng_build'
-        )
+        self.patcher_servers_managed_ng_build = mock.patch('scripts.start.servers.managed_ng_build')
         self.mock_ng_build = self.patcher_servers_managed_ng_build.start()
 
-        self.patcher_servers_managed_webpack = mock.patch(
-            'scripts.start.servers.managed_webpack_compiler'
-        )
+        self.patcher_servers_managed_webpack = mock.patch('scripts.start.servers.managed_webpack_compiler')
         self.mock_webpack = self.patcher_servers_managed_webpack.start()
 
-        self.patcher_servers_managed_firebase = mock.patch(
-            'scripts.start.servers.managed_firebase_auth_emulator'
-        )
+        self.patcher_servers_managed_firebase = mock.patch('scripts.start.servers.managed_firebase_auth_emulator')
         self.mock_firebase = self.patcher_servers_managed_firebase.start()
 
-        self.patcher_servers_managed_datastore = mock.patch(
-            'scripts.start.servers.managed_cloud_datastore_emulator'
-        )
+        self.patcher_servers_managed_datastore = mock.patch('scripts.start.servers.managed_cloud_datastore_emulator')
         self.mock_datastore = self.patcher_servers_managed_datastore.start()
 
-        self.patcher_extend_index = mock.patch(
-            'scripts.start.extend_index_yaml.main'
-        )
+        self.patcher_extend_index = mock.patch('scripts.start.extend_index_yaml.main')
         self.mock_extend_index = self.patcher_extend_index.start()
 
         self.patcher_time_sleep = mock.patch('scripts.start.time.sleep')
         self.mock_time_sleep = self.patcher_time_sleep.start()
 
-        self.patcher_servers_create_browser = mock.patch(
-            'scripts.start.servers.create_managed_web_browser'
-        )
+        self.patcher_servers_create_browser = mock.patch('scripts.start.servers.create_managed_web_browser')
         self.mock_create_browser = self.patcher_servers_create_browser.start()
         self.mock_create_browser.return_value.__enter__.return_value = None
         self.mock_create_browser.return_value.__exit__.return_value = None
 
-        self.patcher_common_set_constants = mock.patch(
-            'scripts.start.common.set_constants_to_default'
-        )
+        self.patcher_common_set_constants = mock.patch('scripts.start.common.set_constants_to_default')
         self.mock_set_constants = self.patcher_common_set_constants.start()
 
-        self.patcher_attempt_launch = mock.patch(
-            'scripts.start.attempt_launch_browser'
-        )
+        self.patcher_attempt_launch = mock.patch('scripts.start.attempt_launch_browser')
         self.mock_attempt_launch = self.patcher_attempt_launch.start()
 
         self.dev_appserver_mock = mock.Mock()
         self.dev_appserver_mock.wait = mock.Mock()
         self.dev_appserver_mock.is_running = mock.Mock(return_value=True)
-        self.mock_dev_appserver.return_value.__enter__.return_value = (
-            self.dev_appserver_mock
-        )
+        self.mock_dev_appserver.return_value.__enter__.return_value = self.dev_appserver_mock
         self.mock_dev_appserver.return_value.__exit__.return_value = None
 
         # Mock context managers to avoid starting real services.
@@ -342,9 +284,7 @@ class MainTests(unittest.TestCase):
         self.patcher_servers_create_browser.stop()
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    def test_main_exits_and_prints_error_if_ports_in_use(
-        self, mock_print: mock.Mock
-    ) -> None:
+    def test_main_exits_and_prints_error_if_ports_in_use(self, mock_print: mock.Mock) -> None:
         required_ports = [
             (8181, 'GAE dev appserver'),
             (8000, 'GAE dev appserver admin port'),
@@ -370,9 +310,7 @@ class MainTests(unittest.TestCase):
             )
 
     @mock.patch('scripts.start.attempt_launch_browser')
-    def test_main_successful_startup_with_no_install(
-        self, mock_attempt_launch: mock.Mock
-    ) -> None:
+    def test_main_successful_startup_with_no_install(self, mock_attempt_launch: mock.Mock) -> None:
         start.main(['--no_browser', '--skip_install'])
         self.mock_install.assert_not_called()
         self.mock_build.assert_called_once_with(args=[])
@@ -380,9 +318,7 @@ class MainTests(unittest.TestCase):
         self.dev_appserver_mock.wait.assert_called_once()
 
     @mock.patch('scripts.start.attempt_launch_browser')
-    def test_main_successful_startup_with_install(
-        self, mock_attempt_launch: mock.Mock
-    ) -> None:
+    def test_main_successful_startup_with_install(self, mock_attempt_launch: mock.Mock) -> None:
         start.main(['--no_browser'])
         self.mock_install.assert_called_once()
         self.mock_build.assert_called_once_with(args=[])
@@ -430,9 +366,7 @@ class MainTests(unittest.TestCase):
         )
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    def test_final_port_check_warns_if_ports_still_in_use_after_exit(
-        self, mock_print: mock.Mock
-    ) -> None:
+    def test_final_port_check_warns_if_ports_still_in_use_after_exit(self, mock_print: mock.Mock) -> None:
         self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
 
         call_count = 0
@@ -452,15 +386,7 @@ class MainTests(unittest.TestCase):
         mock_print.assert_called_with(
             [
                 'WARNING',
-                (
-                    'The following ports are still in use after exiting: '
-                    '8181 (GAE dev appserver), '
-                    '8000 (GAE dev appserver admin port), '
-                    '6379 (Redis server), '
-                    '9200 (ElasticSearch server), '
-                    '9099 (Firebase auth emulator), '
-                    '8089 (Cloud Datastore emulator)'
-                ),
+                ('The following ports are still in use after exiting: 8181 (GAE dev appserver), 8000 (GAE dev appserver admin port), 6379 (Redis server), 9200 (ElasticSearch server), 9099 (Firebase auth emulator), 8089 (Cloud Datastore emulator)'),
             ]
         )
 
@@ -480,9 +406,7 @@ class MainTests(unittest.TestCase):
         order: List[str] = []
 
         alert_cm = mock.Mock()
-        alert_cm.__enter__ = mock.Mock(
-            side_effect=lambda *args, **kwargs: order.append('alert')
-        )
+        alert_cm.__enter__ = mock.Mock(side_effect=lambda *args, **kwargs: order.append('alert'))
         alert_cm.__exit__ = mock.Mock(return_value=None)
         mock_alert.return_value = alert_cm
         mock_set_constants.side_effect = lambda: order.append('set_constants')

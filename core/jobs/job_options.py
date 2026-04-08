@@ -20,11 +20,11 @@ from __future__ import annotations
 
 import argparse
 
-from core import feconf
-from core.platform import models
-
 from apache_beam.options import pipeline_options
 from typing import List, Optional
+
+from core import feconf
+from core.platform import models
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -79,15 +79,11 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
         Raises:
             ValueError. Unsupported job option(s).
         """
-        allowed_options = set(self.JOB_OPTIONS.keys()).union(
-            self.DATAFLOW_RESOURCE_OPTIONS
-        )
+        allowed_options = set(self.JOB_OPTIONS.keys()).union(self.DATAFLOW_RESOURCE_OPTIONS)
         unsupported_options = set(job_options).difference(allowed_options)
         if unsupported_options:
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
-            raise ValueError(
-                'Unsupported option(s): %s' % joined_unsupported_options
-            )
+            raise ValueError('Unsupported option(s): %s' % joined_unsupported_options)
         oppia_project_id = app_identity_services.get_application_id()
         assert isinstance(oppia_project_id, str)
         super().__init__(
@@ -96,12 +92,8 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             # Needed by GoogleCloudOptions.
             project=oppia_project_id,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
-            temp_location=(
-                feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id
-            ),
-            staging_location=(
-                feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id
-            ),
+            temp_location=(feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id),
+            staging_location=(feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id),
             # The 'use_runner_v2' is used since some of our jobs require
             # the v2 of the runner. See the docs:
             # https://cloud.google.com/dataflow/docs/guides/deploying-a-pipeline#dataflow-runner-v2
@@ -121,6 +113,4 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             parser: argparse.ArgumentParser. An ArgumentParser instance.
         """
         for option_name, (option_type, option_doc) in cls.JOB_OPTIONS.items():
-            parser.add_argument(
-                '--%s' % option_name, help=option_doc, type=option_type
-            )
+            parser.add_argument('--%s' % option_name, help=option_doc, type=option_type)

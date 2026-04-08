@@ -1,4 +1,3 @@
-from . import Cursor, Key, TYPE_MODEL, Property
 from typing import (
     Any,
     Iterator,
@@ -6,11 +5,13 @@ from typing import (
     Literal,
     Optional,
     Sequence,
-    TypeVar,
     Tuple,
+    TypeVar,
     Union,
     overload,
 )
+
+from . import TYPE_MODEL, Cursor, Key, Property
 
 _T = TypeVar('_T', covariant=True)
 

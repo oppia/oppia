@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.issues import base
-
 from typing import List
+
+from extensions.issues import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -41,9 +41,7 @@ class EarlyQuit(base.BaseExplorationIssueSpec):
         },
         {
             'name': 'time_spent_in_exp_in_msecs',
-            'description': (
-                'Time spent in the exploration before quitting in milliseconds'
-            ),
+            'description': ('Time spent in the exploration before quitting in milliseconds'),
             'schema': {
                 'type': 'int',
             },

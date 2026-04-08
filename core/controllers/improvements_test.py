@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Final, Optional
+
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import improvements
@@ -32,15 +34,11 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final, Optional
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
-(improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS]
-)
+(improvements_models,) = models.Registry.import_models([models.Names.IMPROVEMENTS])
 
 
 class ImprovementsTestBase(test_utils.GenericTestBase):
@@ -174,9 +172,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self,
     ) -> None:
         with self.login_context(self.OWNER_EMAIL):
-            self.get_json(
-                self.get_url(exp_id='bad_exp_id'), expected_status_int=404
-            )
+            self.get_json(self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
     def test_get_with_non_creator_returns_401_error(self) -> None:
         with self.login_context(self.VIEWER_EMAIL):
@@ -195,32 +191,20 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             )
 
     def test_get_returns_open_tasks(self) -> None:
-        task_entries = [
-            self._new_open_task(state_name=name) for name in ['A', 'B', 'C']
-        ]
+        task_entries = [self._new_open_task(state_name=name) for name in ['A', 'B', 'C']]
         improvements_services.put_tasks(task_entries)
 
         with self.login_context(self.OWNER_EMAIL):
             self.assertEqual(
                 self.get_json(self.get_url()),
                 {
-                    'open_tasks': [
-                        improvements.get_task_dict_with_username_and_profile_picture(
-                            t
-                        )
-                        for t in task_entries
-                    ],
+                    'open_tasks': [improvements.get_task_dict_with_username_and_profile_picture(t) for t in task_entries],
                     'resolved_task_types_by_state_name': {},
                 },
             )
 
     def test_get_returns_resolved_tasks(self) -> None:
-        task_entries = [
-            self._new_resolved_task(
-                state_name=name, task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
-            )
-            for name in ['A', 'B', 'C']
-        ]
+        task_entries = [self._new_resolved_task(state_name=name, task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE) for name in ['A', 'B', 'C']]
         improvements_services.put_tasks(task_entries)
 
         with self.login_context(self.OWNER_EMAIL):
@@ -377,19 +361,15 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 csrf_token=self.get_new_csrf_token(),
             )
 
-        task_id = (
-            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
-                self.exp.id,
-                self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
-                feconf.DEFAULT_INIT_STATE_NAME,
-            )
+        task_id = improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            self.exp.id,
+            self.exp.version,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
         )
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
 
         self.assertIsNone(task_entry_model.issue_description)
 
@@ -430,38 +410,24 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 csrf_token=self.get_new_csrf_token(),
             )
 
-        task_id = (
-            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
-                self.exp.id,
-                self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
-                feconf.DEFAULT_INIT_STATE_NAME,
-            )
+        task_id = improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            self.exp.id,
+            self.exp.version,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
         )
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
 
         self.assertEqual(task_entry_model.id, task_id)
-        self.assertEqual(
-            task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION
-        )
+        self.assertEqual(task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION)
         self.assertEqual(task_entry_model.entity_id, self.exp.id)
         self.assertEqual(task_entry_model.entity_version, self.exp.version)
-        self.assertEqual(
-            task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE
-        )
-        self.assertEqual(
-            task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE
-        )
-        self.assertEqual(
-            task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME
-        )
-        self.assertEqual(
-            task_entry_model.issue_description, 'issue description'
-        )
+        self.assertEqual(task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE)
+        self.assertEqual(task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE)
+        self.assertEqual(task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(task_entry_model.issue_description, 'issue description')
         self.assertEqual(task_entry_model.status, constants.TASK_STATUS_OPEN)
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
@@ -484,41 +450,25 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 csrf_token=self.get_new_csrf_token(),
             )
 
-        task_id = (
-            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
-                self.exp.id,
-                self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
-                feconf.DEFAULT_INIT_STATE_NAME,
-            )
+        task_id = improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            self.exp.id,
+            self.exp.version,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
         )
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
 
         self.assertEqual(task_entry_model.id, task_id)
-        self.assertEqual(
-            task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION
-        )
+        self.assertEqual(task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION)
         self.assertEqual(task_entry_model.entity_id, self.exp.id)
         self.assertEqual(task_entry_model.entity_version, self.exp.version)
-        self.assertEqual(
-            task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE
-        )
-        self.assertEqual(
-            task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE
-        )
-        self.assertEqual(
-            task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME
-        )
-        self.assertEqual(
-            task_entry_model.issue_description, 'issue description'
-        )
-        self.assertEqual(
-            task_entry_model.status, constants.TASK_STATUS_OBSOLETE
-        )
+        self.assertEqual(task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE)
+        self.assertEqual(task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE)
+        self.assertEqual(task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(task_entry_model.issue_description, 'issue description')
+        self.assertEqual(task_entry_model.status, constants.TASK_STATUS_OBSOLETE)
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
 
@@ -544,41 +494,25 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 csrf_token=self.get_new_csrf_token(),
             )
 
-        task_id = (
-            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
-                self.exp.id,
-                self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
-                feconf.DEFAULT_INIT_STATE_NAME,
-            )
+        task_id = improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            self.exp.id,
+            self.exp.version,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
         )
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
 
         self.assertEqual(task_entry_model.id, task_id)
-        self.assertEqual(
-            task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION
-        )
+        self.assertEqual(task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION)
         self.assertEqual(task_entry_model.entity_id, self.exp.id)
         self.assertEqual(task_entry_model.entity_version, self.exp.version)
-        self.assertEqual(
-            task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE
-        )
-        self.assertEqual(
-            task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE
-        )
-        self.assertEqual(
-            task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME
-        )
-        self.assertEqual(
-            task_entry_model.issue_description, 'issue description'
-        )
-        self.assertEqual(
-            task_entry_model.status, constants.TASK_STATUS_RESOLVED
-        )
+        self.assertEqual(task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE)
+        self.assertEqual(task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE)
+        self.assertEqual(task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(task_entry_model.issue_description, 'issue description')
+        self.assertEqual(task_entry_model.status, constants.TASK_STATUS_RESOLVED)
         self.assertEqual(task_entry_model.resolver_id, self.owner_id)
         self.assertEqual(task_entry_model.resolved_on, self.MOCK_DATE)
 
@@ -597,9 +531,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             self.MOCK_DATE,
         )
         with self.assertRaisesRegex(Exception, 'User not found'):
-            improvements.get_task_dict_with_username_and_profile_picture(
-                task_entry
-            )
+            improvements.get_task_dict_with_username_and_profile_picture(task_entry)
 
     def test_to_dict_with_non_existing_resolver_id(self) -> None:
         task_entry = improvements_domain.TaskEntry(
@@ -617,11 +549,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         # In case of non-existing resolver_id,
         # get_task_dict_with_username_and_profile_picture should return
         # with no changes to the TaskEntry dict.
-        task_entry_dict = (
-            improvements.get_task_dict_with_username_and_profile_picture(
-                task_entry
-            )
-        )
+        task_entry_dict = improvements.get_task_dict_with_username_and_profile_picture(task_entry)
         self.assertEqual(
             task_entry_dict,
             {
@@ -634,9 +562,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 'issue_description': 'issue description',
                 'status': 'resolved',
                 'resolver_username': None,
-                'resolved_on_msecs': utils.get_time_in_millisecs(
-                    self.MOCK_DATE
-                ),
+                'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
             },
         )
 
@@ -647,9 +573,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def get_url(
-        self, exp_id: Optional[str] = None, cursor: Optional[str] = None
-    ) -> str:
+    def get_url(self, exp_id: Optional[str] = None, cursor: Optional[str] = None) -> str:
         """Returns the URL corresponding to the handler.
 
         Args:
@@ -675,9 +599,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         self,
     ) -> None:
         with self.login_context(self.OWNER_EMAIL):
-            self.get_json(
-                self.get_url(exp_id='bad_exp_id'), expected_status_int=404
-            )
+            self.get_json(self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
     def test_get_with_non_creator_returns_401_error(self) -> None:
         with self.login_context(self.VIEWER_EMAIL):
@@ -817,9 +739,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_get_for_non_existing_exploration_fails(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
-            self.get_json(
-                self.get_url(exp_id='bad_exp_id'), expected_status_int=404
-            )
+            self.get_json(self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
     def test_get_returns_exploration_id(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
@@ -847,9 +767,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertFalse(json_response['is_improvements_tab_enabled'])
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED])
     def test_improvements_tab_enabled(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
@@ -881,9 +799,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(
-            json_response[
-                'high_bounce_rate_task_state_bounce_rate_creation_threshold'
-            ],
+            json_response['high_bounce_rate_task_state_bounce_rate_creation_threshold'],
             0.35,
         )
 
@@ -912,9 +828,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(
-            json_response[
-                'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold'
-            ],
+            json_response['high_bounce_rate_task_state_bounce_rate_obsoletion_threshold'],
             0.05,
         )
 

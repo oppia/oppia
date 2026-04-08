@@ -18,14 +18,12 @@
 
 from __future__ import annotations
 
-from core.controllers import acl_decorators, base
-
 from typing import Dict
 
+from core.controllers import acl_decorators, base
 
-class FractionLandingRedirectPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+
+class FractionLandingRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The handler redirecting to the Fractions landing page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -37,9 +35,7 @@ class FractionLandingRedirectPage(
         self.redirect('/math/fractions')
 
 
-class TopicLandingRedirectPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class TopicLandingRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The handler redirecting the old landing page URL to the new one."""
 
     URL_PATH_ARGS_SCHEMAS = {'topic': {'schema': {'type': 'basestring'}}}

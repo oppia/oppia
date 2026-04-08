@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
+from typing import Optional, Type
+
 from core.domain import story_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
-
-from typing import Optional, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -34,11 +34,7 @@ if MYPY:  # pragma: no cover
 
 
 @validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel)
-class ValidateStorySnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        story_models.StorySnapshotMetadataModel
-    ]
-):
+class ValidateStorySnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[story_models.StorySnapshotMetadataModel]):
     """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
 
     def _get_change_domain_class(
@@ -58,11 +54,7 @@ class ValidateStorySnapshotMetadataModel(
 
 
 @validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel)
-class ValidateStoryCommitLogEntryModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        story_models.StoryCommitLogEntryModel
-    ]
-):
+class ValidateStoryCommitLogEntryModel(base_validation.BaseValidateCommitCmdsSchema[story_models.StoryCommitLogEntryModel]):
     """Overrides _get_change_domain_class for StoryCommitLogEntryModel."""
 
     # Here we use MyPy ignore because the signature of this method doesn't

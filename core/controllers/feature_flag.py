@@ -16,16 +16,14 @@
 
 from __future__ import annotations
 
+from typing import Dict
+
 from core import feature_flag_list, feconf
 from core.controllers import acl_decorators, base
 from core.domain import feature_flag_services
 
-from typing import Dict
 
-
-class FeatureFlagsEvaluationHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class FeatureFlagsEvaluationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The handler for retrieving feature flag values."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -35,9 +33,7 @@ class FeatureFlagsEvaluationHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests. Evaluates and returns all feature flags."""
-        result_dict = feature_flag_services.evaluate_all_feature_flag_configs(
-            self.user_id
-        )
+        result_dict = feature_flag_services.evaluate_all_feature_flag_configs(self.user_id)
 
         self.render_json(result_dict)
 
@@ -58,8 +54,6 @@ class FeatureFlagDummyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json(
             {
                 'msg': 'ok',
-                'is_enabled': feature_flag_services.is_feature_flag_enabled(
-                    dummy_feature_flag_for_e2e_tests, self.user_id
-                ),
+                'is_enabled': feature_flag_services.is_feature_flag_enabled(dummy_feature_flag_for_e2e_tests, self.user_id),
             }
         )

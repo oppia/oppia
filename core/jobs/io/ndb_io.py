@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
-from core.jobs import job_utils
-from core.platform import models
-
 import apache_beam as beam
 from apache_beam import pvalue
 from apache_beam.io.gcp.datastore.v1new import datastoreio
 from typing import Optional
+
+from core.jobs import job_utils
+from core.platform import models
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -41,9 +41,7 @@ datastore_services = models.Registry.import_datastore_services()
 class GetModels(beam.PTransform):  # type: ignore[misc]
     """Reads NDB models from the datastore using a query."""
 
-    def __init__(
-        self, query: datastore_services.Query, label: Optional[str] = None
-    ) -> None:
+    def __init__(self, query: datastore_services.Query, label: Optional[str] = None) -> None:
         """Initializes the GetModels PTransform.
 
         Args:
@@ -53,9 +51,7 @@ class GetModels(beam.PTransform):  # type: ignore[misc]
         super().__init__(label=label)
         self.query = query
 
-    def expand(
-        self, pbegin: pvalue.PBegin
-    ) -> beam.PCollection[datastore_services.Model]:
+    def expand(self, pbegin: pvalue.PBegin) -> beam.PCollection[datastore_services.Model]:
         """Returns a PCollection with models matching the corresponding query.
 
         This overrides the expand() method from the parent class.
@@ -67,16 +63,8 @@ class GetModels(beam.PTransform):  # type: ignore[misc]
         Returns:
             PCollection. The PCollection of models.
         """
-        query = job_utils.get_beam_query_from_ndb_query(
-            self.query, namespace=pbegin.pipeline.options.namespace
-        )
-        return (
-            pbegin.pipeline
-            | 'Reading %r from the datastore' % self.query
-            >> (datastoreio.ReadFromDatastore(query))
-            | 'Transforming %r into NDB models' % self.query
-            >> (beam.Map(job_utils.get_ndb_model_from_beam_entity))
-        )
+        query = job_utils.get_beam_query_from_ndb_query(self.query, namespace=pbegin.pipeline.options.namespace)
+        return pbegin.pipeline | 'Reading %r from the datastore' % self.query >> (datastoreio.ReadFromDatastore(query)) | 'Transforming %r into NDB models' % self.query >> (beam.Map(job_utils.get_ndb_model_from_beam_entity))
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -86,9 +74,7 @@ class GetModels(beam.PTransform):  # type: ignore[misc]
 class PutModels(beam.PTransform):  # type: ignore[misc]
     """Writes NDB models to the datastore."""
 
-    def expand(
-        self, entities: beam.PCollection[datastore_services.Model]
-    ) -> pvalue.PDone:
+    def expand(self, entities: beam.PCollection[datastore_services.Model]) -> pvalue.PDone:
         """Writes the given models to the datastore.
 
         This overrides the expand() method from the parent class.
@@ -102,13 +88,7 @@ class PutModels(beam.PTransform):  # type: ignore[misc]
             expand() methods need to return some PCollection.
         """
         oppia_project_id = app_identity_services.get_application_id()
-        return (
-            entities
-            | 'Transforming the NDB models into Apache Beam entities'
-            >> (beam.Map(job_utils.get_beam_entity_from_ndb_model))
-            | 'Writing the NDB models to the datastore'
-            >> (datastoreio.WriteToDatastore(oppia_project_id))
-        )
+        return entities | 'Transforming the NDB models into Apache Beam entities' >> (beam.Map(job_utils.get_beam_entity_from_ndb_model)) | 'Writing the NDB models to the datastore' >> (datastoreio.WriteToDatastore(oppia_project_id))
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -118,9 +98,7 @@ class PutModels(beam.PTransform):  # type: ignore[misc]
 class DeleteModels(beam.PTransform):  # type: ignore[misc]
     """Deletes NDB models from the datastore."""
 
-    def expand(
-        self, entities: beam.PCollection[datastore_services.Key]
-    ) -> pvalue.PDone:
+    def expand(self, entities: beam.PCollection[datastore_services.Key]) -> pvalue.PDone:
         """Deletes the given models from the datastore.
 
         This overrides the expand() method from the parent class.
@@ -134,10 +112,4 @@ class DeleteModels(beam.PTransform):  # type: ignore[misc]
             expand() methods need to return some PCollection.
         """
         oppia_project_id = app_identity_services.get_application_id()
-        return (
-            entities
-            | 'Transforming the NDB keys into Apache Beam keys'
-            >> (beam.Map(job_utils.get_beam_key_from_ndb_key))
-            | 'Deleting the NDB keys from the datastore'
-            >> (datastoreio.DeleteFromDatastore(oppia_project_id))
-        )
+        return entities | 'Transforming the NDB keys into Apache Beam keys' >> (beam.Map(job_utils.get_beam_key_from_ndb_key)) | 'Deleting the NDB keys from the datastore' >> (datastoreio.DeleteFromDatastore(oppia_project_id))

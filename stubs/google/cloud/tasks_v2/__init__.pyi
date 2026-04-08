@@ -1,7 +1,6 @@
 from google import auth
 from google.api_core.retry import Retry
 from google.cloud.tasks_v2 import types
-
 from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 class CloudTasksClient(object):

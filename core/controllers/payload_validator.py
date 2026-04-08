@@ -20,9 +20,9 @@ Also contains a list of handler class names which does not contain the schema.
 
 from __future__ import annotations
 
-from core import schema_utils
-
 from typing import Any, Dict, List, Tuple, Union
+
+from core import schema_utils
 
 
 # Here we use type Any because the sub-classes of BaseHandler can
@@ -103,19 +103,11 @@ def validate_arguments_against_schema(
 
         # Below normalization is for arguments which are expected to be boolean
         # but from API request they are received as string type.
-        if (
-            allow_string_to_bool_conversion
-            and get_schema_type(arg_schema) == schema_utils.SCHEMA_TYPE_BOOL
-            and isinstance(handler_args[arg_key], str)
-        ):
-            handler_args[arg_key] = convert_string_to_bool(
-                handler_args[arg_key]
-            )
+        if allow_string_to_bool_conversion and get_schema_type(arg_schema) == schema_utils.SCHEMA_TYPE_BOOL and isinstance(handler_args[arg_key], str):
+            handler_args[arg_key] = convert_string_to_bool(handler_args[arg_key])
 
         try:
-            normalized_value = schema_utils.normalize_against_schema(
-                handler_args[arg_key], arg_schema['schema']
-            )
+            normalized_value = schema_utils.normalize_against_schema(handler_args[arg_key], arg_schema['schema'])
 
             # Modification of argument name if new_key_for_argument
             # field is present in the schema.
@@ -123,9 +115,7 @@ def validate_arguments_against_schema(
                 arg_key = get_corresponding_key_for_object(arg_schema)
             normalized_values[arg_key] = normalized_value
         except Exception as e:
-            errors.append(
-                'Schema validation for \'%s\' failed: %s' % (arg_key, e)
-            )
+            errors.append('Schema validation for \'%s\' failed: %s' % (arg_key, e))
 
     extra_args = set(handler_args.keys()) - set(handler_args_schemas.keys())
 

@@ -18,14 +18,14 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.jobs import job_test_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import blog_validation
 from core.jobs.types import blog_validation_errors
 from core.platform import models
 from core.tests import test_utils
-
-import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -37,51 +37,37 @@ if MYPY:  # pragma: no cover
 class RelationshipsOfTests(test_utils.TestBase):
     def test_blog_post_model_relationships(self) -> None:
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'BlogPostModel', 'id'
-            ),
+            validation_decorators.RelationshipsOf.get_model_kind_references('BlogPostModel', 'id'),
             ['BlogPostSummaryModel', 'BlogPostRightsModel'],
         )
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'BlogPostModel', 'author_id'
-            ),
+            validation_decorators.RelationshipsOf.get_model_kind_references('BlogPostModel', 'author_id'),
             ['UserSettingsModel'],
         )
 
     def test_blog_post_summary_model_relationships(self) -> None:
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'BlogPostSummaryModel', 'id'
-            ),
+            validation_decorators.RelationshipsOf.get_model_kind_references('BlogPostSummaryModel', 'id'),
             ['BlogPostModel', 'BlogPostRightsModel'],
         )
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'BlogPostSummaryModel', 'author_id'
-            ),
+            validation_decorators.RelationshipsOf.get_model_kind_references('BlogPostSummaryModel', 'author_id'),
             ['UserSettingsModel'],
         )
 
     def test_blog_post_rights_model_relationships(self) -> None:
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'BlogPostRightsModel', 'id'
-            ),
+            validation_decorators.RelationshipsOf.get_model_kind_references('BlogPostRightsModel', 'id'),
             ['BlogPostModel', 'BlogPostSummaryModel'],
         )
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'BlogPostRightsModel', 'editor_ids'
-            ),
+            validation_decorators.RelationshipsOf.get_model_kind_references('BlogPostRightsModel', 'editor_ids'),
             ['UserSettingsModel'],
         )
 
     def test_blog_author_details_model_relationships(self) -> None:
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'BlogAuthorDetailsModel', 'author_id'
-            ),
+            validation_decorators.RelationshipsOf.get_model_kind_references('BlogAuthorDetailsModel', 'author_id'),
             ['UserSettingsModel'],
         )
 
@@ -101,18 +87,12 @@ class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
             published_on=self.YEAR_AGO,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
-        )
+        output = self.pipeline | beam.Create([invalid_timestamp]) | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
 
         self.assert_pcoll_equal(
             output,
             [
-                blog_validation_errors.InconsistentLastUpdatedTimestampsError(
-                    invalid_timestamp
-                ),
+                blog_validation_errors.InconsistentLastUpdatedTimestampsError(invalid_timestamp),
             ],
         )
 
@@ -130,18 +110,12 @@ class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
             published_on=self.NOW,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
-        )
+        output = self.pipeline | beam.Create([invalid_timestamp]) | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
 
         self.assert_pcoll_equal(
             output,
             [
-                blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(
-                    invalid_timestamp
-                ),
+                blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(invalid_timestamp),
             ],
         )
 
@@ -157,11 +131,7 @@ class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
             published_on=None,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([valid_timestamp])
-            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
-        )
+        output = self.pipeline | beam.Create([valid_timestamp]) | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
 
         self.assert_pcoll_equal(output, [])
 
@@ -179,18 +149,12 @@ class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
             published_on=self.YEAR_LATER,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
-        )
+        output = self.pipeline | beam.Create([invalid_timestamp]) | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
 
         self.assert_pcoll_equal(
             output,
             [
-                blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(
-                    invalid_timestamp
-                ),
+                blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(invalid_timestamp),
                 blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(  # pylint: disable=line-too-long
                     invalid_timestamp
                 ),
@@ -211,25 +175,17 @@ class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
             published_on=self.YEAR_AGO,
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
-        )
+        output = self.pipeline | beam.Create([invalid_timestamp]) | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
 
         self.assert_pcoll_equal(
             output,
             [
-                blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(
-                    invalid_timestamp
-                ),
+                blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(invalid_timestamp),
             ],
         )
 
 
-class ValidateBlogPostModelDomainObjectsInstancesTests(
-    job_test_utils.PipelinedTestBase
-):
+class ValidateBlogPostModelDomainObjectsInstancesTests(job_test_utils.PipelinedTestBase):
     def test_validation_type_for_domain_object_strict(self) -> None:
         blog_model = blog_models.BlogPostModel(
             id='validblogid2',
@@ -244,13 +200,7 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
             tags=['learners'],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([blog_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogPostModelDomainObjectsInstances()
-            )
-        )
+        output = self.pipeline | beam.Create([blog_model]) | beam.ParDo(blog_validation.ValidateBlogPostModelDomainObjectsInstances())
 
         self.assert_pcoll_equal(output, [])
 
@@ -268,20 +218,12 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
             tags=[],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([blog_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogPostModelDomainObjectsInstances()
-            )
-        )
+        output = self.pipeline | beam.Create([blog_model]) | beam.ParDo(blog_validation.ValidateBlogPostModelDomainObjectsInstances())
 
         self.assert_pcoll_equal(output, [])
 
 
-class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
-    job_test_utils.PipelinedTestBase
-):
+class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(job_test_utils.PipelinedTestBase):
     def test_validation_type_for_domain_object_strict(self) -> None:
         blog_summary_model = blog_models.BlogPostSummaryModel(
             id='validblogid4',
@@ -297,11 +239,7 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
         )
 
         output = (
-            self.pipeline
-            | beam.Create([blog_summary_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()
-            )  # pylint: disable=line-too-long
+            self.pipeline | beam.Create([blog_summary_model]) | beam.ParDo(blog_validation.ValidateBlogSummaryModelDomainObjectsInstances())  # pylint: disable=line-too-long
         )
 
         self.assert_pcoll_equal(output, [])
@@ -321,11 +259,7 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
         )
 
         output = (
-            self.pipeline
-            | beam.Create([blog_summary_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()
-            )  # pylint: disable=line-too-long
+            self.pipeline | beam.Create([blog_summary_model]) | beam.ParDo(blog_validation.ValidateBlogSummaryModelDomainObjectsInstances())  # pylint: disable=line-too-long
         )
 
         self.assert_pcoll_equal(output, [])

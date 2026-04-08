@@ -20,17 +20,6 @@ from __future__ import annotations
 
 import json
 
-from core.domain import (
-    caching_domain,
-    collection_domain,
-    exp_domain,
-    platform_parameter_domain,
-    skill_domain,
-    story_domain,
-    topic_domain,
-)
-from core.platform import models
-
 from typing import (
     Callable,
     Dict,
@@ -44,13 +33,22 @@ from typing import (
     overload,
 )
 
+from core.domain import (
+    caching_domain,
+    collection_domain,
+    exp_domain,
+    platform_parameter_domain,
+    skill_domain,
+    story_domain,
+    topic_domain,
+)
+from core.platform import models
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import memory_cache_services
 
-    AllowedDefaultTypes = Union[
-        str, int, List[Optional[bool]], Dict[str, float]
-    ]
+    AllowedDefaultTypes = Union[str, int, List[Optional[bool]], Dict[str, float]]
 
     AllowedCacheableObjectTypes = Union[
         AllowedDefaultTypes,
@@ -151,9 +149,7 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_SKILL: skill_domain.Skill.deserialize,
     CACHE_NAMESPACE_STORY: story_domain.Story.deserialize,
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
-    CACHE_NAMESPACE_PLATFORM_PARAMETER: (
-        platform_parameter_domain.PlatformParameter.deserialize
-    ),
+    CACHE_NAMESPACE_PLATFORM_PARAMETER: (platform_parameter_domain.PlatformParameter.deserialize),
     CACHE_NAMESPACE_DEFAULT: json.loads,
 }
 
@@ -169,9 +165,7 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
 }
 
 
-def _get_memcache_key(
-    namespace: NamespaceType, sub_namespace: str | None, obj_id: str
-) -> str:
+def _get_memcache_key(namespace: NamespaceType, sub_namespace: str | None, obj_id: str) -> str:
     """Returns a memcache key for the class under the corresponding
     namespace and sub_namespace.
 
@@ -194,9 +188,7 @@ def _get_memcache_key(
     """
     sub_namespace_key_string = sub_namespace or ''
     if MEMCACHE_KEY_DELIMITER in sub_namespace_key_string:
-        raise ValueError(
-            'Sub-namespace %s cannot contain \':\'.' % sub_namespace_key_string
-        )
+        raise ValueError('Sub-namespace %s cannot contain \':\'.' % sub_namespace_key_string)
     return '%s%s%s%s%s' % (
         namespace,
         MEMCACHE_KEY_DELIMITER,
@@ -228,21 +220,15 @@ def get_multi(
 
 
 @overload
-def get_multi(
-    namespace: Literal['skill'], sub_namespace: str | None, obj_ids: List[str]
-) -> Dict[str, skill_domain.Skill]: ...
+def get_multi(namespace: Literal['skill'], sub_namespace: str | None, obj_ids: List[str]) -> Dict[str, skill_domain.Skill]: ...
 
 
 @overload
-def get_multi(
-    namespace: Literal['story'], sub_namespace: str | None, obj_ids: List[str]
-) -> Dict[str, story_domain.Story]: ...
+def get_multi(namespace: Literal['story'], sub_namespace: str | None, obj_ids: List[str]) -> Dict[str, story_domain.Story]: ...
 
 
 @overload
-def get_multi(
-    namespace: Literal['topic'], sub_namespace: str | None, obj_ids: List[str]
-) -> Dict[str, topic_domain.Topic]: ...
+def get_multi(namespace: Literal['topic'], sub_namespace: str | None, obj_ids: List[str]) -> Dict[str, topic_domain.Topic]: ...
 
 
 @overload
@@ -254,14 +240,10 @@ def get_multi(
 
 
 @overload
-def get_multi(
-    namespace: Literal['default'], sub_namespace: str | None, obj_ids: List[str]
-) -> Dict[str, AllowedDefaultTypes]: ...
+def get_multi(namespace: Literal['default'], sub_namespace: str | None, obj_ids: List[str]) -> Dict[str, AllowedDefaultTypes]: ...
 
 
-def get_multi(
-    namespace: NamespaceType, sub_namespace: str | None, obj_ids: List[str]
-) -> Mapping[str, AllowedCacheableObjectTypes]:
+def get_multi(namespace: NamespaceType, sub_namespace: str | None, obj_ids: List[str]) -> Mapping[str, AllowedCacheableObjectTypes]:
     """Get a dictionary of the {id, value} pairs from the memory cache.
 
     Args:
@@ -293,10 +275,7 @@ def get_multi(
     if namespace not in DESERIALIZATION_FUNCTIONS:
         raise ValueError('Invalid namespace: %s.' % namespace)
 
-    memcache_keys = [
-        _get_memcache_key(namespace, sub_namespace, obj_id)
-        for obj_id in obj_ids
-    ]
+    memcache_keys = [_get_memcache_key(namespace, sub_namespace, obj_id) for obj_id in obj_ids]
     values = memory_cache_services.get_multi(memcache_keys)
     for obj_id, value in zip(obj_ids, values):
         if value:
@@ -405,9 +384,7 @@ def set_multi(
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 
-def delete_multi(
-    namespace: NamespaceType, sub_namespace: str | None, obj_ids: List[str]
-) -> bool:
+def delete_multi(namespace: NamespaceType, sub_namespace: str | None, obj_ids: List[str]) -> bool:
     """Deletes multiple ids in the cache.
 
     Args:
@@ -430,10 +407,7 @@ def delete_multi(
     if len(obj_ids) == 0:
         return True
 
-    memcache_keys = [
-        _get_memcache_key(namespace, sub_namespace, obj_id)
-        for obj_id in obj_ids
-    ]
+    memcache_keys = [_get_memcache_key(namespace, sub_namespace, obj_id) for obj_id in obj_ids]
     return memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)
 
 

@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Final, Type
+
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Final, Type
 
 MYPY = False
 if MYPY:
@@ -36,22 +36,14 @@ if MYPY:
 
 
 class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[
-        user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
-    ] = user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
+    JOB_CLASS: Type[user_stats_computation_jobs.CollectWeeklyDashboardStatsJob] = user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
 
-    VALID_USER_ID_1: Final = 'uid_%s' % (
-        'a' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
-    VALID_USER_ID_2: Final = 'uid_%s' % (
-        'b' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
+    VALID_USER_ID_1: Final = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    VALID_USER_ID_2: Final = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
 
     def setUp(self) -> None:
         super().setUp()
-        self.formated_datetime = datetime.datetime.utcnow().strftime(
-            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT
-        )
+        self.formated_datetime = datetime.datetime.utcnow().strftime(feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -71,13 +63,9 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([user_settings_model, user_stats_model])
 
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')])
 
-        new_user_stats_model = user_models.UserStatsModel.get(
-            self.VALID_USER_ID_1
-        )
+        new_user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
         # Ruling out the possibility of None for mypy type checking.
         assert new_user_stats_model is not None
         self.assertEqual(
@@ -109,16 +97,11 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Sorry, we can only process v1-v%d dashboard stats schemas at '
-            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
+            'Sorry, we can only process v1-v%d dashboard stats schemas at present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
         ):
-            self.assert_job_output_is(
-                [job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')]
-            )
+            self.assert_job_output_is([job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')])
 
-        new_user_stats_model = user_models.UserStatsModel.get(
-            self.VALID_USER_ID_1
-        )
+        new_user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
         # Ruling out the possibility of None for mypy type checking.
         assert new_user_stats_model is not None
         self.assertEqual(new_user_stats_model.weekly_creator_stats_list, [])
@@ -141,13 +124,9 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([user_settings_model, user_stats_model])
 
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='OLD MODELS SUCCESS: 1')])
 
-        new_user_stats_model = user_models.UserStatsModel.get(
-            self.VALID_USER_ID_1
-        )
+        new_user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
         # Ruling out the possibility of None for mypy type checking.
         assert new_user_stats_model is not None
         self.assertEqual(
@@ -172,9 +151,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
         user_settings_model.update_timestamps()
         user_settings_model.put()
 
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='NEW MODELS SUCCESS: 1')]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='NEW MODELS SUCCESS: 1')])
 
         user_stats_model = user_models.UserStatsModel.get(self.VALID_USER_ID_1)
         # Ruling out the possibility of None for mypy type checking.
@@ -203,13 +180,9 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
             id=self.VALID_USER_ID_2,
             email='b@b.com',
         )
-        user_stats_model_1 = self.create_model(
-            user_models.UserStatsModel, id=self.VALID_USER_ID_1
-        )
+        user_stats_model_1 = self.create_model(user_models.UserStatsModel, id=self.VALID_USER_ID_1)
 
-        self.put_multi(
-            [user_settings_model_1, user_settings_model_2, user_stats_model_1]
-        )
+        self.put_multi([user_settings_model_1, user_settings_model_2, user_stats_model_1])
 
         self.assert_job_output_is(
             [

@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions import domain
-
 from typing import Dict, List
+
+from extensions import domain
 
 
 class BaseExplorationIssueSpec:
@@ -37,10 +37,7 @@ class BaseExplorationIssueSpec:
     @property
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         """The customization arg specs for the components."""
-        return [
-            domain.CustomizationArgSpec(**cas)
-            for cas in self._customization_arg_specs
-        ]
+        return [domain.CustomizationArgSpec(**cas) for cas in self._customization_arg_specs]
 
     def to_dict(self) -> Dict[str, List[domain.CustomizationArgSpecsDict]]:
         """Gets a dict representing this issue. Only default values are

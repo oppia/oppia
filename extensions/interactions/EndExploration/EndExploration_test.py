@@ -19,9 +19,6 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.EndExploration import (  # pylint: disable=unused-import
-    EndExploration,
-)
 
 
 class EndExplorationTests(test_utils.GenericTestBase):

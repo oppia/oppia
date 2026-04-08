@@ -19,6 +19,8 @@ from __future__ import annotations
 import datetime
 import os
 
+from typing import List
+
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
@@ -35,8 +37,6 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import List
-
 
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
@@ -47,26 +47,18 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.topic_manager_id = self.get_user_id_from_email(
-            self.TOPIC_MANAGER_EMAIL
-        )
+        self.topic_manager_id = self.get_user_id_from_email(self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.topic_manager = user_services.get_user_actions_info(
-            self.topic_manager_id
-        )
+        self.topic_manager = user_services.get_user_actions_info(self.topic_manager_id)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.new_user = user_services.get_user_actions_info(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id, self.admin_id, description='Skill Description'
-        )
+        self.save_new_skill(self.skill_id, self.admin_id, description='Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id_2, self.admin_id, description='Skill Description 2'
-        )
+        self.save_new_skill(self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.topic_id_with_no_classroom = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -116,17 +108,13 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             topic_domain.TopicChange(
                 {
                     'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                    'property_name': (
-                        topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
-                    ),
+                    'property_name': (topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
                     'old_value': old_value,
                     'new_value': [self.skill_id],
                 }
             ),
         ]
-        topic_services.update_topic_and_subtopic_pages(
-            self.admin_id, self.topic_id, changelist, 'Added subtopic.'
-        )
+        topic_services.update_topic_and_subtopic_pages(self.admin_id, self.topic_id, changelist, 'Added subtopic.')
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id,
             self.topic_id_with_no_classroom,
@@ -136,31 +124,19 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        self.save_new_valid_classroom(
-            topic_id_to_prerequisite_topic_ids={self.topic_id: []}
-        )
+        self.save_new_valid_classroom(topic_id_to_prerequisite_topic_ids={self.topic_id: []})
         self.logout()
 
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
-        ]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW])
     def test_handler_updates_story_summary_dicts(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.save_new_valid_exploration(
-            'exp-1', self.admin_id, title='Title 1', end_state_name='End'
-        )
+        self.save_new_valid_exploration('exp-1', self.admin_id, title='Title 1', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-1')
-        self.save_new_valid_exploration(
-            'exp-2', self.admin_id, title='Title 2', end_state_name='End'
-        )
+        self.save_new_valid_exploration('exp-2', self.admin_id, title='Title 2', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-2')
-        self.save_new_valid_exploration(
-            'exp-3', self.admin_id, title='Title 3', end_state_name='End'
-        )
+        self.save_new_valid_exploration('exp-3', self.admin_id, title='Title 3', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-3')
 
         topic_id = topic_fetchers.get_new_topic_id()
@@ -171,9 +147,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         # 'self.topic_id' does not contain any canonical_story_summary_dicts
         # or additional_story_summary_dicts.
-        response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id)
-        )
+        response = self.get_json('%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
         story = story_domain.Story.create_default_story(
             canonical_story_id_1,
             'title',
@@ -193,9 +167,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': None,
@@ -214,9 +186,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
             'planned_publication_date_msecs': 1672770600000,
@@ -235,9 +205,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1690655400000,
@@ -299,9 +267,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             language_code='en',
             version=1,
             node_titles=[],
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][
-                0
-            ],
+            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
             thumbnail_filename='img.svg',
             url_fragment='url',
             story_model_created_on=datetime.datetime.today(),
@@ -309,12 +275,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         )
         story_services.save_story_summary(story_summary)
 
-        topic_services.publish_story(
-            topic_id, canonical_story_id_1, self.admin_id
-        )
-        topic_services.publish_story(
-            topic_id, canonical_story_id_2, self.admin_id
-        )
+        topic_services.publish_story(topic_id, canonical_story_id_1, self.admin_id)
+        topic_services.publish_story(topic_id, canonical_story_id_2, self.admin_id)
 
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
@@ -324,52 +286,26 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
         ):
-            response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id)
-            )
-            canonical_story_summary_dict = response[
-                'canonical_story_summary_dicts'
-            ][0]
-            additional_story_summary_dict = response[
-                'additional_story_summary_dicts'
-            ][0]
+            response = self.get_json('%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+            canonical_story_summary_dict = response['canonical_story_summary_dicts'][0]
+            additional_story_summary_dict = response['additional_story_summary_dicts'][0]
 
-            self.assertEqual(
-                canonical_story_summary_dict['description'], 'description'
-            )
+            self.assertEqual(canonical_story_summary_dict['description'], 'description')
             self.assertEqual(canonical_story_summary_dict['title'], 'title')
-            self.assertEqual(
-                canonical_story_summary_dict['id'], canonical_story_id_1
-            )
-            self.assertEqual(
-                canonical_story_summary_dict['story_is_published'], True
-            )
-            self.assertEqual(
-                canonical_story_summary_dict['total_chapters_count'], 3
-            )
-            self.assertEqual(
-                canonical_story_summary_dict['published_chapters_count'], 1
-            )
-            self.assertEqual(
-                canonical_story_summary_dict['upcoming_chapters_count'], 1
-            )
-            self.assertEqual(
-                canonical_story_summary_dict['overdue_chapters_count'], 1
-            )
+            self.assertEqual(canonical_story_summary_dict['id'], canonical_story_id_1)
+            self.assertEqual(canonical_story_summary_dict['story_is_published'], True)
+            self.assertEqual(canonical_story_summary_dict['total_chapters_count'], 3)
+            self.assertEqual(canonical_story_summary_dict['published_chapters_count'], 1)
+            self.assertEqual(canonical_story_summary_dict['upcoming_chapters_count'], 1)
+            self.assertEqual(canonical_story_summary_dict['overdue_chapters_count'], 1)
 
             self.assertEqual(
                 additional_story_summary_dict['description'],
                 'another description',
             )
-            self.assertEqual(
-                additional_story_summary_dict['title'], 'another title'
-            )
-            self.assertEqual(
-                additional_story_summary_dict['id'], additional_story_id
-            )
-            self.assertEqual(
-                additional_story_summary_dict['story_is_published'], False
-            )
+            self.assertEqual(additional_story_summary_dict['title'], 'another title')
+            self.assertEqual(additional_story_summary_dict['id'], additional_story_id)
+            self.assertEqual(additional_story_summary_dict['story_is_published'], False)
 
         self.logout()
 
@@ -400,9 +336,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         story_id = json_response['storyId']
         self.assertEqual(len(story_id), 12)
-        self.assertIsNotNone(
-            story_fetchers.get_story_by_id(story_id, strict=False)
-        )
+        self.assertIsNotNone(story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
 
     def test_story_creation_with_invalid_description(self) -> None:
@@ -433,10 +367,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         invalid_description = 'Story Description' * 60
         self.assertIn(
-            'Schema validation for \'description\' failed: '
-            'Validation failed: has_length_at_most '
-            f'({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
-            f'for object {invalid_description}',
+            f'Schema validation for \'description\' failed: Validation failed: has_length_at_most ({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) for object {invalid_description}',
             json_response['error'],
         )
 
@@ -468,9 +399,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=400,
         )
 
-        self.assertEqual(
-            json_response['error'], 'Image exceeds file size limit of 100 KB.'
-        )
+        self.assertEqual(json_response['error'], 'Image exceeds file size limit of 100 KB.')
 
     def test_story_creation_fails_with_duplicate_story_url_fragment(
         self,
@@ -536,8 +465,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         # editable subtopic data.
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1),
+            '%s/%s/%s' % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1),
             expected_status_int=401,
         )
         self.logout()
@@ -545,17 +473,12 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         # Check that topic managers not assigned to this topic can
         # access its subtopic pages.
         self.login(self.TOPIC_MANAGER_EMAIL)
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             {
                 'subtitled_html': {'html': '', 'content_id': 'content'},
                 'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
-                'written_translations': {
-                    'translations_mapping': {'content': {}}
-                },
+                'written_translations': {'translations_mapping': {'content': {}}},
             },
             json_response['subtopic_page_dict']['page_contents'],
         )
@@ -563,17 +486,12 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
         # Check that topic managers can access the subtopic page.
         self.login(self.TOPIC_MANAGER_EMAIL)
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             {
                 'subtitled_html': {'html': '', 'content_id': 'content'},
                 'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
-                'written_translations': {
-                    'translations_mapping': {'content': {}}
-                },
+                'written_translations': {'translations_mapping': {'content': {}}},
             },
             json_response['subtopic_page_dict']['page_contents'],
         )
@@ -581,17 +499,12 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
         # Check that admins can access the editable subtopic data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             {
                 'subtitled_html': {'html': '', 'content_id': 'content'},
                 'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
-                'written_translations': {
-                    'translations_mapping': {'content': {}}
-                },
+                'written_translations': {'translations_mapping': {'content': {}}},
             },
             json_response['subtopic_page_dict']['page_contents'],
         )
@@ -599,9 +512,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 
 class StudyGuideEditorTests(BaseTopicEditorControllerTests):
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES])
     def setUp(self) -> None:
         super().setUp()
         changelist = [
@@ -668,9 +579,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                 }
             ),
         ]
-        topic_services.update_topic_and_subtopic_pages(
-            self.admin_id, self.topic_id, changelist, 'Updated study guide.'
-        )
+        topic_services.update_topic_and_subtopic_pages(self.admin_id, self.topic_id, changelist, 'Updated study guide.')
 
     def test_get_can_not_access_handler_with_invalid_topic_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -692,8 +601,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
         # editable study guide data.
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/%s/%s'
-            % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1),
+            '%s/%s/%s' % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1),
             expected_status_int=401,
         )
         self.logout()
@@ -701,10 +609,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
         # Check that topic managers not assigned to this topic can
         # access its study guides.
         self.login(self.TOPIC_MANAGER_EMAIL)
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             [
                 {
@@ -724,10 +629,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
 
         # Check that topic managers can access the study guide.
         self.login(self.TOPIC_MANAGER_EMAIL)
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             [
                 {
@@ -747,10 +649,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
 
         # Check that admins can access the editable study guide data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             [
                 {
@@ -769,9 +668,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicEditorTests(
-    BaseTopicEditorControllerTests, test_utils.EmailTestBase
-):
+class TopicEditorTests(BaseTopicEditorControllerTests, test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
@@ -800,32 +697,19 @@ class TopicEditorTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         messages = self._get_sent_email_messages('testadmin@example.com')
         self.assertEqual(len(messages), 0)
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id)
-        )
+        json_response = self.get_json('%s/%s' % (feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
         self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-        self.assertTrue(
-            self.skill_id in json_response['skill_question_count_dict']
-        )
-        self.assertEqual(
-            json_response['skill_question_count_dict'][self.skill_id], 0
-        )
-        self.assertTrue(
-            self.skill_id_2 in json_response['skill_question_count_dict']
-        )
-        self.assertEqual(
-            json_response['skill_question_count_dict'][self.skill_id_2], 0
-        )
+        self.assertTrue(self.skill_id in json_response['skill_question_count_dict'])
+        self.assertEqual(json_response['skill_question_count_dict'][self.skill_id], 0)
+        self.assertTrue(self.skill_id_2 in json_response['skill_question_count_dict'])
+        self.assertEqual(json_response['skill_question_count_dict'][self.skill_id_2], 0)
         self.assertEqual(
             'Skill Description',
             json_response['skill_id_to_description_dict'][self.skill_id],
         )
 
         messages = self._get_sent_email_messages('testadmin@example.com')
-        expected_email_html_body = (
-            'The deleted skills: %s are still'
-            ' present in topic with id %s' % (self.skill_id_2, self.topic_id)
-        )
+        expected_email_html_body = 'The deleted skills: %s are still present in topic with id %s' % (self.skill_id_2, self.topic_id)
         self.assertEqual(len(messages), 2)
         self.assertIn(expected_email_html_body, messages[0].html)
 
@@ -872,10 +756,7 @@ class TopicEditorTests(
             expected_status_int=400,
         )
         self.assertIn(
-            'Schema validation for \'commit_message\' failed: '
-            'Validation failed: has_length_at_most '
-            f'({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
-            f'for object {commit_msg}',
+            f'Schema validation for \'commit_message\' failed: Validation failed: has_length_at_most ({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) for object {commit_msg}',
             json_response['error'],
         )
 
@@ -1041,18 +922,12 @@ class TopicEditorTests(
         )
 
         messages = self._get_sent_email_messages('testadmin@example.com')
-        expected_email_html_body = (
-            'The deleted skills: %s are still'
-            ' present in topic with id %s' % (self.skill_id_2, self.topic_id)
-        )
+        expected_email_html_body = 'The deleted skills: %s are still present in topic with id %s' % (self.skill_id_2, self.topic_id)
         self.assertEqual(len(messages), 1)
         self.assertIn(expected_email_html_body, messages[0].html)
 
         # Test if the corresponding subtopic pages were created.
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             {
                 'subtitled_html': {
@@ -1060,16 +935,11 @@ class TopicEditorTests(
                     'content_id': 'content',
                 },
                 'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
-                'written_translations': {
-                    'translations_mapping': {'content': {}}
-                },
+                'written_translations': {'translations_mapping': {'content': {}}},
             },
             json_response['subtopic_page_dict']['page_contents'],
         )
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 2)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 2))
         self.assertEqual(
             {
                 'subtitled_html': {
@@ -1088,18 +958,13 @@ class TopicEditorTests(
                         }
                     }
                 },
-                'written_translations': {
-                    'translations_mapping': {'content': {}}
-                },
+                'written_translations': {'translations_mapping': {'content': {}}},
             },
             json_response['subtopic_page_dict']['page_contents'],
         )
 
         # Test if the corresponding study guides were created.
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
+        json_response = self.get_json('%s/%s/%s' % (feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1))
         self.assertEqual(
             [
                 {
@@ -1202,8 +1067,7 @@ class TopicEditorTests(
 
         self.assertEqual(
             json_response['error'],
-            'Trying to update version 1 of topic from version 3, '
-            'which is too old. Please reload the page and try again.',
+            'Trying to update version 1 of topic from version 3, which is too old. Please reload the page and try again.',
         )
 
         self.logout()
@@ -1329,9 +1193,7 @@ class TopicEditorTests(
             '%s/%s' % (feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             expected_status_int=401,
         )
-        self.assertEqual(
-            response['error'], 'You must be logged in to access this resource.'
-        )
+        self.assertEqual(response['error'], 'You must be logged in to access this resource.')
 
     def test_cannot_delete_invalid_topic(self) -> None:
         # Check that an invalid topic can not be deleted.
@@ -1383,9 +1245,7 @@ class TopicEditorTests(
         self.logout()
 
 
-class TopicPublishSendMailHandlerTests(
-    BaseTopicEditorControllerTests, test_utils.EmailTestBase
-):
+class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests, test_utils.EmailTestBase):
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
@@ -1410,11 +1270,7 @@ class TopicPublishSendMailHandlerTests(
             csrf_token=csrf_token,
         )
         messages = self._get_sent_email_messages('testadmin@example.com')
-        expected_email_html_body = (
-            'wants to publish topic: Topic Name at URL %s/%s, please review'
-            ' and publish if it looks good.'
-            % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id)
-        )
+        expected_email_html_body = 'wants to publish topic: Topic Name at URL %s/%s, please review and publish if it looks good.' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id)
         self.assertEqual(len(messages), 1)
         self.assertIn(expected_email_html_body, messages[0].html)
 
@@ -1424,9 +1280,7 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
         """Test the get topic rights functionality."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Test whether admin can access topic rights.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id)
-        )
+        json_response = self.get_json('%s/%s' % (feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
         self.assertEqual(json_response['published'], False)
         self.assertEqual(json_response['can_publish_topic'], True)
         self.logout()
@@ -1452,9 +1306,7 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
             ),
             expected_status_int=400,
         )
-        self.assertEqual(
-            json_response['error'], 'Expected a valid topic id to be provided.'
-        )
+        self.assertEqual(json_response['error'], 'Expected a valid topic id to be provided.')
 
         self.logout()
 
@@ -1473,8 +1325,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=400,
         )
         self.assertIn(
-            'Schema validation for \'publish_status\' failed: '
-            f'Expected bool, received {invalid}',
+            f'Schema validation for \'publish_status\' failed: Expected bool, received {invalid}',
             response['error'],
         )
 
@@ -1486,33 +1337,26 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         # Test whether admin can publish and unpublish a topic.
         self.put_json(
-            '%s/%s'
-            % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
+            '%s/%s' % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
             {'publish_status': True},
             csrf_token=csrf_token,
         )
-        topic_rights = topic_fetchers.get_topic_rights(
-            self.topic_id_with_no_classroom
-        )
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id_with_no_classroom)
         self.assertTrue(topic_rights.topic_is_published)
 
         self.put_json(
-            '%s/%s'
-            % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
+            '%s/%s' % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
             {'publish_status': False},
             csrf_token=csrf_token,
         )
-        topic_rights = topic_fetchers.get_topic_rights(
-            self.topic_id_with_no_classroom
-        )
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id_with_no_classroom)
         self.assertFalse(topic_rights.topic_is_published)
         self.logout()
 
         self.login(self.NEW_USER_EMAIL)
         # Test that other users cannot access topic rights.
         self.put_json(
-            '%s/%s'
-            % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
+            '%s/%s' % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
             {'publish_status': False},
             csrf_token=csrf_token,
             expected_status_int=401,
@@ -1555,14 +1399,11 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_cannot_unpublish_an_unpublished_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        topic_rights = topic_fetchers.get_topic_rights(
-            self.topic_id_with_no_classroom
-        )
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id_with_no_classroom)
         self.assertFalse(topic_rights.topic_is_published)
 
         response = self.put_json(
-            '%s/%s'
-            % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
+            '%s/%s' % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom),
             {'publish_status': False},
             csrf_token=csrf_token,
             expected_status_int=401,
@@ -1581,11 +1422,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         )
         topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertTrue(topic_rights.topic_is_published)
-        error_message = (
-            'The topic is assigned to the math classroom. '
-            'Contact the curriculum admins to remove it from '
-            'the classroom first.'
-        )
+        error_message = 'The topic is assigned to the math classroom. Contact the curriculum admins to remove it from the classroom first.'
 
         response = self.put_json(
             '%s/%s' % (feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
@@ -1611,9 +1448,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         topic_url_fragment = 'fragment'
 
         # Topic url fragment does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment)
-        )
+        json_response = self.get_json('%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], False)
 
         # Publish the topic.
@@ -1634,9 +1469,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         # Unique topic url fragment does not exist.
         topic_url_fragment = 'topic-fragment'
 
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment)
-        )
+        json_response = self.get_json('%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], False)
 
         self.logout()
@@ -1647,9 +1480,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         topic_url_fragment = 'fragment'
 
         # Topic url fragment does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment)
-        )
+        json_response = self.get_json('%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], False)
 
         # Publish the topic.
@@ -1668,9 +1499,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         )
 
         # Topic url fragment exists since we've already published it.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment)
-        )
+        json_response = self.get_json('%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], True)
 
         self.logout()
@@ -1682,14 +1511,10 @@ class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.add_user_role(
-            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
-        )
+        self.add_user_role(self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        self.topic = topic_domain.Topic.create_default_topic(
-            'topic_id', 'Dummy Topic', 'abbrev', 'description', 'fragm'
-        )
+        self.topic = topic_domain.Topic.create_default_topic('topic_id', 'Dummy Topic', 'abbrev', 'description', 'fragm')
         self.topic.thumbnail_filename = 'thumbnail.svg'
         self.topic.thumbnail_bg_color = '#C6DCDA'
         self.topic.subtopics = [
@@ -1715,9 +1540,7 @@ class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
             'topic_id',
         )
         json_response = self.get_json(url)
-        self.assertEqual(
-            json_response['topic_id_to_topic_name'], {'topic_id': 'Dummy Topic'}
-        )
+        self.assertEqual(json_response['topic_id_to_topic_name'], {'topic_id': 'Dummy Topic'})
 
         url = '%s/?comma_separated_topic_ids=%s' % (
             feconf.TOPIC_ID_TO_TOPIC_NAME,
@@ -1726,8 +1549,7 @@ class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(url, expected_status_int=500)
         self.assertEqual(
             json_response['error'],
-            'No corresponding topic models exist for these topic IDs: '
-            'incorrect_topic_id.',
+            'No corresponding topic models exist for these topic IDs: incorrect_topic_id.',
         )
 
         url = '%s/?comma_separated_topic_ids=%s' % (

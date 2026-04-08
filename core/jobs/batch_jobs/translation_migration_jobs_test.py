@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from typing import Final, Sequence
+
 from core import feconf
 from core.domain import exp_domain, rights_manager, state_domain
 from core.jobs import job_test_utils
@@ -26,15 +28,11 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final, Sequence
-
 MYPY = False
 if MYPY:
     from mypy_imports import exp_models, translation_models
 
-(exp_models, translation_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.TRANSLATION]
-)
+(exp_models, translation_models) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.TRANSLATION])
 
 STATE_DICT_IN_V52 = {
     'content': {'content_id': 'content', 'html': 'Content for the state'},
@@ -177,12 +175,8 @@ STATE_DICT_IN_V52 = {
 }
 
 
-class EntityTranslationsModelGenerationOneOffJobTests(
-    job_test_utils.JobTestBase, test_utils.GenericTestBase
-):
-    JOB_CLASS = (
-        translation_migration_jobs.EntityTranslationsModelGenerationOneOffJob
-    )
+class EntityTranslationsModelGenerationOneOffJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
+    JOB_CLASS = translation_migration_jobs.EntityTranslationsModelGenerationOneOffJob
 
     AUTHOR_EMAIL: Final = 'author@example.com'
 
@@ -220,33 +214,23 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         model.commit(self.author_id, 'commit_message', commit_cmds_dict)
 
     def test_entity_translation_model_generated_from_old_exp(self) -> None:
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='GENERATED TRANSLATIONS SUCCESS: 2'
-                ),
+                job_run_result.JobRunResult(stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='GENERATED TRANSLATIONS SUCCESS: 2'),
             ]
         )
 
-        entity_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch()
-        )
+        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 2)
 
     def test_job_raises_error_for_failing_exp_traversal_steps(self) -> None:
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
         raise_swap = self.swap_to_always_raise(
@@ -254,57 +238,31 @@ class EntityTranslationsModelGenerationOneOffJobTests(
             'generate_old_content_id_to_new_content_id_in_v54_states',
         )
         with raise_swap:
-            self.assert_job_output_is(
-                [
-                    job_run_result.JobRunResult(
-                        stderr=(
-                            'EXPLORATION MODELS TRAVERSED ERROR: "(\'exp1\', '
-                            'Exception())": 1'
-                        )
-                    )
-                ]
-            )
+            self.assert_job_output_is([job_run_result.JobRunResult(stderr=('EXPLORATION MODELS TRAVERSED ERROR: "(\'exp1\', Exception())": 1'))])
 
-        entity_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch()
-        )
+        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
 
     def test_job_raises_error_for_failing_model_creation_steps(self) -> None:
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_swap = self.swap_to_always_raise(
-            translation_models.EntityTranslationsModel, 'create_new'
-        )
+        raise_swap = self.swap_to_always_raise(translation_models.EntityTranslationsModel, 'create_new')
         with raise_swap:
             self.assert_job_output_is(
                 [
-                    job_run_result.JobRunResult(
-                        stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'
-                    ),
-                    job_run_result.JobRunResult(
-                        stderr=(
-                            'GENERATED TRANSLATIONS ERROR: "(\'exp1\', '
-                            'Exception())": 2'
-                        )
-                    ),
+                    job_run_result.JobRunResult(stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'),
+                    job_run_result.JobRunResult(stderr=('GENERATED TRANSLATIONS ERROR: "(\'exp1\', Exception())": 2')),
                 ]
             )
 
-        entity_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch()
-        )
+        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
 
 
-class AuditEntityTranslationsModelGenerationOneOffJobTests(
-    job_test_utils.JobTestBase, test_utils.GenericTestBase
-):
+class AuditEntityTranslationsModelGenerationOneOffJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
     JOB_CLASS = translation_migration_jobs.AuditEntityTranslationsModelGenerationOneOffJob
 
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -343,33 +301,23 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
         model.commit(self.author_id, 'commit_message', commit_cmds_dict)
 
     def test_entity_translation_model_not_generated_from_old_exp(self) -> None:
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='GENERATED TRANSLATIONS SUCCESS: 2'
-                ),
+                job_run_result.JobRunResult(stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='GENERATED TRANSLATIONS SUCCESS: 2'),
             ]
         )
 
-        entity_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch()
-        )
+        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
 
     def test_job_raises_error_for_failing_exp_traversal_steps(self) -> None:
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
         raise_swap = self.swap_to_always_raise(
@@ -377,49 +325,25 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
             'generate_old_content_id_to_new_content_id_in_v54_states',
         )
         with raise_swap:
-            self.assert_job_output_is(
-                [
-                    job_run_result.JobRunResult(
-                        stderr=(
-                            'EXPLORATION MODELS TRAVERSED ERROR: "(\'exp1\', '
-                            'Exception())": 1'
-                        )
-                    )
-                ]
-            )
+            self.assert_job_output_is([job_run_result.JobRunResult(stderr=('EXPLORATION MODELS TRAVERSED ERROR: "(\'exp1\', Exception())": 1'))])
 
-        entity_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch()
-        )
+        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
 
     def test_job_raises_error_for_failing_model_creation_steps(self) -> None:
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_swap = self.swap_to_always_raise(
-            translation_models.EntityTranslationsModel, 'create_new'
-        )
+        raise_swap = self.swap_to_always_raise(translation_models.EntityTranslationsModel, 'create_new')
         with raise_swap:
             self.assert_job_output_is(
                 [
-                    job_run_result.JobRunResult(
-                        stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'
-                    ),
-                    job_run_result.JobRunResult(
-                        stderr=(
-                            'GENERATED TRANSLATIONS ERROR: "(\'exp1\', '
-                            'Exception())": 2'
-                        )
-                    ),
+                    job_run_result.JobRunResult(stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'),
+                    job_run_result.JobRunResult(stderr=('GENERATED TRANSLATIONS ERROR: "(\'exp1\', Exception())": 2')),
                 ]
             )
 
-        entity_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch()
-        )
+        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)

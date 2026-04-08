@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import os
 
+from typing import Final
+
 from core import feconf
 from core.constants import constants
 from core.domain import (
@@ -32,15 +34,11 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import Final
-
 
 class AssetDevHandlerImageTests(test_utils.GenericTestBase):
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
 
-    def _get_image_url(
-        self, entity_type: str, entity_id: str, filename: str
-    ) -> str:
+    def _get_image_url(self, entity_type: str, entity_id: str, filename: str) -> str:
         """Gets the image URL."""
         return '%s/%s/%s/assets/image/%s' % (
             self.ASSET_HANDLER_URL_PREFIX,
@@ -64,9 +62,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
@@ -78,9 +74,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: filename.',
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' these errors are happening:\nMissing key in handler args: filename.',
         )
 
         self.logout()
@@ -101,9 +95,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
@@ -113,14 +105,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=[('image', 'unused_filename', raw_image)],
         )
 
-        error_msg = (
-            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': '
-            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
-            ') for object .png'
-        )
+        error_msg = 'At \'http://localhost/createhandler/imageupload/exploration/0\' these errors are happening:\nSchema validation for \'filename\' failed: Validation failed: is_regex_matched ({\'regex_pattern\': \'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}) for object .png'
         self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
@@ -129,9 +114,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
@@ -142,9 +125,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         filename = response_dict['filename']
 
-        response = self.get_custom_response(
-            self._get_image_url('exploration', '0', filename), 'image/png'
-        )
+        response = self.get_custom_response(self._get_image_url('exploration', '0', filename), 'image/png')
         self.assertEqual(response.body, raw_image)
 
         response_dict = self.post_json(
@@ -157,8 +138,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response_dict['error'],
-            'A file with the name test.png already exists. Please choose a '
-            'different name.',
+            'A file with the name test.png already exists. Please choose a different name.',
         )
 
     def test_image_upload_and_download(self) -> None:
@@ -167,9 +147,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title', 'url-frag'
-        )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title', 'url-frag')
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         skill_id = skill_services.get_new_skill_id()
@@ -191,9 +169,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
@@ -205,18 +181,14 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_custom_response(
-            self._get_image_url('exploration', '0', filename), 'image/png'
-        )
+        response = self.get_custom_response(self._get_image_url('exploration', '0', filename), 'image/png')
         self.assertEqual(response.body, raw_image)
 
         # Page context: Topic.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/topic/%s' % (feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, topic_id),
@@ -228,18 +200,14 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_custom_response(
-            self._get_image_url('topic', topic_id, filename), 'image/png'
-        )
+        response = self.get_custom_response(self._get_image_url('topic', topic_id, filename), 'image/png')
         self.assertEqual(response.body, raw_image)
 
         # Page context: Story.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/story/%s' % (feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, story_id),
@@ -251,18 +219,14 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_custom_response(
-            self._get_image_url('story', story_id, filename), 'image/png'
-        )
+        response = self.get_custom_response(self._get_image_url('story', story_id, filename), 'image/png')
         self.assertEqual(response.body, raw_image)
 
         # Page context: Skill.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/skill/%s' % (feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, skill_id),
@@ -274,22 +238,17 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_custom_response(
-            self._get_image_url('skill', skill_id, filename), 'image/png'
-        )
+        response = self.get_custom_response(self._get_image_url('skill', skill_id, filename), 'image/png')
         self.assertEqual(response.body, raw_image)
 
         # Image context: Question Suggestions.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/question_suggestions/%s'
-            % (feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, skill_id),
+            '%s/question_suggestions/%s' % (feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, skill_id),
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             upload_files=[('image', 'unused_filename', raw_image)],
@@ -298,9 +257,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_custom_response(
-            self._get_image_url('skill', skill_id, filename), 'image/png'
-        )
+        response = self.get_custom_response(self._get_image_url('skill', skill_id, filename), 'image/png')
         self.assertEqual(response.body, raw_image)
 
     def test_non_matching_extensions_are_detected(self) -> None:
@@ -311,9 +268,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         supplied_filename = '%s.jpg' % filename_without_extension
         filename_with_correct_extension = '%s.png' % filename_without_extension
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         # Pass JPG extension even though raw_image data is PNG.
         # This test verifies that, when the filename extension differs from what
@@ -338,9 +293,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
         self.get_json(
-            self._get_image_url(
-                'exploration', '0', filename_with_correct_extension
-            ),
+            self._get_image_url('exploration', '0', filename_with_correct_extension),
             expected_status_int=404,
         )
 
@@ -370,11 +323,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         # Simulate valid image data of a different type (e.g., BMP).
-        bmp_image_data = (
-            b'BM\x1a\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00'
-            b'\x0c\x00\x00\x00\x01\x00\x01\x00\x01\x00\x18\x00\xff\xff\xff'
-            b'\x00\x00\x00'
-        )
+        bmp_image_data = b'BM\x1a\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x0c\x00\x00\x00\x01\x00\x01\x00\x01\x00\x18\x00\xff\xff\xff\x00\x00\x00'
 
         # Upload the BMP image.
         response_dict = self.post_json(
@@ -387,9 +336,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         # Assert the response.
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'], 'Image uses unsupported format'
-        )
+        self.assertEqual(response_dict['error'], 'Image uses unsupported format')
 
         self.logout()
 
@@ -400,9 +347,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         # Simulate corrupted image data.
-        corrupted_image_data = (
-            b'\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff'
-        )
+        corrupted_image_data = b'\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff'
 
         # Upload the corrupted image.
         response_dict = self.post_json(
@@ -436,8 +381,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
-            'Unsupported tags/attributes found in the SVG:\ntags: '
-            '[\'badsvg\']\n',
+            'Unsupported tags/attributes found in the SVG:\ntags: [\'badsvg\']\n',
         )
 
         self.logout()
@@ -458,15 +402,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                 (
                     'image',
                     'unused_filename',
-                    b'<svg><path d="%s" /></svg>'
-                    % (b'M150 0 L75 200 L225 200 Z ' * 4000),
+                    b'<svg><path d="%s" /></svg>' % (b'M150 0 L75 200 L225 200 Z ' * 4000),
                 )
             ],
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'], 'Image exceeds file size limit of 100 KB.'
-        )
+        self.assertEqual(response_dict['error'], 'Image exceeds file size limit of 100 KB.')
 
         self.logout()
 
@@ -483,9 +424,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
@@ -496,14 +435,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response_dict['status_code'], 400)
 
-        error_msg = (
-            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': '
-            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
-            ') for object test/a.png'
-        )
+        error_msg = 'At \'http://localhost/createhandler/imageupload/exploration/0\' these errors are happening:\nSchema validation for \'filename\' failed: Validation failed: is_regex_matched ({\'regex_pattern\': \'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}) for object test/a.png'
         self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
@@ -512,9 +444,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         """Test that filenames without extensions are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
@@ -525,14 +455,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response_dict['status_code'], 400)
 
-        error_msg = (
-            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': '
-            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
-            ') for object test'
-        )
+        error_msg = 'At \'http://localhost/createhandler/imageupload/exploration/0\' these errors are happening:\nSchema validation for \'filename\' failed: Validation failed: is_regex_matched ({\'regex_pattern\': \'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}) for object test'
         self.assertEqual(error_msg, response_dict['error'])
 
         self.logout()
@@ -542,9 +465,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
@@ -555,14 +476,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response_dict['status_code'], 400)
 
-        error_msg = (
-            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': '
-            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
-            ') for object test.pdf'
-        )
+        error_msg = 'At \'http://localhost/createhandler/imageupload/exploration/0\' these errors are happening:\nSchema validation for \'filename\' failed: Validation failed: is_regex_matched ({\'regex_pattern\': \'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}) for object test.pdf'
         self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
@@ -623,9 +537,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
             expected_status_int=401,
         )
-        self.assertEqual(
-            response['error'], 'You must be logged in to access this resource.'
-        )
+        self.assertEqual(response['error'], 'You must be logged in to access this resource.')
 
     def test_cannot_upload_audio_with_invalid_exp_id(self) -> None:
         self.login(self.EDITOR_EMAIL)
@@ -660,9 +572,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
-            upload_files=[
-                ('raw_audio_file', self.TEST_AUDIO_FILE_MP3, raw_audio)
-            ],
+            upload_files=[('raw_audio_file', self.TEST_AUDIO_FILE_MP3, raw_audio)],
             expected_status_int=200,
         )
         self.logout()
@@ -687,9 +597,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': self.TEST_AUDIO_FILE_FLAC},
             csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=[
-                ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)
-            ],
+            upload_files=[('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)],
         )
         error_msg = (
             'At \'http://localhost/createhandler/audioupload/0\' '
@@ -726,12 +634,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             upload_files=[('raw_audio_file', mismatched_filename, raw_audio)],
         )
         self.logout()
-        error_msg = (
-            'At \'http://localhost/createhandler/audioupload/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'raw_audio_file\' failed: '
-            'Audio not recognized as a mp3 file'
-        )
+        error_msg = 'At \'http://localhost/createhandler/audioupload/0\' these errors are happening:\nSchema validation for \'raw_audio_file\' failed: Audio not recognized as a mp3 file'
         self.assertEqual(response_dict['error'], error_msg)
 
     def test_detect_non_audio_file(self) -> None:
@@ -742,9 +645,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
-        ) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
             raw_audio = f.read()
 
         response_dict = self.post_json(
@@ -772,9 +673,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         with open(
-            os.path.join(
-                feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MPEG_CONTAINER
-            ),
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MPEG_CONTAINER),
             'rb',
             encoding=None,
         ) as f:
@@ -816,13 +715,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        error_msg = (
-            'At \'http://localhost/createhandler/audioupload/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': '
-            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.wav'
-        )
+        error_msg = 'At \'http://localhost/createhandler/audioupload/0\' these errors are happening:\nSchema validation for \'filename\' failed: Validation failed: is_regex_matched ({\'regex_pattern\': \'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.wav'
         self.assertEqual(response_dict['error'], error_msg)
 
     def test_upload_empty_audio(self) -> None:
@@ -842,10 +735,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/createhandler/audioupload/0\' '
-            'these errors are happening:\n'
-            'Schema validation for '
-            '\'raw_audio_file\' failed: No audio supplied',
+            'At \'http://localhost/createhandler/audioupload/0\' these errors are happening:\nSchema validation for \'raw_audio_file\' failed: No audio supplied',
         )
 
     def test_upload_bad_audio(self) -> None:
@@ -858,18 +748,13 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': 'test.mp3'},
             csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=[
-                ('raw_audio_file', 'unused_filename', b'non_audio_data')
-            ],
+            upload_files=[('raw_audio_file', 'unused_filename', b'non_audio_data')],
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/createhandler/audioupload/0\' '
-            'these errors are happening:\n'
-            'Schema validation for \'raw_audio_file\''
-            ' failed: Audio not recognized as a mp3 file',
+            'At \'http://localhost/createhandler/audioupload/0\' these errors are happening:\nSchema validation for \'raw_audio_file\' failed: Audio not recognized as a mp3 file',
         )
 
     def test_missing_extensions_are_detected(self) -> None:
@@ -894,13 +779,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        error_msg = (
-            'At \'http://localhost/createhandler/audioupload/0\' these '
-            'errors are happening:\n'
-            'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': '
-            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test'
-        )
+        error_msg = 'At \'http://localhost/createhandler/audioupload/0\' these errors are happening:\nSchema validation for \'filename\' failed: Validation failed: is_regex_matched ({\'regex_pattern\': \'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test'
         self.assertEqual(response_dict['error'], error_msg)
 
     def test_exceed_max_length_detected(self) -> None:
@@ -910,9 +789,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         with open(
-            os.path.join(
-                feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_OVER_MAX_LENGTH
-            ),
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_OVER_MAX_LENGTH),
             'rb',
             encoding=None,
         ) as f:
@@ -927,8 +804,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertIn(
-            'Audio files must be under %s seconds in length'
-            % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
+            'Audio files must be under %s seconds in length' % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
             response_dict['error'],
         )
 
@@ -960,10 +836,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/createhandler/audioupload/0\' these '
-            'errors are happening:\n'
-            'Schema validation for \'raw_audio_file\' '
-            'failed: Audio not recognized as a mp3 file',
+            'At \'http://localhost/createhandler/audioupload/0\' these errors are happening:\nSchema validation for \'raw_audio_file\' failed: Audio not recognized as a mp3 file',
         )
 
     def test_upload_check_for_duration_sec_as_response(self) -> None:
@@ -999,9 +872,7 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(
-            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME
-        )
+        self.signup(self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
@@ -1010,9 +881,7 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
 
     def test_get_promo_bar_data(self) -> None:
         response = self.get_json('/promo_bar_handler')
-        self.assertEqual(
-            response, {'promo_bar_enabled': False, 'promo_bar_message': ''}
-        )
+        self.assertEqual(response, {'promo_bar_enabled': False, 'promo_bar_message': ''})
 
     def test_release_coordinator_able_to_update_promo_bar_config(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
@@ -1044,21 +913,15 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
 class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
     def test_value_generated_error(self) -> None:
         dummy_id = 'someID'
-        response = self.get_json(
-            '/value_generator_handler/%s' % dummy_id, expected_status_int=400
-        )
+        response = self.get_json('/value_generator_handler/%s' % dummy_id, expected_status_int=400)
         self.assertIn(
-            'Schema validation for \'generator_id\' failed: Received someID '
-            'which is not in the allowed range of choices: [\'Copier\', '
-            '\'RandomSelector\']',
+            'Schema validation for \'generator_id\' failed: Received someID which is not in the allowed range of choices: [\'Copier\', \'RandomSelector\']',
             response['error'],
         )
 
     def test_html_response(self) -> None:
         copier_id = 'Copier'
-        response = self.get_html_response(
-            '/value_generator_handler/%s' % copier_id
-        )
+        response = self.get_html_response('/value_generator_handler/%s' % copier_id)
         self.assertIn(b'<object-editor [objType]="objType"', response.body)
 
 
@@ -1066,9 +929,7 @@ class FaviconHandlerTest(test_utils.GenericTestBase):
     """Test for the FaviconHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        response = self.get_html_response(
-            '/favicon.ico', expected_status_int=302
-        )
+        response = self.get_html_response('/favicon.ico', expected_status_int=302)
         self.assertEqual(
             'http://localhost:8181/assetsstatic/favicon.ico',
             response.headers['location'],
@@ -1079,9 +940,7 @@ class RobotsTxtHandlerTest(test_utils.GenericTestBase):
     """Test for the RobotsTxtHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        response = self.get_html_response(
-            '/robots.txt', expected_status_int=302
-        )
+        response = self.get_html_response('/robots.txt', expected_status_int=302)
         self.assertEqual(
             'http://localhost:8181/assetsstatic/robots.txt',
             response.headers['location'],
@@ -1097,7 +956,6 @@ class CopyrightImagesHandlerTest(test_utils.GenericTestBase):
             expected_status_int=302,
         )
         self.assertEqual(
-            'http://localhost:8181/assetsstatic/copyrighted-images/'
-            'general/mascot.svg',
+            'http://localhost:8181/assetsstatic/copyrighted-images/general/mascot.svg',
             response.headers['location'],
         )

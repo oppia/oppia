@@ -1,6 +1,3 @@
-import os
-import sys
-
 from core.tests import test_utils
 
 

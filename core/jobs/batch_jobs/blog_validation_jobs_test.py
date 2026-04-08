@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+from typing import Type
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import blog_validation_jobs
 from core.jobs.types import blog_validation_errors
 from core.platform import models
-
-from typing import Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,9 +33,7 @@ if MYPY:  # pragma: no cover
 
 
 class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostTitlesJob] = (
-        blog_validation_jobs.FindDuplicateBlogPostTitlesJob
-    )
+    JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostTitlesJob] = blog_validation_jobs.FindDuplicateBlogPostTitlesJob
 
     def test_run_with_same_titles_for_blog_posts(self) -> None:
         blog_post_model_1 = self.create_model(
@@ -73,20 +71,14 @@ class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                blog_validation_errors.DuplicateBlogTitleError(
-                    blog_post_model_1
-                ),
-                blog_validation_errors.DuplicateBlogTitleError(
-                    blog_post_model_2
-                ),
+                blog_validation_errors.DuplicateBlogTitleError(blog_post_model_1),
+                blog_validation_errors.DuplicateBlogTitleError(blog_post_model_2),
             ]
         )
 
 
 class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[
-        blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
-    ] = blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
+    JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob] = blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
 
     def test_run_with_same_titles_for_blog_posts(self) -> None:
         blog_post_summary_model_1 = self.create_model(
@@ -124,20 +116,14 @@ class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                blog_validation_errors.DuplicateBlogTitleError(
-                    blog_post_summary_model_1
-                ),
-                blog_validation_errors.DuplicateBlogTitleError(
-                    blog_post_summary_model_2
-                ),
+                blog_validation_errors.DuplicateBlogTitleError(blog_post_summary_model_1),
+                blog_validation_errors.DuplicateBlogTitleError(blog_post_summary_model_2),
             ]
         )
 
 
 class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostUrlsJob] = (
-        blog_validation_jobs.FindDuplicateBlogPostUrlsJob
-    )
+    JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostUrlsJob] = blog_validation_jobs.FindDuplicateBlogPostUrlsJob
 
     def test_run_with_same_url_for_blog_posts(self) -> None:
         blog_post_model_1 = self.create_model(
@@ -182,9 +168,7 @@ class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
 
 
 class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[
-        blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
-    ] = blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
+    JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob] = blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
 
     def test_run_with_same_url_for_blog_posts(self) -> None:
         blog_post_summary_model_1 = self.create_model(
@@ -222,22 +206,14 @@ class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                blog_validation_errors.DuplicateBlogUrlError(
-                    blog_post_summary_model_1
-                ),
-                blog_validation_errors.DuplicateBlogUrlError(
-                    blog_post_summary_model_2
-                ),
+                blog_validation_errors.DuplicateBlogUrlError(blog_post_summary_model_1),
+                blog_validation_errors.DuplicateBlogUrlError(blog_post_summary_model_2),
             ]
         )
 
 
-class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(
-    job_test_utils.JobTestBase
-):
-    JOB_CLASS: Type[
-        blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob
-    ] = blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob
+class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(job_test_utils.JobTestBase):
+    JOB_CLASS: Type[blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob] = blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob
 
     def test_run_with_same_author_id_for_blog_posts(self) -> None:
         author_details_model_1 = self.create_model(
@@ -272,11 +248,7 @@ class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(
 
         self.assert_job_output_is(
             [
-                blog_validation_errors.DuplicateBlogAuthorModelError(
-                    author_details_model_1
-                ),
-                blog_validation_errors.DuplicateBlogAuthorModelError(
-                    author_details_model_2
-                ),
+                blog_validation_errors.DuplicateBlogAuthorModelError(author_details_model_1),
+                blog_validation_errors.DuplicateBlogAuthorModelError(author_details_model_2),
             ]
         )

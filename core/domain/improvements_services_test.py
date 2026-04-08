@@ -20,21 +20,19 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Final
+
 from core import feconf
 from core.constants import constants
 from core.domain import improvements_domain, improvements_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
-(improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS]
-)
+(improvements_models,) = models.Registry.import_models([models.Names.IMPROVEMENTS])
 
 
 class ImprovementsServicesTestBase(test_utils.GenericTestBase):
@@ -158,27 +156,17 @@ class GetTaskEntryFromModelTests(ImprovementsServicesTestBase):
             self.owner_id,
             self.MOCK_DATE,
         )
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
-        )
-        task_entry = improvements_services.get_task_entry_from_model(
-            task_entry_model
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_id)
+        task_entry = improvements_services.get_task_entry_from_model(task_entry_model)
 
         self.assertEqual(task_entry.task_id, task_entry_model.id)
-        self.assertEqual(
-            task_entry.composite_entity_id, task_entry_model.composite_entity_id
-        )
+        self.assertEqual(task_entry.composite_entity_id, task_entry_model.composite_entity_id)
         self.assertEqual(task_entry.entity_type, task_entry_model.entity_type)
-        self.assertEqual(
-            task_entry.entity_version, task_entry_model.entity_version
-        )
+        self.assertEqual(task_entry.entity_version, task_entry_model.entity_version)
         self.assertEqual(task_entry.task_type, task_entry_model.task_type)
         self.assertEqual(task_entry.target_type, task_entry_model.target_type)
         self.assertEqual(task_entry.target_id, task_entry_model.target_id)
-        self.assertEqual(
-            task_entry.issue_description, task_entry_model.issue_description
-        )
+        self.assertEqual(task_entry.issue_description, task_entry_model.issue_description)
         self.assertEqual(task_entry.status, task_entry_model.status)
         self.assertEqual(task_entry.resolver_id, task_entry_model.resolver_id)
         self.assertEqual(task_entry.resolved_on, task_entry_model.resolved_on)
@@ -188,37 +176,24 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
     """Unit tests for the fetch_exploration_tasks function."""
 
     def test_fetch_when_no_models_exist(self) -> None:
-        open_tasks, resolved_task_types_by_state_name = (
-            improvements_services.fetch_exploration_tasks(self.exp)
-        )
+        open_tasks, resolved_task_types_by_state_name = improvements_services.fetch_exploration_tasks(self.exp)
         self.assertEqual(open_tasks, [])
         self.assertEqual(resolved_task_types_by_state_name, {})
 
     def test_fetch_when_number_of_open_tasks_exceed_single_fetch_limit(
         self,
     ) -> None:
-        tasks = [
-            self._new_open_task(state_name='State %d' % (i,))
-            for i in range(int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
-        ]
+        tasks = [self._new_open_task(state_name='State %d' % (i,)) for i in range(int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))]
         improvements_services.put_tasks(tasks)
-        open_tasks, resolved_task_types_by_state_name = (
-            improvements_services.fetch_exploration_tasks(self.exp)
-        )
+        open_tasks, resolved_task_types_by_state_name = improvements_services.fetch_exploration_tasks(self.exp)
 
         self.assertEqual(resolved_task_types_by_state_name, {})
-        self.assertItemsEqual(
-            [t.to_dict() for t in tasks], [t.to_dict() for t in open_tasks]
-        )
+        self.assertItemsEqual([t.to_dict() for t in tasks], [t.to_dict() for t in open_tasks])
 
     def test_fetch_identifies_the_resolved_tasks_of_each_state(self) -> None:
         tasks = [
-            self._new_resolved_task(
-                state_name='A', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
-            ),
-            self._new_resolved_task(
-                state_name='B', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
-            ),
+            self._new_resolved_task(state_name='A', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE),
+            self._new_resolved_task(state_name='B', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE),
             self._new_resolved_task(
                 state_name='B',
                 task_type=(constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES),
@@ -227,9 +202,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
                 state_name='C',
                 task_type=(constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP),
             ),
-            self._new_resolved_task(
-                state_name='D', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
-            ),
+            self._new_resolved_task(state_name='D', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE),
             self._new_resolved_task(
                 state_name='D',
                 task_type=(constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES),
@@ -244,9 +217,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             ),
         ]
         improvements_services.put_tasks(tasks)
-        open_tasks, resolved_task_types_by_state_name = (
-            improvements_services.fetch_exploration_tasks(self.exp)
-        )
+        open_tasks, resolved_task_types_by_state_name = improvements_services.fetch_exploration_tasks(self.exp)
 
         self.assertEqual(open_tasks, [])
         self.assertItemsEqual(
@@ -258,9 +229,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
                 'D',
             ],
         )
-        self.assertItemsEqual(
-            resolved_task_types_by_state_name['A'], ['high_bounce_rate']
-        )
+        self.assertItemsEqual(resolved_task_types_by_state_name['A'], ['high_bounce_rate'])
         self.assertItemsEqual(
             resolved_task_types_by_state_name['B'],
             [
@@ -285,14 +254,9 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
         )
 
     def test_fetch_ignores_obsolete_tasks(self) -> None:
-        tasks = [
-            self._new_obsolete_task(state_name='State %d' % (i,))
-            for i in range(50)
-        ]
+        tasks = [self._new_obsolete_task(state_name='State %d' % (i,)) for i in range(50)]
         improvements_services.put_tasks(tasks)
-        open_tasks, resolved_task_types_by_state_name = (
-            improvements_services.fetch_exploration_tasks(self.exp)
-        )
+        open_tasks, resolved_task_types_by_state_name = improvements_services.fetch_exploration_tasks(self.exp)
 
         self.assertEqual(open_tasks, [])
         self.assertEqual(resolved_task_types_by_state_name, {})
@@ -337,13 +301,9 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
         improvements_services.put_tasks(tasks)
 
         self.exp.version = 2
-        open_tasks, resolved_task_types_by_state_name = (
-            improvements_services.fetch_exploration_tasks(self.exp)
-        )
+        open_tasks, resolved_task_types_by_state_name = improvements_services.fetch_exploration_tasks(self.exp)
 
-        self.assertItemsEqual(
-            [t.to_dict() for t in open_tasks], [tasks[3].to_dict()]
-        )
+        self.assertItemsEqual([t.to_dict() for t in open_tasks], [tasks[3].to_dict()])
         self.assertEqual(
             resolved_task_types_by_state_name,
             {
@@ -360,22 +320,14 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
         super().setUp()
         task_entries = []
         for i in range(1, 26):
-            task_entry = self._new_resolved_task(
-                state_name='State %d' % (i,), exploration_version=i
-            )
-            task_entry.resolved_on = self.MOCK_DATE + datetime.timedelta(
-                minutes=5 * i
-            )
+            task_entry = self._new_resolved_task(state_name='State %d' % (i,), exploration_version=i)
+            task_entry.resolved_on = self.MOCK_DATE + datetime.timedelta(minutes=5 * i)
 
             task_entries.append(task_entry)
-        improvements_services.put_tasks(
-            task_entries, update_last_updated_time=False
-        )
+        improvements_services.put_tasks(task_entries, update_last_updated_time=False)
 
     def test_fetch_returns_first_page_of_history(self) -> None:
-        results, cursor, more = (
-            improvements_services.fetch_exploration_task_history_page(self.exp)
-        )
+        results, cursor, more = improvements_services.fetch_exploration_task_history_page(self.exp)
 
         self.assertEqual(
             [t.target_id for t in results],
@@ -400,11 +352,7 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
     ) -> None:
         aggregated_tasks, cursor, more = [], None, True
         while more:
-            results, cursor, more = (
-                improvements_services.fetch_exploration_task_history_page(
-                    self.exp, urlsafe_start_cursor=cursor
-                )
-            )
+            results, cursor, more = improvements_services.fetch_exploration_task_history_page(self.exp, urlsafe_start_cursor=cursor)
             aggregated_tasks.extend(results)
 
         self.assertEqual(
@@ -442,19 +390,13 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
     def test_fetch_first_page_after_fetching_next_page_returns_same_results(
         self,
     ) -> None:
-        initial_results, initial_cursor, initial_more = (
-            improvements_services.fetch_exploration_task_history_page(self.exp)
-        )
+        initial_results, initial_cursor, initial_more = improvements_services.fetch_exploration_task_history_page(self.exp)
         self.assertIsNotNone(initial_cursor)
         self.assertTrue(initial_more)
         # Make a call for the second page.
-        improvements_services.fetch_exploration_task_history_page(
-            self.exp, urlsafe_start_cursor=initial_cursor
-        )
+        improvements_services.fetch_exploration_task_history_page(self.exp, urlsafe_start_cursor=initial_cursor)
         # Make another call for the first page.
-        subsequent_results, subsequent_cursor, subsequent_more = (
-            improvements_services.fetch_exploration_task_history_page(self.exp)
-        )
+        subsequent_results, subsequent_cursor, subsequent_more = improvements_services.fetch_exploration_task_history_page(self.exp)
 
         self.assertEqual(
             [t.to_dict() for t in initial_results],
@@ -474,35 +416,15 @@ class PutTasksTests(ImprovementsServicesTestBase):
         obsolete_task = self._new_obsolete_task(state_name='Middle')
         resolved_task = self._new_resolved_task(state_name='End')
 
-        improvements_services.put_tasks(
-            [open_task, obsolete_task, resolved_task]
-        )
+        improvements_services.put_tasks([open_task, obsolete_task, resolved_task])
 
-        open_task_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                open_task.task_id
-            )
-        )
-        obsolete_task_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                obsolete_task.task_id
-            )
-        )
-        resolved_task_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                resolved_task.task_id
-            )
-        )
+        open_task_model = improvements_models.ExplorationStatsTaskEntryModel.get(open_task.task_id)
+        obsolete_task_model = improvements_models.ExplorationStatsTaskEntryModel.get(obsolete_task.task_id)
+        resolved_task_model = improvements_models.ExplorationStatsTaskEntryModel.get(resolved_task.task_id)
 
-        open_task_entry = improvements_services.get_task_entry_from_model(
-            open_task_model
-        )
-        obsolete_task_entry = improvements_services.get_task_entry_from_model(
-            obsolete_task_model
-        )
-        resolved_task_entry = improvements_services.get_task_entry_from_model(
-            resolved_task_model
-        )
+        open_task_entry = improvements_services.get_task_entry_from_model(open_task_model)
+        obsolete_task_entry = improvements_services.get_task_entry_from_model(obsolete_task_model)
+        resolved_task_entry = improvements_services.get_task_entry_from_model(resolved_task_model)
         self.assertEqual(open_task.to_dict(), open_task_entry.to_dict())
         self.assertEqual(obsolete_task.to_dict(), obsolete_task_entry.to_dict())
         self.assertEqual(resolved_task.to_dict(), resolved_task_entry.to_dict())
@@ -515,9 +437,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.ExplorationStatsTaskEntryModel.get(
-            task_entry.task_id
-        )
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -527,9 +447,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.ExplorationStatsTaskEntryModel.get(
-            task_entry.task_id
-        )
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, updated_on)
@@ -544,9 +462,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.ExplorationStatsTaskEntryModel.get(
-            task_entry.task_id
-        )
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -554,9 +470,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.ExplorationStatsTaskEntryModel.get(
-            task_entry.task_id
-        )
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -571,9 +485,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.ExplorationStatsTaskEntryModel.get(
-            task_entry.task_id
-        )
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -581,13 +493,9 @@ class PutTasksTests(ImprovementsServicesTestBase):
         task_entry = self._new_resolved_task()
 
         with self.mock_datetime_utcnow(updated_on):
-            improvements_services.put_tasks(
-                [task_entry], update_last_updated_time=False
-            )
+            improvements_services.put_tasks([task_entry], update_last_updated_time=False)
 
-        model = improvements_models.ExplorationStatsTaskEntryModel.get(
-            task_entry.task_id
-        )
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -599,90 +507,48 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
     def test_passing_mismatching_task_entries_raises_an_exception(self) -> None:
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                task_entry.task_id
-            )
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         task_entry.target_id = 'Different State'
 
         with self.assertRaisesRegex(Exception, 'Wrong model provided'):
-            improvements_services.apply_changes_to_model(
-                task_entry, task_entry_model
-            )
+            improvements_services.apply_changes_to_model(task_entry, task_entry_model)
 
     def test_returns_false_when_task_is_equalivalent_to_model(self) -> None:
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                task_entry.task_id
-            )
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
 
-        self.assertFalse(
-            improvements_services.apply_changes_to_model(
-                task_entry, task_entry_model
-            )
-        )
+        self.assertFalse(improvements_services.apply_changes_to_model(task_entry, task_entry_model))
 
     def test_makes_changes_when_issue_description_is_different(self) -> None:
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                task_entry.task_id
-            )
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         task_entry.issue_description = 'new issue description'
 
-        self.assertTrue(
-            improvements_services.apply_changes_to_model(
-                task_entry, task_entry_model
-            )
-        )
-        self.assertEqual(
-            task_entry_model.issue_description, 'new issue description'
-        )
+        self.assertTrue(improvements_services.apply_changes_to_model(task_entry, task_entry_model))
+        self.assertEqual(task_entry_model.issue_description, 'new issue description')
 
     def test_makes_changes_to_status_related_fields_if_status_is_different(
         self,
     ) -> None:
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                task_entry.task_id
-            )
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         task_entry = self._new_resolved_task()
 
-        self.assertTrue(
-            improvements_services.apply_changes_to_model(
-                task_entry, task_entry_model
-            )
-        )
-        self.assertEqual(
-            task_entry_model.status, constants.TASK_STATUS_RESOLVED
-        )
+        self.assertTrue(improvements_services.apply_changes_to_model(task_entry, task_entry_model))
+        self.assertEqual(task_entry_model.status, constants.TASK_STATUS_RESOLVED)
         self.assertEqual(task_entry_model.resolver_id, self.owner_id)
         self.assertEqual(task_entry_model.resolved_on, self.MOCK_DATE)
 
     def test_no_changes_made_if_only_resolver_id_is_different(self) -> None:
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                task_entry.task_id
-            )
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         task_entry.resolver_id = self.owner_id
 
-        self.assertFalse(
-            improvements_services.apply_changes_to_model(
-                task_entry, task_entry_model
-            )
-        )
+        self.assertFalse(improvements_services.apply_changes_to_model(task_entry, task_entry_model))
         self.assertEqual(task_entry_model.status, constants.TASK_STATUS_OPEN)
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
@@ -690,22 +556,14 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
     def test_no_changes_made_if_only_resolved_on_is_different(self) -> None:
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
-        task_entry_model = (
-            improvements_models.ExplorationStatsTaskEntryModel.get(
-                task_entry.task_id
-            )
-        )
+        task_entry_model = improvements_models.ExplorationStatsTaskEntryModel.get(task_entry.task_id)
         # Here we use MyPy ignore because `resolved_on` can only accept
         # datetime values but for testing purposes here we are providing
         # string value which causes MyPy to throw an error. Thus to avoid
         # the error, we used ignore here.
         task_entry.resolved_on = self.owner_id  # type: ignore[assignment]
 
-        self.assertFalse(
-            improvements_services.apply_changes_to_model(
-                task_entry, task_entry_model
-            )
-        )
+        self.assertFalse(improvements_services.apply_changes_to_model(task_entry, task_entry_model))
         self.assertEqual(task_entry_model.status, constants.TASK_STATUS_OPEN)
         self.assertIsNone(task_entry_model.resolved_on)
         self.assertIsNone(task_entry_model.resolved_on)

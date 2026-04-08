@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -42,11 +42,7 @@ class MathEquationInput(base.BaseInteraction):
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
         {
             'name': 'allowedVariables',
-            'description': (
-                'Shortcut variables that the learner can access in the on-screen '
-                'keyboard. (The order of these variables will be reflected in the '
-                'learner\'s keyboard)'
-            ),
+            'description': ('Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner\'s keyboard)'),
             'schema': {
                 'type': 'custom',
                 'obj_type': 'AllowedVariables',
@@ -55,9 +51,7 @@ class MathEquationInput(base.BaseInteraction):
         },
         {
             'name': 'useFractionForDivision',
-            'description': (
-                'Represent division using fractions (rather than ÷).'
-            ),
+            'description': ('Represent division using fractions (rather than ÷).'),
             'schema': {'type': 'bool'},
             'default_value': False,
         },

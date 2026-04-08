@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -47,168 +47,48 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
         Returns:
             PCollection[JobRunResult]. Results from audit or deletion.
         """
-        thread_ids = (
-            self.pipeline
-            | 'Get GeneralFeedbackThreadModels'
-            >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackThreadModel.get_all(
-                    include_deleted=False
-                )
-            )
-            | 'Extract thread ids' >> beam.Map(lambda model: model.id)
-        )
+        thread_ids = self.pipeline | 'Get GeneralFeedbackThreadModels' >> ndb_io.GetModels(feedback_models.GeneralFeedbackThreadModel.get_all(include_deleted=False)) | 'Extract thread ids' >> beam.Map(lambda model: model.id)
 
         invalid_messages = (
             self.pipeline
-            | 'Get GeneralFeedbackMessageModels'
-            >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackMessageModel.get_all(
-                    include_deleted=False
-                )
-            )
+            | 'Get GeneralFeedbackMessageModels' >> ndb_io.GetModels(feedback_models.GeneralFeedbackMessageModel.get_all(include_deleted=False))
             | 'Filter invalid feedback messages'
             >> beam.Filter(
-                lambda msg, valid_thread_ids: (
-                    msg.thread_id not in valid_thread_ids
-                ),
+                lambda msg, valid_thread_ids: (msg.thread_id not in valid_thread_ids),
                 beam.pvalue.AsList(thread_ids),
             )
         )
 
         invalid_user_threads = (
             self.pipeline
-            | 'Get GeneralFeedbackThreadUserModels'
-            >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackThreadUserModel.get_all(
-                    include_deleted=False
-                )
-            )
+            | 'Get GeneralFeedbackThreadUserModels' >> ndb_io.GetModels(feedback_models.GeneralFeedbackThreadUserModel.get_all(include_deleted=False))
             | 'Filter invalid user threads'
             >> beam.Filter(
-                lambda model, valid_thread_ids: (
-                    model.thread_id not in valid_thread_ids
-                ),
+                lambda model, valid_thread_ids: (model.thread_id not in valid_thread_ids),
                 beam.pvalue.AsList(thread_ids),
             )
         )
 
-        invalid_message_logs = (
-            invalid_messages
-            | 'Log invalid feedback messages'
-            >> beam.Map(
-                lambda model: job_run_result.JobRunResult.as_stdout(
-                    (
-                        'GeneralFeedbackMessageModel with non-existent thread: '
-                        f'id={model.id}, '
-                        f'thread_id={model.thread_id}, '
-                        f'message_id={model.message_id}'
-                    )
-                )
-            )
-        )
+        invalid_message_logs = invalid_messages | 'Log invalid feedback messages' >> beam.Map(lambda model: job_run_result.JobRunResult.as_stdout((f'GeneralFeedbackMessageModel with non-existent thread: id={model.id}, thread_id={model.thread_id}, message_id={model.message_id}')))
 
-        invalid_user_thread_logs = invalid_user_threads | 'Log invalid user threads' >> beam.Map(
-            lambda model: job_run_result.JobRunResult.as_stdout(
-                (
-                    'GeneralFeedbackThreadUserModel with non-existent thread: '
-                    f'id={model.id}, '
-                    f'thread_id={model.thread_id}, '
-                    f'user_id={model.user_id}'
-                )
-            )
-        )
+        invalid_user_thread_logs = invalid_user_threads | 'Log invalid user threads' >> beam.Map(lambda model: job_run_result.JobRunResult.as_stdout((f'GeneralFeedbackThreadUserModel with non-existent thread: id={model.id}, thread_id={model.thread_id}, user_id={model.user_id}')))
 
-        invalid_message_count = (
-            invalid_messages
-            | 'Count invalid feedback messages'
-            >> beam.combiners.Count.Globally().with_defaults(0)
-            | 'Report invalid feedback message count'
-            >> beam.Map(
-                lambda count: job_run_result.JobRunResult.as_stdout(
-                    f'invalid_feedback_message_models_count: {count}'
-                )
-            )
-        )
+        invalid_message_count = invalid_messages | 'Count invalid feedback messages' >> beam.combiners.Count.Globally().with_defaults(0) | 'Report invalid feedback message count' >> beam.Map(lambda count: job_run_result.JobRunResult.as_stdout(f'invalid_feedback_message_models_count: {count}'))
 
-        invalid_user_thread_count = (
-            invalid_user_threads
-            | 'Count invalid user threads'
-            >> beam.combiners.Count.Globally().with_defaults(0)
-            | 'Report invalid user thread count'
-            >> beam.Map(
-                lambda count: job_run_result.JobRunResult.as_stdout(
-                    f'invalid_user_thread_models_count: {count}'
-                )
-            )
-        )
+        invalid_user_thread_count = invalid_user_threads | 'Count invalid user threads' >> beam.combiners.Count.Globally().with_defaults(0) | 'Report invalid user thread count' >> beam.Map(lambda count: job_run_result.JobRunResult.as_stdout(f'invalid_user_thread_models_count: {count}'))
         outputs = []
         if self.DATASTORE_UPDATES_ALLOWED:
-            deleted_message_logs = (
-                invalid_messages
-                | 'Log deleted messages'
-                >> beam.Map(
-                    lambda model: job_run_result.JobRunResult.as_stdout(
-                        (
-                            'Deleted GeneralFeedbackMessageModel: '
-                            f'id={model.id}, '
-                            f'thread_id={model.thread_id}, '
-                            f'message_id={model.message_id}'
-                        )
-                    )
-                )
-            )
+            deleted_message_logs = invalid_messages | 'Log deleted messages' >> beam.Map(lambda model: job_run_result.JobRunResult.as_stdout((f'Deleted GeneralFeedbackMessageModel: id={model.id}, thread_id={model.thread_id}, message_id={model.message_id}')))
 
-            deleted_user_thread_logs = (
-                invalid_user_threads
-                | 'Log deleted user threads'
-                >> beam.Map(
-                    lambda model: job_run_result.JobRunResult.as_stdout(
-                        (
-                            'Deleted GeneralFeedbackThreadUserModel: '
-                            f'id={model.id}, '
-                            f'thread_id={model.thread_id}, '
-                            f'user_id={model.user_id} '
-                        )
-                    )
-                )
-            )
+            deleted_user_thread_logs = invalid_user_threads | 'Log deleted user threads' >> beam.Map(lambda model: job_run_result.JobRunResult.as_stdout((f'Deleted GeneralFeedbackThreadUserModel: id={model.id}, thread_id={model.thread_id}, user_id={model.user_id} ')))
 
-            deleted_message_count = (
-                invalid_messages
-                | 'Count deleted messages'
-                >> beam.combiners.Count.Globally().with_defaults(0)
-                | 'Report deleted message count'
-                >> beam.Map(
-                    lambda count: job_run_result.JobRunResult.as_stdout(
-                        f'deleted_feedback_message_models_count: {count}'
-                    )
-                )
-            )
+            deleted_message_count = invalid_messages | 'Count deleted messages' >> beam.combiners.Count.Globally().with_defaults(0) | 'Report deleted message count' >> beam.Map(lambda count: job_run_result.JobRunResult.as_stdout(f'deleted_feedback_message_models_count: {count}'))
 
-            deleted_user_thread_count = (
-                invalid_user_threads
-                | 'Count deleted user threads'
-                >> beam.combiners.Count.Globally().with_defaults(0)
-                | 'Report deleted user thread count'
-                >> beam.Map(
-                    lambda count: job_run_result.JobRunResult.as_stdout(
-                        f'deleted_user_thread_models_count: {count}'
-                    )
-                )
-            )
+            deleted_user_thread_count = invalid_user_threads | 'Count deleted user threads' >> beam.combiners.Count.Globally().with_defaults(0) | 'Report deleted user thread count' >> beam.Map(lambda count: job_run_result.JobRunResult.as_stdout(f'deleted_user_thread_models_count: {count}'))
 
-            delete_message_results = (
-                invalid_messages
-                | 'Extract message keys' >> beam.Map(lambda model: model.key)
-                | 'Delete invalid feedback messages' >> ndb_io.DeleteModels()
-            )
+            delete_message_results = invalid_messages | 'Extract message keys' >> beam.Map(lambda model: model.key) | 'Delete invalid feedback messages' >> ndb_io.DeleteModels()
 
-            delete_user_thread_results = (
-                invalid_user_threads
-                | 'Extract user thread keys'
-                >> beam.Map(lambda model: model.key)
-                | 'Delete invalid user threads' >> ndb_io.DeleteModels()
-            )
+            delete_user_thread_results = invalid_user_threads | 'Extract user thread keys' >> beam.Map(lambda model: model.key) | 'Delete invalid user threads' >> ndb_io.DeleteModels()
 
             outputs.extend(
                 [

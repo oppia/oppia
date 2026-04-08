@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
+from typing import Any, Dict, List, Mapping, TypedDict, Union
+
 from core import schema_utils, utils
 from core.domain import calculation_registry
-
-from typing import Any, Dict, List, Mapping, TypedDict, Union
 
 OptionsDictType = Mapping[str, Union[str, List[str], bool]]
 
@@ -68,30 +68,18 @@ class BaseVisualization:
         calculation_registry.Registry.get_calculation_by_id(self.calculation_id)
 
         # Check that the options_dict is valid.
-        expected_option_names = sorted(
-            [spec['name'] for spec in self._OPTIONS_SPECS]
-        )
+        expected_option_names = sorted([spec['name'] for spec in self._OPTIONS_SPECS])
         actual_option_names = sorted(self.options.keys())
         if actual_option_names != expected_option_names:
-            raise utils.ValidationError(
-                'For visualization %s, expected option names %s; received '
-                'names %s'
-                % (self.id, expected_option_names, actual_option_names)
-            )
+            raise utils.ValidationError('For visualization %s, expected option names %s; received names %s' % (self.id, expected_option_names, actual_option_names))
 
         # Check that the schemas are correct.
         for spec in self._OPTIONS_SPECS:
-            schema_utils.normalize_against_schema(
-                self.options[spec['name']], spec['schema']
-            )
+            schema_utils.normalize_against_schema(self.options[spec['name']], spec['schema'])
 
         # Check that addressed_info_is_supported is valid.
         if not isinstance(self.addressed_info_is_supported, bool):
-            raise utils.ValidationError(
-                'For visualization %s, expected a bool value for '
-                'addressed_info_is_supported; received %s'
-                % (self.id, self.addressed_info_is_supported)
-            )
+            raise utils.ValidationError('For visualization %s, expected a bool value for addressed_info_is_supported; received %s' % (self.id, self.addressed_info_is_supported))
 
 
 class ClickHexbins(BaseVisualization):

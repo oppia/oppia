@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
+from typing import List, Tuple
+
 from core.domain import html_cleaner
 from core.tests import test_utils
-
-from typing import List, Tuple
 
 
 class HtmlCleanerUnitTests(test_utils.GenericTestBase):
@@ -32,21 +32,13 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.longMessage = True
 
     def test_whitelisted_tags(self) -> None:
-        self.assertTrue(
-            html_cleaner.filter_a('a', 'href', 'http://www.oppia.com')
-        )
+        self.assertTrue(html_cleaner.filter_a('a', 'href', 'http://www.oppia.com'))
 
-        self.assertFalse(
-            html_cleaner.filter_a('a', 'href', '<code>http://www.oppia.com')
-        )
+        self.assertFalse(html_cleaner.filter_a('a', 'href', '<code>http://www.oppia.com'))
 
-        self.assertTrue(
-            html_cleaner.filter_a('a', 'title', 'http://www.oppia.com')
-        )
+        self.assertTrue(html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
 
-        with self.assertRaisesRegex(
-            Exception, 'The filter_a method should only be used for a tags.'
-        ):
+        with self.assertRaisesRegex(Exception, 'The filter_a method should only be used for a tags.'):
             html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 
     def test_good_tags_allowed(self) -> None:
@@ -110,14 +102,11 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         test_data: List[Tuple[str, ...]] = [
             (
                 '<oppia-noninteractive-image filepath-with-value="1"/>',
-                '<oppia-noninteractive-image filepath-with-value="1">'
-                '</oppia-noninteractive-image>',
+                '<oppia-noninteractive-image filepath-with-value="1"></oppia-noninteractive-image>',
             ),
             (
-                '<oppia-noninteractive-image filepath-with-value="1">'
-                '</oppia-noninteractive-image>',
-                '<oppia-noninteractive-image filepath-with-value="1">'
-                '</oppia-noninteractive-image>',
+                '<oppia-noninteractive-image filepath-with-value="1"></oppia-noninteractive-image>',
+                '<oppia-noninteractive-image filepath-with-value="1"></oppia-noninteractive-image>',
             ),
             ('<oppia-fake-tag></oppia-fake-tag>', ''),
         ]
@@ -202,9 +191,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                 'customization_args': {
                     'start-with-value': 0,
                     'end-with-value': 0,
-                    'video_id-with-value': (
-                        'https://www.youtube.com/watch?v=Ntcw0H0hwPU'
-                    ),
+                    'video_id-with-value': ('https://www.youtube.com/watch?v=Ntcw0H0hwPU'),
                     'autoplay-with-value': False,
                 },
                 'id': 'oppia-noninteractive-video',
@@ -220,9 +207,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             },
         ]
 
-        components: List[html_cleaner.ComponentsDict] = (
-            html_cleaner.get_rte_components(test_data)
-        )
+        components: List[html_cleaner.ComponentsDict] = html_cleaner.get_rte_components(test_data)
 
         self.assertEqual(len(components), len(expected_components))
         for component in components:

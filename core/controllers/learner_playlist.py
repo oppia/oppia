@@ -16,11 +16,11 @@
 
 from __future__ import annotations
 
+from typing import Dict, Optional, TypedDict
+
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import learner_playlist_services, learner_progress_services
-
-from typing import Dict, Optional, TypedDict
 
 
 class LearnerPlaylistHandlerNormalizedPayloadDict(TypedDict):
@@ -31,11 +31,7 @@ class LearnerPlaylistHandlerNormalizedPayloadDict(TypedDict):
     index: Optional[int]
 
 
-class LearnerPlaylistHandler(
-    base.BaseHandler[
-        LearnerPlaylistHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class LearnerPlaylistHandler(base.BaseHandler[LearnerPlaylistHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handles operations related to the learner playlist."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -88,13 +84,9 @@ class LearnerPlaylistHandler(
 
         self.values.update(
             {
-                'belongs_to_completed_or_incomplete_list': (
-                    belongs_to_completed_or_incomplete_list
-                ),
+                'belongs_to_completed_or_incomplete_list': (belongs_to_completed_or_incomplete_list),
                 'playlist_limit_exceeded': playlist_limit_exceeded,
-                'belongs_to_subscribed_activities': (
-                    belongs_to_subscribed_activities
-                ),
+                'belongs_to_subscribed_activities': (belongs_to_subscribed_activities),
             }
         )
 
@@ -104,12 +96,8 @@ class LearnerPlaylistHandler(
     def delete(self, activity_type: str, activity_id: str) -> None:
         assert self.user_id is not None
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            learner_playlist_services.remove_exploration_from_learner_playlist(
-                self.user_id, activity_id
-            )
+            learner_playlist_services.remove_exploration_from_learner_playlist(self.user_id, activity_id)
         elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-            learner_playlist_services.remove_collection_from_learner_playlist(
-                self.user_id, activity_id
-            )
+            learner_playlist_services.remove_collection_from_learner_playlist(self.user_id, activity_id)
 
         self.render_json(self.values)

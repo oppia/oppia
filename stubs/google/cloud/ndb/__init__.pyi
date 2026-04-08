@@ -1,33 +1,43 @@
-from .context import Context as Context
-from .query import (
-    AND as AND,
-    OR as OR,
-    Query as Query,
-    Node as Node,
-    ConjunctionNode as ConjunctionNode,
-    DisjunctionNode as DisjunctionNode,
-    FilterNode as FilterNode,
-    PropertyOrder as PropertyOrder,
-)
 from google.cloud import datastore
 from redis import StrictRedis
-
 from typing import (
     Any,
     Callable,
     Dict,
-    Generic,
     Iterable,
-    Iterator,
     List,
-    Literal,
     Optional,
     Sequence,
+    Tuple,
     Type,
     TypeVar,
-    Tuple,
     Union,
-    overload,
+)
+
+from .context import Context as Context
+from .query import (
+    AND as AND,
+)
+from .query import (
+    OR as OR,
+)
+from .query import (
+    ConjunctionNode as ConjunctionNode,
+)
+from .query import (
+    DisjunctionNode as DisjunctionNode,
+)
+from .query import (
+    FilterNode as FilterNode,
+)
+from .query import (
+    Node as Node,
+)
+from .query import (
+    PropertyOrder as PropertyOrder,
+)
+from .query import (
+    Query as Query,
 )
 
 TYPE_MODEL = TypeVar('TYPE_MODEL', bound='Model')

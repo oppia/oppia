@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import json
 
+from typing import Final
+
 from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
@@ -33,8 +35,6 @@ from core.domain import (
     user_services,
 )
 from core.tests import test_utils
-
-from typing import Final
 
 
 class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
@@ -65,9 +65,7 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
             'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['story_id_1', 'story_id_2'],
         }
-        response = self.post_json(
-            '/create_learner_group_handler', payload, csrf_token=csrf_token
-        )
+        response = self.post_json('/create_learner_group_handler', payload, csrf_token=csrf_token)
 
         self.assertIsNotNone(response['id'])
         self.assertEqual(response['title'], 'Learner Group Title')
@@ -78,9 +76,7 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response['learner_usernames'], [])
 
-        learner_group = learner_group_fetchers.get_learner_group_by_id(
-            response['id']
-        )
+        learner_group = learner_group_fetchers.get_learner_group_by_id(response['id'])
 
         self.assertIsNotNone(learner_group)
 
@@ -104,9 +100,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.user_id_2 = self.get_user_id_from_email(self.USER2_EMAIL)
         self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
 
         self.learner_group = learner_group_services.create_learner_group(
             self.learner_group_id,
@@ -139,13 +133,9 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['id'], self.learner_group_id)
         self.assertEqual(response['title'], 'Updated Learner Group Title')
         self.assertEqual(response['description'], 'Learner Group Description')
-        self.assertEqual(
-            response['invited_learner_usernames'], [self.USER2_USERNAME]
-        )
+        self.assertEqual(response['invited_learner_usernames'], [self.USER2_USERNAME])
         self.assertEqual(response['learner_usernames'], [])
-        self.assertEqual(
-            response['subtopic_page_ids'], ['subtopic_id_1', 'subtopic_id_2']
-        )
+        self.assertEqual(response['subtopic_page_ids'], ['subtopic_id_1', 'subtopic_id_2'])
         self.assertEqual(response['story_ids'], ['story_id_1', 'story_id_2'])
 
         # Test bad learner group id.
@@ -187,9 +177,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
     def test_delete_learner_group_as_facilitator(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        response = self.delete_json(
-            '/delete_learner_group_handler/%s' % (self.learner_group_id)
-        )
+        response = self.delete_json('/delete_learner_group_handler/%s' % (self.learner_group_id))
 
         self.assertEqual(response['success'], True)
 
@@ -211,8 +199,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'You do not have the rights to delete this '
-            'learner group as you are not its facilitator.',
+            'You do not have the rights to delete this learner group as you are not its facilitator.',
         )
 
         self.logout()
@@ -249,9 +236,7 @@ class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_json('%s' % (feconf.FACILITATOR_DASHBOARD_HANDLER))
 
         self.assertEqual(len(response['learner_groups_list']), 1)
-        self.assertEqual(
-            response['learner_groups_list'][0]['id'], learner_group.group_id
-        )
+        self.assertEqual(response['learner_groups_list'][0]['id'], learner_group.group_id)
 
         self.logout()
 
@@ -273,9 +258,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
 
         learner_group_services.create_learner_group(
             self.learner_group_id,
@@ -288,9 +271,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         )
 
         # Set up topics, subtopics and stories for learner group syllabus.
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_0, 'Place Values', 'abbrev', 'description', 'fragm'
-        )
+        topic = topic_domain.Topic.create_default_topic(self.TOPIC_ID_0, 'Place Values', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -307,18 +288,12 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic)
-        self.save_new_story(
-            self.STORY_ID_0, self.admin_id, self.TOPIC_ID_0, 'Story test 0'
-        )
-        topic_services.add_canonical_story(
-            self.admin_id, self.TOPIC_ID_0, self.STORY_ID_0
-        )
+        self.save_new_story(self.STORY_ID_0, self.admin_id, self.TOPIC_ID_0, 'Story test 0')
+        topic_services.add_canonical_story(self.admin_id, self.TOPIC_ID_0, self.STORY_ID_0)
 
         # Publish the topic and its stories.
         topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
-        topic_services.publish_story(
-            self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id
-        )
+        topic_services.publish_story(self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
 
         # Create another topic.
         topic = topic_domain.Topic.create_default_topic(
@@ -345,18 +320,12 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         topic_services.save_new_topic(self.admin_id, topic)
-        self.save_new_story(
-            self.STORY_ID_1, self.admin_id, self.TOPIC_ID_1, 'Story test 1'
-        )
-        topic_services.add_canonical_story(
-            self.admin_id, self.TOPIC_ID_1, self.STORY_ID_1
-        )
+        self.save_new_story(self.STORY_ID_1, self.admin_id, self.TOPIC_ID_1, 'Story test 1')
+        topic_services.add_canonical_story(self.admin_id, self.TOPIC_ID_1, self.STORY_ID_1)
 
         # Publish the topic and its stories.
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
-        topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
-        )
+        topic_services.publish_story(self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
     def test_filter_learner_group_syllabus(self) -> None:
         self.login(self.NEW_USER_EMAIL)
@@ -368,9 +337,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
             'search_language_code': constants.DEFAULT_LANGUAGE_CODE,
         }
 
-        response = self.get_json(
-            '/learner_group_search_syllabus_handler', params=params
-        )
+        response = self.get_json('/learner_group_search_syllabus_handler', params=params)
 
         self.assertEqual(response['learner_group_id'], self.learner_group_id)
         story_summary_dicts = response['story_summary_dicts']
@@ -382,12 +349,8 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         subtopic_summary_dicts = response['subtopic_summary_dicts']
         self.assertEqual(len(subtopic_summary_dicts), 1)
         self.assertEqual(subtopic_summary_dicts[0]['subtopic_id'], 1)
-        self.assertEqual(
-            subtopic_summary_dicts[0]['subtopic_title'], 'Naming Numbers'
-        )
-        self.assertEqual(
-            subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID_0
-        )
+        self.assertEqual(subtopic_summary_dicts[0]['subtopic_title'], 'Naming Numbers')
+        self.assertEqual(subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID_0)
 
         self.logout()
 
@@ -408,9 +371,7 @@ class ViewLearnerGroupInfoHandlerTests(test_utils.GenericTestBase):
         self.user_id_1 = self.get_user_id_from_email(self.USER1_EMAIL)
         self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
 
         self.learner_group = learner_group_services.create_learner_group(
             self.learner_group_id,
@@ -425,22 +386,14 @@ class ViewLearnerGroupInfoHandlerTests(test_utils.GenericTestBase):
     def test_facilitators_view_details_as_facilitator(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        response = self.get_json(
-            '/view_learner_group_info_handler/%s' % (self.learner_group_id)
-        )
+        response = self.get_json('/view_learner_group_info_handler/%s' % (self.learner_group_id))
 
         self.assertEqual(response['id'], self.learner_group_id)
         self.assertEqual(response['title'], self.learner_group.title)
-        self.assertEqual(
-            response['description'], self.learner_group.description
-        )
-        self.assertEqual(
-            response['facilitator_usernames'], [self.NEW_USER_USERNAME]
-        )
+        self.assertEqual(response['description'], self.learner_group.description)
+        self.assertEqual(response['facilitator_usernames'], [self.NEW_USER_USERNAME])
         self.assertEqual(response['learner_usernames'], [])
-        self.assertEqual(
-            response['invited_learner_usernames'], [self.USER1_USERNAME]
-        )
+        self.assertEqual(response['invited_learner_usernames'], [self.USER1_USERNAME])
         self.assertEqual(response['subtopic_page_ids'], ['subtopic_id_1'])
         self.assertEqual(response['story_ids'], ['story_id_1'])
 
@@ -490,9 +443,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
 
         learner_group_services.create_learner_group(
             self.learner_group_id,
@@ -505,15 +456,9 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         )
 
         # Set up topics, subtopics and stories for learner group syllabus.
-        self.save_new_valid_exploration(
-            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End'
-        )
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End'
-        )
-        self.save_new_valid_exploration(
-            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End'
-        )
+        self.save_new_valid_exploration(self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
+        self.save_new_valid_exploration(self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
+        self.save_new_valid_exploration(self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
@@ -532,9 +477,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -553,9 +496,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -574,9 +515,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'title': 'Title 3',
             'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -599,12 +538,8 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         story.story_contents.initial_node_id = 'node_2'
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
-        self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'sub-one-frag'
-        )
-        self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2', 'sub-two-frag'
-        )
+        self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'sub-one-frag')
+        self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(2, 'Subtopic Title 2', 'sub-two-frag')
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
         self.subtopic_1.skill_ids = [self.SKILL_ID_1]
@@ -621,46 +556,26 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             next_subtopic_id=3,
         )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
-        topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
-        )
+        topic_services.publish_story(self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
         # Add the invited learners to the learner group.
-        learner_group_services.add_learner_to_learner_group(
-            self.learner_group_id, self.LEARNER_ID_1, True
-        )
+        learner_group_services.add_learner_to_learner_group(self.learner_group_id, self.LEARNER_ID_1, True)
 
-        learner_group_services.add_learner_to_learner_group(
-            self.learner_group_id, self.LEARNER_ID_2, False
-        )
+        learner_group_services.add_learner_to_learner_group(self.learner_group_id, self.LEARNER_ID_2, False)
 
         # Add some progress for the learners.
-        story_services.record_completed_node_in_story_context(
-            self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_1
-        )
-        story_services.record_completed_node_in_story_context(
-            self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_2
-        )
-        story_services.record_completed_node_in_story_context(
-            self.LEARNER_ID_2, self.STORY_ID_1, self.NODE_ID_3
-        )
+        story_services.record_completed_node_in_story_context(self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(self.LEARNER_ID_2, self.STORY_ID_1, self.NODE_ID_3)
 
         self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
-        skill_services.create_user_skill_mastery(
-            self.LEARNER_ID_1, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1
-        )
-        skill_services.create_user_skill_mastery(
-            self.LEARNER_ID_2, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2
-        )
+        skill_services.create_user_skill_mastery(self.LEARNER_ID_1, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
+        skill_services.create_user_skill_mastery(self.LEARNER_ID_2, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
 
     def test_get_progress_of_learners(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        params = {
-            'learner_usernames': json.dumps(
-                [self.LEARNER_1_USERNAME, self.LEARNER_2_USERNAME]
-            )
-        }
+        params = {'learner_usernames': json.dumps([self.LEARNER_1_USERNAME, self.LEARNER_2_USERNAME])}
 
         response = self.get_json(
             '/learner_group_user_progress_handler/%s' % (self.learner_group_id),
@@ -672,9 +587,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         learner2_stories_prog = learners_prog[1]['stories_progress']
         learner1_subtopics_prog = learners_prog[0]['subtopic_pages_progress']
         learner2_subtopics_prog = learners_prog[1]['subtopic_pages_progress']
-        story_summary = story_fetchers.get_story_summaries_by_ids(
-            [self.STORY_ID_1]
-        )[0]
+        story_summary = story_fetchers.get_story_summaries_by_ids([self.STORY_ID_1])[0]
         story = story_fetchers.get_story_by_id(self.STORY_ID_1)
         story_prog_summary = story_summary.to_dict()
         expected_story_prog_summary = {
@@ -687,20 +600,14 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'thumbnail_filename': story_prog_summary['thumbnail_filename'],
             'thumbnail_bg_color': story_prog_summary['thumbnail_bg_color'],
             'url_fragment': story_prog_summary['url_fragment'],
-            'story_model_created_on': (
-                story_prog_summary['story_model_created_on']
-            ),
-            'story_model_last_updated': (
-                story_prog_summary['story_model_last_updated']
-            ),
+            'story_model_created_on': (story_prog_summary['story_model_created_on']),
+            'story_model_last_updated': (story_prog_summary['story_model_last_updated']),
             'story_is_published': True,
             'completed_node_titles': ['Title 1', 'Title 2'],
             'topic_name': 'Topic',
             'topic_url_fragment': 'topic',
             'classroom_url_fragment': 'staging',
-            'all_node_dicts': [
-                node.to_dict() for node in story.story_contents.nodes
-            ],
+            'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
         }
 
         expected_learner1_subtopics_prog = [
@@ -720,29 +627,19 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(learners_prog), 2)
         self.assertEqual(learners_prog[0]['username'], self.LEARNER_1_USERNAME)
         self.assertEqual(learners_prog[1]['username'], self.LEARNER_2_USERNAME)
-        self.assertEqual(
-            learners_prog[0]['progress_sharing_is_turned_on'], True
-        )
-        self.assertEqual(
-            learners_prog[1]['progress_sharing_is_turned_on'], False
-        )
+        self.assertEqual(learners_prog[0]['progress_sharing_is_turned_on'], True)
+        self.assertEqual(learners_prog[1]['progress_sharing_is_turned_on'], False)
         self.assertEqual(len(learner1_stories_prog), 1)
         self.assertEqual(learner1_stories_prog[0], expected_story_prog_summary)
         self.assertEqual(len(learner2_stories_prog), 0)
         self.assertEqual(len(learner1_subtopics_prog), 1)
-        self.assertEqual(
-            learner1_subtopics_prog, expected_learner1_subtopics_prog
-        )
+        self.assertEqual(learner1_subtopics_prog, expected_learner1_subtopics_prog)
         self.assertEqual(len(learner2_subtopics_prog), 0)
 
     def test_get_progress_of_learners_with_invalid_group_id(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        params = {
-            'learner_usernames': json.dumps(
-                [self.LEARNER_1_USERNAME, self.LEARNER_2_USERNAME]
-            )
-        }
+        params = {'learner_usernames': json.dumps([self.LEARNER_1_USERNAME, self.LEARNER_2_USERNAME])}
 
         self.get_json(
             '/learner_group_user_progress_handler/%s' % ('invalidId'),
@@ -753,9 +650,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerGroupLearnerSpecificProgressHandlerTests(
-    test_utils.GenericTestBase
-):
+class LearnerGroupLearnerSpecificProgressHandlerTests(test_utils.GenericTestBase):
     """Tests fetching of learner specific progress of a learner group."""
 
     LEARNER_1_EMAIL: Final = 'user1@example.com'
@@ -783,9 +678,7 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
         learner_group_services.create_learner_group(
             self.learner_group_id,
             'Learner Group Name',
@@ -797,12 +690,8 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         )
 
         # Set up topics, subtopics and stories for learner group syllabus.
-        self.save_new_valid_exploration(
-            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End'
-        )
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End'
-        )
+        self.save_new_valid_exploration(self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
+        self.save_new_valid_exploration(self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
 
@@ -820,9 +709,7 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -841,9 +728,7 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'
-            ][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -865,12 +750,8 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         story.story_contents.initial_node_id = 'node_2'
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
-        self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'sub-one-frag'
-        )
-        self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2', 'sub-two-frag'
-        )
+        self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'sub-one-frag')
+        self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(2, 'Subtopic Title 2', 'sub-two-frag')
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
         self.subtopic_1.skill_ids = [self.SKILL_ID_1]
@@ -887,42 +768,27 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             next_subtopic_id=3,
         )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
-        topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
-        )
+        topic_services.publish_story(self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
         # Add the invited learner to the learner group.
-        learner_group_services.add_learner_to_learner_group(
-            self.learner_group_id, self.LEARNER_ID_1, True
-        )
+        learner_group_services.add_learner_to_learner_group(self.learner_group_id, self.LEARNER_ID_1, True)
 
         # Add some progress for the learner.
-        story_services.record_completed_node_in_story_context(
-            self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_1
-        )
-        story_services.record_completed_node_in_story_context(
-            self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_2
-        )
+        story_services.record_completed_node_in_story_context(self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_2)
 
         self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
-        skill_services.create_user_skill_mastery(
-            self.LEARNER_ID_1, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1
-        )
+        skill_services.create_user_skill_mastery(self.LEARNER_ID_1, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
 
     def test_get_progress_of_learner(self) -> None:
         self.login(self.LEARNER_1_EMAIL)
 
-        response = self.get_json(
-            '/learner_group_learner_specific_progress_handler/%s'
-            % (self.learner_group_id)
-        )
+        response = self.get_json('/learner_group_learner_specific_progress_handler/%s' % (self.learner_group_id))
 
         learner_prog = response
         learner1_stories_prog = learner_prog['stories_progress']
         learner1_subtopics_prog = learner_prog['subtopic_pages_progress']
-        story_summary = story_fetchers.get_story_summaries_by_ids(
-            [self.STORY_ID_1]
-        )[0]
+        story_summary = story_fetchers.get_story_summaries_by_ids([self.STORY_ID_1])[0]
         story = story_fetchers.get_story_by_id(self.STORY_ID_1)
         story_prog_summary = story_summary.to_dict()
         expected_story_prog_summary = {
@@ -935,20 +801,14 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'thumbnail_filename': story_prog_summary['thumbnail_filename'],
             'thumbnail_bg_color': story_prog_summary['thumbnail_bg_color'],
             'url_fragment': story_prog_summary['url_fragment'],
-            'story_model_created_on': (
-                story_prog_summary['story_model_created_on']
-            ),
-            'story_model_last_updated': (
-                story_prog_summary['story_model_last_updated']
-            ),
+            'story_model_created_on': (story_prog_summary['story_model_created_on']),
+            'story_model_last_updated': (story_prog_summary['story_model_last_updated']),
             'story_is_published': True,
             'completed_node_titles': ['Title 1', 'Title 2'],
             'topic_name': 'Topic',
             'topic_url_fragment': 'topic',
             'classroom_url_fragment': 'staging',
-            'all_node_dicts': [
-                node.to_dict() for node in story.story_contents.nodes
-            ],
+            'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
         }
 
         expected_learner1_subtopics_prog = [
@@ -969,16 +829,13 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         self.assertEqual(learner_prog['progress_sharing_is_turned_on'], True)
         self.assertEqual(len(learner1_stories_prog), 1)
         self.assertEqual(learner1_stories_prog[0], expected_story_prog_summary)
-        self.assertEqual(
-            learner1_subtopics_prog, expected_learner1_subtopics_prog
-        )
+        self.assertEqual(learner1_subtopics_prog, expected_learner1_subtopics_prog)
 
     def test_get_progress_of_learners_with_invalid_group_id(self) -> None:
         self.login(self.LEARNER_1_EMAIL)
 
         self.get_json(
-            '/learner_group_learner_specific_progress_handler/%s'
-            % ('invalidId'),
+            '/learner_group_learner_specific_progress_handler/%s' % ('invalidId'),
             expected_status_int=400,
         )
 
@@ -998,9 +855,7 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
 
     def test_searching_invalid_user(self) -> None:
         params = {'username': 'invalid_username', 'learner_group_id': 'groupId'}
-        response = self.get_json(
-            '/learner_group_search_learner_handler', params=params
-        )
+        response = self.get_json('/learner_group_search_learner_handler', params=params)
 
         self.assertEqual(response['username'], 'invalid_username')
         self.assertEqual(
@@ -1014,14 +869,10 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
             'username': self.OWNER_USERNAME,
             'learner_group_id': 'groupId',
         }
-        response = self.get_json(
-            '/learner_group_search_learner_handler', params=params
-        )
+        response = self.get_json('/learner_group_search_learner_handler', params=params)
 
         self.assertEqual(response['username'], self.OWNER_USERNAME)
-        self.assertEqual(
-            response['error'], 'You cannot invite yourself to the group'
-        )
+        self.assertEqual(response['error'], 'You cannot invite yourself to the group')
         self.logout()
 
     def test_searching_an_already_invited_user(self) -> None:
@@ -1038,15 +889,12 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
             'username': self.NEW_USER_USERNAME,
             'learner_group_id': 'groupId',
         }
-        response = self.get_json(
-            '/learner_group_search_learner_handler', params=params
-        )
+        response = self.get_json('/learner_group_search_learner_handler', params=params)
 
         self.assertEqual(response['username'], self.NEW_USER_USERNAME)
         self.assertEqual(
             response['error'],
-            'User with username %s has been already invited to join the '
-            'group' % self.NEW_USER_USERNAME,
+            'User with username %s has been already invited to join the group' % self.NEW_USER_USERNAME,
         )
         self.logout()
 
@@ -1064,13 +912,9 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
             'username': self.NEW_USER_USERNAME,
             'learner_group_id': 'groupId',
         }
-        response = self.get_json(
-            '/learner_group_search_learner_handler', params=params
-        )
+        response = self.get_json('/learner_group_search_learner_handler', params=params)
 
-        user_settings = user_services.get_user_settings_from_username(
-            self.NEW_USER_USERNAME
-        )
+        user_settings = user_services.get_user_settings_from_username(self.NEW_USER_USERNAME)
         assert user_settings is not None
         self.assertEqual(response['username'], user_settings.username)
         self.assertEqual(response['error'], '')
@@ -1088,9 +932,7 @@ class LearnerGroupLearnerInvitationHandlerTests(test_utils.GenericTestBase):
         self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.LEARNER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
         self.learner_group = learner_group_services.create_learner_group(
             self.learner_group_id,
             'Learner Group Name',
@@ -1111,16 +953,13 @@ class LearnerGroupLearnerInvitationHandlerTests(test_utils.GenericTestBase):
             'progress_sharing_permission': 'true',
         }
         response = self.put_json(
-            '/learner_group_learner_invitation_handler/%s'
-            % (self.learner_group_id),
+            '/learner_group_learner_invitation_handler/%s' % (self.learner_group_id),
             payload,
             csrf_token=csrf_token,
         )
 
         self.assertEqual(response['id'], self.learner_group_id)
-        self.assertEqual(
-            response['learner_usernames'], [self.NEW_USER_USERNAME]
-        )
+        self.assertEqual(response['learner_usernames'], [self.NEW_USER_USERNAME])
         self.assertEqual(response['invited_learner_usernames'], [])
 
     def test_cannot_invite_learner_with_invalid_learner_username(self) -> None:
@@ -1133,16 +972,14 @@ class LearnerGroupLearnerInvitationHandlerTests(test_utils.GenericTestBase):
             'progress_sharing_permission': 'true',
         }
         response = self.put_json(
-            '/learner_group_learner_invitation_handler/%s'
-            % (self.learner_group_id),
+            '/learner_group_learner_invitation_handler/%s' % (self.learner_group_id),
             payload,
             csrf_token=csrf_token,
             expected_status_int=500,
         )
         self.assertEqual(
             response['error'],
-            'No learner user_id found for the given learner username: '
-            'Invalid_user_name',
+            'No learner user_id found for the given learner username: Invalid_user_name',
         )
 
     def test_invitation_declined_by_the_learner(self) -> None:
@@ -1155,8 +992,7 @@ class LearnerGroupLearnerInvitationHandlerTests(test_utils.GenericTestBase):
             'progress_sharing_permission': 'false',
         }
         response = self.put_json(
-            '/learner_group_learner_invitation_handler/%s'
-            % (self.learner_group_id),
+            '/learner_group_learner_invitation_handler/%s' % (self.learner_group_id),
             payload,
             csrf_token=csrf_token,
         )
@@ -1183,9 +1019,7 @@ class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
         self.signup(self.LEARNER_EMAIL, self.LEARNER_USERNAME)
         self.LEARNER_ID_2 = self.get_user_id_from_email(self.LEARNER_EMAIL)
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
         self.learner_group = learner_group_services.create_learner_group(
             self.learner_group_id,
             'Learner Group Name',
@@ -1195,22 +1029,16 @@ class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
             ['subtopic_id_1'],
             ['story_id_1'],
         )
-        learner_group_services.add_learner_to_learner_group(
-            self.learner_group_id, self.LEARNER_ID_1, False
-        )
+        learner_group_services.add_learner_to_learner_group(self.learner_group_id, self.LEARNER_ID_1, False)
 
     def test_getting_info_of_learners_and_invities(self) -> None:
         self.login(self.OWNER_EMAIL)
-        response = self.get_json(
-            '/learner_group_learners_info_handler/%s' % self.learner_group_id
-        )
+        response = self.get_json('/learner_group_learners_info_handler/%s' % self.learner_group_id)
 
         learner_info = [{'username': self.NEW_USER_USERNAME}]
         invited_learner_info = [{'username': self.LEARNER_USERNAME}]
         self.assertEqual(response['learners_info'], learner_info)
-        self.assertEqual(
-            response['invited_learners_info'], invited_learner_info
-        )
+        self.assertEqual(response['invited_learners_info'], invited_learner_info)
 
         self.logout()
 
@@ -1246,9 +1074,7 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
 
         learner_group_services.create_learner_group(
             self.learner_group_id,
@@ -1261,9 +1087,7 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         )
 
         # Set up topics, subtopics and stories for learner group syllabus.
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'Place Values', 'abbrev', 'description', 'fragm'
-        )
+        topic = topic_domain.Topic.create_default_topic(self.TOPIC_ID, 'Place Values', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -1280,24 +1104,16 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic)
-        self.save_new_story(
-            self.STORY_ID, self.admin_id, self.TOPIC_ID, 'Story test'
-        )
-        topic_services.add_canonical_story(
-            self.admin_id, self.TOPIC_ID, self.STORY_ID
-        )
+        self.save_new_story(self.STORY_ID, self.admin_id, self.TOPIC_ID, 'Story test')
+        topic_services.add_canonical_story(self.admin_id, self.TOPIC_ID, self.STORY_ID)
 
         # Publish the topic and its stories.
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-        topic_services.publish_story(
-            self.TOPIC_ID, self.STORY_ID, self.admin_id
-        )
+        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
     def test_get_learner_group_syllabus(self) -> None:
         self.login(self.NEW_USER_EMAIL)
-        response = self.get_json(
-            '/learner_group_syllabus_handler/%s' % self.learner_group_id
-        )
+        response = self.get_json('/learner_group_syllabus_handler/%s' % self.learner_group_id)
 
         self.assertEqual(response['learner_group_id'], self.learner_group_id)
 
@@ -1310,18 +1126,10 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         subtopic_summary_dicts = response['subtopic_summary_dicts']
         self.assertEqual(len(subtopic_summary_dicts), 1)
         self.assertEqual(subtopic_summary_dicts[0]['subtopic_id'], 1)
-        self.assertEqual(
-            subtopic_summary_dicts[0]['subtopic_title'], 'Naming Numbers'
-        )
-        self.assertEqual(
-            subtopic_summary_dicts[0]['parent_topic_name'], 'Place Values'
-        )
-        self.assertEqual(
-            subtopic_summary_dicts[0]['thumbnail_filename'], 'image.svg'
-        )
-        self.assertEqual(
-            subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID
-        )
+        self.assertEqual(subtopic_summary_dicts[0]['subtopic_title'], 'Naming Numbers')
+        self.assertEqual(subtopic_summary_dicts[0]['parent_topic_name'], 'Place Values')
+        self.assertEqual(subtopic_summary_dicts[0]['thumbnail_filename'], 'image.svg')
+        self.assertEqual(subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID)
         self.assertIsNone(subtopic_summary_dicts[0]['subtopic_mastery'])
 
         self.logout()
@@ -1329,9 +1137,7 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     def test_get_learner_group_syllabus_for_invalid_group(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        self.get_json(
-            '/learner_group_syllabus_handler/invalidId', expected_status_int=400
-        )
+        self.get_json('/learner_group_syllabus_handler/invalidId', expected_status_int=400)
 
         self.logout()
 
@@ -1360,12 +1166,8 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
             subtopics=[],
             next_subtopic_id=0,
         )
-        self.save_new_story(
-            self.story_id, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
-        )
-        topic_services.add_canonical_story(
-            self.USER_ID, self.TOPIC_ID, self.story_id
-        )
+        self.save_new_story(self.story_id, self.USER_ID, self.TOPIC_ID, url_fragment='story-one')
+        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, self.story_id)
 
         self.exp_id_1 = 'expid1'
         self.save_new_valid_exploration(self.exp_id_1, self.USER_ID)
@@ -1381,31 +1183,24 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (
-                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                    ),
+                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': self.exp_id_1,
                 }
             ),
         ]
-        story_services.update_story(
-            self.USER_ID, self.story_id, change_list, 'Added node.'
-        )
+        story_services.update_story(self.USER_ID, self.story_id, change_list, 'Added node.')
         self.story = story_fetchers.get_story_by_id(self.story_id)
 
     def test_get_learner_stories_chapters_progress(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        user_services.update_learner_checkpoint_progress(
-            self.USER_ID, self.exp_id_1, 'Introduction', 1
-        )
+        user_services.update_learner_checkpoint_progress(self.USER_ID, self.exp_id_1, 'Introduction', 1)
 
         params = {'story_ids': json.dumps([self.story_id])}
         response = self.get_json(
-            '/user_progress_in_stories_chapters_handler/%s'
-            % (self.NEW_USER_USERNAME),
+            '/user_progress_in_stories_chapters_handler/%s' % (self.NEW_USER_USERNAME),
             params=params,
         )
 
@@ -1421,30 +1216,24 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        user_services.update_learner_checkpoint_progress(
-            self.USER_ID, self.exp_id_1, 'Introduction', 1
-        )
+        user_services.update_learner_checkpoint_progress(self.USER_ID, self.exp_id_1, 'Introduction', 1)
 
         params = {'story_ids': json.dumps([self.story_id])}
         response = self.get_json(
-            '/user_progress_in_stories_chapters_handler/%s'
-            % ('Invalid_username'),
+            '/user_progress_in_stories_chapters_handler/%s' % ('Invalid_username'),
             params=params,
             expected_status_int=500,
         )
         self.assertEqual(
             response['error'],
-            'No learner user_id found for the given learner username: '
-            'Invalid_username',
+            'No learner user_id found for the given learner username: Invalid_username',
         )
 
 
 class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
     """Unit test for LearnerGroupsFeatureStatusHandler."""
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_get_request_returns_true_when_learner_groups_featuer_flag_enabled(
         self,
     ) -> None:
@@ -1476,9 +1265,7 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.facilitator_id = self.get_user_id_from_email(
-            self.CURRICULUM_ADMIN_EMAIL
-        )
+        self.facilitator_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.learner_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
     def test_get_learner_dashboard_learner_groups_view(self) -> None:
@@ -1486,9 +1273,7 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
 
         # User has not joined any learner group and has not been invited to join
         # any learner groups.
-        response = self.get_json(
-            '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER)
-        )
+        response = self.get_json('%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
 
         self.assertEqual(response['learner_groups_joined'], [])
         self.assertEqual(response['invited_to_learner_groups'], [])
@@ -1506,9 +1291,7 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
             ['story_id_1'],
         )
 
-        response = self.get_json(
-            '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER)
-        )
+        response = self.get_json('%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
 
         self.assertEqual(len(response['invited_to_learner_groups']), 1)
         self.assertEqual(len(response['learner_groups_joined']), 0)
@@ -1518,19 +1301,13 @@ class LearnerDashboardLearnerGroupsHandlerTests(test_utils.GenericTestBase):
         )
 
         # User accepts the invitation to join the learner group.
-        learner_group_services.add_learner_to_learner_group(
-            learner_group_id, self.learner_id, False
-        )
+        learner_group_services.add_learner_to_learner_group(learner_group_id, self.learner_id, False)
 
-        response = self.get_json(
-            '%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER)
-        )
+        response = self.get_json('%s' % (feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER))
 
         self.assertEqual(len(response['invited_to_learner_groups']), 0)
         self.assertEqual(len(response['learner_groups_joined']), 1)
-        self.assertEqual(
-            response['learner_groups_joined'][0]['id'], learner_group.group_id
-        )
+        self.assertEqual(response['learner_groups_joined'][0]['id'], learner_group.group_id)
 
         self.logout()
 
@@ -1543,9 +1320,7 @@ class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.facilitator_id = self.get_user_id_from_email(
-            self.CURRICULUM_ADMIN_EMAIL
-        )
+        self.facilitator_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.learner_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
     def test_exit_learner_group(self) -> None:
@@ -1564,9 +1339,7 @@ class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
         )
 
         # User accepts the invitation to join the learner group.
-        learner_group_services.add_learner_to_learner_group(
-            learner_group_id, self.learner_id, False
-        )
+        learner_group_services.add_learner_to_learner_group(learner_group_id, self.learner_id, False)
 
         payload = {'learner_username': self.NEW_USER_USERNAME}
         response = self.put_json(
@@ -1596,9 +1369,7 @@ class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
         )
 
         # User accepts the invitation to join the learner group.
-        learner_group_services.add_learner_to_learner_group(
-            learner_group_id, self.learner_id, False
-        )
+        learner_group_services.add_learner_to_learner_group(learner_group_id, self.learner_id, False)
 
         payload = {'learner_username': 'Invalid_username'}
         response = self.put_json(
@@ -1609,14 +1380,11 @@ class ExitLearnerGroupHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'No learner user_id found for the given learner username: '
-            'Invalid_username',
+            'No learner user_id found for the given learner username: Invalid_username',
         )
 
 
-class LearnerGroupProgressSharingPermissionHandlerTests(
-    test_utils.GenericTestBase
-):
+class LearnerGroupProgressSharingPermissionHandlerTests(test_utils.GenericTestBase):
     """Checks fetching and updating of progress sharing permission."""
 
     def setUp(self) -> None:
@@ -1624,14 +1392,10 @@ class LearnerGroupProgressSharingPermissionHandlerTests(
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.facilitator_id = self.get_user_id_from_email(
-            self.CURRICULUM_ADMIN_EMAIL
-        )
+        self.facilitator_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.learner_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.learner_group_id = learner_group_fetchers.get_new_learner_group_id()
         learner_group_services.create_learner_group(
             self.learner_group_id,
             'Learner Group Title',
@@ -1645,14 +1409,9 @@ class LearnerGroupProgressSharingPermissionHandlerTests(
     def test_get_progress_sharing_permission(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
-        learner_group_services.add_learner_to_learner_group(
-            self.learner_group_id, self.learner_id, False
-        )
+        learner_group_services.add_learner_to_learner_group(self.learner_group_id, self.learner_id, False)
 
-        response = self.get_json(
-            '/learner_group_progress_sharing_permission_handler/%s'
-            % (self.learner_group_id)
-        )
+        response = self.get_json('/learner_group_progress_sharing_permission_handler/%s' % (self.learner_group_id))
 
         self.assertEqual(response['progress_sharing_permission'], False)
 
@@ -1662,14 +1421,11 @@ class LearnerGroupProgressSharingPermissionHandlerTests(
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        learner_group_services.add_learner_to_learner_group(
-            self.learner_group_id, self.learner_id, False
-        )
+        learner_group_services.add_learner_to_learner_group(self.learner_group_id, self.learner_id, False)
 
         payload = {'progress_sharing_permission': 'true'}
         response = self.put_json(
-            '/learner_group_progress_sharing_permission_handler/%s'
-            % (self.learner_group_id),
+            '/learner_group_progress_sharing_permission_handler/%s' % (self.learner_group_id),
             payload,
             csrf_token=csrf_token,
         )

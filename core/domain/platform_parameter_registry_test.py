@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import enum
 
+from typing import List
+
 from core import feconf, utils
 from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
-
-from typing import List
 
 DataTypes = parameter_domain.DataTypes
 FeatureStages = parameter_domain.FeatureStages
@@ -44,9 +44,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.original_parameter_registry = (
-            registry.Registry.parameter_registry.copy()
-        )
+        self.original_parameter_registry = registry.Registry.parameter_registry.copy()
         registry.Registry.parameter_registry.clear()
 
         # Parameter names that might be used in following tests.
@@ -80,16 +78,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '111',
             }
         )
 
-    def _create_dummy_platform_parameter(
-        self, data_types: DataTypes
-    ) -> parameter_domain.PlatformParameter:
+    def _create_dummy_platform_parameter(self, data_types: DataTypes) -> parameter_domain.PlatformParameter:
         """Creates dummy platform parameter."""
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_platform_parameter only accepts
@@ -111,9 +105,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
             INVALID = 'invalid'
 
-        with self.assertRaisesRegex(
-            Exception, 'Unsupported data type \'invalid\''
-        ):
+        with self.assertRaisesRegex(Exception, 'Unsupported data type \'invalid\''):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -126,9 +118,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_create_platform_parameter_with_the_same_name_failure(self) -> None:
         param_name = 'parameter_a'
         self._create_example_parameter_with_name(param_name)
-        with self.assertRaisesRegex(
-            Exception, 'Parameter with name %s already exists' % param_name
-        ):
+        with self.assertRaisesRegex(Exception, 'Parameter with name %s already exists' % param_name):
             self._create_example_parameter_with_name(param_name)
 
     def test_default_value_of_bool_platform_parameter(self) -> None:
@@ -170,17 +160,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
 
-        self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_memcache(
-                parameter_name
-            )
-        )
+        self.assertIsNone(registry.Registry.load_platform_parameter_from_memcache(parameter_name))
         registry.Registry.get_platform_parameter(parameter_name)
-        self.assertIsNotNone(
-            registry.Registry.load_platform_parameter_from_memcache(
-                parameter_name
-            )
-        )
+        self.assertIsNotNone(registry.Registry.load_platform_parameter_from_memcache(parameter_name))
 
     def test_update_parameter(self) -> None:
         parameter_name = 'parameter_a'
@@ -205,15 +187,11 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             ],
             'default',
         )
-        parameter_updated = registry.Registry.get_platform_parameter(
-            parameter_name
-        )
+        parameter_updated = registry.Registry.get_platform_parameter(parameter_name)
 
         self.assertEqual(parameter_updated.name, parameter_name)
         self.assertEqual(len(parameter_updated.rules), 1)
-        self.assertEqual(
-            parameter_updated.rules[0].value_when_matched, 'updated'
-        )
+        self.assertEqual(parameter_updated.rules[0].value_when_matched, 'updated')
 
     def test_cached_value_is_invalidated_after_update(self) -> None:
         parameter_name = 'parameter_a'
@@ -238,11 +216,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             ],
             'default',
         )
-        self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_memcache(
-                parameter_name
-            )
-        )
+        self.assertIsNone(registry.Registry.load_platform_parameter_from_memcache(parameter_name))
 
     def test_update_parameter_with_invalid_rules_failure(self) -> None:
         parameter_name = 'parameter_a'
@@ -275,11 +249,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_updated_parameter_is_saved_in_storage(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
-        self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_storage(
-                parameter_name
-            )
-        )
+        self.assertIsNone(registry.Registry.load_platform_parameter_from_storage(parameter_name))
 
         registry.Registry.update_platform_parameter(
             parameter_name,
@@ -301,11 +271,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'default',
         )
 
-        parameter_updated = (
-            registry.Registry.load_platform_parameter_from_storage(
-                parameter_name
-            )
-        )
+        parameter_updated = registry.Registry.load_platform_parameter_from_storage(parameter_name)
         self.assertIsNotNone(parameter_updated)
 
     def test_default_value_return_from_parameter_registry_when_none_in_model(
@@ -341,9 +307,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 commit_message,
                 [
                     {
-                        'cmd': (
-                            parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
-                        ),
+                        'cmd': (parameter_domain.PlatformParameterChange.CMD_EDIT_RULES),
                         'new_rules': new_rule_dicts,
                         'default_value': None,
                     }
@@ -383,11 +347,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'default',
             )
 
-            parameter_storage = (
-                registry.Registry.load_platform_parameter_from_storage(
-                    parameter_name
-                )
-            )
+            parameter_storage = registry.Registry.load_platform_parameter_from_storage(parameter_name)
 
         self.assertIsNotNone(parameter_storage)
         assert parameter_storage is not None
@@ -419,9 +379,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
@@ -431,9 +389,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'description': 'for test',
                 'data_type': DataTypes.BOOL.value,
                 'rules': [],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': False,
             }
         )

@@ -20,6 +20,10 @@ from __future__ import annotations
 
 import logging
 
+import apache_beam as beam
+import result
+from typing import List, Tuple
+
 from core import utils
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -27,17 +31,11 @@ from core.jobs.transforms import job_result_transforms, results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
-import apache_beam as beam
-import result
-from typing import List, Tuple
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services, story_models, topic_models
 
-(story_models, topic_models) = models.Registry.import_models(
-    [models.Names.STORY, models.Names.TOPIC]
-)
+(story_models, topic_models) = models.Registry.import_models([models.Names.STORY, models.Names.TOPIC])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -52,9 +50,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
 
     def _update_story_node(
         self,
-        topic_story_list: Tuple[
-            List[topic_models.TopicModel], List[story_models.StoryModel]
-        ],
+        topic_story_list: Tuple[List[topic_models.TopicModel], List[story_models.StoryModel]],
     ) -> result.Result[List[story_models.StoryModel], Tuple[str, Exception]]:
         """Populate the 5 new fields in each story node of the StoryModel
         instance, namely: status, planned_publication_date_msecs,
@@ -77,13 +73,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                 story_model_list = topic_story_list[1]
                 for story_model in story_model_list:
                     nodes = story_model.story_contents['nodes']
-                    story_reference = next(
-                        story_ref
-                        for story_ref in (
-                            topic_model.canonical_story_references
-                        )
-                        if story_ref['story_id'] == story_model.id
-                    )
+                    story_reference = next(story_ref for story_ref in (topic_model.canonical_story_references) if story_ref['story_id'] == story_model.id)
                     for node in nodes:
                         node['unpublishing_reason'] = None
                         node['status'] = 'Draft'
@@ -93,24 +83,11 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                         current_topic_version = topic_model.version
                         story_published_on = None
                         for version in range(current_topic_version, 0, -1):
-                            snapshot_id = topic_model.get_snapshot_id(
-                                topic_model.id, version
-                            )
-                            topic_metadata = (
-                                topic_models.TopicSnapshotMetadataModel.get(
-                                    snapshot_id
-                                )
-                            )
+                            snapshot_id = topic_model.get_snapshot_id(topic_model.id, version)
+                            topic_metadata = topic_models.TopicSnapshotMetadataModel.get(snapshot_id)
                             for cmd in topic_metadata.commit_cmds:
-                                if (
-                                    cmd['cmd'] == 'publish_story'
-                                    and cmd['story_id'] == story_model.id
-                                ):
-                                    story_published_on = (
-                                        utils.get_time_in_millisecs(
-                                            topic_metadata.created_on
-                                        )
-                                    )
+                                if cmd['cmd'] == 'publish_story' and cmd['story_id'] == story_model.id:
+                                    story_published_on = utils.get_time_in_millisecs(topic_metadata.created_on)
                                     break
                             if story_published_on is not None:
                                 break
@@ -118,35 +95,14 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                         current_story_version = story_model.version
                         node_created_on = None
                         for version in range(current_story_version, 0, -1):
-                            snapshot_id = story_model.get_snapshot_id(
-                                story_model.id, version
-                            )
-                            story_metadata = (
-                                story_models.StorySnapshotMetadataModel.get(
-                                    snapshot_id
-                                )
-                            )
+                            snapshot_id = story_model.get_snapshot_id(story_model.id, version)
+                            story_metadata = story_models.StorySnapshotMetadataModel.get(snapshot_id)
                             for cmd in story_metadata.commit_cmds:
-                                if (
-                                    cmd['cmd'] == 'update_story_node_property'
-                                    and cmd['node_id'] == node['id']
-                                    and node.get('last_modified_msecs') is None
-                                ):
-                                    node['last_modified_msecs'] = (
-                                        utils.get_time_in_millisecs(
-                                            story_metadata.created_on
-                                        )
-                                    )
+                                if cmd['cmd'] == 'update_story_node_property' and cmd['node_id'] == node['id'] and node.get('last_modified_msecs') is None:
+                                    node['last_modified_msecs'] = utils.get_time_in_millisecs(story_metadata.created_on)
 
-                                if (
-                                    cmd['cmd'] == 'add_story_node'
-                                    and cmd['node_id'] == node['id']
-                                ):
-                                    node_created_on = (
-                                        utils.get_time_in_millisecs(
-                                            story_metadata.created_on
-                                        )
-                                    )
+                                if cmd['cmd'] == 'add_story_node' and cmd['node_id'] == node['id']:
+                                    node_created_on = utils.get_time_in_millisecs(story_metadata.created_on)
                                     break
                             if node_created_on is not None:
                                 break
@@ -154,23 +110,9 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                         if node_created_on is None:
                             raise Exception('Node was not created.')
 
-                        node_published_on = (
-                            story_published_on
-                            if (
-                                story_published_on is not None
-                                and node_created_on is not None
-                                and story_published_on > node_created_on
-                            )
-                            else (node_created_on)
-                        )
-                        node['first_publication_date_msecs'] = (
-                            node_published_on
-                            if node['status'] == 'Published'
-                            else None
-                        )
-                        node['planned_publication_date_msecs'] = node[
-                            'first_publication_date_msecs'
-                        ]
+                        node_published_on = story_published_on if (story_published_on is not None and node_created_on is not None and story_published_on > node_created_on) else (node_created_on)
+                        node['first_publication_date_msecs'] = node_published_on if node['status'] == 'Published' else None
+                        node['planned_publication_date_msecs'] = node['first_publication_date_msecs']
                         if node.get('last_modified_msecs') is None:
                             node['last_modified_msecs'] = node_published_on
 
@@ -184,8 +126,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         fetched_story_models = (
             self.pipeline
-            | 'Get story models'
-            >> ndb_io.GetModels(story_models.StoryModel.get_all())
+            | 'Get story models' >> ndb_io.GetModels(story_models.StoryModel.get_all())
             | 'Add corresponding topic Ids as keys'
             >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda story_model: story_model.corresponding_topic_id
@@ -194,8 +135,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
 
         fetched_topic_models = (
             self.pipeline
-            | 'Get topic models'
-            >> ndb_io.GetModels(topic_models.TopicModel.get_all())
+            | 'Get topic models' >> ndb_io.GetModels(topic_models.TopicModel.get_all())
             | 'Add topic Ids as keys'
             >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda topic_model: topic_model.id
@@ -203,37 +143,17 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
         )
 
         topic_story_pairs = (
-            (fetched_topic_models, fetched_story_models)
-            | 'Merge topic and story models' >> beam.CoGroupByKey()
-            | 'Get rid of topic ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            (fetched_topic_models, fetched_story_models) | 'Merge topic and story models' >> beam.CoGroupByKey() | 'Get rid of topic ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
-        updated_story_models_results = (
-            topic_story_pairs
-            | 'Update story node fields' >> beam.Map(self._update_story_node)
-        )
+        updated_story_models_results = topic_story_pairs | 'Update story node fields' >> beam.Map(self._update_story_node)
 
-        updated_story_models_job_results = (
-            updated_story_models_results
-            | job_result_transforms.ResultsToJobRunResults(
-                'TOPIC MODELS WHOSE STORIES ARE UPDATED'
-            )
-        )
+        updated_story_models_job_results = updated_story_models_results | job_result_transforms.ResultsToJobRunResults('TOPIC MODELS WHOSE STORIES ARE UPDATED')
 
-        filtered_migrated_stories = (
-            updated_story_models_results
-            | 'Filter migration results'
-            >> (results_transforms.DrainResultsOnError())
-        )
+        filtered_migrated_stories = updated_story_models_results | 'Filter migration results' >> (results_transforms.DrainResultsOnError())
 
         if self.DATASTORE_UPDATES_ALLOWED:
-            unused_put_results = (
-                filtered_migrated_stories
-                | 'Unwrap story models lists'
-                >> beam.Map(lambda result_item: result_item.unwrap())
-                | 'Flatten story models lists' >> beam.FlatMap(lambda x: x)
-                | 'Put models into datastore' >> ndb_io.PutModels()
-            )
+            (filtered_migrated_stories | 'Unwrap story models lists' >> beam.Map(lambda result_item: result_item.unwrap()) | 'Flatten story models lists' >> beam.FlatMap(lambda x: x) | 'Put models into datastore' >> ndb_io.PutModels())
 
         return updated_story_models_job_results
 

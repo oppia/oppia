@@ -1,6 +1,7 @@
 import sys
 from collections.abc import Callable, Iterable, Mapping
 from types import TracebackType
+
 from typing import Any, List, Optional, Type, TypeVar, Union
 
 _T = TypeVar("_T")

@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
+from typing import List, TypedDict
+
 from core import utils
 from core.domain import story_domain, subtopic_page_domain
-
-from typing import List, TypedDict
 
 
 class LearnerGroupDict(TypedDict):
@@ -106,29 +106,21 @@ class LearnerGroup:
         """
 
         if len(self.facilitator_user_ids) < 1:
-            raise utils.ValidationError(
-                'Expected learner group to have at least one facilitator.'
-            )
+            raise utils.ValidationError('Expected learner group to have at least one facilitator.')
 
         invited_learner_set = set(self.invited_learner_user_ids)
         learner_set = set(self.learner_user_ids)
 
         if len(invited_learner_set.intersection(learner_set)) > 0:
-            raise utils.ValidationError(
-                'Learner group learner cannot be invited to join the group.'
-            )
+            raise utils.ValidationError('Learner group learner cannot be invited to join the group.')
 
         facilitator_set = set(self.facilitator_user_ids)
 
         if len(facilitator_set.intersection(learner_set)) > 0:
-            raise utils.ValidationError(
-                'Learner group facilitator cannot be a learner of the group.'
-            )
+            raise utils.ValidationError('Learner group facilitator cannot be a learner of the group.')
 
         if len(facilitator_set.intersection(invited_learner_set)) > 0:
-            raise utils.ValidationError(
-                'Learner group facilitator cannot be invited to join the group.'
-            )
+            raise utils.ValidationError('Learner group facilitator cannot be invited to join the group.')
 
 
 class LearnerGroupSyllabusDict(TypedDict):

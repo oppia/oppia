@@ -27,6 +27,8 @@ from __future__ import annotations
 import copy
 import logging
 
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
+
 from core import feconf
 from core.domain import (
     caching_services,
@@ -36,15 +38,11 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services, exp_models, user_models
 
-(exp_models, user_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.USER]
-)
+(exp_models, user_models) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.USER])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -78,15 +76,9 @@ def _migrate_states_schema(
     Raises:
         Exception. The given states_schema_version is invalid.
     """
-    states_schema_version = versioned_exploration_states[
-        'states_schema_version'
-    ]
+    states_schema_version = versioned_exploration_states['states_schema_version']
 
-    if not (
-        feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION
-        <= states_schema_version
-        <= feconf.CURRENT_STATE_SCHEMA_VERSION
-    ):
+    if not (feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION <= states_schema_version <= feconf.CURRENT_STATE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v%d-v%d exploration state schemas at '
             'present.'
@@ -104,13 +96,11 @@ def _migrate_states_schema(
             # populates the next_content_id_index from the old state, which will
             # be used for introducing next_content_id_index into
             # exploration level.
-            next_content_id_index = (
-                exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states,
-                    states_schema_version,
-                    init_state_name,
-                    language_code,
-                )
+            next_content_id_index = exp_domain.Exploration.update_states_from_model(
+                versioned_exploration_states,
+                states_schema_version,
+                init_state_name,
+                language_code,
             )
         else:
             exp_domain.Exploration.update_states_from_model(
@@ -141,9 +131,7 @@ def get_new_unique_progress_url_id() -> str:
     return exp_models.TransientCheckpointUrlModel.get_new_progress_id()
 
 
-def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-    exp_id: str, version_numbers: List[int]
-) -> List[exp_domain.VersionedExplorationInteractionIdsMapping]:
+def get_multiple_versioned_exp_interaction_ids_mapping_by_version(exp_id: str, version_numbers: List[int]) -> List[exp_domain.VersionedExplorationInteractionIdsMapping]:
     """Returns a list of VersionedExplorationInteractionIdsMapping domain
     objects corresponding to the specified versions.
 
@@ -160,14 +148,9 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
             not be converted to the latest schema version.
     """
     versioned_exp_interaction_ids_mapping = []
-    exploration_models = exp_models.ExplorationModel.get_multi_versions(
-        exp_id, version_numbers
-    )
+    exploration_models = exp_models.ExplorationModel.get_multi_versions(exp_id, version_numbers)
     for index, exploration_model in enumerate(exploration_models):
-        if (
-            exploration_model.states_schema_version
-            != feconf.CURRENT_STATE_SCHEMA_VERSION
-        ):
+        if exploration_model.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
             raise Exception(
                 'Exploration(id=%s, version=%s, states_schema_version=%s) '
                 'does not match the latest schema version %s'
@@ -180,21 +163,13 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
             )
         states_to_interaction_id_mapping = {}
         for state_name in exploration_model.states:
-            states_to_interaction_id_mapping[state_name] = (
-                exploration_model.states[state_name]['interaction']['id']
-            )
-        versioned_exp_interaction_ids_mapping.append(
-            exp_domain.VersionedExplorationInteractionIdsMapping(
-                exploration_model.version, states_to_interaction_id_mapping
-            )
-        )
+            states_to_interaction_id_mapping[state_name] = exploration_model.states[state_name]['interaction']['id']
+        versioned_exp_interaction_ids_mapping.append(exp_domain.VersionedExplorationInteractionIdsMapping(exploration_model.version, states_to_interaction_id_mapping))
 
     return versioned_exp_interaction_ids_mapping
 
 
-def get_exploration_from_model(
-    exploration_model: exp_models.ExplorationModel, run_conversion: bool = True
-) -> exp_domain.Exploration:
+def get_exploration_from_model(exploration_model: exp_models.ExplorationModel, run_conversion: bool = True) -> exp_domain.Exploration:
     """Returns an Exploration domain object given an exploration model loaded
     from the datastore.
 
@@ -228,14 +203,8 @@ def get_exploration_from_model(
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
-    if (
-        run_conversion
-        and exploration_model.states_schema_version
-        != feconf.CURRENT_STATE_SCHEMA_VERSION
-    ):
-        next_content_id_index = _migrate_states_schema(
-            versioned_exploration_states, init_state_name, language_code
-        )
+    if run_conversion and exploration_model.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
+        next_content_id_index = _migrate_states_schema(versioned_exploration_states, init_state_name, language_code)
     if next_content_id_index is not None:
         exploration_model.next_content_id_index = next_content_id_index
 
@@ -269,20 +238,14 @@ def get_exploration_summary_by_id(
 
 
 @overload
-def get_exploration_summary_by_id(
-    exploration_id: str, *, strict: Literal[True]
-) -> exp_domain.ExplorationSummary: ...
+def get_exploration_summary_by_id(exploration_id: str, *, strict: Literal[True]) -> exp_domain.ExplorationSummary: ...
 
 
 @overload
-def get_exploration_summary_by_id(
-    exploration_id: str, *, strict: Literal[False]
-) -> Optional[exp_domain.ExplorationSummary]: ...
+def get_exploration_summary_by_id(exploration_id: str, *, strict: Literal[False]) -> Optional[exp_domain.ExplorationSummary]: ...
 
 
-def get_exploration_summary_by_id(
-    exploration_id: str, strict: bool = True
-) -> Optional[exp_domain.ExplorationSummary]:
+def get_exploration_summary_by_id(exploration_id: str, strict: bool = True) -> Optional[exp_domain.ExplorationSummary]:
     """Returns a domain object representing an exploration summary.
 
     Args:
@@ -294,9 +257,7 @@ def get_exploration_summary_by_id(
         ExplorationSummary|None. The summary domain object corresponding to the
         given exploration, and none if no ExpSummaryModel exists for given id.
     """
-    exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration_id, strict=strict
-    )
+    exp_summary_model = exp_models.ExpSummaryModel.get(exploration_id, strict=strict)
     if exp_summary_model:
         exp_summary = get_exploration_summary_from_model(exp_summary_model)
         return exp_summary
@@ -318,10 +279,7 @@ def get_exploration_summaries_from_models(
         dict. The keys are exploration ids and the values are the corresponding
         ExplorationSummary domain objects.
     """
-    exploration_summaries = [
-        get_exploration_summary_from_model(exp_summary_model)
-        for exp_summary_model in exp_summary_models
-    ]
+    exploration_summaries = [get_exploration_summary_from_model(exp_summary_model) for exp_summary_model in exp_summary_models]
     result = {}
     for exp_summary in exploration_summaries:
         result[exp_summary.id] = exp_summary
@@ -382,10 +340,7 @@ def get_exploration_summaries_matching_ids(
         corresponding to the given exploration ids. If an ExplorationSummary
         does not exist, the corresponding returned list element is None.
     """
-    return [
-        get_exploration_summary_from_model(model) if model else None
-        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
-    ]
+    return [get_exploration_summary_from_model(model) if model else None for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
 
 
 def get_exploration_summaries_subscribed_to(
@@ -401,13 +356,7 @@ def get_exploration_summaries_subscribed_to(
         list(ExplorationSummary). List of ExplorationSummary domain objects that
         the user subscribes to.
     """
-    return [
-        summary
-        for summary in get_exploration_summaries_matching_ids(
-            subscription_services.get_exploration_ids_subscribed_to(user_id)
-        )
-        if summary is not None
-    ]
+    return [summary for summary in get_exploration_summaries_matching_ids(subscription_services.get_exploration_ids_subscribed_to(user_id)) if summary is not None]
 
 
 @overload
@@ -417,15 +366,11 @@ def get_exploration_by_id(
 
 
 @overload
-def get_exploration_by_id(
-    exploration_id: str, *, version: Optional[int] = None
-) -> exp_domain.Exploration: ...
+def get_exploration_by_id(exploration_id: str, *, version: Optional[int] = None) -> exp_domain.Exploration: ...
 
 
 @overload
-def get_exploration_by_id(
-    exploration_id: str, *, strict: Literal[True], version: Optional[int] = None
-) -> exp_domain.Exploration: ...
+def get_exploration_by_id(exploration_id: str, *, strict: Literal[True], version: Optional[int] = None) -> exp_domain.Exploration: ...
 
 
 @overload
@@ -437,9 +382,7 @@ def get_exploration_by_id(
 ) -> Optional[exp_domain.Exploration]: ...
 
 
-def get_exploration_by_id(
-    exploration_id: str, strict: bool = True, version: Optional[int] = None
-) -> Optional[exp_domain.Exploration]:
+def get_exploration_by_id(exploration_id: str, strict: bool = True, version: Optional[int] = None) -> Optional[exp_domain.Exploration]:
     """Returns an Exploration domain object.
 
     Args:
@@ -463,9 +406,7 @@ def get_exploration_by_id(
     if cached_exploration is not None:
         return cached_exploration
     else:
-        exploration_model = exp_models.ExplorationModel.get(
-            exploration_id, strict=strict, version=version
-        )
+        exploration_model = exp_models.ExplorationModel.get(exploration_id, strict=strict, version=version)
         if exploration_model:
             exploration = get_exploration_from_model(exploration_model)
             caching_services.set_multi(
@@ -478,9 +419,7 @@ def get_exploration_by_id(
             return None
 
 
-def get_multiple_explorations_by_id(
-    exp_ids: List[str], strict: bool = True
-) -> Dict[str, exp_domain.Exploration]:
+def get_multiple_explorations_by_id(exp_ids: List[str], strict: bool = True) -> Dict[str, exp_domain.Exploration]:
     """Returns a dict of domain objects representing explorations with the
     given ids as keys. If an exp_id is not present, it is not included in the
     return dict.
@@ -500,9 +439,7 @@ def get_multiple_explorations_by_id(
     """
     result = {}
     uncached = []
-    cache_result = caching_services.get_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION, None, exp_ids
-    )
+    cache_result = caching_services.get_multi(caching_services.CACHE_NAMESPACE_EXPLORATION, None, exp_ids)
 
     for exp_obj in cache_result.values():
         result[exp_obj.id] = exp_obj
@@ -520,28 +457,16 @@ def get_multiple_explorations_by_id(
             exploration = get_exploration_from_model(model)
             db_results_dict[eid] = exploration
         else:
-            logging.info(
-                'Tried to fetch exploration with id %s, but no such '
-                'exploration exists in the datastore' % eid
-            )
+            logging.info('Tried to fetch exploration with id %s, but no such exploration exists in the datastore' % eid)
             not_found.append(eid)
 
     if strict and not_found:
-        raise ValueError(
-            'Couldn\'t find explorations with the following ids:\n%s'
-            % '\n'.join(not_found)
-        )
+        raise ValueError('Couldn\'t find explorations with the following ids:\n%s' % '\n'.join(not_found))
 
-    cache_update = {
-        eid: results
-        for eid, results in db_results_dict.items()
-        if results is not None
-    }
+    cache_update = {eid: results for eid, results in db_results_dict.items() if results is not None}
 
     if cache_update:
-        caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, None, cache_update
-        )
+        caching_services.set_multi(caching_services.CACHE_NAMESPACE_EXPLORATION, None, cache_update)
 
     result.update(db_results_dict)
     return result
@@ -562,13 +487,8 @@ def get_multiple_explorations_by_ids_and_version(
         given IDs and versions. If an exploration does not exist, the
         corresponding entry will be None.
     """
-    exp_models_list = exp_models.ExplorationModel.get_version_multi(
-        exp_ids_and_versions
-    )
-    return [
-        get_exploration_from_model(exp_model) if exp_model is not None else None
-        for exp_model in exp_models_list
-    ]
+    exp_models_list = exp_models.ExplorationModel.get_version_multi(exp_ids_and_versions)
+    return [get_exploration_from_model(exp_model) if exp_model is not None else None for exp_model in exp_models_list]
 
 
 def get_exploration_summaries_where_user_has_role(
@@ -584,26 +504,19 @@ def get_exploration_summaries_where_user_has_role(
         list(ExplorationSummary). List of ExplorationSummary domain objects
         where the user has some role.
     """
-    exp_summary_models: Sequence[exp_models.ExpSummaryModel] = (
-        exp_models.ExpSummaryModel.query(
-            datastore_services.any_of(
-                exp_models.ExpSummaryModel.owner_ids == user_id,
-                exp_models.ExpSummaryModel.editor_ids == user_id,
-                exp_models.ExpSummaryModel.voice_artist_ids == user_id,
-                exp_models.ExpSummaryModel.viewer_ids == user_id,
-                exp_models.ExpSummaryModel.contributor_ids == user_id,
-            )
-        ).fetch()
-    )
-    return [
-        get_exploration_summary_from_model(exp_summary_model)
-        for exp_summary_model in exp_summary_models
-    ]
+    exp_summary_models: Sequence[exp_models.ExpSummaryModel] = exp_models.ExpSummaryModel.query(
+        datastore_services.any_of(
+            exp_models.ExpSummaryModel.owner_ids == user_id,
+            exp_models.ExpSummaryModel.editor_ids == user_id,
+            exp_models.ExpSummaryModel.voice_artist_ids == user_id,
+            exp_models.ExpSummaryModel.viewer_ids == user_id,
+            exp_models.ExpSummaryModel.contributor_ids == user_id,
+        )
+    ).fetch()
+    return [get_exploration_summary_from_model(exp_summary_model) for exp_summary_model in exp_summary_models]
 
 
-def get_exploration_user_data(
-    user_id: str, exp_id: str
-) -> Optional[user_domain.ExplorationUserData]:
+def get_exploration_user_data(user_id: str, exp_id: str) -> Optional[user_domain.ExplorationUserData]:
     """Returns an ExplorationUserData domain object.
 
     Args:
@@ -615,9 +528,7 @@ def get_exploration_user_data(
         given user and exploration. If the model corresponsing to given user
         and exploration is not found, return None.
     """
-    exp_user_data_model = user_models.ExplorationUserDataModel.get(
-        user_id, exp_id
-    )
+    exp_user_data_model = user_models.ExplorationUserDataModel.get(user_id, exp_id)
 
     if exp_user_data_model is None:
         return None
@@ -641,9 +552,7 @@ def get_exploration_user_data(
 
 
 @overload
-def get_logged_out_user_progress(
-    unique_progress_url_id: str, *, strict: Literal[True]
-) -> exp_domain.TransientCheckpointUrl: ...
+def get_logged_out_user_progress(unique_progress_url_id: str, *, strict: Literal[True]) -> exp_domain.TransientCheckpointUrl: ...
 
 
 @overload
@@ -653,20 +562,14 @@ def get_logged_out_user_progress(
 
 
 @overload
-def get_logged_out_user_progress(
-    unique_progress_url_id: str, *, strict: Literal[False]
-) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+def get_logged_out_user_progress(unique_progress_url_id: str, *, strict: Literal[False]) -> Optional[exp_domain.TransientCheckpointUrl]: ...
 
 
 @overload
-def get_logged_out_user_progress(
-    unique_progress_url_id: str, *, strict: bool
-) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+def get_logged_out_user_progress(unique_progress_url_id: str, *, strict: bool) -> Optional[exp_domain.TransientCheckpointUrl]: ...
 
 
-def get_logged_out_user_progress(
-    unique_progress_url_id: str, strict: bool = False
-) -> Optional[exp_domain.TransientCheckpointUrl]:
+def get_logged_out_user_progress(unique_progress_url_id: str, strict: bool = False) -> Optional[exp_domain.TransientCheckpointUrl]:
     """Returns an TransientCheckpointUrl domain object.
 
     Args:
@@ -680,9 +583,7 @@ def get_logged_out_user_progress(
         given unique_progress_url_id. If the model corresponding to given
         unique_progress_url_id is not found, return None.
     """
-    logged_out_user_progress_model = exp_models.TransientCheckpointUrlModel.get(
-        unique_progress_url_id, strict=strict
-    )
+    logged_out_user_progress_model = exp_models.TransientCheckpointUrlModel.get(unique_progress_url_id, strict=strict)
 
     if logged_out_user_progress_model is None:
         return None
@@ -696,9 +597,7 @@ def get_logged_out_user_progress(
     )
 
 
-def get_exploration_version_history(
-    exp_id: str, exp_version: int
-) -> Optional[exp_domain.ExplorationVersionHistory]:
+def get_exploration_version_history(exp_id: str, exp_version: int) -> Optional[exp_domain.ExplorationVersionHistory]:
     """Returns an ExplorationVersionHistory domain object by fetching the
     ExplorationVersionHistoryModel for the given exploration id and version.
 
@@ -711,14 +610,8 @@ def get_exploration_version_history(
         object for the ExplorationVersionHistoryModel corresponding to the
         given exploration id and version.
     """
-    version_history_model_id = (
-        exp_models.ExplorationVersionHistoryModel.get_instance_id(
-            exp_id, exp_version
-        )
-    )
-    version_history_model = exp_models.ExplorationVersionHistoryModel.get(
-        version_history_model_id, strict=False
-    )
+    version_history_model_id = exp_models.ExplorationVersionHistoryModel.get_instance_id(exp_id, exp_version)
+    version_history_model = exp_models.ExplorationVersionHistoryModel.get(version_history_model_id, strict=False)
 
     if version_history_model is None:
         return None

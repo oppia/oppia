@@ -20,6 +20,18 @@ from __future__ import annotations
 
 import base64
 
+from typing import (
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
+)
+
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
@@ -41,30 +53,14 @@ from core.domain import (
     user_services,
 )
 
-from typing import (
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
-    TypedDict,
-    TypeVar,
-    Union,
-    cast,
-)
-
 # Note: These private type variables are only defined to implement
 # the Generic typing structure of SuggestionsProviderHandler, because
 # SuggestionsProviderHandler is a super-class of some other handlers.
 # So, to transfer the generic typing pattern of self.normalized_* to those
 # sub-handlers as well, we used generics here. So, do not make these
 # private type variables public in the future.
-_SuggestionsProviderHandlerNormalizedRequestDictType = TypeVar(
-    '_SuggestionsProviderHandlerNormalizedRequestDictType'
-)
-_SuggestionsProviderHandlerNormalizedPayloadDictType = TypeVar(
-    '_SuggestionsProviderHandlerNormalizedPayloadDictType'
-)
+_SuggestionsProviderHandlerNormalizedRequestDictType = TypeVar('_SuggestionsProviderHandlerNormalizedRequestDictType')
+_SuggestionsProviderHandlerNormalizedPayloadDictType = TypeVar('_SuggestionsProviderHandlerNormalizedPayloadDictType')
 
 
 class FrontendSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
@@ -94,9 +90,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     exploration_content_html: Optional[Union[str, List[str]]]
 
 
-SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
-    str, Dict[str, Union[Dict[str, str], List[str]]]
-]
+SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[str, Dict[str, Union[Dict[str, str], List[str]]]]
 
 SuggestionsProviderHandlerArgsSchemaDictType = Dict[
     str,
@@ -105,9 +99,7 @@ SuggestionsProviderHandlerArgsSchemaDictType = Dict[
         Dict[
             str,
             Union[
-                Optional[
-                    Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]
-                ],
+                Optional[Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]],
                 List[str],
             ],
         ],
@@ -125,9 +117,7 @@ SCHEMA_FOR_SUBTITLED_HTML_DICT = {
 
 SCHEMA_FOR_TARGET_ID = {
     'type': 'basestring',
-    'validators': [
-        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
-    ],
+    'validators': [{'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}],
 }
 
 
@@ -145,9 +135,7 @@ class SuggestionHandlerNormalizedPayloadDict(TypedDict):
     files: Optional[Dict[str, str]]
 
 
-class SuggestionHandler(
-    base.BaseHandler[SuggestionHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class SuggestionHandler(base.BaseHandler[SuggestionHandlerNormalizedPayloadDict, Dict[str, str]]):
     """ "Handles operations relating to suggestions."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -175,18 +163,14 @@ class SuggestionHandler(
             'change_cmd': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_suggestion_change
-                    ),
+                    'validation_method': (domain_objects_validator.validate_suggestion_change),
                 }
             },
             'description': {'schema': {'type': 'basestring'}},
             'files': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_suggestion_images
-                    ),
+                    'validation_method': (domain_objects_validator.validate_suggestion_images),
                 },
                 'default_value': None,
             },
@@ -205,9 +189,7 @@ class SuggestionHandler(
         assert self.normalized_payload is not None
         suggestion_type = self.normalized_payload['suggestion_type']
         if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
-            raise self.InvalidInputException(
-                'Content suggestion submissions are no longer supported.'
-            )
+            raise self.InvalidInputException('Content suggestion submissions are no longer supported.')
 
         suggestion = suggestion_services.create_suggestion(
             suggestion_type,
@@ -219,24 +201,14 @@ class SuggestionHandler(
             self.normalized_payload['description'],
         )
 
-        if suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        ):
-            (
-                suggestion_services
-            ).update_translation_contribution_stats_at_submission(suggestion)
+        if suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            (suggestion_services).update_translation_contribution_stats_at_submission(suggestion)
 
         if suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_ADD_QUESTION):
-            (
-                suggestion_services
-            ).update_question_contribution_stats_at_submission(suggestion)
+            (suggestion_services).update_question_contribution_stats_at_submission(suggestion)
 
         suggestion_change = suggestion.change_cmd
-        if suggestion_change.cmd == 'add_written_translation' and (
-            translation_domain.TranslatableContentFormat.is_data_format_list(
-                suggestion_change.data_format
-            )
-        ):
+        if suggestion_change.cmd == 'add_written_translation' and (translation_domain.TranslatableContentFormat.is_data_format_list(suggestion_change.data_format)):
             self.render_json(self.values)
             return
 
@@ -247,26 +219,14 @@ class SuggestionHandler(
         # adding an image, there is no method to remove the uploaded image.
         # See more - https://github.com/oppia/oppia/issues/14298
         if suggestion_type != feconf.SUGGESTION_TYPE_ADD_QUESTION:
-            assert isinstance(
-                suggestion, suggestion_registry.SuggestionTranslateContent
-            )
-            self._copy_images_from_target_exploration_content_to_translation(
-                suggestion
-            )
+            assert isinstance(suggestion, suggestion_registry.SuggestionTranslateContent)
+            self._copy_images_from_target_exploration_content_to_translation(suggestion)
 
             files = self.normalized_payload.get('files')
-            new_image_filenames = (
-                suggestion.get_new_image_filenames_added_in_suggestion()
-            )
+            new_image_filenames = suggestion.get_new_image_filenames_added_in_suggestion()
             if new_image_filenames and files is not None:
-                new_image_files = {
-                    filename: image_blob
-                    for filename, image_blob in files.items()
-                    if filename in new_image_filenames
-                }
-                self._save_new_images_added_in_translation(
-                    new_image_files, suggestion
-                )
+                new_image_files = {filename: image_blob for filename, image_blob in files.items() if filename in new_image_filenames}
+                self._save_new_images_added_in_translation(new_image_files, suggestion)
 
         self.render_json(self.values)
 
@@ -285,12 +245,8 @@ class SuggestionHandler(
         """
         for filename, image in new_files.items():
             decoded_image = base64.decodebytes(image.encode('utf-8'))
-            file_format = image_validation_services.validate_image_and_filename(
-                decoded_image, filename
-            )
-            image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
-            )
+            file_format = image_validation_services.validate_image_and_filename(decoded_image, filename)
+            image_is_compressible = file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
             fs_services.save_original_and_compressed_versions_of_image(
                 filename,
                 suggestion.image_context,
@@ -300,9 +256,7 @@ class SuggestionHandler(
                 image_is_compressible,
             )
 
-    def _copy_images_from_target_exploration_content_to_translation(
-        self, suggestion: suggestion_registry.SuggestionTranslateContent
-    ) -> None:
+    def _copy_images_from_target_exploration_content_to_translation(self, suggestion: suggestion_registry.SuggestionTranslateContent) -> None:
         """Creates copies of images from the suggestion's target exploration
         for the translation suggestion to use.
 
@@ -314,11 +268,7 @@ class SuggestionHandler(
             Exception. An image in the target exploration's content is not a
                 saved asset belonging to the target exploration.
         """
-        target_image_filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(
-                suggestion.get_target_entity_html_strings()
-            )
-        )
+        target_image_filenames = html_cleaner.get_image_filenames_from_html_strings(suggestion.get_target_entity_html_strings())
         try:
             fs_services.copy_images(
                 suggestion.target_type,
@@ -332,13 +282,7 @@ class SuggestionHandler(
             filename_start_index = source_asset_path.rfind('/') + 1
             source_asset_filename = source_asset_path[filename_start_index:]
             source_asset_directory = source_asset_path[:filename_start_index]
-            raise Exception(
-                'An image in the submitted translation\'s original content '
-                'named "%s" cannot be found. Please save it to the '
-                % (source_asset_filename)
-                + 'backend file system at /%s ' % (source_asset_directory)
-                + 'before submitting this translation again.'
-            ) from error
+            raise Exception('An image in the submitted translation\'s original content named "%s" cannot be found. Please save it to the ' % (source_asset_filename) + 'backend file system at /%s ' % (source_asset_directory) + 'before submitting this translation again.') from error
 
 
 class SuggestionToExplorationActionHandlerNormalizedPayloadDict(TypedDict):
@@ -401,9 +345,7 @@ class SuggestionToExplorationActionHandler(
         }
     }
 
-    @acl_decorators.get_decorator_for_accepting_suggestion(
-        acl_decorators.can_edit_exploration
-    )
+    @acl_decorators.get_decorator_for_accepting_suggestion(acl_decorators.can_edit_exploration)
     def put(self, target_id: str, suggestion_id: str) -> None:
         """Handles PUT requests.
 
@@ -418,32 +360,21 @@ class SuggestionToExplorationActionHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_EXPLORATION:
-            raise self.InvalidInputException(
-                'This handler allows actions only'
-                ' on suggestions to explorations.'
-            )
+            raise self.InvalidInputException('This handler allows actions only on suggestions to explorations.')
 
         if suggestion_id.split('.')[1] != target_id:
-            raise self.InvalidInputException(
-                'The exploration id provided does not match the exploration id '
-                'present as part of the suggestion_id'
-            )
+            raise self.InvalidInputException('The exploration id provided does not match the exploration id present as part of the suggestion_id')
 
         action = self.normalized_payload['action']
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
-            raise self.UnauthorizedUserException(
-                'You cannot accept/reject your own suggestion.'
-            )
+            raise self.UnauthorizedUserException('You cannot accept/reject your own suggestion.')
 
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.normalized_payload.get('commit_message')
             if commit_message is None:
-                raise Exception(
-                    'The \'commit_message\' must be provided when the '
-                    'action is \'accept suggestion\'.'
-                )
+                raise Exception('The \'commit_message\' must be provided when the action is \'accept suggestion\'.')
             suggestion_services.accept_suggestion(
                 suggestion_id,
                 self.user_id,
@@ -459,9 +390,7 @@ class SuggestionToExplorationActionHandler(
             )
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        ):
+        if suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
@@ -477,22 +406,14 @@ class ResubmitSuggestionHandlerNormalizedPayloadDict(TypedDict):
     summary_message: str
 
 
-class ResubmitSuggestionHandler(
-    base.BaseHandler[
-        ResubmitSuggestionHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class ResubmitSuggestionHandler(base.BaseHandler[ResubmitSuggestionHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handler to reopen a rejected suggestion."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'suggestion_id': {'schema': {'type': 'basestring'}}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'suggestion_id': {'schema': {'type': 'basestring'}}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'action': {
-                'schema': {'type': 'basestring', 'choices': ['resubmit']}
-            },
+            'action': {'schema': {'type': 'basestring', 'choices': ['resubmit']}},
             'change_cmd': {
                 'schema': {
                     'type': 'dict',
@@ -543,9 +464,7 @@ class ResubmitSuggestionHandler(
         change_cls = type(suggestion.change_cmd)
         change_object = change_cls(new_change)
         summary_message = self.normalized_payload['summary_message']
-        suggestion_services.resubmit_rejected_suggestion(
-            suggestion_id, summary_message, self.user_id, change_object
-        )
+        suggestion_services.resubmit_rejected_suggestion(suggestion_id, summary_message, self.user_id, change_object)
         self.render_json(self.values)
 
 
@@ -559,11 +478,7 @@ class SuggestionToSkillActionHandlerNormalizedPayloadDict(TypedDict):
     skill_difficulty: Optional[str]
 
 
-class SuggestionToSkillActionHandler(
-    base.BaseHandler[
-        SuggestionToSkillActionHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class SuggestionToSkillActionHandler(base.BaseHandler[SuggestionToSkillActionHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handles actions performed on suggestions to skills."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -606,9 +521,7 @@ class SuggestionToSkillActionHandler(
         }
     }
 
-    @acl_decorators.get_decorator_for_accepting_suggestion(
-        acl_decorators.can_edit_skill
-    )
+    @acl_decorators.get_decorator_for_accepting_suggestion(acl_decorators.can_edit_skill)
     def put(self, target_id: str, suggestion_id: str) -> None:
         """Handles PUT requests.
 
@@ -623,15 +536,10 @@ class SuggestionToSkillActionHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_SKILL:
-            raise self.InvalidInputException(
-                'This handler allows actions only on suggestions to skills.'
-            )
+            raise self.InvalidInputException('This handler allows actions only on suggestions to skills.')
 
         if suggestion_id.split('.')[1] != target_id:
-            raise self.InvalidInputException(
-                'The skill id provided does not match the skill id present as '
-                'part of the suggestion_id'
-            )
+            raise self.InvalidInputException('The skill id provided does not match the skill id present as part of the suggestion_id')
 
         action = self.normalized_payload['action']
 
@@ -645,14 +553,8 @@ class SuggestionToSkillActionHandler(
             )
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-            target_entity_html_list = (
-                suggestion.get_target_entity_html_strings()
-            )
-            target_image_filenames = (
-                html_cleaner.get_image_filenames_from_html_strings(
-                    target_entity_html_list
-                )
-            )
+            target_entity_html_list = suggestion.get_target_entity_html_strings()
+            target_image_filenames = html_cleaner.get_image_filenames_from_html_strings(target_entity_html_list)
 
             fs_services.copy_images(
                 suggestion.target_type,
@@ -688,9 +590,7 @@ class SuggestionsProviderHandler(
     URL_PATH_ARGS_SCHEMAS: SuggestionsProviderHandlerUrlPathArgsSchemaDictType = {}
     HANDLER_ARGS_SCHEMAS: SuggestionsProviderHandlerArgsSchemaDictType = {}
 
-    def _require_valid_suggestion_and_target_types(
-        self, target_type: str, suggestion_type: str
-    ) -> None:
+    def _require_valid_suggestion_and_target_types(self, target_type: str, suggestion_type: str) -> None:
         """Checks whether the given target_type and suggestion_type are valid.
 
         Args:
@@ -702,14 +602,10 @@ class SuggestionsProviderHandler(
                 are invalid.
         """
         if target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
-            raise self.InvalidInputException(
-                'Invalid target_type: %s' % target_type
-            )
+            raise self.InvalidInputException('Invalid target_type: %s' % target_type)
 
         if suggestion_type not in feconf.SUGGESTION_TYPE_CHOICES:
-            raise self.InvalidInputException(
-                'Invalid suggestion_type: %s' % suggestion_type
-            )
+            raise self.InvalidInputException('Invalid suggestion_type: %s' % suggestion_type)
 
     def _render_suggestions(
         self,
@@ -726,22 +622,16 @@ class SuggestionsProviderHandler(
                 of all results matching the original query.
         """
         if target_type == feconf.ENTITY_TYPE_EXPLORATION:
-            target_id_to_exp_opportunity_dict = (
-                _get_target_id_to_exploration_opportunity_dict(suggestions)
-            )
+            target_id_to_exp_opportunity_dict = _get_target_id_to_exploration_opportunity_dict(suggestions)
             self.render_json(
                 {
-                    'suggestions': _construct_exploration_suggestions(
-                        suggestions
-                    ),
+                    'suggestions': _construct_exploration_suggestions(suggestions),
                     'target_id_to_opportunity_dict': target_id_to_exp_opportunity_dict,
                     'next_offset': next_offset,
                 }
             )
         elif target_type == feconf.ENTITY_TYPE_SKILL:
-            target_id_to_skill_opportunity_dict = (
-                _get_target_id_to_skill_opportunity_dict(suggestions)
-            )
+            target_id_to_skill_opportunity_dict = _get_target_id_to_skill_opportunity_dict(suggestions)
             self.render_json(
                 {
                     'suggestions': [s.to_dict() for s in suggestions],
@@ -765,11 +655,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     topic_name: Optional[str]
 
 
-class ReviewableSuggestionsHandler(
-    SuggestionsProviderHandler[
-        Dict[str, str], ReviewableSuggestionsHandlerNormalizedRequestDict
-    ]
-):
+class ReviewableSuggestionsHandler(SuggestionsProviderHandler[Dict[str, str], ReviewableSuggestionsHandlerNormalizedRequestDict]):
     """Provides all suggestions which can be reviewed by the user for a given
     suggestion type.
     """
@@ -818,23 +704,16 @@ class ReviewableSuggestionsHandler(
         }
     }
 
-    def _get_skill_ids_for_topic(
-        self, topic_name: Optional[str]
-    ) -> Optional[List[str]]:
+    def _get_skill_ids_for_topic(self, topic_name: Optional[str]) -> Optional[List[str]]:
         """Gets all skill ids for the provided topic.
 
         Returns None to indicate that no filtering is needed.
         """
-        if (
-            topic_name is None
-            or topic_name == constants.TOPIC_SENTINEL_NAME_ALL
-        ):
+        if topic_name is None or topic_name == constants.TOPIC_SENTINEL_NAME_ALL:
             return None
         topic = topic_fetchers.get_topic_by_name(topic_name)
         if topic is None:
-            raise self.InvalidInputException(
-                f'The topic \'{topic_name}\' is not valid'
-            )
+            raise self.InvalidInputException(f'The topic \'{topic_name}\' is not valid')
         return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
@@ -850,9 +729,7 @@ class ReviewableSuggestionsHandler(
         """
         assert self.user_id is not None
         assert self.normalized_request is not None
-        self._require_valid_suggestion_and_target_types(
-            target_type, suggestion_type
-        )
+        self._require_valid_suggestion_and_target_types(target_type, suggestion_type)
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
@@ -861,49 +738,27 @@ class ReviewableSuggestionsHandler(
         user_settings = user_services.get_user_settings(self.user_id)
         # User_settings.preferred_translation_language_code is the language
         # selected by user in language filter of contributor dashboard.
-        language_code_to_filter_by = (
-            user_settings.preferred_translation_language_code
-        )
+        language_code_to_filter_by = user_settings.preferred_translation_language_code
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            reviewable_suggestions: List[
-                suggestion_registry.SuggestionTranslateContent
-            ] = []
+            reviewable_suggestions: List[suggestion_registry.SuggestionTranslateContent] = []
             if exp_ids and len(exp_ids) == 1 and language_code_to_filter_by:
-                reviewable_suggestions, next_offset = (
-                    suggestion_services.get_reviewable_translation_suggestions_for_single_exp(
-                        self.user_id, exp_ids[0], language_code_to_filter_by
-                    )
-                )
+                reviewable_suggestions, next_offset = suggestion_services.get_reviewable_translation_suggestions_for_single_exp(self.user_id, exp_ids[0], language_code_to_filter_by)
             else:
                 # TODO(#18745): Deprecate the
                 # get_reviewable_translation_suggestions_by_offset method
                 # as its limit is unbounded and it can be given an
                 # unlimited number of exp_ids.
-                reviewable_suggestions, next_offset = (
-                    suggestion_services.get_reviewable_translation_suggestions_by_offset(
-                        self.user_id, exp_ids, limit, offset, sort_key
-                    )
-                )
-            suggestions = (
-                suggestion_services.get_suggestions_with_editable_explorations(
-                    reviewable_suggestions
-                )
-            )
+                reviewable_suggestions, next_offset = suggestion_services.get_reviewable_translation_suggestions_by_offset(self.user_id, exp_ids, limit, offset, sort_key)
+            suggestions = suggestion_services.get_suggestions_with_editable_explorations(reviewable_suggestions)
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             if limit is None:
-                raise self.InvalidInputException(
-                    'Limit must be provided for question suggestions.'
-                )
+                raise self.InvalidInputException('Limit must be provided for question suggestions.')
             topic_name = self.normalized_request.get('topic_name')
             skill_ids = self._get_skill_ids_for_topic(topic_name)
 
-            suggestions, next_offset = (
-                suggestion_services.get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key, skill_ids
-                )
-            )
+            suggestions, next_offset = suggestion_services.get_reviewable_question_suggestions_by_offset(self.user_id, limit, offset, sort_key, skill_ids)
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -917,11 +772,7 @@ class UserSubmittedSuggestionsHandlerNormalizedRequestDict(TypedDict):
     sort_key: str
 
 
-class UserSubmittedSuggestionsHandler(
-    SuggestionsProviderHandler[
-        Dict[str, str], UserSubmittedSuggestionsHandlerNormalizedRequestDict
-    ]
-):
+class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler[Dict[str, str], UserSubmittedSuggestionsHandlerNormalizedRequestDict]):
     """Provides all suggestions which are submitted by the user for a given
     suggestion type.
     """
@@ -971,17 +822,11 @@ class UserSubmittedSuggestionsHandler(
         """
         assert self.user_id is not None
         assert self.normalized_request is not None
-        self._require_valid_suggestion_and_target_types(
-            target_type, suggestion_type
-        )
+        self._require_valid_suggestion_and_target_types(target_type, suggestion_type)
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
-        suggestions, next_offset = (
-            suggestion_services.get_submitted_suggestions_by_offset(
-                self.user_id, suggestion_type, limit, offset, sort_key
-            )
-        )
+        suggestions, next_offset = suggestion_services.get_submitted_suggestions_by_offset(self.user_id, suggestion_type, limit, offset, sort_key)
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
             # Here we use cast because the above 'if' condition can only be
             # true if suggestion_type is 'translate_content', and if the above
@@ -993,30 +838,19 @@ class UserSubmittedSuggestionsHandler(
                 Sequence[suggestion_registry.SuggestionTranslateContent],
                 suggestions,
             )
-            suggestions_with_translatable_exps = (
-                suggestion_services.get_suggestions_with_editable_explorations(
-                    translatable_suggestions
-                )
-            )
-            while (
-                len(translatable_suggestions) > 0
-                and len(suggestions_with_translatable_exps) == 0
-            ):
+            suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(translatable_suggestions)
+            while len(translatable_suggestions) > 0 and len(suggestions_with_translatable_exps) == 0:
                 # If all of the fetched suggestions are filtered out, then keep
                 # fetching until we have some suggestions to return or there
                 # are no more results.
-                translatable_suggestions, next_offset = (
-                    suggestion_services.get_submitted_suggestions_by_offset(
-                        self.user_id,
-                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        limit,
-                        next_offset,
-                        sort_key,
-                    )
+                translatable_suggestions, next_offset = suggestion_services.get_submitted_suggestions_by_offset(
+                    self.user_id,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    limit,
+                    next_offset,
+                    sort_key,
                 )
-                suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(
-                    translatable_suggestions
-                )
+                suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(translatable_suggestions)
             suggestions = suggestions_with_translatable_exps
 
         self._render_suggestions(target_type, suggestions, next_offset)
@@ -1067,9 +901,7 @@ class SuggestionListHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
         query_fields_and_values = list(self.request.GET.items())
-        suggestions = suggestion_services.query_suggestions(
-            query_fields_and_values
-        )
+        suggestions = suggestion_services.query_suggestions(query_fields_and_values)
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
@@ -1083,11 +915,7 @@ class UpdateTranslationSuggestionHandlerNormalizedPayloadDict(TypedDict):
     translation_html: str
 
 
-class UpdateTranslationSuggestionHandler(
-    base.BaseHandler[
-        UpdateTranslationSuggestionHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class UpdateTranslationSuggestionHandler(base.BaseHandler[UpdateTranslationSuggestionHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handles update operations relating to translation suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1118,14 +946,9 @@ class UpdateTranslationSuggestionHandler(
         assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.is_handled:
-            raise self.InvalidInputException(
-                'The suggestion with id %s has been accepted or rejected'
-                % (suggestion_id)
-            )
+            raise self.InvalidInputException('The suggestion with id %s has been accepted or rejected' % (suggestion_id))
 
-        suggestion_services.update_translation_suggestion(
-            suggestion_id, self.normalized_payload['translation_html']
-        )
+        suggestion_services.update_translation_suggestion(suggestion_id, self.normalized_payload['translation_html'])
 
         self.render_json(self.values)
 
@@ -1141,11 +964,7 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
     inapplicable_skill_misconception_ids: List[str]
 
 
-class UpdateQuestionSuggestionHandler(
-    base.BaseHandler[
-        UpdateQuestionSuggestionHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class UpdateQuestionSuggestionHandler(base.BaseHandler[UpdateQuestionSuggestionHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handles update operations relating to question suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1170,9 +989,7 @@ class UpdateQuestionSuggestionHandler(
             'question_state_data': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_question_state_dict
-                    ),
+                    'validation_method': (domain_objects_validator.validate_question_state_dict),
                 }
             },
             'next_content_id_index': {'schema': {'type': 'int'}},
@@ -1193,10 +1010,7 @@ class UpdateQuestionSuggestionHandler(
         assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.is_handled:
-            raise self.InvalidInputException(
-                'The suggestion with id %s has been accepted or rejected'
-                % suggestion_id
-            )
+            raise self.InvalidInputException('The suggestion with id %s has been accepted or rejected' % suggestion_id)
 
         suggestion_services.update_question_suggestion(
             suggestion_id,
@@ -1211,9 +1025,7 @@ class UpdateQuestionSuggestionHandler(
 
 def _get_target_id_to_exploration_opportunity_dict(
     suggestions: Sequence[suggestion_registry.BaseSuggestion],
-) -> Dict[
-    str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]
-]:
+) -> Dict[str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]]:
     """Returns a dict of target_id to exploration opportunity summary dict.
 
     Args:
@@ -1225,14 +1037,7 @@ def _get_target_id_to_exploration_opportunity_dict(
         summary dict.
     """
     target_ids = set(s.target_id for s in suggestions)
-    opportunity_id_to_opportunity_dict = {
-        opp_id: (opp.to_dict() if opp is not None else None)
-        for opp_id, opp in (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                list(target_ids)
-            ).items()
-        )
-    }
+    opportunity_id_to_opportunity_dict = {opp_id: (opp.to_dict() if opp is not None else None) for opp_id, opp in (opportunity_services.get_exploration_opportunity_summaries_by_ids(list(target_ids)).items())}
     return opportunity_id_to_opportunity_dict
 
 
@@ -1253,31 +1058,16 @@ def _get_target_id_to_skill_opportunity_dict(
     # the type from the Dict of 'SkillOpportunityDict' to the Dict of
     # 'FrontendSkillOpportunityDict', and this is done because below we
     # are adding new keys that are not defined on the 'SkillOpportunityDict'.
-    opportunity_id_to_opportunity_dict: Dict[
-        str, Optional[FrontendSkillOpportunityDict]
-    ] = {
+    opportunity_id_to_opportunity_dict: Dict[str, Optional[FrontendSkillOpportunityDict]] = {
         opp_id: opp.to_dict() if opp is not None else None  # type: ignore[misc]
-        for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
-            list(target_ids)
-        ).items()
+        for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(list(target_ids)).items()
     }
-    opportunity_id_to_skill = {
-        skill.id: skill
-        for skill in skill_fetchers.get_multi_skills(
-            [
-                opp['id']
-                for opp in opportunity_id_to_opportunity_dict.values()
-                if opp is not None
-            ]
-        )
-    }
+    opportunity_id_to_skill = {skill.id: skill for skill in skill_fetchers.get_multi_skills([opp['id'] for opp in opportunity_id_to_opportunity_dict.values() if opp is not None])}
 
     for opp_id, skill in opportunity_id_to_skill.items():
         opportunity_dict = opportunity_id_to_opportunity_dict[opp_id]
         if skill is not None and opportunity_dict is not None:
-            opportunity_dict['skill_rubrics'] = [
-                rubric.to_dict() for rubric in skill.rubrics
-            ]
+            opportunity_dict['skill_rubrics'] = [rubric.to_dict() for rubric in skill.rubrics]
 
     return opportunity_id_to_opportunity_dict
 
@@ -1321,9 +1111,7 @@ def _construct_exploration_suggestions(
             'suggestion_type': suggestion_dict['suggestion_type'],
             'target_type': suggestion_dict['target_type'],
             'target_id': suggestion_dict['target_id'],
-            'target_version_at_submission': (
-                suggestion_dict['target_version_at_submission']
-            ),
+            'target_version_at_submission': (suggestion_dict['target_version_at_submission']),
             'status': suggestion_dict['status'],
             'author_name': suggestion_dict['author_name'],
             'final_reviewer_id': suggestion_dict['final_reviewer_id'],

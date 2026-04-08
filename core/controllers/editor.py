@@ -21,6 +21,8 @@ from __future__ import annotations
 import datetime
 import logging
 
+from typing import Dict, List, Optional, TypedDict
+
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -44,12 +46,8 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict
 
-
-def _require_valid_version(
-    version_from_payload: Optional[int], exploration_version: int
-) -> None:
+def _require_valid_version(version_from_payload: Optional[int], exploration_version: int) -> None:
     """Check that the payload version matches the given exploration version.
 
     Args:
@@ -62,19 +60,13 @@ def _require_valid_version(
     """
 
     if version_from_payload != exploration_version:
-        raise base.BaseHandler.InvalidInputException(
-            'Trying to update version %s of exploration from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (exploration_version, version_from_payload)
-        )
+        raise base.BaseHandler.InvalidInputException('Trying to update version %s of exploration from version %s, which is too old. Please reload the page and try again.' % (exploration_version, version_from_payload))
 
 
 # Common schemas used in this file.
 SCHEMA_FOR_EXPLORATION_ID = {
     'type': 'basestring',
-    'validators': [
-        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
-    ],
+    'validators': [{'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}],
 }
 SCHEMA_FOR_VERSION = {
     'type': 'int',
@@ -116,9 +108,7 @@ class ExplorationHandler(
     """Page with editor data for a single exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'v': {'schema': SCHEMA_FOR_VERSION, 'default_value': None},
@@ -169,11 +159,7 @@ class ExplorationHandler(
         version = self.normalized_request.get('v')
         apply_draft = self.normalized_request['apply_draft']
 
-        user_settings = (
-            user_services.get_user_settings(self.user_id, strict=False)
-            if self.user_id
-            else None
-        )
+        user_settings = user_services.get_user_settings(self.user_id, strict=False) if self.user_id else None
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
         if user_settings is not None:
@@ -189,18 +175,13 @@ class ExplorationHandler(
                 apply_draft=apply_draft,
                 version=version,
             )
-            exploration_data['show_state_editor_tutorial_on_load'] = bool(
-                self.user_id and not has_seen_editor_tutorial
-            )
-            exploration_data['show_state_translation_tutorial_on_load'] = bool(
-                self.user_id and not has_seen_translation_tutorial
-            )
+            exploration_data['show_state_editor_tutorial_on_load'] = bool(self.user_id and not has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = bool(self.user_id and not has_seen_translation_tutorial)
             # Here we use MyPy ignore because here we are defining a new
             # 'exploration_is_linked_to_story' key on a well defined TypedDict
             # dictionary.
             exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[typeddict-item]
-                exp_services.get_story_id_linked_to_exploration(exploration_id)
-                is not None
+                exp_services.get_story_id_linked_to_exploration(exploration_id) is not None
             )
         except Exception as e:
             raise self.NotFoundException from e
@@ -227,45 +208,26 @@ class ExplorationHandler(
         version = self.normalized_payload['version']
 
         if version > exploration.version:
-            raise base.BaseHandler.InvalidInputException(
-                'Trying to update version %s of exploration from version %s, '
-                'which is not possible. Please reload the page and try again.'
-                % (exploration.version, version)
-            )
+            raise base.BaseHandler.InvalidInputException('Trying to update version %s of exploration from version %s, which is not possible. Please reload the page and try again.' % (exploration.version, version))
         if not exploration.edits_allowed:
-            raise base.BaseHandler.InvalidInputException(
-                'This exploration cannot be edited. Please contact the admin.'
-            )
+            raise base.BaseHandler.InvalidInputException('This exploration cannot be edited. Please contact the admin.')
 
         commit_message = self.normalized_payload.get('commit_message')
         change_list = self.normalized_payload['change_list']
 
         # Validate commit message for public explorations.
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id)
         if exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC:
             if not commit_message:
-                raise self.InvalidInputException(
-                    'Exploration is public so expected a commit '
-                    'message but received none.'
-                )
+                raise self.InvalidInputException('Exploration is public so expected a commit message but received none.')
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            exploration_id, version, change_list
-        )
-        can_edit = rights_manager.check_can_edit_activity(
-            self.user, exploration_rights
-        )
-        can_voiceover = rights_manager.check_can_voiceover_activity(
-            self.user, exploration_rights
-        )
+        changes_are_mergeable = exp_services.are_changes_mergeable(exploration_id, version, change_list)
+        can_edit = rights_manager.check_can_edit_activity(self.user, exploration_rights)
+        can_voiceover = rights_manager.check_can_voiceover_activity(self.user, exploration_rights)
 
         try:
             if can_edit and changes_are_mergeable:
-                exp_services.update_exploration(
-                    self.user_id, exploration_id, change_list, commit_message
-                )
+                exp_services.update_exploration(self.user_id, exploration_id, change_list, commit_message)
             elif can_voiceover and changes_are_mergeable:
                 exp_services.update_exploration(
                     self.user_id,
@@ -277,15 +239,12 @@ class ExplorationHandler(
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        exploration_data = exp_services.get_user_exploration_data(
-            self.user_id, exploration_id
-        )
+        exploration_data = exp_services.get_user_exploration_data(self.user_id, exploration_id)
         # Here we use MyPy ignore because here we are defining a new
         # 'exploration_is_linked_to_story' key on a well defined TypedDict
         # dictionary.
         exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[typeddict-item]
-            exp_services.get_story_id_linked_to_exploration(exploration_id)
-            is not None
+            exp_services.get_story_id_linked_to_exploration(exploration_id) is not None
         )
 
         self.values.update(exploration_data)
@@ -307,12 +266,8 @@ class ExplorationHandler(
         )
         logging.debug(log_debug_string)
 
-        is_exploration_cloned = rights_manager.is_exploration_cloned(
-            exploration_id
-        )
-        exp_services.delete_exploration(
-            self.user_id, exploration_id, force_deletion=is_exploration_cloned
-        )
+        is_exploration_cloned = rights_manager.is_exploration_cloned(exploration_id)
+        exp_services.delete_exploration(self.user_id, exploration_id, force_deletion=is_exploration_cloned)
 
         log_info_string = '(%s) %s deleted exploration %s' % (
             self.roles,
@@ -323,9 +278,7 @@ class ExplorationHandler(
         self.render_json(self.values)
 
 
-class EntityTranslationsBulkHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class EntityTranslationsBulkHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles fetching all available translations for a given entity."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -379,12 +332,10 @@ class EntityTranslationsBulkHandler(
 
         if exploration_editor_can_modify_translations:
             translations = {}
-            entity_translations = (
-                translation_fetchers.get_all_entity_translations_for_entity(
-                    feconf.TranslatableEntityType(entity_type),
-                    entity_id,
-                    entity_version,
-                )
+            entity_translations = translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType(entity_type),
+                entity_id,
+                entity_version,
             )
 
             for translation in entity_translations:
@@ -395,15 +346,11 @@ class EntityTranslationsBulkHandler(
             raise self.NotFoundException
 
 
-class UserExplorationPermissionsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class UserExplorationPermissionsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles user permissions for a particular exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
@@ -413,41 +360,17 @@ class UserExplorationPermissionsHandler(
         Args:
             exploration_id: str. The exploration ID.
         """
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id)
         self.values.update(
             {
-                'can_delete': rights_manager.check_can_delete_activity(
-                    self.user, exploration_rights
-                ),
-                'can_edit': rights_manager.check_can_edit_activity(
-                    self.user, exploration_rights
-                ),
-                'can_modify_roles': (
-                    rights_manager.check_can_modify_core_activity_roles(
-                        self.user, exploration_rights
-                    )
-                ),
-                'can_publish': rights_manager.check_can_publish_activity(
-                    self.user, exploration_rights
-                ),
-                'can_release_ownership': (
-                    rights_manager.check_can_release_ownership(
-                        self.user, exploration_rights
-                    )
-                ),
-                'can_voiceover': (
-                    rights_manager.check_can_voiceover_activity(
-                        self.user, exploration_rights
-                    )
-                ),
-                'can_unpublish': rights_manager.check_can_unpublish_activity(
-                    self.user, exploration_rights
-                ),
-                'can_manage_voice_artist': rights_manager.check_can_manage_voice_artist_in_activity(
-                    self.user, exploration_rights
-                ),
+                'can_delete': rights_manager.check_can_delete_activity(self.user, exploration_rights),
+                'can_edit': rights_manager.check_can_edit_activity(self.user, exploration_rights),
+                'can_modify_roles': (rights_manager.check_can_modify_core_activity_roles(self.user, exploration_rights)),
+                'can_publish': rights_manager.check_can_publish_activity(self.user, exploration_rights),
+                'can_release_ownership': (rights_manager.check_can_release_ownership(self.user, exploration_rights)),
+                'can_voiceover': (rights_manager.check_can_voiceover_activity(self.user, exploration_rights)),
+                'can_unpublish': rights_manager.check_can_unpublish_activity(self.user, exploration_rights),
+                'can_manage_voice_artist': rights_manager.check_can_manage_voice_artist_in_activity(self.user, exploration_rights),
             }
         )
         self.render_json(self.values)
@@ -481,9 +404,7 @@ class ExplorationRightsHandler(
 ):
     """Handles management of exploration editing rights."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'version': {'schema': SCHEMA_FOR_VERSION},
@@ -538,25 +459,14 @@ class ExplorationRightsHandler(
         viewable_if_private = self.normalized_payload.get('viewable_if_private')
 
         if new_member_username:
-            new_member_id = user_services.get_user_id_from_username(
-                new_member_username
-            )
+            new_member_id = user_services.get_user_id_from_username(new_member_username)
             if new_member_id is None:
-                raise self.InvalidInputException(
-                    'Sorry, we could not find the specified user.'
-                )
+                raise self.InvalidInputException('Sorry, we could not find the specified user.')
             if new_member_role is None:
-                raise self.InvalidInputException(
-                    'Please provide a role for the new member of the '
-                    'exploration.'
-                )
+                raise self.InvalidInputException('Please provide a role for the new member of the exploration.')
             if new_member_id == self.user_id:
-                raise self.InvalidInputException(
-                    'Users are not allowed to assign other roles to themselves.'
-                )
-            rights_manager.assign_role_for_exploration(
-                self.user, exploration_id, new_member_id, new_member_role
-            )
+                raise self.InvalidInputException('Users are not allowed to assign other roles to themselves.')
+            rights_manager.assign_role_for_exploration(self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
                 self.user_id,
                 new_member_id,
@@ -572,27 +482,15 @@ class ExplorationRightsHandler(
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
 
-            rights_manager.release_ownership_of_exploration(
-                self.user, exploration_id
-            )
+            rights_manager.release_ownership_of_exploration(self.user, exploration_id)
 
         elif viewable_if_private is not None:
-            rights_manager.set_private_viewability_of_exploration(
-                self.user, exploration_id, viewable_if_private
-            )
+            rights_manager.set_private_viewability_of_exploration(self.user, exploration_id, viewable_if_private)
 
         else:
-            raise self.InvalidInputException(
-                'No change was made to this exploration.'
-            )
+            raise self.InvalidInputException('No change was made to this exploration.')
 
-        self.render_json(
-            {
-                'rights': rights_manager.get_exploration_rights(
-                    exploration_id
-                ).to_dict()
-            }
-        )
+        self.render_json({'rights': rights_manager.get_exploration_rights(exploration_id).to_dict()})
 
     @acl_decorators.can_modify_exploration_roles
     def delete(self, exploration_id: str) -> None:
@@ -611,24 +509,12 @@ class ExplorationRightsHandler(
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
-            raise self.InvalidInputException(
-                'Sorry, we could not find the specified user.'
-            )
+            raise self.InvalidInputException('Sorry, we could not find the specified user.')
         if self.user.user_id == user_id:
-            raise self.InvalidInputException(
-                'Sorry, users cannot remove their own roles.'
-            )
+            raise self.InvalidInputException('Sorry, users cannot remove their own roles.')
 
-        rights_manager.deassign_role_for_exploration(
-            self.user, exploration_id, user_id
-        )
-        self.render_json(
-            {
-                'rights': rights_manager.get_exploration_rights(
-                    exploration_id
-                ).to_dict()
-            }
-        )
+        rights_manager.deassign_role_for_exploration(self.user, exploration_id, user_id)
+        self.render_json({'rights': rights_manager.get_exploration_rights(exploration_id).to_dict()})
 
 
 class ExplorationStatusHandlerNormalizedPayloadDict(TypedDict):
@@ -639,21 +525,11 @@ class ExplorationStatusHandlerNormalizedPayloadDict(TypedDict):
     make_public: bool
 
 
-class ExplorationStatusHandler(
-    base.BaseHandler[
-        ExplorationStatusHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class ExplorationStatusHandler(base.BaseHandler[ExplorationStatusHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handles publishing of an exploration."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'make_public': {'schema': {'type': 'bool'}, 'default_value': False}
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
+    HANDLER_ARGS_SCHEMAS = {'PUT': {'make_public': {'schema': {'type': 'bool'}, 'default_value': False}}}
 
     def _publish_exploration(self, exploration_id: str) -> None:
         """Publish an exploration.
@@ -670,9 +546,7 @@ class ExplorationStatusHandler(
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        exp_services.publish_exploration_and_update_user_profiles(
-            self.user, exploration_id
-        )
+        exp_services.publish_exploration_and_update_user_profiles(self.user, exploration_id)
         exp_services.index_explorations_given_ids([exploration_id])
 
     @acl_decorators.can_publish_exploration
@@ -688,13 +562,7 @@ class ExplorationStatusHandler(
         if make_public:
             self._publish_exploration(exploration_id)
 
-        self.render_json(
-            {
-                'rights': rights_manager.get_exploration_rights(
-                    exploration_id
-                ).to_dict()
-            }
-        )
+        self.render_json({'rights': rights_manager.get_exploration_rights(exploration_id).to_dict()})
 
 
 class ExplorationModeratorRightsHandlerNormalizedPayloadDict(TypedDict):
@@ -706,16 +574,10 @@ class ExplorationModeratorRightsHandlerNormalizedPayloadDict(TypedDict):
     version: Optional[int]
 
 
-class ExplorationModeratorRightsHandler(
-    base.BaseHandler[
-        ExplorationModeratorRightsHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class ExplorationModeratorRightsHandler(base.BaseHandler[ExplorationModeratorRightsHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handles management of exploration rights by moderators."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'email_body': {'schema': {'type': 'basestring'}},
@@ -744,9 +606,7 @@ class ExplorationModeratorRightsHandler(
 
         # Check that all the prerequisites are satisfied, otherwise do nothing.
         if not email_body:
-            raise self.InvalidInputException(
-                'Moderator actions should include an email to the recipient.'
-            )
+            raise self.InvalidInputException('Moderator actions should include an email to the recipient.')
         email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.
@@ -781,18 +641,12 @@ class UserExplorationEmailsHandlerNormalizedPayloadDict(TypedDict):
     message_type: str
 
 
-class UserExplorationEmailsHandler(
-    base.BaseHandler[
-        UserExplorationEmailsHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class UserExplorationEmailsHandler(base.BaseHandler[UserExplorationEmailsHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handles management of user email notification preferences for this
     exploration.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'mute': {'schema': {'type': 'bool'}, 'default_value': None},
@@ -824,22 +678,12 @@ class UserExplorationEmailsHandler(
         message_type = self.normalized_payload['message_type']
 
         if message_type == feconf.MESSAGE_TYPE_FEEDBACK:
-            user_services.set_email_preferences_for_exploration(
-                self.user_id, exploration_id, mute_feedback_notifications=mute
-            )
+            user_services.set_email_preferences_for_exploration(self.user_id, exploration_id, mute_feedback_notifications=mute)
         elif message_type == feconf.MESSAGE_TYPE_SUGGESTION:
-            user_services.set_email_preferences_for_exploration(
-                self.user_id, exploration_id, mute_suggestion_notifications=mute
-            )
+            user_services.set_email_preferences_for_exploration(self.user_id, exploration_id, mute_suggestion_notifications=mute)
 
-        exploration_email_preferences = (
-            user_services.get_email_preferences_for_exploration(
-                self.user_id, exploration_id
-            )
-        )
-        self.render_json(
-            {'email_preferences_dict': exploration_email_preferences.to_dict()}
-        )
+        exploration_email_preferences = user_services.get_email_preferences_for_exploration(self.user_id, exploration_id)
+        self.render_json({'email_preferences_dict': exploration_email_preferences.to_dict()})
 
 
 class ExplorationFileDownloaderNormalizedRequestDict(TypedDict):
@@ -851,19 +695,13 @@ class ExplorationFileDownloaderNormalizedRequestDict(TypedDict):
     output_format: str
 
 
-class ExplorationFileDownloader(
-    base.BaseHandler[
-        Dict[str, str], ExplorationFileDownloaderNormalizedRequestDict
-    ]
-):
+class ExplorationFileDownloader(base.BaseHandler[Dict[str, str], ExplorationFileDownloaderNormalizedRequestDict]):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'v': {'schema': SCHEMA_FOR_VERSION, 'default_value': None},
@@ -907,18 +745,12 @@ class ExplorationFileDownloader(
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(
-                exp_services.export_to_zip_file(
-                    exploration_id, version=version
-                ),
+                exp_services.export_to_zip_file(exploration_id, version=version),
                 filename,
                 'text/plain',
             )
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-            self.render_json(
-                exp_services.export_states_to_yaml(
-                    exploration_id, version=version
-                )
-            )
+            self.render_json(exp_services.export_states_to_yaml(exploration_id, version=version))
 
 
 class StateYamlHandlerNormalizedPayloadDict(TypedDict):
@@ -930,18 +762,14 @@ class StateYamlHandlerNormalizedPayloadDict(TypedDict):
     width: int
 
 
-class StateYamlHandler(
-    base.BaseHandler[StateYamlHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class StateYamlHandler(base.BaseHandler[StateYamlHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Given a representation of a state, converts it to a YAML string.
 
     Note that this handler is stateless; it does not make use of the storage
     layer.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'state_dict': {
@@ -978,22 +806,16 @@ class StateYamlHandler(
 
         self.render_json(
             {
-                'yaml': state_domain.State.convert_state_dict_to_yaml(
-                    state_dict, width
-                ),
+                'yaml': state_domain.State.convert_state_dict_to_yaml(state_dict, width),
             }
         )
 
 
-class ExplorationSnapshotsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class ExplorationSnapshotsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Returns the exploration snapshot history."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
@@ -1003,17 +825,11 @@ class ExplorationSnapshotsHandler(
         Args:
             exploration_id: str. The exploration ID.
         """
-        snapshots = exp_services.get_exploration_snapshots_metadata(
-            exploration_id
-        )
+        snapshots = exp_services.get_exploration_snapshots_metadata(exploration_id)
 
         # Patch `snapshots` to use the editor's display name.
-        snapshots_committer_ids = [
-            snapshot['committer_id'] for snapshot in snapshots
-        ]
-        committer_usernames = user_services.get_usernames(
-            snapshots_committer_ids, strict=True
-        )
+        snapshots_committer_ids = [snapshot['committer_id'] for snapshot in snapshots]
+        committer_usernames = user_services.get_usernames(snapshots_committer_ids, strict=True)
         for index, snapshot in enumerate(snapshots):
             snapshot['committer_id'] = committer_usernames[index]
 
@@ -1024,9 +840,7 @@ class ExplorationSnapshotsHandler(
         )
 
 
-class ExplorationCheckRevertValidHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class ExplorationCheckRevertValidHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Checks if an older version of an exploration is valid."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1044,9 +858,7 @@ class ExplorationCheckRevertValidHandler(
             exploration_id: str. The exploration ID.
             version: int. The version of an exploration.
         """
-        info = exp_services.get_exploration_validation_error(
-            exploration_id, version
-        )
+        info = exp_services.get_exploration_validation_error(exploration_id, version)
         self.render_json({'valid': not info, 'details': info})
 
 
@@ -1059,16 +871,10 @@ class ExplorationRevertHandlerNormalizedPayloadDict(TypedDict):
     revert_to_version: int
 
 
-class ExplorationRevertHandler(
-    base.BaseHandler[
-        ExplorationRevertHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class ExplorationRevertHandler(base.BaseHandler[ExplorationRevertHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Reverts an exploration to an older version."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'current_version': {'schema': SCHEMA_FOR_VERSION},
@@ -1089,29 +895,20 @@ class ExplorationRevertHandler(
         revert_to_version = self.normalized_payload['revert_to_version']
 
         if revert_to_version >= current_version:
-            raise self.InvalidInputException(
-                'Cannot revert to version %s from version %s.'
-                % (revert_to_version, current_version)
-            )
+            raise self.InvalidInputException('Cannot revert to version %s from version %s.' % (revert_to_version, current_version))
 
         exp_services.discard_draft(exploration_id, self.user_id)
-        exp_services.revert_exploration(
-            self.user_id, exploration_id, current_version, revert_to_version
-        )
+        exp_services.revert_exploration(self.user_id, exploration_id, current_version, revert_to_version)
         self.render_json({})
 
 
-class ExplorationStatisticsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class ExplorationStatisticsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Returns statistics for an exploration. This is the handler for the new
     statistics framework.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
@@ -1123,16 +920,10 @@ class ExplorationStatisticsHandler(
         """
         current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
-        self.render_json(
-            stats_services.get_exploration_stats(
-                exploration_id, current_exploration.version
-            ).to_frontend_dict()
-        )
+        self.render_json(stats_services.get_exploration_stats(exploration_id, current_exploration.version).to_frontend_dict())
 
 
-class StateInteractionStatsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class StateInteractionStatsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Returns detailed learner answer statistics for a state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1157,10 +948,7 @@ class StateInteractionStatsHandler(
 
         if state_name not in current_exploration.states:
             logging.exception('Could not find state: %s' % state_name)
-            logging.exception(
-                'Available states: %s'
-                % (list(current_exploration.states.keys()))
-            )
+            logging.exception('Available states: %s' % (list(current_exploration.states.keys())))
             raise self.NotFoundException
 
         # TODO(#11475): Return visualizations info based on Apache Beam job.
@@ -1175,21 +963,15 @@ class FetchIssuesHandlerNormalizedRequestDict(TypedDict):
     exp_version: int
 
 
-class FetchIssuesHandler(
-    base.BaseHandler[Dict[str, str], FetchIssuesHandlerNormalizedRequestDict]
-):
+class FetchIssuesHandler(base.BaseHandler[Dict[str, str], FetchIssuesHandlerNormalizedRequestDict]):
     """Handler used for retrieving the list of unresolved issues in an
     exploration. This removes the invalid issues and returns the remaining
     unresolved ones.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {'exp_version': {'schema': SCHEMA_FOR_VERSION}}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
+    HANDLER_ARGS_SCHEMAS = {'GET': {'exp_version': {'schema': SCHEMA_FOR_VERSION}}}
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exp_id: str) -> None:
@@ -1203,14 +985,9 @@ class FetchIssuesHandler(
         """
         assert self.normalized_request is not None
         exp_version = self.normalized_request['exp_version']
-        exp_issues = stats_services.get_exp_issues(
-            exp_id, exp_version, strict=False
-        )
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version, strict=False)
         if exp_issues is None:
-            raise self.NotFoundException(
-                'Invalid version %s for exploration ID %s'
-                % (exp_version, exp_id)
-            )
+            raise self.NotFoundException('Invalid version %s for exploration ID %s' % (exp_version, exp_id))
         unresolved_issues = []
         for issue in exp_issues.unresolved_issues:
             if issue.is_valid:
@@ -1243,9 +1020,7 @@ class FetchPlaythroughHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
-            raise self.NotFoundException(
-                'Invalid playthrough ID %s' % (playthrough_id)
-            )
+            raise self.NotFoundException('Invalid playthrough ID %s' % (playthrough_id))
         self.render_json(playthrough.to_dict())
 
 
@@ -1258,18 +1033,14 @@ class ResolveIssueHandlerNormalizedPayloadDict(TypedDict):
     exp_version: int
 
 
-class ResolveIssueHandler(
-    base.BaseHandler[ResolveIssueHandlerNormalizedPayloadDict, Dict[str, str]]
-):
+class ResolveIssueHandler(base.BaseHandler[ResolveIssueHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Handler used for resolving an issue. Currently, when an issue is
     resolved, the issue is removed from the unresolved issues list in the
     ExplorationIssuesModel instance, and all corresponding playthrough
     instances are deleted.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'exp_issue_dict': {
@@ -1300,9 +1071,7 @@ class ResolveIssueHandler(
         exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload['exp_version']
 
-        exp_issues = stats_services.get_exp_issues(
-            exp_id, exp_version, strict=False
-        )
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version, strict=False)
         if exp_issues is None:
             raise self.NotFoundException('Invalid exploration ID %s' % (exp_id))
 
@@ -1315,19 +1084,14 @@ class ResolveIssueHandler(
                 break
 
         if not issue_to_remove:
-            raise self.NotFoundException(
-                'Exploration issue does not exist in the list of issues for '
-                'the exploration with ID %s' % exp_id
-            )
+            raise self.NotFoundException('Exploration issue does not exist in the list of issues for the exploration with ID %s' % exp_id)
 
         # Remove the issue from the unresolved issues list.
         exp_issues.unresolved_issues.remove(issue_to_remove)
 
         # Update the exploration issues instance and delete the playthrough
         # instances.
-        stats_services.delete_playthroughs_multi(
-            issue_to_remove.playthrough_ids
-        )
+        stats_services.delete_playthroughs_multi(issue_to_remove.playthrough_ids)
         stats_services.save_exp_issues_model(exp_issues)
 
         self.render_json({})
@@ -1372,9 +1136,7 @@ class ImageUploadHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': (
-                                utils.get_image_filename_regex_pattern()
-                            ),
+                            'regex_pattern': (utils.get_image_filename_regex_pattern()),
                         }
                     ],
                 }
@@ -1409,9 +1171,7 @@ class ImageUploadHandler(
         filename_prefix = self.normalized_payload['filename_prefix']
 
         try:
-            file_format = image_validation_services.validate_image_and_filename(
-                raw, filename, entity_type
-            )
+            file_format = image_validation_services.validate_image_and_filename(raw, filename, entity_type)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -1419,10 +1179,7 @@ class ImageUploadHandler(
         filepath = '%s/%s' % (filename_prefix, filename)
 
         if fs.isfile(filepath):
-            raise self.InvalidInputException(
-                'A file with the name %s already exists. Please choose a '
-                'different name.' % filename
-            )
+            raise self.InvalidInputException('A file with the name %s already exists. Please choose a different name.' % filename)
         image_is_compressible = file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
         fs_services.save_original_and_compressed_versions_of_image(
             filename,
@@ -1436,14 +1193,10 @@ class ImageUploadHandler(
         self.render_json({'filename': filename})
 
 
-class StartedTutorialEventHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class StartedTutorialEventHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Records that this user has started the state editor tutorial."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_play_exploration
@@ -1457,9 +1210,7 @@ class StartedTutorialEventHandler(
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'version': {'schema': SCHEMA_FOR_VERSION},
@@ -1500,15 +1251,9 @@ class EditorAutosaveHandler(ExplorationHandler):
         assert self.normalized_payload is not None
         change_list = self.normalized_payload['change_list']
         version = self.normalized_payload['version']
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id
-        )
-        can_edit = rights_manager.check_can_edit_activity(
-            self.user, exploration_rights
-        )
-        can_voiceover = rights_manager.check_can_voiceover_activity(
-            self.user, exploration_rights
-        )
+        exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+        can_edit = rights_manager.check_can_edit_activity(self.user, exploration_rights)
+        can_voiceover = rights_manager.check_can_voiceover_activity(self.user, exploration_rights)
 
         try:
             if can_edit:
@@ -1532,21 +1277,15 @@ class EditorAutosaveHandler(ExplorationHandler):
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
 
-        exp_user_data = exp_services.get_user_exploration_data(
-            self.user_id, exploration_id
-        )
+        exp_user_data = exp_services.get_user_exploration_data(self.user_id, exploration_id)
         # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the changes are
         # not mergeable, so that it is available for recovery later.
         self.render_json(
             {
                 'draft_change_list_id': exp_user_data['draft_change_list_id'],
-                'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                    exploration_id, version
-                ),
-                'changes_are_mergeable': exp_services.are_changes_mergeable(
-                    exploration_id, version, change_list
-                ),
+                'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(exploration_id, version),
+                'changes_are_mergeable': exp_services.are_changes_mergeable(exploration_id, version, change_list),
             }
         )
 
@@ -1562,15 +1301,11 @@ class EditorAutosaveHandler(ExplorationHandler):
         self.render_json({})
 
 
-class StateAnswerStatisticsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class StateAnswerStatisticsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Returns basic learner answer statistics for a state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
@@ -1584,15 +1319,11 @@ class StateAnswerStatisticsHandler(
         self.render_json({'answers': {}, 'interaction_ids': {}})
 
 
-class TopUnresolvedAnswersHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class TopUnresolvedAnswersHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Returns a list of top N unresolved answers."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
@@ -1614,17 +1345,11 @@ class ExplorationEditsAllowedHandlerNormalizedPayloadDict(TypedDict):
     edits_are_allowed: bool
 
 
-class ExplorationEditsAllowedHandler(
-    base.BaseHandler[
-        ExplorationEditsAllowedHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class ExplorationEditsAllowedHandler(base.BaseHandler[ExplorationEditsAllowedHandlerNormalizedPayloadDict, Dict[str, str]]):
     """Toggles whether exploration can be edited."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
-    }
+    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'edits_are_allowed': {
@@ -1643,9 +1368,7 @@ class ExplorationEditsAllowedHandler(
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        exp_services.set_exploration_edits_allowed(
-            exploration_id, self.normalized_payload['edits_are_allowed']
-        )
+        exp_services.set_exploration_edits_allowed(exploration_id, self.normalized_payload['edits_are_allowed'])
         self.render_json({})
 
 
@@ -1658,11 +1381,7 @@ class LearnerAnswerInfoHandlerNormalizedRequestDict(TypedDict):
     learner_answer_info_id: str
 
 
-class LearnerAnswerInfoHandler(
-    base.BaseHandler[
-        Dict[str, str], LearnerAnswerInfoHandlerNormalizedRequestDict
-    ]
-):
+class LearnerAnswerInfoHandler(base.BaseHandler[Dict[str, str], LearnerAnswerInfoHandlerNormalizedRequestDict]):
     """Handles the learner answer info for an exploration state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1710,62 +1429,30 @@ class LearnerAnswerInfoHandler(
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp = exp_fetchers.get_exploration_by_id(entity_id)
             for state_name in exp.states:
-                state_reference = (
-                    stats_services.get_state_reference_for_exploration(
-                        entity_id, state_name
-                    )
-                )
-                learner_answer_details = (
-                    stats_services.get_learner_answer_details(
-                        feconf.ENTITY_TYPE_EXPLORATION, state_reference
-                    )
-                )
+                state_reference = stats_services.get_state_reference_for_exploration(entity_id, state_name)
+                learner_answer_details = stats_services.get_learner_answer_details(feconf.ENTITY_TYPE_EXPLORATION, state_reference)
                 if learner_answer_details is not None:
                     learner_answer_info_data.append(
                         {
                             'state_name': state_name,
                             'interaction_id': learner_answer_details.interaction_id,
-                            'customization_args': exp.states[
-                                state_name
-                            ].interaction.to_dict()['customization_args'],
-                            'learner_answer_info_dicts': [
-                                learner_answer_info.to_dict()
-                                for learner_answer_info in learner_answer_details.learner_answer_info_list
-                            ],
+                            'customization_args': exp.states[state_name].interaction.to_dict()['customization_args'],
+                            'learner_answer_info_dicts': [learner_answer_info.to_dict() for learner_answer_info in learner_answer_details.learner_answer_info_list],
                         }
                     )
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
             question = question_services.get_question_by_id(entity_id)
-            state_reference = stats_services.get_state_reference_for_question(
-                entity_id
-            )
-            learner_answer_details = stats_services.get_learner_answer_details(
-                feconf.ENTITY_TYPE_QUESTION, state_reference
-            )
+            state_reference = stats_services.get_state_reference_for_question(entity_id)
+            learner_answer_details = stats_services.get_learner_answer_details(feconf.ENTITY_TYPE_QUESTION, state_reference)
             if learner_answer_details is not None:
-                learner_answer_info_dicts = [
-                    learner_answer_info.to_dict()
-                    for learner_answer_info in learner_answer_details.learner_answer_info_list
-                ]
+                learner_answer_info_dicts = [learner_answer_info.to_dict() for learner_answer_info in learner_answer_details.learner_answer_info_list]
                 learner_answer_info_data_dict = {
                     'interaction_id': learner_answer_details.interaction_id,
-                    'customization_args': (
-                        question.question_state_data.interaction.to_dict()[
-                            'customization_args'
-                        ]
-                    ),
+                    'customization_args': (question.question_state_data.interaction.to_dict()['customization_args']),
                     'learner_answer_info_dicts': learner_answer_info_dicts,
                 }
 
-        self.render_json(
-            {
-                'learner_answer_info_data': (
-                    learner_answer_info_data_dict
-                    if entity_type == feconf.ENTITY_TYPE_QUESTION
-                    else learner_answer_info_data
-                )
-            }
-        )
+        self.render_json({'learner_answer_info_data': (learner_answer_info_data_dict if entity_type == feconf.ENTITY_TYPE_QUESTION else learner_answer_info_data)})
 
     @acl_decorators.can_edit_entity
     def delete(self, entity_type: str, entity_id: str) -> None:
@@ -1787,20 +1474,10 @@ class LearnerAnswerInfoHandler(
             state_name = self.normalized_request.get('state_name')
             if not state_name:
                 raise self.InvalidInputException
-            state_reference = (
-                stats_services.get_state_reference_for_exploration(
-                    entity_id, state_name
-                )
-            )
+            state_reference = stats_services.get_state_reference_for_exploration(entity_id, state_name)
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            state_reference = stats_services.get_state_reference_for_question(
-                entity_id
-            )
-        learner_answer_info_id = self.normalized_request[
-            'learner_answer_info_id'
-        ]
+            state_reference = stats_services.get_state_reference_for_question(entity_id)
+        learner_answer_info_id = self.normalized_request['learner_answer_info_id']
 
-        stats_services.delete_learner_answer_info(
-            entity_type, state_reference, learner_answer_info_id
-        )
+        stats_services.delete_learner_answer_info(entity_type, state_reference, learner_answer_info_id)
         self.render_json({})

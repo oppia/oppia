@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from typing import Iterator, List, Optional, Tuple, Type, Union
+
 from core.domain import question_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
@@ -25,27 +27,17 @@ from core.jobs.transforms.validation import base_validation
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Iterator, List, Optional, Tuple, Type, Union
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services, question_models, skill_models
 
-(question_models, skill_models) = models.Registry.import_models(
-    [models.Names.QUESTION, models.Names.SKILL]
-)
+(question_models, skill_models) = models.Registry.import_models([models.Names.QUESTION, models.Names.SKILL])
 
 datastore_services = models.Registry.import_datastore_services()
 
 
-@validation_decorators.AuditsExisting(
-    question_models.QuestionSnapshotMetadataModel
-)
-class ValidateQuestionSnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        question_models.QuestionSnapshotMetadataModel
-    ]
-):
+@validation_decorators.AuditsExisting(question_models.QuestionSnapshotMetadataModel)
+class ValidateQuestionSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[question_models.QuestionSnapshotMetadataModel]):
     """Overrides _get_change_domain_class for QuestionSnapshotMetadataModel."""
 
     def _get_change_domain_class(
@@ -70,9 +62,7 @@ def question_skill_link_model_relationships(
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[
-            Type[Union[question_models.QuestionModel, skill_models.SkillModel]]
-        ],
+        List[Type[Union[question_models.QuestionModel, skill_models.SkillModel]]],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
@@ -81,16 +71,10 @@ def question_skill_link_model_relationships(
     yield model.skill_id, [skill_models.SkillModel]
 
 
-@validation_decorators.RelationshipsOf(
-    question_models.QuestionCommitLogEntryModel
-)
+@validation_decorators.RelationshipsOf(question_models.QuestionCommitLogEntryModel)
 def question_commit_log_entry_model_relationships(
     model: Type[question_models.QuestionCommitLogEntryModel],
-) -> Iterator[
-    Tuple[
-        datastore_services.Property, List[Type[question_models.QuestionModel]]
-    ]
-]:
+) -> Iterator[Tuple[datastore_services.Property, List[Type[question_models.QuestionModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.question_id, [question_models.QuestionModel]
@@ -99,24 +83,14 @@ def question_commit_log_entry_model_relationships(
 @validation_decorators.RelationshipsOf(question_models.QuestionSummaryModel)
 def question_summary_model_relationships(
     model: Type[question_models.QuestionSummaryModel],
-) -> Iterator[
-    Tuple[
-        model_property.PropertyType, List[Type[question_models.QuestionModel]]
-    ]
-]:
+) -> Iterator[Tuple[model_property.PropertyType, List[Type[question_models.QuestionModel]]]]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [question_models.QuestionModel]
 
 
-@validation_decorators.AuditsExisting(
-    question_models.QuestionCommitLogEntryModel
-)
-class ValidateQuestionCommitLogEntryModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        question_models.QuestionCommitLogEntryModel
-    ]
-):
+@validation_decorators.AuditsExisting(question_models.QuestionCommitLogEntryModel)
+class ValidateQuestionCommitLogEntryModel(base_validation.BaseValidateCommitCmdsSchema[question_models.QuestionCommitLogEntryModel]):
     """Overrides _get_change_domain_class for QuestionCommitLogEntryModel."""
 
     # Here we use MyPy ignore because the signature of this method doesn't

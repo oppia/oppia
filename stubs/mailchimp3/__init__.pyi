@@ -1,6 +1,6 @@
-from .mailchimpclient import MailChimpClient as MailChimpClient
-
 from typing import Any, Dict, List, Optional, TypedDict
+
+from .mailchimpclient import MailChimpClient as MailChimpClient
 
 class ListsDataDict(TypedDict):
     members: List[Dict[str, Any]]

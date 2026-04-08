@@ -18,19 +18,17 @@
 
 from __future__ import annotations
 
+from typing import Final
+
 from core import feconf
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import audit_models, base_models
 
-(audit_models, base_models) = models.Registry.import_models(
-    [models.Names.AUDIT, models.Names.BASE_MODEL]
-)
+(audit_models, base_models) = models.Registry.import_models([models.Names.AUDIT, models.Names.BASE_MODEL])
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
@@ -70,9 +68,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
-        self.assertEqual(
-            audit_models.RoleQueryAuditModel.get_export_policy(), sample_dict
-        )
+        self.assertEqual(audit_models.RoleQueryAuditModel.get_export_policy(), sample_dict)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -81,16 +77,8 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(
-            audit_models.RoleQueryAuditModel.has_reference_to_user_id(
-                self.USER_ID
-            )
-        )
-        self.assertFalse(
-            audit_models.RoleQueryAuditModel.has_reference_to_user_id(
-                self.NONEXISTENT_USER_ID
-            )
-        )
+        self.assertTrue(audit_models.RoleQueryAuditModel.has_reference_to_user_id(self.USER_ID))
+        self.assertFalse(audit_models.RoleQueryAuditModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
     def test_get_model(self) -> None:
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
@@ -149,16 +137,8 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(
-            audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
-                self.COMMITTER_ID
-            )
-        )
-        self.assertFalse(
-            audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
-                self.NONEXISTENT_COMMITTER_ID
-            )
-        )
+        self.assertTrue(audit_models.UsernameChangeAuditModel.has_reference_to_user_id(self.COMMITTER_ID))
+        self.assertFalse(audit_models.UsernameChangeAuditModel.has_reference_to_user_id(self.NONEXISTENT_COMMITTER_ID))
 
     def test_get_model(self) -> None:
         audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)

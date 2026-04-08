@@ -27,9 +27,9 @@ import tempfile
 import zipfile
 from urllib import request as urlrequest
 
-from core.tests import test_utils
-
 from typing import Any, BinaryIO, Final, NoReturn, Tuple
+
+from core.tests import test_utils
 
 from . import common, install_dependencies_json_packages
 
@@ -91,9 +91,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'TMP_UNZIP_PATH',
             MOCK_TMP_UNZIP_PATH,
         )
-        self.dir_exists_swap = self.swap(
-            common, 'ensure_directory_exists', mock_ensure_directory_exists
-        )
+        self.dir_exists_swap = self.swap(common, 'ensure_directory_exists', mock_ensure_directory_exists)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
@@ -102,9 +100,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'url_retrieve',
             mock_url_retrieve,
         )
-        self.extract_swap = self.swap(
-            zipfile.ZipFile, 'extractall', mock_extractall
-        )
+        self.extract_swap = self.swap(zipfile.ZipFile, 'extractall', mock_extractall)
 
     def test_download_files_with_invalid_source_filenames(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -145,9 +141,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             mock_url_retrieve,
         )
         with self.dir_exists_swap, exists_swap, url_retrieve_swap:
-            install_dependencies_json_packages.download_files(
-                'source_url', 'target_dir', ['file1', 'file2']
-            )
+            install_dependencies_json_packages.download_files('source_url', 'target_dir', ['file1', 'file2'])
         self.assertEqual(check_file_downloads, expected_check_file_downloads)
 
     def test_download_and_unzip_files_without_exception(self) -> None:
@@ -164,12 +158,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
             with self.remove_swap, self.rename_swap, self.unzip_swap:
                 with self.extract_swap:
-                    install_dependencies_json_packages.download_and_unzip_files(
-                        'source url', 'target dir', 'zip root', 'target root'
-                    )
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls
-        )
+                    install_dependencies_json_packages.download_and_unzip_files('source url', 'target dir', 'zip root', 'target root')
+        self.assertEqual(self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(exists_arr, [False])
 
     def test_download_and_unzip_files_with_exception(self) -> None:
@@ -189,24 +179,16 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # The function is used as follows: url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
-            file_obj = install_dependencies_json_packages.open_file(
-                MOCK_TMP_UNZIP_PATH, 'rb', None
-            )
+            file_obj = install_dependencies_json_packages.open_file(MOCK_TMP_UNZIP_PATH, 'rb', None)
             return file_obj
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_open_swap = self.swap(
-            install_dependencies_json_packages, 'url_open', mock_url_open
-        )
+        url_open_swap = self.swap(install_dependencies_json_packages, 'url_open', mock_url_open)
         with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
             with self.remove_swap, self.rename_swap, self.extract_swap:
                 with url_open_swap:
-                    install_dependencies_json_packages.download_and_unzip_files(
-                        'http://src', 'target dir', 'zip root', 'target root'
-                    )
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls
-        )
+                    install_dependencies_json_packages.download_and_unzip_files('http://src', 'target dir', 'zip root', 'target root')
+        self.assertEqual(self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(exists_arr, [False, True])
 
     def test_download_and_unzip_files_with_existing_target_dir(self) -> None:
@@ -246,13 +228,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.rename_swap,
             self.extract_swap,
         ):
-            install_dependencies_json_packages.download_and_unzip_files(
-                'source url', 'target dir', 'zip root', 'target root'
-            )
+            install_dependencies_json_packages.download_and_unzip_files('source url', 'target dir', 'zip root', 'target root')
 
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls
-        )
+        self.assertEqual(self.check_function_calls, self.expected_check_function_calls)
 
     def test_download_and_unzip_files_with_exception_and_tmp_unzip_missing(
         self,
@@ -298,9 +276,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         # to inspect specific attributes or methods of the request.
         def mock_url_open(_req: object) -> BinaryIO:
             self.check_function_calls['url_open_is_called'] = True
-            file_obj = install_dependencies_json_packages.open_file(
-                install_dependencies_json_packages.TMP_UNZIP_PATH, 'rb', None
-            )
+            file_obj = install_dependencies_json_packages.open_file(install_dependencies_json_packages.TMP_UNZIP_PATH, 'rb', None)
             return file_obj
 
         def mock_remove(_path: str) -> None:
@@ -308,9 +284,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         zipfile_swap = self.swap(zipfile.ZipFile, '__init__', mock_zipfile_init)
-        url_open_swap = self.swap(
-            install_dependencies_json_packages, 'url_open', mock_url_open
-        )
+        url_open_swap = self.swap(install_dependencies_json_packages, 'url_open', mock_url_open)
         remove_swap = self.swap(os, 'remove', mock_remove)
 
         with exists_swap, zipfile_swap, url_open_swap, remove_swap:
@@ -321,13 +295,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 self.unzip_swap,
             ):
                 with self.extract_swap:
-                    install_dependencies_json_packages.download_and_unzip_files(
-                        'http://src', 'target dir', 'zip root', 'target root'
-                    )
+                    install_dependencies_json_packages.download_and_unzip_files('http://src', 'target dir', 'zip root', 'target root')
 
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls
-        )
+        self.assertEqual(self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(zipfile_call_count['count'], 2)
         self.assertEqual(exists_arr, [False, True])
 
@@ -380,9 +350,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     'downloadFormat': 'files',
                 },
             )
-        self.assertTrue(
-            'This key is missing or misspelled: "url".' in print_arr
-        )
+        self.assertTrue('This key is missing or misspelled: "url".' in print_arr)
 
     def test_dependencies_syntax_with_extra_optional_key(self) -> None:
         print_arr = []
@@ -403,10 +371,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     'rootDirPrefix': 'rootDirPrefix',
                 },
             )
-        self.assertTrue(
-            'Only one of these keys pair must be used: '
-            '"rootDir, rootDirPrefix".' in print_arr
-        )
+        self.assertTrue('Only one of these keys pair must be used: "rootDir, rootDirPrefix".' in print_arr)
 
     def test_dependencies_syntax_with_invalid_url(self) -> None:
         print_arr = []
@@ -421,18 +386,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 {
                     'version': '4.7.1',
                     'downloadFormat': 'zip',
-                    'url': (
-                        'https://python.org/packages/beautifulsoup4-4.7.1.tar'
-                        '#md5=321d'
-                    ),
+                    'url': ('https://python.org/packages/beautifulsoup4-4.7.1.tar#md5=321d'),
                     'rootDirPrefix': 'beautifulsoup4-',
                     'targetDirPrefix': 'beautifulsoup4-',
                 },
             )
-        self.assertTrue(
-            'This url https://python.org/packages/beautifulsoup4-4.7.1.tar is '
-            'invalid for zip file format.' in print_arr
-        )
+        self.assertTrue('This url https://python.org/packages/beautifulsoup4-4.7.1.tar is invalid for zip file format.' in print_arr)
 
     def test_validate_dependencies_with_correct_syntax(self) -> None:
         def mock_return_json(
@@ -450,9 +409,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 }
             }
 
-        return_json_swap = self.swap(
-            install_dependencies_json_packages, 'return_json', mock_return_json
-        )
+        return_json_swap = self.swap(install_dependencies_json_packages, 'return_json', mock_return_json)
         with return_json_swap:
             install_dependencies_json_packages.validate_dependencies('filepath')
 
@@ -470,18 +427,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 }
             }
 
-        return_json_swap = self.swap(
-            install_dependencies_json_packages, 'return_json', mock_return_json
-        )
+        return_json_swap = self.swap(install_dependencies_json_packages, 'return_json', mock_return_json)
         with (
             return_json_swap,
             self.assertRaisesRegex(
                 Exception,
-                re.escape(
-                    'downloadFormat not specified in {\'version\': \'2.7.5\', '
-                    '\'url\': \'https://github.com/mathjax/2.7.5.zip\', '
-                    '\'targetDirPrefix\': \'MathJax-\'}'
-                ),
+                re.escape('downloadFormat not specified in {\'version\': \'2.7.5\', \'url\': \'https://github.com/mathjax/2.7.5.zip\', \'targetDirPrefix\': \'MathJax-\'}'),
             ),
         ):
             install_dependencies_json_packages.validate_dependencies('filepath')
@@ -546,9 +497,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         ) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
 
-        return_json_swap = self.swap(
-            install_dependencies_json_packages, 'return_json', mock_return_json
-        )
+        return_json_swap = self.swap(install_dependencies_json_packages, 'return_json', mock_return_json)
         validate_swap = self.swap(
             install_dependencies_json_packages,
             'validate_dependencies',
@@ -609,9 +558,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_download_and_unzip_files(*_args: Any, **_kwargs: Any) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
 
-        return_json_swap = self.swap(
-            install_dependencies_json_packages, 'return_json', mock_return_json
-        )
+        return_json_swap = self.swap(install_dependencies_json_packages, 'return_json', mock_return_json)
         validate_swap = self.swap(
             install_dependencies_json_packages,
             'validate_dependencies',
@@ -669,9 +616,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(response.getcode(), 200)
         self.assertEqual(response.url, test_url)
 
-    def _assert_ssl_context_matches_default(
-        self, context: ssl.SSLContext
-    ) -> None:
+    def _assert_ssl_context_matches_default(self, context: ssl.SSLContext) -> None:
         """Assert that an SSL context matches the default one.
 
         If we create two default SSL contexts, they will evaluate as unequal
@@ -697,9 +642,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'maximum_version',
             'check_hostname',
         ):
-            self.assertEqual(
-                getattr(context, attribute), getattr(default_context, attribute)
-            )
+            self.assertEqual(getattr(context, attribute), getattr(default_context, attribute))
         # Note: We intentionally don't compare get_ca_certs() because url_open
         # uses certifi's certificate bundle which differs from system certs.
         # We only compare get_ciphers() to verify cipher configuration matches.
@@ -710,9 +653,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             output_path = os.path.join(tempdir, 'buffer')
             attempts = []
 
-            def mock_urlopen(
-                url: str, context: ssl.SSLContext
-            ) -> io.BufferedIOBase:
+            def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
                 attempts.append(url)
                 self.assertLessEqual(len(attempts), 1)
                 self.assertEqual(url, 'https://example.com')
@@ -722,9 +663,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
             with urlopen_swap:
-                install_dependencies_json_packages.url_retrieve(
-                    'https://example.com', output_path
-                )
+                install_dependencies_json_packages.url_retrieve('https://example.com', output_path)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
 
@@ -733,9 +672,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             output_path = os.path.join(tempdir, 'output')
             attempts = []
 
-            def mock_urlopen(
-                url: str, context: ssl.SSLContext
-            ) -> io.BufferedIOBase:
+            def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
                 attempts.append(url)
                 self.assertLessEqual(len(attempts), 2)
                 self.assertEqual(url, 'https://example.com')
@@ -747,9 +684,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
             with urlopen_swap:
-                install_dependencies_json_packages.url_retrieve(
-                    'https://example.com', output_path
-                )
+                install_dependencies_json_packages.url_retrieve('https://example.com', output_path)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
 
@@ -759,9 +694,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_open(_path: str, _options: str) -> NoReturn:
             raise AssertionError('open() should not be called')
 
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> io.BufferedIOBase:
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
             attempts.append(url)
             self.assertLessEqual(len(attempts), 2)
             self.assertEqual(url, 'https://example.com')
@@ -773,9 +706,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         with open_swap, urlopen_swap:
             with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
-                install_dependencies_json_packages.url_retrieve(
-                    'https://example.com', 'test_path'
-                )
+                install_dependencies_json_packages.url_retrieve('https://example.com', 'test_path')
 
     def test_url_retrieve_https_check_fails(self) -> None:
         def mock_open(_path: str, _options: str) -> NoReturn:
@@ -788,21 +719,15 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
         with open_swap, urlopen_swap:
-            with self.assertRaisesRegex(
-                Exception, 'The URL http://example.com should use HTTPS.'
-            ):
-                install_dependencies_json_packages.url_retrieve(
-                    'http://example.com', 'test_path'
-                )
+            with self.assertRaisesRegex(Exception, 'The URL http://example.com should use HTTPS.'):
+                install_dependencies_json_packages.url_retrieve('http://example.com', 'test_path')
 
     def test_url_retrieve_with_successful_http_works(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             output_path = os.path.join(tempdir, 'output')
             attempts = []
 
-            def mock_urlopen(
-                url: str, context: ssl.SSLContext
-            ) -> io.BufferedIOBase:
+            def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
                 attempts.append(url)
                 self.assertLessEqual(len(attempts), 1)
                 self.assertEqual(url, 'https://example.com')
@@ -812,8 +737,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
             with urlopen_swap:
-                install_dependencies_json_packages.url_retrieve(
-                    'https://example.com', output_path, enforce_https=False
-                )
+                install_dependencies_json_packages.url_retrieve('https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')

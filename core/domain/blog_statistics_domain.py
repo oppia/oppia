@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Dict
+
 from core import utils
 from core.constants import constants
-
-from typing import Dict
 
 
 class BlogPostViewsAggregatedStats:
@@ -72,14 +72,10 @@ class BlogPostViewsAggregatedStats:
             raise utils.ValidationError('No blog_post_id specified')
 
         if not isinstance(self.blog_post_id, str):
-            raise utils.ValidationError(
-                'Blog Post ID must be a string, but got %r' % self.blog_post_id
-            )
+            raise utils.ValidationError('Blog Post ID must be a string, but got %r' % self.blog_post_id)
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
-            raise utils.ValidationError(
-                'Blog ID %s is invalid' % self.blog_post_id
-            )
+            raise utils.ValidationError('Blog ID %s is invalid' % self.blog_post_id)
 
 
 class BlogPostReadsAggregatedStats:
@@ -128,14 +124,10 @@ class BlogPostReadsAggregatedStats:
             raise utils.ValidationError('No blog_post_id specified')
 
         if not isinstance(self.blog_post_id, str):
-            raise utils.ValidationError(
-                'Blog Post ID must be a string, but got %r' % self.blog_post_id
-            )
+            raise utils.ValidationError('Blog Post ID must be a string, but got %r' % self.blog_post_id)
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
-            raise utils.ValidationError(
-                'Blog ID %s is invalid' % self.blog_post_id
-            )
+            raise utils.ValidationError('Blog ID %s is invalid' % self.blog_post_id)
 
 
 class BlogPostReadingTime:
@@ -208,14 +200,10 @@ class BlogPostReadingTime:
             raise utils.ValidationError('No blog_post_id specified')
 
         if not isinstance(self.blog_post_id, str):
-            raise utils.ValidationError(
-                'Blog Post ID must be a string, but got %r' % self.blog_post_id
-            )
+            raise utils.ValidationError('Blog Post ID must be a string, but got %r' % self.blog_post_id)
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
-            raise utils.ValidationError(
-                'Blog Post ID %s is invalid' % self.blog_post_id
-            )
+            raise utils.ValidationError('Blog Post ID %s is invalid' % self.blog_post_id)
 
 
 class AuthorBlogPostViewsAggregatedStats:
@@ -267,14 +255,10 @@ class AuthorBlogPostViewsAggregatedStats:
             raise utils.ValidationError('No author_id specified')
 
         if not isinstance(self.author_id, str):
-            raise utils.ValidationError(
-                'Author ID must be a string, but got %r' % self.author_id
-            )
+            raise utils.ValidationError('Author ID must be a string, but got %r' % self.author_id)
 
         if not utils.is_user_id_valid(self.author_id):
-            raise utils.ValidationError(
-                'author_id=%r has the wrong format' % self.author_id
-            )
+            raise utils.ValidationError('author_id=%r has the wrong format' % self.author_id)
 
 
 class AuthorBlogPostReadsAggregatedStats:
@@ -326,14 +310,10 @@ class AuthorBlogPostReadsAggregatedStats:
             raise utils.ValidationError('No author_id specified')
 
         if not isinstance(self.author_id, str):
-            raise utils.ValidationError(
-                'Author ID must be a string, but got %r' % self.author_id
-            )
+            raise utils.ValidationError('Author ID must be a string, but got %r' % self.author_id)
 
         if not utils.is_user_id_valid(self.author_id):
-            raise utils.ValidationError(
-                'author_id=%r has the wrong format' % self.author_id
-            )
+            raise utils.ValidationError('author_id=%r has the wrong format' % self.author_id)
 
 
 class AuthorBlogPostsReadingTime:
@@ -406,11 +386,7 @@ class AuthorBlogPostsReadingTime:
             raise utils.ValidationError('No author_id specified')
 
         if not isinstance(self.author_id, str):
-            raise utils.ValidationError(
-                'Author ID must be a string, but got %r' % self.author_id
-            )
+            raise utils.ValidationError('Author ID must be a string, but got %r' % self.author_id)
 
         if not utils.is_user_id_valid(self.author_id):
-            raise utils.ValidationError(
-                'author_id=%r has the wrong format' % self.author_id
-            )
+            raise utils.ValidationError('author_id=%r has the wrong format' % self.author_id)

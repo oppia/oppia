@@ -20,10 +20,6 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.issues.EarlyQuit import (  # pylint: disable=unused-import # isort: skip
-    EarlyQuit,
-)
-
 
 class EarlyQuitTests(test_utils.GenericTestBase):
     # At Oppia, we require all files to have an associated test file, since

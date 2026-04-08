@@ -16,18 +16,16 @@
 
 from __future__ import annotations
 
+from typing import Final
+
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, recommendations_models
 
-(base_models, recommendations_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.RECOMMENDATIONS]
-)
+(base_models, recommendations_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.RECOMMENDATIONS])
 
 
 class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
@@ -54,9 +52,7 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'recommended_exploration_ids': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
-            ),
+            'recommended_exploration_ids': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
         }
         self.assertEqual(
             recommendations_models.ExplorationRecommendationsModel.get_export_policy(),

@@ -18,14 +18,14 @@
 
 from __future__ import annotations
 
+from typing import Final, Type
+
 from core import feconf
 from core.constants import constants
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import skill_inspection_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Final, Type
 
 MYPY = False
 if MYPY:
@@ -37,9 +37,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[skill_inspection_jobs.CountHangingPrerequisiteSkillsJob] = (
-        skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
-    )
+    JOB_CLASS: Type[skill_inspection_jobs.CountHangingPrerequisiteSkillsJob] = skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
 
     SKILL_1_ID: Final = 'skill_id_1'
     SKILL_1_DESC: Final = 'skill_description_1'

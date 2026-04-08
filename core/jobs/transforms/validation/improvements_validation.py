@@ -18,36 +18,30 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+from typing import Iterator
+
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import improvements_validation_errors
 from core.platform import models
 
-import apache_beam as beam
-from typing import Iterator
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
-(improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS]
-)
+(improvements_models,) = models.Registry.import_models([models.Names.IMPROVEMENTS])
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-@validation_decorators.AuditsExisting(
-    improvements_models.ExplorationStatsTaskEntryModel
-)
+@validation_decorators.AuditsExisting(improvements_models.ExplorationStatsTaskEntryModel)
 class ValidateCompositeEntityId(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the composite entity id."""
 
-    def process(
-        self, input_model: improvements_models.ExplorationStatsTaskEntryModel
-    ) -> Iterator[improvements_validation_errors.InvalidCompositeEntityError]:
+    def process(self, input_model: improvements_models.ExplorationStatsTaskEntryModel) -> Iterator[improvements_validation_errors.InvalidCompositeEntityError]:
         """Function that checks if the composite entity id is valid
 
         Args:
@@ -59,11 +53,7 @@ class ValidateCompositeEntityId(beam.DoFn):  # type: ignore[misc]
             invalid composite entity.
         """
         model = job_utils.clone_model(input_model)
-        expected_composite_entity_id = improvements_models.ExplorationStatsTaskEntryModel.generate_composite_entity_id(
-            model.entity_type, model.entity_id, model.entity_version
-        )
+        expected_composite_entity_id = improvements_models.ExplorationStatsTaskEntryModel.generate_composite_entity_id(model.entity_type, model.entity_id, model.entity_version)
 
         if model.composite_entity_id != expected_composite_entity_id:
-            yield improvements_validation_errors.InvalidCompositeEntityError(
-                model
-            )
+            yield improvements_validation_errors.InvalidCompositeEntityError(model)

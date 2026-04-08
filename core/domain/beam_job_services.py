@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
+from typing import List, Optional, Type
+
 from core.constants import constants
 from core.domain import beam_job_domain
 from core.jobs import base_jobs, jobs_manager
 from core.jobs import registry as jobs_registry
 from core.platform import models
-
-from typing import List, Optional, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -78,9 +78,7 @@ def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
     Raises:
         ValueError. Job does not exist.
     """
-    beam_job_run_model = beam_job_models.BeamJobRunModel.get(
-        job_id, strict=False
-    )
+    beam_job_run_model = beam_job_models.BeamJobRunModel.get(job_id, strict=False)
 
     if beam_job_run_model is None:
         raise ValueError('No such job with id="%s"' % job_id)
@@ -127,9 +125,7 @@ def get_beam_job_runs(refresh: bool = True) -> List[beam_job_domain.BeamJobRun]:
         list(BeamJobRun). A list of every job run recorded in the datastore.
     """
     beam_job_run_models = list(beam_job_models.BeamJobRunModel.query())
-    beam_job_runs = [
-        get_beam_job_run_from_model(m) for m in beam_job_run_models
-    ]
+    beam_job_runs = [get_beam_job_run_from_model(m) for m in beam_job_run_models]
 
     if refresh:
         updated_beam_job_run_models = []
@@ -159,9 +155,7 @@ def get_beam_job_run_result(
     Returns:
         AggregateBeamJobRunResult. The result of the given Apache Beam job run.
     """
-    beam_job_run_result_models = beam_job_models.BeamJobRunResultModel.query(
-        beam_job_models.BeamJobRunResultModel.job_id == job_id
-    ).iter()
+    beam_job_run_result_models = beam_job_models.BeamJobRunResultModel.query(beam_job_models.BeamJobRunResultModel.job_id == job_id).iter()
 
     # Job results are inherently unordered; there's no need to sort them.
     stdouts, stderrs = [], []
@@ -171,14 +165,10 @@ def get_beam_job_run_result(
         if beam_job_run_result_model.stderr:
             stderrs.append(beam_job_run_result_model.stderr)
 
-    return beam_job_domain.AggregateBeamJobRunResult(
-        stdout='\n'.join(stdouts), stderr='\n'.join(stderrs)
-    )
+    return beam_job_domain.AggregateBeamJobRunResult(stdout='\n'.join(stdouts), stderr='\n'.join(stderrs))
 
 
-def create_beam_job_run_model(
-    job_name: str, dataflow_job_id: Optional[str] = None
-) -> beam_job_models.BeamJobRunModel:
+def create_beam_job_run_model(job_name: str, dataflow_job_id: Optional[str] = None) -> beam_job_models.BeamJobRunModel:
     """Creates a new BeamJobRunModel without putting it into storage.
 
     Args:
@@ -202,9 +192,7 @@ def create_beam_job_run_model(
     return model
 
 
-def create_beam_job_run_result_model(
-    job_id: str, stdout: str, stderr: str
-) -> beam_job_models.BeamJobRunResultModel:
+def create_beam_job_run_result_model(job_id: str, stdout: str, stderr: str) -> beam_job_models.BeamJobRunResultModel:
     """Creates a new BeamJobRunResultModel without putting it into storage.
 
     Args:
@@ -216,9 +204,7 @@ def create_beam_job_run_result_model(
         BeamJobRunResultModel. The model.
     """
     model_id = beam_job_models.BeamJobRunResultModel.get_new_id()
-    model = beam_job_models.BeamJobRunResultModel(
-        id=model_id, job_id=job_id, stdout=stdout, stderr=stderr
-    )
+    model = beam_job_models.BeamJobRunResultModel(id=model_id, job_id=job_id, stdout=stdout, stderr=stderr)
     model.update_timestamps()
     return model
 

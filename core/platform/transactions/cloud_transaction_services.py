@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import functools
 
-from core import utils
-
 from google.cloud import datastore
 from typing import Callable, TypeVar
+
+from core import utils
 
 # TypeVar for the decorator to maintain function return type.
 ReturnType = TypeVar('ReturnType')

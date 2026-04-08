@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.domain import caching_domain
-
 import redis
 from typing import Dict, List, Optional
+
+from core import feconf, utils
+from core.domain import caching_domain
 
 
 class OppiaRedisClient(metaclass=utils.SingletonMeta):

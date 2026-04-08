@@ -1,6 +1,5 @@
-from core.domain import auth_domain
-
 import datetime
+
 from typing import (
     Any,
     Callable,
@@ -11,6 +10,8 @@ from typing import (
     Sequence,
     Union,
 )
+
+from core.domain import auth_domain
 
 from . import App
 

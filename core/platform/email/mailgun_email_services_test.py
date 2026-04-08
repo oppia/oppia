@@ -22,12 +22,12 @@ import os
 import textwrap
 from unittest import mock
 
+from typing import Dict, Tuple, Union
+
 from core.domain import platform_parameter_list
 from core.platform import models
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
-
-from typing import Dict, Tuple, Union
 
 secrets_services = models.Registry.import_secrets_services()
 
@@ -40,9 +40,7 @@ class EmailTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.swapped_request = lambda *args: args
-        self.swap_api_key_secrets_return_none = self.swap_to_always_return(
-            secrets_services, 'get_secret', None
-        )
+        self.swap_api_key_secrets_return_none = self.swap_to_always_return(secrets_services, 'get_secret', None)
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -52,13 +50,9 @@ class EmailTests(test_utils.GenericTestBase):
             ],
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')])
     @mock.patch('requests.post')
-    def test_send_email_to_mailgun_without_bcc_reply_to_and_recipients(
-        self, mock_post: mock.Mock
-    ) -> None:
+    def test_send_email_to_mailgun_without_bcc_reply_to_and_recipients(self, mock_post: mock.Mock) -> None:
         """Test for sending HTTP POST request."""
         # Test sending email without bcc, reply_to or recipient_variables.
         mock_response = mock.Mock()
@@ -99,13 +93,9 @@ class EmailTests(test_utils.GenericTestBase):
         )
         self.assertTrue(resp)
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')])
     @mock.patch('requests.post')
-    def test_send_email_to_mailgun_with_file_attachments(
-        self, mock_post: mock.Mock
-    ) -> None:
+    def test_send_email_to_mailgun_with_file_attachments(self, mock_post: mock.Mock) -> None:
         mock_response = mock.Mock()
         mock_response.status_code = 200
         mock_post.return_value = mock_response
@@ -145,13 +135,9 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertIn('files', kwargs)
         self.assertEqual(kwargs['files'][0][1][0], 'test_file.txt')
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')])
     @mock.patch('requests.post')
-    def test_send_email_to_mailgun_with_bcc_and_recipient(
-        self, mock_post: mock.Mock
-    ) -> None:
+    def test_send_email_to_mailgun_with_bcc_and_recipient(self, mock_post: mock.Mock) -> None:
         # Test sending email with single bcc and single recipient email.
         mock_response = mock.Mock()
         mock_response.status_code = 200
@@ -162,9 +148,7 @@ class EmailTests(test_utils.GenericTestBase):
         subject = 'Hola 😂 - invitation to collaborate'
         plaintext_body = 'plaintext_body 😂'
         html_body = 'Hi abc,<br> 😂'
-        recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
-            'b@b.com': {'first': 'Bob', 'id': 1}
-        }
+        recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {'b@b.com': {'first': 'Bob', 'id': 1}}
         bcc = ['c@example.com']
         cc = ['cc@example.com']
         reply_to = 'abc'
@@ -204,13 +188,9 @@ class EmailTests(test_utils.GenericTestBase):
         )
         self.assertTrue(resp)
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')])
     @mock.patch('requests.post')
-    def test_send_email_to_mailgun_with_bcc_and_recipients(
-        self, mock_post: mock.Mock
-    ) -> None:
+    def test_send_email_to_mailgun_with_bcc_and_recipients(self, mock_post: mock.Mock) -> None:
         # Test sending email with single bcc, and multiple recipient emails
         # differentiated by recipient_variables ids.
         mock_response = mock.Mock()
@@ -222,9 +202,7 @@ class EmailTests(test_utils.GenericTestBase):
         subject = 'Hola 😂 - invitation to collaborate'
         plaintext_body = 'plaintext_body 😂'
         html_body = 'Hi abc,<br> 😂'
-        recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
-            'b@example.com': {'first': 'Bob', 'id': 1}
-        }
+        recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {'b@example.com': {'first': 'Bob', 'id': 1}}
         bcc = ['c@example.com', 'd@example.com']
         reply_to = 'abc'
         attachments = None
@@ -263,9 +241,7 @@ class EmailTests(test_utils.GenericTestBase):
         )
         self.assertTrue(resp)
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')])
     @mock.patch('requests.post')
     def test_batch_send_to_mailgun(self, mock_post: mock.Mock) -> None:
         """Test for sending HTTP POST request."""
@@ -335,10 +311,7 @@ class EmailTests(test_utils.GenericTestBase):
         )
         mailgun_exception = self.assertRaisesRegex(
             Exception,
-            (
-                'Mailgun API key is not available. Here is the email that '
-                'failed sending: %s' % msg_body
-            ),
+            ('Mailgun API key is not available. Here is the email that failed sending: %s' % msg_body),
         )
         with self.swap_api_key_secrets_return_none, mailgun_exception:
             with self.capture_logging() as logs:
@@ -379,10 +352,7 @@ class EmailTests(test_utils.GenericTestBase):
         )
         mailgun_exception = self.assertRaisesRegex(
             Exception,
-            (
-                'Mailgun domain name is not set. Here is the email that '
-                'failed sending: %s' % msg_body
-            ),
+            ('Mailgun domain name is not set. Here is the email that failed sending: %s' % msg_body),
         )
         with self.swap_api_key_secrets_return_secret, mailgun_exception:
             with self.capture_logging() as logs:
@@ -398,13 +368,9 @@ class EmailTests(test_utils.GenericTestBase):
                     logs,
                 )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
-    )
+    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')])
     @mock.patch('requests.post')
-    def test_invalid_status_code_returns_false(
-        self, mock_post: mock.Mock
-    ) -> None:
+    def test_invalid_status_code_returns_false(self, mock_post: mock.Mock) -> None:
         mock_response = mock.Mock()
         mock_response.status_code = 500
         mock_post.return_value = mock_response

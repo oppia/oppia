@@ -21,14 +21,14 @@ from __future__ import annotations
 import datetime
 import itertools
 
+import apache_beam as beam
+from typing import List, Optional
+
 from core.domain import beam_job_domain, beam_job_services
 from core.jobs import base_jobs, jobs_manager
 from core.jobs import registry as jobs_registry
 from core.platform import models
 from core.tests import test_utils
-
-import apache_beam as beam
-from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -47,9 +47,7 @@ class NoOpJob(base_jobs.JobBase):
 class BeamJobServicesTests(test_utils.TestBase):
     def test_gets_jobs_from_registry(self) -> None:
         beam_jobs = beam_job_services.get_beam_jobs()
-        self.assertItemsEqual(
-            [j.name for j in beam_jobs], jobs_registry.get_all_job_names()
-        )
+        self.assertItemsEqual([j.name for j in beam_jobs], jobs_registry.get_all_job_names())
 
 
 class BeamJobRunServicesTests(test_utils.GenericTestBase):
@@ -106,10 +104,13 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         """
         self.assertEqual(len(beam_job_runs), len(beam_job_run_models))
         runs = sorted(beam_job_runs, key=lambda j: j.job_id)
+
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
         # instead. Reference: https://github.com/python/mypy/issues/9590.
-        by_id = lambda model: model.id
+        def by_id(model):
+            return model.id
+
         run_models = sorted(beam_job_run_models, key=by_id)
         for i, (run, model) in enumerate(zip(runs, run_models)):
             with self.subTest('i=%d' % i):
@@ -118,9 +119,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
                 self.assertEqual(run.job_state, model.latest_job_state)
                 self.assertEqual(run.job_started_on, model.created_on)
                 self.assertEqual(run.job_updated_on, model.last_updated)
-                self.assertEqual(
-                    run.job_is_synchronous, model.dataflow_job_id is None
-                )
+                self.assertEqual(run.job_is_synchronous, model.dataflow_job_id is None)
 
     def test_run_beam_job_using_job_name(self) -> None:
         model = beam_job_services.create_beam_job_run_model('NoOpJob')
@@ -149,9 +148,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             beam_job_services.run_beam_job()
 
     def test_cancel_beam_job(self) -> None:
-        model = beam_job_services.create_beam_job_run_model(
-            'NoOpJob', dataflow_job_id='123'
-        )
+        model = beam_job_services.create_beam_job_run_model('NoOpJob', dataflow_job_id='123')
         model.put()
 
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
@@ -170,9 +167,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
     def test_cancel_beam_job_which_has_no_dataflow_job_id_raises_an_error(
         self,
     ) -> None:
-        model = beam_job_services.create_beam_job_run_model(
-            'NoOpJob', dataflow_job_id=None
-        )
+        model = beam_job_services.create_beam_job_run_model('NoOpJob', dataflow_job_id=None)
         model.put()
 
         with self.swap_to_always_return(jobs_manager, 'cancel_job'):
@@ -181,20 +176,12 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_get_beam_job_runs(self) -> None:
         beam_job_run_models = [
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.DONE.value
-            ),
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.RUNNING.value
-            ),
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.CANCELLED.value
-            ),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
 
-        beam_job_models.BeamJobRunModel.update_timestamps_multi(
-            beam_job_run_models
-        )
+        beam_job_models.BeamJobRunModel.update_timestamps_multi(beam_job_run_models)
         beam_job_models.BeamJobRunModel.put_multi(beam_job_run_models)
 
         self.assert_domains_equal_models(
@@ -204,25 +191,15 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_get_beam_job_runs_with_refresh(self) -> None:
         beam_job_run_models = [
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.DONE.value
-            ),
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.RUNNING.value
-            ),
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.CANCELLED.value
-            ),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
 
-        beam_job_models.BeamJobRunModel.update_timestamps_multi(
-            beam_job_run_models
-        )
+        beam_job_models.BeamJobRunModel.update_timestamps_multi(beam_job_run_models)
         beam_job_models.BeamJobRunModel.put_multi(beam_job_run_models)
 
-        with self.swap_to_always_return(
-            jobs_manager, 'refresh_state_of_beam_job_run_model'
-        ):
+        with self.swap_to_always_return(jobs_manager, 'refresh_state_of_beam_job_run_model'):
             self.assert_domains_equal_models(
                 beam_job_services.get_beam_job_runs(refresh=True),
                 beam_job_run_models,
@@ -232,20 +209,12 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         beam_job_run_models = [
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.DONE.value
-            ),
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.CANCELLED.value
-            ),
-            self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.FAILED.value
-            ),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.CANCELLED.value),
+            self.create_beam_job_run_model(job_state=beam_job_models.BeamJobState.FAILED.value),
         ]
 
-        beam_job_models.BeamJobRunModel.update_timestamps_multi(
-            beam_job_run_models
-        )
+        beam_job_models.BeamJobRunModel.update_timestamps_multi(beam_job_run_models)
         beam_job_models.BeamJobRunModel.put_multi(beam_job_run_models)
 
         result = beam_job_services.get_beam_job_runs(refresh=True)
@@ -253,9 +222,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         self.assert_domains_equal_models(result, beam_job_run_models)
 
     def test_create_beam_job_run_model(self) -> None:
-        model = beam_job_services.create_beam_job_run_model(
-            'FooJob', dataflow_job_id='123'
-        )
+        model = beam_job_services.create_beam_job_run_model('FooJob', dataflow_job_id='123')
         model.put()
 
         all_runs = beam_job_services.get_beam_job_runs(refresh=False)
@@ -265,9 +232,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         self.assertFalse(run.job_is_synchronous)
 
     def test_create_beam_job_run_result_model(self) -> None:
-        model = beam_job_services.create_beam_job_run_result_model(
-            '123', 'abc', '123'
-        )
+        model = beam_job_services.create_beam_job_run_result_model('123', 'abc', '123')
         model.put()
 
         result = beam_job_services.get_beam_job_run_result('123')
@@ -366,50 +331,22 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             True,
         )
 
-        self.assertTrue(
-            beam_job_services.is_state_terminal(
-                cancelled_beam_job_run.job_state
-            )
-        )
-        self.assertTrue(
-            beam_job_services.is_state_terminal(drained_beam_job_run.job_state)
-        )
-        self.assertTrue(
-            beam_job_services.is_state_terminal(updated_beam_job_run.job_state)
-        )
-        self.assertTrue(
-            beam_job_services.is_state_terminal(done_beam_job_run.job_state)
-        )
-        self.assertTrue(
-            beam_job_services.is_state_terminal(failed_beam_job_run.job_state)
-        )
-        self.assertFalse(
-            beam_job_services.is_state_terminal(
-                cancelling_beam_job_run.job_state
-            )
-        )
-        self.assertFalse(
-            beam_job_services.is_state_terminal(draining_beam_job_run.job_state)
-        )
-        self.assertFalse(
-            beam_job_services.is_state_terminal(pending_beam_job_run.job_state)
-        )
-        self.assertFalse(
-            beam_job_services.is_state_terminal(running_beam_job_run.job_state)
-        )
-        self.assertFalse(
-            beam_job_services.is_state_terminal(stopped_beam_job_run.job_state)
-        )
-        self.assertFalse(
-            beam_job_services.is_state_terminal(unknown_beam_job_run.job_state)
-        )
+        self.assertTrue(beam_job_services.is_state_terminal(cancelled_beam_job_run.job_state))
+        self.assertTrue(beam_job_services.is_state_terminal(drained_beam_job_run.job_state))
+        self.assertTrue(beam_job_services.is_state_terminal(updated_beam_job_run.job_state))
+        self.assertTrue(beam_job_services.is_state_terminal(done_beam_job_run.job_state))
+        self.assertTrue(beam_job_services.is_state_terminal(failed_beam_job_run.job_state))
+        self.assertFalse(beam_job_services.is_state_terminal(cancelling_beam_job_run.job_state))
+        self.assertFalse(beam_job_services.is_state_terminal(draining_beam_job_run.job_state))
+        self.assertFalse(beam_job_services.is_state_terminal(pending_beam_job_run.job_state))
+        self.assertFalse(beam_job_services.is_state_terminal(running_beam_job_run.job_state))
+        self.assertFalse(beam_job_services.is_state_terminal(stopped_beam_job_run.job_state))
+        self.assertFalse(beam_job_services.is_state_terminal(unknown_beam_job_run.job_state))
 
 
 class GetBeamJobRunResultTests(test_utils.GenericTestBase):
     def test_get_beam_run_result(self) -> None:
-        beam_job_models.BeamJobRunResultModel(
-            job_id='123', stdout='abc', stderr='def'
-        ).put()
+        beam_job_models.BeamJobRunResultModel(job_id='123', stdout='abc', stderr='def').put()
 
         beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
 
@@ -425,15 +362,9 @@ class GetBeamJobRunResultTests(test_utils.GenericTestBase):
     def test_get_beam_run_result_with_result_batches(self) -> None:
         beam_job_models.BeamJobRunResultModel(job_id='123', stdout='abc').put()
         beam_job_models.BeamJobRunResultModel(job_id='123', stderr='123').put()
-        beam_job_models.BeamJobRunResultModel(
-            job_id='123', stdout='def', stderr='456'
-        ).put()
+        beam_job_models.BeamJobRunResultModel(job_id='123', stdout='def', stderr='456').put()
 
         beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
 
-        self.assertItemsEqual(
-            beam_job_run_result.stdout.split('\n'), ['abc', 'def']
-        )
-        self.assertItemsEqual(
-            beam_job_run_result.stderr.split('\n'), ['123', '456']
-        )
+        self.assertItemsEqual(beam_job_run_result.stdout.split('\n'), ['abc', 'def'])
+        self.assertItemsEqual(beam_job_run_result.stderr.split('\n'), ['123', '456'])

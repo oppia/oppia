@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
-from core.jobs import job_test_utils
-from core.jobs.transforms import results_transforms
-
 import apache_beam as beam
 import result
+
+from core.jobs import job_test_utils
+from core.jobs.transforms import results_transforms
 
 
 class DrainResultsOnErrorTests(job_test_utils.PipelinedTestBase):
@@ -64,10 +64,6 @@ class DrainResultsOnErrorTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_zero_objects_correctly_outputs(self) -> None:
-        transform_result = (
-            self.pipeline
-            | beam.Create([])
-            | results_transforms.DrainResultsOnError()
-        )
+        transform_result = self.pipeline | beam.Create([]) | results_transforms.DrainResultsOnError()
 
         self.assert_pcoll_empty(transform_result)

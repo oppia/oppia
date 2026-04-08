@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List, Optional
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -76,10 +76,7 @@ class TextInput(base.BaseInteraction):
         },
         {
             'name': 'catchMisspellings',
-            'description': (
-                'Catch Misspellings (Detect if answer is misspelled'
-                ' and nudge the learner to correct the misspelling)'
-            ),
+            'description': ('Catch Misspellings (Detect if answer is misspelled and nudge the learner to correct the misspelling)'),
             'schema': {'type': 'bool'},
             'default_value': False,
         },

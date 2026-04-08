@@ -29,9 +29,9 @@ import sys
 import tempfile
 import threading
 
-from core.tests import test_utils
-
 from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
+
+from core.tests import test_utils
 
 from . import (
     build,
@@ -50,9 +50,7 @@ MOCK_ASSETS_OUT_DIR = os.path.join(TEST_DIR, 'static', 'assets', '')
 MOCK_EXTENSIONS_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'extensions', '')
 MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
 
-MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
-    TEST_SOURCE_DIR, 'mock_tsc_output_log.txt'
-)
+MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(TEST_SOURCE_DIR, 'mock_tsc_output_log.txt')
 INVALID_FILENAME = 'invalid_filename.css'
 INVALID_INPUT_FILEPATH = os.path.join(TEST_DIR, INVALID_FILENAME)
 INVALID_OUTPUT_FILEPATH = os.path.join(TEST_DIR, INVALID_FILENAME)
@@ -60,18 +58,14 @@ INVALID_OUTPUT_FILEPATH = os.path.join(TEST_DIR, INVALID_FILENAME)
 EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
 
 
-def mock_managed_process(
-    *unused_args: str, **unused_kwargs: str
-) -> ContextManager[scripts_test_utils.PopenStub]:
+def mock_managed_process(*unused_args: str, **unused_kwargs: str) -> ContextManager[scripts_test_utils.PopenStub]:
     """Mock method for replacing the managed_process() functions.
 
     Returns:
         Context manager. A context manager that always yields a mock
         process.
     """
-    return contextlib.nullcontext(
-        enter_result=scripts_test_utils.PopenStub(alive=False)
-    )
+    return contextlib.nullcontext(enter_result=scripts_test_utils.PopenStub(alive=False))
 
 
 class BuildTests(test_utils.GenericTestBase):
@@ -86,9 +80,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_func_with_invalid_filepath(self) -> None:
         """Tests minify_func with an invalid filepath."""
-        with self.assertRaisesRegex(
-            OSError, r'\[Errno 2\] No such file or directory:'
-        ):
+        with self.assertRaisesRegex(OSError, r'\[Errno 2\] No such file or directory:'):
             build.minify_func(
                 INVALID_INPUT_FILEPATH,
                 INVALID_OUTPUT_FILEPATH,
@@ -173,10 +165,7 @@ class BuildTests(test_utils.GenericTestBase):
         ignored_file_count = 0
         for _, _, files in os.walk(MOCK_EXTENSIONS_DEV_DIR):
             for filename in files:
-                if not build.should_file_be_built(filename) or any(
-                    filename.endswith(p)
-                    for p in build.FILE_EXTENSIONS_TO_IGNORE
-                ):
+                if not build.should_file_be_built(filename) or any(filename.endswith(p) for p in build.FILE_EXTENSIONS_TO_IGNORE):
                     ignored_file_count += 1
         self.assertEqual(
             all_inclusive_file_count - ignored_file_count,
@@ -197,8 +186,7 @@ class BuildTests(test_utils.GenericTestBase):
         assert target_dir_file_count > 0
         with self.assertRaisesRegex(
             ValueError,
-            ('%s files in first dir list != %s files in second dir list')
-            % (source_dir_file_count, target_dir_file_count),
+            ('%s files in first dir list != %s files in second dir list') % (source_dir_file_count, target_dir_file_count),
         ):
             build._compare_file_count(  # pylint: disable=protected-access
                 [EMPTY_DIR], [MOCK_ASSETS_DEV_DIR]
@@ -212,8 +200,7 @@ class BuildTests(test_utils.GenericTestBase):
         assert target_dir_file_count > 0
         with self.assertRaisesRegex(
             ValueError,
-            ('%s files in first dir list != %s files in second dir list')
-            % (source_dir_file_count, target_dir_file_count),
+            ('%s files in first dir list != %s files in second dir list') % (source_dir_file_count, target_dir_file_count),
         ):
             build._compare_file_count(  # pylint: disable=protected-access
                 [EMPTY_DIR], mock_extensions_dir_list
@@ -239,9 +226,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Generate a random hash dict for base.html.
         file_hashes = {base_filename: (test_utils.generate_random_hexa_str())}
-        with self.assertRaisesRegex(
-            ValueError, '%s is expected to contain MD5 hash' % base_filename
-        ):
+        with self.assertRaisesRegex(ValueError, '%s is expected to contain MD5 hash' % base_filename):
             build._verify_filepath_hash(  # pylint: disable=protected-access
                 base_filename, file_hashes
             )
@@ -252,9 +237,7 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         bad_filepath = 'README'
-        with self.assertRaisesRegex(
-            ValueError, 'Filepath has less than 2 partitions after splitting'
-        ):
+        with self.assertRaisesRegex(ValueError, 'Filepath has less than 2 partitions after splitting'):
             build._verify_filepath_hash(  # pylint: disable=protected-access
                 bad_filepath, file_hashes
             )
@@ -264,8 +247,7 @@ class BuildTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             KeyError,
-            'Hash from file named %s does not match hash dict values'
-            % hashed_base_filename,
+            'Hash from file named %s does not match hash dict values' % hashed_base_filename,
         ):
             build._verify_filepath_hash(  # pylint: disable=protected-access
                 hashed_base_filename, file_hashes
@@ -273,9 +255,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_process_html(self) -> None:
         """Test process_html removes whitespaces."""
-        base_html_source_path = os.path.join(
-            MOCK_TEMPLATES_DEV_DIR, 'base.html'
-        )
+        base_html_source_path = os.path.join(MOCK_TEMPLATES_DEV_DIR, 'base.html')
 
         build._ensure_files_exist(  # pylint: disable=protected-access
             [base_html_source_path]
@@ -283,29 +263,23 @@ class BuildTests(test_utils.GenericTestBase):
         minified_html_file_stream = io.StringIO()
 
         # Assert that base.html has white spaces and has original filepaths.
-        with open(
-            base_html_source_path, 'r', encoding='utf-8'
-        ) as source_base_file:
+        with open(base_html_source_path, 'r', encoding='utf-8') as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegex(
                 source_base_file_content,
                 r'\s{2,}',
-                msg='No white spaces detected in %s unexpectedly'
-                % base_html_source_path,
+                msg='No white spaces detected in %s unexpectedly' % base_html_source_path,
             )
 
         # Build base.html file.
-        with open(
-            base_html_source_path, 'r', encoding='utf-8'
-        ) as source_base_file:
+        with open(base_html_source_path, 'r', encoding='utf-8') as source_base_file:
             build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegex(
             minified_html_file_content,
             r'\s{2,}',
-            msg='All white spaces must be removed from %s'
-            % base_html_source_path,
+            msg='All white spaces must be removed from %s' % base_html_source_path,
         )
 
     def test_should_file_be_built(self) -> None:
@@ -331,9 +305,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Swapping out constants to check if the reverse is true.
         # ALL JS files that ends with ...Service.js should not be built.
-        with self.swap(
-            build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)
-        ):
+        with self.swap(build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
 
     def test_hash_should_be_inserted(self) -> None:
@@ -345,26 +317,12 @@ class BuildTests(test_utils.GenericTestBase):
             'FILEPATHS_NOT_TO_RENAME',
             ('*.py', 'path/to/fonts/*', 'path/to/third_party.min.css.map'),
         ):
-            self.assertFalse(
-                build.hash_should_be_inserted(
-                    'path/to/fonts/fontawesome-webfont.svg'
-                )
-            )
-            self.assertFalse(
-                build.hash_should_be_inserted('path/to/third_party.min.css.map')
-            )
-            self.assertTrue(
-                build.hash_should_be_inserted('path/to/wrongFonts/fonta.eot')
-            )
-            self.assertTrue(
-                build.hash_should_be_inserted(
-                    'rich_text_components/Video/protractor.js'
-                )
-            )
+            self.assertFalse(build.hash_should_be_inserted('path/to/fonts/fontawesome-webfont.svg'))
+            self.assertFalse(build.hash_should_be_inserted('path/to/third_party.min.css.map'))
+            self.assertTrue(build.hash_should_be_inserted('path/to/wrongFonts/fonta.eot'))
+            self.assertTrue(build.hash_should_be_inserted('rich_text_components/Video/protractor.js'))
             self.assertFalse(build.hash_should_be_inserted('main.py'))
-            self.assertFalse(
-                build.hash_should_be_inserted('extensions/domain.py')
-            )
+            self.assertFalse(build.hash_should_be_inserted('extensions/domain.py'))
 
     def test_generate_copy_tasks_to_copy_from_source_to_target(self) -> None:
         """Test generate_copy_tasks_to_copy_from_source_to_target queues up
@@ -375,9 +333,7 @@ class BuildTests(test_utils.GenericTestBase):
         copy_tasks: Deque[threading.Thread] = collections.deque()
 
         self.assertEqual(len(copy_tasks), 0)
-        copy_tasks += build.generate_copy_tasks_to_copy_from_source_to_target(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, assets_hashes
-        )
+        copy_tasks += build.generate_copy_tasks_to_copy_from_source_to_target(MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, assets_hashes)
         self.assertEqual(len(copy_tasks), total_file_count)
 
     def test_is_file_hash_provided_to_frontend(self) -> None:
@@ -389,34 +345,20 @@ class BuildTests(test_utils.GenericTestBase):
             'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/file.js', 'path/to/file.html', 'file.js'),
         ):
-            self.assertTrue(
-                build.is_file_hash_provided_to_frontend('path/to/file.js')
-            )
-            self.assertTrue(
-                build.is_file_hash_provided_to_frontend('path/to/file.html')
-            )
+            self.assertTrue(build.is_file_hash_provided_to_frontend('path/to/file.js'))
+            self.assertTrue(build.is_file_hash_provided_to_frontend('path/to/file.html'))
             self.assertTrue(build.is_file_hash_provided_to_frontend('file.js'))
         with self.swap(
             build,
             'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/*', '*.js', '*_end.html'),
         ):
-            self.assertTrue(
-                build.is_file_hash_provided_to_frontend('path/to/file.js')
-            )
-            self.assertTrue(
-                build.is_file_hash_provided_to_frontend('path/to/file.html')
-            )
+            self.assertTrue(build.is_file_hash_provided_to_frontend('path/to/file.js'))
+            self.assertTrue(build.is_file_hash_provided_to_frontend('path/to/file.html'))
             self.assertTrue(build.is_file_hash_provided_to_frontend('file.js'))
-            self.assertFalse(
-                build.is_file_hash_provided_to_frontend('path/file.css')
-            )
-            self.assertTrue(
-                build.is_file_hash_provided_to_frontend('good_end.html')
-            )
-            self.assertFalse(
-                build.is_file_hash_provided_to_frontend('bad_end.css')
-            )
+            self.assertFalse(build.is_file_hash_provided_to_frontend('path/file.css'))
+            self.assertTrue(build.is_file_hash_provided_to_frontend('good_end.html'))
+            self.assertFalse(build.is_file_hash_provided_to_frontend('bad_end.css'))
 
     def test_get_filepaths_by_extensions(self) -> None:
         """Test get_filepaths_by_extensions only returns filepaths in
@@ -430,9 +372,7 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(len(filepaths), 0)
-        filepaths = build.get_filepaths_by_extensions(
-            MOCK_ASSETS_DEV_DIR, extensions
-        )
+        filepaths = build.get_filepaths_by_extensions(MOCK_ASSETS_DEV_DIR, extensions)
         for filepath in filepaths:
             self.assertTrue(any(filepath.endswith(p) for p in extensions))
         file_count = 0
@@ -450,9 +390,7 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(len(filepaths), 0)
-        filepaths = build.get_filepaths_by_extensions(
-            MOCK_ASSETS_DEV_DIR, extensions
-        )
+        filepaths = build.get_filepaths_by_extensions(MOCK_ASSETS_DEV_DIR, extensions)
         self.assertEqual(len(filepaths), 0)
 
     def test_get_file_hashes(self) -> None:
@@ -478,12 +416,8 @@ class BuildTests(test_utils.GenericTestBase):
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/to/file.js': '123456', 'path/file.min.js': '123456'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertEqual(
-                filtered_hashes['/path/to/file.js'], hashes['path/to/file.js']
-            )
-            self.assertEqual(
-                filtered_hashes['/path/file.min.js'], hashes['path/file.min.js']
-            )
+            self.assertEqual(filtered_hashes['/path/to/file.js'], hashes['path/to/file.js'])
+            self.assertEqual(filtered_hashes['/path/file.min.js'], hashes['path/file.min.js'])
 
         with self.swap(
             build,
@@ -516,9 +450,7 @@ class BuildTests(test_utils.GenericTestBase):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
                 with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
-                    self.assertEqual(
-                        hashes_file.read(), '{"/path/file.js": "123456"}\n'
-                    )
+                    self.assertEqual(hashes_file.read(), '{"/path/file.js": "123456"}\n')
 
                 hashes = {'file.js': '123456', 'file.min.js': '654321'}
                 build.save_hashes_to_file(hashes)
@@ -550,25 +482,15 @@ class BuildTests(test_utils.GenericTestBase):
             build_tasks.append(task)
             count -= 1
 
-        extra_build_threads = [
-            thread.name
-            for thread in threading.enumerate()
-            if thread in build_thread_names
-        ]
+        extra_build_threads = [thread.name for thread in threading.enumerate() if thread in build_thread_names]
         self.assertEqual(len(extra_build_threads), 0)
         build._execute_tasks(build_tasks)  # pylint: disable=protected-access
-        with self.assertRaisesRegex(
-            OSError, 'threads can only be started once'
-        ):
+        with self.assertRaisesRegex(OSError, 'threads can only be started once'):
             build._execute_tasks(  # pylint: disable=protected-access
                 build_tasks
             )
         # Assert that all threads are joined.
-        extra_build_threads = [
-            thread.name
-            for thread in threading.enumerate()
-            if thread in build_thread_names
-        ]
+        extra_build_threads = [thread.name for thread in threading.enumerate() if thread in build_thread_names]
         self.assertEqual(len(extra_build_threads), 0)
 
     def test_generate_build_tasks_to_build_all_files_in_directory(self) -> None:
@@ -580,9 +502,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(tasks), 0)
         # Build all files.
-        tasks = build.generate_build_tasks_to_build_all_files_in_directory(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR
-        )
+        tasks = build.generate_build_tasks_to_build_all_files_in_directory(MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR)
         total_file_count = build.get_file_count(MOCK_ASSETS_DEV_DIR)
         self.assertEqual(len(tasks), total_file_count)
 
@@ -591,28 +511,20 @@ class BuildTests(test_utils.GenericTestBase):
         corresponding number of build tasks to the number of file changes.
         """
         new_filename = 'dependencies.json'
-        recently_changed_filenames = [
-            os.path.join(MOCK_ASSETS_DEV_DIR, new_filename)
-        ]
+        recently_changed_filenames = [os.path.join(MOCK_ASSETS_DEV_DIR, new_filename)]
         build_tasks: Deque[threading.Thread] = collections.deque()
 
         self.assertEqual(len(build_tasks), 0)
-        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, recently_changed_filenames
-        )
+        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, recently_changed_filenames)
         self.assertEqual(len(build_tasks), len(recently_changed_filenames))
 
         build_tasks.clear()
-        svg_filepaths = build.get_filepaths_by_extensions(
-            MOCK_ASSETS_DEV_DIR, ('.svg',)
-        )
+        svg_filepaths = build.get_filepaths_by_extensions(MOCK_ASSETS_DEV_DIR, ('.svg',))
         # Make sure there is at least 1 SVG file.
         self.assertGreater(len(svg_filepaths), 0)
 
         self.assertEqual(len(build_tasks), 0)
-        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, svg_filepaths
-        )
+        build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, svg_filepaths)
         self.assertEqual(len(build_tasks), len(svg_filepaths))
 
     def test_generate_build_tasks_to_build_directory(self) -> None:
@@ -621,48 +533,36 @@ class BuildTests(test_utils.GenericTestBase):
         """
         extensions_dirnames_to_dirpaths = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
-            'staging_dir': os.path.join(
-                TEST_DIR, 'backend_prod_files', 'extensions', ''
-            ),
+            'staging_dir': os.path.join(TEST_DIR, 'backend_prod_files', 'extensions', ''),
             'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', ''),
         }
         file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
         build_dir_tasks: Deque[threading.Thread] = collections.deque()
-        build_all_files_tasks = (
-            build.generate_build_tasks_to_build_all_files_in_directory(
-                MOCK_EXTENSIONS_DEV_DIR,
-                extensions_dirnames_to_dirpaths['out_dir'],
-            )
+        build_all_files_tasks = build.generate_build_tasks_to_build_all_files_in_directory(
+            MOCK_EXTENSIONS_DEV_DIR,
+            extensions_dirnames_to_dirpaths['out_dir'],
         )
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
-        build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            extensions_dirnames_to_dirpaths
-        )
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(extensions_dirnames_to_dirpaths)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
         build_dir_tasks.clear()
 
         # Test for building only new files when staging dir exists.
-        common.ensure_directory_exists(
-            extensions_dirnames_to_dirpaths['staging_dir']
-        )
+        common.ensure_directory_exists(extensions_dirnames_to_dirpaths['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
-        build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            extensions_dirnames_to_dirpaths
-        )
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(extensions_dirnames_to_dirpaths)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
 
         # Build all files and save to final directory.
-        common.ensure_directory_exists(
-            extensions_dirnames_to_dirpaths['staging_dir']
-        )
+        common.ensure_directory_exists(extensions_dirnames_to_dirpaths['staging_dir'])
         build._execute_tasks(  # pylint: disable=protected-access
             build_dir_tasks
         )
@@ -679,16 +579,12 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Test for only building files that need to be rebuilt.
         self.assertEqual(len(build_dir_tasks), 0)
-        build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            extensions_dirnames_to_dirpaths
-        )
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(extensions_dirnames_to_dirpaths)
         file_extensions_to_always_rebuild = (
             '.html',
             '.py',
         )
-        always_rebuilt_filepaths = build.get_filepaths_by_extensions(
-            MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild
-        )
+        always_rebuilt_filepaths = build.get_filepaths_by_extensions(MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
         self.assertGreater(len(always_rebuilt_filepaths), 0)
         self.assertEqual(len(build_dir_tasks), len(always_rebuilt_filepaths))
 
@@ -700,51 +596,37 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', temp_file_name)
-        with open(
-            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w', encoding='utf-8'
-        ) as tmp:
+        with open('%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w', encoding='utf-8') as tmp:
             tmp.write('Some content.')
 
         extensions_dirnames_to_dirpaths = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
-            'staging_dir': os.path.join(
-                TEST_DIR, 'backend_prod_files', 'extensions', ''
-            ),
+            'staging_dir': os.path.join(TEST_DIR, 'backend_prod_files', 'extensions', ''),
             'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', ''),
         }
 
         build_dir_tasks: Deque[threading.Thread] = collections.deque()
-        build_all_files_tasks = (
-            build.generate_build_tasks_to_build_all_files_in_directory(
-                MOCK_EXTENSIONS_DEV_DIR,
-                extensions_dirnames_to_dirpaths['out_dir'],
-            )
+        build_all_files_tasks = build.generate_build_tasks_to_build_all_files_in_directory(
+            MOCK_EXTENSIONS_DEV_DIR,
+            extensions_dirnames_to_dirpaths['out_dir'],
         )
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
-        build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            extensions_dirnames_to_dirpaths
-        )
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(extensions_dirnames_to_dirpaths)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
         build_dir_tasks.clear()
 
         # Test for building only new files when staging dir exists.
-        common.ensure_directory_exists(
-            extensions_dirnames_to_dirpaths['staging_dir']
-        )
+        common.ensure_directory_exists(extensions_dirnames_to_dirpaths['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
-        build_dir_tasks = build.generate_build_tasks_to_build_directory(
-            extensions_dirnames_to_dirpaths
-        )
+        build_dir_tasks = build.generate_build_tasks_to_build_directory(extensions_dirnames_to_dirpaths)
         file_extensions_to_always_rebuild = ('.py', '.js', '.html')
-        always_rebuilt_filepaths = build.get_filepaths_by_extensions(
-            MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild
-        )
+        always_rebuilt_filepaths = build.get_filepaths_by_extensions(MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
         self.assertEqual(
             sorted(always_rebuilt_filepaths),
             sorted(
@@ -782,9 +664,7 @@ class BuildTests(test_utils.GenericTestBase):
         recently_changed_filenames: List[str] = []
 
         self.assertEqual(len(recently_changed_filenames), 0)
-        recently_changed_filenames = build.get_recently_changed_filenames(
-            assets_hashes, EMPTY_DIR
-        )
+        recently_changed_filenames = build.get_recently_changed_filenames(assets_hashes, EMPTY_DIR)
         # Since all HTML and Python files are already built, they are ignored.
         with self.swap(
             build,
@@ -810,22 +690,14 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes: Dict[str, str] = {}
 
         self.assertEqual(len(delete_tasks), 0)
-        delete_tasks += build.generate_delete_tasks_to_remove_deleted_files(
-            file_hashes, MOCK_TEMPLATES_DEV_DIR
-        )
-        self.assertEqual(
-            len(delete_tasks), build.get_file_count(MOCK_TEMPLATES_DEV_DIR)
-        )
+        delete_tasks += build.generate_delete_tasks_to_remove_deleted_files(file_hashes, MOCK_TEMPLATES_DEV_DIR)
+        self.assertEqual(len(delete_tasks), build.get_file_count(MOCK_TEMPLATES_DEV_DIR))
 
     def test_generate_app_yaml_with_deploy_mode(self) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
-        app_dev_yaml_filepath_swap = self.swap(
-            build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath
-        )
-        app_yaml_filepath_swap = self.swap(
-            build, 'APP_YAML_FILEPATH', mock_yaml_filepath
-        )
+        app_dev_yaml_filepath_swap = self.swap(build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath)
+        app_yaml_filepath_swap = self.swap(build, 'APP_YAML_FILEPATH', mock_yaml_filepath)
         env_vars_to_remove_from_deployed_app_yaml_swap = self.swap(
             build,
             'ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML',
@@ -857,8 +729,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             content,
-            '# THIS FILE IS AUTOGENERATED, DO NOT MODIFY\n'
-            'Some content in mock_app_dev.yaml\n',
+            '# THIS FILE IS AUTOGENERATED, DO NOT MODIFY\nSome content in mock_app_dev.yaml\n',
         )
 
         app_yaml_temp_file.close()
@@ -869,12 +740,8 @@ class BuildTests(test_utils.GenericTestBase):
     ) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
-        app_dev_yaml_filepath_swap = self.swap(
-            build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath
-        )
-        app_yaml_filepath_swap = self.swap(
-            build, 'APP_YAML_FILEPATH', mock_yaml_filepath
-        )
+        app_dev_yaml_filepath_swap = self.swap(build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath)
+        app_yaml_filepath_swap = self.swap(build, 'APP_YAML_FILEPATH', mock_yaml_filepath)
         env_vars_to_remove_from_deployed_app_yaml_swap = self.swap(
             build,
             'ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML',
@@ -901,8 +768,7 @@ class BuildTests(test_utils.GenericTestBase):
             with env_vars_to_remove_from_deployed_app_yaml_swap:
                 with self.assertRaisesRegex(
                     Exception,
-                    'Environment variable \'DATASTORE_HOST\' to be '
-                    'removed does not exist.',
+                    'Environment variable \'DATASTORE_HOST\' to be removed does not exist.',
                 ):
                     build.generate_app_yaml(deploy_mode=True)
 
@@ -934,9 +800,7 @@ class BuildTests(test_utils.GenericTestBase):
         # The '\' character is usually seem in Windows style path.
         # https://docs.python.org/2/library/os.html#os.sep
         # https://docs.python.org/2/library/re.html#regular-expression-syntax
-        error_message = ('File %s does not exist.') % re.escape(
-            non_existent_filepaths[0]
-        )
+        error_message = ('File %s does not exist.') % re.escape(non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
         with self.assertRaisesRegex(OSError, error_message):
             build.safe_delete_file(non_existent_filepaths[0])
@@ -946,31 +810,19 @@ class BuildTests(test_utils.GenericTestBase):
             """Mocks build.safe_delete_file()."""
             pass
 
-        self.assertFalse(
-            os.path.isfile(
-                'core/tests/data/third_party/css/third_party.min.css'
-            )
-        )
+        self.assertFalse(os.path.isfile('core/tests/data/third_party/css/third_party.min.css'))
 
         with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
             build.minify_third_party_libs('core/tests/data/third_party')
 
-        self.assertTrue(
-            os.path.isfile(
-                'core/tests/data/third_party/css/third_party.min.css'
-            )
-        )
+        self.assertTrue(os.path.isfile('core/tests/data/third_party/css/third_party.min.css'))
 
         self.assertLess(
-            os.path.getsize(
-                'core/tests/data/third_party/css/third_party.min.css'
-            ),
+            os.path.getsize('core/tests/data/third_party/css/third_party.min.css'),
             os.path.getsize('core/tests/data/third_party/css/third_party.css'),
         )
 
-        build.safe_delete_file(
-            'core/tests/data/third_party/css/third_party.min.css'
-        )
+        build.safe_delete_file('core/tests/data/third_party/css/third_party.min.css')
 
     def test_clean(self) -> None:
         check_function_calls = {
@@ -983,25 +835,19 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_safe_delete_directory_tree(unused_path: str) -> None:
             check_function_calls['safe_delete_directory_tree_gets_called'] += 1
 
-        with self.swap(
-            build, 'safe_delete_directory_tree', mock_safe_delete_directory_tree
-        ):
+        with self.swap(build, 'safe_delete_directory_tree', mock_safe_delete_directory_tree):
             build.clean()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_with_prod_env(self) -> None:
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', lambda _: None
-        )
+        ensure_files_exist_swap = self.swap(build, '_ensure_files_exist', lambda _: None)
         build_using_webpack_swap = self.swap_with_checks(
             build,
             'build_using_webpack',
             lambda _: None,
             expected_args=[(build.WEBPACK_PROD_CONFIG,)],
         )
-        build_using_ng_swap = self.swap_with_checks(
-            build, 'build_using_ng', lambda: None, expected_args=[()]
-        )
+        build_using_ng_swap = self.swap_with_checks(build, 'build_using_ng', lambda: None, expected_args=[()])
         modify_constants_swap = self.swap_with_checks(
             common,
             'modify_constants',
@@ -1014,12 +860,8 @@ class BuildTests(test_utils.GenericTestBase):
                 }
             ],
         )
-        generate_python_package_swap = self.swap_with_checks(
-            build, 'generate_python_package', lambda: None, expected_args=[()]
-        )
-        clean_swap = self.swap_with_checks(
-            build, 'clean', lambda: None, expected_args=[()]
-        )
+        generate_python_package_swap = self.swap_with_checks(build, 'generate_python_package', lambda: None, expected_args=[()])
+        clean_swap = self.swap_with_checks(build, 'clean', lambda: None, expected_args=[()])
 
         with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
             with modify_constants_swap, build_using_ng_swap:
@@ -1027,18 +869,14 @@ class BuildTests(test_utils.GenericTestBase):
                     build.main(args=['--prod_env'])
 
     def test_build_with_prod_source_maps(self) -> None:
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', lambda _: None
-        )
+        ensure_files_exist_swap = self.swap(build, '_ensure_files_exist', lambda _: None)
         build_using_webpack_swap = self.swap_with_checks(
             build,
             'build_using_webpack',
             lambda _: None,
             expected_args=[(build.WEBPACK_PROD_SOURCE_MAPS_CONFIG,)],
         )
-        build_using_ng_swap = self.swap_with_checks(
-            build, 'build_using_ng', lambda: None, expected_args=[()]
-        )
+        build_using_ng_swap = self.swap_with_checks(build, 'build_using_ng', lambda: None, expected_args=[()])
         modify_constants_swap = self.swap_with_checks(
             common,
             'modify_constants',
@@ -1051,21 +889,15 @@ class BuildTests(test_utils.GenericTestBase):
                 }
             ],
         )
-        compare_file_count_swap = self.swap(
-            build, '_compare_file_count', lambda *_: None
-        )
-        clean_swap = self.swap_with_checks(
-            build, 'clean', lambda: None, expected_args=[()]
-        )
+        compare_file_count_swap = self.swap(build, '_compare_file_count', lambda *_: None)
+        clean_swap = self.swap_with_checks(build, 'clean', lambda: None, expected_args=[()])
         install_python_dev_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'main',
             lambda _: None,
             expected_args=[(['--uninstall'],)],
         )
-        install_third_party_libs_swap = self.swap_with_checks(
-            install_third_party_libs, 'main', lambda: None, expected_args=[()]
-        )
+        install_third_party_libs_swap = self.swap_with_checks(install_third_party_libs, 'main', lambda: None, expected_args=[()])
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
@@ -1098,12 +930,8 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist
-        )
-        modify_constants_swap = self.swap(
-            common, 'modify_constants', mock_modify_constants
-        )
+        ensure_files_exist_swap = self.swap(build, '_ensure_files_exist', mock_ensure_files_exist)
+        modify_constants_swap = self.swap(common, 'modify_constants', mock_modify_constants)
         clean_swap = self.swap(build, 'clean', mock_clean)
 
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
@@ -1112,9 +940,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_cannot_maintenance_mode_in_dev_mode(self) -> None:
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception, 'maintenance_mode should only be enabled in prod build.'
-        )
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'maintenance_mode should only be enabled in prod build.')
         with assert_raises_regexp_context_manager:
             build.main(args=['--maintenance_mode'])
 
@@ -1134,9 +960,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist
-        )
+        ensure_files_exist_swap = self.swap(build, '_ensure_files_exist', mock_ensure_files_exist)
         clean_swap = self.swap(build, 'clean', mock_clean)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
@@ -1172,12 +996,8 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist
-        )
-        modify_constants_swap = self.swap(
-            common, 'modify_constants', mock_modify_constants
-        )
+        ensure_files_exist_swap = self.swap(build, '_ensure_files_exist', mock_ensure_files_exist)
+        modify_constants_swap = self.swap(common, 'modify_constants', mock_modify_constants)
         clean_swap = self.swap(build, 'clean', mock_clean)
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
             build.main(args=['--prod_env', '--minify_third_party_libs_only'])
@@ -1186,9 +1006,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_build_using_webpack_command(self) -> None:
         @contextlib.contextmanager
-        def mock_managed_webpack_compiler(
-            config_path: str, max_old_space_size: int
-        ) -> Iterator[scripts_test_utils.PopenStub]:
+        def mock_managed_webpack_compiler(config_path: str, max_old_space_size: int) -> Iterator[scripts_test_utils.PopenStub]:
             self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
             self.assertEqual(max_old_space_size, 8192)
             yield scripts_test_utils.PopenStub()
@@ -1196,12 +1014,8 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 1
 
-        webpack_compiler_swap = self.swap(
-            servers, 'managed_webpack_compiler', mock_managed_webpack_compiler
-        )
-        get_file_count_swap = self.swap(
-            build, 'get_file_count', mock_get_file_count
-        )
+        webpack_compiler_swap = self.swap(servers, 'managed_webpack_compiler', mock_managed_webpack_compiler)
+        get_file_count_swap = self.swap(build, 'get_file_count', mock_get_file_count)
 
         with webpack_compiler_swap, get_file_count_swap:
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
@@ -1210,9 +1024,7 @@ class BuildTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         @contextlib.contextmanager
-        def mock_managed_webpack_compiler(
-            config_path: str, max_old_space_size: int
-        ) -> Iterator[scripts_test_utils.PopenStub]:
+        def mock_managed_webpack_compiler(config_path: str, max_old_space_size: int) -> Iterator[scripts_test_utils.PopenStub]:
             self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
             self.assertEqual(max_old_space_size, 8192)
             yield scripts_test_utils.PopenStub()
@@ -1220,17 +1032,11 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 0
 
-        webpack_compiler_swap = self.swap(
-            servers, 'managed_webpack_compiler', mock_managed_webpack_compiler
-        )
-        get_file_count_swap = self.swap(
-            build, 'get_file_count', mock_get_file_count
-        )
+        webpack_compiler_swap = self.swap(servers, 'managed_webpack_compiler', mock_managed_webpack_compiler)
+        get_file_count_swap = self.swap(build, 'get_file_count', mock_get_file_count)
 
         with webpack_compiler_swap, get_file_count_swap:
-            with self.assertRaisesRegex(
-                AssertionError, 'webpack_bundles should be non-empty.'
-            ):
+            with self.assertRaisesRegex(AssertionError, 'webpack_bundles should be non-empty.'):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
     def test_build_using_ng_command(self) -> None:
@@ -1285,9 +1091,7 @@ class BuildTests(test_utils.GenericTestBase):
         )
 
         with ng_build_swap, get_file_count_swap:
-            with self.assertRaisesRegex(
-                AssertionError, 'angular generated bundle should be non-empty'
-            ):
+            with self.assertRaisesRegex(AssertionError, 'angular generated bundle should be non-empty'):
                 build.build_using_ng()
 
 
@@ -1314,17 +1118,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
 
         # The webpack compilation processes will be called 4 times as mock_isdir
         # will return true after 4 calls.
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_webpack_compiler', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_webpack_compiler', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir))
 
         build.run_webpack_compilation()
 
@@ -1337,19 +1133,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             return old_os_path_isdir(path)
 
         # The webpack compilation processes will be called five times.
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_webpack_compiler', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(1,)]
-            )
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_webpack_compiler', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir))
+        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
         build.run_webpack_compilation()
 
@@ -1361,11 +1147,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 return True
             return old_os_path_isdir(path)
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_webpack_compiler', mock_managed_process
-            )
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_webpack_compiler', mock_managed_process))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -1374,26 +1156,14 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 expected_kwargs=[{'args': []}],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(servers, 'run_ng_compilation', lambda: None, expected_args=[()]))
+        self.exit_stack.enter_context(self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir))
+        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, called=False))
 
         build.build_js_files(True)
 
     def test_build_js_files_in_prod_mode(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_cmd', lambda *_: None, called=False
-            )
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(common, 'run_cmd', lambda *_: None, called=False))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -1406,11 +1176,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         build.build_js_files(False)
 
     def test_build_js_files_in_prod_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_cmd', lambda *_: None, called=False
-            )
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(common, 'run_cmd', lambda *_: None, called=False))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -1423,11 +1189,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         build.build_js_files(False, source_maps=True)
 
     def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_cmd', lambda *_: None, called=False
-            )
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(common, 'run_cmd', lambda *_: None, called=False))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -1436,11 +1198,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 expected_kwargs=[{'args': []}],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
+        self.exit_stack.enter_context(self.swap_with_checks(servers, 'run_ng_compilation', lambda: None, expected_args=[()]))
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,

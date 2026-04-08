@@ -19,6 +19,8 @@ from __future__ import annotations
 import logging
 import os
 
+from typing import Dict, Final, List, Union
+
 from core import feconf
 from core.constants import constants
 from core.controllers import creator_dashboard
@@ -36,17 +38,11 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Union
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models, suggestion_models, user_models
 
-(user_models, suggestion_models, feedback_models) = (
-    models.Registry.import_models(
-        [models.Names.USER, models.Names.SUGGESTION, models.Names.FEEDBACK]
-    )
-)
+(user_models, suggestion_models, feedback_models) = models.Registry.import_models([models.Names.USER, models.Names.SUGGESTION, models.Names.FEEDBACK])
 
 
 class OldContributorDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -58,9 +54,7 @@ class OldContributorDashboardRedirectPageTest(test_utils.GenericTestBase):
         """Test to validate that the old contributor dashboard page url
         redirects to the new one.
         """
-        response = self.get_html_response(
-            '/contributor_dashboard', expected_status_int=301
-        )
+        response = self.get_html_response('/contributor_dashboard', expected_status_int=301)
         self.assertEqual(
             'http://localhost/contributor-dashboard',
             response.headers['location'],
@@ -76,12 +70,8 @@ class OldCreatorDashboardRedirectPageTest(test_utils.GenericTestBase):
         """Test to validate that the old creator dashboard page url redirects
         to the new one.
         """
-        response = self.get_html_response(
-            '/creator_dashboard', expected_status_int=301
-        )
-        self.assertEqual(
-            'http://localhost/creator-dashboard', response.headers['location']
-        )
+        response = self.get_html_response('/creator_dashboard', expected_status_int=301)
+        self.assertEqual('http://localhost/creator-dashboard', response.headers['location'])
 
 
 class HomePageTests(test_utils.GenericTestBase):
@@ -123,9 +113,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.owner_1 = user_services.get_user_actions_info(self.owner_id_1)
-        self.collaborator_id = self.get_user_id_from_email(
-            self.COLLABORATOR_EMAIL
-        )
+        self.collaborator_id = self.get_user_id_from_email(self.COLLABORATOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_no_explorations(self) -> None:
@@ -144,9 +132,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def test_create_single_exploration_and_visit_dashboard(self) -> None:
         self.login(self.OWNER_EMAIL)
-        self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id, title=self.EXP_TITLE
-        )
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         # Testing the quantity of exploration created and it should be 1.
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
@@ -156,12 +142,8 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.OWNER_EMAIL_1)
-        self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1
-        )
-        self.save_new_default_exploration(
-            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2
-        )
+        self.save_new_default_exploration(self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+        self.save_new_default_exploration(self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
         # Testing the quantity of exploration and it should be 2.
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
@@ -175,15 +157,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.OWNER_EMAIL_2)
-        self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_2, title=self.EXP_TITLE_1
-        )
-        self.save_new_default_exploration(
-            self.EXP_ID_2, self.owner_id_2, title=self.EXP_TITLE_2
-        )
-        self.save_new_default_exploration(
-            self.EXP_ID_3, self.owner_id_2, title=self.EXP_TITLE_3
-        )
+        self.save_new_default_exploration(self.EXP_ID_1, self.owner_id_2, title=self.EXP_TITLE_1)
+        self.save_new_default_exploration(self.EXP_ID_2, self.owner_id_2, title=self.EXP_TITLE_2)
+        self.save_new_default_exploration(self.EXP_ID_3, self.owner_id_2, title=self.EXP_TITLE_3)
         # Testing for quantity of explorations to be 3.
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 3)
@@ -198,9 +174,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_managers_can_see_explorations(self) -> None:
-        self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id, title=self.EXP_TITLE
-        )
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.login(self.OWNER_EMAIL)
@@ -222,9 +196,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_collaborators_can_see_explorations(self) -> None:
-        self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id, title=self.EXP_TITLE
-        )
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
             self.owner,
             self.EXP_ID,
@@ -252,12 +224,8 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_viewer_cannot_see_explorations(self) -> None:
-        self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id, title=self.EXP_TITLE
-        )
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.viewer_id, rights_domain.ROLE_VIEWER
-        )
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
+        rights_manager.assign_role_for_exploration(self.owner, self.EXP_ID, self.viewer_id, rights_domain.ROLE_VIEWER)
         self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
@@ -271,9 +239,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_feedback_thread_counts(self) -> None:
-        self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id, title=self.EXP_TITLE
-        )
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
 
         self.login(self.OWNER_EMAIL)
 
@@ -283,11 +249,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         def mock_get_thread_analytics_multi(
             unused_exploration_ids: List[str],
         ) -> List[feedback_domain.FeedbackAnalytics]:
-            return [
-                feedback_domain.FeedbackAnalytics(
-                    feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 2, 3
-                )
-            ]
+            return [feedback_domain.FeedbackAnalytics(feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 2, 3)]
 
         with self.swap(
             feedback_services,
@@ -306,9 +268,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['subscribers_list']), 0)
 
         # Subscribe to creator.
-        subscription_services.subscribe_to_creator(
-            self.viewer_id, self.owner_id
-        )
+        subscription_services.subscribe_to_creator(self.viewer_id, self.owner_id)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 1)
         self.assertEqual(
@@ -317,9 +277,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         )
 
         # Unsubscribe from creator.
-        subscription_services.unsubscribe_from_creator(
-            self.viewer_id, self.owner_id
-        )
+        subscription_services.unsubscribe_from_creator(self.viewer_id, self.owner_id)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
@@ -349,9 +307,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def test_can_update_display_preference(self) -> None:
         self.login(self.OWNER_EMAIL)
-        display_preference = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'display_preference'
-        ]
+        display_preference = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['display_preference']
         self.assertEqual(display_preference, 'card')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -359,9 +315,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             {'display_preference': 'list'},
             csrf_token=csrf_token,
         )
-        display_preference = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'display_preference'
-        ]
+        display_preference = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['display_preference']
         self.assertEqual(display_preference, 'list')
         self.logout()
 
@@ -369,21 +323,13 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        collection_id = self.post_json(
-            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token
-        )[creator_dashboard.COLLECTION_ID_KEY]
+        collection_id = self.post_json(feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[creator_dashboard.COLLECTION_ID_KEY]
         collection = collection_services.get_collection_by_id(collection_id)
         self.assertEqual(collection.id, collection_id)
         self.assertEqual(collection.title, feconf.DEFAULT_COLLECTION_TITLE)
-        self.assertEqual(
-            collection.objective, feconf.DEFAULT_COLLECTION_CATEGORY
-        )
-        self.assertEqual(
-            collection.category, feconf.DEFAULT_COLLECTION_OBJECTIVE
-        )
-        self.assertEqual(
-            collection.language_code, constants.DEFAULT_LANGUAGE_CODE
-        )
+        self.assertEqual(collection.objective, feconf.DEFAULT_COLLECTION_CATEGORY)
+        self.assertEqual(collection.category, feconf.DEFAULT_COLLECTION_OBJECTIVE)
+        self.assertEqual(collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
         self.logout()
 
     def test_get_dashboard_stats(self) -> None:
@@ -395,9 +341,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         ).put()
 
         self.login(self.OWNER_EMAIL, is_super_admin=True)
-        dashboard_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'dashboard_stats'
-        ]
+        dashboard_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['dashboard_stats']
         self.assertEqual(
             dashboard_stats,
             {
@@ -424,9 +368,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         )
 
         with get_last_week_dashboard_stats_swap:
-            last_week_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-                'last_week_stats'
-            ]
+            last_week_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
 
         self.assertEqual(
             last_week_stats,
@@ -450,25 +392,17 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with get_last_week_dashboard_stats_swap:
-                last_week_stats = self.get_json(
-                    feconf.CREATOR_DASHBOARD_DATA_URL
-                )['last_week_stats']
+                last_week_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
             self.assertEqual(
                 logs,
-                [
-                    '\'last_week_stats\' should contain only one key-value pair'
-                    ' denoting last week dashboard stats of the user keyed by a'
-                    ' datetime string.'
-                ],
+                ['\'last_week_stats\' should contain only one key-value pair denoting last week dashboard stats of the user keyed by a datetime string.'],
             )
         self.assertIsNone(last_week_stats)
 
     def test_get_collections_list(self) -> None:
         self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
-        collection_list = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'collections_list'
-        ]
+        collection_list = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
         self.assertEqual(collection_list, [])
         self.save_new_default_collection(
             'collection_id',
@@ -477,9 +411,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             objective='An objective',
             category='A category',
         )
-        collection_list = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'collections_list'
-        ]
+        collection_list = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
         self.assertEqual(len(collection_list), 1)
         self.assertEqual(collection_list[0]['id'], 'collection_id')
         self.assertEqual(collection_list[0]['title'], 'A title')
@@ -489,9 +421,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def test_get_suggestions_list(self) -> None:
         self.login(self.OWNER_EMAIL)
-        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'created_suggestions_list'
-        ]
+        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list']
         self.assertEqual(suggestions, [])
         change_dict: Dict[str, Union[str, Dict[str, str]]] = {
             'cmd': 'edit_state_property',
@@ -509,23 +439,17 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             change_dict,
             '',
         )
-        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'created_suggestions_list'
-        ][0]
+        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list'][0]
         change_dict['old_value'] = {'content_id': 'content_0', 'html': ''}
         self.assertEqual(suggestions['change_cmd'], change_dict)
         # Test to check if suggestions populate old value of the change.
-        self.assertEqual(
-            suggestions['change_cmd']['old_value']['content_id'], 'content_0'
-        )
+        self.assertEqual(suggestions['change_cmd']['old_value']['content_id'], 'content_0')
         self.logout()
 
     def test_get_suggestions_to_review_list(self) -> None:
         self.login(self.OWNER_EMAIL)
 
-        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'suggestions_to_review_list'
-        ]
+        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['suggestions_to_review_list']
         self.assertEqual(suggestions, [])
 
         change_dict: Dict[str, Union[str, Dict[str, str]]] = {
@@ -536,12 +460,8 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         }
         self.save_new_default_exploration('exp1', self.owner_id)
 
-        user_models.UserContributionProficiencyModel.create(
-            self.owner_id, 'category1', 15
-        )
-        model1 = feedback_models.GeneralFeedbackThreadModel.create(
-            'exploration.exp1.thread_1'
-        )
+        user_models.UserContributionProficiencyModel.create(self.owner_id, 'category1', 15)
+        model1 = feedback_models.GeneralFeedbackThreadModel.create('exploration.exp1.thread_1')
         model1.entity_type = 'exploration'
         model1.entity_id = 'exp1'
         model1.subject = 'subject'
@@ -563,16 +483,12 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         )
 
         change_dict['old_value'] = {'content_id': 'content_0', 'html': ''}
-        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
-            'suggestions_to_review_list'
-        ]
+        suggestions = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['suggestions_to_review_list']
 
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(suggestions[0]['change_cmd'], change_dict)
         # Test to check if suggestions populate old value of the change.
-        self.assertEqual(
-            suggestions[0]['change_cmd']['old_value']['content_id'], 'content_0'
-        )
+        self.assertEqual(suggestions[0]['change_cmd']['old_value']['content_id'], 'content_0')
 
         self.logout()
 
@@ -595,9 +511,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
-        exp_a_id = self.post_json(
-            feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
-        )[creator_dashboard.EXPLORATION_ID_KEY]
+        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token)[creator_dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()
@@ -625,9 +539,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
             csrf_token = self.get_new_csrf_token()
-            explorations_list = self.get_json(
-                feconf.CREATOR_DASHBOARD_DATA_URL
-            )['explorations_list']
+            explorations_list = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list, [])
             exp_a_id = self.post_json(
                 feconf.UPLOAD_EXPLORATION_URL,
@@ -635,9 +547,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 upload_files=[('yaml_file', 'unused_filename', self.raw_yaml)],
             )[creator_dashboard.EXPLORATION_ID_KEY]
-            explorations_list = self.get_json(
-                feconf.CREATOR_DASHBOARD_DATA_URL
-            )['explorations_list']
+            explorations_list = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list[0]['id'], exp_a_id)
             self.logout()
 

@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from typing import Dict, List, TypedDict
+
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
@@ -24,8 +26,6 @@ from core.domain import (
     email_manager,
     summary_services,
 )
-
-from typing import Dict, List, TypedDict
 
 
 class FeaturedActivitiesHandlerNormalizedPayloadDict(TypedDict):
@@ -36,11 +36,7 @@ class FeaturedActivitiesHandlerNormalizedPayloadDict(TypedDict):
     featured_activity_reference_dicts: List[activity_domain.ActivityReference]
 
 
-class FeaturedActivitiesHandler(
-    base.BaseHandler[
-        FeaturedActivitiesHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
+class FeaturedActivitiesHandler(base.BaseHandler[FeaturedActivitiesHandlerNormalizedPayloadDict, Dict[str, str]]):
     """The moderator page handler for featured activities."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -65,10 +61,7 @@ class FeaturedActivitiesHandler(
         """Handles GET requests."""
         self.render_json(
             {
-                'featured_activity_references': [
-                    activity_reference.to_dict()
-                    for activity_reference in activity_services.get_featured_activity_references()
-                ],
+                'featured_activity_references': [activity_reference.to_dict() for activity_reference in activity_services.get_featured_activity_references()],
             }
         )
 
@@ -76,9 +69,7 @@ class FeaturedActivitiesHandler(
     def post(self) -> None:
         """Handles POST requests."""
         assert self.normalized_payload is not None
-        featured_activity_references = self.normalized_payload[
-            'featured_activity_reference_dicts'
-        ]
+        featured_activity_references = self.normalized_payload['featured_activity_reference_dicts']
 
         try:
             # Retrieve the list for each type of inavlid ID.
@@ -87,22 +78,13 @@ class FeaturedActivitiesHandler(
                 non_existent_collection_ids,
                 private_exploration_ids,
                 private_collection_ids,
-            ) = summary_services.check_activity_id_validity(
-                featured_activity_references
-            )
+            ) = summary_services.check_activity_id_validity(featured_activity_references)
 
             # If all of the lists are empty, there are no invalid IDs.
             # Since there are no invalid IDs, the Featured Activity
             # References are allowed to be updated.
-            if (
-                (not non_existent_exploration_ids)
-                & (not non_existent_collection_ids)
-                & (not private_exploration_ids)
-                & (not private_collection_ids)
-            ):
-                activity_services.update_featured_activity_references(
-                    featured_activity_references
-                )
+            if (not non_existent_exploration_ids) & (not non_existent_collection_ids) & (not private_exploration_ids) & (not private_collection_ids):
+                activity_services.update_featured_activity_references(featured_activity_references)
                 self.render_json({})
             else:
                 # Create empty error message that can be added to
@@ -177,8 +159,6 @@ class EmailDraftHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests."""
         self.render_json(
             {
-                'draft_email_body': (
-                    email_manager.get_moderator_unpublish_exploration_email()
-                ),
+                'draft_email_body': (email_manager.get_moderator_unpublish_exploration_email()),
             }
         )

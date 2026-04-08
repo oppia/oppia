@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
+from typing import Dict, List, Optional, Sequence, TypedDict
+
 from core import feconf, utils
 from core.platform import models
-
-from typing import Dict, List, Optional, Sequence, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -53,13 +53,9 @@ class EntityTranslationsModel(base_models.BaseModel):
         choices=[feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_QUESTION],
     )
     # The version of the corresponding entity.
-    entity_version = datastore_services.IntegerProperty(
-        required=True, indexed=True
-    )
+    entity_version = datastore_services.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language an entity is written in.
-    language_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
     # A dict representing content-id as keys and dict(TranslatedContent)
     # as values.
     translations = datastore_services.JsonProperty(required=True)
@@ -70,9 +66,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -142,15 +136,11 @@ class EntityTranslationsModel(base_models.BaseModel):
             instance corresponding to the given inputs, if such a translation
             exists, or None if no translation is found.
         """
-        model_id = cls._generate_id(
-            entity_type, entity_id, entity_version, language_code
-        )
+        model_id = cls._generate_id(entity_type, entity_id, entity_version, language_code)
         return cls.get_by_id(model_id)
 
     @classmethod
-    def get_model_multi(
-        cls, entity_translation_references: List[EntityTranslationReferenceDict]
-    ) -> List[Optional[EntityTranslationsModel]]:
+    def get_model_multi(cls, entity_translation_references: List[EntityTranslationReferenceDict]) -> List[Optional[EntityTranslationsModel]]:
         """Gets multiple EntityTranslationsModels by their references.
 
         Args:
@@ -257,24 +247,16 @@ class MachineTranslationModel(base_models.BaseModel):
     source_text = datastore_services.TextProperty(required=True, indexed=False)
     # A SHA-1 hash of the source text. This can be used to index the datastore
     # by source text.
-    hashed_source_text = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    hashed_source_text = datastore_services.StringProperty(required=True, indexed=True)
     # The language code for the source text language. Must be different from
     # target_language_code.
-    source_language_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    source_language_code = datastore_services.StringProperty(required=True, indexed=True)
     # The language code for the target translation language. Must be different
     # from source_language_code.
-    target_language_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    target_language_code = datastore_services.StringProperty(required=True, indexed=True)
     # The machine generated translation of the source text into the target
     # language.
-    translated_text = datastore_services.TextProperty(
-        required=True, indexed=False
-    )
+    translated_text = datastore_services.TextProperty(required=True, indexed=False)
 
     @classmethod
     def create(
@@ -306,9 +288,7 @@ class MachineTranslationModel(base_models.BaseModel):
         # SHA-1 always produces a 40 digit hash. 50 is chosen here to prevent
         # convert_to_hash from truncating the hash.
         hashed_source_text = utils.convert_to_hash(source_text, 50)
-        entity_id = cls._generate_id(
-            source_language_code, target_language_code, hashed_source_text
-        )
+        entity_id = cls._generate_id(source_language_code, target_language_code, hashed_source_text)
         translation_entity = cls(
             id=entity_id,
             hashed_source_text=hashed_source_text,
@@ -373,9 +353,7 @@ class MachineTranslationModel(base_models.BaseModel):
             exists, or None if no translation is found.
         """
         hashed_source_text = utils.convert_to_hash(source_text, 50)
-        instance_id = cls._generate_id(
-            source_language_code, target_language_code, hashed_source_text
-        )
+        instance_id = cls._generate_id(source_language_code, target_language_code, hashed_source_text)
         return cls.get(instance_id, strict=False)
 
     @staticmethod
@@ -384,9 +362,7 @@ class MachineTranslationModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not associated with users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

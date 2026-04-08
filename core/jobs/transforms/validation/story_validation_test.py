@@ -18,20 +18,18 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.jobs import job_test_utils
 from core.jobs.transforms.validation import story_validation
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
-import apache_beam as beam
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, story_models
 
-(base_models, story_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.STORY]
-)
+(base_models, story_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.STORY])
 
 
 class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
@@ -45,11 +43,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([valid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(output, [])
 
@@ -63,11 +57,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'invalid': 'data'}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -90,11 +80,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'invalid': 'data'}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -121,11 +107,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -133,8 +115,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
-                    'The following required attributes are missing: '
-                    'new_value, old_value',
+                    'The following required attributes are missing: new_value, old_value',
                 )
             ],
         )
@@ -155,11 +136,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -171,8 +148,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                         'node_id': 'node_id',
                         'invalid': 'invalid',
                     },
-                    'The following required attributes are missing: title, '
-                    'The following extra attributes are present: invalid',
+                    'The following required attributes are missing: title, The following extra attributes are present: invalid',
                 )
             ],
         )
@@ -193,11 +169,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -205,8 +177,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
-                    'Value for property_name in cmd update_story_property: '
-                    'invalid is not allowed',
+                    'Value for property_name in cmd update_story_property: invalid is not allowed',
                 )
             ],
         )
@@ -229,11 +200,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -247,8 +214,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                         'old_value': 'old_value',
                         'new_value': 'new_value',
                     },
-                    'Value for property_name in cmd '
-                    'update_story_node_property: invalid is not allowed',
+                    'Value for property_name in cmd update_story_node_property: invalid is not allowed',
                 )
             ],
         )
@@ -271,11 +237,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
 
         self.assert_pcoll_equal(
             output,
@@ -283,8 +245,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 base_validation_errors.CommitCmdsValidateError(
                     invalid_commit_cmd_model,
                     commit_dict,
-                    'Value for property_name in cmd '
-                    'update_story_contents_property: invalid is not allowed',
+                    'Value for property_name in cmd update_story_contents_property: invalid is not allowed',
                 )
             ],
         )
@@ -303,11 +264,7 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([valid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
-        )
+        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
 
         self.assert_pcoll_equal(output, [])
 
@@ -323,17 +280,9 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
-        )
+        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
 
         self.assert_pcoll_equal(
             output,
-            [
-                base_validation_errors.CommitCmdsNoneError(
-                    invalid_commit_cmd_model
-                )
-            ],
+            [base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)],
         )

@@ -27,27 +27,11 @@ are imported into this file.
 
 from __future__ import annotations
 
-from core.jobs.decorators import validation_decorators
-from core.jobs.transforms.validation import (  # pylint: disable=unused-import
-    auth_validation,
-    base_validation,
-    blog_validation,
-    collection_validation,
-    config_validation,
-    exp_validation,
-    feedback_validation,
-    improvements_validation,
-    question_validation,
-    skill_validation,
-    story_validation,
-    subtopic_validation,
-    topic_validation,
-    user_validation,
-)
-from core.jobs.types import model_property
-
 import apache_beam as beam
 from typing import Dict, FrozenSet, Set, Tuple, Type
+
+from core.jobs.decorators import validation_decorators
+from core.jobs.types import model_property
 
 
 def get_audit_do_fn_types_by_kind() -> Dict[str, FrozenSet[Type[beam.DoFn]]]:
@@ -60,9 +44,7 @@ def get_audit_do_fn_types_by_kind() -> Dict[str, FrozenSet[Type[beam.DoFn]]]:
     return validation_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
 
 
-def get_id_referencing_properties_by_kind_of_possessor() -> Dict[
-    str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
-]:
+def get_id_referencing_properties_by_kind_of_possessor() -> Dict[str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]]:
     """Returns properties whose values refer to the IDs of the corresponding
     set of model kinds, grouped by the kind of model the properties belong to.
 

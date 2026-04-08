@@ -1,6 +1,6 @@
-from typing import Any, Optional, Sequence, Tuple
-from . import credentials
-from . import transport
+from typing import Optional, Sequence, Tuple
+
+from . import credentials, transport
 
 def default(
     scopes: Sequence[str] = ...,

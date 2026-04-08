@@ -56,9 +56,9 @@ Dataflow service: https://cloud.google.com/dataflow.
 
 from __future__ import annotations
 
-from core.jobs.types import job_run_result
-
 import apache_beam as beam
+
+from core.jobs.types import job_run_result
 
 from typing import Dict, List, Tuple, Type  # isort: skip
 
@@ -110,10 +110,7 @@ class JobMetaclass(type):
         """
         if name in mcs._JOB_REGISTRY:
             collision = mcs._JOB_REGISTRY[name]
-            raise TypeError(
-                '%s name is already used by %s.%s'
-                % (name, collision.__module__, name)
-            )
+            raise TypeError('%s name is already used by %s.%s' % (name, collision.__module__, name))
 
         job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 

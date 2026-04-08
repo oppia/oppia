@@ -18,14 +18,14 @@
 
 from __future__ import annotations
 
+import result
+from typing import Iterable, List, Set, Union
+
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import missing_translation_images_repair_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import result
-from typing import Iterable, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -55,9 +55,7 @@ class MissingTranslationImagesJobTestsBase(job_test_utils.JobTestBase):
     MIME_TYPE = 'image/png'
 
     @staticmethod
-    def _make_translation_html(
-        images: Iterable[str], lst_format: bool
-    ) -> Union[List[str], str]:
+    def _make_translation_html(images: Iterable[str], lst_format: bool) -> Union[List[str], str]:
         """Generate HTML with image elements with the provided filenames.
 
         Args:
@@ -68,10 +66,7 @@ class MissingTranslationImagesJobTestsBase(job_test_utils.JobTestBase):
         Returns:
             str|list(str). The HTML.
         """
-        tags = [
-            f'<oppia-noninteractive-image filepath-with-value="{image}">'
-            for image in images
-        ]
+        tags = [f'<oppia-noninteractive-image filepath-with-value="{image}">' for image in images]
         return tags if lst_format else '\n'.join(tags)
 
     def _add_suggestion(
@@ -109,11 +104,7 @@ class MissingTranslationImagesJobTestsBase(job_test_utils.JobTestBase):
             target_version_at_submission=1,
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id=self.AUTHOR,
-            change_cmd={
-                'translation_html': self._make_translation_html(
-                    image_filenames, lst_html
-                )
-            },
+            change_cmd={'translation_html': self._make_translation_html(image_filenames, lst_html)},
             score_category=score_cat,
         )
         model.update_timestamps()
@@ -140,20 +131,13 @@ class MissingTranslationImagesJobTestsBase(job_test_utils.JobTestBase):
         """List the files in GCS under the provided path."""
         if not path.endswith('/'):
             path += '/'
-        return {
-            blob.name[len(path) :]
-            for blob in storage_services.listdir(BUCKET, path)
-        }
+        return {blob.name[len(path) :] for blob in storage_services.listdir(BUCKET, path)}
 
 
-class CopyMissingTranslationImagesJobTests(
-    MissingTranslationImagesJobTestsBase
-):
+class CopyMissingTranslationImagesJobTests(MissingTranslationImagesJobTestsBase):
     """Tests for CopyMissingTranslationImagesJob."""
 
-    JOB_CLASS = (
-        missing_translation_images_repair_jobs.CopyMissingTranslationImagesJob
-    )
+    JOB_CLASS = missing_translation_images_repair_jobs.CopyMissingTranslationImagesJob
 
     def test_copy_images_when_dst_missing(self) -> None:
         self._add_suggestion('e1', ['image1.png', 'image2.png'], False, True)
@@ -198,9 +182,7 @@ class CopyMissingTranslationImagesJobTests(
         )
 
     def test_copy_images_when_dst_missing_lst_translation_html(self) -> None:
-        self._add_suggestion(
-            'e1', ['image1.png', 'image2.png'], False, True, True
-        )
+        self._add_suggestion('e1', ['image1.png', 'image2.png'], False, True, True)
         self.assertSetEqual(
             self._gcs_ls('exploration/e1/assets/image'),
             {'image1.png', 'image2.png'},
@@ -279,25 +261,17 @@ class CopyMissingTranslationImagesJobTests(
 
     def test_do_nothing_when_no_suggestions(self) -> None:
         self.assertSetEqual(self._gcs_ls('exploration/e1/assets/image'), set())
-        self.assertSetEqual(
-            self._gcs_ls('exploration_suggestions/e1/assets/image'), set()
-        )
+        self.assertSetEqual(self._gcs_ls('exploration_suggestions/e1/assets/image'), set())
         self.assert_job_output_is([])
 
         self.assertSetEqual(self._gcs_ls('exploration/e1/assets/image'), set())
-        self.assertSetEqual(
-            self._gcs_ls('exploration_suggestions/e1/assets/image'), set()
-        )
+        self.assertSetEqual(self._gcs_ls('exploration_suggestions/e1/assets/image'), set())
 
 
-class DebugMissingTranslationImagesJobTests(
-    MissingTranslationImagesJobTestsBase
-):
+class DebugMissingTranslationImagesJobTests(MissingTranslationImagesJobTestsBase):
     """Tests for DebugMissingTranslationImagesJob."""
 
-    JOB_CLASS = (
-        missing_translation_images_repair_jobs.DebugMissingTranslationImagesJob
-    )
+    JOB_CLASS = missing_translation_images_repair_jobs.DebugMissingTranslationImagesJob
 
     def test_copy_images_when_dst_missing(self) -> None:
         self._add_suggestion('e1', ['image1.png', 'image2.png'], False, True)
@@ -457,25 +431,17 @@ class DebugMissingTranslationImagesJobTests(
 
     def test_do_nothing_when_no_suggestions(self) -> None:
         self.assertSetEqual(self._gcs_ls('exploration/e1/assets/image'), set())
-        self.assertSetEqual(
-            self._gcs_ls('exploration_suggestions/e1/assets/image'), set()
-        )
+        self.assertSetEqual(self._gcs_ls('exploration_suggestions/e1/assets/image'), set())
         self.assert_job_output_is([])
 
         self.assertSetEqual(self._gcs_ls('exploration/e1/assets/image'), set())
-        self.assertSetEqual(
-            self._gcs_ls('exploration_suggestions/e1/assets/image'), set()
-        )
+        self.assertSetEqual(self._gcs_ls('exploration_suggestions/e1/assets/image'), set())
 
 
-class AuditMissingTranslationImagesJobTests(
-    MissingTranslationImagesJobTestsBase
-):
+class AuditMissingTranslationImagesJobTests(MissingTranslationImagesJobTestsBase):
     """Tests for AuditMissingTranslationImagesJob."""
 
-    JOB_CLASS = (
-        missing_translation_images_repair_jobs.AuditMissingTranslationImagesJob
-    )
+    JOB_CLASS = missing_translation_images_repair_jobs.AuditMissingTranslationImagesJob
 
     def test_copy_images_when_dst_missing(self) -> None:
         self._add_suggestion('e1', ['image1.png', 'image2.png'], False, True)
@@ -541,12 +507,8 @@ class AuditMissingTranslationImagesJobTests(
 
     def test_do_nothing_when_no_suggestions(self) -> None:
         self.assertSetEqual(self._gcs_ls('exploration/e1/assets/image'), set())
-        self.assertSetEqual(
-            self._gcs_ls('exploration_suggestions/e1/assets/image'), set()
-        )
+        self.assertSetEqual(self._gcs_ls('exploration_suggestions/e1/assets/image'), set())
         self.assert_job_output_is([])
 
         self.assertSetEqual(self._gcs_ls('exploration/e1/assets/image'), set())
-        self.assertSetEqual(
-            self._gcs_ls('exploration_suggestions/e1/assets/image'), set()
-        )
+        self.assertSetEqual(self._gcs_ls('exploration_suggestions/e1/assets/image'), set())

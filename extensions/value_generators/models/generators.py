@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import copy
 
+from typing import Dict, List, Optional
+
 from core import utils
 from core.domain import value_generators_domain
-
-from typing import Dict, List, Optional
 
 
 class Copier(value_generators_domain.BaseValueGenerator):
@@ -58,7 +58,5 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    def generate_value(
-        self, unused_context_params: Dict[str, str], list_of_values: List[str]
-    ) -> str:
+    def generate_value(self, unused_context_params: Dict[str, str], list_of_values: List[str]) -> str:
         return copy.deepcopy(utils.get_random_choice(list_of_values))

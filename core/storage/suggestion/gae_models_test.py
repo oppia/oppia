@@ -20,12 +20,12 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Dict, Final, List, Mapping
+
 from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Dict, Final, List, Mapping
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,9 +33,7 @@ if MYPY:  # pragma: no cover
     from core.domain import change_domain  # pylint: disable=invalid-import
     from mypy_imports import base_models, suggestion_models
 
-(base_models, suggestion_models, user_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.SUGGESTION, models.Names.USER]
-)
+(base_models, suggestion_models, user_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.SUGGESTION, models.Names.USER])
 
 
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
@@ -128,9 +126,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_in_review_translation_suggestions_by_exp_id(self) -> None:
         model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_id(
-                self.target_id
-            ),
+            model.get_in_review_translation_suggestions_by_exp_id(self.target_id),
             [],
         )
 
@@ -151,18 +147,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         created_suggestion_model = model.get_by_id(suggestion_id)
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_id(
-                self.target_id
-            ),
+            model.get_in_review_translation_suggestions_by_exp_id(self.target_id),
             [created_suggestion_model],
         )
 
     def test_get_all_in_review_translation_suggestions_by_exp_ids(self) -> None:
         model = suggestion_models.GeneralSuggestionModel
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_ids(
-                [self.target_id], 'en'
-            ),
+            model.get_in_review_translation_suggestions_by_exp_ids([self.target_id], 'en'),
             [],
         )
         suggestion_id = 'exploration.exp1.thread_6'
@@ -182,9 +174,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         created_suggestion_model = model.get_by_id(suggestion_id)
         self.assertEqual(
-            model.get_in_review_translation_suggestions_by_exp_ids(
-                [self.target_id], 'en'
-            ),
+            model.get_in_review_translation_suggestions_by_exp_ids([self.target_id], 'en'),
             [created_suggestion_model],
         )
 
@@ -194,9 +184,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         model = suggestion_models.GeneralSuggestionModel
         expected_suggestion_model = model.get_by_id('exploration.exp1.thread_1')
         self.assertEqual(
-            model.get_user_created_suggestions_of_suggestion_type(
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'author_1'
-            ),
+            model.get_user_created_suggestions_of_suggestion_type(feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'author_1'),
             [expected_suggestion_model],
         )
 
@@ -207,47 +195,17 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel.has_reference_to_user_id(
-                'author_1'
-            )
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel.has_reference_to_user_id(
-                'author_2'
-            )
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel.has_reference_to_user_id(
-                'author_3'
-            )
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel.has_reference_to_user_id(
-                'reviewer_1'
-            )
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel.has_reference_to_user_id(
-                'reviewer_2'
-            )
-        )
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel.has_reference_to_user_id(
-                'reviewer_3'
-            )
-        )
-        self.assertFalse(
-            suggestion_models.GeneralSuggestionModel.has_reference_to_user_id(
-                'id_x'
-            )
-        )
+        self.assertTrue(suggestion_models.GeneralSuggestionModel.has_reference_to_user_id('author_1'))
+        self.assertTrue(suggestion_models.GeneralSuggestionModel.has_reference_to_user_id('author_2'))
+        self.assertTrue(suggestion_models.GeneralSuggestionModel.has_reference_to_user_id('author_3'))
+        self.assertTrue(suggestion_models.GeneralSuggestionModel.has_reference_to_user_id('reviewer_1'))
+        self.assertTrue(suggestion_models.GeneralSuggestionModel.has_reference_to_user_id('reviewer_2'))
+        self.assertTrue(suggestion_models.GeneralSuggestionModel.has_reference_to_user_id('reviewer_3'))
+        self.assertFalse(suggestion_models.GeneralSuggestionModel.has_reference_to_user_id('id_x'))
 
     def test_score_type_contains_delimiter(self) -> None:
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
-            self.assertTrue(
-                suggestion_models.SCORE_CATEGORY_DELIMITER not in score_type
-            )
+            self.assertTrue(suggestion_models.SCORE_CATEGORY_DELIMITER not in score_type)
 
     def test_get_translation_suggestions_submitted_for_given_date_range(
         self,
@@ -265,14 +223,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_6',
             'hi',
         )
-        to_date = datetime.datetime.now(datetime.timezone.utc).replace(
-            tzinfo=None
-        )
+        to_date = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         from_date = to_date - datetime.timedelta(days=1)
 
-        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_within_given_dates(
-            from_date, to_date, 'test_author', 'hi'
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_within_given_dates(from_date, to_date, 'test_author', 'hi')
 
         self.assertEqual(len(suggestions), 1)
 
@@ -292,14 +246,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_6',
             'hi',
         )
-        to_date = datetime.datetime.now(datetime.timezone.utc).replace(
-            tzinfo=None
-        )
+        to_date = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         from_date = to_date - datetime.timedelta(days=1)
 
-        suggestions = suggestion_models.GeneralSuggestionModel.get_question_suggestions_submitted_within_given_dates(
-            from_date, to_date, 'test_author'
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_question_suggestions_submitted_within_given_dates(from_date, to_date, 'test_author')
 
         self.assertEqual(len(suggestions), 1)
 
@@ -320,9 +270,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         suggestion_id = 'exploration.exp1.thread_6'
 
-        observed_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
-        )
+        observed_suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
         self.assertEqual(
             observed_suggestion_model.suggestion_type,
@@ -337,16 +285,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             observed_suggestion_model.target_version_at_submission,
             self.target_version_at_submission,
         )
-        self.assertEqual(
-            observed_suggestion_model.status, suggestion_models.STATUS_IN_REVIEW
-        )
+        self.assertEqual(observed_suggestion_model.status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(observed_suggestion_model.author_id, 'author_3')
-        self.assertEqual(
-            observed_suggestion_model.final_reviewer_id, 'reviewer_3'
-        )
-        self.assertEqual(
-            observed_suggestion_model.score_category, self.score_category
-        )
+        self.assertEqual(observed_suggestion_model.final_reviewer_id, 'reviewer_3')
+        self.assertEqual(observed_suggestion_model.score_category, self.score_category)
         self.assertEqual(observed_suggestion_model.change_cmd, self.change_cmd)
 
     def test_create_suggestion_fails_if_id_collides_with_existing_one(
@@ -354,8 +296,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'There is already a suggestion with the given id: '
-            'exploration.exp1.thread_1',
+            'There is already a suggestion with the given id: exploration.exp1.thread_1',
         ):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -372,128 +313,77 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             )
 
     def test_get_suggestions_by_type(self) -> None:
-        queries = [
-            ('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
-        ]
+        queries = [('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             5,
         )
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
         with self.assertRaisesRegex(
             Exception,
-            'Value \'invalid_suggestion_type\' for property'
-            ' suggestion_type is not an allowed choice',
+            'Value \'invalid_suggestion_type\' for property suggestion_type is not an allowed choice',
         ):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
     def test_get_suggestion_by_author(self) -> None:
         queries = [('author_id', 'author_1')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             1,
         )
         queries = [('author_id', 'author_2')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             3,
         )
         queries = [('author_id', 'author_3')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             1,
         )
         queries = [('author_id', 'author_invalid')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             0,
         )
 
     def test_get_suggestion_by_reviewer(self) -> None:
         queries = [('final_reviewer_id', 'reviewer_1')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             1,
         )
         queries = [('final_reviewer_id', 'reviewer_2')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             3,
         )
         queries = [('final_reviewer_id', 'reviewer_3')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             1,
         )
         queries = [('final_reviewer_id', 'reviewer_invalid')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             0,
         )
 
     def test_get_suggestions_by_status(self) -> None:
         queries = [('status', suggestion_models.STATUS_IN_REVIEW)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             1,
         )
         queries = [('status', suggestion_models.STATUS_REJECTED)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             2,
         )
         queries = [('status', suggestion_models.STATUS_ACCEPTED)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             2,
         )
 
@@ -503,11 +393,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id),
         ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             5,
         )
         queries = [
@@ -515,11 +401,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('target_id', 'exp_invalid'),
         ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             0,
         )
 
@@ -529,11 +411,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id),
         ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             5,
         )
 
@@ -543,11 +421,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('author_id', 'author_2'),
         ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             3,
         )
 
@@ -558,11 +432,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('status', suggestion_models.STATUS_ACCEPTED),
         ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             2,
         )
 
@@ -571,9 +441,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id),
             ('invalid_field', 'value'),
         ]
-        with self.assertRaisesRegex(
-            Exception, 'Not allowed to query on field invalid_field'
-        ):
+        with self.assertRaisesRegex(Exception, 'Not allowed to query on field invalid_field'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
         queries = [
@@ -586,11 +454,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('score_category', self.score_category),
         ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             1,
         )
 
@@ -612,11 +476,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         queries = [('language_code', self.translation_language_code)]
 
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)),
             1,
         )
 
@@ -676,9 +536,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        suggestions = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions(
-            'exp1', [self.translation_language_code]
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions('exp1', [self.translation_language_code])
 
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(suggestions[0].target_id, 'exp1')
@@ -686,17 +544,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestions[0].suggestion_type,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
         )
-        self.assertEqual(
-            suggestions[0].status, suggestion_models.STATUS_IN_REVIEW
-        )
+        self.assertEqual(suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(suggestions[1].target_id, 'exp1')
         self.assertEqual(
             suggestions[1].suggestion_type,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
         )
-        self.assertEqual(
-            suggestions[1].status, suggestion_models.STATUS_IN_REVIEW
-        )
+        self.assertEqual(suggestions[1].status, suggestion_models.STATUS_IN_REVIEW)
 
     def test_get_reviewable_translation_suggestions(self) -> None:
         suggestion_1_id = 'exploration.exp1.thread_6'
@@ -743,12 +597,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        results, _ = (
-            suggestion_models.GeneralSuggestionModel.get_reviewable_translation_suggestions(
-                user_id=user_id,
-                language_code=self.translation_language_code,
-                exp_id='exp1',
-            )
+        results, _ = suggestion_models.GeneralSuggestionModel.get_reviewable_translation_suggestions(
+            user_id=user_id,
+            language_code=self.translation_language_code,
+            exp_id='exp1',
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -782,9 +634,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
-            'exp1', self.translation_language_code
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id('exp1', self.translation_language_code)
 
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(suggestions[0].target_id, 'exp1')
@@ -792,9 +642,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestions[0].suggestion_type,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
         )
-        self.assertEqual(
-            suggestions[0].status, suggestion_models.STATUS_IN_REVIEW
-        )
+        self.assertEqual(suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(suggestions[1].target_id, 'exp1')
 
     def test_get_translation_suggestions_in_review_with_exp_ids_by_offset(
@@ -828,15 +676,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        suggestions, offset_1 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit,
-                0,
-                'author_4',
-                None,
-                [self.translation_language_code],
-                ['exp1'],
-            )
+        suggestions, offset_1 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
+            limit,
+            0,
+            'author_4',
+            None,
+            [self.translation_language_code],
+            ['exp1'],
         )
 
         self.assertEqual(len(suggestions), 1)
@@ -846,9 +692,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestions[0].suggestion_type,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
         )
-        self.assertEqual(
-            suggestions[0].status, suggestion_models.STATUS_IN_REVIEW
-        )
+        self.assertEqual(suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
 
     def test_get_translation_suggestions_in_review_with_exp_ids_by_offset_sorted(  # pylint: disable=line-too-long
         self,
@@ -897,15 +741,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        sorted_results, offset_1 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit=1,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-                exp_ids=['exp1'],
-            )
+        sorted_results, offset_1 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
+            limit=1,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
+            exp_ids=['exp1'],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -913,15 +755,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[0].id, suggestion_2_id)
         self.assertEqual(offset_1, 2)
 
-        sorted_results, offset_2 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit=2,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-                exp_ids=['exp1'],
-            )
+        sorted_results, offset_2 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
+            limit=2,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
+            exp_ids=['exp1'],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -930,15 +770,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset_2, 3)
 
-        sorted_results, offset_3 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit=10,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-                exp_ids=['exp1'],
-            )
+        sorted_results, offset_3 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
+            limit=10,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
+            exp_ids=['exp1'],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -947,15 +785,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset_3, 3)
 
-        sorted_results, offset_4 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit=None,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-                exp_ids=['exp1'],
-            )
+        sorted_results, offset_4 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
+            limit=None,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
+            exp_ids=['exp1'],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -996,14 +832,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        results, offset_1 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=limit,
-                offset=0,
-                user_id=user_id,
-                sort_key=None,
-                language_codes=[self.translation_language_code],
-            )
+        results, offset_1 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=limit,
+            offset=0,
+            user_id=user_id,
+            sort_key=None,
+            language_codes=[self.translation_language_code],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -1011,14 +845,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, suggestion_1_id)
         self.assertEqual(offset_1, 1)
 
-        results, offset_2 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=limit,
-                offset=offset_1,
-                user_id=user_id,
-                sort_key=None,
-                language_codes=[self.translation_language_code],
-            )
+        results, offset_2 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=limit,
+            offset=offset_1,
+            user_id=user_id,
+            sort_key=None,
+            language_codes=[self.translation_language_code],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -1026,14 +858,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, suggestion_2_id)
         self.assertEqual(offset_2, 2)
 
-        results, offset_3 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=limit,
-                offset=offset_2,
-                user_id=user_id,
-                sort_key=None,
-                language_codes=[self.translation_language_code],
-            )
+        results, offset_3 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=limit,
+            offset=offset_2,
+            user_id=user_id,
+            sort_key=None,
+            language_codes=[self.translation_language_code],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -1073,14 +903,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=None,
-                offset=0,
-                user_id=user_id,
-                sort_key=None,
-                language_codes=[self.translation_language_code],
-            )
+        results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=None,
+            offset=0,
+            user_id=user_id,
+            sort_key=None,
+            language_codes=[self.translation_language_code],
         )
 
         # Ruling out the possibility of None for mypy type checking.
@@ -1137,14 +965,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        sorted_results, offset_1 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=1,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-            )
+        sorted_results, offset_1 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=1,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1152,14 +978,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[0].id, suggestion_2_id)
         self.assertEqual(offset_1, 2)
 
-        sorted_results, offset_2 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=2,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-            )
+        sorted_results, offset_2 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=2,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1168,14 +992,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset_2, 3)
 
-        sorted_results, offset_3 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=10,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-            )
+        sorted_results, offset_3 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=10,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1184,14 +1006,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset_3, 3)
 
-        sorted_results, offset_4 = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit=None,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                language_codes=[self.translation_language_code],
-            )
+        sorted_results, offset_4 = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
+            limit=None,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            language_codes=[self.translation_language_code],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1295,9 +1115,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        target_ids = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestion_target_ids(
-            user_id, language_codes
-        )
+        target_ids = suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestion_target_ids(user_id, language_codes)
 
         self.assertCountEqual(target_ids, ['exp1', 'exp2', 'exp3'])
 
@@ -1347,14 +1165,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.question_language_code,
         )
 
-        results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
-                limit=limit,
-                offset=0,
-                user_id=user_id,
-                sort_key=None,
-                skill_ids=None,
-            )
+        results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
+            limit=limit,
+            offset=0,
+            user_id=user_id,
+            sort_key=None,
+            skill_ids=None,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -1363,14 +1179,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 1)
         prev_offset = offset
 
-        results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
-                limit=limit,
-                offset=prev_offset,
-                user_id=user_id,
-                sort_key=None,
-                skill_ids=None,
-            )
+        results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
+            limit=limit,
+            offset=prev_offset,
+            user_id=user_id,
+            sort_key=None,
+            skill_ids=None,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -1379,28 +1193,24 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 2)
         prev_offset = offset
 
-        results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
-                limit=limit,
-                offset=prev_offset,
-                user_id=user_id,
-                sort_key=None,
-                skill_ids=None,
-            )
+        results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
+            limit=limit,
+            offset=prev_offset,
+            user_id=user_id,
+            sort_key=None,
+            skill_ids=None,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 0)
         self.assertEqual(offset, 2)
 
-        sorted_results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
-                limit=1,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=None,
-            )
+        sorted_results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
+            limit=1,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            skill_ids=None,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1408,14 +1218,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[0].id, suggestion_2_id)
         self.assertEqual(offset, 2)
 
-        sorted_results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
-                limit=2,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=None,
-            )
+        sorted_results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
+            limit=2,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            skill_ids=None,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1424,14 +1232,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset, 3)
 
-        sorted_results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
-                limit=10,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=None,
-            )
+        sorted_results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
+            limit=10,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            skill_ids=None,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1440,14 +1246,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset, 3)
 
-        sorted_results, offset = (
-            suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
-                limit=10,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=['skill_1', 'skill_3'],
-            )
+        sorted_results, offset = suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
+            limit=10,
+            offset=0,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+            skill_ids=['skill_1', 'skill_3'],
         )
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -1455,9 +1259,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[0].id, suggestion_1_id)
         self.assertEqual(offset, 3)
 
-        with self.assertRaisesRegex(
-            RuntimeError, 'skill_ids list can\'t be empty'
-        ):
+        with self.assertRaisesRegex(RuntimeError, 'skill_ids list can\'t be empty'):
             (
                 suggestion_models.GeneralSuggestionModel.get_in_review_question_suggestions_by_offset(
                     limit=10,
@@ -1517,14 +1319,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.question_language_code,
         )
 
-        results, translation_suggestion_offset = (
-            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
-                limit=limit,
-                offset=0,
-                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-            )
+        results, translation_suggestion_offset = suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+            limit=limit,
+            offset=0,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            user_id=user_id,
+            sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -1532,14 +1332,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, authored_translation_suggestion_id)
         self.assertEqual(translation_suggestion_offset, 1)
 
-        results, question_suggestion_offset = (
-            suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
-                limit=limit,
-                offset=0,
-                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
-                user_id=user_id,
-                sort_key=None,
-            )
+        results, question_suggestion_offset = suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
+            limit=limit,
+            offset=0,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            user_id=user_id,
+            sort_key=None,
         )
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
@@ -1550,9 +1348,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_translation_suggestions_in_review_with_exp_id_with_invalid_exp(
         self,
     ) -> None:
-        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
-            'invalid_exp', 'hi'
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id('invalid_exp', 'hi')
         self.assertEqual(len(suggestions), 0)
 
     def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(
@@ -1575,11 +1371,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # Assert that there is one translation suggestion with the given
         # exploration id found.
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(
-                    ['exp1']
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(['exp1'])),
             1,
         )
 
@@ -1614,9 +1406,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
         with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
-            suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
-                'exp1', self.translation_language_code
-            )
+            suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id('exp1', self.translation_language_code)
 
         self.assertEqual(len(suggestions), 1)
 
@@ -1650,9 +1440,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
-            'exp1', self.translation_language_code
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id('exp1', self.translation_language_code)
 
         self.assertEqual(len(suggestions), 0)
 
@@ -1686,9 +1474,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
-            'exp1', self.translation_language_code
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id('exp1', self.translation_language_code)
 
         self.assertEqual(len(suggestions), 0)
 
@@ -1709,9 +1495,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'hi',
         )
 
-        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
-            'exp1', 'pt'
-        )
+        suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id('exp1', 'pt')
 
         self.assertEqual(len(suggestions), 0)
 
@@ -1748,11 +1532,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # Assert that there are two translation suggestions with the given
         # exploration ids found.
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(
-                    ['exp2', 'exp3']
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(['exp2', 'exp3'])),
             2,
         )
 
@@ -1762,11 +1542,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # Assert that there are no translation suggestions with an invalid
         # exploration id found.
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(
-                    ['invalid_exp']
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(['invalid_exp'])),
             0,
         )
 
@@ -1801,22 +1577,16 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
         with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
-            suggestion_model_results = suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(
-                ['exp4', 'exp5']
-            )
+            suggestion_model_results = suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(['exp4', 'exp5'])
 
         # Assert that there are two translation suggestions with the given
         # exploration ids found. There should be two fetch_page calls.
         self.assertEqual(len(suggestion_model_results), 2)
 
     def test_get_all_stale_suggestion_ids(self) -> None:
-        with self.swap(
-            suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0
-        ):
+        with self.swap(suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
             self.assertEqual(
-                len(
-                    suggestion_models.GeneralSuggestionModel.get_all_stale_suggestion_ids()
-                ),
+                len(suggestion_models.GeneralSuggestionModel.get_all_stale_suggestion_ids()),
                 1,
             )
 
@@ -1826,9 +1596,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             7 * 24 * 60 * 60 * 1000,
         ):
             self.assertEqual(
-                len(
-                    suggestion_models.GeneralSuggestionModel.get_all_stale_suggestion_ids()
-                ),
+                len(suggestion_models.GeneralSuggestionModel.get_all_stale_suggestion_ids()),
                 0,
             )
 
@@ -1838,12 +1606,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
             with self.assertRaisesRegex(
                 Exception,
-                'Expected the suggestion types offered on the Contributor '
-                'Dashboard to be nonempty.',
+                'Expected the suggestion types offered on the Contributor Dashboard to be nonempty.',
             ):
-                (
-                    suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review()
-                )
+                (suggestion_models.GeneralSuggestionModel.get_suggestions_waiting_too_long_for_review())
 
     def test_get_new_suggestions_waiting_for_review(self) -> None:
         suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
@@ -1852,7 +1617,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         creation_time_in_millisecs = int(creation_time.timestamp() * 1000)
         mock_value = creation_time_in_millisecs
 
-        mock_get_current_time_in_millisecs = lambda: mock_value
+        def mock_get_current_time_in_millisecs():
+            return mock_value
 
         with self.swap(
             utils,
@@ -1896,9 +1662,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             None,
         )
         # This mocked list cannot be empty because then the query will fail.
-        mocked_contributor_dashboard_suggestion_types = [
-            feconf.SUGGESTION_TYPE_ADD_QUESTION
-        ]
+        mocked_contributor_dashboard_suggestion_types = [feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
             feconf,
@@ -1959,13 +1723,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 self.translation_language_code,
             )
         mocked_threshold_review_wait_time_in_days = 2
-        mocked_datetime_less_than_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow + datetime.timedelta(days=1)
-        )
+        mocked_datetime_less_than_review_wait_time_threshold = self.mocked_datetime_utcnow + datetime.timedelta(days=1)
 
-        with self.mock_datetime_utcnow(
-            mocked_datetime_less_than_review_wait_time_threshold
-        ):
+        with self.mock_datetime_utcnow(mocked_datetime_less_than_review_wait_time_threshold):
             with self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
@@ -1993,14 +1753,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 self.translation_language_code,
             )
         mocked_threshold_review_wait_time_in_days = 2
-        mocked_datetime_eq_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow
-            + datetime.timedelta(days=mocked_threshold_review_wait_time_in_days)
-        )
+        mocked_datetime_eq_review_wait_time_threshold = self.mocked_datetime_utcnow + datetime.timedelta(days=mocked_threshold_review_wait_time_in_days)
 
-        with self.mock_datetime_utcnow(
-            mocked_datetime_eq_review_wait_time_threshold
-        ):
+        with self.mock_datetime_utcnow(mocked_datetime_eq_review_wait_time_threshold):
             with self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
@@ -2053,9 +1808,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'exploration.exp1.thread1',
                 self.translation_language_code,
             )
-        with self.mock_datetime_utcnow(
-            self.mocked_datetime_utcnow + datetime.timedelta(days=2)
-        ):
+        with self.mock_datetime_utcnow(self.mocked_datetime_utcnow + datetime.timedelta(days=2)):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 feconf.ENTITY_TYPE_SKILL,
@@ -2070,13 +1823,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 self.question_language_code,
             )
         mocked_threshold_review_wait_time_in_days = 3
-        mocked_datetime_past_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow + datetime.timedelta(days=4)
-        )
+        mocked_datetime_past_review_wait_time_threshold = self.mocked_datetime_utcnow + datetime.timedelta(days=4)
 
-        with self.mock_datetime_utcnow(
-            mocked_datetime_past_review_wait_time_threshold
-        ):
+        with self.mock_datetime_utcnow(mocked_datetime_past_review_wait_time_threshold):
             with self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
@@ -2229,62 +1978,32 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(
-                    ['category1'], 'author_3'
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(['category1'], 'author_3')),
             0,
         )
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(
-                    ['category1'], 'author_2'
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(['category1'], 'author_2')),
             1,
         )
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(
-                    ['category2'], 'author_2'
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(['category2'], 'author_2')),
             1,
         )
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(
-                    ['category1', 'category2'], 'author_3'
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(['category1', 'category2'], 'author_3')),
             1,
         )
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(
-                    ['category1', 'category2', 'category3'], 'author_1'
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(['category1', 'category2', 'category3'], 'author_1')),
             4,
         )
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(
-                    ['category1', 'category_invalid'], 'author_2'
-                )
-            ),
+            len(suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(['category1', 'category_invalid'], 'author_2')),
             1,
         )
-        with self.assertRaisesRegex(
-            Exception, 'Received empty list of score categories'
-        ):
+        with self.assertRaisesRegex(Exception, 'Received empty list of score categories'):
             self.assertEqual(
-                len(
-                    suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories(
-                        [], 'author_1'
-                    )
-                ),
+                len(suggestion_models.GeneralSuggestionModel.get_in_review_suggestions_in_score_categories([], 'author_1')),
                 0,
             )
 
@@ -2315,9 +2034,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_12',
             None,
         )
-        score_categories = (
-            suggestion_models.GeneralSuggestionModel.get_all_score_categories()
-        )
+        score_categories = suggestion_models.GeneralSuggestionModel.get_all_score_categories()
         self.assertIn(self.score_category, score_categories)
         self.assertIn('category1', score_categories)
         self.assertIn('category2', score_categories)
@@ -2430,31 +2147,19 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'fr',
         )
 
-        translation_suggestion_models = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review(
-            self.translation_language_code
-        )
+        translation_suggestion_models = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review(self.translation_language_code)
 
         self.assertEqual(len(translation_suggestion_models), 3)
         # Assert that the order of the returned suggestion models represents
         # the suggestions sorted in descending order, based on how long each
         # suggestion has been waiting for review.
-        self.assertEqual(
-            translation_suggestion_models[0].id, 'exploration.exp1.thread1'
-        )
-        self.assertEqual(
-            translation_suggestion_models[1].id, 'exploration.exp2.thread1'
-        )
-        self.assertEqual(
-            translation_suggestion_models[2].id, 'exploration.exp3.thread1'
-        )
+        self.assertEqual(translation_suggestion_models[0].id, 'exploration.exp1.thread1')
+        self.assertEqual(translation_suggestion_models[1].id, 'exploration.exp2.thread1')
+        self.assertEqual(translation_suggestion_models[2].id, 'exploration.exp3.thread1')
 
-        translation_suggestion_models_with_different_lang_code = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review(
-            'fr'
-        )
+        translation_suggestion_models_with_different_lang_code = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review('fr')
 
-        self.assertEqual(
-            len(translation_suggestion_models_with_different_lang_code), 1
-        )
+        self.assertEqual(len(translation_suggestion_models_with_different_lang_code), 1)
         self.assertEqual(
             translation_suggestion_models_with_different_lang_code[0].id,
             'exploration.exp4.thread1',
@@ -2463,9 +2168,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
         self,
     ) -> None:
-        translation_suggestion_models = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review(
-            'wrong_language_code'
-        )
+        translation_suggestion_models = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review('wrong_language_code')
 
         self.assertEqual(len(translation_suggestion_models), 0)
 
@@ -2504,16 +2207,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS',
             1,
         ):
-            translation_suggestion_models = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review(
-                self.translation_language_code
-            )
+            translation_suggestion_models = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_waiting_longest_for_review(self.translation_language_code)
 
         # There should only be one translation suggestion returned since we
         # changed the maximum translations to fetch to 1.
         self.assertEqual(len(translation_suggestion_models), 1)
-        self.assertEqual(
-            translation_suggestion_models[0].id, 'exploration.exp1.thread1'
-        )
+        self.assertEqual(translation_suggestion_models[0].id, 'exploration.exp1.thread1')
 
     def test_get_question_suggestions_waiting_longest_for_review_max_fetch(
         self,
@@ -2558,9 +2257,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_suggestion_models[0].id, 'skill1.thread1')
 
     def test_export_data_trivial(self) -> None:
-        user_data = suggestion_models.GeneralSuggestionModel.export_data(
-            'non_existent_user'
-        )
+        user_data = suggestion_models.GeneralSuggestionModel.export_data('non_existent_user')
         test_data: Dict[str, str] = {}
         self.assertEqual(user_data, test_data)
 
@@ -2592,9 +2289,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             test_export_language_code,
         )
 
-        user_data = suggestion_models.GeneralSuggestionModel.export_data(
-            'test_export_author'
-        )
+        user_data = suggestion_models.GeneralSuggestionModel.export_data('test_export_author')
 
         test_data = {
             test_export_thread_id: {
@@ -2660,34 +2355,24 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
     ) -> None:
         suggestion_models.CommunityContributionStatsModel(
             id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
-            translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code
-            ),
-            translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code
-            ),
+            translation_reviewer_counts_by_lang_code=(self.translation_reviewer_counts_by_lang_code),
+            translation_suggestion_counts_by_lang_code=(self.translation_suggestion_counts_by_lang_code),
             question_reviewer_count=self.question_reviewer_count,
             question_suggestion_count=self.question_suggestion_count,
         ).put()
 
-        community_contribution_stats_model = (
-            suggestion_models.CommunityContributionStatsModel.get()
-        )
+        community_contribution_stats_model = suggestion_models.CommunityContributionStatsModel.get()
 
         self.assertEqual(
             community_contribution_stats_model.id,
             suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
         )
         self.assertEqual(
-            (
-                community_contribution_stats_model.translation_reviewer_counts_by_lang_code
-            ),
+            (community_contribution_stats_model.translation_reviewer_counts_by_lang_code),
             self.translation_reviewer_counts_by_lang_code,
         )
         self.assertEqual(
-            (
-                community_contribution_stats_model.translation_suggestion_counts_by_lang_code
-            ),
+            (community_contribution_stats_model.translation_suggestion_counts_by_lang_code),
             self.translation_suggestion_counts_by_lang_code,
         )
         self.assertEqual(
@@ -2705,37 +2390,25 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
         """If the model has not been created yet, get should create the model
         with default values.
         """
-        community_contribution_stats_model = (
-            suggestion_models.CommunityContributionStatsModel.get()
-        )
+        community_contribution_stats_model = suggestion_models.CommunityContributionStatsModel.get()
         self.assertEqual(
             community_contribution_stats_model.id,
             suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
         )
         self.assertEqual(
-            (
-                community_contribution_stats_model.translation_reviewer_counts_by_lang_code
-            ),
+            (community_contribution_stats_model.translation_reviewer_counts_by_lang_code),
             {},
         )
         self.assertEqual(
-            (
-                community_contribution_stats_model.translation_suggestion_counts_by_lang_code
-            ),
+            (community_contribution_stats_model.translation_suggestion_counts_by_lang_code),
             {},
         )
-        self.assertEqual(
-            community_contribution_stats_model.question_reviewer_count, 0
-        )
-        self.assertEqual(
-            community_contribution_stats_model.question_suggestion_count, 0
-        )
+        self.assertEqual(community_contribution_stats_model.question_reviewer_count, 0)
+        self.assertEqual(community_contribution_stats_model.question_suggestion_count, 0)
 
     def test_get_deletion_policy_returns_not_applicable(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.CommunityContributionStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.CommunityContributionStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.NOT_APPLICABLE,
         )
 
@@ -2788,25 +2461,15 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=self.TOPIC_ID,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES,
         )
-        translation_contribution_stats_model = model.get(
-            self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
-        )
+        translation_contribution_stats_model = model.get(self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID)
         self.assertEqual(
             model.get_all_by_user_id(self.CONTRIBUTOR_USER_ID),
             [translation_contribution_stats_model],
@@ -2818,28 +2481,16 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=self.TOPIC_ID,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES,
         )
 
-        translation_contribution_stats_model = (
-            suggestion_models.TranslationContributionStatsModel.get(
-                self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
-            )
-        )
+        translation_contribution_stats_model = suggestion_models.TranslationContributionStatsModel.get(self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_contribution_stats_model is not None
@@ -2856,9 +2507,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.SUBMITTED_TRANSLATIONS_COUNT,
         )
         self.assertEqual(
-            (
-                translation_contribution_stats_model.submitted_translation_word_count
-            ),
+            (translation_contribution_stats_model.submitted_translation_word_count),
             self.SUBMITTED_TRANSLATION_WORD_COUNT,
         )
         self.assertEqual(
@@ -2866,15 +2515,11 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_TRANSLATIONS_COUNT,
         )
         self.assertEqual(
-            (
-                translation_contribution_stats_model.accepted_translations_without_reviewer_edits_count
-            ),
+            (translation_contribution_stats_model.accepted_translations_without_reviewer_edits_count),
             self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
         )
         self.assertEqual(
-            (
-                translation_contribution_stats_model.accepted_translation_word_count
-            ),
+            (translation_contribution_stats_model.accepted_translation_word_count),
             self.ACCEPTED_TRANSLATION_WORD_COUNT,
         )
         self.assertEqual(
@@ -2882,9 +2527,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.REJECTED_TRANSLATIONS_COUNT,
         )
         self.assertEqual(
-            (
-                translation_contribution_stats_model.rejected_translation_word_count
-            ),
+            (translation_contribution_stats_model.rejected_translation_word_count),
             self.REJECTED_TRANSLATION_WORD_COUNT,
         )
         self.assertEqual(
@@ -2894,9 +2537,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.TranslationContributionStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.TranslationContributionStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.DELETE,
         )
 
@@ -2933,46 +2574,22 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=self.TOPIC_ID,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES,
         )
-        self.assertTrue(
-            suggestion_models.TranslationContributionStatsModel.has_reference_to_user_id(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        self.assertTrue(suggestion_models.TranslationContributionStatsModel.has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
 
-        (
-            suggestion_models.TranslationContributionStatsModel.apply_deletion_policy(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        (suggestion_models.TranslationContributionStatsModel.apply_deletion_policy(self.CONTRIBUTOR_USER_ID))
 
-        self.assertFalse(
-            suggestion_models.TranslationContributionStatsModel.has_reference_to_user_id(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        self.assertFalse(suggestion_models.TranslationContributionStatsModel.has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
 
     def test_export_data_trivial(self) -> None:
-        user_data = (
-            suggestion_models.TranslationContributionStatsModel.export_data(
-                'non_existent_user'
-            )
-        )
+        user_data = suggestion_models.TranslationContributionStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
@@ -2983,20 +2600,12 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=self.TOPIC_ID,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES,
         )
         model_2_id = suggestion_models.TranslationContributionStatsModel.create(
@@ -3004,91 +2613,45 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=topic_id_2,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES,
         )
-        dates_in_iso_format = [
-            date.isoformat() for date in self.CONTRIBUTION_DATES
-        ]
-        model_1_id_without_user_id = model_1_id.replace(
-            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
-        )
-        model_2_id_without_user_id = model_2_id.replace(
-            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
-        )
+        dates_in_iso_format = [date.isoformat() for date in self.CONTRIBUTION_DATES]
+        model_1_id_without_user_id = model_1_id.replace('.%s.' % self.CONTRIBUTOR_USER_ID, '.')
+        model_2_id_without_user_id = model_2_id.replace('.%s.' % self.CONTRIBUTOR_USER_ID, '.')
         expected_data = {
             model_1_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
                 'topic_id': self.TOPIC_ID,
-                'submitted_translations_count': (
-                    self.SUBMITTED_TRANSLATIONS_COUNT
-                ),
-                'submitted_translation_word_count': (
-                    self.SUBMITTED_TRANSLATION_WORD_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_without_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'rejected_translations_count': (
-                    self.REJECTED_TRANSLATIONS_COUNT
-                ),
-                'rejected_translation_word_count': (
-                    self.REJECTED_TRANSLATION_WORD_COUNT
-                ),
+                'submitted_translations_count': (self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (self.REJECTED_TRANSLATION_WORD_COUNT),
                 'contribution_dates': dates_in_iso_format,
             },
             model_2_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
                 'topic_id': topic_id_2,
-                'submitted_translations_count': (
-                    self.SUBMITTED_TRANSLATIONS_COUNT
-                ),
-                'submitted_translation_word_count': (
-                    self.SUBMITTED_TRANSLATION_WORD_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_without_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'rejected_translations_count': (
-                    self.REJECTED_TRANSLATIONS_COUNT
-                ),
-                'rejected_translation_word_count': (
-                    self.REJECTED_TRANSLATION_WORD_COUNT
-                ),
+                'submitted_translations_count': (self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (self.REJECTED_TRANSLATION_WORD_COUNT),
                 'contribution_dates': dates_in_iso_format,
             },
         }
 
-        user_data = (
-            suggestion_models.TranslationContributionStatsModel.export_data(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        user_data = suggestion_models.TranslationContributionStatsModel.export_data(self.CONTRIBUTOR_USER_ID)
 
         self.assertEqual(expected_data, user_data)
 
@@ -3113,31 +2676,19 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            reviewed_translation_word_count=(
-                self.REVIEWED_TRANSLATION_WORD_COUNT
-            ),
+            reviewed_translation_word_count=(self.REVIEWED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
 
-        translation_review_stats_model = (
-            suggestion_models.TranslationReviewStatsModel.get(
-                self.LANGUAGE_CODE, self.REVIEWER_USER_ID, self.TOPIC_ID
-            )
-        )
+        translation_review_stats_model = suggestion_models.TranslationReviewStatsModel.get(self.LANGUAGE_CODE, self.REVIEWER_USER_ID, self.TOPIC_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_review_stats_model is not None
-        self.assertEqual(
-            translation_review_stats_model.language_code, self.LANGUAGE_CODE
-        )
+        self.assertEqual(translation_review_stats_model.language_code, self.LANGUAGE_CODE)
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id,
             self.REVIEWER_USER_ID,
@@ -3155,9 +2706,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_TRANSLATIONS_COUNT,
         )
         self.assertEqual(
-            (
-                translation_review_stats_model.accepted_translations_with_reviewer_edits_count
-            ),
+            (translation_review_stats_model.accepted_translations_with_reviewer_edits_count),
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
         )
         self.assertEqual(
@@ -3175,9 +2724,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.TranslationReviewStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.TranslationReviewStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.DELETE,
         )
 
@@ -3187,25 +2734,15 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            reviewed_translation_word_count=(
-                self.REVIEWED_TRANSLATION_WORD_COUNT
-            ),
+            reviewed_translation_word_count=(self.REVIEWED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
 
-        translation_review_stats_models = (
-            suggestion_models.TranslationReviewStatsModel.get_all_by_user_id(
-                self.REVIEWER_USER_ID
-            )
-        )
+        translation_review_stats_models = suggestion_models.TranslationReviewStatsModel.get_all_by_user_id(self.REVIEWER_USER_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_review_stats_models is not None
@@ -3214,9 +2751,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         translation_review_stats_model = translation_review_stats_models[0]
 
-        self.assertEqual(
-            translation_review_stats_model.language_code, self.LANGUAGE_CODE
-        )
+        self.assertEqual(translation_review_stats_model.language_code, self.LANGUAGE_CODE)
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id,
             self.REVIEWER_USER_ID,
@@ -3234,9 +2769,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_TRANSLATIONS_COUNT,
         )
         self.assertEqual(
-            (
-                translation_review_stats_model.accepted_translations_with_reviewer_edits_count
-            ),
+            (translation_review_stats_model.accepted_translations_with_reviewer_edits_count),
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
         )
         self.assertEqual(
@@ -3258,41 +2791,21 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            reviewed_translation_word_count=(
-                self.REVIEWED_TRANSLATION_WORD_COUNT
-            ),
+            reviewed_translation_word_count=(self.REVIEWED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.TranslationReviewStatsModel.has_reference_to_user_id(
-                self.REVIEWER_USER_ID
-            )
-        )
+        self.assertTrue(suggestion_models.TranslationReviewStatsModel.has_reference_to_user_id(self.REVIEWER_USER_ID))
 
-        (
-            suggestion_models.TranslationReviewStatsModel.apply_deletion_policy(
-                self.REVIEWER_USER_ID
-            )
-        )
+        (suggestion_models.TranslationReviewStatsModel.apply_deletion_policy(self.REVIEWER_USER_ID))
 
-        self.assertFalse(
-            suggestion_models.TranslationReviewStatsModel.has_reference_to_user_id(
-                self.REVIEWER_USER_ID
-            )
-        )
+        self.assertFalse(suggestion_models.TranslationReviewStatsModel.has_reference_to_user_id(self.REVIEWER_USER_ID))
 
     def test_export_data_trivial(self) -> None:
-        user_data = suggestion_models.TranslationReviewStatsModel.export_data(
-            'non_existent_user'
-        )
+        user_data = suggestion_models.TranslationReviewStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
@@ -3303,16 +2816,10 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            reviewed_translation_word_count=(
-                self.REVIEWED_TRANSLATION_WORD_COUNT
-            ),
+            reviewed_translation_word_count=(self.REVIEWED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
@@ -3321,81 +2828,41 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=topic_id_2,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            reviewed_translation_word_count=(
-                self.REVIEWED_TRANSLATION_WORD_COUNT
-            ),
+            reviewed_translation_word_count=(self.REVIEWED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        model_1_id_without_user_id = model_1_id.replace(
-            '.%s.' % self.REVIEWER_USER_ID, '.'
-        )
-        model_2_id_without_user_id = model_2_id.replace(
-            '.%s.' % self.REVIEWER_USER_ID, '.'
-        )
+        model_1_id_without_user_id = model_1_id.replace('.%s.' % self.REVIEWER_USER_ID, '.')
+        model_2_id_without_user_id = model_2_id.replace('.%s.' % self.REVIEWER_USER_ID, '.')
         expected_data = {
             model_1_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
                 'topic_id': self.TOPIC_ID,
-                'reviewed_translations_count': (
-                    self.REVIEWED_TRANSLATIONS_COUNT
-                ),
-                'reviewed_translation_word_count': (
-                    self.REVIEWED_TRANSLATION_WORD_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_with_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'reviewed_translations_count': (self.REVIEWED_TRANSLATIONS_COUNT),
+                'reviewed_translation_word_count': (self.REVIEWED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
             model_2_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
                 'topic_id': topic_id_2,
-                'reviewed_translations_count': (
-                    self.REVIEWED_TRANSLATIONS_COUNT
-                ),
-                'reviewed_translation_word_count': (
-                    self.REVIEWED_TRANSLATION_WORD_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_with_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'reviewed_translations_count': (self.REVIEWED_TRANSLATIONS_COUNT),
+                'reviewed_translation_word_count': (self.REVIEWED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
         }
 
-        user_data = suggestion_models.TranslationReviewStatsModel.export_data(
-            self.REVIEWER_USER_ID
-        )
+        user_data = suggestion_models.TranslationReviewStatsModel.export_data(self.REVIEWER_USER_ID)
 
         self.assertEqual(expected_data, user_data)
 
@@ -3443,18 +2910,12 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
 
-        question_contribution_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
-            )
-        )
+        question_contribution_stats_model = suggestion_models.QuestionContributionStatsModel.get(self.CONTRIBUTOR_USER_ID, self.TOPIC_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_contribution_stats_model is not None
@@ -3471,9 +2932,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_COUNT,
         )
         self.assertEqual(
-            (
-                question_contribution_stats_model.accepted_questions_without_reviewer_edits_count
-            ),
+            (question_contribution_stats_model.accepted_questions_without_reviewer_edits_count),
             self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
         )
         self.assertEqual(
@@ -3491,27 +2950,19 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
 
-        question_contribution_stats_models = (
-            suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        question_contribution_stats_models = suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(self.CONTRIBUTOR_USER_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_contribution_stats_models is not None
 
         self.assertEqual(len(question_contribution_stats_models), 1)
 
-        question_contribution_stats_model = question_contribution_stats_models[
-            0
-        ]
+        question_contribution_stats_model = question_contribution_stats_models[0]
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_contribution_stats_model is not None
@@ -3528,9 +2979,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_COUNT,
         )
         self.assertEqual(
-            (
-                question_contribution_stats_model.accepted_questions_without_reviewer_edits_count
-            ),
+            (question_contribution_stats_model.accepted_questions_without_reviewer_edits_count),
             self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
         )
         self.assertEqual(
@@ -3544,9 +2993,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.QuestionContributionStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.QuestionContributionStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.DELETE,
         )
 
@@ -3556,36 +3003,18 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.QuestionContributionStatsModel.has_reference_to_user_id(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        self.assertTrue(suggestion_models.QuestionContributionStatsModel.has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
 
-        (
-            suggestion_models.QuestionContributionStatsModel.apply_deletion_policy(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        (suggestion_models.QuestionContributionStatsModel.apply_deletion_policy(self.CONTRIBUTOR_USER_ID))
 
-        self.assertFalse(
-            suggestion_models.QuestionContributionStatsModel.has_reference_to_user_id(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        self.assertFalse(suggestion_models.QuestionContributionStatsModel.has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
 
     def test_export_data_trivial(self) -> None:
-        user_data = (
-            suggestion_models.QuestionContributionStatsModel.export_data(
-                'non_existent_user'
-            )
-        )
+        user_data = suggestion_models.QuestionContributionStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
@@ -3596,9 +3025,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
@@ -3607,9 +3034,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=topic_id_2,
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
@@ -3620,37 +3045,21 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
                 'topic_id': self.TOPIC_ID,
                 'submitted_questions_count': (self.SUBMITTED_QUESTION_COUNT),
                 'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-                'accepted_questions_without_reviewer_edits_count': (
-                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'accepted_questions_without_reviewer_edits_count': (self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
             model_2_id_without_user_id: {
                 'topic_id': topic_id_2,
                 'submitted_questions_count': (self.SUBMITTED_QUESTION_COUNT),
                 'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-                'accepted_questions_without_reviewer_edits_count': (
-                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'accepted_questions_without_reviewer_edits_count': (self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
         }
 
-        user_data = (
-            suggestion_models.QuestionContributionStatsModel.export_data(
-                self.CONTRIBUTOR_USER_ID
-            )
-        )
+        user_data = suggestion_models.QuestionContributionStatsModel.export_data(self.CONTRIBUTOR_USER_ID)
 
         self.assertEqual(expected_data, user_data)
 
@@ -3695,24 +3104,16 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
 
-        question_review_stats_model = (
-            suggestion_models.QuestionReviewStatsModel.get(
-                self.REVIEWER_USER_ID, self.TOPIC_ID
-            )
-        )
+        question_review_stats_model = suggestion_models.QuestionReviewStatsModel.get(self.REVIEWER_USER_ID, self.TOPIC_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_review_stats_model is not None
-        self.assertEqual(
-            question_review_stats_model.reviewer_user_id, self.REVIEWER_USER_ID
-        )
+        self.assertEqual(question_review_stats_model.reviewer_user_id, self.REVIEWER_USER_ID)
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count,
             self.REVIEWED_QUESTIONS_COUNT,
@@ -3722,9 +3123,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_COUNT,
         )
         self.assertEqual(
-            (
-                question_review_stats_model.accepted_questions_with_reviewer_edits_count
-            ),
+            (question_review_stats_model.accepted_questions_with_reviewer_edits_count),
             self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
         )
         self.assertEqual(
@@ -3742,27 +3141,19 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
 
-        question_review_stats_models = (
-            suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
-                self.REVIEWER_USER_ID
-            )
-        )
+        question_review_stats_models = suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(self.REVIEWER_USER_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_review_stats_models is not None
 
         question_review_stats_model = question_review_stats_models[0]
 
-        self.assertEqual(
-            question_review_stats_model.reviewer_user_id, self.REVIEWER_USER_ID
-        )
+        self.assertEqual(question_review_stats_model.reviewer_user_id, self.REVIEWER_USER_ID)
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count,
             self.REVIEWED_QUESTIONS_COUNT,
@@ -3772,9 +3163,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_COUNT,
         )
         self.assertEqual(
-            (
-                question_review_stats_model.accepted_questions_with_reviewer_edits_count
-            ),
+            (question_review_stats_model.accepted_questions_with_reviewer_edits_count),
             self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
         )
         self.assertEqual(
@@ -3798,34 +3187,18 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.QuestionReviewStatsModel.has_reference_to_user_id(
-                self.REVIEWER_USER_ID
-            )
-        )
+        self.assertTrue(suggestion_models.QuestionReviewStatsModel.has_reference_to_user_id(self.REVIEWER_USER_ID))
 
-        (
-            suggestion_models.QuestionReviewStatsModel.apply_deletion_policy(
-                self.REVIEWER_USER_ID
-            )
-        )
+        (suggestion_models.QuestionReviewStatsModel.apply_deletion_policy(self.REVIEWER_USER_ID))
 
-        self.assertFalse(
-            suggestion_models.QuestionReviewStatsModel.has_reference_to_user_id(
-                self.REVIEWER_USER_ID
-            )
-        )
+        self.assertFalse(suggestion_models.QuestionReviewStatsModel.has_reference_to_user_id(self.REVIEWER_USER_ID))
 
     def test_export_data_trivial(self) -> None:
-        user_data = suggestion_models.QuestionReviewStatsModel.export_data(
-            'non_existent_user'
-        )
+        user_data = suggestion_models.QuestionReviewStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
@@ -3836,9 +3209,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
@@ -3847,9 +3218,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             topic_id=topic_id_2,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
@@ -3860,35 +3229,21 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
                 'topic_id': self.TOPIC_ID,
                 'reviewed_questions_count': (self.REVIEWED_QUESTIONS_COUNT),
                 'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-                'accepted_questions_with_reviewer_edits_count': (
-                    self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'accepted_questions_with_reviewer_edits_count': (self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
             model_2_id_without_user_id: {
                 'topic_id': topic_id_2,
                 'reviewed_questions_count': (self.REVIEWED_QUESTIONS_COUNT),
                 'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-                'accepted_questions_with_reviewer_edits_count': (
-                    self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'accepted_questions_with_reviewer_edits_count': (self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
         }
 
-        user_data = suggestion_models.QuestionReviewStatsModel.export_data(
-            self.REVIEWER_USER_ID
-        )
+        user_data = suggestion_models.QuestionReviewStatsModel.export_data(self.REVIEWER_USER_ID)
 
         self.assertEqual(expected_data, user_data)
 
@@ -3916,9 +3271,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class TranslationSubmitterTotalContributionStatsModelUnitTests(
-    test_utils.GenericTestBase
-):
+class TranslationSubmitterTotalContributionStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the TranslationSubmitterTotalContributionStatsModel class."""
 
     SUGGESTION_LANGUAGE_CODE: Final = 'es'
@@ -3938,41 +3291,27 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
     def test_get_all_model_instances_matching_the_given_user_id(self) -> None:
-        model = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-        )
+        model = suggestion_models.TranslationSubmitterTotalContributionStatsModel
         self.assertEqual(model.get_all_by_user_id(self.USER_ID_1), [])
 
         model.create(
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        translation_submitter_total_contribution_stats = model.get(
-            self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1
-        )
+        translation_submitter_total_contribution_stats = model.get(self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1)
         self.assertEqual(
             model.get_all_by_user_id(self.USER_ID_1),
             [translation_submitter_total_contribution_stats],
@@ -3988,24 +3327,14 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=1,
             overall_accuracy=4,
             submitted_translations_count=20,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -4016,24 +3345,14 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=2,
             overall_accuracy=3,
             submitted_translations_count=10,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -4044,66 +3363,42 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=3,
             overall_accuracy=2,
             submitted_translations_count=50,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_4',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=4,
             overall_accuracy=1,
             submitted_translations_count=4,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
 
         # Check for decreasing performance(default) sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -4112,15 +3407,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for non-performance sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4129,15 +3422,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for decreasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4146,15 +3437,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for increasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -4163,15 +3452,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for decreasing Translated cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -4180,15 +3467,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for increasing Translated cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertEqual(sorted_results[1].id, 'model_2')
@@ -4196,15 +3481,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for decreasing last activity sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -4213,15 +3496,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for increasing last activity sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4239,24 +3520,14 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=1,
             overall_accuracy=4,
             submitted_translations_count=20,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -4267,24 +3538,14 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=2,
             overall_accuracy=2,
             submitted_translations_count=10,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -4295,66 +3556,42 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=3,
             overall_accuracy=1,
             submitted_translations_count=50,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_4',
             language_code='hi',
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=4,
             overall_accuracy=1,
             submitted_translations_count=4,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
 
         # Check for 'es' language filter.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -4363,15 +3600,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for 'hi' language filter.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='hi',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='hi',
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -4379,15 +3614,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 1)
 
         # Check for topic filter ['topic1', 'topic2'].
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                topic_ids=['topic1', 'topic2'],
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            topic_ids=['topic1', 'topic2'],
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -4396,15 +3629,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for last activity under 7 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=7,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=7,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4412,15 +3643,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for last activity under 90 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=90,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=90,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -4429,15 +3658,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for no sorted_results in given time.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=7,
-                language_code='hi',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=7,
+            language_code='hi',
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -4453,20 +3680,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=1,
             overall_accuracy=4,
             submitted_translations_count=20,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.datetime.utcnow(),
         ).put()
@@ -4479,20 +3698,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=2,
             overall_accuracy=2,
             submitted_translations_count=10,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.datetime.utcnow(),
         ).put()
@@ -4505,66 +3716,42 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=3,
             overall_accuracy=1,
             submitted_translations_count=50,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_4',
             language_code='hi',
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=4,
             overall_accuracy=1,
             submitted_translations_count=4,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
 
         # Check for topic filter and non-performance sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
-                topic_ids=['topic1', 'topic2'],
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
+            topic_ids=['topic1', 'topic2'],
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4573,15 +3760,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
 
         # Check for decreasing last activity sort order and
         # topic filter.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                topic_ids=['topic1', 'topic2'],
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+            topic_ids=['topic1', 'topic2'],
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -4599,24 +3784,14 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=1,
             overall_accuracy=4,
             submitted_translations_count=20,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -4627,24 +3802,14 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=2,
             overall_accuracy=3,
             submitted_translations_count=10,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -4655,66 +3820,42 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=3,
             overall_accuracy=2,
             submitted_translations_count=50,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_4',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=4,
             overall_accuracy=1,
             submitted_translations_count=4,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
 
         # Check for pagination with offset 2.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=2,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=2,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -4723,67 +3864,43 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for pagination with no results.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=4,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=4,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 4)
 
     def test_has_reference_to_user_id(self) -> None:
-        model = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-        )
+        model = suggestion_models.TranslationSubmitterTotalContributionStatsModel
         model.create(
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
-        self.assertFalse(
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id(
-                'non-existent_user'
-            )
-        )
+        self.assertTrue(suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
+        self.assertFalse(suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id('non-existent_user'))
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.TranslationSubmitterTotalContributionStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.TranslationSubmitterTotalContributionStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.DELETE,
         )
 
@@ -4809,15 +3926,11 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             'first_contribution_date': base_models.EXPORT_POLICY.EXPORTED,
             'last_contribution_date': base_models.EXPORT_POLICY.EXPORTED,
         }
-        model = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-        )
+        model = suggestion_models.TranslationSubmitterTotalContributionStatsModel
         self.assertEqual(model.get_export_policy(), expected_dict)
 
     def test_get_model_association_to_user(self) -> None:
-        model = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-        )
+        model = suggestion_models.TranslationSubmitterTotalContributionStatsModel
         self.assertEqual(
             model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER,
@@ -4827,52 +3940,28 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         suggestion_models.TranslationSubmitterTotalContributionStatsModel.create(  # pylint: disable=line-too-long
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertTrue(suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
-        (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.apply_deletion_policy(
-                self.USER_ID_1
-            )
-        )
+        (suggestion_models.TranslationSubmitterTotalContributionStatsModel.apply_deletion_policy(self.USER_ID_1))
 
-        self.assertFalse(
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertFalse(suggestion_models.TranslationSubmitterTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
     def test_export_data_trivial(self) -> None:
-        user_data = suggestion_models.TranslationSubmitterTotalContributionStatsModel.export_data(
-            'non_existent_user'
-        )
+        user_data = suggestion_models.TranslationSubmitterTotalContributionStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
@@ -4880,27 +3969,17 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         suggestion_models.TranslationSubmitterTotalContributionStatsModel.create(  # pylint: disable=line-too-long
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=(
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-            ),
+            topic_ids_with_translation_submissions=(self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
@@ -4912,20 +3991,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT
-            ),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_without_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT
-            ),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
@@ -4934,39 +4005,19 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         expected_data = {
             model_1_id_without_user_id: {
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'topic_ids_with_translation_submissions': (
-                    self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
-                ),
+                'topic_ids_with_translation_submissions': (self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
                 'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
                 'recent_performance': self.RECENT_PERFORMANCE,
                 'overall_accuracy': self.OVERALL_ACCURACY,
-                'submitted_translations_count': (
-                    self.SUBMITTED_TRANSLATIONS_COUNT
-                ),
-                'submitted_translation_word_count': (
-                    self.SUBMITTED_TRANSLATION_WORD_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_without_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'rejected_translations_count': (
-                    self.REJECTED_TRANSLATIONS_COUNT
-                ),
-                'rejected_translation_word_count': (
-                    self.REJECTED_TRANSLATION_WORD_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'submitted_translations_count': (self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (self.REJECTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
             model_2_id_without_user_id: {
                 'language_code': 'hi',
@@ -4974,46 +4025,24 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
                 'recent_performance': self.RECENT_PERFORMANCE,
                 'overall_accuracy': self.OVERALL_ACCURACY,
-                'submitted_translations_count': (
-                    self.SUBMITTED_TRANSLATIONS_COUNT
-                ),
-                'submitted_translation_word_count': (
-                    self.SUBMITTED_TRANSLATION_WORD_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_without_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'rejected_translations_count': (
-                    self.REJECTED_TRANSLATIONS_COUNT
-                ),
-                'rejected_translation_word_count': (
-                    self.REJECTED_TRANSLATION_WORD_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'submitted_translations_count': (self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (self.REJECTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
         }
 
-        user_data = suggestion_models.TranslationSubmitterTotalContributionStatsModel.export_data(
-            self.USER_ID_1
-        )
+        user_data = suggestion_models.TranslationSubmitterTotalContributionStatsModel.export_data(self.USER_ID_1)
 
         self.assertEqual(expected_data, user_data)
 
 
-class TranslationReviewerTotalContributionStatsModelUnitTests(
-    test_utils.GenericTestBase
-):
+class TranslationReviewerTotalContributionStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the TranslationReviewerTotalContributionStatsModel class."""
 
     LANGUAGE_CODE = 'es'
@@ -5029,9 +4058,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.TranslationReviewerTotalContributionStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.TranslationReviewerTotalContributionStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.DELETE,
         )
 
@@ -5042,24 +4069,16 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         model.create(
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        translation_reviewer_total_contribution_stats = model.get(
-            self.LANGUAGE_CODE, self.USER_ID_1
-        )
+        translation_reviewer_total_contribution_stats = model.get(self.LANGUAGE_CODE, self.USER_ID_1)
         self.assertEqual(
             model.get_all_by_user_id(self.USER_ID_1),
             [translation_reviewer_total_contribution_stats],
@@ -5070,96 +4089,62 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=10,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_2',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=20,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_3',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=30,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_4',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=40,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(155)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(155)),
         ).put()
 
         # Check for decreasing order of reviewed cards(default)
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5168,14 +4153,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for increasing order of reviewed cards.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5184,14 +4167,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for decreasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5200,14 +4181,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for increasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5220,59 +4199,37 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=10,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_2',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=20,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_3',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=30,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.datetime.utcnow(),
@@ -5281,33 +4238,23 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_4',
             language_code='hi',
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
 
         # Check for 'es' language filter.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5316,14 +4263,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for 'hi' language filter.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=None,
-                language_code='hi',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=None,
+            language_code='hi',
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5331,14 +4276,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 1)
 
         # Check for max_days_since_last_activity filter within 7 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=7,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=7,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5346,14 +4289,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for max_days_since_last_activity filter within 90 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=90,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=90,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5362,14 +4303,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for no sorted_results within 7 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=7,
-                language_code='hi',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=7,
+            language_code='hi',
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5380,17 +4319,11 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=10,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.date.today(),
@@ -5399,75 +4332,49 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_2',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=20,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_3',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=30,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_4',
             language_code='hi',
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
 
         # Check for language filter and IncreasingLastActivity sort.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                max_days_since_last_activity=None,
-                language_code='hi',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+            max_days_since_last_activity=None,
+            language_code='hi',
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5476,14 +4383,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
 
         # Check for max_days_since_last_activity filter within 7 days
         # and IncreasingReviewedTranslations sort.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                max_days_since_last_activity=7,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+            max_days_since_last_activity=7,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5495,38 +4400,24 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=10,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_2',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=20,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.datetime.utcnow(),
@@ -5535,17 +4426,11 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_3',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=30,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.datetime.utcnow(),
@@ -5554,33 +4439,23 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_4',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=40,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
 
         # Check for Pagination with offset 2.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=2,
-                sort_by=None,
-                max_days_since_last_activity=None,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=2,
+            sort_by=None,
+            max_days_since_last_activity=None,
+            language_code='es',
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5593,38 +4468,24 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=10,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_2',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=20,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.datetime.utcnow(),
@@ -5633,17 +4494,11 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_3',
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=30,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
             last_contribution_date=datetime.datetime.utcnow(),
@@ -5652,61 +4507,47 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             id='model_4',
             language_code='hi',
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(65)),
         ).put()
 
         # Check for last_acitvity filter within 7 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                max_days_since_last_activity=7,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+            max_days_since_last_activity=7,
+            language_code='es',
         )
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
         # Check for last_acitvity filter within 90 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                max_days_since_last_activity=90,
-                language_code='es',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
+            max_days_since_last_activity=90,
+            language_code='es',
         )
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for no sorted_results within 7 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=7,
-                language_code='hi',
-            )
+        sorted_results, next_offset, more = suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=7,
+            language_code='hi',
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5716,43 +4557,23 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertTrue(suggestion_models.TranslationReviewerTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
-        (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.apply_deletion_policy(
-                self.USER_ID_1
-            )
-        )
+        (suggestion_models.TranslationReviewerTotalContributionStatsModel.apply_deletion_policy(self.USER_ID_1))
 
-        self.assertFalse(
-            suggestion_models.TranslationReviewerTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertFalse(suggestion_models.TranslationReviewerTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
     def test_export_data_trivial(self) -> None:
-        user_data = suggestion_models.TranslationReviewerTotalContributionStatsModel.export_data(
-            'non_existent_user'
-        )
+        user_data = suggestion_models.TranslationReviewerTotalContributionStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
@@ -5760,17 +4581,11 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(  # pylint: disable=line-too-long
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
@@ -5778,17 +4593,11 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(  # pylint: disable=line-too-long
             language_code='hi',
             contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=(
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-            ),
+            topic_ids_with_translation_reviews=(self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT
-            ),
+            accepted_translations_with_reviewer_edits_count=(self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
@@ -5798,63 +4607,29 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         expected_data = {
             model_1_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
-                'topic_ids_with_translation_reviews': (
-                    self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-                ),
-                'reviewed_translations_count': (
-                    self.REVIEWED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_with_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'rejected_translations_count': (
-                    self.REJECTED_TRANSLATIONS_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'topic_ids_with_translation_reviews': (self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+                'reviewed_translations_count': (self.REVIEWED_TRANSLATIONS_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
             model_2_id_without_user_id: {
                 'language_code': 'hi',
-                'topic_ids_with_translation_reviews': (
-                    self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
-                ),
-                'reviewed_translations_count': (
-                    self.REVIEWED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_count': (
-                    self.ACCEPTED_TRANSLATIONS_COUNT
-                ),
-                'accepted_translations_with_reviewer_edits_count': (
-                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-                ),
-                'accepted_translation_word_count': (
-                    self.ACCEPTED_TRANSLATION_WORD_COUNT
-                ),
-                'rejected_translations_count': (
-                    self.REJECTED_TRANSLATIONS_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()
-                ),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat()
-                ),
+                'topic_ids_with_translation_reviews': (self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+                'reviewed_translations_count': (self.REVIEWED_TRANSLATIONS_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
             },
         }
 
-        user_data = suggestion_models.TranslationReviewerTotalContributionStatsModel.export_data(
-            self.USER_ID_1
-        )
+        user_data = suggestion_models.TranslationReviewerTotalContributionStatsModel.export_data(self.USER_ID_1)
 
         self.assertEqual(expected_data, user_data)
 
@@ -5886,9 +4661,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         )
 
 
-class QuestionSubmitterTotalContributionStatsModelUnitTests(
-    test_utils.GenericTestBase
-):
+class QuestionSubmitterTotalContributionStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSubmitterTotalContributionStatsModel class."""
 
     USER_ID_1 = 'uid_01234567890123456789012345678911'
@@ -5916,14 +4689,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=30.0,
             submitted_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -5934,14 +4703,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=20.0,
             submitted_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -5952,14 +4717,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=10.0,
             submitted_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_4',
@@ -5970,25 +4731,19 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=5.0,
             submitted_questions_count=40,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for decreasing performance(default) sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5997,14 +4752,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for increasing performance sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6013,14 +4766,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for decreasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6029,14 +4780,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for increasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -6045,14 +4794,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for decreasing Submitted cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -6061,14 +4808,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for increasing Submitted cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6077,14 +4822,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for decreasing last activity sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6093,14 +4836,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for increasing last activity sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -6118,14 +4859,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=30.0,
             submitted_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -6136,14 +4873,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=20.0,
             submitted_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -6154,14 +4887,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=10.0,
             submitted_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_4',
@@ -6172,25 +4901,19 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=5.0,
             submitted_questions_count=40,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for topic filter.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=4,
-                offset=0,
-                sort_by=None,
-                topic_ids=['topic1', 'topic2'],
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=4,
+            offset=0,
+            sort_by=None,
+            topic_ids=['topic1', 'topic2'],
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6199,14 +4922,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for max_days_since_last_activity under 7 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=7,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=7,
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -6214,14 +4935,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for max_days_since_last_activity under 90 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=90,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=90,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -6230,14 +4949,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results in given time.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=['non_existent_topic'],
-                max_days_since_last_activity=7,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=None,
+            topic_ids=['non_existent_topic'],
+            max_days_since_last_activity=7,
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6253,14 +4970,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=30.0,
             submitted_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -6271,14 +4984,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=20.0,
             submitted_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -6289,14 +4998,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=10.0,
             submitted_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_4',
@@ -6307,25 +5012,19 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=5.0,
             submitted_questions_count=40,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for topic filter and non-performance sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=1,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
-                topic_ids=['topic1', 'topic2'],
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=1,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
+            topic_ids=['topic1', 'topic2'],
+            max_days_since_last_activity=None,
         )
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
@@ -6333,14 +5032,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
 
         # Check for max_days_since_last_activity in 90 days
         # and DecreasingLastActivity order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                topic_ids=None,
-                max_days_since_last_activity=90,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+            topic_ids=None,
+            max_days_since_last_activity=90,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6358,14 +5055,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=30.0,
             submitted_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(125)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -6376,14 +5069,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=20.0,
             submitted_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -6394,14 +5083,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=10.0,
             submitted_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_4',
@@ -6412,25 +5097,19 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             overall_accuracy=5.0,
             submitted_questions_count=40,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for pagination with offset=2.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=2,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=2,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6439,14 +5118,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 4)
 
         # Check for pagination with no results.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=4,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=4,
+            sort_by=None,
+            topic_ids=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6454,94 +5131,62 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.DELETE,
         )
 
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
-            topic_ids_with_question_submissions=(
-                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS
-            ),
+            topic_ids_with_question_submissions=(self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertTrue(suggestion_models.QuestionSubmitterTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
-        (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.apply_deletion_policy(
-                self.USER_ID_1
-            )
-        )
+        (suggestion_models.QuestionSubmitterTotalContributionStatsModel.apply_deletion_policy(self.USER_ID_1))
 
-        self.assertFalse(
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertFalse(suggestion_models.QuestionSubmitterTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
     def test_export_data_trivial(self) -> None:
-        user_data = suggestion_models.QuestionSubmitterTotalContributionStatsModel.export_data(
-            'non_existent_user'
-        )
+        user_data = suggestion_models.QuestionSubmitterTotalContributionStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
-            topic_ids_with_question_submissions=(
-                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS
-            ),
+            topic_ids_with_question_submissions=(self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_without_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
         expected_data = {
-            'topic_ids_with_question_submissions': (
-                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS
-            ),
+            'topic_ids_with_question_submissions': (self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
             'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
             'recent_performance': self.RECENT_PERFORMANCE,
             'overall_accuracy': self.OVERALL_ACCURACY,
             'submitted_questions_count': (self.SUBMITTED_QUESTIONS_COUNT),
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_without_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_without_reviewer_edits_count': (self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             'rejected_questions_count': (self.REJECTED_QUESTIONS_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE.isoformat()
-            ),
+            'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
             'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
         }
 
-        user_data = suggestion_models.QuestionSubmitterTotalContributionStatsModel.export_data(
-            self.USER_ID_1
-        )
+        user_data = suggestion_models.QuestionSubmitterTotalContributionStatsModel.export_data(self.USER_ID_1)
 
         self.assertEqual(expected_data, user_data)
 
@@ -6573,9 +5218,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         )
 
 
-class QuestionReviewerTotalContributionStatsModelUnitTests(
-    test_utils.GenericTestBase
-):
+class QuestionReviewerTotalContributionStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionReviewerTotalContributionStatsModel class."""
 
     USER_ID_1 = 'uid_01234567890123456789012345678911'
@@ -6597,14 +5240,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1'],
             reviewed_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_2',
@@ -6612,14 +5251,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1', 'topic2'],
             reviewed_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_3',
@@ -6627,24 +5262,18 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic3'],
             reviewed_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for decreasing order of reviewed questions(default)
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6653,13 +5282,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for increasing order of reviewed questions.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=3,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=3,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6668,13 +5295,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for decreasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6683,13 +5308,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for increasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6704,14 +5327,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1'],
             reviewed_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_2',
@@ -6719,14 +5338,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1', 'topic2'],
             reviewed_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_3',
@@ -6734,24 +5349,18 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic3'],
             reviewed_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for max_days_since_last_activity filter within 7 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=7,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=7,
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6759,13 +5368,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for max_days_since_last_activity filter within 90 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=90,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=90,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6774,13 +5381,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results within 1 day.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                max_days_since_last_activity=1,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=None,
+            max_days_since_last_activity=1,
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6793,14 +5398,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1'],
             reviewed_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_2',
@@ -6808,14 +5409,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1', 'topic2'],
             reviewed_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_3',
@@ -6823,25 +5420,19 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic3'],
             reviewed_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for max_days_since_last_activity filter within 90 days
         # and IncreasingReviewedQuestions sort.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                max_days_since_last_activity=90,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
+            max_days_since_last_activity=90,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6851,13 +5442,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
 
         # Check for max_days_since_last_activity filter within 7 days
         # and IncreasingReviewedQuestions sort.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                max_days_since_last_activity=7,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
+            max_days_since_last_activity=7,
         )
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6866,13 +5455,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
 
         # Check for max_days_since_last_activity filter within 90 days
         # and IncreasingLastActivity sort.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                max_days_since_last_activity=90,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=suggestion_models.SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
+            max_days_since_last_activity=90,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6887,14 +5474,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1'],
             reviewed_questions_count=10,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(95)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_2',
@@ -6902,14 +5485,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic1', 'topic2'],
             reviewed_questions_count=20,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(35)),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_3',
@@ -6917,24 +5496,18 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             topic_ids_with_question_reviews=['topic3'],
             reviewed_questions_count=30,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
-            ),
+            last_contribution_date=(datetime.date.today() - datetime.timedelta(5)),
         ).put()
 
         # Check for pagination with offset=1.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=1,
-                sort_by=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=1,
+            sort_by=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6943,13 +5516,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(next_offset, 3)
 
         # Check for pagination with no results.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
-                page_size=2,
-                offset=3,
-                sort_by=None,
-                max_days_since_last_activity=None,
-            )
+        sorted_results, next_offset, more = suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
+            page_size=2,
+            offset=3,
+            sort_by=None,
+            max_days_since_last_activity=None,
         )
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6957,85 +5528,53 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            (
-                suggestion_models.QuestionReviewerTotalContributionStatsModel.get_deletion_policy()
-            ),
+            (suggestion_models.QuestionReviewerTotalContributionStatsModel.get_deletion_policy()),
             base_models.DELETION_POLICY.DELETE,
         )
 
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
-            topic_ids_with_question_reviews=(
-                self.TOPIC_IDS_WITH_QUESTION_REVIEWS
-            ),
+            topic_ids_with_question_reviews=(self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
-        self.assertTrue(
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertTrue(suggestion_models.QuestionReviewerTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
-        (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.apply_deletion_policy(
-                self.USER_ID_1
-            )
-        )
+        (suggestion_models.QuestionReviewerTotalContributionStatsModel.apply_deletion_policy(self.USER_ID_1))
 
-        self.assertFalse(
-            suggestion_models.QuestionReviewerTotalContributionStatsModel.has_reference_to_user_id(
-                self.USER_ID_1
-            )
-        )
+        self.assertFalse(suggestion_models.QuestionReviewerTotalContributionStatsModel.has_reference_to_user_id(self.USER_ID_1))
 
     def test_export_data_trivial(self) -> None:
-        user_data = suggestion_models.QuestionReviewerTotalContributionStatsModel.export_data(
-            'non_existent_user'
-        )
+        user_data = suggestion_models.QuestionReviewerTotalContributionStatsModel.export_data('non_existent_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
-            topic_ids_with_question_reviews=(
-                self.TOPIC_IDS_WITH_QUESTION_REVIEWS
-            ),
+            topic_ids_with_question_reviews=(self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            accepted_questions_with_reviewer_edits_count=(self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE,
         )
         expected_data = {
-            'topic_ids_with_question_reviews': (
-                self.TOPIC_IDS_WITH_QUESTION_REVIEWS
-            ),
+            'topic_ids_with_question_reviews': (self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
             'reviewed_questions_count': (self.REVIEWED_QUESTIONS_COUNT),
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_with_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_with_reviewer_edits_count': (self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE.isoformat()
-            ),
+            'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
             'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat()),
         }
 
-        user_data = suggestion_models.QuestionReviewerTotalContributionStatsModel.export_data(
-            self.USER_ID_1
-        )
+        user_data = suggestion_models.QuestionReviewerTotalContributionStatsModel.export_data(self.USER_ID_1)
 
         self.assertEqual(expected_data, user_data)
 
@@ -7114,42 +5653,26 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        language_coordinator_model = (
-            suggestion_models.TranslationCoordinatorsModel(
-                id=self.LANGUAGE_1_ID,
-                coordinator_ids=['coordinator_id'],
-                coordinators_count=1,
-            )
+        language_coordinator_model = suggestion_models.TranslationCoordinatorsModel(
+            id=self.LANGUAGE_1_ID,
+            coordinator_ids=['coordinator_id'],
+            coordinators_count=1,
         )
         language_coordinator_model.put()
-        self.assertTrue(
-            suggestion_models.TranslationCoordinatorsModel.has_reference_to_user_id(
-                'coordinator_id'
-            )
-        )
-        self.assertFalse(
-            suggestion_models.TranslationCoordinatorsModel.has_reference_to_user_id(
-                'x_id'
-            )
-        )
+        self.assertTrue(suggestion_models.TranslationCoordinatorsModel.has_reference_to_user_id('coordinator_id'))
+        self.assertFalse(suggestion_models.TranslationCoordinatorsModel.has_reference_to_user_id('x_id'))
 
     def test_export_data_nontrivial(self) -> None:
         """Tests nontrivial export data on user with some coordinated
         languages.
         """
-        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(
-            self.USER_ID_2
-        )
-        expected_data = {
-            'coordinated_language_ids': [self.LANGUAGE_4_ID, self.LANGUAGE_5_ID]
-        }
+        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(self.USER_ID_2)
+        expected_data = {'coordinated_language_ids': [self.LANGUAGE_4_ID, self.LANGUAGE_5_ID]}
         self.assertEqual(user_data, expected_data)
 
     def test_export_data_trivial(self) -> None:
         """Tests trivial export data on user with no coordinated languages."""
-        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(
-            self.USER_ID_1
-        )
+        user_data = suggestion_models.TranslationCoordinatorsModel.export_data(self.USER_ID_1)
         expected_data: Dict[str, List[str]] = {'coordinated_language_ids': []}
         self.assertEqual(user_data, expected_data)
 
@@ -7178,27 +5701,15 @@ class TranslationCoordinatorsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_returns_model_when_it_exists(self) -> None:
-        translation_coordinators_model = (
-            suggestion_models.TranslationCoordinatorsModel.get(
-                self.LANGUAGE_4_ID
-            )
-        )
+        translation_coordinators_model = suggestion_models.TranslationCoordinatorsModel.get(self.LANGUAGE_4_ID)
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_coordinators_model is not None
         self.assertEqual(translation_coordinators_model.id, self.LANGUAGE_4_ID)
 
     def test_get_model_by_user_id(self) -> None:
-        translation_coordinators_models = (
-            suggestion_models.TranslationCoordinatorsModel.get_by_user(
-                self.USER_ID_2
-            )
-        )
+        translation_coordinators_models = suggestion_models.TranslationCoordinatorsModel.get_by_user(self.USER_ID_2)
 
         self.assertEqual(len(translation_coordinators_models), 2)
-        self.assertIn(
-            self.USER_ID_2, translation_coordinators_models[0].coordinator_ids
-        )
-        self.assertIn(
-            self.USER_ID_2, translation_coordinators_models[1].coordinator_ids
-        )
+        self.assertIn(self.USER_ID_2, translation_coordinators_models[0].coordinator_ids)
+        self.assertIn(self.USER_ID_2, translation_coordinators_models[1].coordinator_ids)

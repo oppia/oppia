@@ -23,9 +23,9 @@ import importlib
 import inspect
 import os
 
-from core import feconf, utils
-
 from typing import Any, Dict, Type
+
+from core import feconf, utils
 
 
 class BaseValueGenerator:
@@ -75,9 +75,7 @@ class BaseValueGenerator:
 
         The first arg should be context_params.
         """
-        raise NotImplementedError(
-            'generate_value() method has not yet been implemented'
-        )
+        raise NotImplementedError('generate_value() method has not yet been implemented')
 
 
 class Registry:
@@ -114,9 +112,7 @@ class Registry:
         return copy.deepcopy(cls.value_generators_dict)
 
     @classmethod
-    def get_generator_class_by_id(
-        cls, generator_id: str
-    ) -> Type[BaseValueGenerator]:
+    def get_generator_class_by_id(cls, generator_id: str) -> Type[BaseValueGenerator]:
         """Gets a generator class by its id.
 
         Refreshes once if the generator is not found; subsequently, throws an

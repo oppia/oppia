@@ -20,10 +20,6 @@ import datetime
 import enum
 import re
 
-from core import feconf, utils
-from core.constants import constants
-from core.platform import models
-
 from typing import (
     Any,
     Dict,
@@ -41,6 +37,10 @@ from typing import (
     cast,
     overload,
 )
+
+from core import feconf, utils
+from core.constants import constants
+from core.platform import models
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel'
@@ -67,9 +67,7 @@ if MYPY:  # pragma: no cover
     from core.domain import change_domain  # pylint: disable=invalid-import
     from mypy_imports import datastore_services, transaction_services
 
-    AllowedCommitCmdsListType = Sequence[
-        Mapping[str, change_domain.AcceptableChangeDictTypes]
-    ]
+    AllowedCommitCmdsListType = Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -116,9 +114,7 @@ class DELETION_POLICY(enum.Enum):  # pylint: disable=invalid-name
     LOCALLY_PSEUDONYMIZE = 'LOCALLY_PSEUDONYMIZE'
     # Models that should be pseudonymized if they are published and otherwise
     # (when private) deleted.
-    PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE = (
-        'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE'
-    )
+    PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE = 'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE'
     # Models that are not directly or indirectly related to users.
     NOT_APPLICABLE = 'NOT_APPLICABLE'
 
@@ -166,14 +162,10 @@ class BaseModel(datastore_services.Model):
 
     # When this entity was first created. This value should only be modified by
     # the update_timestamps method.
-    created_on = datastore_services.DateTimeProperty(
-        indexed=True, required=True
-    )
+    created_on = datastore_services.DateTimeProperty(indexed=True, required=True)
     # When this entity was last updated. This value should only be modified by
     # the update_timestamps method.
-    last_updated = datastore_services.DateTimeProperty(
-        indexed=True, required=True
-    )
+    last_updated = datastore_services.DateTimeProperty(indexed=True, required=True)
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
@@ -200,9 +192,7 @@ class BaseModel(datastore_services.Model):
             self._last_updated_timestamp_is_fresh = True
 
         if not self._last_updated_timestamp_is_fresh:
-            raise Exception(
-                '%s did not call update_timestamps() yet' % type(self).__name__
-            )
+            raise Exception('%s did not call update_timestamps() yet' % type(self).__name__)
 
         self._last_updated_timestamp_is_fresh = False
 
@@ -224,10 +214,7 @@ class BaseModel(datastore_services.Model):
             NotImplementedError. The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError(
-            'The get_deletion_policy() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The get_deletion_policy() method is missing from the derived class. It should be implemented in the derived class.')
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
@@ -237,10 +224,7 @@ class BaseModel(datastore_services.Model):
             NotImplementedError. The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError(
-            'The apply_deletion_policy() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The apply_deletion_policy() method is missing from the derived class. It should be implemented in the derived class.')
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -253,10 +237,7 @@ class BaseModel(datastore_services.Model):
             NotImplementedError. The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError(
-            'The has_reference_to_user_id() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The has_reference_to_user_id() method is missing from the derived class. It should be implemented in the derived class.')
 
     # Here we use type Any because the return type of all the export_data
     # methods in BaseModel's subclasses is a subclass of Dict[str, Any].
@@ -272,10 +253,7 @@ class BaseModel(datastore_services.Model):
             NotImplementedError. The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError(
-            'The export_data() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The export_data() method is missing from the derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
@@ -285,10 +263,7 @@ class BaseModel(datastore_services.Model):
             NotImplementedError. The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError(
-            'The get_model_association_to_user() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The get_model_association_to_user() method is missing from the derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, EXPORT_POLICY]:
@@ -316,26 +291,18 @@ class BaseModel(datastore_services.Model):
 
     @overload
     @classmethod
-    def get(
-        cls: Type[SELF_BASE_MODEL], entity_id: str, *, strict: Literal[True]
-    ) -> SELF_BASE_MODEL: ...
+    def get(cls: Type[SELF_BASE_MODEL], entity_id: str, *, strict: Literal[True]) -> SELF_BASE_MODEL: ...
 
     @overload
     @classmethod
-    def get(
-        cls: Type[SELF_BASE_MODEL], entity_id: str, *, strict: Literal[False]
-    ) -> Optional[SELF_BASE_MODEL]: ...
+    def get(cls: Type[SELF_BASE_MODEL], entity_id: str, *, strict: Literal[False]) -> Optional[SELF_BASE_MODEL]: ...
 
     @overload
     @classmethod
-    def get(
-        cls: Type[SELF_BASE_MODEL], entity_id: str, *, strict: bool = ...
-    ) -> Optional[SELF_BASE_MODEL]: ...
+    def get(cls: Type[SELF_BASE_MODEL], entity_id: str, *, strict: bool = ...) -> Optional[SELF_BASE_MODEL]: ...
 
     @classmethod
-    def get(
-        cls: Type[SELF_BASE_MODEL], entity_id: str, strict: bool = True
-    ) -> Optional[SELF_BASE_MODEL]:
+    def get(cls: Type[SELF_BASE_MODEL], entity_id: str, strict: bool = True) -> Optional[SELF_BASE_MODEL]:
         """Gets an entity by id.
 
         Args:
@@ -358,10 +325,7 @@ class BaseModel(datastore_services.Model):
             entity = None
 
         if strict and entity is None:
-            raise cls.EntityNotFoundError(
-                'Entity for class %s with id %s not found'
-                % (cls.__name__, entity_id)
-            )
+            raise cls.EntityNotFoundError('Entity for class %s with id %s not found' % (cls.__name__, entity_id))
         return entity
 
     @classmethod
@@ -391,9 +355,7 @@ class BaseModel(datastore_services.Model):
             else:
                 none_argument_indices.append(index)
 
-        entities: List[Optional[SELF_BASE_MODEL]] = (
-            datastore_services.get_multi(entity_keys)
-        )
+        entities: List[Optional[SELF_BASE_MODEL]] = datastore_services.get_multi(entity_keys)
         for index in none_argument_indices:
             entities.insert(index, None)
 
@@ -435,9 +397,7 @@ class BaseModel(datastore_services.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the model.
         """
-        datastore_services.update_timestamps_multi(
-            entities, update_last_updated_time=update_last_updated_time
-        )
+        datastore_services.update_timestamps_multi(entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
     @transaction_services.run_in_transaction_wrapper
@@ -486,9 +446,7 @@ class BaseModel(datastore_services.Model):
         self.key.delete()
 
     @classmethod
-    def get_all(
-        cls: Type[SELF_BASE_MODEL], include_deleted: bool = False
-    ) -> datastore_services.Query:
+    def get_all(cls: Type[SELF_BASE_MODEL], include_deleted: bool = False) -> datastore_services.Query:
         """Gets iterable of all entities of this class.
 
         Args:
@@ -502,7 +460,7 @@ class BaseModel(datastore_services.Model):
             cls.query()
             if include_deleted
             else cls.query().filter(
-                cls.deleted == False  # pylint: disable=singleton-comparison
+                not cls.deleted  # pylint: disable=singleton-comparison
             )
         )
 
@@ -564,22 +522,14 @@ class BaseModel(datastore_services.Model):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        start_cursor: Optional[datastore_services.Cursor] = (
-            datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
-            if urlsafe_start_cursor
-            else None
-        )
+        start_cursor: Optional[datastore_services.Cursor] = datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor) if urlsafe_start_cursor else None
 
         last_updated_query = query.order(-cls.last_updated)
-        fetch_result: Tuple[
-            Sequence[SELF_BASE_MODEL], datastore_services.Cursor, bool
-        ] = last_updated_query.fetch_page(page_size, start_cursor=start_cursor)
+        fetch_result: Tuple[Sequence[SELF_BASE_MODEL], datastore_services.Cursor, bool] = last_updated_query.fetch_page(page_size, start_cursor=start_cursor)
         query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        fetch_result = last_updated_query.fetch_page(
-            page_size + 1, start_cursor=start_cursor
-        )
+        fetch_result = last_updated_query.fetch_page(page_size + 1, start_cursor=start_cursor)
         plus_one_query_models, _, _ = fetch_result
         # The urlsafe returns bytes and we need to decode them to string.
         return (
@@ -602,9 +552,7 @@ class BaseHumanMaintainedModel(BaseModel):
     """
 
     # When this entity was last updated on behalf of a human.
-    last_updated_by_human = datastore_services.DateTimeProperty(
-        indexed=True, required=True
-    )
+    last_updated_by_human = datastore_services.DateTimeProperty(indexed=True, required=True)
 
     # Here we use type Any because we need to denote the compatibility with the
     # overridden put method of the parent class i.e. BaseModel here.
@@ -624,14 +572,10 @@ class BaseHumanMaintainedModel(BaseModel):
     @classmethod
     def put_multi(cls, unused_instances: List[SELF_BASE_MODEL]) -> None:
         """Unsupported operation on human-maintained models."""
-        raise NotImplementedError(
-            'Use put_multi_for_human or put_multi_for_bot instead'
-        )
+        raise NotImplementedError('Use put_multi_for_human or put_multi_for_bot instead')
 
     @classmethod
-    def put_multi_for_human(
-        cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
-    ) -> None:
+    def put_multi_for_human(cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None:
         """Stores the given model instances on behalf of a human.
 
         Args:
@@ -646,9 +590,7 @@ class BaseHumanMaintainedModel(BaseModel):
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
 
     @classmethod
-    def put_multi_for_bot(
-        cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
-    ) -> None:
+    def put_multi_for_bot(cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None:
         """Stores the given model instances on behalf of a non-human.
 
         Args:
@@ -674,13 +616,9 @@ class BaseCommitLogEntryModel(BaseModel):
     # The commit_cmds dict for this commit.
     commit_cmds = datastore_services.JsonProperty(indexed=False, required=True)
     # The status of the entity after the edit event ('private', 'public').
-    post_commit_status = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    post_commit_status = datastore_services.StringProperty(indexed=True, required=True)
     # Whether the entity is community-owned after the edit event.
-    post_commit_community_owned = datastore_services.BooleanProperty(
-        indexed=True
-    )
+    post_commit_community_owned = datastore_services.BooleanProperty(indexed=True)
     # Whether the entity is private after the edit event. Having a
     # separate field for this makes queries faster, since an equality query
     # on this property is faster than an inequality query on
@@ -783,9 +721,7 @@ class BaseCommitLogEntryModel(BaseModel):
             version=version,
             post_commit_status=status,
             post_commit_community_owned=community_owned,
-            post_commit_is_private=(
-                status == constants.ACTIVITY_STATUS_PRIVATE
-            ),
+            post_commit_is_private=(status == constants.ACTIVITY_STATUS_PRIVATE),
         )
 
     @classmethod
@@ -802,10 +738,7 @@ class BaseCommitLogEntryModel(BaseModel):
             NotImplementedError. The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError(
-            'The get_instance_id() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The get_instance_id() method is missing from the derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get_all_commits(
@@ -835,9 +768,7 @@ class BaseCommitLogEntryModel(BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor
-        )
+        return cls._fetch_page_sorted_by_last_updated(cls.query(), page_size, urlsafe_start_cursor)
 
     @classmethod
     def get_commit(
@@ -932,9 +863,7 @@ class VersionedModel(BaseModel):
     # Here we use type Any because the method '_reconstitute' defined in
     # subclasses of VersionedModel can accept different Dict/TypedDict types.
     # So, to allow every Dict/TypedDict type we used Any here.
-    def _reconstitute(
-        self: SELF_VERSIONED_MODEL, snapshot_dict: Dict[str, Any]
-    ) -> SELF_VERSIONED_MODEL:
+    def _reconstitute(self: SELF_VERSIONED_MODEL, snapshot_dict: Dict[str, Any]) -> SELF_VERSIONED_MODEL:
         """Populates the model instance with the snapshot.
 
         Args:
@@ -948,9 +877,7 @@ class VersionedModel(BaseModel):
         self.populate(**snapshot_dict)
         return self
 
-    def _reconstitute_from_snapshot_id(
-        self: SELF_VERSIONED_MODEL, snapshot_id: str
-    ) -> SELF_VERSIONED_MODEL:
+    def _reconstitute_from_snapshot_id(self: SELF_VERSIONED_MODEL, snapshot_id: str) -> SELF_VERSIONED_MODEL:
         """Gets a reconstituted instance of this model class, based on the given
         snapshot id.
 
@@ -1046,22 +973,15 @@ class VersionedModel(BaseModel):
         if self.SNAPSHOT_CONTENT_CLASS is None:
             raise Exception('No snapshot content class defined.')
         if not isinstance(commit_cmds, list):
-            raise Exception(
-                'Expected commit_cmds to be a list of dicts, received %s'
-                % commit_cmds
-            )
+            raise Exception('Expected commit_cmds to be a list of dicts, received %s' % commit_cmds)
 
         self.version += 1
 
         snapshot = self.compute_snapshot()
         snapshot_id = self.get_snapshot_id(self.id, self.version)
 
-        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(
-            snapshot_id, committer_id, commit_type, commit_message, commit_cmds
-        )
-        snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS.create(
-            snapshot_id, snapshot
-        )
+        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(snapshot_id, committer_id, commit_type, commit_message, commit_cmds)
+        snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)
 
         return {
             'snapshot_metadata_model': snapshot_metadata_instance,
@@ -1094,41 +1014,18 @@ class VersionedModel(BaseModel):
             current_version = self.version
 
             version_numbers = range(1, current_version + 1)
-            snapshot_ids = [
-                self.get_snapshot_id(self.id, version_number)
-                for version_number in version_numbers
-            ]
+            snapshot_ids = [self.get_snapshot_id(self.id, version_number) for version_number in version_numbers]
 
-            metadata_keys = [
-                datastore_services.Key(
-                    self.SNAPSHOT_METADATA_CLASS, snapshot_id
-                )
-                for snapshot_id in snapshot_ids
-            ]
+            metadata_keys = [datastore_services.Key(self.SNAPSHOT_METADATA_CLASS, snapshot_id) for snapshot_id in snapshot_ids]
 
-            content_keys = [
-                datastore_services.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id)
-                for snapshot_id in snapshot_ids
-            ]
+            content_keys = [datastore_services.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id) for snapshot_id in snapshot_ids]
 
             commit_log_keys: List[datastore_services.Key] = []
             if self.COMMIT_LOG_ENTRY_CLASS is not None:
-                commit_log_ids = (
-                    self.COMMIT_LOG_ENTRY_CLASS.get_instance_id(
-                        self.id, version_number
-                    )
-                    for version_number in version_numbers
-                )
-                commit_log_keys = [
-                    datastore_services.Key(
-                        self.COMMIT_LOG_ENTRY_CLASS, commit_log_id
-                    )
-                    for commit_log_id in commit_log_ids
-                ]
+                commit_log_ids = (self.COMMIT_LOG_ENTRY_CLASS.get_instance_id(self.id, version_number) for version_number in version_numbers)
+                commit_log_keys = [datastore_services.Key(self.COMMIT_LOG_ENTRY_CLASS, commit_log_id) for commit_log_id in commit_log_ids]
 
-            datastore_services.delete_multi(
-                content_keys + metadata_keys + commit_log_keys
-            )
+            datastore_services.delete_multi(content_keys + metadata_keys + commit_log_keys)
 
             super().delete()
         else:
@@ -1175,75 +1072,29 @@ class VersionedModel(BaseModel):
         Raises:
             Exception. This model instance has been already deleted.
         """
-        versioned_models_with_none = cls.get_multi(
-            entity_ids, include_deleted=force_deletion
-        )
-        versioned_models: List[VersionedModel] = [
-            versioned_model
-            for versioned_model in versioned_models_with_none
-            if versioned_model is not None
-        ]
+        versioned_models_with_none = cls.get_multi(entity_ids, include_deleted=force_deletion)
+        versioned_models: List[VersionedModel] = [versioned_model for versioned_model in versioned_models_with_none if versioned_model is not None]
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []
             all_models_commit_keys: List[datastore_services.Key] = []
             for model in versioned_models:
                 model_version_numbers = range(1, model.version + 1)
-                model_snapshot_ids = [
-                    model.get_snapshot_id(model.id, version_number)
-                    for version_number in model_version_numbers
-                ]
+                model_snapshot_ids = [model.get_snapshot_id(model.id, version_number) for version_number in model_version_numbers]
 
-                all_models_metadata_keys.extend(
-                    [
-                        datastore_services.Key(
-                            model.SNAPSHOT_METADATA_CLASS, snapshot_id
-                        )
-                        for snapshot_id in model_snapshot_ids
-                    ]
-                )
-                all_models_content_keys.extend(
-                    [
-                        datastore_services.Key(
-                            model.SNAPSHOT_CONTENT_CLASS, snapshot_id
-                        )
-                        for snapshot_id in model_snapshot_ids
-                    ]
-                )
+                all_models_metadata_keys.extend([datastore_services.Key(model.SNAPSHOT_METADATA_CLASS, snapshot_id) for snapshot_id in model_snapshot_ids])
+                all_models_content_keys.extend([datastore_services.Key(model.SNAPSHOT_CONTENT_CLASS, snapshot_id) for snapshot_id in model_snapshot_ids])
                 if model.COMMIT_LOG_ENTRY_CLASS is not None:
                     # This assert is used to eliminate the possibility of None
                     # during mypy type checking.
                     assert cls.COMMIT_LOG_ENTRY_CLASS is not None
-                    commit_log_ids = (
-                        cls.COMMIT_LOG_ENTRY_CLASS.get_instance_id(
-                            model.id, version_number
-                        )
-                        for version_number in model_version_numbers
-                    )
-                    all_models_commit_keys.extend(
-                        [
-                            datastore_services.Key(
-                                model.COMMIT_LOG_ENTRY_CLASS, commit_log_id
-                            )
-                            for commit_log_id in commit_log_ids
-                        ]
-                    )
+                    commit_log_ids = (cls.COMMIT_LOG_ENTRY_CLASS.get_instance_id(model.id, version_number) for version_number in model_version_numbers)
+                    all_models_commit_keys.extend([datastore_services.Key(model.COMMIT_LOG_ENTRY_CLASS, commit_log_id) for commit_log_id in commit_log_ids])
 
             versioned_models_keys = [model.key for model in versioned_models]
-            all_models_keys = (
-                all_models_metadata_keys
-                + all_models_content_keys
-                + all_models_commit_keys
-                + versioned_models_keys
-            )
-            for i in range(
-                0, len(all_models_keys), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
-            ):
-                datastore_services.delete_multi_transactional(
-                    all_models_keys[
-                        i : i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
-                    ]
-                )
+            all_models_keys = all_models_metadata_keys + all_models_content_keys + all_models_commit_keys + versioned_models_keys
+            for i in range(0, len(all_models_keys), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                datastore_services.delete_multi_transactional(all_models_keys[i : i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
         else:
             for model in versioned_models:
                 model._require_not_marked_deleted()  # pylint: disable=protected-access
@@ -1273,9 +1124,7 @@ class VersionedModel(BaseModel):
                 # This assert is used to eliminate the possibility of None
                 # during mypy type checking.
                 assert model.SNAPSHOT_CONTENT_CLASS is not None
-                snapshot_content_models.append(
-                    model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)
-                )
+                snapshot_content_models.append(model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
             entities: List[BaseModel] = []
             for snapshot_model in snapshot_metadata_models:
@@ -1291,18 +1140,13 @@ class VersionedModel(BaseModel):
     # overridden constructor of the parent class i.e BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """For VersionedModels, this method is replaced with commit()."""
-        raise NotImplementedError(
-            'The put() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
+        raise NotImplementedError('The put() method is missing from the derived class. It should be implemented in the derived class.')
 
     def get_models_to_put_values(
         self,
         committer_id: str,
         commit_message: Optional[str],
-        commit_cmds: Sequence[
-            Mapping[str, change_domain.AcceptableChangeDictTypes]
-        ],
+        commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
     ) -> List[BaseModel]:
         """Returns the models which should be put.
 
@@ -1321,11 +1165,7 @@ class VersionedModel(BaseModel):
         Returns:
             list(BaseModel). The models which should be put.
         """
-        commit_type = (
-            feconf.COMMIT_TYPE_CREATE
-            if self.version == 0
-            else feconf.COMMIT_TYPE_EDIT
-        )
+        commit_type = feconf.COMMIT_TYPE_CREATE if self.version == 0 else feconf.COMMIT_TYPE_EDIT
 
         models_to_put = self.compute_models_to_commit(
             committer_id,
@@ -1370,23 +1210,13 @@ class VersionedModel(BaseModel):
 
         for commit_cmd in commit_cmds:
             if not isinstance(commit_cmd, dict):
-                raise Exception(
-                    'Expected commit_cmds to be a list of dicts, received %s'
-                    % commit_cmds
-                )
+                raise Exception('Expected commit_cmds to be a list of dicts, received %s' % commit_cmds)
             if 'cmd' not in commit_cmd:
-                raise Exception(
-                    'Invalid commit_cmd: %s. Expected a \'cmd\' key.'
-                    % commit_cmd
-                )
+                raise Exception('Invalid commit_cmd: %s. Expected a \'cmd\' key.' % commit_cmd)
             if commit_cmd['cmd'].startswith(self._AUTOGENERATED_PREFIX):
-                raise Exception(
-                    'Invalid change list command: %s' % commit_cmd['cmd']
-                )
+                raise Exception('Invalid change list command: %s' % commit_cmd['cmd'])
 
-        models_to_put = self.get_models_to_put_values(
-            committer_id, commit_message, commit_cmds
-        )
+        models_to_put = self.get_models_to_put_values(committer_id, commit_message, commit_cmds)
         BaseModel.update_timestamps_multi(models_to_put)
         BaseModel.put_multi_transactional(models_to_put)
 
@@ -1413,14 +1243,9 @@ class VersionedModel(BaseModel):
         model._require_not_marked_deleted()  # pylint: disable=protected-access
 
         if not model.ALLOW_REVERT:
-            raise Exception(
-                'Reverting objects of type %s is not allowed.'
-                % model.__class__.__name__
-            )
+            raise Exception('Reverting objects of type %s is not allowed.' % model.__class__.__name__)
 
-        commit_cmds: List[Dict[str, Union[str, int]]] = [
-            {'cmd': model.CMD_REVERT_COMMIT, 'version_number': version_number}
-        ]
+        commit_cmds: List[Dict[str, Union[str, int]]] = [{'cmd': model.CMD_REVERT_COMMIT, 'version_number': version_number}]
 
         # Do not overwrite the version number.
         current_version = model.version
@@ -1550,52 +1375,30 @@ class VersionedModel(BaseModel):
             list(VersionedModel). Model instances representing the given
             versions.
         """
-        entity_ids = list(
-            {entity_id for (entity_id, _) in entity_ids_and_versions}
-        )
-        current_version_models = cls.get_multi(
-            entity_ids, include_deleted=False
-        )
+        entity_ids = list({entity_id for (entity_id, _) in entity_ids_and_versions})
+        current_version_models = cls.get_multi(entity_ids, include_deleted=False)
 
-        latest_versions_by_id = {
-            model.id: model.version
-            for model in current_version_models
-            if model is not None
-        }
+        latest_versions_by_id = {model.id: model.version for model in current_version_models if model is not None}
 
-        results: List[Optional[SELF_VERSIONED_MODEL]] = [None] * len(
-            entity_ids_and_versions
-        )
+        results: List[Optional[SELF_VERSIONED_MODEL]] = [None] * len(entity_ids_and_versions)
         valid_snapshot_ids = []
         valid_indices = []
 
-        for idx, (entity_id, version_number) in enumerate(
-            entity_ids_and_versions
-        ):
+        for idx, (entity_id, version_number) in enumerate(entity_ids_and_versions):
             if entity_id in latest_versions_by_id:
-                version = (
-                    version_number
-                    if version_number is not None
-                    else latest_versions_by_id[entity_id]
-                )
+                version = version_number if version_number is not None else latest_versions_by_id[entity_id]
                 snapshot_id = cls.get_snapshot_id(entity_id, version)
                 valid_snapshot_ids.append(snapshot_id)
                 valid_indices.append(idx)
 
         assert cls.SNAPSHOT_CONTENT_CLASS is not None
 
-        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(
-            valid_snapshot_ids
-        )
+        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(valid_snapshot_ids)
 
         for idx, snapshot_model in zip(valid_indices, snapshot_models):
             if snapshot_model is not None:
                 entity_id, version_number = entity_ids_and_versions[idx]
-                version = (
-                    version_number
-                    if version_number is not None
-                    else latest_versions_by_id[entity_id]
-                )
+                version = version_number if version_number is not None else latest_versions_by_id[entity_id]
                 model = cls(id=entity_id, version=version)
                 results[idx] = model._reconstitute(snapshot_model.content)
         return results
@@ -1630,10 +1433,7 @@ class VersionedModel(BaseModel):
         current_version = entity.version
         max_version = max(version_numbers)
         if max_version > current_version:
-            raise ValueError(
-                'Requested version number %s cannot be higher than the current '
-                'version number %s.' % (max_version, current_version)
-            )
+            raise ValueError('Requested version number %s cannot be higher than the current version number %s.' % (max_version, current_version))
 
         snapshot_ids = []
         for version in version_numbers:
@@ -1766,29 +1566,18 @@ class VersionedModel(BaseModel):
             model = cls.get(model_instance_id)
             model._require_not_marked_deleted()  # pylint: disable=protected-access
 
-        snapshot_ids = [
-            cls.get_snapshot_id(model_instance_id, version_number)
-            for version_number in version_numbers
-        ]
-        metadata_keys = [
-            datastore_services.Key(cls.SNAPSHOT_METADATA_CLASS, snapshot_id)
-            for snapshot_id in snapshot_ids
-        ]
+        snapshot_ids = [cls.get_snapshot_id(model_instance_id, version_number) for version_number in version_numbers]
+        metadata_keys = [datastore_services.Key(cls.SNAPSHOT_METADATA_CLASS, snapshot_id) for snapshot_id in snapshot_ids]
         returned_models = datastore_services.get_multi(metadata_keys)
 
         for ind, returned_model in enumerate(returned_models):
             if returned_model is None:
-                raise Exception(
-                    'Invalid version number %s for model %s with id %s'
-                    % (version_numbers[ind], cls.__name__, model_instance_id)
-                )
+                raise Exception('Invalid version number %s for model %s with id %s' % (version_numbers[ind], cls.__name__, model_instance_id))
 
         # Here we use cast because we need to make sure that returned_models
         # only contains BaseSnapshotMetadataModel and not None. In above code,
         # we are already throwing an error if None value is encountered.
-        returned_models_without_none = cast(
-            List[BaseSnapshotMetadataModel], returned_models
-        )
+        returned_models_without_none = cast(List[BaseSnapshotMetadataModel], returned_models)
         return [
             {
                 'committer_id': model.committer_id,
@@ -1830,27 +1619,19 @@ class BaseSnapshotMetadataModel(BaseModel):
     ID_IS_USED_AS_TAKEOUT_KEY: bool = True
 
     # The id of the user who committed this revision.
-    committer_id = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    committer_id = datastore_services.StringProperty(required=True, indexed=True)
     # The type of the commit associated with this snapshot.
-    commit_type = datastore_services.StringProperty(
-        required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES
-    )
+    commit_type = datastore_services.StringProperty(required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
     # The commit message associated with this snapshot.
     commit_message = datastore_services.StringProperty(indexed=True)
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = datastore_services.JsonProperty(indexed=False)
     # The user ids that are in some field in commit_cmds.
-    commit_cmds_user_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    commit_cmds_user_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # The user ids that are enclosed inside the 'content' field in the relevant
     # snapshot content model.
-    content_user_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    content_user_ids = datastore_services.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> DELETION_POLICY:
@@ -1957,9 +1738,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
-        metadata_models: Sequence[BaseSnapshotMetadataModel] = cls.query(
-            cls.committer_id == user_id
-        ).fetch(projection=[cls.commit_type, cls.commit_message])
+        metadata_models: Sequence[BaseSnapshotMetadataModel] = cls.query(cls.committer_id == user_id).fetch(projection=[cls.commit_type, cls.commit_message])
 
         user_data = {}
         for metadata_model in metadata_models:

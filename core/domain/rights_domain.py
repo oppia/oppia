@@ -16,12 +16,14 @@
 
 from __future__ import annotations
 
+from typing import List, Optional, TypedDict
+
 from core import feconf, utils
 from core.constants import constants
-from core.domain import user_services  # pylint: disable=invalid-import-from
-from core.domain import change_domain
-
-from typing import List, Optional, TypedDict
+from core.domain import (
+    change_domain,
+    user_services,  # pylint: disable=invalid-import-from
+)
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -104,26 +106,14 @@ class ActivityRights:
                 has owners, editors, voice artists or viewers specified.
         """
         if self.community_owned:
-            if (
-                self.owner_ids
-                or self.editor_ids
-                or self.voice_artist_ids
-                or self.viewer_ids
-            ):
-                raise utils.ValidationError(
-                    'Community-owned explorations should have no owners, '
-                    'editors, voice artists or viewers specified.'
-                )
+            if self.owner_ids or self.editor_ids or self.voice_artist_ids or self.viewer_ids:
+                raise utils.ValidationError('Community-owned explorations should have no owners, editors, voice artists or viewers specified.')
 
         if self.community_owned and self.status == ACTIVITY_STATUS_PRIVATE:
-            raise utils.ValidationError(
-                'Community-owned explorations cannot be private.'
-            )
+            raise utils.ValidationError('Community-owned explorations cannot be private.')
 
         if self.status != ACTIVITY_STATUS_PRIVATE and self.viewer_ids:
-            raise utils.ValidationError(
-                'Public explorations should have no viewers specified.'
-            )
+            raise utils.ValidationError('Public explorations should have no viewers specified.')
 
         owner_editor = set(self.owner_ids) & set(self.editor_ids)
         owner_voice_artist = set(self.owner_ids) & set(self.voice_artist_ids)
@@ -132,39 +122,20 @@ class ActivityRights:
         editor_viewer = set(self.editor_ids) & set(self.viewer_ids)
         voice_artist_viewer = set(self.voice_artist_ids) & set(self.viewer_ids)
         if owner_editor:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and an editor: %s'
-                % owner_editor
-            )
+            raise utils.ValidationError('A user cannot be both an owner and an editor: %s' % owner_editor)
         if owner_voice_artist:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and a voice artist: %s'
-                % owner_voice_artist
-            )
+            raise utils.ValidationError('A user cannot be both an owner and a voice artist: %s' % owner_voice_artist)
         if owner_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and a viewer: %s' % owner_viewer
-            )
+            raise utils.ValidationError('A user cannot be both an owner and a viewer: %s' % owner_viewer)
         if editor_voice_artist:
-            raise utils.ValidationError(
-                'A user cannot be both an editor and a voice artist: %s'
-                % editor_voice_artist
-            )
+            raise utils.ValidationError('A user cannot be both an editor and a voice artist: %s' % editor_voice_artist)
         if editor_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both an editor and a viewer: %s'
-                % editor_viewer
-            )
+            raise utils.ValidationError('A user cannot be both an editor and a viewer: %s' % editor_viewer)
         if voice_artist_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both a voice artist and a viewer: %s'
-                % voice_artist_viewer
-            )
+            raise utils.ValidationError('A user cannot be both a voice artist and a viewer: %s' % voice_artist_viewer)
 
         if not self.community_owned and len(self.owner_ids) == 0:
-            raise utils.ValidationError(
-                'Activity should have atleast one owner.'
-            )
+            raise utils.ValidationError('Activity should have atleast one owner.')
 
     def to_dict(self) -> ActivityRightsDict:
         """Returns a dict suitable for use by the frontend.
@@ -189,18 +160,10 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(
-                    self.owner_ids
-                ),
-                'editor_names': user_services.get_human_readable_user_ids(
-                    self.editor_ids
-                ),
-                'voice_artist_names': user_services.get_human_readable_user_ids(
-                    self.voice_artist_ids
-                ),
-                'viewer_names': user_services.get_human_readable_user_ids(
-                    self.viewer_ids
-                ),
+                'owner_names': user_services.get_human_readable_user_ids(self.owner_ids),
+                'editor_names': user_services.get_human_readable_user_ids(self.editor_ids),
+                'voice_artist_names': user_services.get_human_readable_user_ids(self.voice_artist_ids),
+                'viewer_names': user_services.get_human_readable_user_ids(self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
             }
 
@@ -317,9 +280,7 @@ class ActivityRights:
                 raise Exception('This user already can edit this exploration.')
 
             if old_role == ROLE_VOICE_ARTIST:
-                raise Exception(
-                    'This user already can voiceover this exploration.'
-                )
+                raise Exception('This user already can voiceover this exploration.')
 
             if old_role == ROLE_VIEWER:
                 raise Exception('This user already can view this exploration.')

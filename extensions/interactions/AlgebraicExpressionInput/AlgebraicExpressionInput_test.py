@@ -19,9 +19,6 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.AlgebraicExpressionInput import (  # pylint: disable=unused-import
-    AlgebraicExpressionInput,
-)
 
 
 class AlgebraicExpressionInputTests(test_utils.GenericTestBase):

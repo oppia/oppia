@@ -21,10 +21,10 @@ import os
 import subprocess
 import tempfile
 
+from typing import List, Sequence
+
 from core.tests import test_utils
 from scripts import check_ci_test_suites_to_run, generate_root_files_mapping
-
-from typing import List, Sequence
 
 LIGHTHOUSE_PAGES_CONFIG = {
     'splash': {
@@ -128,10 +128,7 @@ LIGHTHOUSE_PAGES_FOR_SUITES = {
     '2': ['learner-dashboard', 'email-dashboard'],
 }
 
-LIGHTHOUSE_PAGES: List[check_ci_test_suites_to_run.LighthousePageDict] = [
-    {'name': name, 'url': page['url'], 'page_module': page['page_module']}
-    for name, page in LIGHTHOUSE_PAGES_CONFIG.items()
-]
+LIGHTHOUSE_PAGES: List[check_ci_test_suites_to_run.LighthousePageDict] = [{'name': name, 'url': page['url'], 'page_module': page['page_module']} for name, page in LIGHTHOUSE_PAGES_CONFIG.items()]
 
 
 class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
@@ -140,9 +137,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
 
         self.maxDiff = None
         self.tempdir = tempfile.TemporaryDirectory()
-        root_files_mapping_file = os.path.join(
-            self.tempdir.name, 'root-files-mapping.json'
-        )
+        root_files_mapping_file = os.path.join(self.tempdir.name, 'root-files-mapping.json')
         with open(root_files_mapping_file, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
@@ -151,32 +146,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'assets/README.md': ['assets/README.md'],
                         'CODEOWNERS': ['CODEOWNERS'],
                         'src/main.ts': ['src/main.ts'],
-                        'splash-banner.component.html': [
-                            'splash-page.module.ts'
-                        ],
+                        'splash-banner.component.html': ['splash-page.module.ts'],
                         'about-component.ts': ['about-page.module.ts'],
                         'terms.component.html': ['terms-page.module.ts'],
-                        'privacy-policy.component.ts': [
-                            'privacy-page.module.ts'
-                        ],
-                        'exploration-player.component.html': [
-                            'exploration-player-page.module.ts'
-                        ],
-                        'exploration-player-banners.component.html': [
-                            'exploration-player-page.module.ts'
-                        ],
-                        'exploration-player/view-exploration.spec.ts': [
-                            'exploration-player/view-exploration.spec.ts'
-                        ],
-                        '.lighthouserc-performance.js': [
-                            '.lighthouserc-performance.js'
-                        ],
+                        'privacy-policy.component.ts': ['privacy-page.module.ts'],
+                        'exploration-player.component.html': ['exploration-player-page.module.ts'],
+                        'exploration-player-banners.component.html': ['exploration-player-page.module.ts'],
+                        'exploration-player/view-exploration.spec.ts': ['exploration-player/view-exploration.spec.ts'],
+                        '.lighthouserc-performance.js': ['.lighthouserc-performance.js'],
                     }
                 )
             )
-        root_files_config_file = os.path.join(
-            self.tempdir.name, 'root-files-config.json'
-        )
+        root_files_config_file = os.path.join(self.tempdir.name, 'root-files-config.json')
         with open(root_files_config_file, 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps(
@@ -190,14 +171,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     }
                 )
             )
-        lighthouse_pages_config_file = os.path.join(
-            self.tempdir.name, 'lighthouse-pages.json'
-        )
+        lighthouse_pages_config_file = os.path.join(self.tempdir.name, 'lighthouse-pages.json')
         with open(lighthouse_pages_config_file, 'w', encoding='utf-8') as f:
             f.write(json.dumps(LIGHTHOUSE_PAGES_CONFIG))
-        ci_test_suite_configs_directory = os.path.join(
-            self.tempdir.name, 'ci-test-suite-configs'
-        )
+        ci_test_suite_configs_directory = os.path.join(self.tempdir.name, 'ci-test-suite-configs')
         os.mkdir(ci_test_suite_configs_directory)
         with open(
             os.path.join(ci_test_suite_configs_directory, 'acceptance.json'),
@@ -249,19 +226,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     }
                 )
             )
-        test_modules_mapping_directory = os.path.join(
-            self.tempdir.name, 'test-modules-mapping'
-        )
+        test_modules_mapping_directory = os.path.join(self.tempdir.name, 'test-modules-mapping')
         os.mkdir(test_modules_mapping_directory)
-        acceptance_test_modules_mapping_directory = os.path.join(
-            test_modules_mapping_directory, 'acceptance'
-        )
+        acceptance_test_modules_mapping_directory = os.path.join(test_modules_mapping_directory, 'acceptance')
         os.mkdir(acceptance_test_modules_mapping_directory)
-        os.mkdir(
-            os.path.join(
-                acceptance_test_modules_mapping_directory, 'blog-admin'
-            )
-        )
+        os.mkdir(os.path.join(acceptance_test_modules_mapping_directory, 'blog-admin'))
         with open(
             os.path.join(
                 acceptance_test_modules_mapping_directory,
@@ -280,11 +249,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             encoding='utf-8',
         ) as f:
             f.write('blog-admin-page.module.ts')
-        os.mkdir(
-            os.path.join(
-                acceptance_test_modules_mapping_directory, 'blog-editor'
-            )
-        )
+        os.mkdir(os.path.join(acceptance_test_modules_mapping_directory, 'blog-editor'))
         with open(
             os.path.join(
                 acceptance_test_modules_mapping_directory,
@@ -299,11 +264,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     'blog-dashboard-page.module.ts\n',
                 ]
             )
-        os.mkdir(
-            os.path.join(
-                acceptance_test_modules_mapping_directory, 'exploration-player'
-            )
-        )
+        os.mkdir(os.path.join(acceptance_test_modules_mapping_directory, 'exploration-player'))
         with open(
             os.path.join(
                 acceptance_test_modules_mapping_directory,
@@ -339,9 +300,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             'TEST_MODULES_MAPPING_DIRECTORY',
             test_modules_mapping_directory,
         )
-        self.github_output_file_path = os.path.join(
-            self.tempdir.name, 'github-output.json'
-        )
+        self.github_output_file_path = os.path.join(self.tempdir.name, 'github-output.json')
         os.environ['GITHUB_OUTPUT'] = self.github_output_file_path
 
         def mock_generate_root_files_mapping() -> None:
@@ -432,18 +391,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             {'name': 'suite2', 'module': 'module2', 'environment': 'python'},
             {'name': 'suite3', 'module': 'module3', 'environment': 'python'},
         ]
-        test_suites_to_add: List[
-            check_ci_test_suites_to_run.GenericTestSuiteDict
-        ] = [
+        test_suites_to_add: List[check_ci_test_suites_to_run.GenericTestSuiteDict] = [
             {'name': 'suite2', 'module': 'module2', 'environment': 'python'},
             {'name': 'suite3', 'module': 'module3', 'environment': 'python'},
             {'name': 'suite4', 'module': 'module4', 'environment': 'python'},
         ]
-        extended_test_suites = (
-            check_ci_test_suites_to_run.extend_test_suites_without_duplicates(
-                test_suites, test_suites_to_add
-            )
-        )
+        extended_test_suites = check_ci_test_suites_to_run.extend_test_suites_without_duplicates(test_suites, test_suites_to_add)
         self.assertEqual(
             extended_test_suites,
             [
@@ -476,9 +429,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         """Get the test suites to run from the GitHub output file."""
         with open(self.github_output_file_path, 'r', encoding='utf-8') as f:
             test_suites_json = f.read().split('=')[1]
-            test_suites: Sequence[
-                check_ci_test_suites_to_run.GenericTestSuiteDict
-            ] = json.loads(test_suites_json)
+            test_suites: Sequence[check_ci_test_suites_to_run.GenericTestSuiteDict] = json.loads(test_suites_json)
             print(test_suites)
             return test_suites
 
@@ -491,10 +442,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             def communicate(self) -> tuple[bytes, bytes]:
                 """Mocks the communicate method of subprocess.Popen class."""
                 return (
-                    b'M core/components/oppia-angular-root.component.html\n'
-                    b'M core/constants.py\n'
-                    b'A core/utils.py\n'
-                    b'R core/templates/pages/Base.ts\n',
+                    b'M core/components/oppia-angular-root.component.html\nM core/constants.py\nA core/utils.py\nR core/templates/pages/Base.ts\n',
                     b'',
                 )
 
@@ -506,11 +454,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen:
-            git_diff_name_status_files = (
-                check_ci_test_suites_to_run.get_git_diff_name_status_files(
-                    'left', 'right'
-                )
-            )
+            git_diff_name_status_files = check_ci_test_suites_to_run.get_git_diff_name_status_files('left', 'right')
             self.assertEqual(
                 git_diff_name_status_files,
                 [
@@ -539,12 +483,8 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen:
-            with self.assertRaisesRegex(
-                ValueError, 'fatal: not a valid git branch'
-            ):
-                check_ci_test_suites_to_run.get_git_diff_name_status_files(
-                    'left', 'right'
-                )
+            with self.assertRaisesRegex(ValueError, 'fatal: not a valid git branch'):
+                check_ci_test_suites_to_run.get_git_diff_name_status_files('left', 'right')
 
     def test_does_files_include_python(self) -> None:
         self.assertTrue(
@@ -576,9 +516,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_partition_lighthouse_pages_into_test_suites_one_shard_output(
         self,
     ) -> None:
-        lighthouse_pages: List[
-            check_ci_test_suites_to_run.LighthousePageDict
-        ] = [
+        lighthouse_pages: List[check_ci_test_suites_to_run.LighthousePageDict] = [
             {
                 'name': 'splash',
                 'url': 'http://localhost:8181/',
@@ -607,9 +545,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         ]
 
         self.assertEqual(
-            check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', lighthouse_pages
-            ),
+            check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites('performance.js', lighthouse_pages),
             [
                 {
                     'name': '1',
@@ -630,9 +566,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.assertEqual(
-            check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', LIGHTHOUSE_PAGES
-            ),
+            check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites('performance.js', LIGHTHOUSE_PAGES),
             [
                 {
                     'name': '1',
@@ -924,9 +858,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
-                        lambda *args: [
-                            'exploration-player/view-exploration.spec.ts'
-                        ],
+                        lambda *args: ['exploration-player/view-exploration.spec.ts'],
                     ):
                         check_ci_test_suites_to_run.main(
                             [
@@ -1007,17 +939,13 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             'name': '1',
                                             'module': '.lighthouserc-performance.js',
                                             'environment': 'python',
-                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
-                                                '1'
-                                            ],
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
                                         },
                                         {
                                             'name': '2',
                                             'module': '.lighthouserc-performance.js',
                                             'environment': 'python',
-                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
-                                                '2'
-                                            ],
+                                            'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                                         },
                                     ],
                                 },
@@ -1027,9 +955,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_missing_test_suite_to_module_mapping(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        acceptance_config_file_path = os.path.join(
-            self.tempdir.name, 'ci-test-suite-configs', 'acceptance.json'
-        )
+        acceptance_config_file_path = os.path.join(self.tempdir.name, 'ci-test-suite-configs', 'acceptance.json')
         with open(acceptance_config_file_path, 'r', encoding='utf-8') as f:
             acceptance_config = json.load(f)
             acceptance_config['suites'].append(

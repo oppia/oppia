@@ -63,9 +63,9 @@ import subprocess
 import sys
 import threading
 
-from scripts import common
-
 from typing import Dict, List, Optional, Set, Tuple, cast
+
+from scripts import common
 
 from .. import concurrent_task_utils, install_third_party_libs
 
@@ -115,8 +115,7 @@ _PARSER.add_argument(
     '--only_check_file_extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
-    help='specific file extensions to be linted. Space separated list. '
-    'If either of js or ts used then both js and ts files will be linted.',
+    help='specific file extensions to be linted. Space separated list. If either of js or ts used then both js and ts files will be linted.',
     action='store',
 )
 _PARSER.add_argument('--shard', help='Name of shard to run lint checks for')
@@ -129,9 +128,7 @@ class FileCache:
     """Provides thread-safe access to cached file content."""
 
     def __init__(self) -> None:
-        self._CACHE_DATA_DICT: Dict[
-            Tuple[str, common.TextModeTypes], Tuple[str, Tuple[str, ...]]
-        ] = {}
+        self._CACHE_DATA_DICT: Dict[Tuple[str, common.TextModeTypes], Tuple[str, Tuple[str, ...]]] = {}
 
     def read(self, filepath: str, mode: common.TextModeTypes = 'r') -> str:
         """Returns the data read from the file in unicode form.
@@ -145,9 +142,7 @@ class FileCache:
         """
         return self._get_data(filepath, mode)[0]
 
-    def readlines(
-        self, filepath: str, mode: common.TextModeTypes = 'r'
-    ) -> Tuple[str, ...]:
+    def readlines(self, filepath: str, mode: common.TextModeTypes = 'r') -> Tuple[str, ...]:
         """Returns the tuple containing data line by line as read from the
         file in unicode form.
 
@@ -162,9 +157,7 @@ class FileCache:
         _, line_by_line_content = self._get_data(filepath, mode)
         return line_by_line_content
 
-    def _get_data(
-        self, filepath: str, mode: common.TextModeTypes
-    ) -> Tuple[str, Tuple[str, ...]]:
+    def _get_data(self, filepath: str, mode: common.TextModeTypes) -> Tuple[str, Tuple[str, ...]]:
         """Returns the collected data from the file corresponding to the given
         filepath.
 
@@ -216,21 +209,15 @@ def _get_linters_for_file_extension(
     else:
         general_files_to_lint = files['.%s' % file_extension_to_lint]
 
-    custom_linter, _ = general_purpose_linter.get_linters(
-        general_files_to_lint, file_cache
-    )
+    custom_linter, _ = general_purpose_linter.get_linters(general_files_to_lint, file_cache)
     custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
-        third_party_js_ts_linter, _ = js_ts_linter.get_linters(
-            files['.js'], files['.ts']
-        )
+        third_party_js_ts_linter, _ = js_ts_linter.get_linters(files['.js'], files['.ts'])
         third_party_linters.append(third_party_js_ts_linter)
 
     elif file_extension_to_lint == 'html':
-        html_lint_check_manager, third_party_html_linter = (
-            html_linter.get_linters(files['.html'], file_cache)
-        )
+        html_lint_check_manager, third_party_html_linter = html_linter.get_linters(files['.html'], file_cache)
         custom_linters.append(html_lint_check_manager)
         third_party_linters.append(third_party_html_linter)
 
@@ -249,9 +236,7 @@ def _get_linters_for_file_extension(
         code_owner_linter, _ = codeowner_linter.get_linters(file_cache)
         custom_linters.append(code_owner_linter)
 
-        custom_lint_check_manager, _ = other_files_linter.get_linters(
-            file_cache
-        )
+        custom_lint_check_manager, _ = other_files_linter.get_linters(file_cache)
         custom_linters.append(custom_lint_check_manager)
 
     return custom_linters, third_party_linters
@@ -263,19 +248,13 @@ def _get_changed_filepaths() -> List[str]:
     Returns:
         list. A list of filepaths of modified files.
     """
-    unstaged_files = subprocess.check_output(
-        ['git', 'diff', '--name-only', '--diff-filter=ACM']
-    ).splitlines()
-    staged_files = subprocess.check_output(
-        ['git', 'diff', '--cached', '--name-only', '--diff-filter=ACM']
-    ).splitlines()
+    unstaged_files = subprocess.check_output(['git', 'diff', '--name-only', '--diff-filter=ACM']).splitlines()
+    staged_files = subprocess.check_output(['git', 'diff', '--cached', '--name-only', '--diff-filter=ACM']).splitlines()
     all_changed_filepaths = unstaged_files + staged_files
     return [filepath.decode('utf-8') for filepath in all_changed_filepaths]
 
 
-def _get_all_files_in_directory(
-    dir_path: str, excluded_glob_patterns: List[str]
-) -> List[str]:
+def _get_all_files_in_directory(dir_path: str, excluded_glob_patterns: List[str]) -> List[str]:
     """Recursively collects all files in directory and
     subdirectories of specified path.
 
@@ -291,12 +270,8 @@ def _get_all_files_in_directory(
     files_in_directory = []
     for _dir, _, files in os.walk(dir_path):
         for file_name in files:
-            filepath = os.path.relpath(
-                os.path.join(_dir, file_name), start=os.getcwd()
-            )
-            if not any(
-                fnmatch.fnmatch(filepath, gp) for gp in excluded_glob_patterns
-            ):
+            filepath = os.path.relpath(os.path.join(_dir, file_name), start=os.getcwd())
+            if not any(fnmatch.fnmatch(filepath, gp) for gp in excluded_glob_patterns):
                 files_in_directory.append(filepath)
     return files_in_directory
 
@@ -317,16 +292,10 @@ def _get_file_extensions(file_extensions_to_lint: List[str]) -> Set[str]:
 
     if file_extensions_to_lint:
         # Check if 'js' and 'ts' both are present in file_extensions_to_lint.
-        js_and_ts_is_present = 'js' in file_extensions_to_lint and (
-            'ts' in file_extensions_to_lint
-        )
+        js_and_ts_is_present = 'js' in file_extensions_to_lint and ('ts' in file_extensions_to_lint)
 
         if js_and_ts_is_present:
-            print(
-                'Please use only one of "js" or "ts", as we do not have '
-                'separate linters for JS and TS files. If both these options '
-                'are used together, then the JS/TS linter will be run twice.'
-            )
+            print('Please use only one of "js" or "ts", as we do not have separate linters for JS and TS files. If both these options are used together, then the JS/TS linter will be run twice.')
             print('Exiting...')
             sys.exit(1)
 
@@ -335,9 +304,7 @@ def _get_file_extensions(file_extensions_to_lint: List[str]) -> Set[str]:
     return all_file_extensions_type
 
 
-def _get_filepaths_from_path(
-    input_path: str, namespace: multiprocessing.managers.Namespace
-) -> List[str]:
+def _get_filepaths_from_path(input_path: str, namespace: multiprocessing.managers.Namespace) -> List[str]:
     """Get paths to all lintable files recursively under a path.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -362,15 +329,11 @@ def _get_filepaths_from_path(
         return [input_path]
     else:
         eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
-        excluded_glob_patterns = [
-            line.strip() for line in file_cache.readlines(eslintignore_path)
-        ]
+        excluded_glob_patterns = [line.strip() for line in file_cache.readlines(eslintignore_path)]
         return _get_all_files_in_directory(input_path, excluded_glob_patterns)
 
 
-def _get_filepaths_from_non_other_shard(
-    shard: str, namespace: multiprocessing.managers.Namespace
-) -> List[str]:
+def _get_filepaths_from_non_other_shard(shard: str, namespace: multiprocessing.managers.Namespace) -> List[str]:
     """Get paths to lintable files in a shard besides the other shard.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -391,9 +354,7 @@ def _get_filepaths_from_non_other_shard(
     filepaths = []
     assert shard != OTHER_SHARD_NAME
     for filepath in SHARDS[shard]:
-        filepaths.extend(
-            _get_filepaths_from_path(filepath, namespace=namespace)
-        )
+        filepaths.extend(_get_filepaths_from_path(filepath, namespace=namespace))
     if len(filepaths) != len(set(filepaths)):
         # Shards are invalid because of a duplicate file.
         for filepath in filepaths:
@@ -403,8 +364,7 @@ def _get_filepaths_from_non_other_shard(
         # un-testable. It should never be reached, but we raise an
         # assertion error to catch coding errors above.
         raise AssertionError(  # pragma: no cover
-            'There is a file duplicated across shards. '
-            'We should have been able to find it but failed.'
+            'There is a file duplicated across shards. We should have been able to find it but failed.'
         )
     return filepaths
 
@@ -420,16 +380,12 @@ def _get_filepaths_from_other_shard(
     Returns:
         list(str). Paths to lintable files.
     """
-    all_filepaths = set(
-        _get_filepaths_from_path(os.getcwd(), namespace=namespace)
-    )
+    all_filepaths = set(_get_filepaths_from_path(os.getcwd(), namespace=namespace))
     filepaths_in_shards = set()
     for shard in SHARDS:
         if shard == OTHER_SHARD_NAME:
             continue
-        filepaths_in_shards |= set(
-            _get_filepaths_from_non_other_shard(shard, namespace=namespace)
-        )
+        filepaths_in_shards |= set(_get_filepaths_from_non_other_shard(shard, namespace=namespace))
     return list(all_filepaths - filepaths_in_shards)
 
 
@@ -455,9 +411,7 @@ def _get_all_filepaths(
         list(str). The list of filepaths to be linted and checked.
     """
     if input_path:
-        all_filepaths = _get_filepaths_from_path(
-            input_path, namespace=namespace
-        )
+        all_filepaths = _get_filepaths_from_path(input_path, namespace=namespace)
     elif input_filenames:
         valid_filepaths = []
         invalid_filepaths = []
@@ -467,36 +421,22 @@ def _get_all_filepaths(
             else:
                 invalid_filepaths.append(filename)
         if invalid_filepaths:
-            print(
-                'The following file(s) do not exist: %s\n'
-                'Exiting.' % invalid_filepaths
-            )
+            print('The following file(s) do not exist: %s\nExiting.' % invalid_filepaths)
             sys.exit(1)
         all_filepaths = valid_filepaths
     elif input_shard:
         if input_shard != OTHER_SHARD_NAME:
-            all_filepaths = _get_filepaths_from_non_other_shard(
-                input_shard, namespace=namespace
-            )
+            all_filepaths = _get_filepaths_from_non_other_shard(input_shard, namespace=namespace)
         else:
             all_filepaths = _get_filepaths_from_other_shard(namespace=namespace)
     else:
         all_filepaths = _get_changed_filepaths()
 
-    all_matching_filepaths = [
-        filename
-        for filename in all_filepaths
-        if not any(
-            fnmatch.fnmatch(filename, pattern)
-            for pattern in general_purpose_linter.EXCLUDED_PATHS
-        )
-    ]
+    all_matching_filepaths = [filename for filename in all_filepaths if not any(fnmatch.fnmatch(filename, pattern) for pattern in general_purpose_linter.EXCLUDED_PATHS)]
     return all_matching_filepaths
 
 
-def read_files(
-    file_paths: List[str], namespace: multiprocessing.managers.Namespace
-) -> None:
+def read_files(file_paths: List[str], namespace: multiprocessing.managers.Namespace) -> None:
     """Read all files to be checked and cache them. This will spin off multiple
     threads to increase the efficiency.
     """
@@ -512,9 +452,7 @@ def read_files(
         thread.join()
 
 
-def categorize_files(
-    file_paths: List[str], files: Dict[str, List[str]]
-) -> None:
+def categorize_files(file_paths: List[str], files: Dict[str, List[str]]) -> None:
     """Categorize all the files and store them in shared variable files.
 
     Args:
@@ -588,20 +526,14 @@ def _print_errors_stacktrace(errors_stacktrace: List[str]) -> None:
             execution failure.
     """
     print('')
-    print(
-        'Unable to run the complete lint test, please check '
-        'the following stack trace and fix the errors:'
-    )
+    print('Unable to run the complete lint test, please check the following stack trace and fix the errors:')
     print('+--------------------------+')
     for stacktrace in errors_stacktrace:
         print(stacktrace)
         print('--------------------------------------------------')
         print('')
     print('--------------------------------------------------')
-    print(
-        'Some of the linting functions may not run until the'
-        ' above errors gets fixed'
-    )
+    print('Some of the linting functions may not run until the above errors gets fixed')
 
 
 def _get_space_separated_linter_name(linter_name: str) -> str:
@@ -613,9 +545,7 @@ def _get_space_separated_linter_name(linter_name: str) -> str:
     Returns:
         str. Space separated name of the linter class.
     """
-    return re.sub(
-        r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))', r' \1', linter_name
-    )
+    return re.sub(r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))', r' \1', linter_name)
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -629,9 +559,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     parsed_args = _PARSER.parse_args(args=args)
     # File extension to be linted.
-    file_extension_types = _get_file_extensions(
-        parsed_args.only_check_file_extensions
-    )
+    file_extension_types = _get_file_extensions(parsed_args.only_check_file_extensions)
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
@@ -662,16 +590,12 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Prepare custom tasks.
     custom_max_concurrent_runs = 25
-    custom_concurrent_count = min(
-        multiprocessing.cpu_count(), custom_max_concurrent_runs
-    )
+    custom_concurrent_count = min(multiprocessing.cpu_count(), custom_max_concurrent_runs)
     custom_semaphore = threading.Semaphore(custom_concurrent_count)
 
     # Prepare third_party tasks.
     third_party_max_concurrent_runs = 2
-    third_party_concurrent_count = min(
-        multiprocessing.cpu_count(), third_party_max_concurrent_runs
-    )
+    third_party_concurrent_count = min(multiprocessing.cpu_count(), third_party_max_concurrent_runs)
     third_party_semaphore = threading.Semaphore(third_party_concurrent_count)
 
     custom_linters: List[linter_utils.BaseLinter] = []
@@ -680,14 +604,9 @@ def main(args: Optional[List[str]] = None) -> None:
         if file_extension_type in ('js', 'ts'):
             if len(files['.js'] + files['.ts']) == 0:
                 continue
-        elif (
-            not file_extension_type == 'other'
-            and not files['.%s' % file_extension_type]
-        ):
+        elif not file_extension_type == 'other' and not files['.%s' % file_extension_type]:
             continue
-        custom_linter, third_party_linter = _get_linters_for_file_extension(
-            file_extension_type, namespace, files
-        )
+        custom_linter, third_party_linter = _get_linters_for_file_extension(file_extension_type, namespace, files)
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 
@@ -707,9 +626,7 @@ def main(args: Optional[List[str]] = None) -> None:
         tasks_custom.append(task_custom)
 
     for _third_party_linter in third_party_linters:
-        name = _get_space_separated_linter_name(
-            type(_third_party_linter).__name__
-        )
+        name = _get_space_separated_linter_name(type(_third_party_linter).__name__)
         task_third_party = concurrent_task_utils.create_task(
             _third_party_linter.perform_all_lint_checks,
             verbose_mode_enabled,
@@ -730,9 +647,7 @@ def main(args: Optional[List[str]] = None) -> None:
     concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
 
     # Concurrency limit: 2.
-    concurrent_task_utils.execute_tasks(
-        tasks_third_party, third_party_semaphore
-    )
+    concurrent_task_utils.execute_tasks(tasks_third_party, third_party_semaphore)
 
     lint_messages: List[str] = []
     failed = False

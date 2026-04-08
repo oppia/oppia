@@ -22,10 +22,6 @@ import itertools
 import random
 import string
 
-from core import feconf, utils
-from core.constants import constants
-from core.platform import models
-
 from typing import (
     Dict,
     Final,
@@ -38,6 +34,10 @@ from typing import (
     Union,
     overload,
 )
+
+from core import feconf, utils
+from core.constants import constants
+from core.platform import models
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -62,9 +62,7 @@ class UserSettingsModel(base_models.BaseModel):
     # exploration editor.
     # TODO(1995YogeshSharma): Remove the default value once the one-off
     # migration (to give role to all users) is run.
-    role = datastore_services.StringProperty(
-        required=True, indexed=True, default=feconf.ROLE_ID_FULL_USER
-    )
+    role = datastore_services.StringProperty(required=True, indexed=True, default=feconf.ROLE_ID_FULL_USER)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = datastore_services.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
@@ -80,9 +78,7 @@ class UserSettingsModel(base_models.BaseModel):
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
     # Subject interests specified by the user.
-    subject_interests = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    subject_interests = datastore_services.StringProperty(repeated=True, indexed=True)
     # When the user last edited an exploration.
     # Exploration language preferences specified by the user.
     # These language preferences are mainly for the purpose
@@ -95,22 +91,16 @@ class UserSettingsModel(base_models.BaseModel):
     # System language preference (for I18N).
     preferred_site_language_code = datastore_services.StringProperty(
         default=None,
-        choices=[
-            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
-        ],
+        choices=[language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES],
     )
     # Audio language preference used for audio translations.
     preferred_audio_language_code = datastore_services.StringProperty(
         default=None,
-        choices=[
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
-        ],
+        choices=[language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES],
     )
     # Language preference when submitting text translations in the
     # contributor dashboard.
-    preferred_translation_language_code = datastore_services.StringProperty(
-        default=None
-    )
+    preferred_translation_language_code = datastore_services.StringProperty(default=None)
 
     # Attributes used for full users only.
 
@@ -119,20 +109,12 @@ class UserSettingsModel(base_models.BaseModel):
     # Normalized username to use for duplicate-username queries. May be None.
     normalized_username = datastore_services.StringProperty(indexed=True)
     # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = datastore_services.DateTimeProperty(
-        default=None
-    )
+    last_started_state_editor_tutorial = datastore_services.DateTimeProperty(default=None)
     # When the user last started the state translation tutorial. May be None.
-    last_started_state_translation_tutorial = (
-        datastore_services.DateTimeProperty(default=None)
-    )
-    last_edited_an_exploration = datastore_services.DateTimeProperty(
-        default=None
-    )
+    last_started_state_translation_tutorial = datastore_services.DateTimeProperty(default=None)
+    last_edited_an_exploration = datastore_services.DateTimeProperty(default=None)
     # When the user last created an exploration.
-    last_created_an_exploration = datastore_services.DateTimeProperty(
-        default=None
-    )
+    last_created_an_exploration = datastore_services.DateTimeProperty(default=None)
     # The preferred dashboard of the user.
     default_dashboard = datastore_services.StringProperty(
         default=constants.DASHBOARD_TYPE_LEARNER,
@@ -147,9 +129,7 @@ class UserSettingsModel(base_models.BaseModel):
     creator_dashboard_display_pref = datastore_services.StringProperty(
         default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
         indexed=True,
-        choices=list(
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
-        ),
+        choices=list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()),
     )
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
@@ -157,16 +137,12 @@ class UserSettingsModel(base_models.BaseModel):
 
     # Currently, "roles" and "banned" fields are not in use.
     # A list of roles assigned to the user.
-    roles = datastore_services.StringProperty(
-        repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES
-    )
+    roles = datastore_services.StringProperty(repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
     # Flag to check whether the user has viewed lesson info modal once which
     # shows the progress of the user through exploration checkpoints.
-    has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(
-        indexed=True, default=False
-    )
+    has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(indexed=True, default=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -176,9 +152,7 @@ class UserSettingsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -272,57 +246,23 @@ class UserSettingsModel(base_models.BaseModel):
             'banned': user.banned,
             'username': user.username,
             'normalized_username': user.normalized_username,
-            'last_agreed_to_terms_msec': (
-                utils.get_time_in_millisecs(user.last_agreed_to_terms)
-                if user.last_agreed_to_terms
-                else None
-            ),
-            'last_started_state_editor_tutorial_msec': (
-                utils.get_time_in_millisecs(
-                    user.last_started_state_editor_tutorial
-                )
-                if user.last_started_state_editor_tutorial
-                else None
-            ),
-            'last_started_state_translation_tutorial_msec': (
-                utils.get_time_in_millisecs(
-                    user.last_started_state_translation_tutorial
-                )
-                if user.last_started_state_translation_tutorial
-                else None
-            ),
-            'last_logged_in_msec': (
-                utils.get_time_in_millisecs(user.last_logged_in)
-                if user.last_logged_in
-                else None
-            ),
-            'last_edited_an_exploration_msec': (
-                utils.get_time_in_millisecs(user.last_edited_an_exploration)
-                if user.last_edited_an_exploration
-                else None
-            ),
-            'last_created_an_exploration_msec': (
-                utils.get_time_in_millisecs(user.last_created_an_exploration)
-                if user.last_created_an_exploration
-                else None
-            ),
+            'last_agreed_to_terms_msec': (utils.get_time_in_millisecs(user.last_agreed_to_terms) if user.last_agreed_to_terms else None),
+            'last_started_state_editor_tutorial_msec': (utils.get_time_in_millisecs(user.last_started_state_editor_tutorial) if user.last_started_state_editor_tutorial else None),
+            'last_started_state_translation_tutorial_msec': (utils.get_time_in_millisecs(user.last_started_state_translation_tutorial) if user.last_started_state_translation_tutorial else None),
+            'last_logged_in_msec': (utils.get_time_in_millisecs(user.last_logged_in) if user.last_logged_in else None),
+            'last_edited_an_exploration_msec': (utils.get_time_in_millisecs(user.last_edited_an_exploration) if user.last_edited_an_exploration else None),
+            'last_created_an_exploration_msec': (utils.get_time_in_millisecs(user.last_created_an_exploration) if user.last_created_an_exploration else None),
             'default_dashboard': user.default_dashboard,
-            'creator_dashboard_display_pref': (
-                user.creator_dashboard_display_pref
-            ),
+            'creator_dashboard_display_pref': (user.creator_dashboard_display_pref),
             'user_bio': user.user_bio,
             'subject_interests': user.subject_interests,
             'first_contribution_msec': user.first_contribution_msec,
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
-            'preferred_translation_language_code': (
-                user.preferred_translation_language_code
-            ),
+            'preferred_translation_language_code': (user.preferred_translation_language_code),
             'display_alias': user.display_alias,
-            'has_viewed_lesson_info_modal_once': (
-                user.has_viewed_lesson_info_modal_once
-            ),
+            'has_viewed_lesson_info_modal_once': (user.has_viewed_lesson_info_modal_once),
         }
 
     @classmethod
@@ -343,13 +283,8 @@ class UserSettingsModel(base_models.BaseModel):
                 of attempts.
         """
         for _ in range(base_models.MAX_RETRIES):
-            new_id = 'uid_%s' % ''.join(
-                random.choice(string.ascii_lowercase)
-                for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH)
-            )
-            if not cls.get_by_id(new_id) and not DeletedUserModel.get_by_id(
-                new_id
-            ):
+            new_id = 'uid_%s' % ''.join(random.choice(string.ascii_lowercase) for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
+            if not cls.get_by_id(new_id) and not DeletedUserModel.get_by_id(new_id):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -365,24 +300,11 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             bool. Whether the normalized_username has already been taken.
         """
-        hashed_normalized_username = utils.convert_to_hash(
-            normalized_username, DeletedUsernameModel.ID_LENGTH
-        )
-        return (
-            cls.query()
-            .filter(cls.normalized_username == normalized_username)
-            .get()
-            is not None
-            or DeletedUsernameModel.get(
-                hashed_normalized_username, strict=False
-            )
-            is not None
-        )
+        hashed_normalized_username = utils.convert_to_hash(normalized_username, DeletedUsernameModel.ID_LENGTH)
+        return cls.query().filter(cls.normalized_username == normalized_username).get() is not None or DeletedUsernameModel.get(hashed_normalized_username, strict=False) is not None
 
     @classmethod
-    def get_by_normalized_username(
-        cls, normalized_username: str
-    ) -> Optional[UserSettingsModel]:
+    def get_by_normalized_username(cls, normalized_username: str) -> Optional[UserSettingsModel]:
         """Returns a user model given a normalized username.
 
         Args:
@@ -392,11 +314,7 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel. The UserSettingsModel instance which contains
             the same normalized_username.
         """
-        return (
-            cls.get_all()
-            .filter(cls.normalized_username == normalized_username)
-            .get()
-        )
+        return cls.get_all().filter(cls.normalized_username == normalized_username).get()
 
     @classmethod
     def get_by_email(cls, email: str) -> Optional[UserSettingsModel]:
@@ -433,25 +351,17 @@ class CompletedActivitiesModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations completed by the user.
-    exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    exploration_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections completed by the user.
-    collection_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    collection_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the stories completed by the user.
     story_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the topics learnt by the user (i.e. the topics in which the
     # learner has completed all the stories).
-    learnt_topic_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    learnt_topic_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the topics learnt by the user(i.e. the topics in which the
     # learner has completed all the subtopics).
-    mastered_topic_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    mastered_topic_ids = datastore_services.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -459,9 +369,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -537,25 +445,17 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     """
 
     # The ids of the explorations partially completed by the user.
-    exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    exploration_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # The ids of the collections partially completed by the user.
-    collection_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    collection_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the stories partially completed by the user.
     story_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the topics partially learnt by the user(i.e. the topics in
     # which the learner has not completed all the stories).
-    partially_learnt_topic_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    partially_learnt_topic_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the topics partially mastered by the user(i.e. the topics in
     # which the learner has not completed all the subtopics).
-    partially_mastered_topic_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    partially_mastered_topic_ids = datastore_services.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -563,9 +463,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -579,9 +477,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
                 'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
                 'story_ids': base_models.EXPORT_POLICY.EXPORTED,
                 'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
-                'partially_mastered_topic_ids': (
-                    base_models.EXPORT_POLICY.EXPORTED
-                ),
+                'partially_mastered_topic_ids': (base_models.EXPORT_POLICY.EXPORTED),
             },
         )
 
@@ -629,12 +525,8 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'story_ids': user_model.story_ids,
-            'partially_learnt_topic_ids': (
-                user_model.partially_learnt_topic_ids
-            ),
-            'partially_mastered_topic_ids': (
-                user_model.partially_mastered_topic_ids
-            ),
+            'partially_learnt_topic_ids': (user_model.partially_learnt_topic_ids),
+            'partially_mastered_topic_ids': (user_model.partially_mastered_topic_ids),
         }
 
 
@@ -648,9 +540,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # The user id.
     user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration id.
-    exploration_id = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    exploration_id = datastore_services.StringProperty(required=True, indexed=True)
     # The version of the exploration last played by the user.
     last_played_exp_version = datastore_services.IntegerProperty(default=None)
     # The name of the state at which the learner left the exploration when
@@ -665,9 +555,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user, since a user
         has multiple playthroughs associated with their account.
         """
@@ -724,9 +612,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return '%s.%s' % (user_id, exploration_id)
 
     @classmethod
-    def create(
-        cls, user_id: str, exploration_id: str
-    ) -> ExpUserLastPlaythroughModel:
+    def create(cls, user_id: str, exploration_id: str) -> ExpUserLastPlaythroughModel:
         """Creates a new ExpUserLastPlaythroughModel instance and returns it.
 
         Args:
@@ -738,9 +624,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             ExpUserLastPlaythroughModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return cls(
-            id=instance_id, user_id=user_id, exploration_id=exploration_id
-        )
+        return cls(id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
@@ -761,14 +645,10 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return super(ExpUserLastPlaythroughModel, cls).get(
-            instance_id, strict=False
-        )
+        return super(ExpUserLastPlaythroughModel, cls).get(instance_id, strict=False)
 
     @classmethod
-    def export_data(
-        cls, user_id: str
-    ) -> Dict[str, Dict[str, Union[int, str, None]]]:
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, Union[int, str, None]]]:
         """Takeout: Export ExpUserLastPlaythroughModel user-relevant properties.
 
         Args:
@@ -799,13 +679,9 @@ class LearnerGoalsModel(base_models.BaseModel):
     """
 
     # IDs of all the topics selected by the user to learn.
-    topic_ids_to_learn = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    topic_ids_to_learn = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the topics selected by the user to master.
-    topic_ids_to_master = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    topic_ids_to_master = datastore_services.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -813,9 +689,7 @@ class LearnerGoalsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -882,13 +756,9 @@ class LearnerPlaylistModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations in the playlist of the user.
-    exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    exploration_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections in the playlist of the user.
-    collection_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    collection_ids = datastore_services.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -896,9 +766,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -965,14 +833,10 @@ class UserContributionsModel(base_models.BaseModel):
     """
 
     # IDs of explorations that this user has created.
-    created_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    created_exploration_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of explorations that this user has made a positive
     # (i.e. non-revert) commit to.
-    edited_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    edited_exploration_ids = datastore_services.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -980,9 +844,7 @@ class UserContributionsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1051,19 +913,13 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     site_updates = datastore_services.BooleanProperty(indexed=True)
     # The user's preference for receiving email when user is added as a member
     # in exploration. This is set to True when user has never set a preference.
-    editor_role_notifications = datastore_services.BooleanProperty(
-        indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE
-    )
+    editor_role_notifications = datastore_services.BooleanProperty(indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
     # The user's preference for receiving email when user receives feedback
     # message for his/her exploration.
-    feedback_message_notifications = datastore_services.BooleanProperty(
-        indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
-    )
+    feedback_message_notifications = datastore_services.BooleanProperty(indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
     # The user's preference for receiving email when a creator, to which this
     # user has subscribed, publishes an exploration.
-    subscription_notifications = datastore_services.BooleanProperty(
-        indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
-    )
+    subscription_notifications = datastore_services.BooleanProperty(indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1092,9 +948,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1133,17 +987,11 @@ class UserSubscriptionsModel(base_models.BaseModel):
     """
 
     # IDs of explorations that this user subscribes to.
-    exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    exploration_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of collections that this user subscribes to.
-    collection_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    collection_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
-    general_feedback_thread_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    general_feedback_thread_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # IDs of the creators to whom this learner has subscribed.
     creator_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
@@ -1155,9 +1003,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1198,9 +1044,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        user_subscriptions_models: List[UserSubscriptionsModel] = list(
-            cls.query(cls.creator_ids == user_id).fetch()
-        )
+        user_subscriptions_models: List[UserSubscriptionsModel] = list(cls.query(cls.creator_ids == user_id).fetch())
 
         for user_subscribers_model in user_subscriptions_models:
             user_subscribers_model.creator_ids.remove(user_id)
@@ -1224,11 +1068,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return (
-            cls.query(cls.creator_ids == user_id).get(keys_only=True)
-            is not None
-            or cls.get_by_id(user_id) is not None
-        )
+        return cls.query(cls.creator_ids == user_id).get(keys_only=True) is not None or cls.get_by_id(user_id) is not None
 
     @staticmethod
     def export_data(user_id: str) -> Dict[str, Union[List[str], float, None]]:
@@ -1250,30 +1090,20 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         # Ruling out the possibility of None for mypy type checking.
         assert user_model is not None
-        creator_user_models = UserSettingsModel.get_multi(
-            user_model.creator_ids
-        )
+        creator_user_models = UserSettingsModel.get_multi(user_model.creator_ids)
         filtered_creator_user_models = []
         for creator_user_model in creator_user_models:
             if creator_user_model is None:
                 continue
             filtered_creator_user_models.append(creator_user_model)
-        creator_usernames = [
-            creator.username for creator in filtered_creator_user_models
-        ]
+        creator_usernames = [creator.username for creator in filtered_creator_user_models]
 
         user_data = {
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
-            'general_feedback_thread_ids': (
-                user_model.general_feedback_thread_ids
-            ),
+            'general_feedback_thread_ids': (user_model.general_feedback_thread_ids),
             'creator_usernames': creator_usernames,
-            'last_checked_msec': (
-                None
-                if user_model.last_checked is None
-                else utils.get_time_in_millisecs(user_model.last_checked)
-            ),
+            'last_checked_msec': (None if user_model.last_checked is None else utils.get_time_in_millisecs(user_model.last_checked)),
         }
 
         return user_data
@@ -1286,9 +1116,7 @@ class UserSubscribersModel(base_models.BaseModel):
     """
 
     # IDs of the learners who have subscribed to this user.
-    subscriber_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    subscriber_ids = datastore_services.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1302,9 +1130,7 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        user_subscribers_models: List[UserSubscribersModel] = list(
-            cls.query(cls.subscriber_ids == user_id).fetch()
-        )
+        user_subscribers_models: List[UserSubscribersModel] = list(cls.query(cls.subscriber_ids == user_id).fetch())
 
         for user_subscribers_model in user_subscribers_models:
             user_subscribers_model.subscriber_ids.remove(user_id)
@@ -1327,16 +1153,10 @@ class UserSubscribersModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return (
-            cls.query(cls.subscriber_ids == user_id).get(keys_only=True)
-            is not None
-            or cls.get_by_id(user_id) is not None
-        )
+        return cls.query(cls.subscriber_ids == user_id).get(keys_only=True) is not None or cls.get_by_id(user_id) is not None
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not included because it contains data corresponding to other
         users.
         """
@@ -1393,9 +1213,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1468,9 +1286,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -1578,9 +1394,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user id.
     user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration id.
-    exploration_id = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    exploration_id = datastore_services.StringProperty(required=True, indexed=True)
     # The rating (1-5) the user assigned to the exploration. Note that this
     # represents a rating given on completion of the exploration.
     rating = datastore_services.IntegerProperty(default=None, indexed=True)
@@ -1589,13 +1403,9 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # List of uncommitted changes made by the user to the exploration.
     draft_change_list = datastore_services.JsonProperty(default=None)
     # Timestamp of when the change list was last updated.
-    draft_change_list_last_updated = datastore_services.DateTimeProperty(
-        default=None
-    )
+    draft_change_list_last_updated = datastore_services.DateTimeProperty(default=None)
     # The exploration version that this change list applied to.
-    draft_change_list_exp_version = datastore_services.IntegerProperty(
-        default=None
-    )
+    draft_change_list_exp_version = datastore_services.IntegerProperty(default=None)
     # The version of the draft change list which was last saved by the user.
     # Can be zero if the draft is None or if the user has not committed
     # draft changes to this exploration since the draft_change_list_id property
@@ -1603,29 +1413,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
     draft_change_list_id = datastore_services.IntegerProperty(default=0)
     # The user's preference for receiving suggestion emails for this
     # exploration.
-    mute_suggestion_notifications = datastore_services.BooleanProperty(
-        default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
-    )
+    mute_suggestion_notifications = datastore_services.BooleanProperty(default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
     # The user's preference for receiving feedback emails for this exploration.
-    mute_feedback_notifications = datastore_services.BooleanProperty(
-        default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
-    )
+    mute_feedback_notifications = datastore_services.BooleanProperty(default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
     # The state name of the furthest reached checkpoint.
-    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
-        default=None
-    )
+    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(default=None)
     # The exploration version of the furthest reached checkpoint.
-    furthest_reached_checkpoint_exp_version = (
-        datastore_services.IntegerProperty(default=None)
-    )
+    furthest_reached_checkpoint_exp_version = datastore_services.IntegerProperty(default=None)
     # The state name of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_state_name = (
-        datastore_services.StringProperty(default=None)
-    )
+    most_recently_reached_checkpoint_state_name = datastore_services.StringProperty(default=None)
     # The exploration version of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_exp_version = (
-        datastore_services.IntegerProperty(default=None)
-    )
+    most_recently_reached_checkpoint_exp_version = datastore_services.IntegerProperty(default=None)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1645,9 +1443,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         datastore_services.delete_multi(keys)
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple explorations (and corresponding data) relevant to a user.
         """
@@ -1714,9 +1510,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return '%s.%s' % (user_id, exploration_id)
 
     @classmethod
-    def create(
-        cls, user_id: str, exploration_id: str
-    ) -> ExplorationUserDataModel:
+    def create(cls, user_id: str, exploration_id: str) -> ExplorationUserDataModel:
         """Creates a new ExplorationUserDataModel instance and returns it.
 
         Note that the client is responsible for actually saving this entity to
@@ -1731,9 +1525,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return cls(
-            id=instance_id, user_id=user_id, exploration_id=exploration_id
-        )
+        return cls(id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
@@ -1753,9 +1545,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
-        return super(ExplorationUserDataModel, cls).get(
-            instance_id, strict=False
-        )
+        return super(ExplorationUserDataModel, cls).get(instance_id, strict=False)
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
@@ -1775,17 +1565,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
             list(ExplorationUserDataModel|None). The ExplorationUserDataModel
             instance which matches with the given user_ids and exploration_ids.
         """
-        instance_ids = [
-            cls._generate_id(user_id, exploration_id)
-            for (user_id, exploration_id) in user_id_exp_id_combinations
-        ]
+        instance_ids = [cls._generate_id(user_id, exploration_id) for (user_id, exploration_id) in user_id_exp_id_combinations]
 
         return super(ExplorationUserDataModel, cls).get_multi(instance_ids)
 
     @classmethod
-    def export_data(
-        cls, user_id: str
-    ) -> Dict[str, Dict[str, Union[str, float, bool, None]]]:
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, Union[str, float, bool, None]]]:
         """Takeout: Export user-relevant properties of ExplorationUserDataModel.
 
         Args:
@@ -1801,41 +1586,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
-                'rated_on_msec': (
-                    utils.get_time_in_millisecs(user_model.rated_on)
-                    if user_model.rated_on
-                    else None
-                ),
+                'rated_on_msec': (utils.get_time_in_millisecs(user_model.rated_on) if user_model.rated_on else None),
                 'draft_change_list': user_model.draft_change_list,
-                'draft_change_list_last_updated_msec': (
-                    utils.get_time_in_millisecs(
-                        user_model.draft_change_list_last_updated
-                    )
-                    if user_model.draft_change_list_last_updated
-                    else None
-                ),
-                'draft_change_list_exp_version': (
-                    user_model.draft_change_list_exp_version
-                ),
+                'draft_change_list_last_updated_msec': (utils.get_time_in_millisecs(user_model.draft_change_list_last_updated) if user_model.draft_change_list_last_updated else None),
+                'draft_change_list_exp_version': (user_model.draft_change_list_exp_version),
                 'draft_change_list_id': user_model.draft_change_list_id,
-                'mute_suggestion_notifications': (
-                    user_model.mute_suggestion_notifications
-                ),
-                'mute_feedback_notifications': (
-                    user_model.mute_feedback_notifications
-                ),
-                'furthest_reached_checkpoint_exp_version': (
-                    user_model.furthest_reached_checkpoint_exp_version
-                ),
-                'furthest_reached_checkpoint_state_name': (
-                    user_model.furthest_reached_checkpoint_state_name
-                ),
-                'most_recently_reached_checkpoint_exp_version': (
-                    user_model.most_recently_reached_checkpoint_exp_version
-                ),
-                'most_recently_reached_checkpoint_state_name': (
-                    user_model.most_recently_reached_checkpoint_state_name
-                ),
+                'mute_suggestion_notifications': (user_model.mute_suggestion_notifications),
+                'mute_feedback_notifications': (user_model.mute_feedback_notifications),
+                'furthest_reached_checkpoint_exp_version': (user_model.furthest_reached_checkpoint_exp_version),
+                'furthest_reached_checkpoint_state_name': (user_model.furthest_reached_checkpoint_state_name),
+                'most_recently_reached_checkpoint_exp_version': (user_model.most_recently_reached_checkpoint_exp_version),
+                'most_recently_reached_checkpoint_state_name': (user_model.most_recently_reached_checkpoint_state_name),
             }
 
         return user_data
@@ -1858,9 +1619,7 @@ class CollectionProgressModel(base_models.BaseModel):
     # The user id.
     user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The collection id.
-    collection_id = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    collection_id = datastore_services.StringProperty(required=True, indexed=True)
     # The list of IDs of explorations which have been completed within the
     # context of the collection represented by collection_id.
     completed_explorations = datastore_services.StringProperty(repeated=True)
@@ -1873,9 +1632,7 @@ class CollectionProgressModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there can be
         multiple collections associated with a user.
         """
@@ -1931,9 +1688,7 @@ class CollectionProgressModel(base_models.BaseModel):
         return '%s.%s' % (user_id, collection_id)
 
     @classmethod
-    def create(
-        cls, user_id: str, collection_id: str
-    ) -> CollectionProgressModel:
+    def create(cls, user_id: str, collection_id: str) -> CollectionProgressModel:
         """Creates a new CollectionProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
@@ -1968,9 +1723,7 @@ class CollectionProgressModel(base_models.BaseModel):
             which matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
-        return super(CollectionProgressModel, cls).get(
-            instance_id, strict=False
-        )
+        return super(CollectionProgressModel, cls).get(instance_id, strict=False)
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
@@ -1989,17 +1742,12 @@ class CollectionProgressModel(base_models.BaseModel):
             list(CollectionProgressModel). The list of CollectionProgressModel
             instances which matches the given user_id and collection_ids.
         """
-        instance_ids = [
-            cls._generate_id(user_id, collection_id)
-            for collection_id in collection_ids
-        ]
+        instance_ids = [cls._generate_id(user_id, collection_id) for collection_id in collection_ids]
 
         return super(CollectionProgressModel, cls).get_multi(instance_ids)
 
     @classmethod
-    def get_or_create(
-        cls, user_id: str, collection_id: str
-    ) -> CollectionProgressModel:
+    def get_or_create(cls, user_id: str, collection_id: str) -> CollectionProgressModel:
         """Gets the CollectionProgressModel for the given user and collection
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
@@ -2035,9 +1783,7 @@ class CollectionProgressModel(base_models.BaseModel):
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
-            user_data[user_model.collection_id] = {
-                'completed_explorations': user_model.completed_explorations
-            }
+            user_data[user_model.collection_id] = {'completed_explorations': user_model.completed_explorations}
 
         return user_data
 
@@ -2068,9 +1814,7 @@ class StoryProgressModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user
         can have multiple stories associated with their account.
         """
@@ -2149,26 +1893,18 @@ class StoryProgressModel(base_models.BaseModel):
 
     @overload
     @classmethod
-    def get(
-        cls, user_id: str, story_id: str, *, strict: Literal[True]
-    ) -> StoryProgressModel: ...
+    def get(cls, user_id: str, story_id: str, *, strict: Literal[True]) -> StoryProgressModel: ...
 
     @overload
     @classmethod
-    def get(
-        cls, user_id: str, story_id: str, *, strict: Literal[False]
-    ) -> Optional[StoryProgressModel]: ...
+    def get(cls, user_id: str, story_id: str, *, strict: Literal[False]) -> Optional[StoryProgressModel]: ...
 
     @overload
     @classmethod
-    def get(
-        cls, user_id: str, story_id: str, *, strict: bool = ...
-    ) -> Optional[StoryProgressModel]: ...
+    def get(cls, user_id: str, story_id: str, *, strict: bool = ...) -> Optional[StoryProgressModel]: ...
 
     @classmethod
-    def get(
-        cls, user_id: str, story_id: str, strict: bool = True
-    ) -> Optional[StoryProgressModel]:
+    def get(cls, user_id: str, story_id: str, strict: bool = True) -> Optional[StoryProgressModel]:
         """Gets the StoryProgressModel for the given user and story
         id.
 
@@ -2203,10 +1939,7 @@ class StoryProgressModel(base_models.BaseModel):
             instances which matches the given user_ids and story_ids.
         """
         all_posssible_combinations = itertools.product(user_ids, story_ids)
-        instance_ids = [
-            cls._generate_id(user_id, story_id)
-            for (user_id, story_id) in all_posssible_combinations
-        ]
+        instance_ids = [cls._generate_id(user_id, story_id) for (user_id, story_id) in all_posssible_combinations]
 
         return super(StoryProgressModel, cls).get_multi(instance_ids)
 
@@ -2249,9 +1982,7 @@ class StoryProgressModel(base_models.BaseModel):
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
-            user_data[user_model.story_id] = {
-                'completed_node_ids': user_model.completed_node_ids
-            }
+            user_data[user_model.story_id] = {'completed_node_ids': user_model.completed_node_ids}
         return user_data
 
 
@@ -2274,9 +2005,7 @@ class UserQueryModel(base_models.BaseModel):
     inactive_in_last_n_days = datastore_services.IntegerProperty(default=None)
     # Query option to check whether given user has logged in
     # since last n days.
-    has_not_logged_in_for_n_days = datastore_services.IntegerProperty(
-        default=None
-    )
+    has_not_logged_in_for_n_days = datastore_services.IntegerProperty(default=None)
     # Query option to check whether user has created at least
     # n explorations.
     created_at_least_n_exps = datastore_services.IntegerProperty(default=None)
@@ -2294,18 +2023,12 @@ class UserQueryModel(base_models.BaseModel):
     # this list will be populated with all qualifying user ids.
     user_ids = datastore_services.JsonProperty(default=[], compressed=True)
     # ID of the user who submitted the query.
-    submitter_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    submitter_id = datastore_services.StringProperty(indexed=True, required=True)
     # ID of the instance of BulkEmailModel which stores information
     # about sent emails.
-    sent_email_model_id = datastore_services.StringProperty(
-        default=None, indexed=True
-    )
+    sent_email_model_id = datastore_services.StringProperty(default=None, indexed=True)
     # Current status of the query.
-    query_status = datastore_services.StringProperty(
-        indexed=True, choices=feconf.ALLOWED_USER_QUERY_STATUSES
-    )
+    query_status = datastore_services.StringProperty(indexed=True, choices=feconf.ALLOWED_USER_QUERY_STATUSES)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2319,9 +2042,7 @@ class UserQueryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is not exported since this is a computed model
         and the information already exists in other exported models.
         """
@@ -2370,17 +2091,12 @@ class UserQueryModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return (
-            cls.query(cls.submitter_id == user_id).get(keys_only=True)
-            is not None
-        )
+        return cls.query(cls.submitter_id == user_id).get(keys_only=True) is not None
 
     # TODO(#13523): Change the return value of the function below from
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
-    def fetch_page(
-        cls, page_size: int, cursor: Optional[str]
-    ) -> Tuple[Sequence[UserQueryModel], Optional[str], bool]:
+    def fetch_page(cls, page_size: int, cursor: Optional[str]) -> Tuple[Sequence[UserQueryModel], Optional[str], bool]:
         """Fetches a list of all query_models sorted by creation date.
 
         Args:
@@ -2404,23 +2120,15 @@ class UserQueryModel(base_models.BaseModel):
         start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
 
         created_on_query = cls.query().order(-cls.created_on)
-        fetch_result: Tuple[
-            Sequence[UserQueryModel], datastore_services.Cursor, bool
-        ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
+        fetch_result: Tuple[Sequence[UserQueryModel], datastore_services.Cursor, bool] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
         query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        fetch_result = created_on_query.fetch_page(
-            page_size + 1, start_cursor=start_cursor
-        )
+        fetch_result = created_on_query.fetch_page(page_size + 1, start_cursor=start_cursor)
         plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
-        next_cursor_str = (
-            next_cursor.urlsafe().decode('utf-8')
-            if (next_cursor and more_results)
-            else None
-        )
+        next_cursor_str = next_cursor.urlsafe().decode('utf-8') if (next_cursor and more_results) else None
         return (query_models, next_cursor_str, more_results)
 
 
@@ -2432,9 +2140,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
-    sent_email_model_ids = datastore_services.StringProperty(
-        indexed=True, repeated=True
-    )
+    sent_email_model_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2463,9 +2169,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
         cls.delete_by_id(user_id)
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -2474,9 +2178,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(
             super(cls, cls).get_export_policy(),
-            **{
-                'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            },
+            **{'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE},
         )
 
 
@@ -2503,9 +2205,7 @@ class UserGroupModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user can
         be part of multiple user groups.
         """
@@ -2532,9 +2232,7 @@ class UserGroupModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return (
-            cls.query(cls.user_ids == user_id).get(keys_only=True) is not None
-        )
+        return cls.query(cls.user_ids == user_id).get(keys_only=True) is not None
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
@@ -2543,9 +2241,7 @@ class UserGroupModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        user_group_models: List[UserGroupModel] = list(
-            cls.query(cls.user_ids == user_id).fetch()
-        )
+        user_group_models: List[UserGroupModel] = list(cls.query(cls.user_ids == user_id).fetch())
 
         for user_group_model in user_group_models:
             user_group_model.user_ids.remove(user_id)
@@ -2565,9 +2261,7 @@ class UserGroupModel(base_models.BaseModel):
             dict. Dictionary of the data from UserGroupModel.
         """
         user_data = {}
-        user_group_models: List[UserGroupModel] = list(
-            cls.query(cls.user_ids == user_id).fetch()
-        )
+        user_group_models: List[UserGroupModel] = list(cls.query(cls.user_ids == user_id).fetch())
         for user_group_model in user_group_models:
             user_data[user_group_model.id] = {
                 'name': user_group_model.name,
@@ -2590,9 +2284,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
     # The skill id for which the degree of mastery is stored.
     skill_id = datastore_services.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in the skill.
-    degree_of_mastery = datastore_services.FloatProperty(
-        required=True, indexed=True
-    )
+    degree_of_mastery = datastore_services.FloatProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2602,9 +2294,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user has
         many relevant skill masteries.
         """
@@ -2670,14 +2360,10 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """
 
         user_data = {}
-        mastery_models: Sequence[UserSkillMasteryModel] = (
-            cls.get_all().filter(cls.user_id == user_id).fetch()
-        )
+        mastery_models: Sequence[UserSkillMasteryModel] = cls.get_all().filter(cls.user_id == user_id).fetch()
         for mastery_model in mastery_models:
             mastery_model_skill_id = mastery_model.skill_id
-            user_data[mastery_model_skill_id] = {
-                'degree_of_mastery': mastery_model.degree_of_mastery
-            }
+            user_data[mastery_model_skill_id] = {'degree_of_mastery': mastery_model.degree_of_mastery}
 
         return user_data
 
@@ -2693,15 +2379,11 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     # The user id of the user.
     user_id = datastore_services.StringProperty(required=True, indexed=True)
     # The category of suggestion to score the user on.
-    score_category = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    score_category = datastore_services.StringProperty(required=True, indexed=True)
     # The score of the user for the above category of suggestions.
     score = datastore_services.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
-    onboarding_email_sent = datastore_services.BooleanProperty(
-        required=True, default=False
-    )
+    onboarding_email_sent = datastore_services.BooleanProperty(required=True, default=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2711,9 +2393,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since a user has
         multiple relevant contribution proficiencies.
         """
@@ -2733,9 +2413,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         )
 
     @classmethod
-    def export_data(
-        cls, user_id: str
-    ) -> Dict[str, Dict[str, Union[float, bool]]]:
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, Union[float, bool]]]:
         """(Takeout) Exports the data from UserContributionProficiencyModel
         into dict format.
 
@@ -2746,9 +2424,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             dict. Dictionary of the data from UserContributionProficiencyModel.
         """
         user_data = {}
-        scoring_models: Sequence[UserContributionProficiencyModel] = cls.query(
-            cls.user_id == user_id
-        ).fetch()
+        scoring_models: Sequence[UserContributionProficiencyModel] = cls.query(cls.user_id == user_id).fetch()
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
@@ -2779,9 +2455,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def get_all_categories_where_user_can_review(
-        cls, user_id: str
-    ) -> List[str]:
+    def get_all_categories_where_user_can_review(cls, user_id: str) -> List[str]:
         """Gets all the score categories where the user has a score above the
         threshold.
 
@@ -2802,14 +2476,10 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             )
             .fetch()
         )
-        return [
-            scoring_model.score_category for scoring_model in scoring_models
-        ]
+        return [scoring_model.score_category for scoring_model in scoring_models]
 
     @classmethod
-    def get_all_scores_of_user(
-        cls, user_id: str
-    ) -> Sequence[UserContributionProficiencyModel]:
+    def get_all_scores_of_user(cls, user_id: str) -> Sequence[UserContributionProficiencyModel]:
         """Gets all scores for a given user.
 
         Args:
@@ -2822,9 +2492,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         return cls.get_all().filter(cls.user_id == user_id).fetch()
 
     @classmethod
-    def get_all_users_with_score_above_minimum_for_category(
-        cls, score_category: str
-    ) -> Sequence[UserContributionProficiencyModel]:
+    def get_all_users_with_score_above_minimum_for_category(cls, score_category: str) -> Sequence[UserContributionProficiencyModel]:
         """Gets all instances which have score above the
         MINIMUM_SCORE_REQUIRED_TO_REVIEW threshold for the given category.
 
@@ -2907,10 +2575,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         instance_id = cls._get_instance_id(user_id, score_category)
 
         if cls.get_by_id(instance_id):
-            raise Exception(
-                'There is already a UserContributionProficiencyModel entry with'
-                ' the given id: %s' % instance_id
-            )
+            raise Exception('There is already a UserContributionProficiencyModel entry with the given id: %s' % instance_id)
 
         user_proficiency_model = cls(
             id=instance_id,
@@ -2930,16 +2595,10 @@ class UserContributionRightsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    can_review_translation_for_language_codes = (
-        datastore_services.StringProperty(repeated=True, indexed=True)
-    )
-    can_review_voiceover_for_language_codes = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    can_review_translation_for_language_codes = datastore_services.StringProperty(repeated=True, indexed=True)
+    can_review_voiceover_for_language_codes = datastore_services.StringProperty(repeated=True, indexed=True)
     can_review_questions = datastore_services.BooleanProperty(indexed=True)
-    can_submit_questions = datastore_services.BooleanProperty(
-        default=False, indexed=True
-    )
+    can_submit_questions = datastore_services.BooleanProperty(default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2968,9 +2627,7 @@ class UserContributionRightsModel(base_models.BaseModel):
         cls.delete_by_id(user_id)
 
     @classmethod
-    def export_data(
-        cls, user_id: str
-    ) -> Dict[str, Union[bool, List[str], None]]:
+    def export_data(cls, user_id: str) -> Dict[str, Union[bool, List[str], None]]:
         """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
 
@@ -2986,20 +2643,14 @@ class UserContributionRightsModel(base_models.BaseModel):
             return {}
 
         return {
-            'can_review_translation_for_language_codes': (
-                rights_model.can_review_translation_for_language_codes
-            ),
-            'can_review_voiceover_for_language_codes': (
-                rights_model.can_review_voiceover_for_language_codes
-            ),
+            'can_review_translation_for_language_codes': (rights_model.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (rights_model.can_review_voiceover_for_language_codes),
             'can_review_questions': rights_model.can_review_questions,
             'can_submit_questions': rights_model.can_submit_questions,
         }
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -3028,9 +2679,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             translations in the given language code.
         """
-        reviewer_keys = cls.query(
-            cls.can_review_translation_for_language_codes == language_code
-        ).fetch(keys_only=True)
+        reviewer_keys = cls.query(cls.can_review_translation_for_language_codes == language_code).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -3045,9 +2694,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             voiceovers in the given language code.
         """
-        reviewer_keys = cls.query(
-            cls.can_review_voiceover_for_language_codes == language_code
-        ).fetch(keys_only=True)
+        reviewer_keys = cls.query(cls.can_review_voiceover_for_language_codes == language_code).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -3058,10 +2705,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             questions.
         """
-        reviewer_keys = cls.query(
-            cls.can_review_questions  # pylint: disable=singleton-comparison
-            == True
-        ).fetch(keys_only=True)
+        reviewer_keys = cls.query(cls.can_review_questions).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -3072,10 +2716,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to submit
             questions.
         """
-        contributor_keys = cls.query(
-            cls.can_submit_questions  # pylint: disable=singleton-comparison
-            == True
-        ).fetch(keys_only=True)
+        contributor_keys = cls.query(cls.can_submit_questions).fetch(keys_only=True)
         return [contributor_key.id() for contributor_key in contributor_keys]
 
 
@@ -3095,14 +2736,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # Normalized username of the deleted user. May be None in the cases when
     # the user was deleted after a short time and thus the username wasn't that
     # known on the Oppia site.
-    normalized_long_term_username = datastore_services.StringProperty(
-        indexed=True
-    )
+    normalized_long_term_username = datastore_services.StringProperty(indexed=True)
 
     # Whether the deletion is completed.
-    deletion_complete = datastore_services.BooleanProperty(
-        default=False, indexed=True
-    )
+    deletion_complete = datastore_services.BooleanProperty(default=False, indexed=True)
 
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (e.g. config, feedback, story, skill,
@@ -3121,9 +2758,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     #     },
     #     'question': {}
     # }
-    pseudonymizable_entity_mappings = datastore_services.JsonProperty(
-        default={}
-    )
+    pseudonymizable_entity_mappings = datastore_services.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -3133,9 +2768,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not need to be exported as it temporarily holds user
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
@@ -3154,13 +2787,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             **{
                 'username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'normalized_long_term_username': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                ),
+                'normalized_long_term_username': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
                 'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'pseudonymizable_entity_mappings': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                ),
+                'pseudonymizable_entity_mappings': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             },
         )
 
@@ -3197,9 +2826,7 @@ class DeletedUserModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -3234,9 +2861,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -3267,10 +2892,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
                 of attempts.
         """
         for _ in range(base_models.MAX_RETRIES):
-            new_id = 'pid_%s' % ''.join(
-                random.choice(string.ascii_lowercase)
-                for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH)
-            )
+            new_id = 'pid_%s' % ''.join(random.choice(string.ascii_lowercase) for _ in range(feconf.USER_ID_RANDOM_PART_LENGTH))
 
             if not cls.get_by_id(new_id):
                 return new_id
@@ -3296,9 +2918,7 @@ class DeletedUsernameModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -3333,20 +2953,12 @@ class LearnerGroupsUserModel(base_models.BaseModel):
     """
 
     # List of learner group ids which the learner has been invited to join.
-    invited_to_learner_groups_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    invited_to_learner_groups_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
     # group and has details of the user correspoding to that group.
-    learner_groups_user_details = datastore_services.JsonProperty(
-        repeated=True, indexed=False
-    )
+    learner_groups_user_details = datastore_services.JsonProperty(repeated=True, indexed=False)
     # Version of learner group details blob schema.
-    learner_groups_user_details_schema_version = (
-        datastore_services.IntegerProperty(
-            required=True, default=0, indexed=True
-        )
-    )
+    learner_groups_user_details_schema_version = datastore_services.IntegerProperty(required=True, default=0, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -3393,18 +3005,12 @@ class LearnerGroupsUserModel(base_models.BaseModel):
             return {}
 
         return {
-            'invited_to_learner_groups_ids': (
-                learner_grp_user_model.invited_to_learner_groups_ids
-            ),
-            'learner_groups_user_details': (
-                learner_grp_user_model.learner_groups_user_details
-            ),
+            'invited_to_learner_groups_ids': (learner_grp_user_model.invited_to_learner_groups_ids),
+            'learner_groups_user_details': (learner_grp_user_model.learner_groups_user_details),
         }
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -3421,9 +3027,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         )
 
     @classmethod
-    def delete_learner_group_references(
-        cls, group_id: str, user_ids: List[str]
-    ) -> None:
+    def delete_learner_group_references(cls, group_id: str, user_ids: List[str]) -> None:
         """Delete all references of given learner group stored in learner
         groups user model.
 
@@ -3444,18 +3048,14 @@ class LearnerGroupsUserModel(base_models.BaseModel):
             # If the user has been invited to join the group as learner, delete
             # the group id from the invited_to_learner_groups_ids list.
             if group_id in learner_grp_usr_model.invited_to_learner_groups_ids:
-                learner_grp_usr_model.invited_to_learner_groups_ids.remove(
-                    group_id
-                )
+                learner_grp_usr_model.invited_to_learner_groups_ids.remove(group_id)
 
             # If the user is a learner of the group, delete the corresponding
             # learner group details of the learner stored in
             # learner_groups_user_details field.
             updated_details = []
 
-            for (
-                learner_group_details
-            ) in learner_grp_usr_model.learner_groups_user_details:
+            for learner_group_details in learner_grp_usr_model.learner_groups_user_details:
                 if learner_group_details['group_id'] != group_id:
                     updated_details.append(learner_group_details)
 
@@ -3476,16 +3076,12 @@ class PinnedOpportunityModel(base_models.BaseModel):
     """
 
     user_id = datastore_services.StringProperty(required=True, indexed=True)
-    language_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     opportunity_id = datastore_services.StringProperty(indexed=True)
 
     @classmethod
-    def _generate_id(
-        cls, user_id: str, language_code: str, topic_id: str
-    ) -> str:
+    def _generate_id(cls, user_id: str, language_code: str, topic_id: str) -> str:
         """Generates the ID for the instance of PinnedOpportunityModel class.
 
         Args:
@@ -3525,10 +3121,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         """
         instance_id = cls._generate_id(user_id, language_code, topic_id)
         if cls.get_by_id(instance_id):
-            raise Exception(
-                'There is already a pinned opportunity with the given'
-                ' id: %s' % instance_id
-            )
+            raise Exception('There is already a pinned opportunity with the given id: %s' % instance_id)
 
         instance = cls(
             id=instance_id,
@@ -3542,9 +3135,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         return instance
 
     @classmethod
-    def get_model(
-        cls, user_id: str, language_code: str, topic_id: str
-    ) -> Optional[PinnedOpportunityModel]:
+    def get_model(cls, user_id: str, language_code: str, topic_id: str) -> Optional[PinnedOpportunityModel]:
         """Fetches the PinnedOpportunityModel instance from the datastore.
 
         Args:
@@ -3565,9 +3156,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        )
+        datastore_services.delete_multi(cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
@@ -3615,9 +3204,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         """
         user_data = {}
 
-        user_models: Sequence[PinnedOpportunityModel] = cls.query(
-            cls.user_id == user_id
-        ).fetch()
+        user_models: Sequence[PinnedOpportunityModel] = cls.query(cls.user_id == user_id).fetch()
 
         for model in user_models:
             key = '%s_%s' % (
@@ -3630,9 +3217,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         return user_data
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
         multiple languages and topics relevant to a user.
         """

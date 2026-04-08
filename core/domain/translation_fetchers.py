@@ -18,20 +18,18 @@
 
 from __future__ import annotations
 
+from typing import List, Optional
+
 from core import feconf
 from core.domain import translation_domain
 from core.platform import models
-
-from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import translation_models
 
 
-(translation_models,) = models.Registry.import_models(
-    [models.Names.TRANSLATION]
-)
+(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
 
 
 def get_translation_from_model(
@@ -56,9 +54,7 @@ def get_translation_from_model(
     )
 
 
-def get_machine_translation(
-    source_language_code: str, target_language_code: str, source_text: str
-) -> Optional[translation_domain.MachineTranslation]:
+def get_machine_translation(source_language_code: str, target_language_code: str, source_text: str) -> Optional[translation_domain.MachineTranslation]:
     """Gets MachineTranslation by language codes and source text.
     Returns None if no translation exists for the given parameters.
 
@@ -73,11 +69,7 @@ def get_machine_translation(
         MachineTranslation|None. The MachineTranslation
         if a translation exists or None if no translation is found.
     """
-    translation_model = (
-        translation_models.MachineTranslationModel.get_machine_translation(
-            source_language_code, target_language_code, source_text
-        )
-    )
+    translation_model = translation_models.MachineTranslationModel.get_machine_translation(source_language_code, target_language_code, source_text)
     if translation_model is None:
         return None
     return get_translation_from_model(translation_model)
@@ -127,11 +119,7 @@ def get_all_entity_translations_for_entity(
     Returns:
         list(EnitityTranslation). A list of EntityTranslation domain objects.
     """
-    entity_translation_models = (
-        translation_models.EntityTranslationsModel.get_all_for_entity(
-            entity_type, entity_id, entity_version
-        )
-    )
+    entity_translation_models = translation_models.EntityTranslationsModel.get_all_for_entity(entity_type, entity_id, entity_version)
     entity_translation_objects = []
     for model in entity_translation_models:
         domain_object = get_entity_translation_from_model(model)
@@ -157,20 +145,12 @@ def get_entity_translation(
     Returns:
         EntityTranslation. An instance of entity translations.
     """
-    entity_translation_model = (
-        translation_models.EntityTranslationsModel.get_model(
-            entity_type, entity_id, entity_version, language_code
-        )
-    )
+    entity_translation_model = translation_models.EntityTranslationsModel.get_model(entity_type, entity_id, entity_version, language_code)
 
     if entity_translation_model:
-        domain_object = get_entity_translation_from_model(
-            entity_translation_model
-        )
+        domain_object = get_entity_translation_from_model(entity_translation_model)
         return domain_object
-    return translation_domain.EntityTranslation.create_empty(
-        entity_type, entity_id, language_code, entity_version=entity_version
-    )
+    return translation_domain.EntityTranslation.create_empty(entity_type, entity_id, language_code, entity_version=entity_version)
 
 
 def get_multiple_entity_translations(
@@ -187,16 +167,5 @@ def get_multiple_entity_translations(
         to the given references. If a translation does not exist, the
         corresponding entry will be None.
     """
-    entity_translation_models = (
-        translation_models.EntityTranslationsModel.get_model_multi(
-            entity_references
-        )
-    )
-    return [
-        (
-            get_entity_translation_from_model(entity_translation_model)
-            if entity_translation_model is not None
-            else None
-        )
-        for entity_translation_model in entity_translation_models
-    ]
+    entity_translation_models = translation_models.EntityTranslationsModel.get_model_multi(entity_references)
+    return [(get_entity_translation_from_model(entity_translation_model) if entity_translation_model is not None else None) for entity_translation_model in entity_translation_models]

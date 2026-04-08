@@ -18,16 +18,16 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+import result
+from typing import Final, Iterable, List
+
 from core.domain import exp_domain, exp_fetchers, search_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
-import result
-from typing import Final, Iterable, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -54,22 +54,11 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
         """
         return (
             self.pipeline
-            | 'Get all non-deleted models'
-            >> (
-                ndb_io.GetModels(
-                    exp_models.ExpSummaryModel.get_all(include_deleted=False)
-                )
-            )
-            | 'Convert ExpSummaryModels to domain objects'
-            >> beam.Map(exp_fetchers.get_exploration_summary_from_model)
-            | 'Split models into batches'
-            >> beam.transforms.util.BatchElements(
-                max_batch_size=self.MAX_BATCH_SIZE
-            )
-            | 'Index batches of models'
-            >> beam.ParDo(IndexExplorationSummaries())
-            | 'Count the output'
-            >> (job_result_transforms.ResultsToJobRunResults())
+            | 'Get all non-deleted models' >> (ndb_io.GetModels(exp_models.ExpSummaryModel.get_all(include_deleted=False)))
+            | 'Convert ExpSummaryModels to domain objects' >> beam.Map(exp_fetchers.get_exploration_summary_from_model)
+            | 'Split models into batches' >> beam.transforms.util.BatchElements(max_batch_size=self.MAX_BATCH_SIZE)
+            | 'Index batches of models' >> beam.ParDo(IndexExplorationSummaries())
+            | 'Count the output' >> (job_result_transforms.ResultsToJobRunResults())
         )
 
 
@@ -80,9 +69,7 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
 class IndexExplorationSummaries(beam.DoFn):  # type: ignore[misc]
     """DoFn to index exploration summaries."""
 
-    def process(
-        self, exp_summary: List[exp_domain.ExplorationSummary]
-    ) -> Iterable[result.Result[None, Exception]]:
+    def process(self, exp_summary: List[exp_domain.ExplorationSummary]) -> Iterable[result.Result[None, Exception]]:
         """Index exploration summaries and catch any errors.
 
         Args:

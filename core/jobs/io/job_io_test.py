@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.domain import beam_job_services
 from core.jobs import job_test_utils
 from core.jobs.io import job_io
 from core.jobs.types import job_run_result
-
-import apache_beam as beam
 
 
 class PutResultsTests(job_test_utils.PipelinedTestBase):
@@ -31,16 +31,10 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
 
     def test_single_output(self) -> None:
         messages = [
-            job_run_result.JobRunResult(
-                stdout='Hello, World!', stderr='Uh-oh, World!'
-            ),
+            job_run_result.JobRunResult(stdout='Hello, World!', stderr='Uh-oh, World!'),
         ]
 
-        self.assert_pcoll_empty(
-            self.pipeline
-            | beam.Create(messages)
-            | job_io.PutResults(self.JOB_ID)
-        )
+        self.assert_pcoll_empty(self.pipeline | beam.Create(messages) | job_io.PutResults(self.JOB_ID))
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)
         self.assertEqual(result.stdout, 'Hello, World!')
@@ -54,11 +48,7 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
         ]
 
         with self.swap(job_run_result, 'MAX_OUTPUT_CHARACTERS', 8):
-            self.assert_pcoll_empty(
-                self.pipeline
-                | beam.Create(messages)
-                | job_io.PutResults(self.JOB_ID)
-            )
+            self.assert_pcoll_empty(self.pipeline | beam.Create(messages) | job_io.PutResults(self.JOB_ID))
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)
         self.assertItemsEqual(result.stdout.split('\n'), ['abc', 'def', 'ghi'])

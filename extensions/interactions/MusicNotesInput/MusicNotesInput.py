@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -31,10 +31,7 @@ class MusicNotesInput(base.BaseInteraction):
     """Interaction for music notes input."""
 
     name: str = 'Music Notes Input'
-    description: str = (
-        'Allows learners to drag and drop notes onto the lines of a music '
-        'staff.'
-    )
+    description: str = 'Allows learners to drag and drop notes onto the lines of a music staff.'
     display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids: List[str] = ['midijs']
     answer_type: str = 'MusicPhrase'

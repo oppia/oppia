@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+from typing import List
+
 from core import feconf
 from core.platform import models
 from core.tests import test_utils
-
-from typing import List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -30,9 +30,7 @@ if MYPY:  # pragma: no cover
     from core.domain import platform_parameter_domain
     from mypy_imports import base_models, config_models
 
-(base_models, config_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.CONFIG]
-)
+(base_models, config_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.CONFIG])
 
 
 class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -56,9 +54,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model = config_models.PlatformParameterModel.create(
             param_name='parameter_name',
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
-            rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
+            rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False,
         )
         self.assertEqual(param_model.id, 'parameter_name')
@@ -66,31 +62,23 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             param_model.rule_schema_version,
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
         )
-        self.assertEqual(
-            param_model.rules, [{'filters': [], 'value_when_matched': False}]
-        )
+        self.assertEqual(param_model.rules, [{'filters': [], 'value_when_matched': False}])
         self.assertEqual(param_model.default_value, False)
 
     def test_commit(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts: List[
-            platform_parameter_domain.PlatformParameterRuleDict
-        ] = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
             rule_dicts=rule_dicts,
-            rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
+            rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False,
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
-        retrieved_model1 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 1
-        )
+        retrieved_model1 = config_models.PlatformParameterModel.get_version(parameter_name, 1)
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model1 is not None
 
@@ -98,21 +86,15 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
-                'filters': [
-                    {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
-                ],
+                'filters': [{'type': 'app_version', 'conditions': [['>', '1.2.3']]}],
                 'value_when_matched': True,
             },
             {'filters': [], 'value_when_matched': False},
         ]
 
         retrieved_model1.rules = new_rules
-        retrieved_model1.commit(
-            feconf.SYSTEM_COMMITTER_ID, 'commit message', []
-        )
-        retrieved_model2 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 2
-        )
+        retrieved_model1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+        retrieved_model2 = config_models.PlatformParameterModel.get_version(parameter_name, 2)
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model2 is not None
 
@@ -120,49 +102,37 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit_is_persistent_in_storage(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts: List[
-            platform_parameter_domain.PlatformParameterRuleDict
-        ] = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
             rule_dicts=rule_dicts,
-            rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
+            rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False,
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
-        retrieved_model1 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 1
-        )
+        retrieved_model1 = config_models.PlatformParameterModel.get_version(parameter_name, 1)
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model1 is not None
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
     def test_commit_with_updated_rules(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts: List[
-            platform_parameter_domain.PlatformParameterRuleDict
-        ] = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
             rule_dicts=rule_dicts,
-            rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
+            rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False,
         )
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
         new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
-                'filters': [
-                    {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
-                ],
+                'filters': [{'type': 'app_version', 'conditions': [['>', '1.2.3']]}],
                 'value_when_matched': True,
             },
             {'filters': [], 'value_when_matched': False},
@@ -170,9 +140,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         param_model.rules = new_rules
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
-        retrieved_model = config_models.PlatformParameterModel.get_version(
-            parameter_name, 2
-        )
+        retrieved_model = config_models.PlatformParameterModel.get_version(parameter_name, 2)
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model is not None
 
@@ -218,9 +186,7 @@ class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(feature_model.id, 'feature_name')
         self.assertEqual(feature_model.rollout_percentage, 50)
-        self.assertEqual(
-            feature_model.user_group_ids, ['User Group 1', 'User Group 2']
-        )
+        self.assertEqual(feature_model.user_group_ids, ['User Group 1', 'User Group 2'])
         self.assertEqual(feature_model.force_enable_for_all_users, False)
 
     def test_get_model_association_to_user(self) -> None:
@@ -234,9 +200,7 @@ class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'force_enable_for_all_users': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
-            ),
+            'force_enable_for_all_users': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }

@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from typing import Dict, List, Optional, TypedDict
+
 from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
@@ -27,8 +29,6 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
 )
-
-from typing import Dict, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -78,9 +78,7 @@ def _get_blog_card_summary_dicts_for_dashboard(
     return summary_dicts
 
 
-class BlogDashboardDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class BlogDashboardDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides user data for the blog dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -118,39 +116,21 @@ class BlogDashboardDataHandler(
     def get(self) -> None:
         """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
-        author_details_dict = blog_services.get_blog_author_details(
-            self.user_id, strict=False
-        ).to_dict()
+        author_details_dict = blog_services.get_blog_author_details(self.user_id, strict=False).to_dict()
 
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
         draft_blog_post_summary_dicts = []
-        published_post_summaries = (
-            blog_services.get_blog_post_summary_models_list_by_user_id(
-                self.user_id, True
-            )
-        )
+        published_post_summaries = blog_services.get_blog_post_summary_models_list_by_user_id(self.user_id, True)
         if published_post_summaries:
             no_of_published_blog_posts = len(published_post_summaries)
-            published_post_summary_dicts = (
-                _get_blog_card_summary_dicts_for_dashboard(
-                    published_post_summaries
-                )
-            )
+            published_post_summary_dicts = _get_blog_card_summary_dicts_for_dashboard(published_post_summaries)
 
-        draft_blog_post_summaries = (
-            blog_services.get_blog_post_summary_models_list_by_user_id(
-                self.user_id, False
-            )
-        )
+        draft_blog_post_summaries = blog_services.get_blog_post_summary_models_list_by_user_id(self.user_id, False)
         if draft_blog_post_summaries:
             no_of_draft_blog_posts = len(draft_blog_post_summaries)
-            draft_blog_post_summary_dicts = (
-                _get_blog_card_summary_dicts_for_dashboard(
-                    draft_blog_post_summaries
-                )
-            )
+            draft_blog_post_summary_dicts = _get_blog_card_summary_dicts_for_dashboard(draft_blog_post_summaries)
         self.values.update(
             {
                 'author_details': author_details_dict,
@@ -177,12 +157,8 @@ class BlogDashboardDataHandler(
         assert self.normalized_payload is not None
         displayed_author_name = self.normalized_payload['displayed_author_name']
         author_bio = self.normalized_payload['author_bio']
-        blog_services.update_blog_author_details(
-            self.user_id, displayed_author_name, author_bio
-        )
-        author_details_dict = blog_services.get_blog_author_details(
-            self.user_id
-        ).to_dict()
+        blog_services.update_blog_author_details(self.user_id, displayed_author_name, author_bio)
+        author_details_dict = blog_services.get_blog_author_details(self.user_id).to_dict()
 
         self.values.update(
             {
@@ -247,9 +223,7 @@ class BlogPostHandler(
             'change_dict': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (
-                        validation_method.validate_change_dict_for_blog_post
-                    ),
+                    'validation_method': (validation_method.validate_change_dict_for_blog_post),
                 }
             },
         },
@@ -271,20 +245,12 @@ class BlogPostHandler(
             NotFoundException. The blog post with the given id
                 or url doesn't exist.
         """
-        blog_post = blog_services.get_blog_post_by_id(
-            blog_post_id, strict=False
-        )
+        blog_post = blog_services.get_blog_post_by_id(blog_post_id, strict=False)
         if blog_post is None:
-            raise self.NotFoundException(
-                'The blog post with the given id or url doesn\'t exist.'
-            )
+            raise self.NotFoundException('The blog post with the given id or url doesn\'t exist.')
 
-        author_details = blog_services.get_blog_author_details(
-            blog_post.author_id
-        )
-        max_no_of_tags = platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
-        )
+        author_details = blog_services.get_blog_author_details(blog_post.author_id)
+        max_no_of_tags = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value)
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
         blog_post_dict = blog_post.to_dict()
@@ -318,9 +284,7 @@ class BlogPostHandler(
             blog_post_id: str. The ID of the blog post.
         """
         assert self.normalized_payload is not None
-        blog_post_rights = blog_services.get_blog_post_rights(
-            blog_post_id, strict=True
-        )
+        blog_post_rights = blog_services.get_blog_post_rights(blog_post_id, strict=True)
         blog_post_currently_published = blog_post_rights.blog_post_is_published
         change_dict = self.normalized_payload['change_dict']
         blog_services.update_blog_post(blog_post_id, change_dict)
@@ -330,9 +294,7 @@ class BlogPostHandler(
         elif blog_post_currently_published:
             blog_services.unpublish_blog_post(blog_post_id)
 
-        blog_post_dict = blog_services.get_blog_post_by_id(
-            blog_post_id
-        ).to_dict()
+        blog_post_dict = blog_services.get_blog_post_by_id(blog_post_id).to_dict()
 
         self.values.update({'blog_post_dict': blog_post_dict})
         self.render_json(self.values)
@@ -383,11 +345,7 @@ class BlogPostTitleHandlerNormalizedDict(TypedDict):
     title: str
 
 
-class BlogPostTitleHandler(
-    base.BaseHandler[
-        BlogPostTitleHandlerNormalizedDict, BlogPostTitleHandlerNormalizedDict
-    ]
-):
+class BlogPostTitleHandler(base.BaseHandler[BlogPostTitleHandlerNormalizedDict, BlogPostTitleHandlerNormalizedDict]):
     """A data handler for checking if a blog post with given title exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -434,12 +392,4 @@ class BlogPostTitleHandler(
         """
         assert self.normalized_request is not None
         title = self.normalized_request['title']
-        self.render_json(
-            {
-                'blog_post_exists': (
-                    blog_services.does_blog_post_with_title_exist(
-                        title, blog_post_id
-                    )
-                )
-            }
-        )
+        self.render_json({'blog_post_exists': (blog_services.does_blog_post_with_title_exist(title, blog_post_id))})

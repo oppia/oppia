@@ -20,9 +20,9 @@ quitting an exploration.
 
 from __future__ import annotations
 
-from extensions.actions import base
-
 from typing import List
+
+from extensions.actions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover

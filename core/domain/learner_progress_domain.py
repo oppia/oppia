@@ -18,14 +18,14 @@
 
 from __future__ import annotations
 
+from typing import Dict, List
+
 from core.domain import (
     collection_domain,
     exp_domain,
     story_domain,
     topic_domain,
 )
-
-from typing import Dict, List
 
 
 class LearnerProgressInTopicsAndStories:
@@ -73,12 +73,8 @@ class LearnerProgressInTopicsAndStories:
         self.topics_to_learn_summaries = topics_to_learn_summaries
         self.all_topic_summaries = all_topic_summaries
         self.untracked_topic_summaries = untracked_topic_summaries
-        self.completed_to_incomplete_stories = (
-            completed_to_incomplete_story_titles
-        )
-        self.learnt_to_partially_learnt_topics = (
-            learnt_to_partially_learnt_topic_titles
-        )
+        self.completed_to_incomplete_stories = completed_to_incomplete_story_titles
+        self.learnt_to_partially_learnt_topics = learnt_to_partially_learnt_topic_titles
 
 
 class LearnerProgressInCollections:
@@ -86,12 +82,8 @@ class LearnerProgressInCollections:
 
     def __init__(
         self,
-        incomplete_collection_summaries: List[
-            collection_domain.CollectionSummary
-        ],
-        completed_collection_summaries: List[
-            collection_domain.CollectionSummary
-        ],
+        incomplete_collection_summaries: List[collection_domain.CollectionSummary],
+        completed_collection_summaries: List[collection_domain.CollectionSummary],
         collection_playlist: List[collection_domain.CollectionSummary],
         completed_to_incomplete_collection_titles: List[str],
     ) -> None:
@@ -113,9 +105,7 @@ class LearnerProgressInCollections:
         self.incomplete_collection_summaries = incomplete_collection_summaries
         self.completed_collection_summaries = completed_collection_summaries
         self.collection_playlist_summaries = collection_playlist
-        self.completed_to_incomplete_collections = (
-            completed_to_incomplete_collection_titles
-        )
+        self.completed_to_incomplete_collections = completed_to_incomplete_collection_titles
 
 
 class LearnerProgressInExplorations:

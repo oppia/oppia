@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Final
+
 from core import feature_flag_list, feconf
 from core.domain import (
     rights_domain,
@@ -27,8 +29,6 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -48,17 +48,11 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-        self.voice_artist_id = self.get_user_id_from_email(
-            self.VOICE_ARTIST_EMAIL
-        )
+        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
 
-        self.voiceover_admin_id = self.get_user_id_from_email(
-            'voiceoveradmin@app.com'
-        )
+        self.voiceover_admin_id = self.get_user_id_from_email('voiceoveradmin@app.com')
         self.add_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
-        self.voiceover_admin = user_services.get_user_actions_info(
-            self.voiceover_admin_id
-        )
+        self.voiceover_admin = user_services.get_user_actions_info(self.voiceover_admin_id)
 
 
 class VoiceArtistTest(BaseVoiceArtistControllerTests):
@@ -85,9 +79,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id, end_state_name='End card'
-        )
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id, end_state_name='End card')
         self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.voiceover_admin,
@@ -102,9 +94,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         self.csrf_token = self.get_new_csrf_token()
 
     def test_put_with_no_payload_version_raises_error(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'Missing key in handler args: version.'
-        ):
+        with self.assertRaisesRegex(Exception, 'Missing key in handler args: version.'):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID),
                 {
@@ -119,8 +109,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'Trying to update version 1 of exploration from version'
-            ' 3, which is not possible. Please reload the page and try again.',
+            'Trying to update version 1 of exploration from version 3, which is not possible. Please reload the page and try again.',
         ):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID),
@@ -155,10 +144,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
             response,
             {
                 'status_code': 400,
-                'error': (
-                    'Voice artist does not have permission to make'
-                    ' some changes in the change list.'
-                ),
+                'error': ('Voice artist does not have permission to make some changes in the change list.'),
             },
         )
 
@@ -223,11 +209,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         # Generate CSRF token.
         self.csrf_token = self.get_new_csrf_token()
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
-        ]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_draft_updated_version_valid(self) -> None:
         payload = {
             'change_list': self.VALID_DRAFT_CHANGELIST,
@@ -238,12 +220,8 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             payload,
             csrf_token=self.csrf_token,
         )
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID)
-        )
-        self.assertEqual(
-            exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST
-        )
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id('%s.%s' % (self.voice_artist_id, self.EXP_ID))
+        self.assertEqual(exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 2)
@@ -258,29 +236,18 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             csrf_token=self.csrf_token,
             expected_status_int=400,
         )
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID)
-        )
-        self.assertEqual(
-            exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST
-        )
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id('%s.%s' % (self.voice_artist_id, self.EXP_ID))
+        self.assertEqual(exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
         self.assertEqual(
             response,
             {
                 'status_code': 400,
-                'error': (
-                    'Voice artist does not have permission to make'
-                    ' some changes in the change list.'
-                ),
+                'error': ('Voice artist does not have permission to make some changes in the change list.'),
             },
         )
 
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
-        ]
-    )
+    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_draft_updated_version_invalid(self) -> None:
         payload = {
             'change_list': self.VALID_DRAFT_CHANGELIST,
@@ -291,12 +258,8 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             payload,
             csrf_token=self.csrf_token,
         )
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID)
-        )
-        self.assertEqual(
-            exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST
-        )
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id('%s.%s' % (self.voice_artist_id, self.EXP_ID))
+        self.assertEqual(exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
         self.assertFalse(response['changes_are_mergeable'])
@@ -308,9 +271,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             {},
             csrf_token=self.csrf_token,
         )
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.voice_artist_id, self.EXP_ID)
-        )
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id('%s.%s' % (self.voice_artist_id, self.EXP_ID))
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
@@ -343,8 +304,7 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
         """Testing of the firsttime translation tutorial http requests."""
         # Check if method returns 200 http status.
         self.post_json(
-            '/createhandler/started_translation_tutorial_event/%s'
-            % self.EXP_ID,
+            '/createhandler/started_translation_tutorial_event/%s' % self.EXP_ID,
             {},
             csrf_token=self.csrf_token,
             expected_status_int=200,
@@ -355,15 +315,12 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     ) -> None:
         self.logout()
         response = self.post_json(
-            '/createhandler/started_translation_tutorial_event/%s'
-            % self.EXP_ID,
+            '/createhandler/started_translation_tutorial_event/%s' % self.EXP_ID,
             {},
             csrf_token=self.get_new_csrf_token(),
             expected_status_int=401,
         )
-        self.assertEqual(
-            response['error'], 'You must be logged in to access this resource.'
-        )
+        self.assertEqual(response['error'], 'You must be logged in to access this resource.')
 
 
 class VoiceArtistManagementTests(test_utils.GenericTestBase):
@@ -380,12 +337,8 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(
-            self.VOICE_ARTIST_EMAIL
-        )
-        self.voiceover_admin_id = self.get_user_id_from_email(
-            self.VOICEOVER_ADMIN_EMAIL
-        )
+        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(self.VOICEOVER_ADMIN_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.save_new_valid_exploration(self.published_exp_id_1, self.owner_id)
         self.save_new_valid_exploration(self.published_exp_id_2, self.owner_id)
@@ -393,17 +346,14 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(self.private_exp_id_2, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
-        user_services.add_user_role(
-            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN
-        )
+        user_services.add_user_role(self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_owner_cannot_assign_voice_artist(self) -> None:
         self.login(self.OWNER_EMAIL)
         params = {'username': self.VOICE_ARTIST_USERNAME}
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params,
             csrf_token=csrf_token,
             expected_status_int=401,
@@ -415,8 +365,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         params = {'username': self.VOICE_ARTIST_USERNAME}
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params,
             csrf_token=csrf_token,
         )
@@ -427,14 +376,12 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         params = {'username': self.VOICE_ARTIST_USERNAME}
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params,
             csrf_token=csrf_token,
         )
         self.delete_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params={'voice_artist': self.VOICE_ARTIST_USERNAME},
         )
         self.logout()
@@ -444,8 +391,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         params = {'username': 'random_user'}
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params,
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -461,14 +407,12 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         params = {'username': self.VOICE_ARTIST_USERNAME}
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params,
             csrf_token=csrf_token,
         )
         response = self.delete_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params={'voice_artist': 'random_user'},
             expected_status_int=400,
         )
@@ -483,14 +427,11 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         params = {'username': 'invalid'}
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1,
+            '/voice_artist_management_handler/exploration/%s' % self.published_exp_id_1,
             params,
             csrf_token=csrf_token,
             expected_status_int=400,
         )
-        self.assertEqual(
-            response['error'], 'Sorry, we could not find the specified user.'
-        )
+        self.assertEqual(response['error'], 'Sorry, we could not find the specified user.')
 
         self.logout()

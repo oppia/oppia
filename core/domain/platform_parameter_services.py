@@ -23,12 +23,12 @@ import json
 import logging
 import os
 
+from typing import Dict, Final, List
+
 from core import feconf
 from core.constants import constants
 from core.domain import platform_parameter_domain, platform_parameter_list
 from core.domain import platform_parameter_registry as registry
-
-from typing import Dict, Final, List
 
 DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'number': 'float',
@@ -69,14 +69,10 @@ def create_evaluation_context_for_client(
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    return platform_parameter_domain.EvaluationContext.from_dict(
-        client_context_dict, {'server_mode': get_server_mode()}
-    )
+    return platform_parameter_domain.EvaluationContext.from_dict(client_context_dict, {'server_mode': get_server_mode()})
 
 
-def get_all_platform_parameters_dicts() -> List[
-    platform_parameter_domain.PlatformParameterDict
-]:
+def get_all_platform_parameters_dicts() -> List[platform_parameter_domain.PlatformParameterDict]:
     """Returns dict representations of all platform parameters. This method
     is used for providing detailed platform parameters information to the
     release-coordinator page.
@@ -85,10 +81,7 @@ def get_all_platform_parameters_dicts() -> List[
         list(dict). A list containing the dict mappings of all fields of the
         platform parameters.
     """
-    return [
-        registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
-        for _plat_param in platform_parameter_list.ALL_PLATFORM_PARAMS_LIST
-    ]
+    return [registry.Registry.get_platform_parameter(_plat_param.value).to_dict() for _plat_param in platform_parameter_list.ALL_PLATFORM_PARAMS_LIST]
 
 
 def get_server_mode() -> platform_parameter_domain.ServerMode:
@@ -102,32 +95,17 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
     """
     # TODO(release-scripts#137): Remove once project ID is verified on all
     # servers.
-    logging.info(
-        'Logging project ID for debugging: %s'
-        % (os.environ.get('GOOGLE_CLOUD_PROJECT', 'no-project-id-specified'))
-    )
-    return (
-        platform_parameter_domain.ServerMode.DEV
-        if constants.DEV_MODE
-        else (
-            platform_parameter_domain.ServerMode.PROD
-            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else platform_parameter_domain.ServerMode.TEST
-        )
-    )
+    logging.info('Logging project ID for debugging: %s' % (os.environ.get('GOOGLE_CLOUD_PROJECT', 'no-project-id-specified')))
+    return platform_parameter_domain.ServerMode.DEV if constants.DEV_MODE else (platform_parameter_domain.ServerMode.PROD if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER else platform_parameter_domain.ServerMode.TEST)
 
 
-def _create_evaluation_context_for_server() -> (
-    platform_parameter_domain.EvaluationContext
-):
+def _create_evaluation_context_for_server() -> platform_parameter_domain.EvaluationContext:
     """Returns evaluation context with information of the server.
 
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    current_app_version = json.load(
-        open(PACKAGE_JSON_FILE_PATH, 'r', encoding='utf-8')
-    )['version']
+    current_app_version = json.load(open(PACKAGE_JSON_FILE_PATH, 'r', encoding='utf-8'))['version']
     # We want to make sure that the branch is the release branch.
     if not constants.BRANCH_NAME == '' and 'release' in constants.BRANCH_NAME:
         # We only need current app version so we can drop the 'release' part.
@@ -138,11 +116,7 @@ def _create_evaluation_context_for_server() -> (
         # '3-3-1-hotfix-5' will be '3.3.1-hotfix-5' and '3-3-1' will be '3.3.1'.
         if 'hotfix' in current_app_version:
             split_via_hotfix = current_app_version.split('-hotfix')
-            current_app_version = (
-                split_via_hotfix[0].replace('-', '.')
-                + '-hotfix'
-                + split_via_hotfix[1]
-            )
+            current_app_version = split_via_hotfix[0].replace('-', '.') + '-hotfix' + split_via_hotfix[1]
         else:
             current_app_version = current_app_version.replace('-', '.')
 
@@ -171,13 +145,9 @@ def get_platform_parameter_value(
         PlatformParameterNotFoundException. Platform parameter is not valid.
     """
     all_platform_params_dicts = get_all_platform_parameters_dicts()
-    all_platform_params_names_set = set(
-        param['name'] for param in all_platform_params_dicts
-    )
+    all_platform_params_names_set = set(param['name'] for param in all_platform_params_dicts)
     if parameter_name not in all_platform_params_names_set:
-        raise PlatformParameterNotFoundException(
-            'Unknown platform parameter: %s.' % parameter_name
-        )
+        raise PlatformParameterNotFoundException('Unknown platform parameter: %s.' % parameter_name)
 
     context = _create_evaluation_context_for_server()
     param = registry.Registry.get_platform_parameter(parameter_name)
@@ -199,9 +169,7 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
     """
     parameter = registry.Registry.get_platform_parameter(param_name)
     if DATA_TYPE_TO_SCHEMA_TYPE.get(parameter.data_type) is not None:
-        schema_type = copy.deepcopy(
-            DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type]
-        )
+        schema_type = copy.deepcopy(DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type])
         return {'type': schema_type}
     else:
         raise Exception(

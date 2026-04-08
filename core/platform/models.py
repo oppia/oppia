@@ -21,10 +21,10 @@ from __future__ import annotations
 import inspect
 from types import ModuleType  # pylint: disable=import-only-modules
 
+from typing import List, Tuple, Type
+
 from core import feconf
 from core.constants import constants
-
-from typing import List, Tuple, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,9 +60,7 @@ class Platform:
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
-    def import_models(
-        cls, unused_model_names: List[Names]
-    ) -> Tuple[ModuleType, ...]:
+    def import_models(cls, unused_model_names: List[Names]) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
 
@@ -70,9 +68,7 @@ class Platform:
             NotImplementedError. The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError(
-            'import_models() method is not overwritten in derived classes'
-        )
+        raise NotImplementedError('import_models() method is not overwritten in derived classes')
 
 
 class _Gae(Platform):
@@ -254,9 +250,7 @@ class _Gae(Platform):
         return tuple(returned_models)
 
     @classmethod
-    def get_storage_model_classes(
-        cls, model_names: List[Names]
-    ) -> List[Type[base_models.BaseModel]]:
+    def get_storage_model_classes(cls, model_names: List[Names]) -> List[Type[base_models.BaseModel]]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -272,10 +266,7 @@ class _Gae(Platform):
             for member_name, member_obj in inspect.getmembers(module):
                 if inspect.isclass(member_obj):
                     clazz = getattr(module, member_name)
-                    all_base_classes = [
-                        base_class.__name__
-                        for base_class in inspect.getmro(clazz)
-                    ]
+                    all_base_classes = [base_class.__name__ for base_class in inspect.getmro(clazz)]
                     if 'Model' in all_base_classes:
                         model_classes.append(clazz)
         return model_classes
@@ -374,18 +365,12 @@ class _Gae(Platform):
             from core.platform.email import dev_mode_email_services
 
             return dev_mode_email_services
-        elif (
-            feconf.EMAIL_SERVICE_PROVIDER
-            == feconf.EMAIL_SERVICE_PROVIDER_MAILGUN
-        ):
+        elif feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_MAILGUN:
             from core.platform.email import mailgun_email_services
 
             return mailgun_email_services
         else:
-            raise Exception(
-                'Invalid email service provider: %s'
-                % (feconf.EMAIL_SERVICE_PROVIDER)
-            )
+            raise Exception('Invalid email service provider: %s' % (feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
     def import_bulk_email_services(cls) -> ModuleType:
@@ -404,18 +389,12 @@ class _Gae(Platform):
             from core.platform.bulk_email import dev_mode_bulk_email_services
 
             return dev_mode_bulk_email_services
-        elif (
-            feconf.BULK_EMAIL_SERVICE_PROVIDER
-            == feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
-        ):
+        elif feconf.BULK_EMAIL_SERVICE_PROVIDER == feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP:
             from core.platform.bulk_email import mailchimp_bulk_email_services
 
             return mailchimp_bulk_email_services
         else:
-            raise Exception(
-                'Invalid bulk email service provider: %s'
-                % (feconf.BULK_EMAIL_SERVICE_PROVIDER)
-            )
+            raise Exception('Invalid bulk email service provider: %s' % (feconf.BULK_EMAIL_SERVICE_PROVIDER))
 
     @classmethod
     def import_cache_services(cls) -> ModuleType:
@@ -543,9 +522,7 @@ class Registry:
         return cls._get().import_models(model_names)
 
     @classmethod
-    def get_storage_model_classes(
-        cls, model_names: List[Names]
-    ) -> List[Type[base_models.BaseModel]]:
+    def get_storage_model_classes(cls, model_names: List[Names]) -> List[Type[base_models.BaseModel]]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 

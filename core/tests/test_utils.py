@@ -36,6 +36,35 @@ import re
 import string
 import unittest
 
+import elasticsearch
+import requests_mock
+import webapp2
+import webtest
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Final,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    OrderedDict,
+    Pattern,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
+
 import main
 from core import feature_flag_list, feconf, schema_utils, utils
 from core.constants import constants
@@ -81,35 +110,6 @@ from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 from scripts import common
-
-import elasticsearch
-import requests_mock
-import webapp2
-import webtest
-from typing import (
-    Any,
-    Callable,
-    Collection,
-    Dict,
-    Final,
-    Iterable,
-    Iterator,
-    List,
-    Literal,
-    Mapping,
-    Optional,
-    OrderedDict,
-    Pattern,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    TypedDict,
-    TypeVar,
-    Union,
-    cast,
-    overload,
-)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -256,20 +256,13 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     Raises:
         Exception. Multiple files found with given file name.
     """
-    matches = list(
-        itertools.chain.from_iterable(
-            (os.path.join(subdir, f) for f in filenames if f == filename)
-            for subdir, _, filenames in os.walk(rootdir)
-        )
-    )
+    matches = list(itertools.chain.from_iterable((os.path.join(subdir, f) for f in filenames if f == filename) for subdir, _, filenames in os.walk(rootdir)))
     if len(matches) > 1:
         raise Exception('Multiple files found with name: %s' % filename)
     return matches[0] if matches else None
 
 
-def mock_load_template(
-    filename: str, template_is_aot_compiled: bool = False
-) -> str:
+def mock_load_template(filename: str, template_is_aot_compiled: bool = False) -> str:
     """Mock for load_template function. This mock is required for backend tests
     since we do not have webpack compilation before backend tests. The folder to
     search templates is webpack_bundles which is generated after webpack
@@ -289,9 +282,7 @@ def mock_load_template(
     Raises:
         Exception. No file exists for the given file name.
     """
-    filepath = get_filepath_from_filename(
-        filename, os.path.join('core', 'templates', 'pages')
-    )
+    filepath = get_filepath_from_filename(filename, os.path.join('core', 'templates', 'pages'))
     if template_is_aot_compiled:
         filepath = get_filepath_from_filename(filename, 'src')
     if filepath is None:
@@ -334,12 +325,8 @@ def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
         (module,) = models.Registry.import_models([module_name])
         for member_name, member_obj in inspect.getmembers(module):
             if inspect.isclass(member_obj):
-                clazz: Type[base_models.BaseModel] = getattr(
-                    module, member_name
-                )
-                all_base_classes = [
-                    base_class.__name__ for base_class in inspect.getmro(clazz)
-                ]
+                clazz: Type[base_models.BaseModel] = getattr(module, member_name)
+                all_base_classes = [base_class.__name__ for base_class in inspect.getmro(clazz)]
                 if 'Model' in all_base_classes:
                     yield clazz
 
@@ -393,14 +380,9 @@ def swap_is_feature_flag_enabled_function(
             enable_feature_flag: bool. Returns True if the target feature flag
             name is in feature_flag_names list.
         """
-        return any(
-            expected_feature_flag_name.value == feature_flag_name
-            for expected_feature_flag_name in feature_flag_names
-        )
+        return any(expected_feature_flag_name.value == feature_flag_name for expected_feature_flag_name in feature_flag_names)
 
-    original_is_feature_flag_enabled = getattr(
-        feature_flag_services, 'is_feature_flag_enabled'
-    )
+    original_is_feature_flag_enabled = getattr(feature_flag_services, 'is_feature_flag_enabled')
     setattr(
         feature_flag_services,
         'is_feature_flag_enabled',
@@ -439,9 +421,7 @@ def enable_feature_flags(
     ) -> Callable[..., _GenericHandlerFunctionReturnType]:
         # Here we use type Any because this method can accept arbitrary number
         # of arguments with different types.
-        def wrapper(
-            *args: Any, **kwargs: Any
-        ) -> _GenericHandlerFunctionReturnType:
+        def wrapper(*args: Any, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
             with swap_is_feature_flag_enabled_function(feature_flag_names):
                 return func(*args, **kwargs)
 
@@ -492,21 +472,12 @@ def swap_get_platform_parameter_value_function(
             Exception. The parameter_name is not present in the
                 platform_parameter_names list.
         """
-        platform_parameter_name_value_dict = dict(
-            (x.value, y) for x, y in platform_parameter_name_value_tuples
-        )
+        platform_parameter_name_value_dict = dict((x.value, y) for x, y in platform_parameter_name_value_tuples)
         if parameter_name not in platform_parameter_name_value_dict:
-            raise Exception(
-                'The value for the platform parameter %s was needed in this '
-                'test, but not specified in the set_platform_parameters '
-                'decorator. Please use this information in the decorator.'
-                % parameter_name
-            )
+            raise Exception('The value for the platform parameter %s was needed in this test, but not specified in the set_platform_parameters decorator. Please use this information in the decorator.' % parameter_name)
         return platform_parameter_name_value_dict[parameter_name]
 
-    original_get_platform_parameter_value = getattr(
-        platform_parameter_services, 'get_platform_parameter_value'
-    )
+    original_get_platform_parameter_value = getattr(platform_parameter_services, 'get_platform_parameter_value')
     setattr(
         platform_parameter_services,
         'get_platform_parameter_value',
@@ -551,12 +522,8 @@ def set_platform_parameters(
     ) -> Callable[..., _GenericHandlerFunctionReturnType]:
         # Here we use type Any because this method can accept arbitrary number
         # of arguments with different types.
-        def wrapper(
-            *args: Any, **kwargs: Any
-        ) -> _GenericHandlerFunctionReturnType:
-            with swap_get_platform_parameter_value_function(
-                platform_parameter_name_value_tuples
-            ):
+        def wrapper(*args: Any, **kwargs: Any) -> _GenericHandlerFunctionReturnType:
+            with swap_get_platform_parameter_value_function(platform_parameter_name_value_tuples):
                 return func(*args, **kwargs)
 
         return wrapper
@@ -615,9 +582,7 @@ class ElasticSearchStub:
         }
         meta = type('Meta', (), {'status': 404})()
         body = {'status': 404, 'error': error_data}
-        raise elasticsearch.NotFoundError(
-            'index_not_found_exception: no such index [%s]' % index, meta, body
-        )
+        raise elasticsearch.NotFoundError('index_not_found_exception: no such index [%s]' % index, meta, body)
 
     def mock_create_index(self, index: str) -> NewIndexDict:
         """Creates an index with the given name.
@@ -766,13 +731,9 @@ class ElasticSearchStub:
             '_primary_term': 1,
         }
         meta = type('Meta', (), {'status': 404})()
-        raise elasticsearch.NotFoundError(
-            f'document not found: [{index}][{id}]', meta, body
-        )
+        raise elasticsearch.NotFoundError(f'document not found: [{index}][{id}]', meta, body)
 
-    def mock_delete_by_query(
-        self, index: str, body: Dict[str, Dict[str, Dict[str, str]]]
-    ) -> DeletedDocumentDict:
+    def mock_delete_by_query(self, index: str, body: Dict[str, Dict[str, Dict[str, str]]]) -> DeletedDocumentDict:
         """Deletes documents from an index based on the given query.
 
         Note that this mock only supports a specific for the query, i.e. the
@@ -850,7 +811,7 @@ class ElasticSearchStub:
         result_docs = []
         result_doc_ids = set([])
         for doc in self._DB[index]:
-            if not doc['id'] in result_doc_ids:
+            if doc['id'] not in result_doc_ids:
                 result_docs.append(doc)
                 result_doc_ids.add(doc['id'])
 
@@ -884,9 +845,7 @@ class ElasticSearchStub:
                 for _, v in term.items():
                     values = v['query'].split(' ')
                     for doc in result_docs:
-                        strs = [
-                            val for val in doc.values() if isinstance(val, str)
-                        ]
+                        strs = [val for val in doc.values() if isinstance(val, str)]
                         words = []
                         for s in strs:
                             words += s.split(' ')
@@ -911,9 +870,7 @@ class ElasticSearchStub:
             'took': 4,
             'hits': {'hits': formatted_result_docs},
             'total': {'value': len(formatted_result_docs), 'relation': 'eq'},
-            'max_score': max(
-                [0.0] + [d['_score'] for d in formatted_result_docs]
-            ),
+            'max_score': max([0.0] + [d['_score'] for d in formatted_result_docs]),
         }
 
 
@@ -1044,9 +1001,7 @@ class AuthServicesStub:
         return close
 
     @classmethod
-    def establish_auth_session(
-        cls, _: webapp2.Request, __: webapp2.Response
-    ) -> None:
+    def establish_auth_session(cls, _: webapp2.Request, __: webapp2.Response) -> None:
         """Sets login cookies to maintain a user's sign-in session.
 
         Args:
@@ -1068,9 +1023,7 @@ class AuthServicesStub:
         pass
 
     @classmethod
-    def get_auth_claims_from_request(
-        cls, _: webapp2.Request
-    ) -> Optional[auth_domain.AuthClaims]:
+    def get_auth_claims_from_request(cls, _: webapp2.Request) -> Optional[auth_domain.AuthClaims]:
         """Authenticates the request and returns claims about its authorizer.
 
         This stub obtains authorization information from os.environ. To make the
@@ -1117,9 +1070,7 @@ class AuthServicesStub:
         """
         self._external_user_id_associations.discard(user_id)
 
-    def verify_external_auth_associations_are_deleted(
-        self, user_id: str
-    ) -> bool:
+    def verify_external_auth_associations_are_deleted(self, user_id: str) -> bool:
         """Returns true if and only if we have successfully verified that all
         external associations have been deleted.
 
@@ -1144,17 +1095,11 @@ class AuthServicesStub:
             no association exists.
         """
         return next(
-            (
-                auth_id
-                for auth_id, user in self._user_id_by_auth_id.items()
-                if user.id == user_id and not user.deleted
-            ),
+            (auth_id for auth_id, user in self._user_id_by_auth_id.items() if user.id == user_id and not user.deleted),
             None,
         )
 
-    def get_user_id_from_auth_id(
-        self, auth_id: str, include_deleted: bool = False
-    ) -> Optional[str]:
+    def get_user_id_from_auth_id(self, auth_id: str, include_deleted: bool = False) -> Optional[str]:
         """Returns the user ID associated with the given auth ID.
 
         Args:
@@ -1175,9 +1120,7 @@ class AuthServicesStub:
 
         return None
 
-    def get_multi_user_ids_from_auth_ids(
-        self, auth_ids: List[str]
-    ) -> List[Optional[str]]:
+    def get_multi_user_ids_from_auth_ids(self, auth_ids: List[str]) -> List[Optional[str]]:
         """Returns the user IDs associated with the given auth IDs.
 
         Args:
@@ -1189,9 +1132,7 @@ class AuthServicesStub:
         """
         return [self.get_user_id_from_auth_id(auth_id) for auth_id in auth_ids]
 
-    def get_multi_auth_ids_from_user_ids(
-        self, user_ids: List[str]
-    ) -> List[Optional[str]]:
+    def get_multi_auth_ids_from_user_ids(self, user_ids: List[str]) -> List[Optional[str]]:
         """Returns the auth IDs associated with the given user IDs.
 
         Args:
@@ -1201,15 +1142,10 @@ class AuthServicesStub:
             list(str|None). The auth IDs associated with each of the given user
             IDs, or None for associations which don't exist.
         """
-        auth_id_by_user_id = {
-            user.id: auth_id
-            for auth_id, user in self._user_id_by_auth_id.items()
-        }
+        auth_id_by_user_id = {user.id: auth_id for auth_id, user in self._user_id_by_auth_id.items()}
         return [auth_id_by_user_id.get(user_id, None) for user_id in user_ids]
 
-    def associate_auth_id_with_user_id(
-        self, auth_id_user_id_pair: auth_domain.AuthIdUserIdPair
-    ) -> None:
+    def associate_auth_id_with_user_id(self, auth_id_user_id_pair: auth_domain.AuthIdUserIdPair) -> None:
         """Commits the association between auth ID and user ID.
 
         This method also adds the user to the "external" set of associations.
@@ -1223,19 +1159,12 @@ class AuthServicesStub:
         """
         auth_id, user_id = auth_id_user_id_pair
         if auth_id in self._user_id_by_auth_id:
-            raise Exception(
-                'auth_id=%r is already associated with user_id=%r'
-                % (auth_id, self._user_id_by_auth_id[auth_id].id)
-            )
-        auth_models.UserAuthDetailsModel(
-            id=user_id, firebase_auth_id=auth_id
-        ).put()
+            raise Exception('auth_id=%r is already associated with user_id=%r' % (auth_id, self._user_id_by_auth_id[auth_id].id))
+        auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id).put()
         self._external_user_id_associations.add(user_id)
         self._user_id_by_auth_id[auth_id] = AuthServicesStub.AuthUser(user_id)
 
-    def associate_multi_auth_ids_with_user_ids(
-        self, auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]
-    ) -> None:
+    def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]) -> None:
         """Commits the associations between auth IDs and user IDs.
 
         This method also adds the users to the "external" set of associations.
@@ -1247,27 +1176,13 @@ class AuthServicesStub:
         Raises:
             Exception. One or more auth associations already exist.
         """
-        collisions = ', '.join(
-            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a].id)
-            for a, _ in auth_id_user_id_pairs
-            if a in self._user_id_by_auth_id
-        )
+        collisions = ', '.join('{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a].id) for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
         if collisions:
             raise Exception('already associated: %s' % collisions)
-        datastore_services.put_multi(
-            [
-                auth_models.UserAuthDetailsModel(
-                    id=user_id, firebase_auth_id=auth_id
-                )
-                for auth_id, user_id in auth_id_user_id_pairs
-            ]
-        )
+        datastore_services.put_multi([auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id) for auth_id, user_id in auth_id_user_id_pairs])
         external_user_ids: Set[str] = {u for _, u in auth_id_user_id_pairs}
         self._external_user_id_associations.update(external_user_ids)
-        auth_id_user_id_pairs_with_deletion = {
-            auth_id: AuthServicesStub.AuthUser(user_id)
-            for auth_id, user_id in auth_id_user_id_pairs
-        }
+        auth_id_user_id_pairs_with_deletion = {auth_id: AuthServicesStub.AuthUser(user_id) for auth_id, user_id in auth_id_user_id_pairs}
         self._user_id_by_auth_id.update(auth_id_user_id_pairs_with_deletion)
 
 
@@ -1284,9 +1199,7 @@ class TaskqueueServicesStub:
             test_base: GenericTestBase. The current test base.
         """
         self._test_base = test_base
-        self._client = cloud_tasks_emulator.Emulator(
-            task_handler=self._task_handler, automatic_task_handling=False
-        )
+        self._client = cloud_tasks_emulator.Emulator(task_handler=self._task_handler, automatic_task_handling=False)
 
     def _task_handler(
         self,
@@ -1309,9 +1222,7 @@ class TaskqueueServicesStub:
             'X-AppEngine-Fake-Is-Admin': b'1',
             'X-Appengine-QueueName': queue_name.encode('utf-8'),
             # Maps empty strings to None so the output can become 'None'.
-            'X-Appengine-TaskName': (
-                task_name.encode('utf-8') if task_name else b'None'
-            ),
+            'X-Appengine-TaskName': (task_name.encode('utf-8') if task_name else b'None'),
         }
         csrf_token = self._test_base.get_new_csrf_token()
         self._test_base.post_task(url, payload, headers, csrf_token=csrf_token)
@@ -1376,9 +1287,7 @@ class TaskqueueServicesStub:
         """
         self._client.process_and_flush_tasks(queue_name=queue_name)
 
-    def get_pending_tasks(
-        self, queue_name: Optional[str] = None
-    ) -> List[cloud_tasks_emulator.Task]:
+    def get_pending_tasks(self, queue_name: Optional[str] = None) -> List[cloud_tasks_emulator.Task]:
         """Returns a list of the tasks in a single queue if a queue name is
         specified or a list of all of the tasks in the taskqueue if no queue
         name is specified.
@@ -1559,16 +1468,10 @@ class TestBase(unittest.TestCase):
             try:
                 obj_type = exp_param_specs[param_change.name].obj_type
             except Exception as e:
-                raise Exception(
-                    'Parameter %s not found' % param_change.name
-                ) from e
+                raise Exception('Parameter %s not found' % param_change.name) from e
 
             raw_value = param_change.get_value(new_param_dict)
-            new_param_dict[param_change.name] = (
-                object_registry.Registry.get_object_class_by_type(
-                    obj_type
-                ).normalize(raw_value)
-            )
+            new_param_dict[param_change.name] = object_registry.Registry.get_object_class_by_type(obj_type).normalize(raw_value)
         return new_param_dict
 
     def get_static_asset_filepath(self) -> str:
@@ -1588,9 +1491,7 @@ class TestBase(unittest.TestCase):
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
-    def capture_logging(
-        self, min_level: int = logging.NOTSET
-    ) -> Iterator[List[str]]:
+    def capture_logging(self, min_level: int = logging.NOTSET) -> Iterator[List[str]]:
         """Context manager that captures logs into a list.
 
         Strips whitespace from messages for convenience.
@@ -1682,9 +1583,7 @@ class TestBase(unittest.TestCase):
     # 'value' can accept any type of value to replace it with the old
     # value.
     @contextlib.contextmanager
-    def swap_to_always_return(
-        self, obj: Any, attr: str, value: Optional[Any] = None
-    ) -> Iterator[None]:
+    def swap_to_always_return(self, obj: Any, attr: str, value: Optional[Any] = None) -> Iterator[None]:
         """Swap obj.attr with a function that always returns the given value."""
 
         # Here we use type Any because this function returns the newly
@@ -1849,8 +1748,7 @@ class TestBase(unittest.TestCase):
                 self.assertEqual(
                     args,
                     next_args,
-                    msg='*args to call #%d of %s'
-                    % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
+                    msg='*args to call #%d of %s' % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
                 )
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
@@ -1863,8 +1761,7 @@ class TestBase(unittest.TestCase):
                 self.assertEqual(
                     kwargs,
                     next_kwargs,
-                    msg='**kwargs to call #%d of %s'
-                    % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
+                    msg='**kwargs to call #%d of %s' % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
                 )
 
             # Reset self.longMessage just in case `new_function()` raises.
@@ -1902,9 +1799,7 @@ class TestBase(unittest.TestCase):
             # Here we use type Any because the expected_kwargs can contains
             # arguments of arbitrary and mixed types from different functions.
             kwargs: Any
-            for args, kwargs in itertools.zip_longest(
-                expected_args_iter, expected_kwargs_iter, fillvalue={}
-            ):
+            for args, kwargs in itertools.zip_longest(expected_args_iter, expected_kwargs_iter, fillvalue={}):
                 pretty_unused_args.append(
                     ', '.join(
                         itertools.chain(
@@ -1926,8 +1821,7 @@ class TestBase(unittest.TestCase):
                 )
 
                 missing_call_summary = '\n'.join(
-                    '\tCall %d of %d: %s(%s)'
-                    % (i, num_expected_calls, attr, call_args)
+                    '\tCall %d of %d: %s(%s)' % (i, num_expected_calls, attr, call_args)
                     # Here we use MyPy ignore because we are accessing the
                     # 'call_num' attribute on a function which is of type
                     # 'callable' and functions of type 'callable' do not
@@ -1966,18 +1860,13 @@ class TestBase(unittest.TestCase):
     # Here we use type Any because args and kwargs can have an arbitrary number
     # of arguments with different types of values.
     def assertRaises(self, *args: Any, **kwargs: Any) -> None:  # type: ignore[override]
-        raise NotImplementedError(
-            'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegex instead.'
-        )
+        raise NotImplementedError('self.assertRaises should not be used in these tests. Please use self.assertRaisesRegex instead.')
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestCase's assertRaisesRegex().
     def assertRaisesRegex(  # type: ignore[override]
         self,
-        expected_exception: Union[
-            Type[BaseException], Tuple[Type[BaseException], ...]
-        ],
+        expected_exception: Union[Type[BaseException], Tuple[Type[BaseException], ...]],
         expected_regex: Union[str, Pattern[str]],
     ) -> unittest.case._AssertRaisesContext[BaseException]:
         """Asserts that the message in a raised exception matches a regex.
@@ -1997,10 +1886,7 @@ class TestBase(unittest.TestCase):
             Exception. No Regex given.
         """
         if not expected_regex:
-            raise Exception(
-                'Please provide a sufficiently strong regexp string to '
-                'validate that the correct error is being raised.'
-            )
+            raise Exception('Please provide a sufficiently strong regexp string to validate that the correct error is being raised.')
 
         return super().assertRaisesRegex(expected_exception, expected_regex)
 
@@ -2071,23 +1957,13 @@ class TestBase(unittest.TestCase):
                 regexp patterns.
         """
         get_match = re.match if full_match else re.search
-        differences = [
-            '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
-            for i, (regexp, item) in enumerate(zip(regexps, items))
-            if get_match(regexp, item, flags=re.DOTALL) is None
-        ]
+        differences = ['~ [i=%d]:\t%r does not match: %r' % (i, item, regexp) for i, (regexp, item) in enumerate(zip(regexps, items)) if get_match(regexp, item, flags=re.DOTALL) is None]
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items) :]
-            differences.extend(
-                '- [i=%d]:\tmissing item expected to match: %r' % (i, regexp)
-                for i, regexp in enumerate(extra_regexps, start=len(items))
-            )
+            differences.extend('- [i=%d]:\tmissing item expected to match: %r' % (i, regexp) for i, regexp in enumerate(extra_regexps, start=len(items)))
         if len(regexps) < len(items):
             extra_items = items[len(regexps) :]
-            differences.extend(
-                '+ [i=%d]:\textra item %r' % (i, item)
-                for i, item in enumerate(extra_items, start=len(regexps))
-            )
+            differences.extend('+ [i=%d]:\textra item %r' % (i, item) for i, item in enumerate(extra_items, start=len(regexps)))
 
         if differences:
             error_message = 'Lists differ:\n\t%s' % '\n\t'.join(differences)
@@ -2129,9 +2005,7 @@ class AppEngineTestBase(TestBase):
         # accept 'GenericTestBase' class but here we are providing super class
         # (AppEngineTestBase) which causes MyPy to throw `incompatible argument
         # type` error. Thus, to avoid the error, we used cast here.
-        self._platform_taskqueue_services_stub = TaskqueueServicesStub(
-            cast(GenericTestBase, self)
-        )
+        self._platform_taskqueue_services_stub = TaskqueueServicesStub(cast(GenericTestBase, self))
 
     def setUp(self) -> None:
         super().setUp()
@@ -2150,9 +2024,7 @@ class AppEngineTestBase(TestBase):
         self.contextManager.__enter__()
 
     def tearDown(self) -> None:
-        datastore_services.delete_multi(
-            list(datastore_services.query_everything().iter(keys_only=True))
-        )
+        datastore_services.delete_multi(list(datastore_services.query_everything().iter(keys_only=True)))
         storage_services.CLIENT.reset()
         if hasattr(self, 'contextManager'):
             self.contextManager.__exit__(None, None, None)
@@ -2192,13 +2064,9 @@ class AppEngineTestBase(TestBase):
             int. The total number of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
-            queue_name=queue_name
-        )
+        return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(queue_name=queue_name)
 
-    def process_and_flush_pending_tasks(
-        self, queue_name: Optional[str] = None
-    ) -> None:
+    def process_and_flush_pending_tasks(self, queue_name: Optional[str] = None) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -2207,13 +2075,9 @@ class AppEngineTestBase(TestBase):
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        self._platform_taskqueue_services_stub.process_and_flush_tasks(
-            queue_name=queue_name
-        )
+        self._platform_taskqueue_services_stub.process_and_flush_tasks(queue_name=queue_name)
 
-    def get_pending_tasks(
-        self, queue_name: Optional[str] = None
-    ) -> List[cloud_tasks_emulator.Task]:
+    def get_pending_tasks(self, queue_name: Optional[str] = None) -> List[cloud_tasks_emulator.Task]:
         """Returns a list of the tasks in a single queue if a queue name is
         specified or a list of all of the tasks in the taskqueue if no queue
         name is specified.
@@ -2226,9 +2090,7 @@ class AppEngineTestBase(TestBase):
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        return self._platform_taskqueue_services_stub.get_pending_tasks(
-            queue_name=queue_name
-        )
+        return self._platform_taskqueue_services_stub.get_pending_tasks(queue_name=queue_name)
 
     def mock_set_constants_to_default(self) -> None:
         """Mock implementation of set_constants_to_default for tests.
@@ -2237,15 +2099,10 @@ class AppEngineTestBase(TestBase):
         problems. Mocking common.set_constants_to_default() in your test will
         suppress this exception.
         """
-        raise Exception(
-            'Tests should mock common.set_constants_to_default() to avoid '
-            'modifying the constants file during tests.'
-        )
+        raise Exception('Tests should mock common.set_constants_to_default() to avoid modifying the constants file during tests.')
 
     @contextlib.contextmanager
-    def mock_datetime_utcnow(
-        self, mocked_now: datetime.datetime
-    ) -> Iterator[None]:
+    def mock_datetime_utcnow(self, mocked_now: datetime.datetime) -> Iterator[None]:
         """Mocks parts of the datastore to accept a fake datetime type that
         always returns the same value for utcnow.
 
@@ -2443,12 +2300,7 @@ class GenericTestBase(AppEngineTestBase):
     VERSION_1_STORY_CONTENTS_DICT: Final = {
         'nodes': [
             {
-                'outline': (
-                    '<p>Value</p>'
-                    '<oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
-                    '</oppia-noninteractive-math>'
-                ),
+                'outline': ('<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'),
                 'exploration_id': None,
                 'destination_node_ids': [],
                 'outline_is_finalized': False,
@@ -2465,12 +2317,7 @@ class GenericTestBase(AppEngineTestBase):
     VERSION_2_STORY_CONTENTS_DICT: Final = {
         'nodes': [
             {
-                'outline': (
-                    '<p>Value</p>'
-                    '<oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
-                    '</oppia-noninteractive-math>'
-                ),
+                'outline': ('<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'),
                 'exploration_id': None,
                 'destination_node_ids': [],
                 'outline_is_finalized': False,
@@ -2489,12 +2336,7 @@ class GenericTestBase(AppEngineTestBase):
     VERSION_3_STORY_CONTENTS_DICT: Final = {
         'nodes': [
             {
-                'outline': (
-                    '<p>Value</p>'
-                    '<oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
-                    '</oppia-noninteractive-math>'
-                ),
+                'outline': ('<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'),
                 'exploration_id': None,
                 'destination_node_ids': [],
                 'outline_is_finalized': False,
@@ -2514,14 +2356,7 @@ class GenericTestBase(AppEngineTestBase):
     VERSION_4_STORY_CONTENTS_DICT: Final = {
         'nodes': [
             {
-                'outline': (
-                    '<p>Value</p>'
-                    '<oppia-noninteractive-math math_content-with-value="{'
-                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
-                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
-                    '}">'
-                    '</oppia-noninteractive-math>'
-                ),
+                'outline': ('<p>Value</p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
                 'exploration_id': None,
                 'destination_node_ids': [],
                 'outline_is_finalized': False,
@@ -2541,14 +2376,7 @@ class GenericTestBase(AppEngineTestBase):
     VERSION_5_STORY_CONTENTS_DICT: Final = {
         'nodes': [
             {
-                'outline': (
-                    '<p>Value</p>'
-                    '<oppia-noninteractive-math math_content-with-value="{'
-                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
-                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
-                    '}">'
-                    '</oppia-noninteractive-math>'
-                ),
+                'outline': ('<p>Value</p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
                 'exploration_id': None,
                 'destination_node_ids': [],
                 'outline_is_finalized': False,
@@ -2688,28 +2516,12 @@ version: 1
         with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             es_client = elastic_search_services.ES.get_client()
-            stack.enter_context(
-                self.swap(
-                    es_client.indices, 'create', es_stub.mock_create_index
-                )
-            )
-            stack.enter_context(
-                self.swap(es_client, 'index', es_stub.mock_index)
-            )
-            stack.enter_context(
-                self.swap(es_client, 'exists', es_stub.mock_exists)
-            )
-            stack.enter_context(
-                self.swap(es_client, 'delete', es_stub.mock_delete)
-            )
-            stack.enter_context(
-                self.swap(
-                    es_client, 'delete_by_query', es_stub.mock_delete_by_query
-                )
-            )
-            stack.enter_context(
-                self.swap(es_client, 'search', es_stub.mock_search)
-            )
+            stack.enter_context(self.swap(es_client.indices, 'create', es_stub.mock_create_index))
+            stack.enter_context(self.swap(es_client, 'index', es_stub.mock_index))
+            stack.enter_context(self.swap(es_client, 'exists', es_stub.mock_exists))
+            stack.enter_context(self.swap(es_client, 'delete', es_stub.mock_delete))
+            stack.enter_context(self.swap(es_client, 'delete_by_query', es_stub.mock_delete_by_query))
+            stack.enter_context(self.swap(es_client, 'search', es_stub.mock_search))
             stack.enter_context(
                 self.swap(
                     memory_cache_services,
@@ -2771,9 +2583,7 @@ version: 1
         os.environ['USER_IS_ADMIN'] = '0'
 
     @contextlib.contextmanager
-    def login_context(
-        self, email: str, is_super_admin: bool = False
-    ) -> Iterator[Optional[str]]:
+    def login_context(self, email: str, is_super_admin: bool = False) -> Iterator[Optional[str]]:
         """Log in with the given email under the context of a 'with' statement.
 
         Args:
@@ -2802,9 +2612,7 @@ version: 1
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(
-        self, email: str, username: str, is_super_admin: bool = False
-    ) -> None:
+    def signup(self, email: str, username: str, is_super_admin: bool = False) -> None:
         """Complete the signup process for the user with the given username.
 
         Args:
@@ -2833,12 +2641,8 @@ version: 1
                         {
                             'username': username,
                             'agreed_to_terms': True,
-                            'default_dashboard': (
-                                constants.DASHBOARD_TYPE_LEARNER
-                            ),
-                            'can_receive_email_updates': (
-                                feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                            ),
+                            'default_dashboard': (constants.DASHBOARD_TYPE_LEARNER),
+                            'can_receive_email_updates': (feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE),
                         }
                     ),
                 },
@@ -2863,9 +2667,7 @@ version: 1
                 csrf_token=self.get_new_csrf_token(),
             )
 
-    def set_curriculum_admins(
-        self, curriculum_admin_usernames: List[str]
-    ) -> None:
+    def set_curriculum_admins(self, curriculum_admin_usernames: List[str]) -> None:
         """Sets role of given users as CURRICULUM_ADMIN.
 
         Args:
@@ -2874,9 +2676,7 @@ version: 1
         for name in curriculum_admin_usernames:
             self.add_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
-    def set_topic_managers(
-        self, topic_manager_usernames: List[str], topic_id: str
-    ) -> None:
+    def set_topic_managers(self, topic_manager_usernames: List[str], topic_id: str) -> None:
         """Sets role of given users as TOPIC_MANAGER.
 
         Args:
@@ -2895,9 +2695,7 @@ version: 1
                     csrf_token=self.get_new_csrf_token(),
                 )
 
-    def set_translation_coordinators(
-        self, translation_coordinator_usernames: List[str], language_id: str
-    ) -> None:
+    def set_translation_coordinators(self, translation_coordinator_usernames: List[str], language_id: str) -> None:
         """Sets role of given users as TRANSLATION_COORDINATOR.
 
         Args:
@@ -2947,9 +2745,7 @@ version: 1
                 csrf_token=self.get_new_csrf_token(),
             )
 
-    def set_collection_editors(
-        self, collection_editor_usernames: List[str]
-    ) -> None:
+    def set_collection_editors(self, collection_editor_usernames: List[str]) -> None:
         """Sets role of given users as COLLECTION_EDITOR.
 
         Args:
@@ -2962,18 +2758,12 @@ version: 1
     def get_user_id_from_email(self, email: str) -> str: ...
 
     @overload
-    def get_user_id_from_email(
-        self, email: str, *, strict: Literal[True]
-    ) -> str: ...
+    def get_user_id_from_email(self, email: str, *, strict: Literal[True]) -> str: ...
 
     @overload
-    def get_user_id_from_email(
-        self, email: str, *, strict: Literal[False]
-    ) -> Optional[str]: ...
+    def get_user_id_from_email(self, email: str, *, strict: Literal[False]) -> Optional[str]: ...
 
-    def get_user_id_from_email(
-        self, email: str, strict: bool = True
-    ) -> Optional[str]:
+    def get_user_id_from_email(self, email: str, strict: bool = True) -> Optional[str]:
         """Gets the user ID corresponding to the given email.
 
         Args:
@@ -2988,15 +2778,11 @@ version: 1
         Raises:
             Exception. No user_id found for the given email address.
         """
-        user_settings = user_services.get_user_settings_by_auth_id(
-            self.get_auth_id_from_email(email)
-        )
+        user_settings = user_services.get_user_settings_by_auth_id(self.get_auth_id_from_email(email))
         if user_settings is None:
             if not strict:
                 return None
-            raise Exception(
-                'No user_id found for the given email address: %s' % email
-            )
+            raise Exception('No user_id found for the given email address: %s' % email)
 
         return user_settings.user_id
 
@@ -3032,14 +2818,8 @@ version: 1
         files_in_directory = []
         for _dir, _, files in os.walk(current_dir):
             for file_name in files:
-                filepath = os.path.relpath(
-                    os.path.join(_dir, file_name), start=current_dir
-                )
-                if (
-                    filepath.endswith('.py')
-                    and filepath.startswith(('core/', 'extensions/'))
-                    and not filepath.startswith('core/tests')
-                ):
+                filepath = os.path.relpath(os.path.join(_dir, file_name), start=current_dir)
+                if filepath.endswith('.py') and filepath.startswith(('core/', 'extensions/')) and not filepath.startswith('core/tests'):
                     module = filepath[:-3].replace('/', '.')
                     files_in_directory.append(module)
         return files_in_directory
@@ -3141,9 +2921,7 @@ version: 1
         Returns:
             webtest.TestResponse. The test response.
         """
-        self.assertNotIn(
-            expected_content_type, ['text/html', 'application/json']
-        )
+        self.assertNotIn(expected_content_type, ['text/html', 'application/json'])
 
         return self._get_response(
             url,
@@ -3190,18 +2968,14 @@ version: 1
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             if http_method == 'GET':
-                response = self.testapp.get(
-                    url, params=params, expect_errors=True
-                )
+                response = self.testapp.get(url, params=params, expect_errors=True)
 
         if http_method == 'POST':
             response = self.testapp.post(url, params=params, expect_errors=True)
         elif http_method == 'PUT':
             response = self.testapp.put(url, params=params, expect_errors=True)
         elif http_method == 'DELETE':
-            response = self.testapp.delete(
-                url, params=params, expect_errors=True
-            )
+            response = self.testapp.delete(url, params=params, expect_errors=True)
         elif http_method != 'GET':
             raise Exception('Invalid http method %s' % http_method)
 
@@ -3211,9 +2985,7 @@ version: 1
 
     # Here we use type Any because this method can return any python object
     # that was parsed from json response.
-    def _parse_json_response(
-        self, json_response: webtest.TestResponse, expect_errors: bool
-    ) -> Any:
+    def _parse_json_response(self, json_response: webtest.TestResponse, expect_errors: bool) -> Any:
         """Convert a JSON server response to an object (such as a dict).
 
         Args:
@@ -3350,9 +3122,7 @@ version: 1
         # Here we use type Any because response is a JSON response dict
         # which can contain different types of values. So, to allow every
         # type of value we used Any here.
-        response: Dict[str, Any] = self._parse_json_response(
-            json_response, expect_errors
-        )
+        response: Dict[str, Any] = self._parse_json_response(json_response, expect_errors)
         return response
 
     # Here we use type Any because this method can return JSON response Dict
@@ -3398,9 +3168,7 @@ version: 1
         # Here we use type Any because response is a JSON response dict
         # which can contain different types of values. So, to allow every
         # type of value we used Any here.
-        response: Dict[str, Any] = self._parse_json_response(
-            json_response, expect_errors
-        )
+        response: Dict[str, Any] = self._parse_json_response(json_response, expect_errors)
         return response
 
     def _send_post_request(
@@ -3410,9 +3178,7 @@ version: 1
         data: Union[Dict[str, str], bytes],
         expect_errors: bool,
         expected_status_int: int = 200,
-        upload_files: Optional[
-            Union[List[Tuple[str, str, bytes]], Tuple[Tuple[bytes, ...], ...]]
-        ] = None,
+        upload_files: Optional[Union[List[Tuple[str, str, bytes]], Tuple[Tuple[bytes, ...], ...]]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> webtest.TestResponse:
         """Sends a post request with the data provided to the url specified.
@@ -3439,13 +3205,7 @@ version: 1
         """
         # Convert the files to bytes.
         if upload_files is not None:
-            encoded_upload_files = tuple(
-                tuple(
-                    f.encode('utf-8') if isinstance(f, str) else f
-                    for f in upload_file
-                )
-                for upload_file in upload_files
-            )
+            encoded_upload_files = tuple(tuple(f.encode('utf-8') if isinstance(f, str) else f for f in upload_file) for upload_file in upload_files)
 
         return app.post(
             url,
@@ -3525,9 +3285,7 @@ version: 1
 
         expect_errors = expected_status_int >= 400
 
-        json_response = self.testapp.put(
-            url, params=params, expect_errors=expect_errors
-        )
+        json_response = self.testapp.put(url, params=params, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -3541,9 +3299,7 @@ version: 1
         # Here we use type Any because the 'response' is a JSON response dict
         # that can contain different types of values. So, to allow every type
         # of value we used Any here.
-        response: Dict[str, Any] = self._parse_json_response(
-            json_response, expect_errors
-        )
+        response: Dict[str, Any] = self._parse_json_response(json_response, expect_errors)
         return response
 
     def get_new_csrf_token(self) -> str:
@@ -3551,9 +3307,7 @@ version: 1
         response: Dict[str, str] = self.get_json('/csrfhandler')
         return response['token']
 
-    def save_new_default_exploration(
-        self, exploration_id: str, owner_id: str, title: str = 'A title'
-    ) -> exp_domain.Exploration:
+    def save_new_default_exploration(self, exploration_id: str, owner_id: str, title: str = 'A title') -> exp_domain.Exploration:
         """Saves a new default exploration written by owner_id.
 
         Args:
@@ -3564,9 +3318,7 @@ version: 1
         Returns:
             Exploration. The exploration domain object.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title=title, category='Algebra'
-        )
+        exploration = exp_domain.Exploration.create_default_exploration(exploration_id, title=title, category='Algebra')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -3591,9 +3343,7 @@ version: 1
         # customization args and customization args can have int, str, bool and
         # other types too. Also, Any is used for schema because values in schema
         # dictionary can be of type str, List, Dict and other types too.
-        def traverse_schema_and_assign_content_ids(
-            value: Any, schema: Dict[str, Any], ca_name: str
-        ) -> None:
+        def traverse_schema_and_assign_content_ids(value: Any, schema: Dict[str, Any], ca_name: str) -> None:
             """Generates content_id from recursively traversing the schema, and
             assigning to the current value.
 
@@ -3607,16 +3357,8 @@ version: 1
             Raises:
                 NotImplementedError. The schema includes an unsupported type.
             """
-            is_subtitled_html_spec = (
-                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
-                and schema['obj_type']
-                == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
-            )
-            is_subtitled_unicode_spec = (
-                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
-                and schema['obj_type']
-                == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
-            )
+            is_subtitled_html_spec = schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
+            is_subtitled_unicode_spec = schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
                 value['content_id'] = content_id_generator.generate(
@@ -3625,9 +3367,7 @@ version: 1
                 )
             elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
-                    traverse_schema_and_assign_content_ids(
-                        x, schema['items'], ca_name
-                    )
+                    traverse_schema_and_assign_content_ids(x, schema['items'], ca_name)
             elif schema['type'] in (
                 schema_utils.SCHEMA_TYPE_CUSTOM,
                 schema_utils.SCHEMA_TYPE_BOOL,
@@ -3643,31 +3383,22 @@ version: 1
             else:
                 raise NotImplementedError(
                     (  # pragma: no cover
-                        'GenericTestBase.set_interaction_for_state() received '
-                        'an interaction schema with an unsupported type: %s. If '
-                        'you need to test such an interaction, please update '
-                        'GenericTestBase to add support.'
+                        'GenericTestBase.set_interaction_for_state() received an interaction schema with an unsupported type: %s. If you need to test such an interaction, please update GenericTestBase to add support.'
                     )
                     % schema['type']
                 )
 
-        interaction = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id
-        )
+        interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id)
         ca_specs = interaction.customization_arg_specs
         customization_args = {}
 
         for ca_spec in ca_specs:
             ca_name = ca_spec.name
             ca_value = ca_spec.default_value
-            traverse_schema_and_assign_content_ids(
-                ca_value, ca_spec.schema, ca_name
-            )
+            traverse_schema_and_assign_content_ids(ca_value, ca_spec.schema, ca_name)
             # Here we use cast because these ca_values are fetched dynamically
             # and contain only default types.
-            customization_args_value = cast(
-                state_domain.UnionOfCustomizationArgsDictValues, ca_value
-            )
+            customization_args_value = cast(state_domain.UnionOfCustomizationArgsDictValues, ca_value)
             customization_args[ca_name] = {'value': customization_args_value}
 
         state.update_interaction_id(interaction_id)
@@ -3707,14 +3438,10 @@ version: 1
             category=category,
             language_code=language_code,
         )
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
+        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
         init_state = exploration.states[exploration.init_state_name]
         init_state.content.html = content_html
-        self.set_interaction_for_state(
-            init_state, interaction_id, content_id_generator
-        )
+        self.set_interaction_for_state(init_state, interaction_id, content_id_generator)
 
         exploration.objective = objective
 
@@ -3722,18 +3449,12 @@ version: 1
         if end_state_name is not None:
             exploration.add_state(
                 end_state_name,
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT
-                ),
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME
-                ),
+                content_id_generator.generate(translation_domain.ContentType.CONTENT),
+                content_id_generator.generate(translation_domain.ContentType.DEFAULT_OUTCOME),
             )
             end_state = exploration.states[end_state_name]
             end_state.content.html = content_html
-            self.set_interaction_for_state(
-                end_state, 'EndExploration', content_id_generator
-            )
+            self.set_interaction_for_state(end_state, 'EndExploration', content_id_generator)
             end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
@@ -3747,9 +3468,7 @@ version: 1
             # assert here.
             assert init_interaction.default_outcome is not None
             init_interaction.default_outcome.dest = end_state_name
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
+        exploration.next_content_id_index = content_id_generator.next_content_id_index
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
@@ -3805,9 +3524,7 @@ version: 1
             objective=objective,
             language_code=language_code,
         )
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
+        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
 
         init_state = exploration.states[state_names[0]]
         init_state.content.html = content_html
@@ -3815,22 +3532,14 @@ version: 1
         for state_name in state_names[1:]:
             exploration.add_state(
                 state_name,
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT
-                ),
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME
-                ),
+                content_id_generator.generate(translation_domain.ContentType.CONTENT),
+                content_id_generator.generate(translation_domain.ContentType.DEFAULT_OUTCOME),
             )
             curent_state = exploration.states[state_name]
             curent_state.content.html = content_html
-        for from_state_name, dest_state_name in zip(
-            state_names[:-1], state_names[1:]
-        ):
+        for from_state_name, dest_state_name in zip(state_names[:-1], state_names[1:]):
             from_state = exploration.states[from_state_name]
-            self.set_interaction_for_state(
-                from_state, next(iterable_interaction_ids), content_id_generator
-            )
+            self.set_interaction_for_state(from_state, next(iterable_interaction_ids), content_id_generator)
             # Here, from_state is a State domain object and it is created using
             # 'create_default_state' method. So, 'from_state' is a default_state
             # and it is always going to contain a default_outcome. Thus to
@@ -3839,14 +3548,10 @@ version: 1
             assert from_state.interaction.default_outcome is not None
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
-        self.set_interaction_for_state(
-            end_state, 'EndExploration', content_id_generator
-        )
+        self.set_interaction_for_state(end_state, 'EndExploration', content_id_generator)
         end_state.update_interaction_default_outcome(None)
 
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
+        exploration.next_content_id_index = content_id_generator.next_content_id_index
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -3929,9 +3634,7 @@ version: 1
         )
 
         # Check whether exploration with given exploration_id exists or not.
-        exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, strict=False
-        )
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id, strict=False)
         if exploration is None:
             exploration = self.save_new_valid_exploration(
                 exploration_id,
@@ -3956,9 +3659,7 @@ version: 1
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
-    def add_explorations_to_story(
-        self, topic_id: str, story_id: str, exp_ids: List[str]
-    ) -> None:
+    def add_explorations_to_story(self, topic_id: str, story_id: str, exp_ids: List[str]) -> None:
         """Appends a story node for each exploration id given in exp_ids to the
         story with story_id. Each story node is assigned its exp id and then it
         is published.
@@ -4048,9 +3749,7 @@ version: 1
                 story_domain.StoryChange(
                     {
                         'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                        'property_name': (
-                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                        ),
+                        'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                         'node_id': 'node_1',
                         'old_value': None,
                         'new_value': exploration_id,
@@ -4059,9 +3758,7 @@ version: 1
                 story_domain.StoryChange(
                     {
                         'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                        'property_name': (
-                            story_domain.STORY_NODE_PROPERTY_STATUS
-                        ),
+                        'property_name': (story_domain.STORY_NODE_PROPERTY_STATUS),
                         'node_id': 'node_1',
                         'old_value': constants.STORY_NODE_STATUS_DRAFT,
                         'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
@@ -4106,9 +3803,7 @@ version: 1
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story.create_default_story(
-            story_id, title, description, corresponding_topic_id, url_fragment
-        )
+        story = story_domain.Story.create_default_story(story_id, title, description, corresponding_topic_id, url_fragment)
         story.title = title
         story.description = description
         story.notes = notes
@@ -4118,9 +3813,7 @@ version: 1
         story_services.save_new_story(owner_id, story)
         return story
 
-    def save_new_subtopic(
-        self, subtopic_id: int, owner_id: str, topic_id: str
-    ) -> subtopic_page_domain.SubtopicPage:
+    def save_new_subtopic(self, subtopic_id: int, owner_id: str, topic_id: str) -> subtopic_page_domain.SubtopicPage:
         """Creates an Oppia subtopic and saves it.
 
         Args:
@@ -4131,11 +3824,7 @@ version: 1
         Returns:
             SubtopicPage. A newly-created subtopic.
         """
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                subtopic_id, topic_id
-            )
-        )
+        subtopic_page = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(subtopic_id, topic_id)
         subtopic_changes = [
             subtopic_page_domain.SubtopicPageChange(
                 {
@@ -4145,14 +3834,10 @@ version: 1
                 }
             )
         ]
-        subtopic_page_services.save_subtopic_page(
-            owner_id, subtopic_page, 'Create new subtopic', subtopic_changes
-        )
+        subtopic_page_services.save_subtopic_page(owner_id, subtopic_page, 'Create new subtopic', subtopic_changes)
         return subtopic_page
 
-    def save_new_study_guide(
-        self, subtopic_id: int, owner_id: str, topic_id: str
-    ) -> study_guide_domain.StudyGuide:
+    def save_new_study_guide(self, subtopic_id: int, owner_id: str, topic_id: str) -> study_guide_domain.StudyGuide:
         """Creates an Oppia study guide and saves it.
 
         Args:
@@ -4195,9 +3880,7 @@ version: 1
         abbreviated_name: str = 'topic',
         url_fragment: str = 'topic',
         thumbnail_filename: Optional[str] = 'topic.svg',
-        thumbnail_bg_color: Optional[str] = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
-        ),
+        thumbnail_bg_color: Optional[str] = (constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
         thumbnail_size_in_bytes: Optional[int] = 21131,
         description: str = 'description',
         canonical_story_ids: Optional[List[str]] = None,
@@ -4246,14 +3929,8 @@ version: 1
         """
         canonical_story_ids = canonical_story_ids or []
         additional_story_ids = additional_story_ids or []
-        canonical_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in canonical_story_ids
-        ]
-        additional_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in additional_story_ids
-        ]
+        canonical_story_references = [topic_domain.StoryReference.create_default_story_reference(story_id) for story_id in canonical_story_ids]
+        additional_story_references = [topic_domain.StoryReference.create_default_story_reference(story_id) for story_id in additional_story_ids]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
         skill_ids_for_diagnostic_test = []
@@ -4367,9 +4044,7 @@ version: 1
             version=1,
             question_state_data_schema_version=27,
             linked_skill_ids=linked_skill_ids,
-            inapplicable_skill_misconception_ids=(
-                inapplicable_skill_misconception_ids or []
-            ),
+            inapplicable_skill_misconception_ids=(inapplicable_skill_misconception_ids or []),
         )
         question_model.commit(
             owner_id,
@@ -4417,9 +4092,7 @@ version: 1
             'skill_difficulty': 0.3,
         }
         if suggestion_id is None:
-            suggestion_id = feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(
-                feconf.ENTITY_TYPE_SKILL, skill_id
-            )
+            suggestion_id = feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(feconf.ENTITY_TYPE_SKILL, skill_id)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
@@ -4467,9 +4140,7 @@ version: 1
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill.create_default_skill(
-            skill_id, description, []
-        )
+        skill = skill_domain.Skill.create_default_skill(skill_id, description, [])
         if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1
@@ -4481,15 +4152,9 @@ version: 1
             skill.rubrics = rubrics
         else:
             skill.rubrics = [
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
-                ),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
-                ),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
-                ),
+                skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+                skill_domain.Rubric(constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+                skill_domain.Rubric(constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
             ]
         skill.language_code = language_code
         skill.version = 0
@@ -4513,12 +4178,8 @@ version: 1
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name,
-            content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME
-            ),
+            content_id_generator.generate(translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True,
         )
         state.update_interaction_id('TextInput')
@@ -4526,18 +4187,14 @@ version: 1
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION
-                ),
+                'content_id': content_id_generator.generate(translation_domain.ContentType.SOLUTION),
                 'html': '<p>This is a solution.</p>',
             },
         }
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    content_id_generator.generate(
-                        translation_domain.ContentType.HINT
-                    ),
+                    content_id_generator.generate(translation_domain.ContentType.HINT),
                     '<p>This is a hint.</p>',
                 )
             ),
@@ -4545,9 +4202,7 @@ version: 1
         # Ruling out the possibility of None for mypy type checking, because
         # we above we are already updating the value of interaction_id.
         assert state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, solution_dict
-        )
+        solution = state_domain.Solution.from_dict(state.interaction.id, solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.update_interaction_customization_args(
@@ -4584,9 +4239,7 @@ version: 1
         course_details: str = 'Course Details',
         teaser_text: str = 'Teaser Text',
         topic_list_intro: str = 'Topic list intro',
-        topic_id_to_prerequisite_topic_ids: Optional[
-            Dict[str, List[str]]
-        ] = None,
+        topic_id_to_prerequisite_topic_ids: Optional[Dict[str, List[str]]] = None,
         is_published: bool = True,
         diagnostic_test_is_enabled: bool = False,
         thumbnail_data: Optional[classroom_config_domain.ImageData] = None,
@@ -4615,12 +4268,8 @@ version: 1
         Returns:
             Classroom. The classroom domain object.
         """
-        dummy_thumbnail_data = classroom_config_domain.ImageData(
-            'thumbnail.svg', 'transparent', 1000
-        )
-        dummy_banner_data = classroom_config_domain.ImageData(
-            'banner.png', 'transparent', 1000
-        )
+        dummy_thumbnail_data = classroom_config_domain.ImageData('thumbnail.svg', 'transparent', 1000)
+        dummy_banner_data = classroom_config_domain.ImageData('banner.png', 'transparent', 1000)
         classroom = classroom_config_domain.Classroom(
             classroom_id=classroom_id,
             name=name,
@@ -4628,21 +4277,11 @@ version: 1
             teaser_text=teaser_text,
             course_details=course_details,
             topic_list_intro=topic_list_intro,
-            topic_id_to_prerequisite_topic_ids=(
-                topic_id_to_prerequisite_topic_ids
-                if topic_id_to_prerequisite_topic_ids is not None
-                else {}
-            ),
+            topic_id_to_prerequisite_topic_ids=(topic_id_to_prerequisite_topic_ids if topic_id_to_prerequisite_topic_ids is not None else {}),
             is_published=is_published,
             diagnostic_test_is_enabled=(diagnostic_test_is_enabled),
-            thumbnail_data=(
-                thumbnail_data
-                if thumbnail_data is not None
-                else dummy_thumbnail_data
-            ),
-            banner_data=(
-                banner_data if banner_data is not None else dummy_banner_data
-            ),
+            thumbnail_data=(thumbnail_data if thumbnail_data is not None else dummy_thumbnail_data),
+            banner_data=(banner_data if banner_data is not None else dummy_banner_data),
             index=0,
         )
 
@@ -4669,9 +4308,7 @@ class LinterTestBase(GenericTestBase):
 
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
-    def assert_same_list_elements(
-        self, phrases: List[str], stdout: List[str]
-    ) -> None:
+    def assert_same_list_elements(self, phrases: List[str], stdout: List[str]) -> None:
         """Checks to see if all of the phrases appear in at least one of the
         stdout outputs.
 
@@ -4684,13 +4321,9 @@ class LinterTestBase(GenericTestBase):
             stdout: list(str). A list of the output results from the method's
                 execution.
         """
-        self.assertTrue(
-            any(all(p in output for p in phrases) for output in stdout)
-        )
+        self.assertTrue(any(all(p in output for p in phrases) for output in stdout))
 
-    def assert_failed_messages_count(
-        self, stdout: List[str], expected_failed_count: int
-    ) -> None:
+    def assert_failed_messages_count(self, stdout: List[str], expected_failed_count: int) -> None:
         """Assert number of expected failed checks to actual number of failed
         checks.
 
@@ -4715,9 +4348,7 @@ class EmailMessageMock:
         cc: Optional[Sequence[str]] = None,
         bcc: Optional[Sequence[str]] = None,
         reply_to: Optional[str] = None,
-        recipient_variables: Optional[
-            Dict[str, Dict[str, Union[str, int]]]
-        ] = None,
+        recipient_variables: Optional[Dict[str, Dict[str, Union[str, int]]]] = None,
         attachments: Optional[List[Dict[str, str]]] = None,
     ) -> None:
         """Inits a mock email message with all the necessary data.
@@ -4770,9 +4401,7 @@ class EmailMessageMock:
 class GenericEmailTestBase(GenericTestBase):
     """Base class for tests requiring email services."""
 
-    emails_dict: Dict[str, List[EmailMessageMock]] = collections.defaultdict(
-        list
-    )
+    emails_dict: Dict[str, List[EmailMessageMock]] = collections.defaultdict(list)
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
         """Adds a context swap on top of the test_utils.run() method so that
@@ -4805,9 +4434,7 @@ class GenericEmailTestBase(GenericTestBase):
         cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
-        recipient_variables: Optional[
-            Dict[str, Dict[str, Union[str, int]]]
-        ] = None,
+        recipient_variables: Optional[Dict[str, Dict[str, Union[str, int]]]] = None,
         attachments: Optional[List[Dict[str, str]]] = None,
     ) -> bool:
         """Mocks sending an email to each email in recipient_emails.
@@ -4864,9 +4491,7 @@ class GenericEmailTestBase(GenericTestBase):
             cc=cc_emails,
             bcc=bcc_emails,
             reply_to=(reply_to if reply_to else None),
-            recipient_variables=(
-                recipient_variables if recipient_variables else None
-            ),
+            recipient_variables=(recipient_variables if recipient_variables else None),
             attachments=attachments if attachments else None,
         )
         for recipient_email in recipient_emails:
@@ -5051,17 +4676,11 @@ class FailingFunction(FunctionWrapper):
         super().__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
-        self._always_fail = (
-            self._num_tries_before_success == FailingFunction.INFINITY
-        )
+        self._always_fail = self._num_tries_before_success == FailingFunction.INFINITY
         self._times_called = 0
 
         if not self._always_fail and self._num_tries_before_success < 0:
-            raise ValueError(
-                'num_tries_before_success should either be an '
-                'integer greater than or equal to 0, '
-                'or FailingFunction.INFINITY'
-            )
+            raise ValueError('num_tries_before_success should either be an integer greater than or equal to 0, or FailingFunction.INFINITY')
 
     # Here we use type Any because argument 'args' can accept arbitrary number
     # of function's arguments and these arguments can be of any type.
@@ -5074,9 +4693,6 @@ class FailingFunction(FunctionWrapper):
             args: OrderedDict. Set of arguments that the function accepts.
         """
         self._times_called += 1
-        call_should_fail = (
-            self._always_fail
-            or self._num_tries_before_success >= self._times_called
-        )
+        call_should_fail = self._always_fail or self._num_tries_before_success >= self._times_called
         if call_should_fail:
             raise self._exception

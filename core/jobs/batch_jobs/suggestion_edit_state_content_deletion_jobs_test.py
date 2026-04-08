@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
+from typing import Type
+
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import suggestion_edit_state_content_deletion_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -35,14 +35,10 @@ if MYPY:  # pragma: no cover
 suggestion_model = suggestion_models.GeneralSuggestionModel
 
 
-class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
-    job_test_utils.JobTestBase
-):
+class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(job_test_utils.JobTestBase):
     jobs = suggestion_edit_state_content_deletion_jobs
 
-    JOB_CLASS: Type[
-        jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
-    ] = jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
+    JOB_CLASS: Type[jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob] = jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
 
     def create_suggestion(
         self,
@@ -94,48 +90,40 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     def setUp(self) -> None:
         super().setUp()
 
-        self.state_content_suggestion_model_1: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_1',
-                'author_1',
-                'reviewer_1',
-                None,
-            )
+        self.state_content_suggestion_model_1: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_1',
+            'author_1',
+            'reviewer_1',
+            None,
         )
 
-        self.state_content_suggestion_model_2: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_2',
-                'author_2',
-                'reviewer_2',
-                None,
-            )
+        self.state_content_suggestion_model_2: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_2',
+            'author_2',
+            'reviewer_2',
+            None,
         )
 
-        self.translation_suggestion_model: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_3',
-                'author_3',
-                'reviewer_3',
-                'hi',
-            )
+        self.translation_suggestion_model: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_3',
+            'author_3',
+            'reviewer_3',
+            'hi',
         )
 
-        self.question_suggestion_model: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_ADD_QUESTION,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_4',
-                'author_4',
-                'reviewer_4',
-                'en',
-            )
+        self.question_suggestion_model: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_4',
+            'author_4',
+            'reviewer_4',
+            'en',
         )
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
@@ -152,31 +140,19 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             ]
         )
 
-        queries = [
-            ('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
-        ]
+        queries = [('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(len(suggestion_model.query_suggestions(queries)), 2)
 
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2'
-                )
-            ]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')])
 
         self.assertEqual(len(suggestion_model.query_suggestions(queries)), 0)
 
 
-class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
-    job_test_utils.JobTestBase
-):
+class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(job_test_utils.JobTestBase):
     jobs = suggestion_edit_state_content_deletion_jobs
 
-    JOB_CLASS: Type[
-        jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
-    ] = jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
+    JOB_CLASS: Type[jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob] = jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
 
     def create_suggestion(
         self,
@@ -228,48 +204,40 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     def setUp(self) -> None:
         super().setUp()
 
-        self.state_content_suggestion_model_1: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_1',
-                'author_1',
-                'reviewer_1',
-                None,
-            )
+        self.state_content_suggestion_model_1: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_1',
+            'author_1',
+            'reviewer_1',
+            None,
         )
 
-        self.state_content_suggestion_model_2: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_2',
-                'author_2',
-                'reviewer_2',
-                None,
-            )
+        self.state_content_suggestion_model_2: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_2',
+            'author_2',
+            'reviewer_2',
+            None,
         )
 
-        self.translation_suggestion_model: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_3',
-                'author_3',
-                'reviewer_3',
-                'hi',
-            )
+        self.translation_suggestion_model: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_3',
+            'author_3',
+            'reviewer_3',
+            'hi',
         )
 
-        self.question_suggestion_model: suggestion_model = (
-            self.create_suggestion(
-                feconf.SUGGESTION_TYPE_ADD_QUESTION,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                'target_4',
-                'author_4',
-                'reviewer_4',
-                'en',
-            )
+        self.question_suggestion_model: suggestion_model = self.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'target_4',
+            'author_4',
+            'reviewer_4',
+            'en',
         )
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
@@ -286,18 +254,10 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             ]
         )
 
-        queries = [
-            ('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
-        ]
+        queries = [('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(len(suggestion_model.query_suggestions(queries)), 2)
 
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2'
-                )
-            ]
-        )
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')])
 
         self.assertEqual(len(suggestion_model.query_suggestions(queries)), 2)

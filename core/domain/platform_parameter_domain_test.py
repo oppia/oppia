@@ -21,11 +21,11 @@ from __future__ import annotations
 import collections
 import enum
 
+from typing import Dict, Final, List, Optional, Union
+
 from core import feconf, utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
-
-from typing import Dict, Final, List, Optional, Union
 
 ServerMode = parameter_domain.ServerMode
 
@@ -41,24 +41,18 @@ class DummyParamName(enum.Enum):
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterChange class."""
 
-    CMD_EDIT_RULES: Final = (
-        parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
-    )
+    CMD_EDIT_RULES: Final = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
 
     def test_param_change_object_with_missing_cmd_raises_exception(
         self,
     ) -> None:
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Missing cmd key in change dict'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Missing cmd key in change dict'):
             parameter_domain.PlatformParameterChange({'invalid': 'data'})
 
     def test_param_change_object_with_invalid_cmd_raises_exception(
         self,
     ) -> None:
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Command invalid is not allowed'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Command invalid is not allowed'):
             parameter_domain.PlatformParameterChange({'cmd': 'invalid'})
 
     def test_param_change_object_missing_attribute_in_cmd_raises_exception(
@@ -68,9 +62,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'The following required attributes are missing: new_rules',
         ):
-            parameter_domain.PlatformParameterChange(
-                {'cmd': self.CMD_EDIT_RULES}
-            )
+            parameter_domain.PlatformParameterChange({'cmd': self.CMD_EDIT_RULES})
 
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
         self,
@@ -91,9 +83,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': [],
         }
-        param_change_object = parameter_domain.PlatformParameterChange(
-            param_change_dict
-        )
+        param_change_object = parameter_domain.PlatformParameterChange(param_change_dict)
         self.assertEqual(param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(param_change_object.new_rules, [])
 
@@ -102,9 +92,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': [],
         }
-        param_change_object = parameter_domain.PlatformParameterChange(
-            param_change_dict
-        )
+        param_change_object = parameter_domain.PlatformParameterChange(param_change_dict)
         self.assertEqual(param_change_object.to_dict(), param_change_dict)
 
 
@@ -211,9 +199,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'server_mode': ServerMode.DEV,
             },
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid version \'a.a.a\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid version \'a.a.a\''):
             context.validate()
 
     def test_validate_with_invalid_app_sub_version_numbers_raises_exception(
@@ -228,9 +214,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'server_mode': ServerMode.DEV,
             },
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid version \'1.0.0.0\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid version \'1.0.0.0\''):
             context.validate()
 
     def test_validate_with_invalid_app_version_flavor_raises_exception(
@@ -245,9 +229,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'server_mode': ServerMode.DEV,
             },
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid version flavor \'invalid\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid version flavor \'invalid\''):
             context.validate()
 
     def test_validate_with_invalid_server_mode_raises_exception(self) -> None:
@@ -267,9 +249,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'server_mode': mock_enum,  # type: ignore[typeddict-item]
             },
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid server mode \'invalid\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid server mode \'invalid\''):
             context.validate()
 
 
@@ -295,44 +275,26 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             },
         )
 
-    def _test_flavor_relation_holds(
-        self, version: str, op: str, flavor_b: str
-    ) -> None:
+    def _test_flavor_relation_holds(self, version: str, op: str, flavor_b: str) -> None:
         """Helper method to test relation 'flavor_a <op> flavor_b' hold,
         where flavor_a is the flavor of the argument 'version'.
         """
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'app_version_flavor', 'conditions': [[op, flavor_b]]}
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version=version)
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'app_version_flavor', 'conditions': [[op, flavor_b]]})
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version=version)))
 
-    def _test_flavor_relation_does_not_hold(
-        self, version: str, op: str, flavor_b: str
-    ) -> None:
+    def _test_flavor_relation_does_not_hold(self, version: str, op: str, flavor_b: str) -> None:
         """Helper method to test relation 'flavor_a <op> flavor_b' doesn't
         holds, where flavor_a is the flavor of the argument 'version'.
         """
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'app_version_flavor', 'conditions': [[op, flavor_b]]}
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version=version)
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'app_version_flavor', 'conditions': [[op, flavor_b]]})
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version=version)))
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
             'conditions': [['=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
         self.assertEqual(filter_domain.type, 'app_version')
         self.assertEqual(filter_domain.conditions, [['=', '1.2.3']])
@@ -342,9 +304,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
@@ -355,9 +315,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'platform_type',
             'conditions': [['=', 'Backend']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
         web_context = self._create_example_context(platform_type='Backend')
         self.assertTrue(filter_domain.evaluate(web_context))
@@ -369,9 +327,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'platform_type',
             'conditions': [['=', 'Web']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
         web_context = self._create_example_context(platform_type='Web')
         self.assertTrue(filter_domain.evaluate(web_context))
@@ -383,9 +339,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'platform_type',
             'conditions': [['=', 'Web']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
         native_context = self._create_example_context(platform_type='Android')
         self.assertFalse(filter_domain.evaluate(native_context))
@@ -397,14 +351,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.3')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.2.3')))
 
     def test_evaluate_eq_version_filter_with_diff_version_returns_false(
         self,
@@ -413,14 +361,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.4')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.2.4')))
 
     def test_evaluate_gt_version_filter_with_small_version_returns_false(
         self,
@@ -429,19 +371,9 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['>', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='0.2.3')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.1.2')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='0.2.3')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.1.2')))
 
     def test_evaluate_gt_version_filter_with_same_version_returns_false(
         self,
@@ -450,14 +382,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['>', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.3')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.2.3')))
 
     def test_evaluate_gt_version_filter_with_large_version_returns_true(
         self,
@@ -466,24 +392,10 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['>', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.4')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.3.0')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='2.0.0')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.2.4')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.3.0')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='2.0.0')))
 
     def test_evaluate_gte_version_filter_with_small_version_returns_false(
         self,
@@ -492,19 +404,9 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['>=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='0.2.3')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.1.2')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='0.2.3')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.1.2')))
 
     def test_evaluate_gte_version_filter_with_same_version_returns_true(
         self,
@@ -513,14 +415,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['>=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.3')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.2.3')))
 
     def test_evaluate_gte_version_filter_with_large_version_returns_true(
         self,
@@ -529,24 +425,10 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['>=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.4')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.3.0')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='2.0.0')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.2.4')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.3.0')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='2.0.0')))
 
     def test_evaluate_lt_version_filter_with_small_version_returns_true(
         self,
@@ -555,29 +437,11 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['<', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='0.3.4')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.1.0')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.1.2')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.2')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='0.3.4')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.1.0')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.1.2')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.2.2')))
 
     def test_evaluate_lt_version_filter_with_same_version_returns_false(
         self,
@@ -586,14 +450,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['<', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.3')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.2.3')))
 
     def test_evaluate_lt_version_filter_with_large_version_returns_false(
         self,
@@ -602,29 +460,11 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['<', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.4')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.3.0')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.10.0')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='2.0.0')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.2.4')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.3.0')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.10.0')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='2.0.0')))
 
     def test_evaluate_lte_version_filter_with_small_version_returns_true(
         self,
@@ -633,24 +473,10 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['<=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='0.3.4')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.1.0')
-            )
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.2')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='0.3.4')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.1.0')))
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.2.2')))
 
     def test_evaluate_lte_version_filter_with_same_version_returns_true(
         self,
@@ -659,14 +485,8 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['<=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertTrue(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.3')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertTrue(filter_domain.evaluate(self._create_example_context(app_version='1.2.3')))
 
     def test_evaluate_lte_version_filter_with_large_version_returns_false(
         self,
@@ -675,29 +495,11 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['<=', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.2.4')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.3.0')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.10.0')
-            )
-        )
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version='2.0.0')
-            )
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.2.4')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.3.0')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.10.0')))
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='2.0.0')))
 
     def test_evaluate_test_version_with_eq_test_cond_returns_true(self) -> None:
         self._test_flavor_relation_holds('1.0.0-abcdef-test', '=', 'test')
@@ -705,30 +507,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_test_version_with_eq_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '=', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '=', 'alpha')
 
     def test_evaluate_test_version_with_eq_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '=', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '=', 'beta')
 
     def test_evaluate_test_version_with_eq_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '=', 'release')
 
     def test_evaluate_test_version_with_lt_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '<', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '<', 'test')
 
     def test_evaluate_test_version_with_lt_alpha_cond_returns_true(
         self,
@@ -766,30 +560,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_test_version_with_gt_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '>', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '>', 'test')
 
     def test_evaluate_test_version_with_gt_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '>', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '>', 'alpha')
 
     def test_evaluate_test_version_with_gt_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '>', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '>', 'beta')
 
     def test_evaluate_test_version_with_gt_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '>', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '>', 'release')
 
     def test_evaluate_test_version_with_gte_test_cond_returns_true(
         self,
@@ -799,30 +585,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_test_version_with_gte_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '>=', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '>=', 'alpha')
 
     def test_evaluate_test_version_with_gte_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '>=', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '>=', 'beta')
 
     def test_evaluate_test_version_with_gte_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '>=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-test', '>=', 'release')
 
     def test_evaluate_alpha_version_with_eq_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '=', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '=', 'test')
 
     def test_evaluate_alpha_version_with_eq_alpha_cond_returns_true(
         self,
@@ -832,30 +610,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_alpha_version_with_eq_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '=', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '=', 'beta')
 
     def test_evaluate_alpha_version_with_eq_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '=', 'release')
 
     def test_evaluate_alpha_version_with_lt_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '<', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '<', 'test')
 
     def test_evaluate_alpha_version_with_lt_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '<', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '<', 'alpha')
 
     def test_evaluate_alpha_version_with_lt_beta_cond_returns_true(
         self,
@@ -870,9 +640,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_alpha_version_with_lte_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '<=', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '<=', 'test')
 
     def test_evaluate_alpha_version_with_lte_alpha_cond_returns_true(
         self,
@@ -897,23 +665,17 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_alpha_version_with_gt_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '>', 'alpha')
 
     def test_evaluate_alpha_version_with_gt_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '>', 'beta')
 
     def test_evaluate_alpha_version_with_gt_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '>', 'release')
 
     def test_evaluate_alpha_version_with_gte_test_cond_returns_true(
         self,
@@ -928,30 +690,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_alpha_version_with_gte_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>=', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '>=', 'beta')
 
     def test_evaluate_alpha_version_with_gte_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-alpha', '>=', 'release')
 
     def test_evaluate_beta_version_with_eq_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '=', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '=', 'test')
 
     def test_evaluate_beta_version_with_eq_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '=', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '=', 'alpha')
 
     def test_evaluate_beta_version_with_eq_beta_cond_returns_true(self) -> None:
         self._test_flavor_relation_holds('1.0.0-abcdef-beta', '=', 'beta')
@@ -959,30 +713,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_beta_version_with_eq_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '=', 'release')
 
     def test_evaluate_beta_version_with_lt_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '<', 'test')
 
     def test_evaluate_beta_version_with_lt_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '<', 'alpha')
 
     def test_evaluate_beta_version_with_lt_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '<', 'beta')
 
     def test_evaluate_beta_version_with_lt_release_cond_returns_true(
         self,
@@ -992,16 +738,12 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_beta_version_with_lte_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<=', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '<=', 'test')
 
     def test_evaluate_beta_version_with_lte_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<=', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '<=', 'alpha')
 
     def test_evaluate_beta_version_with_lte_beta_cond_returns_true(
         self,
@@ -1024,16 +766,12 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_beta_version_with_gt_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '>', 'beta')
 
     def test_evaluate_beta_version_with_gt_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '>', 'release')
 
     def test_evaluate_beta_version_with_gte_test_cond_returns_true(
         self,
@@ -1053,30 +791,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_beta_version_with_gte_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-beta', '>=', 'release')
 
     def test_evaluate_release_version_with_eq_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '=', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '=', 'test')
 
     def test_evaluate_release_version_with_eq_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '=', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '=', 'alpha')
 
     def test_evaluate_release_version_with_eq_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '=', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '=', 'beta')
 
     def test_evaluate_release_version_with_eq_release_cond_returns_true(
         self,
@@ -1086,58 +816,42 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_release_version_with_lt_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '<', 'test')
 
     def test_evaluate_release_version_with_lt_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '<', 'alpha')
 
     def test_evaluate_release_version_with_lt_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '<', 'beta')
 
     def test_evaluate_release_version_with_lt_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '<', 'release')
 
     def test_evaluate_release_version_with_lte_test_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<=', 'test'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '<=', 'test')
 
     def test_evaluate_release_version_with_lte_alpha_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<=', 'alpha'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '<=', 'alpha')
 
     def test_evaluate_release_version_with_lte_beta_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<=', 'beta'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '<=', 'beta')
 
     def test_evaluate_release_version_with_lte_release_cond_returns_true(
         self,
     ) -> None:
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-release', '<=', 'release'
-        )
+        self._test_flavor_relation_holds('1.0.0-abcdef-release', '<=', 'release')
 
     def test_evaluate_release_version_with_gt_test_cond_returns_true(
         self,
@@ -1157,9 +871,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_release_version_with_gt_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '>', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef-release', '>', 'release')
 
     def test_evaluate_release_version_with_gte_test_cond_returns_true(
         self,
@@ -1179,9 +891,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_release_version_with_gte_release_cond_returns_true(
         self,
     ) -> None:
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-release', '>=', 'release'
-        )
+        self._test_flavor_relation_holds('1.0.0-abcdef-release', '>=', 'release')
 
     def test_evaluate_unspecified_version_with_eq_test_cond_returns_false(
         self,
@@ -1241,9 +951,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_unspecified_version_with_lte_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef', '<=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef', '<=', 'release')
 
     def test_evaluate_unspecified_version_with_gt_test_cond_returns_false(
         self,
@@ -1283,9 +991,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     def test_evaluate_unspecified_version_with_gte_release_cond_returns_false(
         self,
     ) -> None:
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef', '>=', 'release'
-        )
+        self._test_flavor_relation_does_not_hold('1.0.0-abcdef', '>=', 'release')
 
     def test_evaluate_multi_value_filter_with_one_matched_returns_true(
         self,
@@ -1294,9 +1000,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'platform_type',
             'conditions': [['=', 'Web']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
         platform_type_context = self._create_example_context()
         self.assertTrue(filter_domain.evaluate(platform_type_context))
@@ -1308,9 +1012,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'platform_type',
             'conditions': [['=', 'Backend'], ['=', 'Android']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
         test_context = self._create_example_context(mode='TEST')
         self.assertFalse(filter_domain.evaluate(test_context))
@@ -1322,119 +1024,71 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             'type': 'app_version',
             'conditions': [['=', '1.2.3'], ['=', '1.2.4']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
-        self.assertFalse(
-            filter_domain.evaluate(
-                self._create_example_context(app_version=None)
-            )
-        )
+        self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version=None)))
 
     def test_evaluate_filter_with_unsupported_operation_raises_exception(
         self,
     ) -> None:
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'platform_type', 'conditions': [['!=', 'Web']]}
-        )
-        with self.assertRaisesRegex(
-            Exception, 'Unsupported comparison operator \'!=\''
-        ):
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'platform_type', 'conditions': [['!=', 'Web']]})
+        with self.assertRaisesRegex(Exception, 'Unsupported comparison operator \'!=\''):
             filter_domain.evaluate(self._create_example_context())
 
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'app_version',
             'conditions': [['>>', '1.2.3']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
 
-        with self.assertRaisesRegex(
-            Exception, 'Unsupported comparison operator \'>>\''
-        ):
-            self.assertFalse(
-                filter_domain.evaluate(
-                    self._create_example_context(
-                        app_version='1.0.0-abcdef-test'
-                    )
-                )
-            )
+        with self.assertRaisesRegex(Exception, 'Unsupported comparison operator \'>>\''):
+            self.assertFalse(filter_domain.evaluate(self._create_example_context(app_version='1.0.0-abcdef-test')))
 
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'app_version_flavor', 'conditions': [['==', 'beta']]}
-        )
-        with self.assertRaisesRegex(
-            Exception, 'Unsupported comparison operator \'==\''
-        ):
-            filter_domain.evaluate(
-                self._create_example_context(app_version='1.0.0-abcdef-test')
-            )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'app_version_flavor', 'conditions': [['==', 'beta']]})
+        with self.assertRaisesRegex(Exception, 'Unsupported comparison operator \'==\''):
+            filter_domain.evaluate(self._create_example_context(app_version='1.0.0-abcdef-test'))
 
     def test_validate_filter_passes_without_exception(self) -> None:
         filter_dict: parameter_domain.PlatformParameterFilterDict = {
             'type': 'platform_type',
             'conditions': [['=', 'Web']],
         }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(filter_dict)
         filter_domain.validate()
 
     def test_validate_filter_with_invalid_type_raises_exception(self) -> None:
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'invalid', 'conditions': [['=', 'value1']]}
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Unsupported filter type \'invalid\''
-        ):
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'invalid', 'conditions': [['=', 'value1']]})
+        with self.assertRaisesRegex(utils.ValidationError, 'Unsupported filter type \'invalid\''):
             filter_domain.validate()
 
     def test_validate_filter_with_unsupported_operation_raises_exception(
         self,
     ) -> None:
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'platform_type', 'conditions': [['!=', 'Web']]}
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Unsupported comparison operator \'!=\''
-        ):
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'platform_type', 'conditions': [['!=', 'Web']]})
+        with self.assertRaisesRegex(utils.ValidationError, 'Unsupported comparison operator \'!=\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_platform_type_raises_exception(
         self,
     ) -> None:
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'platform_type', 'conditions': [['=', 'invalid']]}
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid platform type \'invalid\''
-        ):
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'platform_type', 'conditions': [['=', 'invalid']]})
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid platform type \'invalid\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_version_expr_raises_exception(
         self,
     ) -> None:
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'app_version', 'conditions': [['=', '1.a.2']]}
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'app_version', 'conditions': [['=', '1.a.2']]})
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid version expression \'1.a.2\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid version expression \'1.a.2\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_version_flavor_raises_exception(
         self,
     ) -> None:
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            {'type': 'app_version_flavor', 'conditions': [['=', 'invalid']]}
-        )
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict({'type': 'app_version_flavor', 'conditions': [['=', 'invalid']]})
 
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid app version flavor \'invalid\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid app version flavor \'invalid\''):
             filter_domain.validate()
 
 
@@ -1442,9 +1096,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterRule."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
-        filters: List[parameter_domain.PlatformParameterFilterDict] = [
-            {'type': 'app_version', 'conditions': [['=', '1.2.3']]}
-        ]
+        filters: List[parameter_domain.PlatformParameterFilterDict] = [{'type': 'app_version', 'conditions': [['=', '1.2.3']]}]
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': filters,
@@ -1454,9 +1106,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         self.assertIsInstance(rule, parameter_domain.PlatformParameterRule)
 
         filter_domain = rule.filters[0]
-        self.assertIsInstance(
-            filter_domain, parameter_domain.PlatformParameterFilter
-        )
+        self.assertIsInstance(filter_domain, parameter_domain.PlatformParameterFilter)
         self.assertEqual(len(rule.filters), 1)
         self.assertEqual(filter_domain.type, 'app_version')
         self.assertEqual(filter_domain.conditions, [['=', '1.2.3']])
@@ -1464,9 +1114,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
 
     def test_to_dict_returns_correct_dict(self) -> None:
         rule_dict: parameter_domain.PlatformParameterRuleDict = {
-            'filters': [
-                {'type': 'app_version', 'conditions': [['=', '1.2.3']]}
-            ],
+            'filters': [{'type': 'app_version', 'conditions': [['=', '1.2.3']]}],
             'value_when_matched': False,
         }
         rule = parameter_domain.PlatformParameterRule.from_dict(rule_dict)
@@ -1525,9 +1173,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'value_when_matched': False,
             }
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Unsupported filter type \'invalid\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Unsupported filter type \'invalid\''):
             rule.validate()
 
 
@@ -1551,9 +1197,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
@@ -1586,15 +1230,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid parameter name \'%s\'' % param.name
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid parameter name \'%s\'' % param.name):
             param.validate()
 
         param1 = parameter_domain.PlatformParameter.from_dict(
@@ -1613,15 +1253,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid parameter name \'%s\'' % param1.name
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid parameter name \'%s\'' % param1.name):
             param1.validate()
 
     def test_validate_with_long_name_raises_exception(self) -> None:
@@ -1642,15 +1278,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid parameter name \'%s\'' % long_name
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid parameter name \'%s\'' % long_name):
             param.validate()
 
     def test_validate_with_unsupported_data_type_raises_exception(self) -> None:
@@ -1670,15 +1302,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Unsupported data type \'InvalidType\''
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Unsupported data type \'InvalidType\''):
             param.validate()
 
     def test_validate_with_inconsistent_data_type_in_rules_raises_exception(
@@ -1700,9 +1328,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     },
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': False,
             }
         )
@@ -1721,9 +1347,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'description': 'for test',
                 'data_type': 'bool',
                 'rules': [],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '111',
             }
         )
@@ -1734,13 +1358,10 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             param.validate()
 
     def test_create_with_old_rule_schema_version_failure(self) -> None:
-        with self.swap(
-            feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2
-        ):
+        with self.swap(feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2):
             with self.assertRaisesRegex(
                 Exception,
-                'Current platform parameter rule schema version is v2, '
-                'received v1',
+                'Current platform parameter rule schema version is v2, received v1',
             ):
                 parameter_domain.PlatformParameter.from_dict(
                     {
@@ -1770,15 +1391,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'data_type': 'string',
             'rules': [
                 {
-                    'filters': [
-                        {'type': 'platform_type', 'conditions': [['=', 'Web']]}
-                    ],
+                    'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
                     'value_when_matched': '222',
                 }
             ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
+            'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': '333',
         }
         parameter = parameter_domain.PlatformParameter.from_dict(param_dict)
@@ -1810,21 +1427,15 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '555',
                     },
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
         new_rule_dict: parameter_domain.PlatformParameterRuleDict = {
-            'filters': [
-                {'type': 'platform_type', 'conditions': [['=', 'Web']]}
-            ],
+            'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
             'value_when_matched': 'new rule value',
         }
-        new_rule = parameter_domain.PlatformParameterRule.from_dict(
-            new_rule_dict
-        )
+        new_rule = parameter_domain.PlatformParameterRule.from_dict(new_rule_dict)
         param.set_rules([new_rule])
 
         self.assertEqual(len(param.rules), 1)
@@ -1847,9 +1458,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
@@ -1874,9 +1483,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '333',
             }
         )
@@ -1909,9 +1516,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '111',
             }
         )
@@ -1946,9 +1551,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '111',
             }
         )
@@ -1983,9 +1586,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': '222',
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': '111',
             }
         )
@@ -2018,9 +1619,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': False,
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': False,
             }
         )
@@ -2048,15 +1647,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         'value_when_matched': True,
                     }
                 ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
+                'rule_schema_version': (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
                 'default_value': False,
             }
         )
         self.assertEqual(
             parameter.to_dict(),
-            parameter_domain.PlatformParameter.deserialize(
-                parameter.serialize()
-            ).to_dict(),
+            parameter_domain.PlatformParameter.deserialize(parameter.serialize()).to_dict(),
         )

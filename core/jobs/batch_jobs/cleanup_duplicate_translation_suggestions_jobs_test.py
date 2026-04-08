@@ -34,10 +34,7 @@ if MYPY:  # pragma: no cover
 
 
 class AuditDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
-
-    JOB_CLASS = (
-        cleanup_duplicate_translation_suggestions_jobs.AuditDuplicateTranslationSuggestionsJob
-    )
+    JOB_CLASS = cleanup_duplicate_translation_suggestions_jobs.AuditDuplicateTranslationSuggestionsJob
 
     def test_empty_datastore_returns_empty_report(self) -> None:
         self.assert_job_output_is_empty()
@@ -73,9 +70,7 @@ class AuditDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'
-                ),
+                job_run_result.JobRunResult(stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'),
             ]
         )
 
@@ -110,30 +105,16 @@ class AuditDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='DUPLICATE GROUPS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'Duplicates found for exploration exp1, language hi, '
-                    'content_id content1. Suggestion IDs: [\'suggestion1\', \'suggestion2\']'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='REJECTED DUPLICATE SUGGESTIONS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'
-                ),
+                job_run_result.JobRunResult(stdout='DUPLICATE GROUPS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult.as_stdout('Duplicates found for exploration exp1, language hi, content_id content1. Suggestion IDs: [\'suggestion1\', \'suggestion2\']'),
+                job_run_result.JobRunResult(stdout='REJECTED DUPLICATE SUGGESTIONS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'),
             ]
         )
 
 
-class CleanupDuplicateTranslationSuggestionsJobTests(
-    job_test_utils.JobTestBase
-):
-
-    JOB_CLASS = (
-        cleanup_duplicate_translation_suggestions_jobs.CleanupDuplicateTranslationSuggestionsJob
-    )
+class CleanupDuplicateTranslationSuggestionsJobTests(job_test_utils.JobTestBase):
+    JOB_CLASS = cleanup_duplicate_translation_suggestions_jobs.CleanupDuplicateTranslationSuggestionsJob
 
     def test_empty_datastore_returns_empty_report(self) -> None:
         self.assert_job_output_is_empty()
@@ -156,15 +137,11 @@ class CleanupDuplicateTranslationSuggestionsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 1'
-                ),
+                job_run_result.JobRunResult(stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 1'),
             ]
         )
 
-        model1 = suggestion_models.GeneralSuggestionModel.get_by_id(
-            'suggestion1'
-        )
+        model1 = suggestion_models.GeneralSuggestionModel.get_by_id('suggestion1')
         self.assertEqual(model1.status, suggestion_models.STATUS_IN_REVIEW)
 
     def test_duplicates_are_cleaned_up(self) -> None:
@@ -205,33 +182,18 @@ class CleanupDuplicateTranslationSuggestionsJobTests(
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
-                    stdout='DUPLICATE GROUPS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stdout(
-                    'Duplicates found for exploration exp1, language hi, '
-                    'content_id content1. Suggestion IDs: [\'suggestion1\', \'suggestion2\']'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='REJECTED DUPLICATE SUGGESTIONS COUNT SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'
-                ),
+                job_run_result.JobRunResult(stdout='DUPLICATE GROUPS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult.as_stdout('Duplicates found for exploration exp1, language hi, content_id content1. Suggestion IDs: [\'suggestion1\', \'suggestion2\']'),
+                job_run_result.JobRunResult(stdout='REJECTED DUPLICATE SUGGESTIONS COUNT SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='TOTAL SUGGESTIONS COUNT SUCCESS: 2'),
             ]
         )
 
         # Suggestion 2 should still be in review (it was the oldest).
-        model2 = suggestion_models.GeneralSuggestionModel.get_by_id(
-            'suggestion2'
-        )
+        model2 = suggestion_models.GeneralSuggestionModel.get_by_id('suggestion2')
         self.assertEqual(model2.status, suggestion_models.STATUS_IN_REVIEW)
 
         # Suggestion 1 should be rejected.
-        model1 = suggestion_models.GeneralSuggestionModel.get_by_id(
-            'suggestion1'
-        )
+        model1 = suggestion_models.GeneralSuggestionModel.get_by_id('suggestion1')
         self.assertEqual(model1.status, suggestion_models.STATUS_REJECTED)
-        self.assertEqual(
-            model1.final_reviewer_id, feconf.SUGGESTION_BOT_USER_ID
-        )
+        self.assertEqual(model1.final_reviewer_id, feconf.SUGGESTION_BOT_USER_ID)

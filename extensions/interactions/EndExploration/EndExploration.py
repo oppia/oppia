@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List, Optional
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -36,10 +36,7 @@ class EndExploration(base.BaseInteraction):
     """
 
     name: str = 'End Exploration'
-    description: str = (
-        'Ends the exploration, and suggests recommendations for explorations '
-        'to try next.'
-    )
+    description: str = 'Ends the exploration, and suggests recommendations for explorations to try next.'
     display_mode: str = base.DISPLAY_MODE_INLINE
     is_terminal: bool = True
     _dependency_ids: List[str] = []
@@ -53,11 +50,7 @@ class EndExploration(base.BaseInteraction):
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
         {
             'name': 'recommendedExplorationIds',
-            'description': (
-                'IDs of explorations to recommend to the learner (at most 3 are '
-                'shown). The ID of an exploration is the string of characters '
-                'appearing after \'/explore/\' in the URL bar.'
-            ),
+            'description': ('IDs of explorations to recommend to the learner (at most 3 are shown). The ID of an exploration is the string of characters appearing after \'/explore/\' in the URL bar.'),
             'schema': {
                 'type': 'list',
                 'items': {

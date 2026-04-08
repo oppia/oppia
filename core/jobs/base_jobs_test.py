@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import re
 
+from typing import Dict, Type
+
 from core.jobs import base_jobs, job_test_utils
 from core.tests import test_utils
-
-from typing import Dict, Type
 
 
 class MockJobMetaclass(base_jobs.JobMetaclass):
@@ -50,9 +50,7 @@ class JobMetaclassTests(test_utils.TestBase):
 
         self.assertEqual(MockJobMetaclass.get_all_jobs(), [])
         self.assertEqual(MockJobMetaclass.get_all_job_names(), [])
-        with self.assertRaisesRegex(
-            ValueError, 'FooJobBase is not registered as a job'
-        ):
+        with self.assertRaisesRegex(ValueError, 'FooJobBase is not registered as a job'):
             MockJobMetaclass.get_job_class_by_name('FooJobBase')
 
     def test_puts_non_base_classes_in_registry(self) -> None:

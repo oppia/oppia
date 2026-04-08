@@ -54,9 +54,9 @@ sys.path.append(os.getcwd())
 
 # These imports must come after sys.path modification,
 # so the pylint import-position rules are disabled.
-from scripts import common  # pylint: disable=wrong-import-position
-from scripts import git_changes_utils  # pylint: disable=wrong-import-position
 from scripts import (  # pylint: disable=wrong-import-position
+    common,  # pylint: disable=wrong-import-position
+    git_changes_utils,  # pylint: disable=wrong-import-position
     install_python_prod_dependencies,
 )
 
@@ -72,9 +72,7 @@ LINTER_FILE_FLAG: Final = '--files'
 
 PYTHON_CMD: Final = 'python'
 
-OPPIA_PARENT_DIR: Final = os.path.join(
-    FILE_DIR, os.pardir, os.pardir, os.pardir
-)
+OPPIA_PARENT_DIR: Final = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 FRONTEND_TEST_CMDS: Final = [
     PYTHON_CMD,
     '-m',
@@ -120,25 +118,16 @@ class ChangedBranch:
 
     def __init__(self, new_branch: str) -> None:
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
-        self.old_branch = subprocess.check_output(
-            get_branch_cmd, encoding='utf-8'
-        ).strip()
+        self.old_branch = subprocess.check_output(get_branch_cmd, encoding='utf-8').strip()
         self.new_branch = new_branch
         self.is_same_branch = self.old_branch == self.new_branch
 
     def __enter__(self) -> None:
         if not self.is_same_branch:
             try:
-                subprocess.check_output(
-                    ['git', 'checkout', self.new_branch, '--'], encoding='utf-8'
-                )
+                subprocess.check_output(['git', 'checkout', self.new_branch, '--'], encoding='utf-8')
             except subprocess.CalledProcessError:
-                print(
-                    '\nCould not change branch to %s. This is most probably '
-                    'because you are in a dirty state. Change manually to '
-                    'the branch that is being linted or stash your changes.'
-                    % self.new_branch
-                )
+                print('\nCould not change branch to %s. This is most probably because you are in a dirty state. Change manually to the branch that is being linted or stash your changes.' % self.new_branch)
                 sys.exit(1)
 
     def __exit__(
@@ -148,9 +137,7 @@ class ChangedBranch:
         exc_tb: Optional[TracebackType],
     ) -> None:
         if not self.is_same_branch:
-            subprocess.check_output(
-                ['git', 'checkout', self.old_branch, '--'], encoding='utf-8'
-            )
+            subprocess.check_output(['git', 'checkout', self.old_branch, '--'], encoding='utf-8')
 
 
 def start_linter(files: List[bytes]) -> int:
@@ -193,9 +180,7 @@ def has_uncommitted_files() -> bool:
     """Returns true if the repo contains modified files that are uncommitted.
     Ignores untracked files.
     """
-    uncommitted_files = subprocess.check_output(
-        GIT_IS_DIRTY_CMD.split(' '), encoding='utf-8'
-    )
+    uncommitted_files = subprocess.check_output(GIT_IS_DIRTY_CMD.split(' '), encoding='utf-8')
     return bool(uncommitted_files)
 
 
@@ -263,12 +248,7 @@ def does_diff_include_ci_config_or_test_files(diff_files: List[bytes]) -> bool:
     """
 
     for file_path in diff_files:
-        if (
-            re.search(rb'ci-test-suite-configs/.*\.json', file_path)
-            or re.search(rb'wdio\.conf\.js', file_path)
-            or re.search(rb'webdriverio', file_path)
-            or re.search(rb'puppeteer-acceptance-tests', file_path)
-        ):
+        if re.search(rb'ci-test-suite-configs/.*\.json', file_path) or re.search(rb'wdio\.conf\.js', file_path) or re.search(rb'webdriverio', file_path) or re.search(rb'puppeteer-acceptance-tests', file_path):
             return True
     return False
 
@@ -282,32 +262,14 @@ def check_for_backend_python_library_inconsistencies() -> None:
     mismatches = install_python_prod_dependencies.get_mismatches()
 
     if mismatches:
-        print(
-            'Your currently installed python libraries do not match the\n'
-            'libraries listed in your "requirements.txt" file. Here is a\n'
-            'full list of library/version discrepancies:\n'
-        )
+        print('Your currently installed python libraries do not match the\nlibraries listed in your "requirements.txt" file. Here is a\nfull list of library/version discrepancies:\n')
 
-        print(
-            '{:<35} |{:<25}|{:<25}'.format(
-                'Library', 'Requirements Version', 'Currently Installed Version'
-            )
-        )
+        print('{:<35} |{:<25}|{:<25}'.format('Library', 'Requirements Version', 'Currently Installed Version'))
         for library_name, version_strings in mismatches.items():
-            print(
-                '{!s:<35} |{!s:<25}|{!s:<25}'.format(
-                    library_name, version_strings[0], version_strings[1]
-                )
-            )
+            print('{!s:<35} |{!s:<25}|{!s:<25}'.format(library_name, version_strings[0], version_strings[1]))
         print('\n')
         common.print_each_string_after_two_new_lines(
-            [
-                'Please fix these discrepancies by editing the `requirements.in`\n'
-                'file, running `scripts.install_third_party_libs` to regenerate\n'
-                'the `third_party/python_libs` directory, or updating\n'
-                '_get_possible_normalized_metadata_directory_names() in\n'
-                'install_python_prod_dependencies().\n'
-            ]
+            ['Please fix these discrepancies by editing the `requirements.in`\nfile, running `scripts.install_third_party_libs` to regenerate\nthe `third_party/python_libs` directory, or updating\n_get_possible_normalized_metadata_directory_names() in\ninstall_python_prod_dependencies().\n']
         )
         sys.exit(1)
     else:
@@ -332,19 +294,12 @@ def main(args: Optional[List[str]] = None) -> None:
         install_hook()
         return
 
-    remote = (
-        parsed_args.remote
-        if parsed_args.remote
-        else git_changes_utils.get_local_git_repository_remote_name()
-    )
+    remote = parsed_args.remote if parsed_args.remote else git_changes_utils.get_local_git_repository_remote_name()
     refs = git_changes_utils.get_refs()
     collected_files = git_changes_utils.get_changed_files(refs, remote)
     # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and has_uncommitted_files():
-        print(
-            'Your repo is in a dirty state which prevents the linting from'
-            ' working.\nStash your changes or commit them.\n'
-        )
+        print('Your repo is in a dirty state which prevents the linting from working.\nStash your changes or commit them.\n')
         sys.exit(1)
 
     check_for_backend_python_library_inconsistencies()
@@ -358,39 +313,25 @@ def main(args: Optional[List[str]] = None) -> None:
                 print('Running backend lint checks...')
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
-                    print(
-                        'Push failed, please correct the linting issues above.'
-                    )
+                    print('Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
             print('Running mypy checks...')
             mypy_check_status = execute_mypy_checks()
             if mypy_check_status != 0:
-                print(
-                    'Push failed, please correct the mypy type annotation '
-                    'issues above.'
-                )
+                print('Push failed, please correct the mypy type annotation issues above.')
                 sys.exit(mypy_check_status)
 
             print('Running backend-associated-test-file checks ...')
-            backend_associated_test_file_check_status = (
-                run_script_and_get_returncode(
-                    BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD
-                )
-            )
+            backend_associated_test_file_check_status = run_script_and_get_returncode(BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD)
             if backend_associated_test_file_check_status != 0:
-                print(
-                    'Push failed due to some backend files lacking an '
-                    'associated test file.'
-                )
+                print('Push failed due to some backend files lacking an associated test file.')
                 sys.exit(1)
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
                 print('Running TypeScript checks ...')
-                typescript_checks_status = run_script_and_get_returncode(
-                    TYPESCRIPT_CHECKS_CMDS
-                )
+                typescript_checks_status = run_script_and_get_returncode(TYPESCRIPT_CHECKS_CMDS)
             if typescript_checks_status != 0:
                 print('Push aborted due to failing typescript checks.')
                 sys.exit(1)
@@ -398,61 +339,37 @@ def main(args: Optional[List[str]] = None) -> None:
             strict_typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
                 print('Running strict TypeScript checks ...')
-                strict_typescript_checks_status = run_script_and_get_returncode(
-                    STRICT_TYPESCRIPT_CHECKS_CMDS
-                )
+                strict_typescript_checks_status = run_script_and_get_returncode(STRICT_TYPESCRIPT_CHECKS_CMDS)
             if strict_typescript_checks_status != 0:
-                print(
-                    'Push aborted due to failing typescript checks in '
-                    'strict mode.'
-                )
+                print('Push aborted due to failing typescript checks in strict mode.')
                 sys.exit(1)
 
             frontend_status = 0
             ci_check_status = 0
             backend_status = 0
-            js_or_ts_files = git_changes_utils.get_js_or_ts_files_from_diff(
-                files_to_lint
-            )
+            js_or_ts_files = git_changes_utils.get_js_or_ts_files_from_diff(files_to_lint)
             if js_or_ts_files:
                 print('Running frontend tests ...')
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
                 frontend_test_cmds.append('--allow_no_spec')
-                frontend_test_cmds.append(
-                    '--specs_to_run=%s' % ','.join(js_or_ts_files)
-                )
-                frontend_status = run_script_and_get_returncode(
-                    frontend_test_cmds
-                )
+                frontend_test_cmds.append('--specs_to_run=%s' % ','.join(js_or_ts_files))
+                frontend_status = run_script_and_get_returncode(frontend_test_cmds)
             if frontend_status != 0:
                 print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
 
             if does_diff_include_ci_config_or_test_files(files_to_lint):
-                ci_check_status = run_script_and_get_returncode(
-                    TESTS_ARE_CAPTURED_IN_CI_CHECK_CMDS
-                )
+                ci_check_status = run_script_and_get_returncode(TESTS_ARE_CAPTURED_IN_CI_CHECK_CMDS)
             if ci_check_status != 0:
-                print(
-                    'Push aborted due to failing tests are captured '
-                    'in ci check.'
-                )
+                print('Push aborted due to failing tests are captured in ci check.')
                 sys.exit(1)
 
-            python_test_files = (
-                git_changes_utils.get_python_dot_test_files_from_diff(
-                    files_to_lint
-                )
-            )
+            python_test_files = git_changes_utils.get_python_dot_test_files_from_diff(files_to_lint)
             if python_test_files:
                 print('Running backend tests ...')
                 backend_test_cmds = BACKEND_TEST_CMDS.copy()
-                backend_test_cmds.append(
-                    '--test_targets=%s' % ','.join(python_test_files)
-                )
-                backend_status = run_script_and_get_returncode(
-                    backend_test_cmds
-                )
+                backend_test_cmds.append('--test_targets=%s' % ','.join(python_test_files))
+                backend_status = run_script_and_get_returncode(backend_test_cmds)
             if backend_status != 0:
                 print('Push aborted due to failing backend tests.')
                 sys.exit(1)

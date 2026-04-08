@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import mypy_imports  # pylint: disable=unused-import
 from core.tests import test_utils
 
 

@@ -1,4 +1,5 @@
-from typing import Any, MutableMapping, Optional, Union, Collection
+from typing import Any, Collection, MutableMapping, Optional, Union
+
 from .utils import NamespacedClient
 
 class IndicesClient(NamespacedClient):

@@ -23,9 +23,9 @@ import shutil
 import subprocess
 import sys
 
-from scripts import build, common, servers
-
 from typing import Final, List, Optional, Tuple
+
+from scripts import build, common, servers
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -43,41 +43,30 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--prod_env',
-    help='Run the tests in prod mode. Static resources are served from '
-    'build directory and use cache slugs.',
+    help='Run the tests in prod mode. Static resources are served from build directory and use cache slugs.',
     action='store_true',
 )
 _PARSER.add_argument(
     '--suite',
     required=True,
-    help='Specifies the test suite to run. '
-    'For performing a full test, no argument is required.',
+    help='Specifies the test suite to run. For performing a full test, no argument is required.',
 )
 _PARSER.add_argument(
     '--server_log_level',
-    help='Sets the log level for the appengine server. The default value is '
-    'set to error.',
+    help='Sets the log level for the appengine server. The default value is set to error.',
     default='error',
     choices=['critical', 'error', 'warning', 'info'],
 )
-_PARSER.add_argument(
-    '--source_maps', help='Build webpack with source maps.', action='store_true'
-)
+_PARSER.add_argument('--source_maps', help='Build webpack with source maps.', action='store_true')
 
-_PARSER.add_argument(
-    '--headless', help='Run the tests in headless mode.', action='store_true'
-)
+_PARSER.add_argument('--headless', help='Run the tests in headless mode.', action='store_true')
 
-_PARSER.add_argument(
-    '--mobile', help='Run the tests in mobile mode.', action='store_true'
-)
+_PARSER.add_argument('--mobile', help='Run the tests in mobile mode.', action='store_true')
 
 
 def compile_test_ts_files() -> None:
     """Compiles the test typescript files into a build directory."""
-    puppeteer_acceptance_tests_dir_path = os.path.join(
-        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests'
-    )
+    puppeteer_acceptance_tests_dir_path = os.path.join(common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
     build_dir_path = os.path.join(
         puppeteer_acceptance_tests_dir_path,
         'build',
@@ -87,13 +76,8 @@ def compile_test_ts_files() -> None:
     if os.path.exists(build_dir_path):
         shutil.rmtree(build_dir_path)
 
-    cmd = (
-        './node_modules/typescript/bin/tsc -p %s'
-        % './tsconfig.puppeteer-acceptance-tests.json'
-    )
-    proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-    )
+    cmd = './node_modules/typescript/bin/tsc -p %s' % './tsconfig.puppeteer-acceptance-tests.json'
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
     _, encoded_stderr = proc.communicate()
     stderr = encoded_stderr.decode('utf-8')
@@ -130,9 +114,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
         stack.enter_context(servers.managed_firebase_auth_emulator())
-        stack.enter_context(
-            servers.managed_cloud_datastore_emulator(clear_datastore=True)
-        )
+        stack.enter_context(servers.managed_cloud_datastore_emulator(clear_datastore=True))
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(

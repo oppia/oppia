@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
+from typing import Dict, Mapping
+
 from core.constants import constants
 from core.platform import models
-
-from typing import Dict, Mapping
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -48,9 +48,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the subtopic page being edited.
-    subtopic_page_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    subtopic_page_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @classmethod
     def get_instance_id(cls, subtopic_page_id: str, version: int) -> str:
@@ -68,9 +66,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -114,13 +110,9 @@ class SubtopicPageModel(base_models.VersionedModel):
     # recorded_voiceovers and written_translations fields.
     page_contents = datastore_services.JsonProperty(required=True)
     # The schema version for the page_contents field.
-    page_contents_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=True
-    )
+    page_contents_schema_version = datastore_services.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
-    language_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -218,9 +210,7 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the study guide being edited.
-    study_guide_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    study_guide_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @classmethod
     def get_instance_id(cls, study_guide_id: str, version: int) -> str:
@@ -238,9 +228,7 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'studyguide-%s-%s' % (study_guide_id, version)
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -287,20 +275,14 @@ class StudyGuideModel(base_models.VersionedModel):
     # The topic id that this study guide is a part of.
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     # The next_content_id index to use for generation of new content ids.
-    next_content_id_index = datastore_services.IntegerProperty(
-        required=True, default=0, indexed=True
-    )
+    next_content_id_index = datastore_services.IntegerProperty(required=True, default=0, indexed=True)
     # The json data of the study guide consisting of sections which
     # is a list of heading and content pairs (sections).
     sections = datastore_services.JsonProperty(required=True)
     # The schema version for the sections field.
-    sections_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=True
-    )
+    sections_schema_version = datastore_services.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this study guide is written in.
-    language_code = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
