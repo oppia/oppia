@@ -933,7 +933,7 @@ describe('SvgEditor initialized with value attribute', () => {
 describe('SvgEditor with image save destination as local storage', () => {
   let pageContextService: PageContextService;
   let fixture: ComponentFixture<SvgEditorComponent>;
-  let component: SvgEditorComponent | null = null;
+  let component: SvgEditorComponent;
   const samplesvg =
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
     'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
