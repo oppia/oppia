@@ -510,12 +510,17 @@ describe('Translation Modal Component', () => {
     });
 
     it('should utilize the modify translations opportunity when available', () => {
+      const modifyOnlyFixture = TestBed.createComponent(
+        TranslationModalComponent
+      );
+      const modifyOnlyComponent = modifyOnlyFixture.componentInstance;
+
       let translationContent = TranslatedContent.createFromBackendDict({
         content_value: 'Current translated content.',
         content_format: 'html',
         needs_update: false,
       });
-      component.modifyTranslationOpportunity = {
+      modifyOnlyComponent.modifyTranslationOpportunity = {
         id: 'expId',
         contentId: 'content_0',
         heading: 'Update Translation',
@@ -523,16 +528,18 @@ describe('Translation Modal Component', () => {
         textToTranslate: 'Current content in English.',
         currentContentTranslation: translationContent,
       };
-      component.ngOnInit();
+      modifyOnlyComponent.ngOnInit();
 
-      expect(component.subheading).toBe('Introduction');
-      expect(component.heading).toBe('Update Translation');
-      expect(component.textToTranslate).toBe('Current content in English.');
-      expect(component.activeContentType).toBe('content');
-      expect(component.activeWrittenTranslation).toBe(
+      expect(modifyOnlyComponent.subheading).toBe('Introduction');
+      expect(modifyOnlyComponent.heading).toBe('Update Translation');
+      expect(modifyOnlyComponent.textToTranslate).toBe(
+        'Current content in English.'
+      );
+      expect(modifyOnlyComponent.activeContentType).toBe('content');
+      expect(modifyOnlyComponent.activeWrittenTranslation).toBe(
         'Current translated content.'
       );
-      expect(component.activeDataFormat).toBe('html');
+      expect(modifyOnlyComponent.activeDataFormat).toBe('html');
     });
   });
 
