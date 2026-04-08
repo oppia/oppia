@@ -308,6 +308,8 @@ describe('Voiceover Admin Page component ', () => {
         'hi-IN': true,
       },
     });
+    flush();
+    discardPeriodicTasks();
   }));
 
   it('should not update cloud supported language accent codes when modal is cancelled', () => {

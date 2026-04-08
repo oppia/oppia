@@ -120,6 +120,7 @@ class VoiceoverLanguageCodesMappingHandler(
         new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
             language_codes_mapping
         )
+        voiceover_services.save_language_accent_support(language_codes_mapping)
 
         if new_accent_code:
             beam_job_services.run_beam_job(
@@ -128,7 +129,6 @@ class VoiceoverLanguageCodesMappingHandler(
                 ),
                 parameterized_args={'language_accent_code': new_accent_code},
             )
-        voiceover_services.save_language_accent_support(language_codes_mapping)
 
         self.render_json(self.values)
 

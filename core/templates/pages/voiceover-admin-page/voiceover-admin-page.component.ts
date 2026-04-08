@@ -246,6 +246,12 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageCodesMapping[languageCode][languageAccentCode] =
           supportsAutogeneration;
         this.saveUpdatedLanguageAccentSupport();
+        if (supportsAutogeneration) {
+          this.showToast(
+            'Voiceovers will be regenerated in the background through a Beam job. For more details, please reach out to a release coordinator.',
+            10000
+          );
+        }
       },
       () => {
         this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
