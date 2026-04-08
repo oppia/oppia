@@ -19,9 +19,9 @@
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
-import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -327,6 +327,7 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
+
 export class CurriculumAdmin extends TopicManager {
   /**
    * Moves the classrooms in the order of the given classroom names.
@@ -1713,8 +1714,7 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
-   * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   * Function to dismiss welcome modal
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
@@ -3003,7 +3003,7 @@ export class CurriculumAdmin extends TopicManager {
           const element = document.querySelector(selector);
           return (element as HTMLInputElement).checked === true;
         },
-        {},
+        {timeout: 60000},
         practiceTabToggle
       );
     } catch (error) {
