@@ -1414,7 +1414,15 @@ export class BaseUser {
     await this.page.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim() === value;
+        // Use '.value' for input and textarea elements, and '.textContent'
+        // for other elements to accurately retrieve the displayed text.
+        const actualText =
+          element instanceof HTMLInputElement ||
+          element instanceof HTMLTextAreaElement
+            ? element.value
+            : element?.textContent;
+
+        return actualText?.trim() === value;
       },
       {},
       selector,

@@ -256,6 +256,7 @@ describe('Logged-Out Learner', function () {
 
     await loggedOutLearner.playAudioTillEnd();
     await loggedOutLearner.expectVoiceoverIsPlaying(false);
+    await loggedOutLearner.expectPlayButtonVisible();
   });
 
   afterAll(async function () {

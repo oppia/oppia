@@ -670,6 +670,7 @@ const completedNodeSelector =
 const newLessonProgressBarContainer = '.progress-bar-container';
 const containerSelector = '.hint-solution-individual-container';
 const saveLessonProgressButton = '.e2e-test-save-progress-button';
+const playButtonSelector = '.fa-play';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6374,7 +6375,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.click(languageDropdown);
     const languageItemSelector = `.e2e-test-i18n-language-${languageCode}`;
     await this.page.waitForSelector(languageItemSelector, {visible: true});
-    await this.clickAndWaitForNavigation(languageItemSelector, true);
+    await this.page.click(languageItemSelector);
+    await this.waitForPageToFullyLoad();
 
     // Post check: check if value has changed to new language.
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -6440,6 +6442,13 @@ export class LoggedOutUser extends BaseUser {
   async playPauseVoiceover(): Promise<void> {
     await this.waitForElementToBeClickable(voiceoverPlayPauseButton);
     await this.page.click(voiceoverPlayPauseButton);
+  }
+
+  /**
+   * Expect play button icon is visible and in the "play" state.
+   */
+  async expectPlayButtonVisible(): Promise<void> {
+    await this.expectElementToBeVisible(playButtonSelector, true);
   }
 
   /**
