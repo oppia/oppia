@@ -183,7 +183,12 @@ export class NumericInputValidationService {
             var x = rule.inputs.x as number;
             var tol = rule.inputs.tol as number;
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
-            if (tol <= 0) {
+            if (tol < 0) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.CRITICAL,
+                message: 'The tolerance cannot be negative.',
+              });
+            } else if (tol === 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message:
