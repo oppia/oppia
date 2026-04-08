@@ -648,6 +648,9 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     NEW_EXP_ID: Final = 'exp_id1'
     UPGRADED_EXP_YAML: str
     albert_id: str
+    # Here we use cast because this fixture intentionally represents an old
+    # states schema shape, but the test later assigns it to exploration model
+    # states and runs it through the migration pipeline.
     STATES_AT_V41: Dict[str, state_domain.StateDict] = cast(
         Dict[str, state_domain.StateDict],
         {
