@@ -87,4 +87,18 @@ describe('Question Misconception Selector Component', () => {
     );
     expect(component.selectedMisconceptionSkillId).toEqual('def');
   });
+
+  it('should clear selected misconception when selectNoMisconception is called', () => {
+    const emitSpy = spyOn(component.updateMisconceptionValues, 'emit');
+
+    component.selectNoMisconception();
+
+    expect(component.selectedMisconception).toBeNull();
+    expect(component.selectedMisconceptionSkillId).toBeNull();
+    expect(emitSpy).toHaveBeenCalledWith({
+      misconception: null,
+      skillId: null,
+      feedbackIsUsed: component.misconceptionFeedbackIsUsed,
+    });
+  });
 });

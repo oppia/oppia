@@ -405,4 +405,14 @@ describe('State Translation Editor Component', () => {
 
     expect(component.saveTranslation).not.toHaveBeenCalled();
   });
+
+  it('should correctly identify RTL languages', () => {
+    component.languageCode = 'ar';
+    expect(component.isTranslationLanguageRTL()).toBe(true);
+  });
+
+  it('should correctly identify LTR languages', () => {
+    component.languageCode = 'en';
+    expect(component.isTranslationLanguageRTL()).toBe(false);
+  });
 });
