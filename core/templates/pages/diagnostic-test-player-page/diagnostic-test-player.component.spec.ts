@@ -468,6 +468,15 @@ describe('Diagnostic test player component', () => {
     expect(component.getTopicUrlFromUrlFragment(undefined)).toEqual('');
   });
 
+  it('should not start diagnostic test if classroom data is not initialized', () => {
+    spyOn(classroomBackendApiService, 'getClassroomDataAsync');
+
+    component.startDiagnosticTest();
+
+    expect(classroomBackendApiService.getClassroomDataAsync).not.toHaveBeenCalled();
+    expect(component.diagnosticTestIsStarted).toBeFalse();
+  });
+
   it('should be able to set topic tracker model after starting diagnostic test', fakeAsync(() => {
     windowRef.nativeWindow.location.search = '?classroom=math';
     // A linear graph with 3 nodes.
