@@ -33,7 +33,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final
+from typing import Dict, Final, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -648,61 +648,71 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     NEW_EXP_ID: Final = 'exp_id1'
     UPGRADED_EXP_YAML: str
     albert_id: str
-    STATES_AT_V41: Dict[str, Dict[str, object]] = {
-        'Introduction': {
-            'classifier_model_id': None,
-            'content': {'content_id': 'content', 'html': ''},
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_2',
-                            'unicode_str': '',
-                        }
+    STATES_AT_V41: Dict[str, state_domain.StateDict] = cast(
+        Dict[str, state_domain.StateDict],
+        {
+            'Introduction': {
+                'classifier_model_id': None,
+                'content': {'content_id': 'content', 'html': ''},
+                'interaction': {
+                    'answer_groups': [],
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_2',
+                                'unicode_str': '',
+                            }
+                        },
+                        'rows': {'value': 1},
                     },
-                    'rows': {'value': 1},
+                    'default_outcome': {
+                        'dest': 'End',
+                        'feedback': {
+                            'content_id': 'default_outcome',
+                            'html': '',
+                        },
+                        'labelled_as_correct': False,
+                        'missing_prerequisite_skill_id': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                    },
+                    'hints': [],
+                    'id': 'TextInput',
+                    'solution': None,
                 },
-                'default_outcome': {
-                    'dest': 'End',
-                    'feedback': {'content_id': 'default_outcome', 'html': ''},
-                    'labelled_as_correct': False,
-                    'missing_prerequisite_skill_id': None,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
+                'next_content_id_index': 1,
+                'param_changes': [],
+                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
+                'solicit_answer_details': False,
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
                 },
-                'hints': [],
-                'id': 'TextInput',
-                'solution': None,
             },
-            'next_content_id_index': 1,
-            'param_changes': [],
-            'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
-            'solicit_answer_details': False,
-            'written_translations': {'translations_mapping': {'content': {}}},
-        },
-        'End': {
-            'classifier_model_id': None,
-            'content': {'content_id': 'content', 'html': ''},
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'recommendedExplorationIds': {'value': []}
+            'End': {
+                'classifier_model_id': None,
+                'content': {'content_id': 'content', 'html': ''},
+                'interaction': {
+                    'answer_groups': [],
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {
+                        'recommendedExplorationIds': {'value': []}
+                    },
+                    'default_outcome': None,
+                    'hints': [],
+                    'id': 'EndExploration',
+                    'solution': None,
                 },
-                'default_outcome': None,
-                'hints': [],
-                'id': 'EndExploration',
-                'solution': None,
+                'next_content_id_index': 0,
+                'param_changes': [],
+                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
+                'solicit_answer_details': False,
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
+                },
             },
-            'next_content_id_index': 0,
-            'param_changes': [],
-            'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
-            'solicit_answer_details': False,
-            'written_translations': {'translations_mapping': {'content': {}}},
         },
-    }
+    )
 
     ALBERT_EMAIL: Final = 'albert@example.com'
     ALBERT_NAME: Final = 'albert'
