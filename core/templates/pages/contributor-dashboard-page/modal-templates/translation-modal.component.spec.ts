@@ -351,7 +351,7 @@ describe('Translation Modal Component', () => {
     expect(activeModal.close).toHaveBeenCalled();
   });
 
-  it('should use a no-op beforeUnloadHandler before initialization', () => {
+  it('should use an empty beforeUnloadHandler callback before initialization', () => {
     component.ngOnDestroy();
     const handler = mockWindow.removeEventListener.calls.argsFor(0)[1];
     const event = jasmine.createSpyObj<MockBeforeUnloadEvent>(
@@ -523,11 +523,6 @@ describe('Translation Modal Component', () => {
         textToTranslate: 'Current content in English.',
         currentContentTranslation: translationContent,
       };
-      Object.defineProperty(component, 'opportunity', {
-        value: undefined,
-        writable: true,
-      });
-
       component.ngOnInit();
 
       expect(component.subheading).toBe('Introduction');

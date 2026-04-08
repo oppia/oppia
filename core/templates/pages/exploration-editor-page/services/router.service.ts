@@ -263,8 +263,8 @@ export class RouterService {
 
   navigateToMainTab(stateName: string | null): void {
     this._savePendingChanges();
-    const currentState = this._getCurrentStateFromLocationPath();
-    let oldState = currentState ? decodeURI(currentState) : null;
+    let oldState = this._getCurrentStateFromLocationPath();
+    oldState = oldState ? decodeURI(oldState) : null;
 
     if (oldState === '/' + stateName) {
       return;

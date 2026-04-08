@@ -850,7 +850,6 @@ export class ExplorationStatesService {
 
     let initStateName = this.explorationInitStateNameService.displayed;
     if (deleteStateName === initStateName) {
-      this.alertsService.addWarning('The initial state can not be deleted.');
       return Promise.reject('The initial state can not be deleted.');
     }
     if (!this._getStates().hasState(deleteStateName)) {
