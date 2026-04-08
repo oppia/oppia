@@ -312,6 +312,8 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 const linkAnotherSkillToQuestionButton = '.e2e-test-link-another-skill-button';
+const questionDifficultyHeaderSelector = '.e2e-test-question-difficulty-header';
+const successToastSelector = '.toast-success';
 
 // Preview tab of the topic editor.
 const previewSubtabClass = 'e2e-test-preview-subtab';
@@ -907,6 +909,7 @@ export class TopicManager extends BaseUser {
     await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
 
     await this.expectElementToBeVisible(saveQuestionButton, false);
+    await this.expectElementToBeVisible(successToastSelector);
   }
 
   /**
@@ -915,6 +918,7 @@ export class TopicManager extends BaseUser {
   async saveQuestionAndExpectNoCommitModal(): Promise<void> {
     await this.clickOnElementWithSelector(saveQuestionButton);
     await this.expectElementToBeVisible(saveQuestionButton, false);
+    await this.expectElementToBeVisible(successToastSelector);
 
     // Ensure the commit modal is hidden.
     await this.expectElementToBeVisible(commitMessageInputSelector, false);
@@ -948,6 +952,18 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - Name of the skill to be linked.
    */
   async linkAnotherSkillToQuestion(skillName: string): Promise<void> {
+    // Wait for the question editor to fully load (including async difficultyCount).
+    // The difficulty header only appears when difficultyCount is set.
+    await this.page.waitForSelector(questionDifficultyHeaderSelector, {
+      visible: true,
+      timeout: 60000,
+    });
+
+    // Now wait for and click the "Link Another Skill" button.
+    await this.page.waitForSelector(linkAnotherSkillToQuestionButton, {
+      visible: true,
+      timeout: 30000,
+    });
     await this.clickOnElementWithSelector(linkAnotherSkillToQuestionButton);
     // Wait for the skill selector modal to load skills from API.
     await this.page.waitForSelector(skillItem, {timeout: 60000});
@@ -959,6 +975,8 @@ export class TopicManager extends BaseUser {
     await this.clickOnElementWithSelector(skillItem);
     // Confirm skill selection.
     await this.clickOnElementWithSelector(confirmSkillButton);
+    // Wait for the success toast to appear as linkage changes are auto-saved.
+    await this.expectElementToBeVisible(successToastSelector);
     // Wait for modal to close and button to be visible again.
     await this.page.waitForTimeout(500);
   }
@@ -3961,6 +3979,10 @@ export class TopicManager extends BaseUser {
     await this.waitForElementToStabilize(questionElement);
     await questionElement.click();
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
+    await this.page.waitForSelector(questionDifficultyHeaderSelector, {
+      visible: true,
+      timeout: 60000,
+    });
   }
 
   /**

@@ -279,7 +279,10 @@ class QuestionSkillLinkHandler(
                     question_id, task_dict['id'], task_dict['difficulty']
                 )
 
-        self.render_json(self.values)
+        question_dict = question_services.get_question_by_id(
+            question_id
+        ).to_dict()
+        self.render_json({'question_dict': question_dict})
 
 
 class EditableQuestionDataHandlerNormalizedPayloadDict(TypedDict):

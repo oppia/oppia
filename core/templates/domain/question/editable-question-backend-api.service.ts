@@ -49,7 +49,10 @@ export interface FetchQuestionBackendResponse {
   username: string;
 }
 export interface UpdateEditableQuestionBackendResponse {
-  questionDict: QuestionBackendDict;
+  question_dict: QuestionBackendDict;
+}
+export interface EditQuestionSkillLinkBackendResponse {
+  question_dict: QuestionBackendDict;
 }
 export interface FetchQuestionResponse {
   questionObject: Question;
@@ -172,7 +175,7 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            let questionDict = cloneDeep(response.questionDict);
+            let questionDict = cloneDeep(response.question_dict);
             successCallback(
               // The returned data is an updated question dict.
               questionDict
@@ -188,9 +191,9 @@ export class EditableQuestionBackendApiService {
   private async _editQuestionSkillLinksAsync(
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[],
-    successCallback: (value: void) => void,
+    successCallback: (value: QuestionBackendDict) => void,
     errorCallback: (reason?: string) => void
-  ): Promise<Question> {
+  ): Promise<QuestionBackendDict> {
     return new Promise((resolve, reject) => {
       var editQuestionSkillLinkUrl =
         this.urlInterpolationService.interpolateUrl(
@@ -200,13 +203,13 @@ export class EditableQuestionBackendApiService {
           }
         );
       this.http
-        .put(editQuestionSkillLinkUrl, {
+        .put<EditQuestionSkillLinkBackendResponse>(editQuestionSkillLinkUrl, {
           skill_ids_task_list: skillIdsTaskArray,
         })
         .toPromise()
         .then(
           response => {
-            successCallback();
+            successCallback(response.question_dict);
           },
           errorResponse => {
             errorCallback(errorResponse.error.error);
@@ -242,7 +245,7 @@ export class EditableQuestionBackendApiService {
   async editQuestionSkillLinksAsync(
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[]
-  ): Promise<void> {
+  ): Promise<QuestionBackendDict> {
     return new Promise((resolve, reject) => {
       this._editQuestionSkillLinksAsync(
         questionId,

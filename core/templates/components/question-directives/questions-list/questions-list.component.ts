@@ -43,7 +43,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
 } from 'domain/skill/misconception.model';
-import {Question} from 'domain/question/question.model';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {State} from 'domain/state/state.model';
 import {Rubric} from 'domain/skill/rubric.model';
 import {EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
@@ -572,10 +572,15 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               this.questionUndoRedoService.getCommittableChangeList()
             )
             .then(
-              () => {
+              (data: QuestionBackendDict) => {
+                this.question = Question.createFromBackendDict(data);
                 this.questionUndoRedoService.clearChanges();
                 this.editorIsOpen = false;
                 this.questionIsBeingSaved = false;
+                this.alertsService.addSuccessMessage(
+                  'Question saved successfully.',
+                  2000
+                );
                 this.questionsListService.resetPageNumber();
                 this.questionsListService.getQuestionSummariesAsync(
                   this.selectedSkillId,
@@ -638,6 +643,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.skillLinkageModificationsArray
       )
       .then(data => {
+        this.question = Question.createFromBackendDict(data);
         this.skillLinkageModificationsArray = [];
         setTimeout(() => {
           this.questionsListService.resetPageNumber();
@@ -659,7 +665,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.skillLinkageModificationsArray
       )
       .then(data => {
+        this.question = Question.createFromBackendDict(data);
         this.skillLinkageModificationsArray = [];
+        this.alertsService.addSuccessMessage(
+          'Question saved successfully.',
+          2000
+        );
       });
   }
 

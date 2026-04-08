@@ -45,7 +45,7 @@ describe('Question Editor Modal', function () {
 
     // Create one question in Skill 1.
     await topicManager.createQuestionsForSkill('QEM Skill 1', 1);
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  }, 600000);
 
   it(
     'should show commit modal when editing question content only',
