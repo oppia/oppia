@@ -125,6 +125,10 @@ class BaseValidationJob(base_jobs.JobBase):
             'Missing implementation for get_model_class in derived class.'
         )
 
+    # TODO(#25777): Explore if we can update the validate methods to accept
+    # subclasses of base_models.BaseModel as parameters. This would allow
+    # subclasses to use specific model types in their signatures and avoid
+    # type assertions.
     def get_validation_fns(
         self,
     ) -> List[

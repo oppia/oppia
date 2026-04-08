@@ -60,6 +60,15 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
     ]:
         """Returns model-level validation functions."""
 
+        # The `validate_exploration_relation` method retrieves an exploration using
+        # `exp_id` and `exp_version` to perform the following:
+        #   - _validate_exploration_reference
+        #   - _validate_state_name_according_exploration
+        #
+        # NOTE: `validate_range_of_exp_version` is intentionally kept separate.
+        # Combining these validations could lead to misleading error reports.
+        # Specifically, if an `exp_id` is valid but the `exp_version` is out of range,
+        # a merged check might simply report that the exploration "does not exist".
         return [
             self.validate_exploration_relation,
             self.validate_range_of_exp_version,
@@ -124,22 +133,23 @@ class AnswerSubmittedEventLogEntryModelValidationJob(
             )
 
     def _validate_exploration_reference(
-        self, model: base_models.BaseModel, exploration: exp_domain.Exploration
+        self,
+        model: stats_models.AnswerSubmittedEventLogEntryModel,
+        exploration: exp_domain.Exploration,
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks if exp_id corresponds to a valid exploration."""
-        assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
+
         if exploration is None:
             yield (
                 statistics_validation_errors.InvalidExplorationIdError(model)
             )
 
     def _validate_state_name_according_exploration(
-        self, model: base_models.BaseModel, exploration: exp_domain.Exploration
+        self,
+        model: stats_models.AnswerSubmittedEventLogEntryModel,
+        exploration: exp_domain.Exploration,
     ) -> Iterator[job_run_result.JobRunResult]:
         """Checks state_name should be valid key in states of exploration."""
-        assert isinstance(model, stats_models.AnswerSubmittedEventLogEntryModel)
-        assert isinstance(exploration, exp_domain.Exploration)
-        assert exploration is not None
 
         if model.state_name not in exploration.states:
             yield statistics_validation_errors.InvalidStateNameError(model)

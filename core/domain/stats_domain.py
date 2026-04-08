@@ -2431,15 +2431,11 @@ class AnswerSubmittedEventLogEntry:
     def validate(self) -> None:
         """Validates properties of the AnswerSubmittedEventLogEntry domain object.
 
-        Ensures that all attributes have the expected types and values, and that
-        the referenced exploration and state exist.
-
         Raises:
             domain_errors.InvalidExpIdError: If exp_id is not a valid string.
             domain_errors.InvalidExpVersionError: If exp_version is not a valid
                 positive integer.
-            domain_errors.InvalidStateNameError: If state_name is not a valid
-                state in the exploration.
+            domain_errors.InvalidStateNameTypeError: If state_name is not a string.
             domain_errors.InvalidSessionIdError: If session_id is not a string.
             domain_errors.InvalidTimeSpentError: If time_spent_in_state_secs is
                 not a non-negative float.
