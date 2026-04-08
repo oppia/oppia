@@ -153,7 +153,7 @@ describe('Voiceover backend API service', function () {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/regenerate_voiceover_on_exp_update/expId/1/Exp%20title'
+      '/regenerate_voiceover_on_exp_update/expId/1'
     );
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);

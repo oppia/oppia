@@ -93,7 +93,7 @@
 /core/templates/services/assets-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-voiceovers.services.ts @oppia/lace-frontend-reviewers
-/core/templates/services/voiceover-regeneration-task-mapping-service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/voiceover-regeneration-job-service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/voiceover-language-management-service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/automatic-voiceover-highlight-service.ts @oppia/lace-frontend-reviewers
 

@@ -26,12 +26,12 @@ import {
   discardPeriodicTasks,
 } from '@angular/core/testing';
 import {Subscription} from 'rxjs';
-import {VoiceoverRegenerationTaskMappingService} from './voiceover-regeneration-task-mapping-service';
+import {VoiceoverRegenerationJobService} from './voiceover-regeneration-job-service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
 describe('Voiceover regeneration task mapping service', () => {
-  let voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService;
+  let voiceoverRegenerationJobService: VoiceoverRegenerationJobService;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
 
   beforeEach(waitForAsync(() => {
@@ -41,30 +41,30 @@ describe('Voiceover regeneration task mapping service', () => {
   }));
 
   beforeEach(() => {
-    voiceoverRegenerationTaskMappingService = TestBed.inject(
-      VoiceoverRegenerationTaskMappingService
+    voiceoverRegenerationJobService = TestBed.inject(
+      VoiceoverRegenerationJobService
     );
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
   });
 
   it('should be able to initialize the service', fakeAsync(() => {
-    voiceoverRegenerationTaskMappingService.explorationID = '';
+    voiceoverRegenerationJobService.explorationID = '';
 
     spyOn(
       voiceoverBackendApiService,
       'fetchLatestVoiceoverRegenerationStatusAsync'
     ).and.returnValue(Promise.resolve({}));
 
-    voiceoverRegenerationTaskMappingService.init('exp1');
+    voiceoverRegenerationJobService.init('exp1');
     flush();
     discardPeriodicTasks();
     tick();
 
-    expect(voiceoverRegenerationTaskMappingService.explorationID).toBe('exp1');
+    expect(voiceoverRegenerationJobService.explorationID).toBe('exp1');
   }));
 
   it('should be able to get content regeneration status', async () => {
-    voiceoverRegenerationTaskMappingService.languageAccentToContentStatusMap = {
+    voiceoverRegenerationJobService.languageAccentToContentStatusMap = {
       'en-US': {
         content_0: 'SUCCEEDED',
         content_1: 'FAILED',
@@ -72,14 +72,14 @@ describe('Voiceover regeneration task mapping service', () => {
     };
 
     expect(
-      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+      voiceoverRegenerationJobService.getContentRegenerationStatus(
         'en-US',
         'content_0'
       )
     ).toBe('SUCCEEDED');
 
     expect(
-      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+      voiceoverRegenerationJobService.getContentRegenerationStatus(
         'en-US',
         'content_1'
       )
@@ -87,34 +87,34 @@ describe('Voiceover regeneration task mapping service', () => {
   });
 
   it('should be able to update content regeneration status', async () => {
-    voiceoverRegenerationTaskMappingService.languageAccentToContentStatusMap = {
+    voiceoverRegenerationJobService.languageAccentToContentStatusMap = {
       'en-US': {
         content_0: 'GENERATING',
         content_1: 'FAILED',
       },
     };
 
-    voiceoverRegenerationTaskMappingService.updateContentRegenerationStatus(
+    voiceoverRegenerationJobService.updateContentRegenerationStatus(
       'en-US',
       'content_0',
       'SUCCEEDED'
     );
 
     expect(
-      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+      voiceoverRegenerationJobService.getContentRegenerationStatus(
         'en-US',
         'content_0'
       )
     ).toBe('SUCCEEDED');
 
-    voiceoverRegenerationTaskMappingService.updateContentRegenerationStatus(
+    voiceoverRegenerationJobService.updateContentRegenerationStatus(
       'en-IN',
       'content_0',
       'SUCCEEDED'
     );
 
     expect(
-      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+      voiceoverRegenerationJobService.getContentRegenerationStatus(
         'en-IN',
         'content_0'
       )
@@ -134,19 +134,19 @@ describe('Voiceover regeneration task mapping service', () => {
 
     const fakeSub = new Subscription();
     spyOn(fakeSub, 'unsubscribe');
-    voiceoverRegenerationTaskMappingService.pollingSub = fakeSub;
+    voiceoverRegenerationJobService.pollingSub = fakeSub;
 
     spyOn(
-      voiceoverRegenerationTaskMappingService,
+      voiceoverRegenerationJobService,
       'getLatestVoiceoverRegenerationStatus'
     ).and.callThrough();
 
-    voiceoverRegenerationTaskMappingService.startPolling();
+    voiceoverRegenerationJobService.startPolling();
 
     expect(fakeSub.unsubscribe).toHaveBeenCalled();
 
     expect(
-      voiceoverRegenerationTaskMappingService.getLatestVoiceoverRegenerationStatus
+      voiceoverRegenerationJobService.getLatestVoiceoverRegenerationStatus
     ).toHaveBeenCalled();
 
     expect(
@@ -163,11 +163,11 @@ describe('Voiceover regeneration task mapping service', () => {
     tick();
 
     expect(
-      voiceoverRegenerationTaskMappingService.languageAccentToContentStatusMap
+      voiceoverRegenerationJobService.languageAccentToContentStatusMap
     ).toEqual(status2);
 
     let emittedValue = null;
-    voiceoverRegenerationTaskMappingService.statusSubject.subscribe(
+    voiceoverRegenerationJobService.statusSubject.subscribe(
       v => (emittedValue = v)
     );
 
@@ -179,26 +179,23 @@ describe('Voiceover regeneration task mapping service', () => {
   }));
 
   it('should be able to update newly added regeneration tasks', () => {
-    voiceoverRegenerationTaskMappingService.currentLanguageAccentCodes = [
-      'en-US',
-    ];
-    voiceoverRegenerationTaskMappingService.languageAccentToContentStatusMap =
-      {};
+    voiceoverRegenerationJobService.currentLanguageAccentCodes = ['en-US'];
+    voiceoverRegenerationJobService.languageAccentToContentStatusMap = {};
 
-    voiceoverRegenerationTaskMappingService.updateNewlyAddedRegenerationTasks([
+    voiceoverRegenerationJobService.updateNewlyAddedRegenerationTasks([
       'content_0',
       'content_1',
     ]);
 
     expect(
-      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+      voiceoverRegenerationJobService.getContentRegenerationStatus(
         'en-US',
         'content_0'
       )
     ).toBe('GENERATING');
 
     expect(
-      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+      voiceoverRegenerationJobService.getContentRegenerationStatus(
         'en-US',
         'content_1'
       )
