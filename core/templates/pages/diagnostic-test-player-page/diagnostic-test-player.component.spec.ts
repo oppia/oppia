@@ -473,7 +473,9 @@ describe('Diagnostic test player component', () => {
 
     component.startDiagnosticTest();
 
-    expect(classroomBackendApiService.getClassroomDataAsync).not.toHaveBeenCalled();
+    expect(
+      classroomBackendApiService.getClassroomDataAsync
+    ).not.toHaveBeenCalled();
     expect(component.diagnosticTestIsStarted).toBeFalse();
   });
 
