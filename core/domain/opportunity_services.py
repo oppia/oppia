@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import collections
-import datetime
 import logging
 
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -221,6 +220,16 @@ def create_exp_opportunity_summary(
         reviewer_only_content_count,
     )
 
+    return exploration_opportunity_summary
+
+
+def generate_voiceovers_async_for_exp_linked_to_topic(exp_id: str) -> None:
+    """Triggers asynchronous voiceover generation for the specified exploration.
+
+    Args:
+        exp_id: str. The ID of the exploration for which voiceovers should be
+            generated.
+    """
     # Asynchronously regenerates voiceovers for exploration contents in English
     # and other available translations when the exploration is linked to a
     # story.
@@ -231,11 +240,8 @@ def create_exp_opportunity_summary(
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'],
             taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
-            exploration.id,
-            datetime.datetime.utcnow().isoformat(),
-            feconf.SYSTEM_COMMITTER_ID,
+            exp_id,
         )
-    return exploration_opportunity_summary
 
 
 def _compute_exploration_incomplete_translation_languages(
@@ -286,8 +292,13 @@ def _create_exploration_opportunities(story: story_domain.Story, topic: topic_do
     explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
     exploration_opportunity_summary_list = []
     for exploration in explorations.values():
-        exploration_opportunity_summary_list.append(create_exp_opportunity_summary(topic, story, exploration))
-    _save_multi_exploration_opportunity_summary(exploration_opportunity_summary_list)
+        exploration_opportunity_summary_list.append(
+            create_exp_opportunity_summary(topic, story, exploration)
+        )
+        generate_voiceovers_async_for_exp_linked_to_topic(exploration.id)
+    _save_multi_exploration_opportunity_summary(
+        exploration_opportunity_summary_list
+    )
 
 
 def compute_opportunity_models_with_updated_exploration(exp_id: str, content_count: int, translation_counts: Dict[str, int]) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:

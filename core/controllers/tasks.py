@@ -296,17 +296,49 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     fn_ids_to_names = feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS
 
     DEFERRED_TASK_FUNCTIONS: Dict[str, Callable[..., None]] = {
-        fn_ids_to_names['FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']: (exp_services.delete_explorations_from_user_models),
-        fn_ids_to_names['FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES']: (exp_services.delete_explorations_from_activities),
-        fn_ids_to_names['FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED']: (wipeout_service.delete_users_pending_to_be_deleted),
-        fn_ids_to_names['FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION']: (wipeout_service.check_completion_of_user_deletion),
-        fn_ids_to_names['FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY']: (exp_services.regenerate_exploration_summary_with_new_contributor),
-        fn_ids_to_names['FUNCTION_ID_UPDATE_STATS']: stats_services.update_stats,
-        fn_ids_to_names['FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS']: (question_services.untag_deleted_misconceptions),
-        fn_ids_to_names['FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS']: (wipeout_service.remove_user_from_activities_with_associated_rights_models),
-        fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE']: (voiceover_services.regenerate_voiceovers_on_exploration_update),
-        fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION']: (voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic),
-        fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT']: (voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent),
+        fn_ids_to_names['FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']: (
+            exp_services.delete_explorations_from_user_models
+        ),
+        fn_ids_to_names['FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES']: (
+            exp_services.delete_explorations_from_activities
+        ),
+        fn_ids_to_names['FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED']: (
+            wipeout_service.delete_users_pending_to_be_deleted
+        ),
+        fn_ids_to_names['FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION']: (
+            wipeout_service.check_completion_of_user_deletion
+        ),
+        fn_ids_to_names['FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY']: (
+            exp_services.regenerate_exploration_summary_with_new_contributor
+        ),
+        fn_ids_to_names[
+            'FUNCTION_ID_UPDATE_STATS'
+        ]: stats_services.update_stats,
+        fn_ids_to_names['FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS']: (
+            question_services.untag_deleted_misconceptions
+        ),
+        fn_ids_to_names['FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS']: (
+            wipeout_service.remove_user_from_activities_with_associated_rights_models
+        ),
+        fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE']: (
+            voiceover_services.regenerate_voiceovers_on_exploration_update
+        ),
+        fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION']: (
+            voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic
+        ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
+        ]: (
+            voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent
+        ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
+        ]: (
+            voiceover_services.regenerate_voiceovers_after_accepting_suggestion
+        ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
+        ]: (voiceover_services.regenerate_voiceovers_for_batch_contents),
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
@@ -340,7 +372,18 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[payload['fn_identifier']]
 
-            # If the deferred task is a voiceover regeneration task, append the
+            # Some deferred tasks (e.g., voiceover regeneration) need to be
+            # split into multiple smaller tasks to distribute the load across
+            # separate deferred requests. If the payload contains a parent
+            # Cloud Task run ID, the ID must be passed as an argument to the
+            # downstream method.
+            parent_cloud_task_run_id = payload.get(
+                'parent_cloud_task_run_id', None
+            )
+            if parent_cloud_task_run_id is not None:
+                payload['args'].append(parent_cloud_task_run_id)
+
+            # If the deferred task is a voiceover regeneration parent task, append the
             # cloud task model ID to the arguments list.
             if voiceover_cloud_task_services.is_voiceover_regeneration_task_function(payload['fn_identifier']):
                 payload['args'].append(cloud_task_model_id)

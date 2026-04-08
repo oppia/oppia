@@ -239,7 +239,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(base.BaseHandler[Dict[str, str], Dic
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {'schema': {'type': 'basestring'}},
         'exploration_version': {'schema': {'type': 'int'}},
-        'exploration_title': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
@@ -248,7 +247,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(base.BaseHandler[Dict[str, str], Dic
         self,
         exploration_id: str,
         exploration_version: int,
-        exploration_title: str,
     ) -> None:
         """Regenerates the voiceover for the given exploration data when an
         exploration is updated.
@@ -263,10 +261,7 @@ class RegenerateVoiceoverOnExpUpdateHandler(base.BaseHandler[Dict[str, str], Dic
                 feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
-                exploration_title,
                 exploration_version,
-                feconf.SYSTEM_COMMITTER_ID,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)
 
@@ -388,7 +383,5 @@ class RegenerateVoiceoversForExplorationHandler(base.BaseHandler[Dict[str, str],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
                 language_accent_code,
-                self.user_id,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)

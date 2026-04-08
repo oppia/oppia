@@ -41,7 +41,6 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         self.render_template('oppia-root.mainpage.html')
 
-
 class OppiaLightweightRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Renders lightweight oppia root page (unified entry point) for all routes
     registered with angular router.

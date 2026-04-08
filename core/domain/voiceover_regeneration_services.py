@@ -518,7 +518,9 @@ def regenerate_voiceover_for_exploration_content(
 
     voiceover = fetch_voiceover_by_filename(exploration_id, voiceover_filename)
 
-    voiceover_cloud_task_services.update_voiceover_regeneration_task_run_mapping_for_content(exploration_id, language_accent_code, content_id, 'SUCCEEDED')
+    voiceover_cloud_task_services.update_voiceover_regeneration_job_status(
+        exploration_id, language_accent_code, content_id, 'SUCCEEDED'
+    )
 
     entity_voiceovers = voiceover_services.get_voiceovers_for_given_language_accent_code(
         feconf.ENTITY_TYPE_EXPLORATION,

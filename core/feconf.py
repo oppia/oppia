@@ -983,10 +983,19 @@ CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
-VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = '/voiceover_language_codes_mapping'
-REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = '/regenerate_automatic_voiceover/<exploration_id>'
-REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = '/regenerate_voiceover_on_exp_update/<exploration_id>/<exploration_version>/<exploration_title>'
-REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = '/regenerate_voiceovers_for_exploration/<exploration_id>/<language_accent_code>'
+VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
+    '/voiceover_language_codes_mapping'
+)
+REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
+    '/regenerate_automatic_voiceover/<exploration_id>'
+)
+REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
+    '/regenerate_voiceover_on_exp_update/<exploration_id>/<exploration_version>'
+)
+REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
+    '/regenerate_voiceovers_for_exploration/'
+    '<exploration_id>/<language_accent_code>'
+)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1669,12 +1678,34 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
     'FUNCTION_ID_UPDATE_STATS': 'update_stats',
     'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS': ('delete_exps_from_user_models'),
     'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES': 'delete_exps_from_activities',
-    'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED': ('delete_users_pending_to_be_deleted'),
-    'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION': ('check_completion_of_user_deletion'),
-    'FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY': ('regenerate_exploration_summary'),
-    'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS': ('untag_deleted_misconceptions'),
-    'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS': ('remove_user_from_rights_models'),
-    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE': ('regenerate_voiceovers_on_exploration_update'),
-    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': ('regenerate_voiceovers_on_exploration_added_to_topic'),
-    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT': ('regenerate_voiceovers_of_exploration_for_given_language_accent'),
+    'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED': (
+        'delete_users_pending_to_be_deleted'
+    ),
+    'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION': (
+        'check_completion_of_user_deletion'
+    ),
+    'FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY': (
+        'regenerate_exploration_summary'
+    ),
+    'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS': (
+        'untag_deleted_misconceptions'
+    ),
+    'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS': (
+        'remove_user_from_rights_models'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE': (
+        'regenerate_voiceovers_on_exploration_update'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': (
+        'regenerate_voiceovers_on_exploration_added_to_topic'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION': (
+        'regenerate_voiceovers_after_accepting_suggestion'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT': (
+        'regenerate_voiceovers_of_exploration_for_given_language_accent'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS': (
+        'regenerate_voiceovers_for_batch_contents'
+    ),
 }

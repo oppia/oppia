@@ -140,8 +140,17 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that error is produced if stdout is not empty."""
-        empty_process = subprocess.Popen(['echo', ''], stdout=subprocess.PIPE, encoding='utf-8')
-        non_empty_process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
+        empty_process = subprocess.Popen(
+            ['echo', ''], stdout=subprocess.PIPE, encoding='utf-8'
+        )
+        non_empty_process = subprocess.Popen(
+            [
+                'echo',
+                'core/new_directory/new_file.ts\ncore/new_directory/fake_excluded_file.ts',
+            ],
+            stdout=subprocess.PIPE,
+            encoding='utf-8',
+        )
 
         def mock_popen_for_errors(  # pylint: disable=unused-argument
             cmd_tokens: List[str], stdout: str, encoding: str
@@ -154,7 +163,15 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 return non_empty_process
             return empty_process
 
-        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
+        swap_exclude_paths = self.swap(
+            run_typescript_checks,
+            'TS_STRICT_EXCLUDE_PATHS',
+            ['core/new_directory/fake_excluded_file.ts'],
+        )
+
+        with self.swap(
+            subprocess, 'Popen', mock_popen_for_errors
+        ), swap_exclude_paths:
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_typescript_checks.compile_and_check_typescript(run_typescript_checks.STRICT_TSCONFIG_FILEPATH)
 

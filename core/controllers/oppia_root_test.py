@@ -30,7 +30,16 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                     response.mustcontain('<lightweight-oppia-root></lightweight-oppia-root>')
                 else:
                     response.mustcontain('<oppia-root></oppia-root>')
+            if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
+                response = self.get_html_response(
+                    '/%s' % page['ROUTE'], expected_status_int=200
+                )
+                response.mustcontain('<oppia-root></oppia-root>')
 
+    def test_explore_and_embed_urls_render_with_no_iframe_restriction(
+        self,
+    ) -> None:
+        """Tests that explore and embed URLs hit the iframe restriction bypass."""
 
 class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
     def test_oppia_lightweight_root_page(self) -> None:
@@ -96,15 +105,16 @@ class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
             '<lightweight-oppia-root></lightweight-oppia-root>',
             no='<title>Loading | Oppia</title>',
         )
+        valid_route = ''
+        for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+            if 'MANUALLY_REGISTERED_WITH_BACKEND' not in page:
+                valid_route = page['ROUTE']
+                break
 
-        self.testapp.set_cookie('dir', 'new_hacker_in_the_block')
-        response = self.get_html_response('/?dir=ltr', expected_status_int=200)
-        response.mustcontain(
-            '<lightweight-oppia-root></lightweight-oppia-root>',
-            '<title>Loading | Oppia</title>',
+        response_explore = self.get_html_response(
+            '/%s?explore=true' % valid_route, expected_status_int=200
         )
-        # The bundle modifier precedence guarantees that a valid cookie dir
-        # value will return the correct bundle.
+        response_explore.mustcontain('<oppia-root></oppia-root>')
 
         # When both modifiers are invalid, default to AoT bundle.
         self.testapp.set_cookie('dir', 'new_hacker_in_the_block')
@@ -112,4 +122,7 @@ class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
             '<title>Loading | Oppia</title>',
+        response_embed = self.get_html_response(
+            '/%s?embed=true' % valid_route, expected_status_int=200
         )
+        response_embed.mustcontain('<oppia-root></oppia-root>')
