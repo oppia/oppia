@@ -727,7 +727,14 @@ class AnswerSubmittedEventHandler(
             )
         )
 
-        normalized_answer = old_interaction_instance.normalize_answer(answer)
+        try:
+            normalized_answer = old_interaction_instance.normalize_answer(
+                answer
+            )
+        except utils.InvalidInputException as e:
+            raise self.InvalidInputException(
+                'Schema validation for \'answer\' failed: %s' % e
+            ) from e
 
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id,
