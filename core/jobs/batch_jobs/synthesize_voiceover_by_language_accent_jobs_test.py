@@ -444,12 +444,6 @@ class VoiceoverSynthesisByAccentJobRunTests(
         self._set_language_accent_code('en-US')
         self.assert_job_output_is_empty()
 
-    def test_check_is_exploration_curated_for_invalid_id(self) -> None:
-        is_exploration_curated = synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob.is_exploration_curated(
-            exploration_id=''
-        )
-        self.assertFalse(is_exploration_curated)
-
     def test_should_regenerate_voiceover_successfully(self) -> None:
         self._create_data_for_testing()
         self._set_language_accent_code('en-US')

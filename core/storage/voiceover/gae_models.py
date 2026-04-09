@@ -42,10 +42,6 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
-VOICEOVER_AUTOGENERATION_BY_ACCENT_ID: Final = (
-    'voiceover_autogeneration_by_accent'
-)
-
 
 assert feconf.VoiceoverType.MANUAL.value == 'manual'
 assert feconf.VoiceoverType.AUTO.value == 'auto'

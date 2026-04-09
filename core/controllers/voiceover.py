@@ -122,7 +122,16 @@ class VoiceoverLanguageCodesMappingHandler(
         )
         voiceover_services.save_language_accent_support(language_codes_mapping)
 
-        if new_accent_code:
+        if (
+            new_accent_code
+            and voiceover_services.is_accent_code_valid_for_autogeneration(
+                new_accent_code
+            )
+            and feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+                None,
+            )
+        ):
             beam_job_services.run_beam_job(
                 job_class=(
                     synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob

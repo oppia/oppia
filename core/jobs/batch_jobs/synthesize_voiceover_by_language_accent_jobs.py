@@ -191,17 +191,12 @@ class VoiceoverSynthesisByAccentJob(base_jobs.JobBase):
             bool. A boolean value indicating if the exploration is curated
             or not.
         """
-        try:
-            with datastore_services.get_ndb_context():
-                return opportunity_services.is_exploration_available_for_contribution(
+        with datastore_services.get_ndb_context():
+            return (
+                opportunity_services.is_exploration_available_for_contribution(
                     exploration_id
                 )
-        except Exception:
-            logging.exception(
-                'Not able to check whether exploration is curated or not'
-                ' for exploration ID %s.' % exploration_id
             )
-            return False
 
     @classmethod
     def generate_voiceovers_for_exploration(

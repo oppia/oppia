@@ -552,6 +552,26 @@ def save_language_accent_support(
     voiceover_autogeneration_policy_model.put()
 
 
+def is_accent_code_valid_for_autogeneration(language_accent_code: str) -> bool:
+    """The method validates whether the provided language accent code is valid
+    for Oppia's voiceover autogeneration.
+
+    Args:
+        language_accent_code: str. The language accent code to be validated.
+
+    Returns:
+        bool. True if the provided language accent code is valid for Oppia's
+        voiceover autogeneration, False otherwise.
+    """
+    autogeneratable_language_accents = (
+        get_autogeneratable_language_accent_codes()
+    )
+    return (
+        isinstance(language_accent_code, str)
+        and language_accent_code in autogeneratable_language_accents
+    )
+
+
 def get_new_auto_voiceover_accent(
     updated_language_accent_mapping: Dict[str, Dict[str, bool]],
 ) -> Optional[str]:
@@ -583,8 +603,7 @@ def get_new_auto_voiceover_accent(
 
     existing_language_accent_mapping = (
         voiceover_autogeneration_policy_model.language_codes_mapping
-        if voiceover_autogeneration_policy_model is not None
-        and voiceover_autogeneration_policy_model.language_codes_mapping
+        if voiceover_autogeneration_policy_model.language_codes_mapping
         is not None
         else {}
     )
@@ -611,7 +630,15 @@ def get_new_auto_voiceover_accent(
         updated_autogeneratable_accents - existing_autogeneratable_accents
     )
 
+    # Since the UI triggers a backend request immediately whenever a language
+    # accent code is updated, the new_accents_set can contain at most one element.
+    # Therefore, we can safely use pop() to retrieve the newly added language
+    # accent code.
     if new_accents_set:
+        assert len(new_accents_set) == 1, (
+            'Expected only one new language-accent code to be added for automatic '
+            'voiceover regeneration, but found multiple: %s' % new_accents_set
+        )
         return new_accents_set.pop()
     return None
 

@@ -993,6 +993,31 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
             expected_language_code,
         )
 
+    def test_validate_language_accent_code_for_autogeneration(self) -> None:
+        invalid_accent_code = 'en-XX'
+        self.assertFalse(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                invalid_accent_code
+            )
+        )
+
+        # Here we use MyPy ignore because here we assign type int to
+        # type str. This is done to test the validation of the
+        # is_accent_code_valid_for_autogeneration method.
+        invalid_accent_code = 5  # type: ignore[assignment]
+        self.assertFalse(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                invalid_accent_code
+            )
+        )
+
+        valid_accent_code = 'en-US'
+        self.assertTrue(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                valid_accent_code
+            )
+        )
+
 
 class VoiceoverRegenerationTests(test_utils.GenericTestBase):
     """Test class to verify voiceover regeneration across various scenarios,
