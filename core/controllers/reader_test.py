@@ -3748,6 +3748,78 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=500,
             )
 
+    def test_submit_learner_answer_details_for_question_with_matching_interaction_id(
+        self,
+    ) -> None:
+        """Test handler for submitting learner answer details for questions
+        with matching interaction ids.
+        """
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, 'user', description='Description')
+
+        question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id,
+            'user',
+            self._create_valid_question_data('ABC', content_id_generator),
+            [skill_id],
+            content_id_generator.next_content_id_index,
+        )
+
+        entity_type = feconf.ENTITY_TYPE_QUESTION
+        csrf_token = self.get_new_csrf_token()
+
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        ):
+            interaction_id = question_services.get_interaction_id_for_question(
+                question_id
+            )
+            state_reference = stats_services.get_state_reference_for_question(
+                question_id
+            )
+
+            self.put_json(
+                '%s/%s/%s'
+                % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type,
+                    question_id,
+                ),
+                {
+                    'interaction_id': interaction_id,
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                },
+                csrf_token=csrf_token,
+            )
+
+            learner_answer_details = stats_services.get_learner_answer_details(
+                entity_type, state_reference
+            )
+            assert learner_answer_details is not None
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference
+            )
+            self.assertEqual(
+                learner_answer_details.interaction_id, interaction_id
+            )
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1
+            )
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0].answer,
+                'This is an answer.',
+            )
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0].answer_details,
+                'This is an answer details.',
+            )
+
 
 class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
     """Tests for checkpoint reached event handler."""
