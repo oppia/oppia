@@ -3947,6 +3947,7 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
     def test_logged_out_checkpoint_reached_event_succeeds(self) -> None:
         """Test handler for checkpoint reached events by logged-out users."""
+        exp_id = '0'
         payload = {
             'most_recently_reached_checkpoint_state_name': 'Introduction',
             'version': 1,
