@@ -5034,6 +5034,9 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickOnElementWithSelector(lessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
+    // Wait for the modal slide-in animation to finish before callers
+    // try to interact with buttons inside the modal (e.g. .save-progress-btn).
+    await this.waitForElementToStabilize(lessonInfoCardSelector);
   }
 
   /**
@@ -5114,8 +5117,38 @@ export class LoggedOutUser extends BaseUser {
    * Saves the progress.(To be used when save progress modal is opened.)
    */
   async saveProgress(): Promise<void> {
+    // Wait for the button to appear in the DOM and be visible.
     await this.page.waitForSelector(saveProgressButton, {visible: true});
-    await this.clickOnElementWithSelector(saveProgressButton);
+
+    // Wait for Angular's async pipeline to settle (checkpoint detection,
+    // change-detection cycles, etc.) before checking clickability.
+    await this.waitForAngularStability();
+
+    // Wait for any slide-in animation on the modal to finish so the button
+    // is no longer occluded or partially off-screen.
+    await this.waitForElementToStabilize(saveProgressButton);
+
+    // Retry loop — guards against transient overlay/animation race conditions
+    // that are common on slow CI runners.
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await this.clickOnElementWithSelector(saveProgressButton);
+        break; // click succeeded
+      } catch (error) {
+        if (attempt === maxAttempts) {
+          throw error; // re-throw on the final attempt
+        }
+        showMessage(
+          `saveProgress: click attempt ${attempt} failed, retrying... ` +
+            `(${error instanceof Error ? error.message : String(error)})`
+        );
+        // Brief pause and re-stable check before retrying.
+        await this.page.waitForTimeout(1000);
+        await this.waitForAngularStability();
+        await this.waitForElementToStabilize(saveProgressButton);
+      }
+    }
 
     await this.page.waitForSelector(signInBoxInSaveProressModalSelector, {
       visible: true,
