@@ -2710,6 +2710,17 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+      const success = await this.page
+        .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+        .then(() => true)
+        .catch(() => false);
+      if (!success) {
+        await this.page.reload({waitUntil: 'networkidle0'});
+        await this.page.waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 30000,
+        });
+      }
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
