@@ -1721,7 +1721,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload,
         )
 
-        self.assertEqual(response, {})
+        self.assertEqual(response, {'is_super_admin': False})
 
     def test_exp_complete_event_in_collection(self) -> None:
         """Test handler for completion of explorations in the context of
