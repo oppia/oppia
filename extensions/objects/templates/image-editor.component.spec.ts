@@ -2839,6 +2839,239 @@ describe('ImageEditor', () => {
     expect(component.validityChange.emit).not.toHaveBeenCalled();
   });
 
+  it('should throw when canvas context or uploaded image metadata is missing', () => {
+    expect(() => {
+      // @ts-ignore
+      component.getCanvasContext({
+        getContext: () => null,
+      } as HTMLCanvasElement);
+    }).toThrowError('Canvas context unavailable.');
+
+    component['imgData'] = null;
+    component.data.metadata.uploadedImageData = undefined;
+    expect(() => {
+      // @ts-ignore
+      component.getUploadedImageDataOrThrow();
+    }).toThrowError('Uploaded image data is missing.');
+
+    component.data.metadata.originalWidth = undefined;
+    component.data.metadata.originalHeight = undefined;
+    expect(() => {
+      // @ts-ignore
+      component.getOriginalImageDimensions();
+    }).toThrowError('Original image dimensions are missing.');
+  });
+
+  it('should throw when local storage image URL resolution fails', () => {
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      null as unknown as string
+    );
+
+    expect(() => {
+      // @ts-ignore
+      component.getTrustedResourceUrlForImageFileName('image.png');
+    }).toThrowError('Image data not found in local storage.');
+
+    (imageLocalStorageService.getRawImageData as jasmine.Spy).and.returnValue(
+      'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4='
+    );
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null as unknown as string
+    );
+
+    expect(() => {
+      // @ts-ignore
+      component.getTrustedResourceUrlForImageFileName('image.svg');
+    }).toThrowError('Trusted SVG URL could not be generated.');
+  });
+
+  it('should return crop area styles when uploaded image data is unavailable', () => {
+    component['imgData'] = null;
+    component.data.metadata.uploadedImageData = undefined;
+    component.cropArea = {
+      x1: 10,
+      y1: 10,
+      x2: 30,
+      y2: 40,
+    };
+
+    const styles = component.getCropAreaDynamicStyles();
+
+    expect(styles).toContain('background: none');
+  });
+
+  it('should warn and return while confirming crop if gif conversion fails', () => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null as unknown as Blob);
+    spyOn(component as never, 'processGIFImage').and.callFake(
+      (
+        _imageDataURI: string,
+        _width: number,
+        _height: number,
+        _processFrameCallback:
+          | ((dataUrl: string) => Promise<string> | string)
+          | null,
+        successCallback: (obj: {image: string; error: boolean}) => void
+      ) => {
+        successCallback({
+          image: 'data:image/gif;base64,ZmFrZQ==',
+          error: false,
+        });
+      }
+    );
+
+    component.data.metadata.uploadedImageData =
+      'data:image/gif;base64,ZmFrZQ==';
+    component.data.metadata.originalWidth = 200;
+    component.data.metadata.originalHeight = 100;
+    component.cropArea = {x1: 0, y1: 0, x2: 10, y2: 10};
+    document.body.style.cursor = 'pointer';
+
+    component.confirmCropImage();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not get resampled file.'
+    );
+    expect(document.body.style.cursor).toBe('default');
+  });
+
+  it('should warn and return while confirming crop if svg conversion fails', () => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null as unknown as Blob);
+
+    component.data.metadata.uploadedImageData =
+      'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=';
+    component.data.metadata.originalWidth = 200;
+    component.data.metadata.originalHeight = 100;
+    component.cropArea = {x1: 0, y1: 0, x2: 10, y2: 10};
+
+    component.confirmCropImage();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not get resampled file.'
+    );
+  });
+
+  it('should warn and return while confirming crop if raster conversion fails', () => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(component as never, 'getCroppedImageData').and.returnValue(
+      'data:image/png;base64,ZmFrZQ=='
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null as unknown as Blob);
+
+    component.data.metadata.uploadedImageData =
+      'data:image/png;base64,ZmFrZQ==';
+    component.data.metadata.originalWidth = 200;
+    component.data.metadata.originalHeight = 100;
+    component.cropArea = {x1: 0, y1: 0, x2: 10, y2: 10};
+
+    component.confirmCropImage();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not get resampled file.'
+    );
+  });
+
+  it('should show invalid warning when uploaded file reader result is not a string', () => {
+    const invalidReader = {
+      onload: null as ((evt: ProgressEvent<FileReader>) => void) | null,
+      result: new ArrayBuffer(8),
+      readAsDataURL: function (_file: Blob): void {
+        if (this.onload) {
+          this.onload({} as ProgressEvent<FileReader>);
+        }
+      },
+    };
+    (window.FileReader as jasmine.Spy).and.returnValue(
+      invalidReader as unknown as FileReader
+    );
+
+    component.setUploadedFile(createMockFile('image.png', 'image/png'));
+
+    expect(component.invalidImageWarningIsShown).toBeTrue();
+  });
+
+  it('should show invalid warning when trusted svg URL cannot be generated', () => {
+    const reader = {
+      onload: null as ((evt: ProgressEvent<FileReader>) => void) | null,
+      result:
+        'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==',
+      readAsDataURL: function (_file: Blob): void {
+        if (this.onload) {
+          this.onload({} as ProgressEvent<FileReader>);
+        }
+      },
+    };
+    (window.FileReader as jasmine.Spy).and.returnValue(
+      reader as unknown as FileReader
+    );
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null as unknown as string
+    );
+
+    component.setUploadedFile(createMockFile('image.svg', 'image/svg+xml'));
+
+    expect(component.invalidImageWarningIsShown).toBeTrue();
+  });
+
+  it('should stop upload when svg resampling returns null', () => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null as unknown as Blob);
+    component.data.metadata.uploadedImageData =
+      'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=';
+    component.data.metadata.originalWidth = 100;
+    component.data.metadata.originalHeight = 50;
+
+    component.saveUploadedFile();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not get resampled file.'
+    );
+    expect(component.imageIsUploading).toBeFalse();
+  });
+
+  it('should show default warning if image upload endpoint resolves with no data', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+
+    component.postImageToServer(
+      {width: 100, height: 50},
+      new Blob(['data'], {type: 'image/png'}),
+      'png'
+    );
+    tick(200);
+
+    const req = httpTestingController.expectOne(
+      '/createhandler/imageupload/question/2'
+    );
+    req.flush(null);
+    tick(100);
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Error communicating with server.'
+    );
+
+    httpTestingController
+      .match(req => req.url.includes('/feature_flags_evaluation_handler'))
+      .forEach(req => req.flush({feature_flag_results: {}}));
+    httpTestingController.verify();
+  }));
+
   it('should update component when the user makes changes to the image', () => {
     let changes: SimpleChanges = {
       value: {

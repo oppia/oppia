@@ -838,6 +838,392 @@ describe('SvgEditor', () => {
       })
     )
   );
+
+  it('should throw for missing local-storage SVG URLs', () => {
+    const imageLocalStorageService = TestBed.inject(
+      ImageLocalStorageService
+    ) as unknown as {
+      getRawImageData: (filename: string) => string | null;
+      isInStorage?: (filename: string) => boolean;
+    };
+    imageLocalStorageService.isInStorage = (_filename: string) => true;
+
+    component.imageSaveDestination =
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE;
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      null as unknown as string
+    );
+
+    const getTrustedResourceUrlForSvgFileName = (
+      component as unknown as {
+        getTrustedResourceUrlForSvgFileName: (filename: string) => {
+          safeUrl: string;
+          unsafeUrl: string;
+        };
+      }
+    ).getTrustedResourceUrlForSvgFileName.bind(component);
+
+    expect(() => getTrustedResourceUrlForSvgFileName('image.svg')).toThrowError(
+      'SVG data not found in local storage.'
+    );
+
+    (imageLocalStorageService.getRawImageData as jasmine.Spy).and.returnValue(
+      'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4='
+    );
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null as unknown as string
+    );
+
+    expect(() => getTrustedResourceUrlForSvgFileName('image.svg')).toThrowError(
+      'Trusted SVG URL could not be generated.'
+    );
+  });
+
+  it('should throw when trusted URL generation fails in setSavedSvgFilename', () => {
+    const imageLocalStorageService = TestBed.inject(
+      ImageLocalStorageService
+    ) as unknown as {
+      getRawImageData: (filename: string) => string | null;
+      isInStorage?: (filename: string) => boolean;
+    };
+    imageLocalStorageService.isInStorage = (_filename: string) => false;
+
+    component.imageSaveDestination =
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE;
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4='
+    );
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null as unknown as string
+    );
+
+    expect(() => component.setSavedSvgFilename('image.svg', true)).toThrowError(
+      'Trusted SVG URL could not be generated.'
+    );
+  });
+
+  it('should throw when svg tag is missing in getSvgString', () => {
+    spyOn(component.canvas, 'toSVG').and.returnValue('<div></div>');
+
+    expect(() => component.getSvgString()).toThrowError(
+      'SVG element not found.'
+    );
+  });
+
+  it('should warn and return if svg conversion fails in saveSvgFile', () => {
+    spyOn(component, 'isDiagramCreated').and.returnValue(true);
+    spyOn(component, 'getSvgString').and.returnValue(
+      '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
+    );
+    spyOn(component, 'isSvgTagValid').and.returnValue(true);
+    const imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null as unknown as Blob);
+
+    component.saveSvgFile();
+
+    expect(alertSpy).toHaveBeenCalledWith('Could not get resampled file.');
+  });
+
+  it('should warn when server upload resolves without data', fakeAsync(() => {
+    spyOn(component, 'isDiagramCreated').and.returnValue(true);
+    spyOn(component, 'getSvgString').and.returnValue(
+      '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
+    );
+    spyOn(component, 'isSvgTagValid').and.returnValue(true);
+    const imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob(['svg'], {type: 'image/svg+xml'}));
+    spyOn(component, 'postSvgToServer').and.returnValue(
+      Promise.resolve(undefined)
+    );
+
+    component.saveSvgFile();
+    tick();
+
+    expect(alertSpy).toHaveBeenCalledWith('Error communicating with server.');
+    expect(component.loadingIndicatorIsShown).toBe(false);
+  }));
+
+  it('should apply color ranges while loading text objects', () => {
+    const textElement = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
+    const coloredTspan = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    coloredTspan.textContent = 'A';
+    coloredTspan.setAttribute('fill', '#ff0000');
+    coloredTspan.setAttribute('stroke', '#000000');
+    coloredTspan.setAttribute('stroke-width', '2');
+    textElement.appendChild(coloredTspan);
+
+    const baseObject = new fabric.Text('A', {
+      left: 10,
+      top: 10,
+      fill: '#000000',
+    });
+
+    const setSelectionStartSpy = spyOn(
+      fabric.Textbox.prototype,
+      'setSelectionStart'
+    ).and.callThrough();
+    const setSelectionEndSpy = spyOn(
+      fabric.Textbox.prototype,
+      'setSelectionEnd'
+    ).and.callThrough();
+    const setSelectionStylesSpy = spyOn(
+      fabric.Textbox.prototype,
+      'setSelectionStyles'
+    ).and.callThrough();
+
+    // @ts-ignore Property 'loadTextObject' is private.
+    component.loadTextObject(
+      textElement,
+      baseObject as unknown as fabric.Object
+    );
+
+    expect(setSelectionStartSpy).toHaveBeenCalled();
+    expect(setSelectionEndSpy).toHaveBeenCalled();
+    expect(setSelectionStylesSpy).toHaveBeenCalled();
+  });
+
+  it('should skip svg objects without matching source elements while editing', fakeAsync(() => {
+    spyOn(component, 'initializeFabricJs').and.callFake(() => {});
+    spyOn(fabric, 'loadSVGFromString').and.callFake(
+      (
+        _svgString: string,
+        callback: (
+          objects: fabric.Object[],
+          options: Record<string, unknown>,
+          elements: SVGElement[]
+        ) => void
+      ) => {
+        callback(
+          [new fabric.Rect({left: 0, top: 0, width: 10, height: 10})],
+          {},
+          []
+        );
+      }
+    );
+
+    component.savedSvgDiagram =
+      '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+    component.continueDiagramEditing();
+    tick();
+
+    expect(component.canvas.getObjects().length).toBe(0);
+  }));
+
+  it('should return null for quadratic bezier curve outside bezier mode', () => {
+    component.drawMode = component.DRAW_MODE_NONE;
+    const getQuadraticBezierCurve = (
+      component as unknown as {
+        getQuadraticBezierCurve: () => fabric.Object | null;
+      }
+    ).getQuadraticBezierCurve.bind(component);
+
+    expect(getQuadraticBezierCurve()).toBeNull();
+  });
+
+  it('should reset bezier draw mode when no latest object remains', () => {
+    component.drawMode = component.DRAW_MODE_BEZIER;
+    component.canvas.add(new fabric.Rect({width: 10, height: 10}));
+    component.canvas.add(new fabric.Rect({width: 10, height: 10}));
+    component.canvas.add(new fabric.Rect({width: 10, height: 10}));
+
+    component.createQuadraticBezier();
+
+    expect(component.drawMode).toBe(component.DRAW_MODE_NONE);
+  });
+
+  it('should remove latest object when bezier path is unavailable', () => {
+    component.drawMode = component.DRAW_MODE_BEZIER;
+    component.canvas.add(new fabric.Rect({width: 10, height: 10}));
+    component.canvas.add(new fabric.Rect({width: 10, height: 10}));
+    component.canvas.add(new fabric.Rect({width: 10, height: 10}));
+    component.canvas.add(new fabric.Rect({width: 10, height: 10}));
+
+    component.createQuadraticBezier();
+
+    expect(component.canvas.getObjects().length).toBe(0);
+    expect(component.drawMode).toBe(component.DRAW_MODE_NONE);
+  });
+
+  it('should reset uploaded svg state when encoded data is missing', () => {
+    component.drawMode = component.DRAW_MODE_SVG_UPLOAD;
+    component.uploadedSvgDataUrl = {
+      safeUrl: 'safe-url',
+      unsafeUrl: 'data:image/svg+xml;base64',
+    };
+
+    component.uploadSvgFile();
+
+    expect(component.uploadedSvgDataUrl).toBeNull();
+  });
+
+  it('should set uploaded svg data from file reader result', () => {
+    const reader = {
+      onload: null as ((evt: ProgressEvent<FileReader>) => void) | null,
+      result: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+      readAsDataURL: function (_file: Blob): void {
+        if (this.onload) {
+          this.onload({} as ProgressEvent<FileReader>);
+        }
+      },
+    };
+    (window.FileReader as jasmine.Spy).and.returnValue(
+      reader as unknown as FileReader
+    );
+    (window.Image as jasmine.Spy).and.returnValue({
+      onload: null as (() => void) | null,
+      set src(_url: string) {
+        this.onload?.();
+      },
+    } as unknown as HTMLImageElement);
+
+    component.setUploadedFile(
+      new File(['svg'], 'image.svg', {type: 'image/svg'})
+    );
+
+    expect(component.uploadedSvgDataUrl).toEqual({
+      safeUrl: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+      unsafeUrl: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+    });
+  });
+
+  it('should ignore uploaded file when trusted svg URL is unavailable', () => {
+    const reader = {
+      onload: null as ((evt: ProgressEvent<FileReader>) => void) | null,
+      result: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+      readAsDataURL: function (_file: Blob): void {
+        if (this.onload) {
+          this.onload({} as ProgressEvent<FileReader>);
+        }
+      },
+    };
+    (window.FileReader as jasmine.Spy).and.returnValue(
+      reader as unknown as FileReader
+    );
+    (window.Image as jasmine.Spy).and.returnValue({
+      onload: null as (() => void) | null,
+      set src(_url: string) {
+        this.onload?.();
+      },
+    } as unknown as HTMLImageElement);
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null as unknown as string
+    );
+
+    component.uploadedSvgDataUrl = null;
+    component.setUploadedFile(
+      new File(['svg'], 'image.svg', {type: 'image/svg'})
+    );
+
+    expect(component.uploadedSvgDataUrl).toBeNull();
+  });
+
+  it('should return early for layer operations without an active object', () => {
+    const bringForwardSpy = spyOn(component.canvas, 'bringForward');
+    const sendBackwardsSpy = spyOn(component.canvas, 'sendBackwards');
+
+    component.bringObjectForward();
+    component.sendObjectBackward();
+
+    expect(bringForwardSpy).not.toHaveBeenCalled();
+    expect(sendBackwardsSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return safely when undo stack pop returns undefined', () => {
+    component.objectUndoStack = [
+      {action: 'add', object: new fabric.Rect({width: 10, height: 10})},
+    ];
+    spyOn(component.objectUndoStack, 'pop').and.returnValue(
+      undefined as unknown as {action: 'add'; object: fabric.Object}
+    );
+
+    component.onUndo();
+
+    expect(component.objectRedoStack.length).toBe(0);
+  });
+
+  it('should return safely when undo add action has no shape in canvasObjects', () => {
+    component.objectUndoStack = [
+      {action: 'add', object: new fabric.Rect({width: 10, height: 10})},
+    ];
+    component.canvasObjects = [];
+
+    component.onUndo();
+
+    expect(component.objectRedoStack.length).toBe(0);
+  });
+
+  it('should return safely when redo stack pop returns undefined', () => {
+    component.objectRedoStack = [
+      {action: 'add', object: new fabric.Rect({width: 10, height: 10})},
+    ];
+    spyOn(component.objectRedoStack, 'pop').and.returnValue(
+      undefined as unknown as {action: 'add'; object: fabric.Object}
+    );
+
+    component.onRedo();
+
+    expect(component.objectUndoStack.length).toBe(0);
+  });
+
+  it('should return early from createColorPicker when parent does not exist', () => {
+    spyOn(document, 'getElementById').and.returnValue(null);
+
+    expect(() => component.createColorPicker('stroke')).not.toThrowError();
+  });
+
+  it('should return early in bezier object moving handler when curve is missing', () => {
+    component.drawMode = component.DRAW_MODE_BEZIER;
+    spyOn(
+      component as unknown as {
+        getQuadraticBezierCurve: () => fabric.Object | null;
+      },
+      'getQuadraticBezierCurve'
+    ).and.returnValue(null);
+    const renderAllSpy = spyOn(component.canvas, 'renderAll');
+
+    component.canvas.fire('object:moving', {
+      target: {name: 'p0', left: 100, top: 100},
+    } as unknown as fabric.IEvent<Event>);
+
+    expect(renderAllSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early in object:added handler when shape is missing', () => {
+    component.drawMode = component.DRAW_MODE_NONE;
+    spyOn(component.canvas, 'getObjects').and.returnValue([]);
+
+    component.canvas.fire('object:added');
+
+    expect(component.objectUndoStack.length).toBe(0);
+  });
+
+  it('should clear selection flags when there is no active shape', () => {
+    component.drawMode = component.DRAW_MODE_NONE;
+    component.objectIsSelected = true;
+    component.displayFontStyles = true;
+    spyOn(component.canvas, 'getActiveObject').and.returnValue(
+      null as unknown as fabric.Object
+    );
+
+    component.canvas.fire('selection:created');
+
+    expect(component.objectIsSelected).toBe(false);
+    expect(component.displayFontStyles).toBe(false);
+  });
 });
 
 describe('SvgEditor initialized with value attribute', () => {
