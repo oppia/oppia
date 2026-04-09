@@ -262,15 +262,27 @@ export class BaseUser {
 
     // Prepare an array of promises for screenshots.
     const screenshotPromises = BaseUser.instances.map(async (instance, i) => {
-      if (instance.page) {
-        await instance.page.screenshot({
-          path: path.join(
-            outputDir,
-            outputFileName + randomString + `-instance-${i}.png`
-          ),
-        });
+      if (!instance.page) {
+        return;
+      }
+      if (instance.page.isClosed()) {
         showMessage(
-          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
+          `Skipped screenshot for ${instance.username ?? 'unknown user'} because the page is already closed.`
+        );
+        return;
+      }
+      try {
+        const screenshotPath = path.join(
+          outputDir,
+          outputFileName + randomString + `-instance-${i}.png`
+        );
+        await instance.page.screenshot({path: screenshotPath});
+        showMessage(
+          `Screenshot captured for test failure and saved as : ${screenshotPath}`
+        );
+      } catch (error) {
+        showMessage(
+          `Error while taking screenshot for ${instance.username ?? 'unknown user'}: ${error}`
         );
       }
     });
