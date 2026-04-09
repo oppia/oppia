@@ -279,9 +279,10 @@ class QuestionSkillLinkHandler(
                     question_id, task_dict['id'], task_dict['difficulty']
                 )
 
-        question_dict = question_services.get_question_by_id(
-            question_id
-        ).to_dict()
+        question = question_services.get_question_by_id(
+            question_id, strict=False
+        )
+        question_dict = question.to_dict() if question else None
         self.render_json({'question_dict': question_dict})
 
 
@@ -376,9 +377,10 @@ class EditableQuestionDataHandler(
             self.user_id, question_id, change_list, commit_message, version
         )
 
-        question_dict = question_services.get_question_by_id(
-            question_id
-        ).to_dict()
+        question = question_services.get_question_by_id(
+            question_id, strict=False
+        )
+        question_dict = question.to_dict() if question else None
         self.render_json({'question_dict': question_dict})
 
     @acl_decorators.can_delete_question
