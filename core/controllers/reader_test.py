@@ -1926,6 +1926,25 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                     ],
                 )
 
+    def test_logged_out_can_leave_exploration_incomplete(self) -> None:
+        """Test handler for leaving an exploration incomplete by logged-out
+        users.
+        """
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1,
+        }
+
+        response = self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
+            payload,
+        )
+
+        self.assertEqual(response, {'is_super_admin': False})
+
     def test_exp_incomplete_event_handler_with_no_version_raises_error(
         self,
     ) -> None:
