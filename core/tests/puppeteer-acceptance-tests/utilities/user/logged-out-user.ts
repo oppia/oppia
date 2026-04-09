@@ -5134,10 +5134,10 @@ export class LoggedOutUser extends BaseUser {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         await this.clickOnElementWithSelector(saveProgressButton);
-        break; // click succeeded
+        break; // Click succeeded.
       } catch (error) {
         if (attempt === maxAttempts) {
-          throw error; // re-throw on the final attempt
+          throw error; // Re-throw on the final attempt.
         }
         showMessage(
           `saveProgress: click attempt ${attempt} failed, retrying... ` +
