@@ -33,7 +33,7 @@ from core.storage.beam_job import gae_models as beam_job_models
 import apache_beam as beam
 from apache_beam import runners
 from google.cloud import dataflow
-from typing import Iterator, Optional, Type
+from typing import Dict, Iterator, Optional, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -123,14 +123,31 @@ def run_job(
     Raises:
         RuntimeError. Failed to deploy given job to the Dataflow service.
     """
+    job_name = job_class.__name__
+
+    additional_options: Dict[str, int | str] = {}
+    if does_job_requires_limiting_workers(job_name):
+        # We want to limit the number of workers for Beam jobs related to voiceover
+        # synthesis, as these jobs depend on Azure for voiceover regeneration, and
+        # increasing parallelism may lead to rate-limiting issues.
+        logging.info('Limiting the number of workers for job: %s' % job_name)
+        additional_options = {
+            'max_num_workers': 15,
+            'autoscaling_algorithm': 'THROUGHPUT_BASED',
+        }
+
     if pipeline is None:
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
-            options=job_options.JobOptions(namespace=namespace),
+            options=job_options.JobOptions(
+                flags=None,
+                namespace=namespace,
+                oppia_project_id=app_identity_services.get_application_id(),
+                **additional_options,
+            ),
         )
 
     job = job_class(pipeline)
-    job_name = job_class.__name__
 
     # Clear cache before running the job to be sure that the cache
     # does not affect the job.
@@ -294,3 +311,21 @@ def _put_job_stderr(job_id: str, stderr: str) -> None:
         job_id, '', stderr
     )
     result_model.put()
+
+
+def does_job_requires_limiting_workers(job_name: str) -> bool:
+    """Returns whether the given job requires limiting the number of workers.
+
+    Args:
+        job_name: str. The name of the job.
+
+    Returns:
+        bool. Whether the given job requires limiting the number of workers.
+    """
+    jobs_requiring_limiting_workers = [
+        'VoiceoverSynthesisJob',
+        'VoiceoverSynthesisAuditJob',
+        # The below job is used in unit tests.
+        'VoiceoverSynthesisForTestingJob',
+    ]
+    return job_name in jobs_requiring_limiting_workers
