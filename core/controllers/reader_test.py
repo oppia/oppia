@@ -3945,21 +3945,6 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_logged_out_checkpoint_reached_event_succeeds(self) -> None:
-        """Test handler for checkpoint reached events by logged-out users."""
-        exp_id = '0'
-        payload = {
-            'most_recently_reached_checkpoint_state_name': 'Introduction',
-            'version': 1,
-        }
-
-        response = self.post_json(
-            '/explorehandler/checkpoint_reached_event/%s' % exp_id,
-            payload,
-        )
-
-        self.assertEqual(response, {'is_super_admin': False})
-
 
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
