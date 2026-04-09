@@ -20,13 +20,23 @@ import {APP_BASE_HREF} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 import {AppConstants} from 'app.constants';
-import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
+import {IsLoggedInGuard} from './guards/is-logged-in.guard';
+import {CanAccessSplashPageGuard} from './guards/can-access-splash-page.guard';
 import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
+    pathMatch: 'full',
+    canLoad: [CanAccessSplashPageGuard],
+    loadChildren: () =>
+      import('pages/splash-page/splash-page.module').then(
+        m => m.SplashPageModule
+      ),
+  },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.ROUTE,
     loadChildren: () =>

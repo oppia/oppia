@@ -501,9 +501,16 @@ describe('Voiceover Admin Page component ', () => {
 
     const functionId3 =
       'regenerate_voiceovers_of_exploration_for_given_language_accent';
-    const expectedText3 =
-      'Voiceover regeneration for the exploration in the chosen language accent';
+    const expectedText3 = 'Regeneration from voiceover admin page';
     expect(component.getFunctionIdText(functionId3)).toBe(expectedText3);
+
+    const functionId4 = 'regenerate_voiceovers_for_batch_contents';
+    const expectedText4 = 'Batch regeneration details';
+    expect(component.getFunctionIdText(functionId4)).toBe(expectedText4);
+
+    const functionId5 = 'regenerate_voiceovers_after_accepting_suggestion';
+    const expectedText5 = 'Regeneration after accepting translation';
+    expect(component.getFunctionIdText(functionId5)).toBe(expectedText5);
 
     expect(component.getFunctionIdText('unknown_function_id')).toBe('');
   });
