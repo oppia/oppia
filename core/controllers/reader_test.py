@@ -3953,7 +3953,7 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.post_json(
-            '/explorehandler/checkpoint_reached_event/%s' % self.EXP_ID_0,
+            '/explorehandler/checkpoint_reached_event/%s' % exp_id,
             payload,
         )
 
