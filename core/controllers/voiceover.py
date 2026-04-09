@@ -286,7 +286,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {'schema': {'type': 'basestring'}},
         'exploration_version': {'schema': {'type': 'int'}},
-        'exploration_title': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
@@ -295,7 +294,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(
         self,
         exploration_id: str,
         exploration_version: int,
-        exploration_title: str,
     ) -> None:
         """Regenerates the voiceover for the given exploration data when an
         exploration is updated.
@@ -314,10 +312,7 @@ class RegenerateVoiceoverOnExpUpdateHandler(
                 ],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
-                exploration_title,
                 exploration_version,
-                feconf.SYSTEM_COMMITTER_ID,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)
 
@@ -475,12 +470,10 @@ class RegenerateVoiceoversForExplorationHandler(
         ):
             taskqueue_services.defer(
                 feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
                 ],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
                 language_accent_code,
-                self.user_id,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)

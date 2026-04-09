@@ -127,7 +127,7 @@ export class GuppyConfigurationService {
     Guppy.configure('buttons', ['controls']);
     Guppy.configure(
       'empty_content',
-      '\\color{grey}{\\text{\\small{Type a formula here.}}}'
+      '\\color{grey}{\\small \\text{Type a formula here.}}'
     );
     GuppyConfigurationService.serviceIsInitialized = true;
   }

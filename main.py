@@ -1424,18 +1424,9 @@ for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
-        if 'LIGHTWEIGHT' in page:
-            URLS.append(
-                get_redirect_route(
-                    r'/%s' % page['ROUTE'], oppia_root.OppiaLightweightRootPage
-                )
-            )
-        else:
-            URLS.append(
-                get_redirect_route(
-                    r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage
-                )
-            )
+        URLS.append(
+            get_redirect_route(r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage)
+        )
 
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend(
@@ -1591,6 +1582,10 @@ URLS.extend(
         get_redirect_route(
             r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
             tasks.FeedbackThreadStatusChangeEmailHandler,
+        ),
+        get_redirect_route(
+            r'%s' % feconf.TASK_URL_RETRY_FAILED_EMAIL,
+            tasks.RetryEmailHandler,
         ),
         get_redirect_route(
             r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler

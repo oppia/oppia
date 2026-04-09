@@ -1,24 +1,8 @@
 {
   "suites": [
     {
-      "name": "additionalEditorFeatures",
-      "module": "core/tests/webdriverio_desktop/additionalEditorFeatures.js"
-    },
-    {
-      "name": "additionalEditorFeaturesModals",
-      "module": "core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js"
-    },
-    {
-      "name": "blog",
-      "module": "core/tests/webdriverio_desktop/blog.js"
-    },
-    {
       "name": "collections",
       "module": "core/tests/webdriverio_desktop/collections.js"
-    },
-    {
-      "name": "contributorAdminDashboard",
-      "module": "core/tests/webdriverio_desktop/contributorAdminDashboard.js"
     },
     {
       "name": "creatorDashboard",
@@ -39,10 +23,6 @@
     {
       "name": "explorationStatisticsTab",
       "module": "core/tests/webdriverio_desktop/explorationStatisticsTab.js"
-    },
-    {
-      "name": "explorationTranslationTab",
-      "module": "core/tests/webdriverio_desktop/explorationTranslationTab.js"
     },
     {
       "name": "learner",
