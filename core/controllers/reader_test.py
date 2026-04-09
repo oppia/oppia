@@ -922,6 +922,24 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         )
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
+    def test_logged_in_without_system_recommendations_uses_only_author_recommendations(
+        self,
+    ) -> None:
+        """Check author recommendations are returned when system
+        recommendations are disabled and the exploration is completed outside a
+        collection.
+        """
+        self.login(self.NEW_USER_EMAIL)
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0,
+            include_system_recommendations=False,
+            author_recommended_ids_str='["7","9"]',
+        )
+
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+
     def test_logged_in_with_sysexps_and_authexps_no_col_has_some_exps(
         self,
     ) -> None:
