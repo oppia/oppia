@@ -83,7 +83,7 @@ def _get_change_list(
 class DoesExplorationExistTests(test_utils.GenericTestBase):
     """Tests for _does_exploration_exist()."""
 
-    def test_returns_false_when_exploration_does_not_exist(self) -> None;
+    def test_returns_false_when_exploration_does_not_exist(self) -> None:
         with self.swap_to_always_return(
             exp_fetchers, 'get_exploration_by_id', None
         ):
