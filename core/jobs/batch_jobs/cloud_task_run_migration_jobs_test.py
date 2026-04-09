@@ -649,7 +649,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 0.'
+                    'Number of VoiceoverRegenerationJobModels updated to FAILED: 0.'
                 )
             ]
         )
@@ -657,7 +657,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
     def test_no_stale_models(self) -> None:
         """Test that the job does not update non-stale models."""
         fresh_model = self.create_model(
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            cloud_task_models.VoiceoverRegenerationJobModel,
             id='exp1:taskrun1',
             exploration_id='exp1',
             cloud_task_run_id='taskrun1',
@@ -681,15 +681,13 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 0.'
+                    'Number of VoiceoverRegenerationJobModels updated to FAILED: 0.'
                 )
             ]
         )
 
-        updated_model = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
-                'exp1:taskrun1'
-            )
+        updated_model = cloud_task_models.VoiceoverRegenerationJobModel.get(
+            'exp1:taskrun1'
         )
 
         # Ruling out the possibility of None for mypy type checking.
@@ -709,7 +707,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
     def test_updates_stale_model_generating_statuses_to_failed(self) -> None:
         """Test that stale GENERATING statuses are marked as FAILED."""
         stale_model = self.create_model(
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            cloud_task_models.VoiceoverRegenerationJobModel,
             id='exp2:taskrun2',
             exploration_id='exp2',
             cloud_task_run_id='taskrun2',
@@ -741,18 +739,16 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 1.'
+                    'Number of VoiceoverRegenerationJobModels updated to FAILED: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp2:taskrun2.'
+                    'Updated state of VoiceoverRegenerationJobModel with ID: exp2:taskrun2.'
                 ),
             ]
         )
 
-        updated_model = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
-                'exp2:taskrun2'
-            )
+        updated_model = cloud_task_models.VoiceoverRegenerationJobModel.get(
+            'exp2:taskrun2'
         )
 
         # Ruling out the possibility of None for mypy type checking.
@@ -776,7 +772,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
     def test_updates_multiple_stale_models(self) -> None:
         """Test that the job updates multiple stale models correctly."""
         stale_model_1 = self.create_model(
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            cloud_task_models.VoiceoverRegenerationJobModel,
             id='exp3:taskrun3',
             exploration_id='exp3',
             cloud_task_run_id='taskrun3',
@@ -796,7 +792,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
         )
 
         stale_model_2 = self.create_model(
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            cloud_task_models.VoiceoverRegenerationJobModel,
             id='exp4:taskrun4',
             exploration_id='exp4',
             cloud_task_run_id='taskrun4',
@@ -816,7 +812,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
         )
 
         fresh_model = self.create_model(
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            cloud_task_models.VoiceoverRegenerationJobModel,
             id='exp5:taskrun5',
             exploration_id='exp5',
             cloud_task_run_id='taskrun5',
@@ -840,31 +836,25 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 2.'
+                    'Number of VoiceoverRegenerationJobModels updated to FAILED: 2.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp3:taskrun3.'
+                    'Updated state of VoiceoverRegenerationJobModel with ID: exp3:taskrun3.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp4:taskrun4.'
+                    'Updated state of VoiceoverRegenerationJobModel with ID: exp4:taskrun4.'
                 ),
             ]
         )
 
         updated_stale_model_1 = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
-                'exp3:taskrun3'
-            )
+            cloud_task_models.VoiceoverRegenerationJobModel.get('exp3:taskrun3')
         )
         updated_stale_model_2 = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
-                'exp4:taskrun4'
-            )
+            cloud_task_models.VoiceoverRegenerationJobModel.get('exp4:taskrun4')
         )
         updated_fresh_model = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
-                'exp5:taskrun5'
-            )
+            cloud_task_models.VoiceoverRegenerationJobModel.get('exp5:taskrun5')
         )
 
         # Ruling out the possibility of None for mypy type checking.
@@ -902,7 +892,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
     def test_should_update_model_that_is_exactly_three_days_old(self) -> None:
         """Test that a model exactly three days old gets updated."""
         exactly_three_days_old_model = self.create_model(
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            cloud_task_models.VoiceoverRegenerationJobModel,
             id='exp6:taskrun6',
             exploration_id='exp6',
             cloud_task_run_id='taskrun6',
@@ -926,10 +916,10 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 1.'
+                    'Number of VoiceoverRegenerationJobModels updated to FAILED: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp6:taskrun6.'
+                    'Updated state of VoiceoverRegenerationJobModel with ID: exp6:taskrun6.'
                 ),
             ]
         )
@@ -951,7 +941,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 0.'
+                    'Number of VoiceoverRegenerationJobModels updated to FAILED: 0.'
                 )
             ]
         )
@@ -959,7 +949,7 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJobTests(
     def test_audit_job_does_not_update_models(self) -> None:
         """Test that the audit job does not update stale models."""
         stale_model = self.create_model(
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel,
+            cloud_task_models.VoiceoverRegenerationJobModel,
             id='exp7:taskrun7',
             exploration_id='exp7',
             cloud_task_run_id='taskrun7',
@@ -986,18 +976,16 @@ class MarkStaleVoiceoverRegenerationJobModelsAsFailedAuditJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of VoiceoverRegenerationTaskMappingModels updated to FAILED: 1.'
+                    'Number of VoiceoverRegenerationJobModels updated to FAILED: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'Updated state of VoiceoverRegenerationTaskMappingModel with ID: exp7:taskrun7.'
+                    'Updated state of VoiceoverRegenerationJobModel with ID: exp7:taskrun7.'
                 ),
             ]
         )
 
-        updated_model = (
-            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
-                'exp7:taskrun7'
-            )
+        updated_model = cloud_task_models.VoiceoverRegenerationJobModel.get(
+            'exp7:taskrun7'
         )
 
         # Ruling out the possibility of None for mypy type checking.
