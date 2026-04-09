@@ -428,11 +428,11 @@ def install_elasticsearch_dev_server() -> None:
 
 
 def copy_missing_guppy_katex_fonts() -> None:
-    """Copies KaTeX fonts missing from guppy-dev/build/fonts.
+    """Copies any KaTeX font files missing from guppy-dev/build/fonts.
 
-    guppy-default.min.css references KaTeX_Main-BoldItalic font files that are
-    not present in guppy-dev/build/fonts for the Oppia-pinned guppy revision.
-    Copy them from guppy-dev/lib/katex/fonts so webpack can emit them.
+    Guppy CSS references KaTeX fonts from guppy-dev/build/fonts. Some Oppia
+    environments may have fonts present under guppy-dev/lib/katex/fonts but not
+    yet mirrored into guppy-dev/build/fonts, so we copy only the missing files.
     """
     source_dir = os.path.join(
         common.NODE_MODULES_PATH, 'guppy-dev', 'lib', 'katex', 'fonts'
@@ -440,22 +440,17 @@ def copy_missing_guppy_katex_fonts() -> None:
     target_dir = os.path.join(
         common.NODE_MODULES_PATH, 'guppy-dev', 'build', 'fonts'
     )
-    missing_font_filenames = [
-        'KaTeX_Main-BoldItalic.ttf',
-        'KaTeX_Main-BoldItalic.woff',
-        'KaTeX_Main-BoldItalic.woff2',
-    ]
 
     if not os.path.exists(source_dir):
         return
 
     os.makedirs(target_dir, exist_ok=True)
 
-    for filename in missing_font_filenames:
+    for filename in os.listdir(source_dir):
         source_file = os.path.join(source_dir, filename)
         target_file = os.path.join(target_dir, filename)
 
-        if not os.path.exists(source_file):
+        if not os.path.isfile(source_file):
             continue
 
         if not os.path.exists(target_file):
