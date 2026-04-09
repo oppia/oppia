@@ -440,8 +440,7 @@ class VoiceoverRegenerationBatchExecutionModel(base_models.BaseModel):
             VoiceoverRegenerationBatchExecutionModel.query(
                 datastore_services.all_of(
                     cls.parent_cloud_task_run_id == parent_cloud_task_run_id,
-                    cls.deleted  # pylint: disable=singleton-comparison
-                    == False,
+                    not cls.deleted,
                 )
             ).fetch()
         )

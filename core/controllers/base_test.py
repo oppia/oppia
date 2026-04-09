@@ -28,11 +28,10 @@ import os
 import re
 import types
 from unittest import mock
-from xml.sax import handler
 
 import webapp2
 import webtest
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
+from typing import Any, Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 from webapp2_extras import routes
 
 import main
@@ -49,11 +48,6 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
-
-import webapp2
-import webtest
-from typing import Any, Dict, Final, FrozenSet, List, Optional, TypedDict, cast
-from webapp2_extras import routes
 
 MYPY = False
 if MYPY:  # pragma: no cover

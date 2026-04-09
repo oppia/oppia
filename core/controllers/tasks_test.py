@@ -35,6 +35,7 @@ from core.domain import (
     user_services,
     voiceover_cloud_task_services,
     voiceover_regeneration_services,
+    voiceover_services,
 )
 from core.platform import models
 from core.tests import test_utils

@@ -22,7 +22,7 @@ import json
 
 import webapp2
 import webtest
-from typing import Dict, Final, List, Union
+from typing import Any, Dict, Final, List, Union
 
 from core import android_validation_constants, feature_flag_list, feconf
 from core.constants import constants
@@ -52,10 +52,6 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
-
-import webapp2
-import webtest
-from typing import Any, Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover

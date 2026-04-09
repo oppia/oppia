@@ -1313,7 +1313,7 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
     language_code_to_contents_mapping.update(extract_english_voiceover_texts_from_exploration(exploration))
 
     # Retrieve all translated contents of the exploration.
-    entity_translations = translation_fetchers.get_all_entity_translations_for_entity(
+    translation_fetchers.get_all_entity_translations_for_entity(
         feconf.TranslatableEntityType.EXPLORATION,
         exploration_id,
         exploration_version,

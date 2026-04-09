@@ -415,7 +415,8 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         class MockError(Exception):
             pass
 
-        function = lambda x: x**2
+        def function(x):
+            return x**2
         failing_func = test_utils.FailingFunction(
             function, MockError('Dummy Exception'), 2
         )
