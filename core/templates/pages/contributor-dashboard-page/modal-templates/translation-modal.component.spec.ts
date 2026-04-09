@@ -122,6 +122,7 @@ describe('Translation Modal Component', () => {
     inReviewCount: 12,
     totalCount: 50,
     translationsCount: 20,
+    reviewerOnlyContentCount: 0,
   };
   const getContentTranslatableItemWithText = (text: string) => {
     return {
