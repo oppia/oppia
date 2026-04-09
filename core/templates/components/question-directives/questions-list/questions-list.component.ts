@@ -643,7 +643,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.skillLinkageModificationsArray
       )
       .then(data => {
-        this.question = Question.createFromBackendDict(data);
+        if (data) {
+          this.question = Question.createFromBackendDict(data);
+        }
         this.skillLinkageModificationsArray = [];
         setTimeout(() => {
           this.questionsListService.resetPageNumber();
