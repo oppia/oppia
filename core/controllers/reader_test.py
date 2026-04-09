@@ -1706,6 +1706,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [],
         )
 
+    def test_logged_out_can_complete_exploration(self) -> None:
+        """Test handler for completion of explorations by logged-out users."""
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'final',
+            'version': 1,
+        }
+
+        response = self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
+            payload,
+        )
+
+        self.assertEqual(response, {})
+
     def test_exp_complete_event_in_collection(self) -> None:
         """Test handler for completion of explorations in the context of
         collections.
