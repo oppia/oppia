@@ -44,7 +44,7 @@ import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface TaggedMisconception {
-  skillId: string;
+  skillId: string | null;
   misconceptionId: number;
 }
 
@@ -66,7 +66,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Output() onSaveAnswerGroupDest = new EventEmitter<Outcome>();
   @Output() onSaveAnswerGroupDestIfStuck = new EventEmitter<Outcome>();
   @Output() onSaveAnswerGroupFeedback = new EventEmitter<Outcome>();
-  @Output() onSaveTaggedMisconception = new EventEmitter<TaggedMisconception>();
+  @Output() onSaveTaggedMisconception =
+    new EventEmitter<TaggedMisconception | null>();
 
   rulesMemento: Rule[];
   directiveSubscriptions = new Subscription();
@@ -86,7 +87,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     private platformFeatureService: PlatformFeatureService
   ) {}
 
-  sendOnSaveTaggedMisconception(event: TaggedMisconception): void {
+  sendOnSaveTaggedMisconception(event: TaggedMisconception | null): void {
     this.onSaveTaggedMisconception.emit(event);
   }
 

@@ -13,7 +13,7 @@
       be reflected after "Use this Image" button is clicked.
     </div>
   </div>
-  <div class="svg-editor" *ngIf="!isDiagramSaved()">
+  <div class="svg-editor" *ngIf="!isDiagramSaved()" [style.min-height.px]="diagramHeight + SVG_EDITOR_TOOLBAR_HEIGHT_PX">
     <div class="fabric-canvas" [attr.id]="canvasContainerId">
       <canvas [attr.id]="canvasID" class="fabric-canvas-container"></canvas>
     </div>
@@ -369,7 +369,7 @@
     cursor: default;
     left: 68px;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
     right: 0;
     top: 31px;
   }
