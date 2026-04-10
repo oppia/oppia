@@ -2334,7 +2334,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             ).to_dict(),
         )
 
-    def test_convert_html_in_draft_change_list_with_interaction_customization_args(
+    def test_convert_html_in_draft_change_list_with_widget_customization_args(
         self,
     ) -> None:
         draft_change_list = [
@@ -2342,7 +2342,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'state2',
-                    'property_name': 'interaction_customization_args',
+                    'property_name': 'widget_customization_args',
                     'new_value': {
                         'choices': {
                             'value': [
@@ -2354,8 +2354,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        # We intentionally call this helper directly to test this branch.
-        converted_draft_change_list = draft_upgrade_services.DraftUpgradeUtil._convert_html_in_draft_change_list(  # pylint: disable=protected-access
+
+        converted_draft_change_list = draft_upgrade_services.DraftUpgradeUtil._convert_html_in_draft_change_list(
             draft_change_list, lambda html: 'converted-' + html
         )
 
@@ -2365,7 +2365,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'state2',
-                    'property_name': 'interaction_customization_args',
+                    'property_name': 'widget_customization_args',
                     'new_value': {
                         'choices': {
                             'value': [
