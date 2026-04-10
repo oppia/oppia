@@ -84,6 +84,7 @@ describe('Community Library Browser', function () {
     // Check subscribed creators in preferences page.
     await communityLibraryBrowser.navigateToPreferencesPageUsingProfileDropdown();
     await communityLibraryBrowser.expectSubscribedCreatorsToContain('currAdm');
+    await communityLibraryBrowser.waitForPageToFullyLoad();
   });
 
   afterAll(async function () {
