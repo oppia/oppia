@@ -210,7 +210,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Oppia Blog | Oppia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Welcome to Oppia Blog!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Search results dey show",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "E dey show <[startingNumber]> - <[endingNumber]> of di total results wey dem search for.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "E dey show <[startingNumber]> - <[endingNumber]> of <[totalNumber]> tori.",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Add small picture for hia",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "Body",
