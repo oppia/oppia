@@ -33,6 +33,10 @@ interface SentenceHighlightInterval {
   providedIn: 'root',
 })
 export class AutomaticVoiceoverHighlightService {
+  // Small buffer time added because audio time is checked at intervals
+  // (e.g., checking every 100ms might miss very short tokens like 50ms).
+  private static readonly HIGHLIGHT_MATCH_TOLERANCE_SECS = 0.08;
+
   public languageCode!: string;
   public activeContentId!: string;
 
@@ -68,6 +72,10 @@ export class AutomaticVoiceoverHighlightService {
   }): void {
     this.highlightIdToSentenceMap = highlightIdToSentenceMap;
     this.removeSpacesAndTransformMathSymbols();
+  }
+
+  getUnmodifiedSentenceByHighlightId(highlightId: string): string {
+    return this.highlightIdToSentenceMap[highlightId];
   }
 
   removeSpacesAndTransformMathSymbols(): void {
@@ -157,6 +165,7 @@ export class AutomaticVoiceoverHighlightService {
   }
 
   transformMathSentenceContainingAudioSpecficWords(sentence: string): string {
+    sentence = this.escapeXml(sentence);
     let mathSymbolPronunciations: {[key: string]: string} = {};
     if (
       AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.hasOwnProperty(
@@ -179,7 +188,14 @@ export class AutomaticVoiceoverHighlightService {
     // core/platform/azure_speech_synthesis/azure_speech_synthesis_services.py.
     // It ensures that sentences from the frontend match those from the backend.
     if (sentence.includes(' - ')) {
-      sentence = sentence.replace(/-/g, mathSymbolPronunciations['-']);
+      if (sentence.includes('-')) {
+        const pattern = /(\d+)\s*-\s*(\d+)/g;
+        const pronunciation = mathSymbolPronunciations['-'];
+
+        sentence = sentence.replace(pattern, (_match, num1, num2) => {
+          return `${num1} ${pronunciation} ${num2}`;
+        });
+      }
     }
 
     if (sentence.includes(' + ')) {
@@ -218,6 +234,13 @@ export class AutomaticVoiceoverHighlightService {
     sentence = sentence.replace(/_{2,}/g, ' dash ');
 
     return sentence;
+  }
+
+  escapeXml(text: string): string {
+    return text
+      .replace(/&(?!amp;|lt;|gt;|quot;|apos;)/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   getSentencesToHighlightForTimeRanges(): void {
@@ -301,6 +324,24 @@ export class AutomaticVoiceoverHighlightService {
         );
       }
     );
+
+    // Fallback logic for very short intervals that might be skipped
+    // above. For example, a 50ms token can be missed if checks happen every
+    // 100ms, so we allow a small extra time window.
+    if (!currentsentenceIdAndInterval) {
+      currentsentenceIdAndInterval = this.sentenceHighlightIntervalList.find(
+        sentenceIdAndInterval => {
+          return (
+            currentAudioPlayerTimeInSecs >=
+              sentenceIdAndInterval.startTimeInSecs &&
+            currentAudioPlayerTimeInSecs <=
+              sentenceIdAndInterval.endTimeInSecs +
+                AutomaticVoiceoverHighlightService.HIGHLIGHT_MATCH_TOLERANCE_SECS
+          );
+        }
+      );
+    }
+
     return currentsentenceIdAndInterval?.highlightSentenceId;
   }
 }
