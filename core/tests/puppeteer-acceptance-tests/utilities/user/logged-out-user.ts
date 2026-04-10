@@ -7287,8 +7287,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(createAccountButton, {
       visible: true,
     });
-    await this.page.click(createAccountButton);
-    await this.waitForPageToFullyLoad();
+    await this.clickAndWaitForNavigation(createAccountButton, true);
   }
 
   /**
