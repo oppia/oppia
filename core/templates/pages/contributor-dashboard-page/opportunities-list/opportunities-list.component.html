@@ -4,7 +4,7 @@
       <input type="search"
              class="oppia-search-bar-input"
              [(ngModel)]="searchQuery"
-             (ngModelChange)="!searchQuery && applySearch()"
+             (ngModelChange)="searchQuery === '' && applySearch()"
              (keyup.enter)="applySearch()"
              placeholder="Search Skill or Topic ...">
       <button class="oppia-search-button" (click)="applySearch()">Search</button>

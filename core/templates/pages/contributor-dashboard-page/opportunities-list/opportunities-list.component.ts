@@ -257,7 +257,7 @@ export class OpportunitiesListComponent {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
     const query = this.searchQuery.toLowerCase();
-    if (!query) {
+    if (query) {
       this.visibleOpportunities = this.filteredOpportunities.slice(
         startIndex,
         endIndex
