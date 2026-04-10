@@ -77,7 +77,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
   @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
-  @ViewChild('br') brTagPortal: TemplateRef<unknown>;
   @Input() rteString: string;
   @Input() rteStringContext!: string;
   @Input() altTextIsDisplayed: boolean = false;
@@ -174,14 +173,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
-    } else if (node.nodeName === 'SPAN') {
-      let text = '';
-      node.childNodes.forEach(child => {
-        text += this.getReadableTextFromNode(child);
-      });
-      return text;
-    } else {
-      return '';
     }
   }
 
@@ -193,22 +184,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
 
-    if (node.nodeName === 'BR') {
-      return [node];
-    }
-
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
-      // Keep sentence-separating whitespace as independent text nodes so that
-      // the original content spacing is preserved after wrapping.
-      const sentenceSplitRegex = new RegExp(`(${sentenceRegex.source})`, 'g');
-      const sentences = textContent.split(sentenceSplitRegex);
+      const sentences = textContent.split(sentenceRegex);
       let textNodesForSentences: Text[] = [];
 
       for (let sentence of sentences) {
-        if (sentence === '') {
-          continue;
-        }
         textNodesForSentences.push(document.createTextNode(sentence));
       }
       return textNodesForSentences;
@@ -247,94 +228,41 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       } else {
         // The earliest parent tag that contains texts that should be voiceovered.
         let textContent = '';
-        let nodeTemp = node.cloneNode();
-        if (currentNodeName === 'LI') {
-          const meaningfulChildren = Array.from(node.childNodes).filter(
-            child =>
-              !(
-                child.nodeType === Node.TEXT_NODE &&
-                child.textContent?.trim() === ''
-              )
-          );
-          const hasParagraphChild = meaningfulChildren.some(
-            child => child.nodeName === 'P'
-          );
-          if (hasParagraphChild) {
-            // Just recurse into children without wrapping the LI itself.
-            let nodeTemp = node.cloneNode();
-            updatedChildNodes.forEach(child => nodeTemp.appendChild(child));
-            return nodeTemp;
-          }
-        }
-
-        let costomNodeAsChildInParentNode = false;
-        for (let tempChildNode of updatedChildNodes) {
-          if (this.customOppiaTags.includes(tempChildNode.nodeName)) {
-            costomNodeAsChildInParentNode = true;
-            break;
-          }
-        }
-
-        if (costomNodeAsChildInParentNode) {
-          let nodeTemp = node.cloneNode();
-          let spanTagElement = document.createElement('span');
-          updatedChildNodes.forEach(child => spanTagElement.appendChild(child));
-          spanTagElement.classList.add(`highlightBlock${this.index}`);
-          this.highlightIdToSentenceText[`highlightBlock${this.index}`] =
-            this.getReadableTextFromNode(spanTagElement);
-          this.index++;
-          nodeTemp.appendChild(spanTagElement);
-          return nodeTemp;
-        }
 
         for (let tempChildNode of updatedChildNodes) {
-          textContent += this.getReadableTextFromNode(tempChildNode);
+          textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
         }
 
         const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
 
         let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
+
+        let spanNodeList = [];
         let spanTagElement = document.createElement('span');
         let nextSentenceOffset = '';
-        // Whitespace separators between sentences should stay outside
-        // highlight spans to preserve the original rendered content exactly.
-        let pendingWhitespaceNodes: Node[] = [];
 
         for (let childNode of updatedChildNodes) {
           let currentText = this.getReadableTextFromNode(childNode);
 
-          if (
-            currentText.trim() === '' &&
-            spanTagElement.childNodes.length === 0 &&
-            nextSentenceOffset === ''
-          ) {
-            pendingWhitespaceNodes.push(childNode);
-            continue;
-          }
+          let sentence = nextSentenceOffset + currentText;
 
-          let sentence = (nextSentenceOffset + currentText).trim();
-          currentSentenceToMatch = currentSentenceToMatch?.trim();
+          // Removing spaces to avoid ambiguity in sentence matching.
+          sentence = sentence.split(' ').join('').trim();
+          currentSentenceToMatch = currentSentenceToMatch
+            ?.split(' ')
+            ?.join('')
+            ?.trim();
 
           spanTagElement.appendChild(childNode);
 
           if (sentence === currentSentenceToMatch) {
-            let textInsideSpanTag = '';
-            for (let tempChildNode of spanTagElement.childNodes) {
-              textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
+            if (spanNodeList.length > 0) {
+              let spaceElement = document.createElement('span');
+              // eslint-disable-next-line oppia/no-inner-html
+              spaceElement.innerHTML = ' ';
+              spanNodeList.push(spaceElement);
             }
-
-            pendingWhitespaceNodes.forEach(n => nodeTemp.appendChild(n));
-            pendingWhitespaceNodes = [];
-
-            if (textInsideSpanTag.trim() !== '') {
-              let elementClass = `highlightBlock${this.index}`;
-              spanTagElement.classList.add(elementClass);
-              this.index++;
-              this.highlightIdToSentenceText[elementClass] =
-                textInsideSpanTag.trim();
-            }
-
-            nodeTemp.appendChild(spanTagElement);
+            spanNodeList.push(spanTagElement);
             spanTagElement = document.createElement('span');
             nextSentenceOffset = '';
             currentSentenceToMatch = sentencesInEarliestParentTag.shift();
@@ -343,12 +271,26 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
-        pendingWhitespaceNodes.forEach(n => nodeTemp.appendChild(n));
-        // Preserve all content even if it did not complete a sentence match.
-        if (spanTagElement.childNodes.length > 0) {
-          Array.from(spanTagElement.childNodes).forEach(n =>
-            nodeTemp.appendChild(n)
-          );
+        let nodeTemp = node.cloneNode();
+
+        for (let spanNode of spanNodeList) {
+          let textInsideSpanTag = '';
+
+          for (let tempChildNode of spanNode.childNodes) {
+            textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
+          }
+
+          if (textInsideSpanTag === ' ') {
+            nodeTemp.appendChild(spanNode);
+            continue;
+          }
+
+          let elementClass = `highlightBlock${this.index}`;
+          spanNode.classList.add(elementClass);
+          this.index++;
+
+          nodeTemp.appendChild(spanNode);
+          this.highlightIdToSentenceText[elementClass] = textInsideSpanTag;
         }
 
         return nodeTemp;
@@ -637,8 +579,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       );
     for (let i = 0; i < elements.length; i++) {
       let element = elements[i] as HTMLElement;
-      let readableText = this.getReadableTextFromNode(element as Node);
-      if (readableText === textContent) {
+      if (element.textContent === textContent) {
         return element;
       }
     }
