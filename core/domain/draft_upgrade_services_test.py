@@ -2354,8 +2354,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
-
-        converted_draft_change_list = draft_upgrade_services.DraftUpgradeUtil._convert_html_in_draft_change_list(
+        # We intentionally call this helper directly to test this branch.
+        converted_draft_change_list = draft_upgrade_services.DraftUpgradeUtil._convert_html_in_draft_change_list(  # pylint: disable=protected-access
             draft_change_list, lambda html: 'converted-' + html
         )
 
