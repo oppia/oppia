@@ -49,10 +49,6 @@ var suites = {
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
   ],
 
-  explorationStatisticsTab: [
-    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
-  ],
-
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
   ],

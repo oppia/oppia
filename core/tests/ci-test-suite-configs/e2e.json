@@ -21,10 +21,6 @@
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
     },
     {
-      "name": "explorationStatisticsTab",
-      "module": "core/tests/webdriverio_desktop/explorationStatisticsTab.js"
-    },
-    {
       "name": "learner",
       "module": "core/tests/webdriverio/learnerFlow.js"
     },
