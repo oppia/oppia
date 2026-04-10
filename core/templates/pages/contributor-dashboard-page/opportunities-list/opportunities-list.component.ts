@@ -323,6 +323,21 @@ export class OpportunitiesListComponent {
 
   applySearch(): void {
     const query = this.searchQuery.toLowerCase();
+    if (!query) {
+      this.filteredOpportunities = [];
+      this.activePageNumber = 1;
+      this.visibleOpportunities = this.opportunities.slice(
+        0,
+        this.OPPORTUNITIES_PAGE_SIZE
+      );
+      this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+        this.opportunities,
+        this.OPPORTUNITIES_PAGE_SIZE,
+        1,
+        this.more
+      );
+      return;
+    }
     this.filteredOpportunities = this.opportunities.filter(opportunity => {
       const headingText = opportunity?.heading?.toLowerCase() ?? '';
       const subheadingText = opportunity?.subheading?.toLowerCase() ?? '';
