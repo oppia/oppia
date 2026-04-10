@@ -2334,6 +2334,50 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             ).to_dict(),
         )
 
+    def test_convert_html_in_draft_change_list_with_interaction_customization_args(
+        self,
+    ) -> None:
+        draft_change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'state2',
+                    'property_name': 'interaction_customization_args',
+                    'new_value': {
+                        'choices': {
+                            'value': [
+                                '<p>1</p>',
+                                {'html': '<p>2</p>'},
+                            ]
+                        }
+                    },
+                }
+            )
+        ]
+
+        converted_draft_change_list = draft_upgrade_services.DraftUpgradeUtil._convert_html_in_draft_change_list(
+            draft_change_list, lambda html: 'converted-' + html
+        )
+
+        self.assertEqual(
+            converted_draft_change_list[0].to_dict(),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'state2',
+                    'property_name': 'interaction_customization_args',
+                    'new_value': {
+                        'choices': {
+                            'value': [
+                                'converted-<p>1</p>',
+                                {'html': 'converted-<p>2</p>'},
+                            ]
+                        }
+                    },
+                }
+            ).to_dict(),
+        )
+
     def test_convert_states_v32_dict_to_v33_dict(self) -> None:
         draft_change_list_v32 = [
             exp_domain.ExplorationChange(

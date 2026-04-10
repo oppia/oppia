@@ -447,6 +447,40 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             }
         ]
 
+        # State with units that is not a list.
+        malformed_state_9 = self._create_base_malformed_state_dict(
+            'content_16', 'default_outcome_17'
+        )
+        interaction_9 = malformed_state_9['interaction']
+        assert isinstance(interaction_9, dict)
+        default_outcome_9 = interaction_9['default_outcome']
+        interaction_9['id'] = 'NumberWithUnits'
+        interaction_9['answer_groups'] = [
+            {
+                'outcome': default_outcome_9,
+                'rule_specs': [
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': {
+                            'f': {
+                                'type': 'real',
+                                'real': 2,
+                                'fraction': {
+                                    'isNegative': False,
+                                    'wholeNumber': 0,
+                                    'numerator': 0,
+                                    'denominator': 1,
+                                },
+                                'units': 'not_a_list',
+                            }
+                        },
+                    }
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            }
+        ]
+
         # Valid state with actual units to ensure job runs and produces output.
         valid_state = self._create_state_with_units(
             [{'unit': 'cm', 'exponent': 1}]
@@ -465,6 +499,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
                 'malformed_1': malformed_state_1,
                 'malformed_2': malformed_state_2,
                 'malformed_3': malformed_state_3,
+                'malformed_9': malformed_state_9,
                 'malformed_4': malformed_state_4,
                 'malformed_5': malformed_state_5,
                 'malformed_6': malformed_state_6,

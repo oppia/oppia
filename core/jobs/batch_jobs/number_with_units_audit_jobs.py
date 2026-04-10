@@ -120,7 +120,7 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
         for answer_group in answer_groups:
             # Here we use object because list entries from persisted JSON must
             # be treated as unknown until runtime checks pass.
-            # Here use cast because each list item must be treated as an
+            # Here we use cast because each list item must be treated as an
             # unknown value before runtime type checks are applied.
             answer_group = cast(object, answer_group)
             if not isinstance(answer_group, dict):
@@ -133,7 +133,7 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
             for rule_spec in rule_specs:
                 # Here we use object because list entries from persisted JSON
                 # must be treated as unknown until runtime checks pass.
-                # Here use cast because each rule spec is handled as unknown
+                # Here we use cast because each rule spec is handled as unknown
                 # until runtime validation confirms its structure.
                 rule_spec = cast(object, rule_spec)
                 if not isinstance(rule_spec, dict):
@@ -156,7 +156,7 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
                 for unit_dict in units:
                     # Here we use object because list entries from persisted
                     # JSON must be treated as unknown until runtime checks pass.
-                    # Here use cast because each unit entry is treated as
+                    # Here we use cast because each unit entry is treated as
                     # unknown before validating that it is a dict.
                     unit_dict = cast(object, unit_dict)
                     if not isinstance(unit_dict, dict):

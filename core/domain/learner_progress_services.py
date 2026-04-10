@@ -224,7 +224,7 @@ def _save_completed_activities(
         'learnt_topic_ids': activities_completed.learnt_topic_ids,
     }
 
-    # Here use cast because get_by_id() can return None and this function
+    # Here we use cast because get_by_id() can return None and this function
     # handles both create and update flows explicitly.
     completed_activities_model = cast(
         Optional[user_models.CompletedActivitiesModel],
@@ -2102,7 +2102,7 @@ def get_learner_dashboard_activities(
     )
 
     # If completed model is present.
-    # Here use cast because datastore fetch returns generic Optional models and
+    # Here we use cast because datastore fetch returns generic Optional models and
     # we narrow to the expected CompletedActivitiesModel slot.
     completed_activities_model = cast(
         Optional[user_models.CompletedActivitiesModel],
@@ -2127,7 +2127,7 @@ def get_learner_dashboard_activities(
         learnt_topic_ids = []
 
     # If incomplete model is present.
-    # Here use cast because datastore fetch returns generic Optional models and
+    # Here we use cast because datastore fetch returns generic Optional models and
     # we narrow to the expected IncompleteActivitiesModel slot.
     incomplete_activities_model = cast(
         Optional[user_models.IncompleteActivitiesModel],
@@ -2152,7 +2152,7 @@ def get_learner_dashboard_activities(
         partially_learnt_topic_ids = []
 
     # If learner playlist model is present.
-    # Here use cast because datastore fetch returns generic Optional models and
+    # Here we use cast because datastore fetch returns generic Optional models and
     # we narrow to the expected LearnerPlaylistModel slot.
     learner_playlist_model = cast(
         Optional[user_models.LearnerPlaylistModel],
@@ -2171,7 +2171,7 @@ def get_learner_dashboard_activities(
         collection_playlist_ids = []
 
     # If learner goals model is present.
-    # Here use cast because datastore fetch returns generic Optional models and
+    # Here we use cast because datastore fetch returns generic Optional models and
     # we narrow to the expected LearnerGoalsModel slot.
     learner_goals_model = cast(
         Optional[user_models.LearnerGoalsModel], learner_progress_models[3][0]
@@ -2254,7 +2254,7 @@ def get_topics_and_stories_progress(
             + untracked_topic_ids
         )
     )
-    # Here use cast because this fetch returns grouped generic models and we
+    # Here we use cast because this fetch returns grouped generic models and we
     # narrow each group to the concrete summary model types by position.
     activity_models = cast(
         Tuple[
@@ -2284,7 +2284,7 @@ def get_topics_and_stories_progress(
     completed_story_summaries: List[Optional[story_domain.StorySummary]] = []
     for story_summary_model in completed_story_models:
         if story_summary_model is not None:
-            # Here use cast because story_summary_model is narrowed by the
+            # Here we use cast because story_summary_model is narrowed by the
             # None-check and must match StorySummaryModel for the fetcher API.
             story_model = cast(
                 story_models.StorySummaryModel, story_summary_model
@@ -2470,7 +2470,7 @@ def get_collection_progress(
             + collection_playlist_ids
         )
     )
-    # Here use cast because this fetch returns grouped generic models and we
+    # Here we use cast because this fetch returns grouped generic models and we
     # narrow the only group to CollectionSummaryModel entries.
     activity_models = cast(
         Tuple[List[Optional[collection_models.CollectionSummaryModel]],],
@@ -2618,7 +2618,7 @@ def get_exploration_progress(
             + exploration_playlist_ids
         )
     )
-    # Here use cast because this fetch returns grouped generic models and we
+    # Here we use cast because this fetch returns grouped generic models and we
     # narrow the only group to ExpSummaryModel entries.
     activity_models = cast(
         Tuple[List[Optional[exp_models.ExpSummaryModel]],],

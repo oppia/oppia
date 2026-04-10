@@ -3223,7 +3223,7 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    # Here use cast because translation_html can be either str or List[str]
+    # Here we use cast because translation_html can be either str or List[str]
     # for legacy suggestions and we need both branches below.
     translation_html = cast(
         Union[str, List[str]], suggestion.change_cmd.translation_html
@@ -3403,7 +3403,7 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    # Here use cast because translation_html can be either str or List[str]
+    # Here we use cast because translation_html can be either str or List[str]
     # for legacy suggestions and we need both branches below.
     translation_html = cast(
         Union[str, List[str]], suggestion.change_cmd.translation_html
@@ -3570,7 +3570,7 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    # Here use cast because translation_html can be either str or List[str]
+    # Here we use cast because translation_html can be either str or List[str]
     # for legacy suggestions and we need both branches below.
     translation_html = cast(
         Union[str, List[str]], suggestion.change_cmd.translation_html
@@ -3743,7 +3743,7 @@ def update_question_contribution_stats_at_submission(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        # Here use cast because get_by_id() can return None and this branch
+        # Here we use cast because get_by_id() can return None and this branch
         # explicitly handles both Optional outcomes.
         question_submitter_total_stat_model = cast(
             Optional[
@@ -3864,7 +3864,7 @@ def update_question_contribution_stats_at_review(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        # Here use cast because get_by_id() can return None and this branch
+        # Here we use cast because get_by_id() can return None and this branch
         # explicitly handles both Optional outcomes.
         question_submitter_total_stat_model = cast(
             Optional[
@@ -3980,7 +3980,7 @@ def update_question_review_stats(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id
     ):
-        # Here use cast because get_by_id() can return None and this branch
+        # Here we use cast because get_by_id() can return None and this branch
         # explicitly handles both Optional outcomes.
         question_reviewer_total_stat_model = cast(
             Optional[

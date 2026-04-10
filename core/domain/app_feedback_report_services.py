@@ -191,7 +191,7 @@ def _update_report_stats_model_in_transaction(
         )
     )
     stats_model = (
-        # Here use cast because get_by_id() can return None and this function
+        # Here we use cast because get_by_id() can return None and this function
         # handles both create and update flows.
         cast(
             Optional[app_feedback_report_models.AppFeedbackReportStatsModel],
@@ -226,7 +226,7 @@ def _update_report_stats_model_in_transaction(
             stats_id, platform, ticket_id, date, 0, stats_dict
         )
         stats_model = (
-            # Here use cast because get_by_id() can return None and this
+            # Here we use cast because get_by_id() can return None and this
             # branch re-fetches the Optional model after create.
             cast(
                 Optional[
