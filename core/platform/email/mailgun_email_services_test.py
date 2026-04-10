@@ -22,8 +22,7 @@ import os
 import textwrap
 from unittest import mock
 
-from core.domain import platform_parameter_list
-from core.domain import email_services
+from core.domain import email_services, platform_parameter_list
 from core.platform import models
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils

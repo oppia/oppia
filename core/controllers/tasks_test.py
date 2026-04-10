@@ -21,6 +21,7 @@ from unittest import mock
 
 from core import feconf
 from core.domain import (
+    cloud_task_domain,
     email_manager,
     email_services,
     exp_fetchers,
@@ -259,8 +260,7 @@ class TasksTests(test_utils.EmailTestBase):
             'The Oppia Contributor Dashboard Team'
         )
         self.assertEqual(messages[0].html, expected_email_html_body)
-
-    self.assertEqual(messages[0].subject, expected_email_subject)
+        self.assertEqual(messages[0].subject, expected_email_subject)
 
     @test_utils.set_platform_parameters(
         [
@@ -294,7 +294,7 @@ class TasksTests(test_utils.EmailTestBase):
             threadlist = feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False
             )
-            thread_id = threadlist.id
+            thread_id = threadlist[0].id
             feedback_services.create_message(
                 thread_id, self.user_id_b, None, None, 'user b message'
             )
