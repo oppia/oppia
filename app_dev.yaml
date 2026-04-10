@@ -118,6 +118,13 @@ handlers:
   upload: core/templates/(.*\.(html))$
   secure: always
   expiration: "0"
+- url: /third_party/generated
+  static_dir: third_party/generated
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
 - url: /extensions/interactions/(.*)/static/(.*\.(css|png))
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*\.(css|png))

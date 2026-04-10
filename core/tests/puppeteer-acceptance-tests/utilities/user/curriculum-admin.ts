@@ -87,6 +87,7 @@ const addStudyGuideSectionModalCancelButton =
   '.e2e-test-add-study-guide-section-modal-cancel-button';
 const addStudyGuideSectionContentLength =
   '.e2e-test-add-study-guide-section-content-length-error';
+const addStudyGuideSectionModal = '.e2e-test-add-study-guide-section-modal';
 const deleteStudyGuideSectionButton = '.e2e-test-delete-example-button';
 const expandedStudyGuideSectionTileHeading =
   '.e2e-test-study-guide-section-heading-field';
@@ -1067,6 +1068,9 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.typeInInputField(richTextAreaField, sectionContent);
     await this.clickOnElementWithSelector(addStudyGuideSectionModalSaveButton);
+    await this.page.waitForSelector(addStudyGuideSectionModal, {
+      hidden: true,
+    });
     if (this.isViewportAtMobileWidth()) {
       await this.scrollToBottomOfPage();
     }
@@ -1123,6 +1127,9 @@ export class CurriculumAdmin extends TopicManager {
     );
     await this.clickOnElementWithSelector(rteComponentSaveButton);
     await this.clickOnElementWithSelector(addStudyGuideSectionModalSaveButton);
+    await this.page.waitForSelector(addStudyGuideSectionModal, {
+      hidden: true,
+    });
     if (this.isViewportAtMobileWidth()) {
       await this.scrollToBottomOfPage();
     }
@@ -1233,16 +1240,12 @@ export class CurriculumAdmin extends TopicManager {
     );
     await this.clickOnElementWithSelector(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.page.evaluate(async textContent => {
-      await navigator.clipboard.writeText(textContent);
-    }, 'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(72));
-
-    const richTextAreaFieldElement =
-      await this.getElementInParent(richTextAreaField);
-    await richTextAreaFieldElement.focus();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('KeyV');
-    await this.page.keyboard.up('Control');
+    await this.typeInInputField(
+      richTextAreaField,
+      'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(
+        72
+      )
+    );
     await this.page.waitForSelector(addStudyGuideSectionContentLength, {
       visible: true,
     });
@@ -1259,6 +1262,9 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(
       addStudyGuideSectionModalCancelButton
     );
+    await this.page.waitForSelector(addStudyGuideSectionModal, {
+      hidden: true,
+    });
   }
 
   /**
