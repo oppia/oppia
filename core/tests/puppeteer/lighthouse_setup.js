@@ -273,8 +273,7 @@ const getTopicEditorUrl = async function (browser, page) {
     await page.waitForSelector(confirmTopicCreationButton, {visible: true});
     await page.waitForTimeout(5000);
     await page.click(confirmTopicCreationButton);
-    // Doing waitForTimeout(10000) to handle new tab being opened.
-    await page.waitForTimeout(10000);
+    await page.waitForNavigation({waitUntil: networkIdle});
     await browser.pages();
 
     // Refresh page and click on topic link.
@@ -319,7 +318,8 @@ const getStoryEditorUrl = async function (browser, page) {
     await page.waitForSelector(confirmStoryCreationButton, {visible: true});
     await page.waitForTimeout(5000);
     await page.click(confirmStoryCreationButton);
-    await page.waitForTimeout(15000);
+    await page.waitForNavigation({waitUntil: networkIdle});
+    await page.waitForSelector('.e2e-test-story-title', {visible: true});
     storyEditorUrl = await page.url();
     storyId = storyEditorUrl.split('/')[4];
   } catch (e) {
@@ -465,7 +465,15 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(publishChangesButton);
     await page.click(publishChangesButton);
-    await page.waitForTimeout(10000);
+    const successMessage = 'Changes saved.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const el = document.querySelector('.oppia-status-message-container');
+        return el ? el.textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
