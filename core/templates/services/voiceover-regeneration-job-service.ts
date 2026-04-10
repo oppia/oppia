@@ -29,7 +29,7 @@ import {VoiceoverLanguageManagementService} from './voiceover-language-managemen
 @Injectable({
   providedIn: 'root',
 })
-export class VoiceoverRegenerationTaskMappingService {
+export class VoiceoverRegenerationJobService {
   public explorationID!: string;
 
   public languageAccentToContentStatusMap: LanguageAccentToContentStatusMap =

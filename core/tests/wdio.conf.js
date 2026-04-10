@@ -56,6 +56,8 @@ var suites = {
 
   explorationTranslationTab: [
     './core/tests/webdriverio_desktop/explorationTranslationTab.js'
+  learner: [
+    './core/tests/webdriverio/learnerFlow.js'
   ],
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'

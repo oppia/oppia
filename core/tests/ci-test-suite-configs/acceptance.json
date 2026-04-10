@@ -117,6 +117,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/save-and-publish-the-exploration.spec.ts"
     },
     {
+      "name": "lesson-creator/view-feedback-and-statistics-of-the-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts"
+    },
+    {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts"
     },
