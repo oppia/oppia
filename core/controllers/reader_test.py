@@ -2746,6 +2746,8 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StateHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
+        # Here use cast because get() returns Optional model in stubs while
+        # count() above confirms that exactly one log entry exists.
         model = cast(stats_models.StateHitEventLogEntryModel, all_models.get())
 
         self.assertEqual(model.exploration_id, exp_id)
@@ -2851,6 +2853,8 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StateCompleteEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
+        # Here use cast because get() returns Optional model in stubs while
+        # count() above confirms that exactly one log entry exists.
         model = cast(
             stats_models.StateCompleteEventLogEntryModel, all_models.get()
         )
@@ -2928,6 +2932,8 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
+        # Here use cast because get() returns Optional model in stubs while
+        # count() above confirms that exactly one log entry exists.
         model = cast(
             stats_models.LeaveForRefresherExplorationEventLogEntryModel,
             all_models.get(),
@@ -3077,6 +3083,8 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.StartExplorationEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
+        # Here use cast because get() returns Optional model in stubs while
+        # count() above confirms that exactly one log entry exists.
         model = cast(
             stats_models.StartExplorationEventLogEntryModel,
             all_models.get(),
@@ -3154,6 +3162,8 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models.count(), 1)
 
+        # Here use cast because get() returns Optional model in stubs while
+        # count() above confirms that exactly one log entry exists.
         model = cast(
             stats_models.ExplorationActualStartEventLogEntryModel,
             all_models.get(),
@@ -3226,6 +3236,8 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
         all_models = stats_models.SolutionHitEventLogEntryModel.get_all()
         self.assertEqual(all_models.count(), 1)
 
+        # Here use cast because get() returns Optional model in stubs while
+        # count() above confirms that exactly one log entry exists.
         model = cast(
             stats_models.SolutionHitEventLogEntryModel,
             all_models.get(),

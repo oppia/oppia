@@ -1076,6 +1076,9 @@ class DraftUpgradeUtil:
                 change.property_name
                 == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
             ):
+                # Here use cast because this branch only runs for
+                # answer_groups updates, where new_value is
+                # List[AnswerGroupDict].
                 new_value_list = cast(
                     List[state_domain.AnswerGroupDict], change.new_value
                 )

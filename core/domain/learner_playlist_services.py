@@ -66,6 +66,8 @@ def save_learner_playlist(
         learner_playlist: LearnerPlaylist. The learner playlist domain object to
             be saved in the datastore.
     """
+    # Here use cast because get_by_id() can return None and this branch
+    # explicitly handles both Optional outcomes.
     learner_playlist_model = cast(
         Optional[user_models.LearnerPlaylistModel],
         user_models.LearnerPlaylistModel.get_by_id(learner_playlist.id),

@@ -88,6 +88,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_get_mypy_cmd_without_files(self) -> None:
         expected_cmd = [
             'mypy',
+            '--warn-unreachable',
             '--exclude',
             'dir1/|dir2/',
             '--config-file',

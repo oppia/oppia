@@ -111,31 +111,53 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
         if interaction_dict.get('id') != 'NumberWithUnits':
             return
 
+        # Here we use object because this value comes from persisted JSON and
+        # must be runtime-validated before treating it as a specific type.
         answer_groups: object = interaction_dict.get('answer_groups', [])
         if not isinstance(answer_groups, list):
             return
 
         for answer_group in answer_groups:
+            # Here we use object because list entries from persisted JSON must
+            # be treated as unknown until runtime checks pass.
+            # Here use cast because each list item must be treated as an
+            # unknown value before runtime type checks are applied.
             answer_group = cast(object, answer_group)
             if not isinstance(answer_group, dict):
                 continue
+            # Here we use object because rule_specs can be malformed in
+            # persisted payloads and are validated with isinstance checks.
             rule_specs: object = answer_group.get('rule_specs', [])
             if not isinstance(rule_specs, list):
                 continue
             for rule_spec in rule_specs:
+                # Here we use object because list entries from persisted JSON
+                # must be treated as unknown until runtime checks pass.
+                # Here use cast because each rule spec is handled as unknown
+                # until runtime validation confirms its structure.
                 rule_spec = cast(object, rule_spec)
                 if not isinstance(rule_spec, dict):
                     continue
+                # Here we use object because inputs are loaded from storage
+                # and need runtime validation before dict access.
                 inputs: object = rule_spec.get('inputs', {})
                 if not isinstance(inputs, dict):
                     continue
+                # Here we use object because the "f" field can be malformed in
+                # legacy payloads and must be validated first.
                 number_with_units: object = inputs.get('f')
                 if not isinstance(number_with_units, dict):
                     continue
+                # Here we use object because units data comes from persisted
+                # state and is validated at runtime before iteration.
                 units: object = number_with_units.get('units', [])
                 if not isinstance(units, list):
                     continue
                 for unit_dict in units:
+                    # Here we use object because list entries from persisted
+                    # JSON must be treated as unknown until runtime checks pass.
+                    # Here use cast because each unit entry is treated as
+                    # unknown before validating that it is a dict.
                     unit_dict = cast(object, unit_dict)
                     if not isinstance(unit_dict, dict):
                         continue
