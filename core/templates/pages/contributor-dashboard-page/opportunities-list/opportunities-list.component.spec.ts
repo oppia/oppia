@@ -1065,4 +1065,87 @@ describe('Opportunities List Component', () => {
       expect(component.visibleOpportunities.length).toBe(2);
     });
   });
+  describe('applySearch with pagination', () => {
+    beforeEach(() => {
+      component.opportunities = Array.from(
+        {length: 25},
+        (_, i) =>
+          ({
+            id: `alg_${i + 1}`,
+            heading: `Algebra Topic ${i + 1}`,
+            subheading: 'Math basics',
+            topicName: 'Math',
+            labelText: 'text',
+            labelColor: 'red',
+            progressPercentage: 50,
+            inReviewCount: 0,
+            totalCount: 100,
+            translationsCount: 50,
+            actionButtonTitle: '',
+            isPinned: false,
+          }) as ExplorationOpportunity
+      );
+    });
+
+    it('should populate filteredOpportunities and reset to page 1', () => {
+      component.activePageNumber = 3;
+      component.searchQuery = 'algebra';
+      component.applySearch();
+
+      expect(component.filteredOpportunities.length).toBe(25);
+      expect(component.activePageNumber).toBe(1);
+      expect(component.visibleOpportunities.length).toBe(10);
+    });
+
+    it('should set userIsOnLastPage false when filtered results span multiple pages', () => {
+      component.searchQuery = 'algebra';
+      component.applySearch();
+
+      expect(component.userIsOnLastPage).toBe(false);
+    });
+
+    it('should set userIsOnLastPage true on last filtered page', () => {
+      component.searchQuery = 'algebra';
+      component.applySearch();
+
+      component.gotoPage(3);
+      expect(component.userIsOnLastPage).toBe(true);
+      expect(component.activePageNumber).toBe(3);
+    });
+
+    it('should paginate over filtered results on gotoPage', () => {
+      component.searchQuery = 'algebra';
+      component.applySearch();
+
+      component.gotoPage(2);
+      expect(component.visibleOpportunities.length).toBe(10);
+      expect(component.visibleOpportunities[0].heading).toBe(
+        'Algebra Topic 11'
+      );
+      expect(component.activePageNumber).toBe(2);
+    });
+
+    it('should show last partial page of filtered results', () => {
+      component.searchQuery = 'algebra';
+      component.applySearch();
+
+      component.gotoPage(3);
+      expect(component.visibleOpportunities.length).toBe(5);
+      expect(component.visibleOpportunities[0].heading).toBe(
+        'Algebra Topic 21'
+      );
+    });
+
+    it('should clear filteredOpportunities and restore full list when query is empty', () => {
+      component.searchQuery = 'algebra';
+      component.applySearch();
+      expect(component.filteredOpportunities.length).toBe(25);
+
+      component.searchQuery = '';
+      component.applySearch();
+      expect(component.filteredOpportunities.length).toBe(0);
+      expect(component.visibleOpportunities.length).toBe(10);
+      expect(component.activePageNumber).toBe(1);
+    });
+  });
 });
