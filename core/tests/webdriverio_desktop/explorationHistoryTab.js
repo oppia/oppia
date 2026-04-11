@@ -322,74 +322,82 @@ describe('Exploration history', function () {
         highlighted: true,
       },
       28: {
-        text: '  default_outcome:',
+        text: '    allowExponentialNotation:',
         highlighted: true,
       },
       29: {
-        text: '    dest: first',
+        text: '      value: false',
         highlighted: true,
       },
       30: {
+        text: '  default_outcome:',
+        highlighted: true,
+      },
+      31: {
+        text: '    dest: first',
+        highlighted: true,
+      },
+      32: {
         text: '    dest_if_really_stuck: null',
         highlighted: false,
       },
-      31: {
+      33: {
         text: '    feedback:',
         highlighted: false,
       },
-      32: {
+      34: {
         text: "      html: ''",
         highlighted: false,
       },
-      33: {
+      35: {
         text: '      content_id: default_outcome_1',
         highlighted: false,
       },
-      34: {
+      36: {
         text: '    labelled_as_correct: false',
         highlighted: false,
       },
-      35: {
+      37: {
         text: '    param_changes: []',
         highlighted: false,
       },
-      36: {
+      38: {
         text: '    refresher_exploration_id: null',
         highlighted: false,
       },
-      37: {
+      39: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false,
       },
-      38: {
+      40: {
         text: '  hints: []',
         highlighted: false,
       },
-      39: {
+      41: {
         text: '  id: NumericInput',
         highlighted: true,
       },
-      40: {
+      42: {
         text: '  solution: null',
         highlighted: false,
       },
-      41: {
+      43: {
         text: 'param_changes: []',
         highlighted: false,
       },
-      42: {
+      44: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      43: {
+      45: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      44: {
+      46: {
         text: 'inapplicable_skill_misconception_ids: []',
         highlighted: false,
       },
-      45: {
+      47: {
         text: '',
         highlighted: false,
       },
