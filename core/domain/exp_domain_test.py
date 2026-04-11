@@ -5723,7 +5723,11 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_convert_states_v57_dict_to_v58_dict(self) -> None:
-        states_dict: Dict[str, Dict[str, Any]] = {
+        # Here we use cast because this test only needs the subset of state
+        # fields read by the migration helper.
+        states_dict = cast(
+            Dict[str, state_domain.StateDict],
+            {
             'Intro': {
                 'interaction': {
                     'id': 'NumericInput',
@@ -5735,11 +5739,12 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
             'Text State': {
                 'interaction': {'id': 'TextInput', 'customization_args': {}}
             },
-        }
+        },
+        )
 
         converted_states_dict = (
-            exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(
-                cast(Dict[str, state_domain.StateDict], states_dict)
+            exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(  # pylint: disable=protected-access
+                states_dict
             )
         )
 

@@ -6098,7 +6098,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             yaml_content
         )
         exploration_dict = cls.migrate_state_schema(
-            cast(Dict[str, Any], versioned_exploration_dict)
+            dict(versioned_exploration_dict)
         )
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
