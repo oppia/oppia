@@ -130,6 +130,34 @@ class DraftUpgradeUtil:
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v56_dict_to_v58_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 56 to 58.
+
+        This conversion composes the v56->v57 and v57->v58 conversion
+        functions.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
+        """
+        draft_change_list = cls._convert_states_v56_dict_to_v57_dict(
+            draft_change_list
+        )
+        draft_change_list = cls._convert_states_v57_dict_to_v58_dict(
+            draft_change_list
+        )
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v57_dict_to_v58_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
