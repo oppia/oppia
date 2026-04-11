@@ -59,7 +59,8 @@
         "core.jobs.batch_jobs.dummy_jobs_test",
         "core.storage.cloud_task.gae_models_test",
         "core.domain.cloud_task_domain_test",
-        "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test"
+        "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
+        "core.jobs.batch_jobs.voiceover_synthesis_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -205,7 +206,8 @@
         "core.jobs.batch_jobs.question_migration_jobs_test",
         "core.jobs.batch_jobs.subtopic_migration_jobs_test",
         "core.jobs.batch_jobs.reject_invalid_suggestion_and_delete_invalid_translation_jobs_test",
-        "core.domain.voiceover_cloud_task_services_test"
+        "core.domain.voiceover_cloud_task_services_test",
+        "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
