@@ -20,10 +20,18 @@
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 
-var customizeInteraction = async function (elem, requireNonnegativeInput) {
+var customizeInteraction = async function (
+  elem,
+  requireNonnegativeInput,
+  allowExponentialNotation = true
+) {
+  var boolEditors = await elem.$$('<schema-based-bool-editor>');
   await objects
-    .BooleanEditor(elem.$('<schema-based-bool-editor>'))
+    .BooleanEditor(boolEditors[0])
     .setValue(requireNonnegativeInput);
+  await objects
+    .BooleanEditor(boolEditors[1])
+    .setValue(allowExponentialNotation);
 };
 
 var expectInteractionDetailsToMatch = async function (elem) {
@@ -43,21 +51,21 @@ var answerObjectType = 'Real';
 
 var testSuite = [
   {
-    interactionArguments: [false],
+    interactionArguments: [false, true],
     ruleArguments: ['IsWithinTolerance', 2, 143],
     expectedInteractionDetails: [],
     wrongAnswers: [146, 130],
     correctAnswers: [142],
   },
   {
-    interactionArguments: [true],
+    interactionArguments: [true, true],
     ruleArguments: ['IsLessThan', 143],
     expectedInteractionDetails: [true],
     wrongAnswers: [146, 152],
     correctAnswers: [142],
   },
   {
-    interactionArguments: [true],
+    interactionArguments: [true, true],
     ruleArguments: ['IsGreaterThan', 2],
     expectedInteractionDetails: [true],
     wrongAnswers: [0, 1],

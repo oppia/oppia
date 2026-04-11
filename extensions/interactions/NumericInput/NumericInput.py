@@ -50,6 +50,14 @@ class NumericInput(base.BaseInteraction):
             'description': ('Allow only input greater than or equal to zero.'),
             'schema': {'type': 'bool'},
             'default_value': False,
+        },
+        {
+            'name': 'allowExponentialNotation',
+            'description': (
+                'Allow exponential notation (e.g. "1.8e39") in learner input.'
+            ),
+            'schema': {'type': 'bool'},
+            'default_value': False,
         }
     ]
 

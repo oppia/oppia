@@ -244,10 +244,19 @@ export class NumericInputValidationService {
   // Returns 'undefined' when no error occurs.
   validateNumericString(
     value: string,
-    decimalSeparator: string
+    decimalSeparator: string,
+    requireNonnegativeInput: boolean = false,
+    allowExponentialNotation: boolean = true
   ): string | undefined {
     value = value.toString().trim();
-    const invalidChars = /[^0-9e.,-]/g;
+    let allowedCharsRegExpSet = '0-9.,';
+    if (allowExponentialNotation) {
+      allowedCharsRegExpSet += 'e';
+    }
+    if (!requireNonnegativeInput) {
+      allowedCharsRegExpSet += '\\-';
+    }
+    const invalidChars = new RegExp(`[^${allowedCharsRegExpSet}]`, 'g');
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
     const trailingMinus = /(^-)|(e-)/g;
@@ -255,6 +264,15 @@ export class NumericInputValidationService {
     const extraExponent = /e.*e/g;
 
     if (value.match(invalidChars)) {
+      if (requireNonnegativeInput && !allowExponentialNotation) {
+        return (
+          'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS'
+        );
+      } else if (requireNonnegativeInput && allowExponentialNotation) {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
+      } else if (!requireNonnegativeInput && !allowExponentialNotation) {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT';
+      }
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS';
     } else if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL';

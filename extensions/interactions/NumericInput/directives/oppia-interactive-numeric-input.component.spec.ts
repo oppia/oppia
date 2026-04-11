@@ -59,6 +59,9 @@ describe('InteractiveNumericInput', () => {
         requireNonnegativeInput: {
           value: false,
         },
+        allowExponentialNotation: {
+          value: false,
+        },
       };
     }
   }
@@ -114,6 +117,7 @@ describe('InteractiveNumericInput', () => {
     fixture = TestBed.createComponent(InteractiveNumericInput);
     component = fixture.componentInstance;
     component.requireNonnegativeInputWithValue = 'false';
+    component.allowExponentialNotationWithValue = 'false';
   });
 
   it('should initialise component when user adds interaction', () => {
@@ -128,10 +132,12 @@ describe('InteractiveNumericInput', () => {
     expect(component.answer).toBe('');
     expect(component.labelForFocusTarget).toBeUndefined();
     expect(component.requireNonnegativeInput).toEqual(false);
+    expect(component.allowExponentialNotation).toEqual(false);
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
       ui_config: {
         checkRequireNonnegativeInput: false,
+        checkAllowExponentialNotation: false,
       },
     });
     expect(component.errorMessageI18nKey).toBe('');
@@ -153,11 +159,14 @@ describe('InteractiveNumericInput', () => {
     expect(component.savedSolution).toBe(20);
     expect(component.labelForFocusTarget).toBe('label');
     expect(component.requireNonnegativeInput).toEqual(false);
+    expect(component.allowExponentialNotation).toEqual(false);
     expect(component.requireNonnegativeInputWithValue).toEqual('false');
+    expect(component.allowExponentialNotationWithValue).toEqual('false');
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
       ui_config: {
         checkRequireNonnegativeInput: false,
+        checkAllowExponentialNotation: false,
       },
     });
     expect(
@@ -179,6 +188,7 @@ describe('InteractiveNumericInput', () => {
       type: 'float',
       ui_config: {
         checkRequireNonnegativeInput: false,
+        checkAllowExponentialNotation: false,
       },
     });
   });

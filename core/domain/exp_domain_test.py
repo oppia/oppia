@@ -5722,6 +5722,41 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_convert_states_v57_dict_to_v58_dict(self) -> None:
+        states_dict = {
+            'Intro': {
+                'interaction': {
+                    'id': 'NumericInput',
+                    'customization_args': {
+                        'requireNonnegativeInput': {'value': False}
+                    },
+                }
+            },
+            'Text State': {
+                'interaction': {'id': 'TextInput', 'customization_args': {}}
+            },
+        }
+
+        converted_states_dict = (
+            exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(
+                states_dict
+            )
+        )
+
+        self.assertEqual(
+            converted_states_dict['Intro']['interaction']['customization_args'],
+            {
+                'requireNonnegativeInput': {'value': False},
+                'allowExponentialNotation': {'value': True},
+            },
+        )
+        self.assertEqual(
+            converted_states_dict['Text State']['interaction'][
+                'customization_args'
+            ],
+            {},
+        )
+
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""

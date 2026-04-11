@@ -399,9 +399,15 @@ export interface NumericInputCustomizationArgsBackendDict {
   requireNonnegativeInput: {
     value: boolean;
   };
+  allowExponentialNotation: {
+    value: boolean;
+  };
 }
 export interface NumericInputCustomizationArgs {
   requireNonnegativeInput: {
+    value: boolean;
+  };
+  allowExponentialNotation: {
     value: boolean;
   };
 }

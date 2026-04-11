@@ -114,24 +114,14 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "NumericInput",
-    "customization_arg_specs": [
-      {
-        "description": "Allow only input greater than or equal to zero.",
-        "name": "requireNonnegativeInput",
-        "schema": {
-          "type": "bool"
-        },
-        "default_value": false
+    "customization_arg_specs": [{
+      "description": "Allow only input greater than or equal to zero.",
+      "name": "requireNonnegativeInput",
+      "schema": {
+        "type": "bool"
       },
-      {
-        "description": "Allow exponential notation (e.g. \"1.8e39\") in learner input.",
-        "name": "allowExponentialNotation",
-        "schema": {
-          "type": "bool"
-        },
-        "default_value": false
-      }
-    ],
+     "default_value": false
+    }],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {

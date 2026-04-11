@@ -130,6 +130,25 @@ class DraftUpgradeUtil:
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v57_dict_to_v58_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 57 to 58. State
+        version 58 adds allowExponentialNotation customization_arg to
+        NumericInput interaction. As this is a new property and therefore
+        doesn't affect any pre-existing drafts, there should be
+        no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_html_in_draft_change_list(
         cls,
         draft_change_list: List[exp_domain.ExplorationChange],

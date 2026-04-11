@@ -5433,6 +5433,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v57_dict_to_v58_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from v57 to v58. Version 58 adds
+        allowExponentialNotation customization arg to NumericInput.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            Dict[str, state_domain.StateDict]. The converted v58 state
+            dictionary.
+        """
+        for _, state_dict in states_dict.items():
+            if state_dict['interaction']['id'] != 'NumericInput':
+                continue
+            customization_args = state_dict['interaction']['customization_args']
+            customization_args['allowExponentialNotation'] = {'value': True}
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -5899,7 +5923,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The dict representation of the Exploration domain object,
             following schema version v62.
         """
-        exploration_dict['schema_version'] = 61
+        exploration_dict['schema_version'] = 62
 
         exploration_dict['states'] = cls._convert_states_v56_dict_to_v57_dict(
             exploration_dict['states']
@@ -6071,6 +6095,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 CURRENT_EXP_SCHEMA_VERSION].
         """
         exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
+        exploration_dict = cls.migrate_state_schema(exploration_dict)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

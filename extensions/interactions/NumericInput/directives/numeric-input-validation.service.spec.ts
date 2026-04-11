@@ -64,6 +64,9 @@ describe('NumericInputValidationService', () => {
       requireNonnegativeInput: {
         value: true,
       },
+      allowExponentialNotation: {
+        value: true,
+      },
     };
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -533,6 +536,20 @@ describe('NumericInputValidationService', () => {
     );
     expect(validatorService.validateNumericString('12e12e', '.')).toEqual(
       'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT'
+    );
+  });
+
+  it('should generate errors for disallowed exponent and minus symbols', () => {
+    expect(
+      validatorService.validateNumericString('12e2', '.', false, false)
+    ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT');
+    expect(
+      validatorService.validateNumericString('-12', '.', true, true)
+    ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS');
+    expect(
+      validatorService.validateNumericString('-12e2', '.', true, false)
+    ).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS'
     );
   });
 

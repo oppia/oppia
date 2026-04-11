@@ -74,7 +74,10 @@ export class SchemaBasedFloatEditorComponent
   @Input() disabled!: boolean;
   @Input() validators!: OppiaValidator[];
   @Input() labelForFocusTarget!: string;
-  @Input() uiConfig!: {checkRequireNonnegativeInput: boolean};
+  @Input() uiConfig!: {
+    checkRequireNonnegativeInput: boolean;
+    checkAllowExponentialNotation: boolean;
+  };
   @ViewChild('floatform', {static: true}) floatForm!: NgForm;
   // If input is empty, the number value should be null.
   localValue!: number | null;
@@ -88,6 +91,7 @@ export class SchemaBasedFloatEditorComponent
   hasLoaded: boolean = false;
   onChange: (value: number | null) => void = () => {};
   checkRequireNonnegativeInputValue: boolean = false;
+  checkAllowExponentialNotationValue: boolean = false;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -120,7 +124,10 @@ export class SchemaBasedFloatEditorComponent
 
   private _validate(
     localValue: number | string,
-    customizationArg: {checkRequireNonnegativeInput: SchemaDefaultValue}
+    customizationArg: {
+      checkRequireNonnegativeInput: SchemaDefaultValue;
+      checkAllowExponentialNotation: SchemaDefaultValue;
+    }
   ): boolean {
     let {checkRequireNonnegativeInput} = customizationArg || {};
 
@@ -156,10 +163,15 @@ export class SchemaBasedFloatEditorComponent
     // To check checkRequireNonnegativeInput customization argument
     // value of numeric input interaction.
     let {checkRequireNonnegativeInput} = this.uiConfig || {};
+    let {checkAllowExponentialNotation} = this.uiConfig || {};
     this.checkRequireNonnegativeInputValue =
       checkRequireNonnegativeInput === undefined
         ? false
         : checkRequireNonnegativeInput;
+    this.checkAllowExponentialNotationValue =
+      checkAllowExponentialNotation === undefined
+        ? false
+        : checkAllowExponentialNotation;
     // If customization argument of numeric input interaction is true,
     // set Min value as 0 to not let down key go below 0.
     if (checkRequireNonnegativeInput) {
@@ -252,7 +264,9 @@ export class SchemaBasedFloatEditorComponent
 
       let error = this.numericInputValidationService.validateNumericString(
         formattedStringValue,
-        currentDecimalSeparator
+        currentDecimalSeparator,
+        this.checkRequireNonnegativeInputValue,
+        this.checkAllowExponentialNotationValue
       );
       if (error !== undefined) {
         this.localValue = null;
