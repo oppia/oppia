@@ -2727,14 +2727,23 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-        return {
-            spec['name']: (
+        customization_args: Dict[str, InteractionCustomizationArg] = {}
+        for spec in ca_specs_dict:
+            customization_arg_dict = ca_dict.get(spec['name'])
+            if customization_arg_dict is None:
+                # Older state dicts may not include newly-added customization
+                # args. In those cases, we backfill from spec defaults.
+                customization_arg_dict = {
+                    'value': copy.deepcopy(spec['default_value'])
+                }
+
+            customization_args[spec['name']] = (
                 InteractionCustomizationArg.from_customization_arg_dict(
-                    ca_dict[spec['name']], spec['schema']
+                    customization_arg_dict, spec['schema']
                 )
             )
-            for spec in ca_specs_dict
-        }
+
+        return customization_args
 
 
 class OutcomeDict(TypedDict):

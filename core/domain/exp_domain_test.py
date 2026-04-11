@@ -7408,6 +7408,8 @@ states:
       customization_args:
         requireNonnegativeInput:
           value: False
+        allowExponentialNotation:
+          value: True
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -7555,6 +7557,8 @@ states:
       customization_args:
         requireNonnegativeInput:
           value: False
+        allowExponentialNotation:
+          value: True
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -7703,6 +7707,8 @@ states:
       customization_args:
         requireNonnegativeInput:
           value: False
+        allowExponentialNotation:
+          value: True
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -7794,7 +7800,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 """
@@ -8019,7 +8025,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 version: 0
@@ -8270,7 +8276,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 version: 0
@@ -8441,7 +8447,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: Title
 version: 0
@@ -8610,6 +8616,8 @@ states:
       customization_args:
         requireNonnegativeInput:
           value: false
+        allowExponentialNotation:
+          value: true
       default_outcome:
         dest: end
         dest_if_really_stuck: null
@@ -8646,7 +8654,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -8926,7 +8934,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -9129,7 +9137,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -9302,7 +9310,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -9718,6 +9726,8 @@ states:
       customization_args:
         requireNonnegativeInput:
           value: false
+        allowExponentialNotation:
+          value: true
       default_outcome:
         dest: end
         dest_if_really_stuck: null
@@ -9762,7 +9772,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -10180,7 +10190,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -10413,7 +10423,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -10711,7 +10721,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -11029,7 +11039,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -11341,7 +11351,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -11591,7 +11601,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -11808,7 +11818,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -12167,7 +12177,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -12439,7 +12449,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -12706,7 +12716,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -13171,7 +13181,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
@@ -13386,7 +13396,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 57
+states_schema_version: 58
 tags: []
 title: ''
 version: 0
