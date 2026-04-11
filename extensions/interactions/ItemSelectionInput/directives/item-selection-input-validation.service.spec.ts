@@ -213,9 +213,45 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
-  it('should expect minimum and maximum allowed selections to be non-negative', () => {
+  it('should expect minimum allowed selections to be non-negative', () => {
     customizationArguments.minAllowableSelectionCount.value = -1;
+    customizationArguments.maxAllowableSelectionCount.value = 2;
+
+    let warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toContain(
+      jasmine.objectContaining({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The minimum/maximum number of selections cannot be negative.',
+      })
+    );
+  });
+
+  it('should expect maximum allowed selections to be non-negative', () => {
+    customizationArguments.minAllowableSelectionCount.value = 2;
     customizationArguments.maxAllowableSelectionCount.value = -1;
+
+    let warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toContain(
+      jasmine.objectContaining({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The minimum/maximum number of selections cannot be negative.',
+      })
+    );
+  });
+
+  it('should expect both minimum and maximum allowed selections to be non-negative', () => {
+    customizationArguments.minAllowableSelectionCount.value = -5;
+    customizationArguments.maxAllowableSelectionCount.value = -2;
 
     let warnings = validatorService.getAllWarnings(
       currentState,
