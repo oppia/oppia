@@ -58,12 +58,10 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
                 role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES,
                 role_services.ACTION_DELETE_ANY_QUESTION,
                 role_services.ACTION_EDIT_ANY_QUESTION,
-                role_services.ACTION_EDIT_ANY_SKILL,
                 role_services.ACTION_MANAGE_QUESTION_RIGHTS,
                 role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE,
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE,
                 role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS,
-                role_services.ACTION_EDIT_SKILL,
             ],
         )
 
