@@ -5723,7 +5723,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_convert_states_v57_dict_to_v58_dict(self) -> None:
-        states_dict = {
+        states_dict: Dict[str, Dict[str, Any]] = {
             'Intro': {
                 'interaction': {
                     'id': 'NumericInput',
@@ -5739,7 +5739,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 
         converted_states_dict = (
             exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(
-                states_dict
+                cast(Dict[str, state_domain.StateDict], states_dict)
             )
         )
 

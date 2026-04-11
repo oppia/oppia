@@ -6094,8 +6094,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 CURRENT_EXP_SCHEMA_VERSION].
         """
-        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
-        exploration_dict = cls.migrate_state_schema(exploration_dict)
+        versioned_exploration_dict = cls._migrate_to_latest_yaml_version(
+            yaml_content
+        )
+        exploration_dict = cls.migrate_state_schema(
+            cast(Dict[str, Any], versioned_exploration_dict)
+        )
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 
