@@ -4732,6 +4732,11 @@ class State(translation_domain.BaseTranslatableObject):
             ]
             for spec in ca_specs_dict:
                 if spec['name'] != 'catchMisspellings':
+                    if spec['name'] not in customisation_args:
+                        # Some older states may not contain newly-added
+                        # customization args. Skip missing args during
+                        # traversal to avoid migration failures.
+                        continue
                     customisation_arg = customisation_args[spec['name']]
                     contents = (
                         InteractionCustomizationArg.traverse_by_schema_and_get(
