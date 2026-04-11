@@ -248,6 +248,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         // The earliest parent tag that contains texts that should be voiceovered.
         let textContent = '';
         let nodeTemp = node.cloneNode();
+
+        // Both <P> and <LI> elements are supported for voiceover highlighting.
+        // However, if an <LI> contains a <P> as a child, only the <P> should be
+        // wrapped in a <span>, not the <LI>. Wrapping both elements causes the
+        // text inside the <LI> to be duplicated during highlighting, leading to
+        // incorrect behavior. Therefore, in such cases, we specifically wrap only
+        // the <P> element.
         if (currentNodeName === 'LI') {
           const meaningfulChildren = Array.from(node.childNodes).filter(
             child =>
@@ -267,15 +274,17 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
-        let costomNodeAsChildInParentNode = false;
+        // If a parent node contains a custom Oppia tag as a child, sentence
+        // highlighting should be applied to the entire content of the parent
+        // node, rather than splitting it into individual sentences.
+        let customNodeAsChildInParentNode = false;
         for (let tempChildNode of updatedChildNodes) {
           if (this.customOppiaTags.includes(tempChildNode.nodeName)) {
-            costomNodeAsChildInParentNode = true;
+            customNodeAsChildInParentNode = true;
             break;
           }
         }
-
-        if (costomNodeAsChildInParentNode) {
+        if (customNodeAsChildInParentNode) {
           let nodeTemp = node.cloneNode();
           let spanTagElement = document.createElement('span');
           updatedChildNodes.forEach(child => spanTagElement.appendChild(child));
