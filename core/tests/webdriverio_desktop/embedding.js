@@ -170,7 +170,7 @@ describe('Embedding', function () {
       await waitFor.pageToFullyLoad();
       // Wait for the interaction component to be present before interacting.
       await waitFor.presenceOf(
-        await $('oppia-interactive-numeric-input'),
+        await $('.e2e-test-float-form-input'),
         'Numeric input component took too long to appear.'
       );
       await explorationPlayerPage.expectContentToMatch(
