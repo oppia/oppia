@@ -2733,9 +2733,12 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             if customization_arg_dict is None:
                 # Older state dicts may not include newly-added customization
                 # args. In those cases, we backfill from spec defaults.
-                customization_arg_dict = {
-                    'value': copy.deepcopy(spec['default_value'])
-                }
+                # Here we use cast because customization arg specs can contain
+                # broader default value types than CustomizationArgsDictType.
+                customization_arg_dict = cast(
+                    Dict[str, UnionOfCustomizationArgsDictValues],
+                    {'value': copy.deepcopy(spec['default_value'])},
+                )
 
             customization_args[spec['name']] = (
                 InteractionCustomizationArg.from_customization_arg_dict(
